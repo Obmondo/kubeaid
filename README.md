@@ -2,11 +2,17 @@ Install argo-cd:
 ```
 helm install -n argocd argo-cd init/charts/argo-cd
 
+## for access to github repos
+
 ```
 Add secret with a username and a password (a personal-access-token) that is valid and has access to that repo.
 ```
 kubectl create secret generic argo-cd-blackwoodseven-github --from-literal=username=KlavsKlavsen --from-literal=password='234dfaf23rf2323232323232323xxxxxxxxxxxxx'
 ```
+
+## for access to SSH git repos
+
+load configmap for ssh known hosts 
 
 init contains argo-cd-root-app - which is installed using:
 ```
