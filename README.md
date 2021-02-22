@@ -27,7 +27,7 @@ and make sure repositories in chart values.yaml matches above secretname.
 ## install root argocd application - that manages the rest
 init contains argo-cd-root-app - which is installed using:
 ```
-helm template argo-cd-helm-apps/8s-nuc8 --show-only templates/root.yaml | kubectl apply -f -
+helm template argo-cd-helm-apps/k8s-nuc8 --show-only templates/root.yaml | kubectl apply -f -
 ```
 
 And its Chart.yaml points to this repo argo-cd-helm-apps - so once Root app is installed - it'll pick up the apps in there and start setting them up.
