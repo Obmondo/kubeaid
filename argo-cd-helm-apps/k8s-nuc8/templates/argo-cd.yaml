@@ -8,11 +8,11 @@ metadata:
 spec:
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: argocd
   project: default
   source:
     path: argo-cd-helm-apps/charts/argo-cd
-    repoURL: https://github.com/blackwoodseven/k8s-init.git
+    repoURL: ssh://git@gitlab.enableit.dk:2223/kubernetes/argocd-apps.git
     targetRevision: HEAD
     helm:
       valueFiles:
