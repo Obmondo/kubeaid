@@ -6,6 +6,11 @@ argo-cd:
 #find latest tag here: https://github.com/argoproj/argo-helm/blob/master/charts/argo-cd/Chart.yaml (AppVersion)
   dex:
     enabled: false
+  configs: 
+    knownHosts:
+      data:
+        ssh_known_hosts: |
+          [gitlab.enableit.dk]:2223 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBCayvWW9xSo/3nhXgu6A+O58aqTP/io/OD0jdU2UFM0XbC+yOK+0srE2847x7TzNpKMzHkWaCetXbGZak++KtFQ=
   server:
     extraArgs:
       - --insecure

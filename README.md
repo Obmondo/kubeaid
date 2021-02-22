@@ -12,13 +12,6 @@ kubectl create secret generic argo-cd-blackwoodseven-github --from-literal=usern
 
 ## for access to SSH git repos
 
-load configmap for ssh known hosts from init folder (correct it to have correct host if not gitlab.enableit.dk)
-```
-kubectl apply -f init/argocd-ssh-known-hosts-cm.yaml
-```
-
-TODO: fix so above is set via argo-cd values instead ?
-
 Setup gitlab user and generate SSH keyset (and add public part to that gitlab user).
 Grant that user ONLY developer access to the projects it needs. Make sure those have master branch and tags protected in config.
 
