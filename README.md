@@ -1,6 +1,6 @@
 # Install argo-cd:
 ```
-helm install -n argocd argo-cd init/charts/argo-cd
+helm install -n argocd argo-cd argo-cd-helm-apps/charts/argo-cd --values argo-cd-helm-apps/charts/argo-cd/values.yaml
 ```
 ## for access to github repos
 
