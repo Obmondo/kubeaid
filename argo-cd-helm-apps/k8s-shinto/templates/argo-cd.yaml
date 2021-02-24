@@ -17,6 +17,7 @@ spec:
     helm:
       valueFiles:
       - values.yaml
+      - ../values-argo-cd.yaml
   syncPolicy:
     automated:
       prune: true

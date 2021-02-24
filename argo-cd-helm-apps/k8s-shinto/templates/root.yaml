@@ -12,7 +12,7 @@ spec:
   source:
     path: argo-cd-helm-apps/k8s-shinto/
     repoURL: ssh://git@gitlab.enableit.dk:2223/kubernetes/argocd-apps.git
-    targetRevision: add-k8s-shinto
+    targetRevision: k8s-shinto
   syncPolicy:
     automated:
       prune: true

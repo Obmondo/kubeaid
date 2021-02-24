@@ -49,3 +49,6 @@ Now we can remove helm management of argo-cd - as argo-cd manages itself (as arg
 ```
 kubectl delete secret -l owner=helm,name=argo-cd
 ```
+
+## Debugging
+Please refer: [Wiki for kubernetes](https://gitlab.enableit.dk/obmondo/wiki/-/tree/master/internal/kubernetes)
