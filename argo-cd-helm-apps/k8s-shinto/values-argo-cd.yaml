@@ -1,0 +1,6 @@
+---
+argo-cd:
+  dex:
+    enabled: false
+  server:
+    config:
