@@ -1,23 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argo-cd
+  name: kube-prometheus-stack
   namespace: argocd
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: monitoring
   project: default
   source:
-    path: argo-cd-helm-apps/charts/argo-cd
+    path: argo-cd-helm-apps/charts/kube-prometheus-stack
     repoURL: ssh://git@gitlab.enableit.dk:2223/kubernetes/argocd-apps.git
     targetRevision: k8s-nuc8
     helm:
       valueFiles:
       - values.yaml
-      - ../../k8s-nuc8/values-argo-cd.yaml
   syncPolicy:
     automated:
       prune: true

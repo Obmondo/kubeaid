@@ -23,6 +23,9 @@ argo-cd:
           name: argo-cd
           url: https://argoproj.github.io/argo-helm
         - type: helm
+          name: prometheus-community
+          url: https://prometheus-community.github.io/helm-charts
+        - type: helm
           name: sealed-secrets
           url: https://bitnami-labs.github.io/sealed-secrets
         - type: git
