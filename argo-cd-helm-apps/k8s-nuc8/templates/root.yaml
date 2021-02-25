@@ -13,7 +13,7 @@ spec:
   source:
     path: argo-cd-helm-apps/k8s-nuc8/
     repoURL: ssh://git@gitlab.enableit.dk:2223/kubernetes/argocd-apps.git
-    targetRevision: k8s-nuc8
+    targetRevision: HEAD
   syncPolicy:
     automated:
       prune: true
