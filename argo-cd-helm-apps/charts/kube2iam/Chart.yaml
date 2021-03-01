@@ -1,0 +1,7 @@
+apiVersion: v2
+name: kube2iam
+version: 1.0.0
+dependencies:
+  - name: kube2iam
+    version: 2.6.0
+    repository: https://jtblin.github.io/kube2iam/

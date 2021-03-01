@@ -1,0 +1,13 @@
+kube2iam:
+  host:
+    interface: weave
+    iptables: true
+  rbac:
+    create: true
+  podAnnotations:
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+  tolerations:
+  - effect: NoSchedule
+    operator: Exists
+  - effect: NoExecute
+    operator: Exists  
