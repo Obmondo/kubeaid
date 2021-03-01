@@ -1,0 +1,53 @@
+apiVersion: kops.k8s.io/v1alpha2
+kind: Cluster
+metadata:
+  name: k8s.ops.blackwoodseven.com
+spec:
+  api:
+    loadBalancer:
+      idleTimeoutSeconds: 3600
+      sslCertificate: arn:aws:acm:eu-west-1:438423213058:certificate/235deb95-7af7-4ae7-aba8-b93eaeeb65848
+      type: Internal
+  authorization:
+    rbac: {}
+  channel: stable
+  cloudLabels:
+    Cost Center: team-site-reliability
+    Maintaining Team: team-site-reliability
+    Purpose: Common Services for bw7
+  cloudProvider: aws
+  configBase: s3://kops.blackwoodseven.com/k8s.ops.blackwoodseven.com
+  etcdClusters:
+  - etcdMembers:
+    - instanceGroup: master-eu-west-1b
+      name: b
+    name: main
+  - etcdMembers:
+    - instanceGroup: master-eu-west-1b
+      name: b
+    name: events
+  iam:
+    allowContainerRegistry: true
+    legacy: false
+  kubeDNS:
+    provider: CoreDNS
+  kubelet:
+    anonymousAuth: false
+    authenticationTokenWebhook: true
+    authorizationMode: Webhook
+  kubernetesApiAccess:
+  - 10.0.0.0/8
+  kubernetesVersion: 1.18.16
+  masterInternalName: api.internal.k8s.ops.blackwoodseven.com
+  masterPublicName: api.k8s.ops.blackwoodseven.com
+  networking:
+    weave:
+      mtu: 8912
+  sshAccess:
+  - 10.0.0.0/8
+  subnets:
+  topology:
+    dns:
+      type: Public
+    masters: private
+    nodes: private

@@ -1,0 +1,12 @@
+apiVersion: storage.k8s.io/v1     
+kind: StorageClass    
+metadata: 
+  labels: 
+    k8s-addon: storage-aws.addons.k8s.io
+  name: default 
+parameters:     
+  type: gp2     
+provisioner: kubernetes.io/aws-ebs
+reclaimPolicy: Delete 
+allowVolumeExpansion: true
+volumeBindingMode: Immediate

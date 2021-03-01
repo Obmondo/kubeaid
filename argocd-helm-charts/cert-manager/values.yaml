@@ -1,0 +1,6 @@
+cert-manager:
+  podAnnotations:
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+  installCRDs: true
+  clusterResourceNamespace: cert-manager
+

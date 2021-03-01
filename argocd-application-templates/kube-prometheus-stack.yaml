@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  project: default
+  source:
+    path: argocd-helm-charts/kube-prometheus-stack
+    repoURL: https://github.com/blackwoodseven/k8s-init.git
+    targetRevision: HEAD
+    helm:
+      valueFiles:
+      - values.yaml
+      - ../../argocd-clusters-managed/k8s.ops.blackwoodseven.com/values-kube-prometheus-stack.yaml
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true

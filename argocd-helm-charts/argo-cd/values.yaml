@@ -1,0 +1,53 @@
+argo-cd:
+  installCRDs: false
+  global:
+    image:
+      tag: v1.8.4
+#find latest tag here: https://github.com/argoproj/argo-helm/blob/master/charts/argo-cd/Chart.yaml (AppVersion)
+  dex:
+    enabled: false
+  server:
+    extraArgs:
+      - --insecure
+    config:
+      repositories: |
+        - type: helm
+          name: stable
+          url: https://charts.helm.sh/stable
+        - type: helm
+          name: argo-cd
+          url: https://argoproj.github.io/argo-helm
+        - type: helm
+          name: sealed-secrets
+          url: https://bitnami-labs.github.io/sealed-secrets
+        - type: helm
+          name: kube2iam
+          url: https://jtblin.github.io/kube2iam/
+        - type: helm
+          name: bitnami
+          url: https://charts.bitnami.com/bitnami
+        - type: helm
+          name: traefik
+          url: https://helm.traefik.io/traefik
+        - type: helm
+          name: jetstack
+          url: https://charts.jetstack.io
+        - type: helm
+          name: prometheus-community
+          url: https://prometheus-community.github.io/helm-charts
+        - type: git
+          url: https://github.com/blackwoodseven/k8s-init.git
+          passwordSecret:
+            name: argo-cd-blackwoodseven-github
+            key: password
+          usernameSecret:
+            name: argo-cd-blackwoodseven-github
+            key: username
+        - type: git
+          url: https://github.com/blackwoodseven/k8s-sealedsecrets-sre.git
+          passwordSecret:
+            name: argo-cd-blackwoodseven-github
+            key: password
+          usernameSecret:
+            name: argo-cd-blackwoodseven-github
+            key: username

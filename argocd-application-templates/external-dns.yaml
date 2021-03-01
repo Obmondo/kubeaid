@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: external-dns
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: aws
+  project: default
+  source:
+    path: argocd-helm-charts/external-dns
+    repoURL: https://github.com/blackwoodseven/k8s-init.git
+    targetRevision: HEAD
+    helm:
+      valueFiles:
+      - values.yaml
+      - ../../argocd-clusters-managed/k8s.ops.blackwoodseven.com/values-external-dns.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+
