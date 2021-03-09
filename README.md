@@ -1,7 +1,7 @@
 # Repository structure
 
 |argocd-clusters-managed | Primary folder - containing applications and configs for each managed cluster, which MAY make use of common resources, such as argocd-helm-charts and argocd-k8s-config. Each clusterfolder is actually a Helm chart - hence applications are put as yaml in ```templates``` folder. |
-| --- | --- | --- |
+| --- | --- |
 |argocd-helm-charts | Contains ArgoCD helm charts, that points to the actual helm charts (as a dependency listed in Charts.yaml) - and with the default values we want. Each cluster can add override/extra values by listing an extra valuesfile in their argocd-clusters-managed/$clustername folder. |
 |argocd-k8sconfig | Kubernetes config objects. Used by all in ```common``` and per-cluster in their indidivual $clustername folder. |
 |argocd-application-templates | collection of applications, to be optionally modified and copied into ```argocd-clusters-managed/$clustername/templates``` to be installed on that cluster. |
