@@ -1,0 +1,7 @@
+apiVersion: v2
+name: traefik-forward-auth
+version: 1.0.0
+dependencies:
+  - name: traefik-forward-auth
+    version: 1.0.5
+    repository: https://k8s-at-home.com/charts/

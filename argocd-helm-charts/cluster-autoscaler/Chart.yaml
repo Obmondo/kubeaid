@@ -1,0 +1,7 @@
+apiVersion: v2
+name: cluster-autoscaler
+version: 1.0.0
+dependencies:
+  - name: cluster-autoscaler
+    version: 9.4.0
+    repository: https://kubernetes.github.io/autoscaler

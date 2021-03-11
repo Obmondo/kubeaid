@@ -1,12 +1,14 @@
 traefik:
   podDisruptionBudget:
    enabled: true
+   maxUnavailable: 1
   logs:
     access:
       enabled: true
   providers:
     kubernetesIngress:
-      enabled: true
+      publishedService:
+        enabled: true
   ports:
     websecure:
       tls:
@@ -14,8 +16,7 @@ traefik:
     web:
       redirectTo: websecure
   deployment:
-    annotations:
-      cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    replicas: 2
   service:
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-type: "nlb"

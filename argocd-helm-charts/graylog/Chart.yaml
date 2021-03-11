@@ -1,0 +1,7 @@
+apiVersion: v2
+name: graylog
+version: 1.0.0
+dependencies:
+  - name: graylog
+    version: 1.7.8
+    repository: https://charts.kong-z.com
