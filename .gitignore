@@ -1,1 +1,3 @@
 .python-version
+*.swp
+*.tgz
