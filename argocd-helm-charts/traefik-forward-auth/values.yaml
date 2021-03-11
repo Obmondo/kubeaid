@@ -1,0 +1,22 @@
+traefik-forward-auth:
+  env:
+  - name: PROVIDERS_GOOGLE_CLIENT_ID
+    valueFrom:
+      secretKeyRef:
+        key: clientId
+        name: traefik-forward-auth-google
+  - name: PROVIDERS_GOOGLE_CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        key: clientSecret
+        name: traefik-forward-auth-google
+  ingress:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+    enabled: true
+  middleware:
+    enabled: true
+  providers:
+    google:
+      enabled: true
+  replicaCount: 2

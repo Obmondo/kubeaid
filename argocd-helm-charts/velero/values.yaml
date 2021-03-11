@@ -1,0 +1,30 @@
+velero:
+  configuration:
+    backupStorageLocation:
+      bucket: bw7-velero-ops
+      config:
+        region: "eu-west-1"
+    provider: aws
+    volumeSnapshotLocation:
+      name: default
+      config:
+        region: "eu-west-1"
+    logLevel: debug
+  credentials:
+    userSecret: false
+  podAnnotations:
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    iam.amazonaws.com/role: arn:aws:iam::438423213058:role/velero
+  initContainers:
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws:v1.1.0
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - mountPath: /target
+      name: plugins
+  tolerations:
+  - key: node-role.kubernetes.io/master
+    operator: Exists
+    effect: NoSchedule
+  nodeSelector:
+    kubernetes.io/role: master
