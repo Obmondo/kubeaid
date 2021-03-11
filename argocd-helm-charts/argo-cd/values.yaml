@@ -35,19 +35,11 @@ argo-cd:
         - type: helm
           name: prometheus-community
           url: https://prometheus-community.github.io/helm-charts
-        - type: git
-          url: https://github.com/blackwoodseven/k8s-init.git
-          passwordSecret:
-            name: argo-cd-blackwoodseven-github
-            key: password
-          usernameSecret:
-            name: argo-cd-blackwoodseven-github
-            key: username
-        - type: git
-          url: https://github.com/blackwoodseven/k8s-sealedsecrets-sre.git
-          passwordSecret:
-            name: argo-cd-blackwoodseven-github
-            key: password
-          usernameSecret:
-            name: argo-cd-blackwoodseven-github
-            key: username
+#        - type: git
+#          url: https://github.com/someuser/k8s-repo.git
+#          passwordSecret:
+#            name: argo-cd-someuser-github
+#            key: password
+#          usernameSecret:
+#            name: argo-cd-someuser-github
+#            key: username
