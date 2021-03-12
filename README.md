@@ -75,6 +75,14 @@ Now we can remove helm management of argo-cd - as argo-cd manages itself (as arg
 kubectl delete secret -l owner=helm,name=argo-cd
 ```
 
+# Secrets handling
+
+IF a helm chart creates a secret - ArgoCD will expect it to remain unchanged (otherwise complain application is out-of-sync). 
+IF this happens - it means you have a secret thats changed via the application (typicly user login password) - and we NEED backup of these.
+To resolve out-of-sync complaint in ArgoCD - AND backup/recovery do this:
+1. let helm chart create secret and application generate it - so you get out-of-sync complaint from ArgoCD.
+2. dump secret in json format, remove unnecessary metadata/helm labels and encode into cluster secrets repo and delete the secret from k8s (before pushing to secrets repo).
+3. update values for chart as to NOT generate secret. Typicly setting is called something like useExistingSecret: $name-of-secret
 ## Debugging
 * you might see pods getting evicted, mostly likely disk is used around 70% or you have less disk size (> 5GB).
   to fix it increase the disk size
