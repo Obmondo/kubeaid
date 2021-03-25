@@ -54,6 +54,12 @@ argo-cd:
           url: https://helm.elastic.co
           name: kongz
           url: https://charts.kong-z.com
+        - type: helm
+          name: rook-ceph
+          url: https://charts.rook.io/release
+
+
+# Examples for adding git repo
 #        - type: git
 #          url: https://github.com/someuser/k8s-repo.git
 #          passwordSecret:
