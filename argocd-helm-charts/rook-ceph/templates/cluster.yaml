@@ -50,15 +50,11 @@ spec:
     # Mons should only be allowed on the same node for test environments where data loss is acceptable.
     allowMultiplePerNode: false
   mgr:
-    # When higher availability of the mgr is needed, increase the count to 2.
-    # In that case, one mgr will be active and one in standby. When Ceph updates which
-    # mgr is active, Rook will update the mgr services to match the active mgr.
-    count: 1
     modules:
-      # Several modules should not need to be included in this list. The "dashboard" and "monitoring" modules
-      # are already enabled by other settings in the cluster CR.
-      - name: pg_autoscaler
-        enabled: true
+    # Several modules should not need to be included in this list. The "dashboard" and "monitoring" modules
+    # are already enabled by other settings in the cluster CR.
+    - name: pg_autoscaler
+      enabled: true
   # enable the ceph dashboard for viewing cluster status
   dashboard:
     enabled: true
@@ -98,9 +94,6 @@ spec:
   # enable the crash collector for ceph daemon crash collection
   crashCollector:
     disable: false
-    # Uncomment daysToRetain to prune ceph crash entries older than the
-    # specified number of days.
-    #daysToRetain: 30
   # enable log collector, daemons will log on files and rotate
   # logCollector:
   #   enabled: true
@@ -181,11 +174,10 @@ spec:
 #      requests:
 #        cpu: "500m"
 #        memory: "1024Mi"
-# The above example requests/limits can also be added to the other components
+# The above example requests/limits can also be added to the mon and osd components
 #    mon:
 #    osd:
 #    prepareosd:
-#    mgr-sidecar:
 #    crashcollector:
 #    logcollector:
 #    cleanup:
@@ -218,6 +210,7 @@ spec:
 #          osdsPerDevice: "5"
 #      - name: "/dev/disk/by-id/ata-ST4000DM004-XXXX" # devices can be specified using full udev paths
 #      config: # configuration can be specified at the node level which overrides the cluster level config
+#        storeType: filestore
 #    - name: "172.17.4.301"
 #      deviceFilter: "^sd."
   # The section for configuring management of daemon disruptions during upgrade or fencing.
@@ -225,7 +218,7 @@ spec:
     # If true, the operator will create and manage PodDisruptionBudgets for OSD, Mon, RGW, and MDS daemons. OSD PDBs are managed dynamically
     # via the strategy outlined in the [design](https://github.com/rook/rook/blob/master/design/ceph/ceph-managed-disruptionbudgets.md). The operator will
     # block eviction of OSDs by default and unblock them safely when drains are detected.
-    managePodBudgets: true
+    managePodBudgets: false
     # A duration in minutes that determines how long an entire failureDomain like `region/zone/host` will be held in `noout` (in addition to the
     # default DOWN/OUT interval) when it is draining. This is only relevant when  `managePodBudgets` is `true`. The default value is `30` minutes.
     osdMaintenanceTimeout: 30
