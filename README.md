@@ -95,95 +95,16 @@ To resolve out-of-sync complaint in ArgoCD - AND backup/recovery do this:
   ```
 * Please refer: [Wiki for kubernetes](https://gitlab.enableit.dk/obmondo/wiki/-/tree/master/internal/kubernetes)
 
+# Testing applications - before doing a PR / MR
 
-### Install
+## Test helm values genereate the yaml you want
+1. run ```helm dep up argocd-helm-charts/<nameofchart>```
+2. run ```helm template argocd-helm-charts/<nameofchart> --values argocd-clusters-managed/<targetcluster>/values-<nameofchart>.yaml >/tmp/before.yaml```
+3. READ yaml and see if you like it.. adjust values to your liking and run 2. again - saving to ```/tmp/after.yaml```
+4. run: ```diff -bduNr /tmp/before.yaml /tmp/after.yaml``` - verify the changes your value update should have caused - did actually happen
 
-*  helm
-```
-curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-
-chmod 700 get_helm.sh
-
-./get_helm.sh
-Downloading https://get.helm.sh/helm-v3.5.2-linux-amd64.tar.gz
-Verifying checksum... Done.
-Preparing to install helm into /usr/local/bin
-helm installed into /usr/local/bin/helm
-```
-
-* k9s
-```
-wget https://github.com/derailed/k9s/releases/download/v0.24.2/k9s_Linux_x86_64.tar.gz
-
-tar -xvf k9s_Linux_x86_64.tar.gz
-LICENSE
-README.md
-k9s
-
-sudo mv k9s /usr/local/bin/
-```
-
-#### Notes
-
-* How to get rid of evicted pods
-  ```
-  kubectl get pods -n <namespace> | grep Evicted | awk '{print $1}' | xargs kubectl delete pod -n <namespace>
-  ```
-
-* How to move the /var/lib/docker into different partition
-  1. STOP docker
-  ```
-  # systemctl stop docker
-  ```
-  2. Copy the content to `/mnt`
-  ```
-  # cp -a /var/lib/docker/* /mnt/
-  ```
-  3, Move the existing docker to docker.bad
-  ```
-  # mv /var/lib/docker /var/lib/docker.bad
-  ```
-  4. Create new directory and give correct perms
-  ```
-  # mkdir /var/lib/docker
-  # chmod 711 /var/lib/docker
-  ```
-  5. Mount the new partition
-  ```
-  # mount /dev/md2 /var/lib/docker
-  # ll /var/lib/docker
-  total 20
-  drwxr-xr-x 14 root root  182 Mar  9 13:37 ./
-  drwxr-xr-x 39 root root 4096 Mar  9 13:40 ../
-  drwx------  2 root root   24 Feb 26 02:50 builder/
-  drwx--x--x  4 root root   92 Feb 26 02:50 buildkit/
-  drwx-----x 18 root root 4096 Mar  9 13:04 containers/
-  drwx------  3 root root   22 Feb 26 02:50 image/
-  drwxr-x---  3 root root   19 Feb 26 02:50 network/
-  drwx-----x 83 root root 8192 Mar  9 13:04 overlay2/
-  drwx------  4 root root   32 Feb 26 02:50 plugins/
-  drwx------  2 root root    6 Feb 26 02:50 runtimes/
-  drwx------  2 root root    6 Feb 26 02:50 swarm/
-  drwx------  2 root root    6 Mar  9 13:04 tmp/
-  drwx------  2 root root    6 Feb 26 02:50 trust/
-  drwx-----x  2 root root   25 Mar  9 12:56 volumes/
-  ```
-  6. Start the docker
-  ```
-  # systemctl start docker
-  ```
-  7. check docker containers status
-  ```
-  # docker ps
-  CONTAINER ID   IMAGE                  COMMAND                  CREATED         STATUS         PORTS     NAMES
-  d369e1e6dd84   ca9843d3b545           "kube-apiserver --ad…"   3 seconds ago   Up 2 seconds             k8s_kube-apiserver_kube-apiserver-htzsb45fsn1b.enableit.dk_kube-system_71d65010c0f7d404111b770c5dae14e1_9
-  1324266a81ba   10cc881966cf           "/usr/local/bin/kube…"   3 seconds ago   Up 1 second              k8s_kube-proxy_kube-proxy-qqzhb_kube-system_634bc852-7f14-4c88-ae8d-a327154df765_1
-  e661c3efc006   727de170e4ce           "/opt/cni/bin/calico…"   3 seconds ago   Up 2 seconds             k8s_upgrade-ipam_calico-node-t4j5f_kube-system_dbf46441-2f50-49c7-8559-38354d8143b6_1
-  9a26da60d255   b9fa1895dcaa           "kube-controller-man…"   3 seconds ago   Up 2 seconds             k8s_kube-controller-manager_kube-controller-manager-htzsb45fsn1b.enableit.dk_kube-system_037456d6c73313a25d5009a0db8afcf7_3
-  0b86e0d1e44f   3138b6e3d471           "kube-scheduler --au…"   3 seconds ago   Up 2 seconds             k8s_kube-scheduler_kube-scheduler-htzsb45fsn1b.enableit.dk_kube-system_81d2d21449d64d5e6d5e9069a7ca99ed_2
-  785432ed2d06   k8s.gcr.io/pause:3.2   "/pause"                 6 seconds ago   Up 3 seconds             k8s_POD_calico-node-t4j5f_kube-system_dbf46441-2f50-49c7-8559-38354d8143b6_1
-  db8a25a8a464   k8s.gcr.io/pause:3.2   "/pause"                 7 seconds ago   Up 3 seconds             k8s_POD_kube-scheduler-htzsb45fsn1b.enableit.dk_kube-system_81d2d21449d64d5e6d5e9069a7ca99ed_1
-  47cae516a012   k8s.gcr.io/pause:3.2   "/pause"                 7 seconds ago   Up 3 seconds             k8s_POD_kube-apiserver-htzsb45fsn1b.enableit.dk_kube-system_71d65010c0f7d404111b770c5dae14e1_1
-  8c76ab3f4218   k8s.gcr.io/pause:3.2   "/pause"                 7 seconds ago   Up 3 seconds             k8s_POD_kube-proxy-qqzhb_kube-system_634bc852-7f14-4c88-ae8d-a327154df765_1
-  fcab4f0e9d18   k8s.gcr.io/pause:3.2   "/pause"                 7 seconds ago   Up 3 seconds             k8s_POD_kube-controller-manager-htzsb45fsn1b.enableit.dk_kube-system_037456d6c73313a25d5009a0db8afcf7_1
-  ```
+## Install the application manually to verify
+1. create/copy application YAML - and set: targetRevision to <yourbranchname> instead of HEAD
+2. Load that yaml manually (k create -ns argocd -f yourapplication.yaml)
+3. Work in your branch - adjust values as needed etc.
+4. When it works.. Simply update the application yaml to pointing to targetRevision: HEAD and make your MR/PR
