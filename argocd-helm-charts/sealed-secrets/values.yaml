@@ -1,2 +1,2 @@
 sealed-secrets:
-  namespace: kube-system 
+  namespace: system 
