@@ -57,6 +57,9 @@ argo-cd:
         - type: helm
           name: rook-ceph
           url: https://charts.rook.io/release
+        - type: helm
+          name: keycloak
+          url: https://codecentric.github.io/helm-charts
 
 
 # Examples for adding git repo
