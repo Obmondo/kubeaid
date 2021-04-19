@@ -1,0 +1,8 @@
+apiVersion: v2
+name: keycloak
+version: 1.0.0
+dependencies:
+  - name: keycloak
+    version: 2.4.3
+    repository: https://charts.bitnami.com/bitnami
+    # see versions here: https://bitnami.com/stack/keycloak/helm
