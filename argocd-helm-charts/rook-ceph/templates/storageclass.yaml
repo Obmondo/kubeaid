@@ -17,7 +17,9 @@ spec:
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-   name: rook-ceph-block
+  name: rook-ceph-block
+  annotations:
+    storageclass.beta.kubernetes.io/is-default-class: {{ .Values.storageclass.default }}
 # Change "rook-ceph" provisioner prefix to match the operator namespace if needed
 provisioner: rook-ceph.rbd.csi.ceph.com
 parameters:
