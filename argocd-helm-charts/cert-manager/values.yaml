@@ -4,3 +4,7 @@ cert-manager:
   installCRDs: true
   clusterResourceNamespace: cert-manager
 
+issuer:
+  secret: argocd-ssl
+  ingressName: argocd-dashboard
+  production: false
