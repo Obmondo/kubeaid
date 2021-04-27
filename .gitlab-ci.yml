@@ -1,0 +1,8 @@
+stages:
+  - lint
+
+lint_yaml:
+  stage: lint
+  image: runejuhl/alpine-ci
+  script:
+    - ./bin/check_yaml.rb
