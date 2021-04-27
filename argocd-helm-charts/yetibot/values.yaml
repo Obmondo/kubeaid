@@ -29,7 +29,7 @@ yetibot:
 #      hosts:
 #      - yetibot.kam.obmondo.com
  
-  podSecurityContext: {}
+  podSecurityContext: 
     fsGroup: 2000
   securityContext: 
     capabilities:
