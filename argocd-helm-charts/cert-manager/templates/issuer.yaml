@@ -17,5 +17,5 @@ spec:
     solvers:
     - http01:
         ingress:
-          name: {{ .Values.issuer.ingressName }}
+          class: traefik-cert-manager
 {{ end }}
