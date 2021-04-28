@@ -2,11 +2,7 @@
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  {{ if .Values.issuer.production }}
   name: letsencrypt
-  {{ else }}
-  name: letsencrypt-staging
-  {{ end }}
 spec:
   acme:
     email: {{ .Values.issuer.issuerEmail }}
