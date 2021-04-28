@@ -29,12 +29,12 @@ yetibot:
 #      hosts:
 #      - yetibot.kam.obmondo.com
  
-  podSecurityContext: 
-    fsGroup: 2000
-  securityContext: 
-    capabilities:
-      drop:
-      - ALL
-    readOnlyRootFilesystem: false
-    runAsNonRoot: true
-    runAsUser: 1000
+#  podSecurityContext: 
+#    fsGroup: 2000
+#  securityContext: 
+#    capabilities:
+#      drop:
+#      - ALL
+#    readOnlyRootFilesystem: false
+#    runAsNonRoot: true
+#    runAsUser: 1000
