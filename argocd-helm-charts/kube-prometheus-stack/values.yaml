@@ -1,4 +1,21 @@
 kube-prometheus-stack:
+  alertmanager:
+    alertmanagerSpec:
+      resources: 
+        limits:
+          cpu: 100m
+          memory: 50Mi
+        requests:
+          cpu: 10m
+          memory: 20Mi
+  prometheusOperator:
+    resources: 
+      limits:
+        cpu: 100m
+        memory: 80Mi
+      requests:
+        cpu: 10m
+        memory: 30Mi
   grafana:
     ingress:
       enabled: true
@@ -11,7 +28,14 @@ kube-prometheus-stack:
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
     # ingressClassName: nginx
   prometheus:
+    # defaults - should be adjusted per-cluster, as it depends on amount of metrics.
     prometheusSpec:
+      resources: 
+        limits:
+          memory: 200Mi
+        requests:
+          cpu: 100m
+          memory: 100Mi
       storageSpec: 
         volumeClaimTemplate:
           spec:
