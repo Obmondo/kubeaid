@@ -21,7 +21,7 @@ yetibot:
       # YB_URL: "yetibot.kam.obmondo.com"
 
       # disabling this - allows for a readonlyfilesystem (in security options below)
-      YETIBOT_LOG_ROLLING_ENABLED: "false"
+      YB_LOG_ROLLING_ENABLED: "false"
 
 #  ingress:
 #    enabled: true
