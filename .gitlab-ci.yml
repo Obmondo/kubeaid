@@ -1,8 +1,19 @@
 stages:
   - lint
+  - diff
 
 lint_yaml:
   stage: lint
   image: runejuhl/alpine-ci
   script:
     - ./bin/check_yaml.rb
+  only:
+  - merge_requests
+
+check_diff:
+  image: registry.obmondo.com/obmondo/dockerfiles/obmondo-build:latest
+  stage: diff
+  script:
+    - ./bin/script.sh
+  only:
+  - merge_requests
