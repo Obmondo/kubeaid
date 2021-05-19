@@ -3,6 +3,8 @@ yetibot:
   # Overriding fullname so we KNOW the name of the secret we must create to store secret env vars
   fullnameOverride: "yetibot"
   yetibot:
+    service: 
+      type: ClusterIP
     env:
       # In the context of running on Kuberenetes, we must ensure Yetibot ignores
       # all `YETIBOT_` env vars, since by convention Kubernetes will expose a
