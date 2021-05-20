@@ -5,4 +5,5 @@ version: 1.0.0
 dependencies:
   - name: yetibot
     version: 1.0.56
-    repository: https://yetibot.com/yetibot-helm/
+    #repository: https://yetibot.com/yetibot-helm/
+    repository: "oci://ghcr.io/Obmondo"

@@ -108,3 +108,19 @@ To resolve out-of-sync complaint in ArgoCD - AND backup/recovery do this:
 2. Load that yaml manually (k create -ns argocd -f yourapplication.yaml)
 3. Work in your branch - adjust values as needed etc.
 4. When it works.. Simply update the application yaml to pointing to targetRevision: HEAD and make your MR/PR
+
+# Helm build dependency
+
+Run the helm-dep-up.sh script to build the dependecy. The script runs the helm dep up command based on what is the value of upstream. IF upstream is true - it downloads the charts from upstream repo url and if false It download charts from our ghcr repo. Path variable is the helm chart path
+
+```bash
+./helm-dep-up.sh -u true -p argocd-helm-charts/yetibot
+```
+
+# Helm cache repo
+
+```bash
+./helm-chart-cache.sh -r ghcr.io/Obmondo -p ******
+````
+Above will push the charts to ghcr.io/Obmondo registry
+Now, we just need to add the charts lock files and raise the MR

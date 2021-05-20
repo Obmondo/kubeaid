@@ -1,6 +1,6 @@
 dependencies:
 - name: cluster-autoscaler
-  repository: https://kubernetes.github.io/autoscaler
+  repository: oci://ghcr.io/Obmondo
   version: 9.4.0
-digest: sha256:abfb523928ed7fbc2a488daaab8060d4e7e4e047ecf82c17ec9d9cde8e7e346d
-generated: "2021-03-02T16:24:54.665297+01:00"
+digest: sha256:b59c7f9fcb3aec9a2f8b2af1469f7a09572b805f7f62fbadb65df1fc18cc7dab
+generated: "2021-05-17T15:27:35.561341501+05:30"

@@ -4,4 +4,5 @@ version: 1.0.0
 dependencies:
   - name: velero
     version: 2.15.0
-    repository: https://vmware-tanzu.github.io/helm-charts
+    #repository: https://vmware-tanzu.github.io/helm-charts
+    repository: "oci://ghcr.io/Obmondo"

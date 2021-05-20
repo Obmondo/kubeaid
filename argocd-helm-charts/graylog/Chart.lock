@@ -1,6 +1,6 @@
 dependencies:
 - name: graylog
-  repository: https://charts.kong-z.com
+  repository: oci://ghcr.io/Obmondo
   version: 1.7.8
-digest: sha256:9a38dd6b2a0bc6c44b4ba6ab9b83dbc59fbaaf5a5d7e54968e9cb3abcf43b43e
-generated: "2021-03-10T12:54:24.673031304+01:00"
+digest: sha256:041b084ff1a08366790fa12ea121c0a498196d062d1363bd71a026a6beb00737
+generated: "2021-05-17T15:27:57.175502958+05:30"

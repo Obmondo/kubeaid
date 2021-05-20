@@ -1,6 +1,6 @@
 dependencies:
 - name: traefik-forward-auth
-  repository: https://k8s-at-home.com/charts/
+  repository: oci://ghcr.io/Obmondo
   version: 1.0.5
-digest: sha256:1ec48baf2065af0796aed5d3d6f3d0f48f66a66cfcf09d951fb6b0530393ba0d
-generated: "2021-03-04T16:07:10.859155+01:00"
+digest: sha256:dc9cff754320065d2255ea0fd310e10e0fb2ce8fab6ca936af2038ac661a46df
+generated: "2021-05-17T15:32:48.988933507+05:30"

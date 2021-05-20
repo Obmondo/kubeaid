@@ -1,6 +1,6 @@
 dependencies:
 - name: kube-prometheus-stack
-  repository: https://prometheus-community.github.io/helm-charts
+  repository: oci://ghcr.io/Obmondo
   version: 13.13.0
-digest: sha256:d2da2f50117128fe388d1cda689f2b780c36a2624c8f1f5f784a65fe96f1afa4
-generated: "2021-02-24T13:25:27.827897878+01:00"
+digest: sha256:200d1090abcdf677b3efc9afc3e3b9eedb1a6408df7b27953c8c4bfe80958591
+generated: "2021-05-17T15:28:28.8115802+05:30"
