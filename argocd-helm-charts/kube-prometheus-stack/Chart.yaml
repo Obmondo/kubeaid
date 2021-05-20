@@ -4,5 +4,6 @@ version: 1.0.0
 dependencies:
   - name: kube-prometheus-stack
     version: 13.13.0
-    repository: https://prometheus-community.github.io/helm-charts
+    #repository: https://prometheus-community.github.io/helm-charts
+    repository: "oci://ghcr.io/Obmondo"
     # see versions here: https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack

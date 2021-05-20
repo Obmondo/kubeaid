@@ -1,6 +1,7 @@
 stages:
   - lint
   - diff
+  - build
 
 lint_yaml:
   stage: lint
@@ -17,3 +18,12 @@ check_diff:
     - ./bin/script.sh
   only:
   - merge_requests
+
+build:
+  stage: build
+  image: dtzar/helm-kubectl
+  only:
+    refs:
+      - 'merge_requests'
+  script:
+    - bash helm-chart-cache.sh -p $PASSWORD -r ghcr.io/Obmondo

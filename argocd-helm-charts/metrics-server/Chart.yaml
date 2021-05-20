@@ -4,5 +4,6 @@ version: 1.0.0
 dependencies:
   - name: metrics-server
     version: 2.11.4
-    repository: https://charts.helm.sh/stable
+    #repository: https://charts.helm.sh/stable
+    repository: "oci://ghcr.io/Obmondo"
     # NB. This needs to be changed to pull from new location once this issue is resolved/merged: https://github.com/kubernetes-sigs/metrics-server/pull/670
