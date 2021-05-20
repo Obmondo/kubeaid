@@ -11,7 +11,7 @@ yetibot:
       # bunch of them inside the pod, unrelated to Yetibot's own config. If we
       # don't override the env prefix, Yetibot will throw exceptions at runtime
       # and the pod will CrashLoop.
-      YETIBOT_ENV_PREFIX: yb
+      YETIBOT_ENV_PREFIX: YB
       YB_DB_URL: "jdbc:postgresql://yetibot:yetibot@yetibot-postgresql:5432/yetibot"
 
       # Enable Mattermost adapter

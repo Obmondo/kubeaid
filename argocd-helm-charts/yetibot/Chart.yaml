@@ -4,5 +4,5 @@ version: 1.0.0
 # see latest chart here: https://github.com/yetibot/yetibot-helm
 dependencies:
   - name: yetibot
-    version: 1.0.54
+    version: 1.0.56
     repository: https://yetibot.com/yetibot-helm/
