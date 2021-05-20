@@ -11,7 +11,7 @@ yetibot:
       # bunch of them inside the pod, unrelated to Yetibot's own config. If we
       # don't override the env prefix, Yetibot will throw exceptions at runtime
       # and the pod will CrashLoop.
-      YETIBOT_ENV_PREFIX: YB
+      YETIBOT_ENV_PREFIX: yb
       YB_DB_URL: "jdbc:postgresql://yetibot:yetibot@yetibot-postgresql:5432/yetibot"
 
       # Enable Mattermost adapter
@@ -20,7 +20,7 @@ yetibot:
       # This is delivered by sealed-secrets 
       #YETIBOT_ADAPTERS_MYMATTERMOST_TOKEN: ""
       # YETIBOT_ADAPTERS_MYMATTERMOST_SECURE: "true" # true by default
-      # YB_URL: "yetibot.kam.obmondo.com"
+      YB_URL: "http://localhost:3003"
 
       # disabling this - allows for a readonlyfilesystem (in security options below)
       YB_LOG_ROLLING_ENABLED: "false"
