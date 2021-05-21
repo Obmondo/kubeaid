@@ -22,21 +22,27 @@ Setup doc:
   1. oidc-client-id (in this case its `kubernetes`) has to be configured by k8s admin.
   2. oidc-client-secret needs to be shared by the k8s admin, so you will need to ask k8s admin for this two details.
 ```
-kubectl oidc-login setup --oidc-issuer-url=https://keycloak.kam.obmondo.com/auth/realms/master --oidc-client-id=kubernetes --oidc-client-secret=xxxxxxxxxxxxxx
+bash -u
+
+export KEYCLOAK_URL="https://keycloak.kam.obmondo.com/auth/realms/master"
+export CLIENT_ID=kubernetes
+export CLIENT_SECRET=xxxxxxxxxxxxxxxxxxx
+
+kubectl oidc-login setup --oidc-issuer-url=$KEYCLOAK_URL --oidc-client-id=$CLIENT_ID --oidc-client-secret=$CLIENT_SECRET
 ```
 
 * Bind a cluster role
   1. After you ran the above command, you would be getting a output which will include the below command, just correct the clusterrolebinding `name` here.
   2. The url should be exactly same from the output of the above command.
 ```
-kubectl create clusterrolebinding <you-username>-oidc-cluster-admin --clusterrole=cluster-admin --user='https://keycloak.kam.obmondo.com/auth/realms/master#xxxxxxxxxxxxxxxxxxxxx'
+kubectl create clusterrolebinding <your-username>-oidc-cluster-admin --clusterrole=cluster-admin --user='https://keycloak.kam.obmondo.com/auth/realms/master#<your-keycloak-userID>'
 ```
 
 * Set up the Kubernetes API server, Add the following options to the kube-apiserver:
   1. k8s admin should have already done it via puppet/kops (get it confirmed by the k8s admin)
 ```
-  --oidc-issuer-url=https://keycloak.kam.obmondo.com/auth/realms/master
-  --oidc-client-id=kubernetes
+  --oidc-issuer-url=$KEYCLOAK_URL
+  --oidc-client-id=$CLIENT_ID
 ```
 
 * Set up the kubeconfig
@@ -46,9 +52,9 @@ kubectl config set-credentials oidc \
   --exec-command=kubectl \
   --exec-arg=oidc-login \
   --exec-arg=get-token \
-  --exec-arg=--oidc-issuer-url=https://keycloak.kam.obmondo.com/auth/realms/master \
-  --exec-arg=--oidc-client-id=kubernetes \
-  --exec-arg=--oidc-client-secret=xxxxxxxxxxxxxxxxxxx
+  --exec-arg=--oidc-issuer-url=$KEYCLOAK_URL \
+  --exec-arg=--oidc-client-id=$CLIENT_ID \
+  --exec-arg=--oidc-client-secret=$CLIENT_SECRET
 
 or
 
@@ -61,9 +67,9 @@ users:
       args:
       - oidc-login
       - get-token
-      - --oidc-issuer-url=https://keycloak.kam.obmondo.com/auth/realms/master
-      - --oidc-client-id=kubernetes
-      - --oidc-client-secret=xxxx
+      - --oidc-issuer-url=$KEYCLOAK_URL
+      - --oidc-client-id=$CLIENT_ID
+      - --oidc-client-secret=$CLIENT_SECRET
       command: kubectl
       env: null
       provideClusterInfo: false
