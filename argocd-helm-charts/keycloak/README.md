@@ -87,3 +87,14 @@ Click on user -> "Role Mappings" -> put `admin` into assigned role
 
 # kubectl delete clusterrolebinding <your-username>-oidc-cluster-admin
 ```
+
+> The keycloack recovery/reconfiguration can also be done by exporting the realm and later importing it.
+>
+> Steps:
+> * Login to keycloack as admin
+> * Go to `https://<keycloack-url>/auth/admin/master/console/#/realms/master/partial-export`
+> * `Export groups and roles` -> ON
+> * `clients` -> ON
+> * Click on `Export`
+>
+> This will download the real and the respective settings as a `.json` file which can later be used to import the settings from `https://<keycloack-url>/auth/admin/master/console/#/realms/master/partial-import`.
