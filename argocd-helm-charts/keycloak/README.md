@@ -1,6 +1,6 @@
 # Keycloak Client Setup
 
-# Install krew plugin manager
+## Install krew plugin manager
 
 https://krew.sigs.k8s.io/docs/user-guide/setup/install/
 
@@ -8,7 +8,7 @@ In case you are interested.
 https://krew.sigs.k8s.io/docs/user-guide/quickstart
 
 
-# Install the oidc-login client
+## Install the oidc-login client
 
 kubectl krew install oidc-login
 
@@ -16,7 +16,7 @@ Setup doc:
 
 * https://github.com/int128/kubelogin/blob/master/docs/setup.md
 
-# Setup the client
+## Setup the client
 
 * Run the below
   1. oidc-client-id (in this case its `kubernetes`) has to be configured by k8s admin.
@@ -73,6 +73,46 @@ users:
 ```
 kubectl --user=oidc get nodes
 ```
+## Create Keycloak Group based Cluster RBAC autherization
+
+* Login to keycloak as admin
+
+* Go to your client(kubernetes in this case)
+
+* In your client go to `mappers` & click on `create`
+
+* Create a new mapper as shown below:
+
+![new mapper](static/mapper.png)
+
+* Once done, you can go ahead create all the respective groups you want in keycloak.
+  1. From [Keycloak homepage](https://keycloak.kam.obmondo.com/auth/admin/master/console/) go to [groups](https://keycloak.kam.obmondo.com/auth/admin/master/console/#/realms/master/groups) and click on `new`
+  2. Provide the new group's name and click save.
+
+* Add the users to the group
+  1. From [Keycloak homepage](https://keycloak.kam.obmondo.com/auth/admin/master/console/) go to [users](https://keycloak.kam.obmondo.com/auth/admin/master/console/#/realms/master/users) and click on `View all users`
+  2. Go `Groups`
+  3. Select the group you want to add the user to from the `Available Groups` table
+  4. Click on `Join`
+
+* Create the repective RBAC policy in kubernetes cluster
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: sre-admin
+subjects:
+- kind: Group
+  name: <Keycloak groups name>
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: <clusterRole name that you want to map the group to>
+  apiGroup: rbac.authorization.k8s.io
+```
+* Refresh your `id-token` retrived from keycloak and you are good to go.
+
+---
 
 ## How to give a user an admin access in [Keycloak](https://keycloak.kam.obmondo.com/auth/admin/master/console/) and not in k8s
 login as admin, password is in `pass` git repo
