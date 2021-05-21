@@ -23,14 +23,13 @@ do
     esac
 done
 
+set +e
 if $oci
 then
-
 	version=$(grep -E "  version*" $path/Chart.yaml)
 	versionnum=$(echo $version | cut -d':' -f2 | sed -e 's/^[[:space:]]*//')
 	chartname=$(echo $path | rev | cut -d'/' -f1 | rev)
 	helm chart pull $registry/$chartname:$versionnum > /dev/null
-
 	if [ $? -ne 0 ]
 	then
 	    echo "### Doing dep up for upstream for $path and $versionnum ###"
