@@ -12,73 +12,87 @@ https://krew.sigs.k8s.io/docs/user-guide/quickstart
 
 kubectl krew install oidc-login
 
-Setup doc:
+Details about setup if you are interested:
 
 * https://github.com/int128/kubelogin/blob/master/docs/setup.md
+
+## Setup the Kubernetes client
+
+* Log into the keycloak server as admin.
+* Go to [clients](http://localhost:8888/auth/admin/master/console/#/realms/master/clients) and click on `Create`.
+* Provide the `Client ID` as `kubernetes`, leave `Client Protocol ` as `openid-connect`, `Root URL` as blank, and click on save.
 
 ## Setup the client
 
 * Run the below
-  1. oidc-client-id (in this case its `kubernetes`) has to be configured by k8s admin.
-  2. oidc-client-secret needs to be shared by the k8s admin, so you will need to ask k8s admin for this two details.
-```
-bash -u
+    ```
+    bash -u
 
-export KEYCLOAK_URL="https://keycloak.kam.obmondo.com/auth/realms/master"
-export CLIENT_ID=kubernetes
-export CLIENT_SECRET=xxxxxxxxxxxxxxxxxxx
+    export KEYCLOAK_URL="https://keycloak.kam.obmondo.com/auth/realms/master"
+    export CLIENT_ID=kubernetes
+    export CLIENT_SECRET=xxxxxxxxxxxxxxxxxxx
 
-kubectl oidc-login setup --oidc-issuer-url=$KEYCLOAK_URL --oidc-client-id=$CLIENT_ID --oidc-client-secret=$CLIENT_SECRET
-```
+    kubectl oidc-login setup --oidc-issuer-url=$KEYCLOAK_URL --oidc-client-id=$CLIENT_ID --oidc-client-secret=$CLIENT_SECRET
+    ```
+  > Note: oidc-client-secret can be any random string. But we suggest to contact your k8s admin to decide upon what you want is being used in your org for the same.
+  >
+  > Also, do verify that the `CLIENT_ID` is `kubernetes` from your k8s admin.
 
 * Bind a cluster role
   1. After you ran the above command, you would be getting a output which will include the below command, just correct the clusterrolebinding `name` here.
   2. The url should be exactly same from the output of the above command.
-```
-kubectl create clusterrolebinding <your-username>-oidc-cluster-admin --clusterrole=cluster-admin --user='https://keycloak.kam.obmondo.com/auth/realms/master#<your-keycloak-userID>'
-```
+        ```
+        kubectl create clusterrolebinding <your-username>-oidc-cluster-admin --clusterrole=cluster-admin --user='$KEYCLOAK_URL#<your-keycloak-userID>'
+        ```
 
-* Set up the Kubernetes API server, Add the following options to the kube-apiserver:
-  1. k8s admin should have already done it via puppet/kops (get it confirmed by the k8s admin)
-```
-  --oidc-issuer-url=$KEYCLOAK_URL
-  --oidc-client-id=$CLIENT_ID
-```
+* Set up the Kubernetes API server. Add the following options to the kube-apiserver:
+    ```
+    --oidc-issuer-url=$KEYCLOAK_URL
+    --oidc-client-id=$CLIENT_ID
+    ```
+    > k8s admin should have already done it via puppet/kops (get it confirmed by the k8s admin)
 
 * Set up the kubeconfig
-```
-kubectl config set-credentials oidc \
-  --exec-api-version=client.authentication.k8s.io/v1beta1 \
-  --exec-command=kubectl \
-  --exec-arg=oidc-login \
-  --exec-arg=get-token \
-  --exec-arg=--oidc-issuer-url=$KEYCLOAK_URL \
-  --exec-arg=--oidc-client-id=$CLIENT_ID \
-  --exec-arg=--oidc-client-secret=$CLIENT_SECRET
 
-or
+  1. Run the following command to add the oidc user in your `kubeconfig` file.
+      ```
+      kubectl config set-credentials oidc \
+        --exec-api-version=client.authentication.k8s.io/v1beta1 \
+        --exec-command=kubectl \
+        --exec-arg=oidc-login \
+        --exec-arg=get-token \
+        --exec-arg=--oidc-issuer-url=$KEYCLOAK_URL \
+        --exec-arg=--oidc-client-id=$CLIENT_ID \
+        --exec-arg=--oidc-client-secret=$CLIENT_SECRET
+      ```
 
-* Directly copy it in your ~/.kube/config
-users:
-- name: oidc
-  user:
-    exec:
-      apiVersion: client.authentication.k8s.io/v1beta1
-      args:
-      - oidc-login
-      - get-token
-      - --oidc-issuer-url=$KEYCLOAK_URL
-      - --oidc-client-id=$CLIENT_ID
-      - --oidc-client-secret=$CLIENT_SECRET
-      command: kubectl
-      env: null
-      provideClusterInfo: false
-```
+  2.  Or directly copy below in your `kubeconfig` file.
+      ```
+      users:
+      - name: oidc
+        user:
+          exec:
+            apiVersion: client.authentication.k8s.io/v1beta1
+            args:
+            - oidc-login
+            - get-token
+            - --oidc-issuer-url=$KEYCLOAK_URL
+            - --oidc-client-id=$CLIENT_ID
+            - --oidc-client-secret=$CLIENT_SECRET
+            command: kubectl
+            env: null
+            provideClusterInfo: false
+      ```
+
+  3. Once done set the `oidc` user for current context.
+      ```
+      kubectl config set-context --user kubernetes-admin $(kubectl config get-contexts -o name)
+      ```
 
 * Verify cluster access
-```
-kubectl --user=oidc get nodes
-```
+  ```
+  kubectl --user=oidc get nodes
+  ```
 ## Create Keycloak Group based Cluster RBAC autherization
 
 * Login to keycloak as admin
@@ -89,7 +103,7 @@ kubectl --user=oidc get nodes
 
 * Create a new mapper as shown below:
 
-![new mapper](static/mapper.png)
+  ![new mapper](static/mapper.png)
 
 * Once done, you can go ahead create all the respective groups you want in keycloak.
   1. From [Keycloak homepage](https://keycloak.kam.obmondo.com/auth/admin/master/console/) go to [groups](https://keycloak.kam.obmondo.com/auth/admin/master/console/#/realms/master/groups) and click on `new`
@@ -101,21 +115,21 @@ kubectl --user=oidc get nodes
   3. Select the group you want to add the user to from the `Available Groups` table
   4. Click on `Join`
 
-* Create the repective RBAC policy in kubernetes cluster
-```
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: sre-admin
-subjects:
-- kind: Group
-  name: <Keycloak groups name>
-  apiGroup: rbac.authorization.k8s.io
-roleRef:
-  kind: ClusterRole
-  name: <clusterRole name that you want to map the group to>
-  apiGroup: rbac.authorization.k8s.io
-```
+* Create the respective RBAC policy in kubernetes cluster
+    ```
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      name: sre-admin
+    subjects:
+    - kind: Group
+      name: <Keycloak groups name>
+      apiGroup: rbac.authorization.k8s.io
+    roleRef:
+      kind: ClusterRole
+      name: <clusterRole name that you want to map the group to>
+      apiGroup: rbac.authorization.k8s.io
+    ```
 * Refresh your `id-token` retrived from keycloak and you are good to go.
 
 ---
@@ -128,11 +142,11 @@ Click on user -> "Role Mappings" -> put `admin` into assigned role
 ## Troubleshooting
 
 * Remove all cache session and run all the steps in the Setup the client.
-```
-# rm -fr ~/.kube/cache/oidc-login
+  ```
+  # rm -fr ~/.kube/cache/oidc-login
 
-# kubectl delete clusterrolebinding <your-username>-oidc-cluster-admin
-```
+  # kubectl delete clusterrolebinding <your-username>-oidc-cluster-admin
+  ```
 
 ## Disaster Recovery
 
