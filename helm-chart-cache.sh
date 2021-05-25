@@ -23,14 +23,16 @@ do
 		for tars in $path/charts/*.tgz
 		do
 			tgzfile=$(basename $tars);
-			version=$(echo $tgzfile | grep -o "[0-9].+*[0-9].*" | sed 's/\.tgz//')
+			version=$(echo $tgzfile | grep -o "v*[0-9]\{1\}[0-9]*.+*[0-9].*" | sed 's/\.tgz//')
 			set +e
 			echo "### Pulling chart $chartname:$version ###"
 			helm chart pull $registry/$chartname:$version > /dev/null
 			if [ $? -ne 0 ]; then
 			    echo "### Saving and pushing chart $chartname:$version ###"
-			    helm chart save $path $registry/$chartname:$version;
+			    helm chart save $tars $registry/$chartname:$version;
 			    helm chart push $registry/$chartname:$version;
+			    echo "###  Doing dep up for ghcr for $path ###"
+			    bash helm-dep-up.sh -u false -p $path -r $registry;
 			fi
 			tar zxvf $tars -C $path/charts > /dev/null;
 		done
@@ -44,24 +46,22 @@ do
 				for subcharts in $subchartfiles
 				do
 				    subchartname=$(basename $subcharts);
-				    if [ -f "$subchart/charts/$subchartname*.tgz" ]; then
-                                        subchartnameversion=$(find $subchart/charts/$subchartname*.tgz)
-				        subchartnameversion=$(basename $subchartnameversion)
+				    for subchartnameversions in "$subchart/charts/$subchartname*.tgz"
+				    do
+				        subchartnameversion=$(basename $subchartnameversions)
 				        tgzfileversion=$(echo $subchartnameversion | grep -o "[0-9].+*[0-9].*" | sed 's/\.tgz//')
 				        set +e
 				        echo "### Pulling Chart $registry/$subchartname:$tgzfileversion"
-				        helm chart pull $registry/$subchartname:$tgzfileversion > /dev/null
+				        helm chart pull $registry/$subchartname:$tgzfileversion
 				        if [ $? -ne 0 ]; then
 				            echo "### Saving and pushing chart $registry/$subchartname:$tgzfileversion"
-				            helm chart save $subcharts $registry/$subchartname:$tgzfileversion;
+				            helm chart save $subchartnameversions $registry/$subchartname:$tgzfileversion;
 				            helm chart push $registry/$subchartname:$tgzfileversion;
 				        fi
-				    fi
+				    done
 
 				done
 			fi
 		done
-	    echo "### Attempting dep up for ghcr for $path ###"
-	    bash helm-dep-up.sh -u false -p $path -r $registry;
     fi
 done
