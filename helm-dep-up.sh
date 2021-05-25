@@ -29,26 +29,25 @@ then
 	version=$(grep -E "  version*" $path/Chart.yaml)
 	versionnum=$(echo $version | cut -d':' -f2 | sed -e 's/^[[:space:]]*//')
 	chartname=$(echo $path | rev | cut -d'/' -f1 | rev)
-	helm chart pull $registry/$chartname:$versionnum > /dev/null
-	if [ $? -ne 0 ]
+	helm chart pull $registry/$chartname:$versionnum
+	if [ $? -ne 0 ] && [ $upstream == true ]
 	then
-	    echo "### Doing dep up for upstream for $path and $versionnum ###"
+		echo "### Doing dep up for upstream for $path and $versionnum ###"
 		if [ -f "$path/Chart.yaml" ]; then
-			if $upstream
-			then
-			    sed -i -e 's/#repository: https:/repository: https:/g' $path/Chart.yaml
-			    sed -i -e 's/#repository: http:/repository: http:/g' $path/Chart.yaml
-			    sed -i -e 's/repository: "oci/#repository: "oci/g' $path/Chart.yaml
-			    helm dep up $path > /dev/null
-			else
-			    sed -i -e 's/#repository: "oci/repository: "oci/g' $path/Chart.yaml
-			    sed -i -e 's/repository: https:/#repository: https:/g' $path/Chart.yaml
-			    sed -i -e 's/repository: http:/#repository: http:/g' $path/Chart.yaml
-			    helm dep up $path > /dev/null
-		        fi
+			sed -i -e 's/#repository: https:/repository: https:/g' $path/Chart.yaml
+			sed -i -e 's/#repository: http:/repository: http:/g' $path/Chart.yaml
+			sed -i -e 's/repository: "oci/#repository: "oci/g' $path/Chart.yaml
+			helm dep up $path > /dev/null
 		fi
+    elif [ $upstream == false ]
+        then
+            echo "### Doing dep up for ghcr for $path and $versionnum ###"
+            sed -i -e 's/#repository: "oci/repository: "oci/g' $path/Chart.yaml
+            sed -i -e 's/repository: https:/#repository: https:/g' $path/Chart.yaml
+            sed -i -e 's/repository: http:/#repository: http:/g' $path/Chart.yaml
+            helm dep up $path > /dev/null
 	else
-		echo "### Ignoring dep up since $versionnum is already present for $path ###"
+		echo "### Ignoring dep up for upstream since $versionnum is already present for $path ###"
 	fi
 
 else

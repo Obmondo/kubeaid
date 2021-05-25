@@ -3,4 +3,4 @@ dependencies:
   repository: oci://ghcr.io/Obmondo
   version: 0.28.0
 digest: sha256:0775fa4ccc52e75bb8bf74b4d4a0d872047717b6e477b7008ec1b1479c1c2393
-generated: "2021-05-20T15:18:49.431912894+05:30"
+generated: "2021-05-25T18:57:56.257810044+05:30"
