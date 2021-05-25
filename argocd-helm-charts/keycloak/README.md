@@ -30,13 +30,10 @@ Details about setup if you are interested:
 
     export KEYCLOAK_URL="https://keycloak.kam.obmondo.com/auth/realms/master"
     export CLIENT_ID=kubernetes
-    export CLIENT_SECRET=xxxxxxxxxxxxxxxxxxx
+    export CLIENT_SECRET=kubernetes
 
     kubectl oidc-login setup --oidc-issuer-url=$KEYCLOAK_URL --oidc-client-id=$CLIENT_ID --oidc-client-secret=$CLIENT_SECRET
     ```
-  > Note: oidc-client-secret can be any random string. But we suggest to contact your k8s admin to decide upon what you want is being used in your org for the same.
-  >
-  > Also, do verify that the `CLIENT_ID` is `kubernetes` from your k8s admin.
 
 * Bind a cluster role
   1. After you ran the above command, you would be getting a output which will include the below command, just correct the clusterrolebinding `name` here.
@@ -86,12 +83,12 @@ Details about setup if you are interested:
 
   3. Once done set the `oidc` user for current context.
       ```
-      kubectl config set-context --user kubernetes-admin $(kubectl config get-contexts -o name)
+      kubectl config set-context --user oidc $(kubectl config get-contexts -o name)
       ```
 
 * Verify cluster access
   ```
-  kubectl --user=oidc get nodes
+  kubectl get nodes
   ```
 ## Create Keycloak Group based Cluster RBAC autherization
 
