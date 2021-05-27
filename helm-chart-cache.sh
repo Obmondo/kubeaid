@@ -4,15 +4,16 @@ set -euo pipefail
 
 export HELM_EXPERIMENTAL_OCI=1
 
-while getopts p:r: flag
+while getopts p:r:u: flag
 do
     case "${flag}" in
         p) password=${OPTARG};;
         r) registry=${OPTARG};;
+        u) username=${OPTARG};;
     esac
 done
 
-helm registry login $registry --username Obmondo --password $password
+helm registry login $registry --username $username --password $password
 
 for path in $(find argocd-helm-charts -maxdepth 1 -mindepth 1 -type d);
 do
@@ -24,6 +25,7 @@ do
 		do
 			tgzfile=$(basename $tars);
 			version=$(echo $tgzfile | grep -o "v*[0-9]\{1\}[0-9]*.+*[0-9].*" | sed 's/\.tgz//')
+			chartname=$(echo $tgzfile | sed "s/-$version.tgz//")
 			set +e
 			echo "### Pulling chart $chartname:$version ###"
 			helm chart pull $registry/$chartname:$version > /dev/null
@@ -52,7 +54,7 @@ do
 				        tgzfileversion=$(echo $subchartnameversion | grep -o "[0-9].+*[0-9].*" | sed 's/\.tgz//')
 				        set +e
 				        echo "### Pulling Chart $registry/$subchartname:$tgzfileversion"
-				        helm chart pull $registry/$subchartname:$tgzfileversion
+				        helm chart pull $registry/$subchartname:$tgzfileversion > /dev/null
 				        if [ $? -ne 0 ]; then
 				            echo "### Saving and pushing chart $registry/$subchartname:$tgzfileversion"
 				            helm chart save $subchartnameversions $registry/$subchartname:$tgzfileversion;

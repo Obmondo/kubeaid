@@ -109,18 +109,20 @@ To resolve out-of-sync complaint in ArgoCD - AND backup/recovery do this:
 3. Work in your branch - adjust values as needed etc.
 4. When it works.. Simply update the application yaml to pointing to targetRevision: HEAD and make your MR/PR
 
-# Helm build dependency
+# General idea/Working of pointing apps to GHRC
 
-Run the helm-dep-up.sh script to build the dependecy. The script runs the helm dep up command based on what is the value of upstream. IF upstream is true - it downloads the charts from upstream repo url and if false It download charts from our ghcr repo. Path variable is the helm chart path
-
-```bash
-./helm-dep-up.sh -u true -p argocd-helm-charts/yetibot
+1. Main script - `helm-chart-cache.sh`
+2. Run `helm-chart-cache.sh` script.
+```
+bash helm-chart-cache.sh -u <Username> -p <Password> -r <Registry>
+```
+Here
+```
+u - Username to login to your registry. Eg - Obmondo
+p - Password. Here you need to pass the PA token which you can create on your Github profile
+r - Name of the registry. Eg - ghcr.io/Obmondo
 ```
 
-# Helm cache repo
+This script will first download the charts from Upstream repo and then save and push it your registry. When the script has run without any issues it will update the `Chart.lock` file of your charts to point it your oci repo path. So, you need to just commit and push the Chart.lock file and then your apps will start pointing to GHCR.
 
-```bash
-./helm-chart-cache.sh -r ghcr.io/Obmondo -p ******
-````
-Above will push the charts to ghcr.io/Obmondo registry
-Now, we just need to add the charts lock files and raise the MR
+Remember - The lock file will only change for charts which are still not in your registry.
