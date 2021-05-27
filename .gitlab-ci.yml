@@ -26,4 +26,4 @@ build:
     refs:
       - 'merge_requests'
   script:
-    - bash helm-chart-cache.sh -p $PASSWORD -r ghcr.io/Obmondo
+    - bash helm-chart-cache.sh -u Obmondo -p $PASSWORD -r ghcr.io/Obmondo
