@@ -1,0 +1,9 @@
+apiVersion: v2
+name: metallb
+version: 1.0.0
+# see latest chart here: https://github.com/yetibot/yetibot-helm
+dependencies:
+  - name: metallb
+    version: 2.4.0
+    repository: https://charts.bitnami.com/bitnami
+    #repository: "oci://ghcr.io/Obmondo"
