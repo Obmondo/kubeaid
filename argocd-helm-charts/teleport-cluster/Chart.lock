@@ -1,6 +1,6 @@
 dependencies:
 - name: teleport-cluster
-  repository: https://charts.releases.teleport.dev
+  repository: oci://ghcr.io/Obmondo
   version: 6.0.0
-digest: sha256:b033ea26e58405d1464df50721676eb06acf8f91fb720d119bbda96e0f8451f3
-generated: "2021-05-31T16:32:07.043689803+05:30"
+digest: sha256:c1fc498a16a7834737cc607fe3e4dd54f84aa9ff47c15a8465f2dee5f056ff8e
+generated: "2021-06-04T11:57:01.693786968+05:30"
