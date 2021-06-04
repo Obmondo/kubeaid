@@ -15,6 +15,7 @@ done
 
 helm registry login $registry --username $username --password $password
 
+set +e
 for path in $(find argocd-helm-charts -maxdepth 1 -mindepth 1 -type d);
 do
 	echo "### Attempting dep up for upstream for $path ###"
@@ -25,7 +26,13 @@ do
 			tgzfile=$(basename $tars);
 			version=$(echo $tgzfile | grep -o "v*[0-9]\{1\}[0-9]*.+*[0-9].*" | sed 's/\.tgz//')
 			chartname=$(echo $tgzfile | sed "s/-$version.tgz//")
-			set +e
+			# The logic behind this if statement is sometimes version is just a single digit and while pulling
+			# the chart for such they fail hence append 0.0
+			if [ -z "$version"]; then
+				version=$(echo $tgzfile | grep -o "v*[0-9]\{1\}.tgz" | sed 's/\.tgz//')
+				chartname=$(echo $tgzfile | sed "s/-$version.tgz//")
+				version=$version.0.0
+			fi
 			echo "### Pulling chart $chartname:$version ###"
 			helm chart pull $registry/$chartname:$version > /dev/null
 			if [ $? -ne 0 ]; then
