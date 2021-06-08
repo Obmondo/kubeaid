@@ -1,6 +1,6 @@
 dependencies:
 - name: argo-cd
   repository: oci://ghcr.io/Obmondo
-  version: 3.6.1
-digest: sha256:d9c7e99ee39ed30b37fa6c7585f0a63104aa656ab0a660bb6a1c184aeb02f3d2
-generated: "2021-05-25T14:34:28.189084111+05:30"
+  version: 3.6.8
+digest: sha256:077f370c174be829d20a988e33dd57e64ff8484883810ee8ccb5ef7da5a52513
+generated: "2021-06-08T16:26:37.05906307+05:30"
