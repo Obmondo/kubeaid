@@ -28,7 +28,7 @@ do
 			chartname=$(echo $tgzfile | sed "s/-$version.tgz//")
 			# The logic behind this if statement is sometimes version is just a single digit and while pulling
 			# the chart for such they fail hence append 0.0
-			if [ -z "$version"]; then
+			if [ -z "$version" ]; then
 				version=$(echo $tgzfile | grep -o "v*[0-9]\{1\}.tgz" | sed 's/\.tgz//')
 				chartname=$(echo $tgzfile | sed "s/-$version.tgz//")
 				version=$version.0.0
