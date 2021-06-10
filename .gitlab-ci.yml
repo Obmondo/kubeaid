@@ -3,6 +3,14 @@ stages:
   - diff
   - build
 
+lint_sh:
+  stage: lint
+  image: koalaman/shellcheck-alpine
+  script:
+    - 'find . -name \*.sh -o -name \*.bash | xargs shellcheck'
+  only:
+  - merge_requests
+
 lint_yaml:
   stage: lint
   image: runejuhl/alpine-ci
