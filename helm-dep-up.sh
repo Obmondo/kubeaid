@@ -24,31 +24,29 @@ do
     esac
 done
 
-set +e
-if $oci
-then
-  version=$(grep -E "  version:.+" "$path/Chart.yaml")
-  versionnum=$(cut -d':' -f2 <<< "$version" | sed -e 's/^[[:space:]]*//')
-  chartname=$(echo "$path" | rev | cut -d'/' -f1 | rev)
-  if ! helm chart pull "${registry}/${chartname}:${versionnum}" && [ "$upstream" == true ]; then
-    echo "### Doing dep up for upstream for $path and $versionnum ###"
-    if [ -f "$path/Chart.yaml" ]; then
+if [[ "$oci" == true ]]; then
+  version=$(grep -E "  version:.+" "${path}/Chart.yaml")
+  versionnum=$(cut -d':' -f2 <<< "${version}" | sed -e 's/^[[:space:]]*//')
+  chartname=$(basename "$path")
+  if ! helm chart pull "${registry}/${chartname}:${versionnum}" && [ "${upstream}" == true ]; then
+    echo "### Doing dep up for upstream for ${path} and ${versionnum} ###"
+
+    if [ -f "${path}/Chart.yaml" ]; then
       sed -ri -e 's/#(repository: https?:)/\1/g' "${path}/Chart.yaml"
       sed -ri -e 's/(repository: "oci)/#\1/g' "${path}/Chart.yaml"
-      helm dep up "${path}" > /dev/null
     fi
   elif [ "$upstream" == false ]; then
-    echo "### Doing dep up for ghcr for $path and $versionnum ###"
+    echo "### Doing dep up for ghcr for ${path} and ${versionnum} ###"
     sed -ri -e 's/#(repository: "oci)/\1/g' "${path}/Chart.yaml"
     sed -ri -e 's/(repository: https?:)/#\1/g' "${path}/Chart.yaml"
-    helm dep up "$path" > /dev/null
   else
-    echo "### Ignoring dep up for upstream since $versionnum is already present for $path ###"
+    echo "### Ignoring dep up for upstream since ${versionnum} is already present for $path ###"
+    exit 0
   fi
 
 else
-  sed -i -e 's/#repository: https:/repository: https:/g' "${path}/Chart.yaml"
-  sed -i -e 's/#repository: http:/repository: http:/g' "${path}/Chart.yaml"
+  sed -ri -e 's/#(repository: https?:)/\1/g' "${path}/Chart.yaml"
   sed -i -e 's/repository: "oci/#repository: "oci/g' "${path}/Chart.yaml"
-  helm dep up "$path" > /dev/null
 fi
+
+helm dep up "${path}" > /dev/null
