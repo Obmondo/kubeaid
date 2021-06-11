@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: RELEASE-NAME
+  name: teleport-cluster
 data:
   teleport.yaml: |
     teleport:
