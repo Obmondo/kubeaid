@@ -20,39 +20,33 @@ do
         p) path=${OPTARG};;
         r) registry=${OPTARG};;
         o) oci=${OPTARG};;
+        *) >&2 echo "Invalid flag '$flag', exiting"; exit 1
     esac
 done
 
-set +e
-if $oci
-then
-	version=$(grep -E "  version*" $path/Chart.yaml)
-	versionnum=$(echo $version | cut -d':' -f2 | sed -e 's/^[[:space:]]*//')
-	chartname=$(echo $path | rev | cut -d'/' -f1 | rev)
-	helm chart pull $registry/$chartname:$versionnum
-	if [ $? -ne 0 ] && [ $upstream == true ]
-	then
-		echo "### Doing dep up for upstream for $path and $versionnum ###"
-		if [ -f "$path/Chart.yaml" ]; then
-			sed -i -e 's/#repository: https:/repository: https:/g' $path/Chart.yaml
-			sed -i -e 's/#repository: http:/repository: http:/g' $path/Chart.yaml
-			sed -i -e 's/repository: "oci/#repository: "oci/g' $path/Chart.yaml
-			helm dep up $path > /dev/null
-		fi
-    elif [ $upstream == false ]
-        then
-            echo "### Doing dep up for ghcr for $path and $versionnum ###"
-            sed -i -e 's/#repository: "oci/repository: "oci/g' $path/Chart.yaml
-            sed -i -e 's/repository: https:/#repository: https:/g' $path/Chart.yaml
-            sed -i -e 's/repository: http:/#repository: http:/g' $path/Chart.yaml
-            helm dep up $path > /dev/null
-	else
-		echo "### Ignoring dep up for upstream since $versionnum is already present for $path ###"
-	fi
+if [[ "$oci" == true ]]; then
+  version=$(grep -E "  version:.+" "${path}/Chart.yaml")
+  versionnum=$(cut -d':' -f2 <<< "${version}" | sed -e 's/^[[:space:]]*//')
+  chartname=$(basename "$path")
+  if ! helm chart pull "${registry}/${chartname}:${versionnum}" && [ "${upstream}" == true ]; then
+    echo "### Doing dep up for upstream for ${path} and ${versionnum} ###"
+
+    if [ -f "${path}/Chart.yaml" ]; then
+      sed -ri -e 's/#(repository: https?:)/\1/g' "${path}/Chart.yaml"
+      sed -ri -e 's/(repository: "oci)/#\1/g' "${path}/Chart.yaml"
+    fi
+  elif [ "$upstream" == false ]; then
+    echo "### Doing dep up for ghcr for ${path} and ${versionnum} ###"
+    sed -ri -e 's/#(repository: "oci)/\1/g' "${path}/Chart.yaml"
+    sed -ri -e 's/(repository: https?:)/#\1/g' "${path}/Chart.yaml"
+  else
+    echo "### Ignoring dep up for upstream since ${versionnum} is already present for $path ###"
+    exit 0
+  fi
 
 else
-	sed -i -e 's/#repository: https:/repository: https:/g' $path/Chart.yaml
-	sed -i -e 's/#repository: http:/repository: http:/g' $path/Chart.yaml
-	sed -i -e 's/repository: "oci/#repository: "oci/g' $path/Chart.yaml
-	helm dep up $path > /dev/null
+  sed -ri -e 's/#(repository: https?:)/\1/g' "${path}/Chart.yaml"
+  sed -i -e 's/repository: "oci/#repository: "oci/g' "${path}/Chart.yaml"
 fi
+
+helm dep up "${path}" > /dev/null
