@@ -15,6 +15,13 @@ data:
         require_session_mfa: yes
         type: local
         second_factor: u2f
+        u2f:
+          app_id: https://teleport.obmondo.com:443
+          facets:
+          - https://teleport.obmondo.com:443
+          - https://teleport.obmondo.com
+          - teleport.obmondo.com:443
+          - teleport.obmondo.com
     kubernetes_service:
       enabled: true
       listen_addr: 0.0.0.0:3027
