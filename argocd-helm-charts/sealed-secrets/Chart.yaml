@@ -3,7 +3,7 @@ name: sealed-secrets
 version: 1.0.0
 dependencies:
   - name: sealed-secrets
-    version: 1.15.0-r1
+    version: 1.16.1
     #repository: https://bitnami-labs.github.io/sealed-secrets
     repository: "oci://ghcr.io/Obmondo"
     # source: https://github.com/bitnami-labs/sealed-secrets
