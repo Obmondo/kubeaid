@@ -1,6 +1,6 @@
 dependencies:
 - name: sealed-secrets
-  repository: https://bitnami-labs.github.io/sealed-secrets
+  repository: oci://ghcr.io/Obmondo
   version: 1.16.1
-digest: sha256:918845bea480547f9e51957aa82f91bbe4620f5cf7f7650ed7d9ffbd3f21e741
-generated: "2021-06-16T10:31:43.661936661+02:00"
+digest: sha256:689098b4be12f226bc876446735ec00a6b43207482d8c28bf11acca417b0f3d9
+generated: "2021-06-16T16:14:56.58448556+05:30"
