@@ -14,7 +14,7 @@ data:
       authentication:
         require_session_mfa: yes
         type: local
-        second_factor: u2f
+        second_factor: on
         u2f:
           app_id: https://teleport.obmondo.com:443
           facets:
