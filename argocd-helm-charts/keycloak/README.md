@@ -7,10 +7,29 @@ https://krew.sigs.k8s.io/docs/user-guide/setup/install/
 In case you are interested.
 https://krew.sigs.k8s.io/docs/user-guide/quickstart
 
+```sh
+(
+  set -x; cd "$(mktemp -d)" &&
+  OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
+  ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
+  curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" &&
+  tar zxvf krew.tar.gz &&
+  KREW=./krew-"${OS}_${ARCH}" &&
+  "$KREW" install krew
+)
+```
+
+Change your shell init scripts to amend `PATH`:
+
+```sh
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+```
 
 ## Install the oidc-login client
 
+```sh
 kubectl krew install oidc-login
+```
 
 Details about setup if you are interested:
 
@@ -20,14 +39,17 @@ Details about setup if you are interested:
 
 * Log into the keycloak server as admin.
 * Go to [clients](http://localhost:8888/auth/admin/master/console/#/realms/master/clients) and click on `Create`.
-* Provide the `Client ID` as `kubernetes`, leave `Client Protocol ` as `openid-connect`, `Root URL` as blank, and click on save.
+* Provide the `Client ID` as `kubernetes`, leave `Client Protocol ` as
+  `openid-connect`, `Root URL` as blank, and click on save.
+* In the "Kubernetes" client details find "Valid redirect URLs" and add
+  `http://localhost` and click "Save.
+
 
 ## Setup the client
 
 * Run the below
-    ```
-    bash -u
 
+    ```sh
     export KEYCLOAK_URL="https://keycloak.kam.obmondo.com/auth/realms/master"
     export CLIENT_ID=kubernetes
     export CLIENT_SECRET=kubernetes
