@@ -12,7 +12,6 @@ data:
       enabled: true
       cluster_name: teleport.obmondo.com
       authentication:
-        require_session_mfa: yes
         type: local
         second_factor: on
         u2f:
