@@ -1,3 +1,18 @@
+# Keycloak Server Setup
+
+### NOTE: Do not give admin password from the webUI, add the password via an ENV variable. 'KEYCLOAK_PASSWORD'
+
+* There are bunch of ways to do this, I have did it in this way.
+
+```
+# Regular way
+kubectl create secret generic keycloak-admin --from-file=KEYCLOAK_PASSWORD=./keycloak_password -n keycloak
+
+# Sealed Secret way
+kubectl create secret generic keycloak-admin -n keycloak --dry-run=client --from-file=KEYCLOAK_PASSWORD=./keycloak_password -o json >mysecret.json
+kubeseal --controller-name sealed-secrets --controller-namespace system <mysecret.json >keycloak-admin.json
+```
+
 # Keycloak Client Setup
 
 ## Install krew plugin manager
@@ -179,5 +194,5 @@ The keycloak recovery/reconfiguration can also be done by exporting the realm an
 
 This will download the real and the respective settings as a `.json` file which can later be used to import the settings from `https://<keycloack-url>/auth/admin/master/console/#/realms/master/partial-import`.
 
-The same can also be done through the argocd UI. You can go ahead and delete the app from the argocd UI which wdoesn't seem to delete the PVC, therefore when you sync the root app and the keycloak app next it will use the same PVC.
+The same can also be done through the argocd UI. You can go ahead and delete the app from the argocd UI which doesn't seem to delete the PVC/PV, therefore when you sync the root app and the keycloak app next it will use the same PVC/PV.
 Restoring itself to the point previously setup and configured to.
