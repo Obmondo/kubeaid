@@ -29,9 +29,10 @@ check_diff:
 
 build:
   stage: build
-  image: dtzar/helm-kubectl
+  image: registry.obmondo.com/obmondo/dockerfiles/obmondo-build:latest
   only:
     refs:
       - 'merge_requests'
   script:
+    - echo "$CI_COMMIT_REF_NAME"
     - bash helm-chart-cache.sh -u Obmondo -p $PASSWORD -r ghcr.io/Obmondo
