@@ -41,6 +41,7 @@ find argocd-helm-charts -maxdepth 1 -mindepth 1 -type d | while read -r path; do
         if git diff "$CI_COMMIT_SHA:$path/Chart.lock" "$path/Chart.lock" | grep '^[+]' | grep -Ev '^(--- a/|\+\+\+ b/)' | grep -qE '\+generated.*'; then
             echo "### Some changes happened in $path/Chart.lock file ###"
             cat "$path/Chart.lock"
+            exit 1
         fi
       fi
     done
