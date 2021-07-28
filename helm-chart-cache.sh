@@ -38,7 +38,7 @@ find argocd-helm-charts -maxdepth 1 -mindepth 1 -type d | while read -r path; do
         echo "###  Doing dep up for ghcr for $path ###"
         bash helm-dep-up.sh -u false -p "$path" -r "$registry";
         echo "### Checking for changes in $path/Chart.lock file for $CI_COMMIT_REF_NAME:$path/Chart.lock ###"
-        if git diff "$CI_COMMIT_REF_NAME:$path/Chart.lock" "$path/Chart.lock" | grep '^[+]' | grep -Ev '^(--- a/|\+\+\+ b/)') | grep -qE '\+generated.*'; then
+        if git diff "$CI_COMMIT_REF_NAME:$path/Chart.lock" "$path/Chart.lock" | grep '^[+]' | grep -Ev '^(--- a/|\+\+\+ b/)' | grep -qE '\+generated.*'; then
             echo "### Some changes happened in $path/Chart.lock file ###"
             cat "$path/Chart.lock"
         fi
