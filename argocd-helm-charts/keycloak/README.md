@@ -173,6 +173,14 @@ login as admin, password is in `pass` git repo
 
 Click on user -> "Role Mappings" -> put `admin` into assigned role
 
+## Add user in keycloak
+
+* From [Keycloak homepage](https://keycloak.kam.obmondo.com/auth/admin/master/console/) go to [users](https://keycloak.kam.obmondo.com/auth/admin/master/console/#/realms/master/users) and click on `View all users`
+* Click on `Add User`
+* Add the relevant details and under `Required User Actions` add `Update Password` (so user can change password on login)
+* Click on `Save`
+* Click on `Credentials` and give the random password and share it with the end user, make sure `Temporary` is **ON**
+
 ## Troubleshooting
 
 * Remove all cache session and run all the steps in the Setup the client.
