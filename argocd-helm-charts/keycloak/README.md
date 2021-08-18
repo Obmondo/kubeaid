@@ -175,11 +175,17 @@ Click on user -> "Role Mappings" -> put `admin` into assigned role
 
 ## Add user in keycloak
 
+* Select realm 'master'
+
+    NOTE: `master` realm is sacred, so add user wisely in this realm and for other purpose just use another realm (most of the cases there will be `devops` realm)
 * From [Keycloak homepage](https://keycloak.your.domain.com/auth/admin/master/console/) go to [users](https://keycloak.your.domain.com/auth/admin/master/console/#/realms/master/users) and click on `View all users`
 * Click on `Add User`
 * Add the relevant details and under `Required User Actions` add `Update Password` (so user can change password on login)
 * Click on `Save`
 * Click on `Credentials` and give the random password and share it with the end user, make sure `Temporary` is **ON**
+* Click on `Role Mappings` and under `Available Roles` select `admin` and click on `Add Selected` (it automatically saves and you should see green colour popup alert toolbox)
+
+    NOTE: `admin` role is quite powerful, so be cautious about this when assigning this role and its only available in `master` realm
 
 ## How to add Identity Provider in keycloak
 
