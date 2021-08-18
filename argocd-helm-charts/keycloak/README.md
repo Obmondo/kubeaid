@@ -181,6 +181,16 @@ Click on user -> "Role Mappings" -> put `admin` into assigned role
 * Click on `Save`
 * Click on `Credentials` and give the random password and share it with the end user, make sure `Temporary` is **ON**
 
+## How to add Identity Provider in keycloak
+
+a. Add google identity provider
+  * From [Keycloak homepage](https://keycloak.your.domain.com/auth/admin/master/console/) go to [Identity Providers](https://keycloak.your.domain.com/auth/admin/master/console/#/realms/devops/identity-provider-settings)
+  * Click on `Add Providers` and select `Google`
+  * Create a google oauth2 client (https://support.google.com/cloud/answer/6158849?hl=en)
+  * Share the `Redirect URI` from the keycloak Identity provider page, when creating the google oauth2 client.
+  * Enter the `Client ID` and `Client Secret`(which you got from the google oauth client) in the keycloak form.
+  * Save and Test
+
 ## Troubleshooting
 
 * Remove all cache session and run all the steps in the Setup the client.
@@ -204,3 +214,7 @@ This will download the real and the respective settings as a `.json` file which 
 
 The same can also be done through the argocd UI. You can go ahead and delete the app from the argocd UI which doesn't seem to delete the PVC/PV, therefore when you sync the root app and the keycloak app next it will use the same PVC/PV.
 Restoring itself to the point previously setup and configured to.
+
+## Good Reads
+
+* https://medium.com/keycloak/github-as-identity-provider-in-keyclaok-dca95a9d80ca
