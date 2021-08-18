@@ -65,7 +65,7 @@ Details about setup if you are interested:
 * Run the below
 
     ```sh
-    export KEYCLOAK_URL="https://keycloak.kam.obmondo.com/auth/realms/master"
+    export KEYCLOAK_URL="https://keycloak.your.domain.com/auth/realms/master"
     export CLIENT_ID=kubernetes
     export CLIENT_SECRET=kubernetes
 
@@ -140,11 +140,11 @@ Details about setup if you are interested:
   ![new mapper](static/mapper.png)
 
 * Once done, you can go ahead create all the respective groups you want in keycloak.
-  1. From [Keycloak homepage](https://keycloak.kam.obmondo.com/auth/admin/master/console/) go to [groups](https://keycloak.kam.obmondo.com/auth/admin/master/console/#/realms/master/groups) and click on `new`
+  1. From [Keycloak homepage](https://keycloak.your.domain.com/auth/admin/master/console/) go to [groups](https://keycloak.your.domain.com/auth/admin/master/console/#/realms/master/groups) and click on `new`
   2. Provide the new group's name and click save.
 
 * Add the users to the group
-  1. From [Keycloak homepage](https://keycloak.kam.obmondo.com/auth/admin/master/console/) go to [users](https://keycloak.kam.obmondo.com/auth/admin/master/console/#/realms/master/users) and click on `View all users`
+  1. From [Keycloak homepage](https://keycloak.your.domain.com/auth/admin/master/console/) go to [users](https://keycloak.your.domain.com/auth/admin/master/console/#/realms/master/users) and click on `View all users`
   2. Go `Groups`
   3. Select the group you want to add the user to from the `Available Groups` table
   4. Click on `Join`
@@ -168,14 +168,14 @@ Details about setup if you are interested:
 
 ---
 
-## How to give a user an admin access in [Keycloak](https://keycloak.kam.obmondo.com/auth/admin/master/console/) and not in k8s
+## How to give a user an admin access in [Keycloak](https://keycloak.your.domain.com/auth/admin/master/console/) and not in k8s
 login as admin, password is in `pass` git repo
 
 Click on user -> "Role Mappings" -> put `admin` into assigned role
 
 ## Add user in keycloak
 
-* From [Keycloak homepage](https://keycloak.kam.obmondo.com/auth/admin/master/console/) go to [users](https://keycloak.kam.obmondo.com/auth/admin/master/console/#/realms/master/users) and click on `View all users`
+* From [Keycloak homepage](https://keycloak.your.domain.com/auth/admin/master/console/) go to [users](https://keycloak.your.domain.com/auth/admin/master/console/#/realms/master/users) and click on `View all users`
 * Click on `Add User`
 * Add the relevant details and under `Required User Actions` add `Update Password` (so user can change password on login)
 * Click on `Save`
