@@ -41,9 +41,13 @@ add secret with ssh keys for gitlab argocd SSH access:
 kubectl create secret generic argocd-sshkey --from-file=ssh-privatekey=/path/to/.ssh/id_rsa --from-file=ssh-publickey=/path/to/.ssh/id_rsa.pub
 ```
 
-Make sure `sshPrivateKeySecret.name` for repositories in
-`argocd-clusters-managed/$yourclustername/values-argocd.yaml` has this repo
+Make sure `sshPrivateKeySecret.name` for repositories in `argocd-clusters-managed/$yourclustername/values-argocd.yaml` has this repo
 added, matching above secretname.
+
+A command to get the existing ssh private key
+```
+kubectl get secrets -n argocd argo-cd-enableit-gitlab-ssh -o jsonpath="{.data.ssh-privatekey}" | base64 --decode
+```
 
 ## Install `argo-cd`
 
@@ -153,3 +157,13 @@ pointing to GHCR.
 
 Remember: the lock file will only change for charts which are still not in your
 registry.
+
+## Fix ssh mismatch key when the Change/Update of git server
+
+* Repository which are configured via ssh might end up not working, since the ssh known_host key is changed.
+* To fix
+  1. ssh-keyscan -p <your-port-number> <git-server>
+  2. Copy the `ecdsa-sha2-nistp256` other sha might work, but haven't tried it.
+  3. Now the argocd won't be working, since it can't connect to the git server.
+  4. Goto repository and click on 'Certificates' and remove the old entery and create a new one and add the key that you got from the ssh-keyscan
+  5. Goto application and click on the `argo-cd` and sync the `argocd-ssh-known-hosts-cm` and then it should work
