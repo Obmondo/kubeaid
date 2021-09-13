@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: teleport-cluster
+data:
+  teleport.yaml: |
+    teleport:
+      log:
+        severity: INFO
+        output: stderr
+    auth_service:
+      enabled: true
+      cluster_name: teleport.obmondo.com
+      listen_addr: 0.0.0.0:3025
+      authentication:
+        type: local
+        second_factor: otp
+    kubernetes_service:
+      enabled: true
+      listen_addr: 0.0.0.0:3027
+      labels:
+    proxy_service:
+      enabled: true
+      listen_addr: 0.0.0.0:3023
+      web_listen_addr: 0.0.0.0:3080
+      tunnel_listen_addr: 0.0.0.0:3024
+      kube_listen_addr: 0.0.0.0:3026
+      public_addr: 'teleport.obmondo.com:3080'      
+      acme:
+        enabled: true
+        email: ops@enableit.dk
+    ssh_service:
+      enabled: true
