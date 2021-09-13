@@ -31,6 +31,6 @@ data:
       enabled: true
       acme:
         enabled: true
-        email: info@enableit.dk
+        email: ops@enableit.dk
     ssh_service:
       enabled: true
