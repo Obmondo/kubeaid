@@ -1,6 +1,6 @@
 dependencies:
 - name: velero
-  repository: oci://ghcr.io/Obmondo
-  version: 2.15.0
-digest: sha256:f456b0c7466ac010d6f4aac948cd08ec712355bde05d63b3993ad36ea4cc66c3
-generated: "2021-05-17T15:32:57.019528229+05:30"
+  repository: https://vmware-tanzu.github.io/helm-charts
+  version: 2.23.8
+digest: sha256:a3005f7d822708b19c67cb1faeab8fdbc7f585448cf0cbcec55f2234f0931678
+generated: "2021-09-16T10:41:17.940972541+02:00"
