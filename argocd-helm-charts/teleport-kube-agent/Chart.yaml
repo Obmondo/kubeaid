@@ -7,6 +7,6 @@ keywords:
   - Teleport
 dependencies:
   - name: teleport-kube-agent
-    version: 6.0.0
-    #repository: https://charts.releases.teleport.dev
-    repository: "oci://ghcr.io/Obmondo"
+    version: 7.1.1
+    repository: https://charts.releases.teleport.dev
+    #repository: "oci://ghcr.io/Obmondo"

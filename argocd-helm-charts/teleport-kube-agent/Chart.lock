@@ -1,6 +1,6 @@
 dependencies:
 - name: teleport-kube-agent
-  repository: oci://ghcr.io/Obmondo
-  version: 6.0.0
-digest: sha256:0c66f247a5d8187b2fcaf349f840359e77a6382069459181aeeafa10ae95b025
-generated: "2021-06-04T12:39:55.715344779+05:30"
+  repository: https://charts.releases.teleport.dev
+  version: 7.1.1
+digest: sha256:7adc608a279bbbad5762bc6ffeb92aee7e231c1825073bd952f872c2e9c3ab71
+generated: "2021-09-21T11:15:26.004563965+05:30"
