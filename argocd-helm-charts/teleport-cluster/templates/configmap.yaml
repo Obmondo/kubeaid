@@ -24,7 +24,7 @@ data:
     kubernetes_service:
       enabled: true
       listen_addr: 0.0.0.0:3027
-      labels:
+      kube_cluster_name: teleport.obmondo.com
     proxy_service:
       public_addr: 'teleport.obmondo.com:443'
       kube_listen_addr: 0.0.0.0:3026
