@@ -173,6 +173,12 @@ login as admin, password is in `pass` git repo
 
 Click on user -> "Role Mappings" -> put `admin` into assigned role
 
+## How to login on keycloak UI as none-admin user
+
+* Select realm (f.ex) 'devops' for `Non-Admin user`
+
+* Login from [Keycloak user homepage](https://keycloak.<cluster-service-domain>/auth/realms/<realm>/account/)
+
 ## Add user in keycloak
 
 * Select realm 'master'
