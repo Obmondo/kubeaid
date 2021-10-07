@@ -62,7 +62,7 @@ gitlab-runner:
   ## Configure resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
-  resources: {}
+  resources:
      limits:
        memory: 256Mi
        cpu: 2
