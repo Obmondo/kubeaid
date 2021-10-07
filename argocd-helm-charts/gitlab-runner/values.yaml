@@ -36,7 +36,7 @@ gitlab-runner:
     locked: false
   
     ## The name of the secret containing runner-token and runner-registration-token
-    # secret: gitlab-runner
+    secret: gitlab-runner
   
   
     ## Service Container specific configuration
