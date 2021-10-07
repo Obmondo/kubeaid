@@ -1,6 +1,6 @@
 dependencies:
 - name: gitlab-runner
-  repository: oci://ghcr.io/Obmondo
-  version: 0.28.0
-digest: sha256:0775fa4ccc52e75bb8bf74b4d4a0d872047717b6e477b7008ec1b1479c1c2393
-generated: "2021-05-25T18:57:56.257810044+05:30"
+  repository: https://charts.gitlab.io
+  version: 0.33.1
+digest: sha256:63af4208478fbcb16c1b0bfb3eb6a42ed6aced439c7828b923b68f8159c9426e
+generated: "2021-10-07T15:18:27.208295882+02:00"
