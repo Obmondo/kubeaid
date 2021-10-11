@@ -29,6 +29,13 @@ gitlab-runner:
         [runners.kubernetes]
           namespace = "{{.Release.Namespace}}"
           image = "ubuntu:20.04"
+          executor = 'docker'
+          docker-image = 'ubuntu/focal'
+          docker-tlsverify = false
+          docker-privileged = false
+          docker-disable-cache = false
+          docker-volumes = ['/var/tmp/:/cache:rw']
+          docker-extra-hosts = ['gitlab.enableit.dk:109.238.49.205']
     #      helper_cpu_limit = "2000m"
           
   
