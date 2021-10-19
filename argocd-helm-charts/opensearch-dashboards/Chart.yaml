@@ -1,0 +1,11 @@
+apiVersion: v2
+name: opensearch-dashboards
+type: application
+appVersion: "1.0.0"
+version: 1.0.0
+dependencies:
+  - name: opensearch-dashboards
+    version: 1.0.4
+    # Chart is maintained at https://github.com/opensearch-project/helm-charts/tree/main/charts/opensearch-dashboards
+    #repository: https://opensearch-project.github.io/helm-charts/
+    repository: "oci://ghcr.io/Obmondo"

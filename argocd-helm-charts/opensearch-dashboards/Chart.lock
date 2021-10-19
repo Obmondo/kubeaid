@@ -1,0 +1,6 @@
+dependencies:
+- name: opensearch-dashboards
+  repository: oci://ghcr.io/Obmondo
+  version: 1.0.4
+digest: sha256:878ffba5c80f456dfe51f47bc1828c2c3e47a38cab20136d9e4933f479af7cdd
+generated: "2021-10-19T08:51:28.025843233+02:00"
