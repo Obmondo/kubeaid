@@ -1,0 +1,6 @@
+dependencies:
+- name: opensearch
+  repository: oci://ghcr.io/Obmondo
+  version: 1.0.4
+digest: sha256:bf9d02e336ea865de27d42d915fbb71ba5b454217506197564fd817ce6399953
+generated: "2021-10-19T08:55:05.8558844+02:00"
