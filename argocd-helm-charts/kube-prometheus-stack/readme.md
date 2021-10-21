@@ -34,6 +34,10 @@ https://github.com/Crimrose/Note-integrate-SSO-grafana
     kubectl get secret  kube-prometheus-stack-grafana -n monitoring -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
     ```
   * The password would be correct, but when you try to login it won't work, why ? cause the stack has already deployed the grafana and has no idea how to change the existing password in grafana.
+  * oneliner to generate the sealed-secret
+    ```
+    kubectl create secret generic kube-prometheus-stack-grafana -n monitoring --dry-run=client --from-literal=grafana-keycloak-secret=i_love_k8s -o json | kubeseal --controller-name sealed-secrets --controller-namespace system - > sealed-secrets/k8s.ops.blackwoodseven.com/monitoring/kube-prometheus-stack-grafana.json
+    ```
   * To reproduce this, delete the kube stack and run the get secret command and you would see the password is changed to the default one, which it shouldn't.
   * Fix is to simply add the `keys` from the grafana helm chart into the kube stack value file.
     a. one of option is to use the existing secret (so make sure the sealedsecret has deployed the password before)
