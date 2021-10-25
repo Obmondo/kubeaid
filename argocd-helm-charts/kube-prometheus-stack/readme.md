@@ -20,6 +20,13 @@ echo -n 'blahblew' | kubectl create secret generic kube-prometheus-stack-grafana
 kubeseal --controller-name sealed-secrets --controller-namespace system <grafana_secrets.json >grafana-sealed.json
 ```
 
+## Connecting Alert Manager with Slack/Obmondo/ other chat platforms
+Set "alertmanager.alertmanagerSpec.UseExistingSecret" in values and Grab the alertmanager.yaml from the running pod
+
+Modify it and ensure it is in the secret named 'alertmanager-kube-prometheus-stack-alertmanager'
+
+If you need for example certificate client auth - you can enable this as well, and add extra secret with those files (and add that to alertmanager.alertmanagerSpec.secrets)
+
 ## Integrate Keycloak with Grafana
 
 * Docs
