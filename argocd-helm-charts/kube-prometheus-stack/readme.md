@@ -21,23 +21,12 @@ kubeseal --controller-name sealed-secrets --controller-namespace system <grafana
 ```
 
 ## Connecting Alert Manager with Slack/Obmondo/ other chat platforms
-Alert manager can be integrated with several chat channels to give real-time alerting based on prometheus metrics. There is a file alertmanager.yml that holds this configuration. You can need private keys and certificates too. Check the official guide for more details: https://prometheus.io/docs/alerting/latest/configuration/
+Set "alertmanager.alertmanagerSpec.UseExistingSecret" in values and Grab the alertmanager.yaml from the running pod
 
-N.B: There will have to be two(2) sealed secrets genetated.
-1. For alert-manager:
-   Encode the alert-manager in base64 by running:
-   # base64 alert-manager.yml 
+Modify it and ensure it is in the secret named 'alertmanager-kube-prometheus-stack-alertmanager'
 
-    Then copy the contents in the secrets, then to seal the secrets, run:
-    # kubeseal --controller-name sealed-secrets --controller-namespace system <alert-manager-secret.json >alert-manager-sealedsecret.json
-  
-2. For certificate and private key 
+If you need for example certificate client auth - you can enable this as well, and add extra secret with those files (and add that to alertmanager.alertmanagerSpec.secrets)
 
-   # base64 certificate.cer 
-   # base64 private-key.pem
-   
-    Then copy the contents in the secrets, then to seal the secrets, run: 
-    # kubeseal --controller-name sealed-secrets --controller-namespace system <alert-manager-secret.json >alert-manager-sealedsecret.json
 ## Integrate Keycloak with Grafana
 
 * Docs
