@@ -191,7 +191,8 @@ spec:
   storage: # cluster level storage configuration and selection
     useAllNodes: true
     useAllDevices: true
-    #deviceFilter:
+    {{- if .Values.deviceFilter }}
+    deviceFilter: {{ .Values.deviceFilter | quote }}
     config:
       # crushRoot: "custom-root" # specify a non-default root label for the CRUSH map
       # metadataDevice: "md0" # specify a non-rotational storage so ceph-volume will use it as block db device of bluestore.
@@ -213,6 +214,7 @@ spec:
 #        storeType: filestore
 #    - name: "172.17.4.301"
 #      deviceFilter: "^sd."
+
   # The section for configuring management of daemon disruptions during upgrade or fencing.
   disruptionManagement:
     # If true, the operator will create and manage PodDisruptionBudgets for OSD, Mon, RGW, and MDS daemons. OSD PDBs are managed dynamically
