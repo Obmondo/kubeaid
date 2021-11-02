@@ -113,6 +113,7 @@ To resolve out-of-sync complaint in ArgoCD - AND backup/recovery do this:
   argo-cd-argocd-application-controller-d6c576f5d-5xwq5   0/1     Evicted   0          44m
   argo-cd-argocd-application-controller-d6c576f5d-7cm78   0/1     Evicted   0          100m
   ```
+* It's important to ensure that: `acme.cert-manager.io/http01-edit-in-place: true` is placed in annotations for ingress when traefik is used 
 
 * Please refer: [Wiki for kubernetes](https://gitlab.enableit.dk/obmondo/wiki/-/tree/master/internal/kubernetes)
 
