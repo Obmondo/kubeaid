@@ -32,10 +32,10 @@ kube-prometheus-stack:
     prometheusSpec:
       resources: 
         limits:
-          memory: 200Mi
+          memory: 400Mi
         requests:
           cpu: 100m
-          memory: 100Mi
+          memory: 200Mi
       storageSpec: 
         volumeClaimTemplate:
           spec:
