@@ -33,6 +33,11 @@ If you need for example certificate client auth - you can enable this as well, a
 
 https://github.com/Crimrose/Note-integrate-SSO-grafana
 
+## Updating the version
+1. Put new value in Chart.yaml file (under depedencies>versions)
+2. Make a push and wait for CI job to run
+3. Update the digest and version in Chart.lock based on CI job output.
+
 ## Troubleshooting.
 
 1. You have deployed the kube stack and now want to change the password of grafana.
