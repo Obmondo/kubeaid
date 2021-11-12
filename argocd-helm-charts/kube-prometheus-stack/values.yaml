@@ -1,4 +1,5 @@
 kube-prometheus-stack:
+  namespaceOverride: monitoring
   alertmanager:
     alertmanagerSpec:
       resources: 
