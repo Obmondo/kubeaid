@@ -2,5 +2,5 @@ dependencies:
 - name: kube-prometheus-stack
   repository: oci://ghcr.io/Obmondo
   version: 13.13.0
-digest: sha256:200d1090abcdf677b3efc9afc3e3b9eedb1a6408df7b27953c8c4bfe80958591
+digest: 9b2f9d56be551d782dcec815ca2403fcf872e0ccace6c674eb33f9937d8628d2
 generated: "2021-05-17T15:28:28.8115802+05:30"
