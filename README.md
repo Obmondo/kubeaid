@@ -6,7 +6,28 @@
 | `argocd-k8sconfig`             | Kubernetes config objects. Used by all in `common` and per-cluster in their individual `$clustername` folder.                                                                                                                                                                         |
 | `argocd-application-templates` | collection of applications, to be optionally modified and copied into `argocd-clusters-managed/$clustername/templates` to be installed on that cluster.                                                                                                                               |
 
-# Add a new cluster to be managed by this repository/argocd
+# Install argocd on a cluster and add it to this repository
+
+## Run the install script
+The install script requires kubectl, helm, kubeseal, bcrypt-tool and pwgen. See wiki/guides/kuberenetes-desktop-setup.md for how to install them. You must also have a working connection with your local kubectl to the kubernetes API on the cluster you want to install argocd on. The install script will install argocd with root app and sealed secrets on the kubernetes your kubeconfig is currently pointing to. So make sure your kubeconfig it set up correctly and you can use kubectl commands against the cluster you want to install argocd on before running the script.
+You run the script like this:
+```
+./bin/install-argocd.sh [cluster_name] [repo_token]
+```
+Here the cluster_name is a unique name/ID for your cluster, which will be the name of the clusters folder in argocd-apps/argocd-clusters-managed/ and repo_token is an access token to this repo.
+The script must run in the root of this repo.
+
+## Uninstall script
+If something goes wrong you can uninstall again with `./bin/uninstall-argocd.sh`. You run it just like that, and it will prompt you for cluster_name and argocd password (which you recieved from the install script.)
+
+## recovery mode
+Both scripts have a recovery mode which you use by calling them like this.
+```
+./bin/install-argocd.sh [cluster_name] [repo_token] --recovery
+or
+./bin/uninstall-argocd.sh --recovery
+```
+In recovery mode the uninstall script will remove argocd from kubernetes but not from you local repo clone, and the install script will install argocd using the existing manifests in your local repo clone.
 
 ## Create namespace for argocd installation
 
