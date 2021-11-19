@@ -16,7 +16,7 @@ MAIN_DIR := my-kube-prometheus/
 
 .PHONY: setup
 setup:
-	go get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb
+	echo "make sure to install by cloning https://github.com/jsonnet-bundler/jsonnet-bundler.git and make install inside."
 	jb init
 	jb install github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@main
 # build.sh and example.jsonnet files have been downloaded and provided in this same directory
