@@ -12,6 +12,16 @@ local kp =
       common+: {
         namespace: 'monitoring',
       },
+      alertmanager+: {
+        config: importstr 'alertmanager-config.yaml',
+      },
+    },
+    alertmanager+: {
+      alertmanager+: {
+        spec+: {
+          logLevel: 'debug',  // So firing alerts show up in log
+        },
+      },
     },
   };
 
