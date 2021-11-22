@@ -23,8 +23,22 @@ local kp =
         },
       },
     },
+    prometheus+: {
+      prometheus+: {
+        spec+: {
+          "storageClassName": "rook-ceph-block",
+            "accessModes": [
+              "ReadWriteOnce"
+            ],
+            "resources": {
+              "requests": {
+                "storage": "10Gi"
+              }
+            }
+        },
+      },
+    },
   };
-
 { 'setup/0namespace-namespace': kp.kubePrometheus.namespace } +
 {
   ['setup/prometheus-operator-' + name]: kp.prometheusOperator[name]
