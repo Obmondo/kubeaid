@@ -23,20 +23,22 @@ local kp =
         },
       },
     },
-    prometheus+: {
+    prometheus+:: {
       prometheus+: {
-        spec+: {
-          "storageClassName": "rook-ceph-block",
-            "accessModes": [
-              "ReadWriteOnce"
-            ],
-            "resources": {
-              "requests": {
-                "storage": "10Gi"
-              }
-            }
-        },
-      },
+        spec+: {  
+          storage: {  
+            volumeClaimTemplate: { 
+              apiVersion: 'v1',
+              kind: 'PersistentVolumeClaim',
+              spec: {
+                accessModes: ['ReadWriteOnce'],
+                resources: { requests: { storage: '10Gi' } },
+                storageClassName: 'rook-ceph-block',
+              },
+            },
+          },  
+        },  
+      },  
     },
   };
 { 'setup/0namespace-namespace': kp.kubePrometheus.namespace } +
