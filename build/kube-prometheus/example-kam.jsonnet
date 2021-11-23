@@ -15,11 +15,43 @@ local kp =
       alertmanager+: {
         config: importstr 'alertmanager-config.yaml',
       },
+      grafana+:{
+        config+: {
+            sections: {
+              date_formats: { default_timezone: 'UTC' },
+              "auth": {
+                "disable_login_form": true,
+                "oauth_auto_login": true,
+                "disable_signout_menu": false,
+                "signout_redirect_url": "https://keycloak.kam.obmondo.com/auth/realms/devops/protocol/openid-connect/logout?redirect_uri=https://grafana.kam.obmondo.com"
+              },
+              "server": {
+                "root_url": "https://grafana.kam.obmondo.com"
+              },
+              "auth.generic_oauth": {
+                "enabled": true,
+                "allow_sign_up": true,
+                "scopes": "openid profile email",
+                "name": "Keycloak",
+                "auth_url": "https://keycloak.kam.obmondo.com/auth/realms/devops/protocol/openid-connect/auth",
+                "token_url": "https://keycloak.kam.obmondo.com/auth/realms/devops/protocol/openid-connect/token",
+                "api_url": "https://keycloak.kam.obmondo.com/auth/realms/devops/protocol/openid-connect/userinfo",
+                "client_id": "grafana",
+                "role_attribute_path": "contains(not_null(roles[*],''), 'Admin') && 'Admin' || contains(not_null(roles[*],''), 'Editor') && 'Editor' || contains(not_null(roles[*],''), 'Viewer') && 'Viewer'|| ''"
+            }
+          } 
+        }
+      }
     },
+
     alertmanager+: {
       alertmanager+: {
         spec+: {
           logLevel: 'debug',  // So firing alerts show up in log
+          "useExistingSecret": true,
+          "secrets": [
+            "obmondo-clientcert"
+          ]
         },
       },
     },
@@ -41,6 +73,7 @@ local kp =
       },  
     },
   };
+
 { 'setup/0namespace-namespace': kp.kubePrometheus.namespace } +
 {
   ['setup/prometheus-operator-' + name]: kp.prometheusOperator[name]
