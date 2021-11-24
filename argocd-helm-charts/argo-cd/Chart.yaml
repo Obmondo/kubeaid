@@ -1,9 +1,9 @@
 apiVersion: v1
 name: argo-cd
-version: 2.1.6
+version: 2.1.7
 dependencies:
   - name: argo-cd
-    version: 3.26.8
-    repository: https://argoproj.github.io/argo-helm
-    #repository: "oci://ghcr.io/Obmondo"
+    version: 3.26.10
+    #repository: https://argoproj.github.io/argo-helm
+    repository: "oci://ghcr.io/Obmondo"
     # see versions here: https://github.com/argoproj/argo-helm/blob/master/charts/argo-cd/Chart.yaml
