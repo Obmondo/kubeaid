@@ -1,0 +1,23 @@
+{
+  "kind": "SealedSecret",
+  "apiVersion": "bitnami.com/v1alpha1",
+  "metadata": {
+    "name": "teleport-kube-agent-join-token",
+    "namespace": "obmondo",
+    "creationTimestamp": null
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "name": "teleport-kube-agent-join-token",
+        "namespace": "obmondo",
+        "creationTimestamp": null
+      },
+      "type": "Opaque",
+      "data": null
+    },
+    "encryptedData": {
+      "auth-token": "AgBzGR8l1+pIQIJnuzuqwdyzF7bTeT580or3amfH2F9LiwpT+z6eefQnrzmmMD93rr7W1L5KkTw1mqx5IFEeLzXJ79y6v0uyZMT9GPIbg55E9By5kPIw8Rq+UisX2wu5Hji/dM8ZDQNupQiPtZ9ePwomhBYSkadiNhW+c/3fwhvrpypINQ5ocg82H9JupZaW2Lz/ck2SvuFMdfYKc8Ig440ouMP/xjNiTywUvZ0DkfPkbapf96sLQc3kYq3SioKIUEfz7Eo8qqg/BUS0keYPmOLPk0259OUeKVXIzDArI4zx16SMaRbvfJ8kd7TxBLQPyitQ1p1XM0GHMgBMHvkeWkx/11amED+nY7uV9F8U8z1P7MqOF4LNA+rYYClvT9ZWVuCNG1J+i6STYFZH5lJMKg23QEp6NKXsMam0O1b2aUzLe9VuEk8BHjmZ8nd884pEkJpoVc4hWfgNPSm3SqDUr6l/7AaYsIPVVSSNynU+j9htyE4UrTIiskCJC9Z2Ti2DYRyP2HBo62oeXVpZs77z/GfP3IS2qdieYo4BrwGlKpWekfwNpjPmjQVgUzO9Ft6sbi+gjerWcGYsVZMMURpDE2n9Bx7G+MG67fPnuyIkQpIR+u55zD8dMtUiot7gqulTpmT18Mt7KlJqQwy3XMiUpzhmiSWB1rS1i3cKD4JI6rRxS2b6fVUjwT/8sG9RJWfbcCpLGHVvom7+G49iH+j9Emy4WlEuk7gCDI+309ixSuYUcQ=="
+    }
+  }
+}
