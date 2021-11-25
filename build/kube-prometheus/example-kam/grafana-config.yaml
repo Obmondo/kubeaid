@@ -10,6 +10,23 @@ metadata:
   namespace: monitoring
 stringData:
   grafana.ini: |
+    [auth]
+    disable_login_form = true
+    disable_signout_menu = false
+    oauth_auto_login = true
+    signout_redirect_url = https://keycloak.kam.obmondo.com/auth/realms/devops/protocol/openid-connect/logout?redirect_uri=https://grafana.kam.obmondo.com
+    [auth.generic_oauth]
+    allow_sign_up = true
+    api_url = https://keycloak.kam.obmondo.com/auth/realms/devops/protocol/openid-connect/userinfo
+    auth_url = https://keycloak.kam.obmondo.com/auth/realms/devops/protocol/openid-connect/auth
+    client_id = grafana
+    enabled = true
+    name = Keycloak
+    role_attribute_path = contains(not_null(roles[*],''), 'Admin') && 'Admin' || contains(not_null(roles[*],''), 'Editor') && 'Editor' || contains(not_null(roles[*],''), 'Viewer') && 'Viewer'|| ''
+    scopes = openid profile email
+    token_url = https://keycloak.kam.obmondo.com/auth/realms/devops/protocol/openid-connect/token
     [date_formats]
     default_timezone = UTC
+    [server]
+    root_url = https://grafana.kam.obmondo.com
 type: Opaque

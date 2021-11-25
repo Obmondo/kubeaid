@@ -1,3 +1,20 @@
+local ingress(name, namespace, rules, tls) = {
+  apiVersion: 'networking.k8s.io/v1',
+  kind: 'Ingress',
+  metadata: {
+    name: name,
+    namespace: namespace,
+    annotations: {
+      'cert-manager.io/cluster-issuer': 'letsencrypt',
+      'kubernetes.io/ingress.class': 'traefik-cert-manager',
+    },
+  },
+  spec: { 
+    rules: rules,
+    [if tls!=null then 'tls']: tls,
+  },
+};
+
 local kp =
   (import 'kube-prometheus/main.libsonnet') +
   // Uncomment the following imports to enable its patches
@@ -44,15 +61,56 @@ local kp =
                 "api_url": "https://keycloak.kam.obmondo.com/auth/realms/devops/protocol/openid-connect/userinfo",
                 "client_id": "grafana",
                 "role_attribute_path": "contains(not_null(roles[*],''), 'Admin') && 'Admin' || contains(not_null(roles[*],''), 'Editor') && 'Editor' || contains(not_null(roles[*],''), 'Viewer') && 'Viewer'|| ''"
+
             }
           } 
         }
       }
     },
 
+    ingress+:: {
+      grafana: ingress(
+        'grafana',
+        $.values.common.namespace,
+        [{
+          host: 'grafana.kam.obmondo.com',
+          http: {
+            paths: [{
+              path: '/',
+              pathType: 'Prefix',
+              backend: {
+                service: {
+                  name: 'grafana',
+                  port: {
+                    name: 'http',
+                  },
+                },
+              },
+            }],
+          },
+        }],
+        [{
+          secretName: 'kube-prometheus-grafana-tls',
+          hosts: [
+            'grafana.kam.obmondo.com'
+          ]
+        }]
+      ),
+    },
+
     alertmanager+: {
       alertmanager+: {
         spec+: {
+          "resources": {
+            "limits": {
+              "cpu" : "100m",
+              "memory": "50Mi"
+            },
+            "requests": {
+              "cpu": "10m",
+              "memory": "20Mi"
+            }
+          },
           logLevel: 'debug',  // So firing alerts show up in log
           "useExistingSecret": true,
           "secrets": [
@@ -63,7 +121,16 @@ local kp =
     },
     prometheus+:: {
       prometheus+: {
-        spec+: {  
+        spec+: { 
+          "resources": {
+            "limits": {
+              "memory": "1Gi"
+            },
+            "requests": {
+              "cpu": "100m",
+              "memory": "200Mi"
+            }
+          }, 
           storage: {  
             volumeClaimTemplate: { 
               apiVersion: 'v1',
@@ -76,7 +143,7 @@ local kp =
             },
           },  
         },  
-      },  
+      },
     },
   };
 
@@ -97,3 +164,4 @@ local kp =
 { ['node-exporter-' + name]: kp.nodeExporter[name] for name in std.objectFields(kp.nodeExporter) } +
 { ['prometheus-' + name]: kp.prometheus[name] for name in std.objectFields(kp.prometheus) } +
 { ['prometheus-adapter-' + name]: kp.prometheusAdapter[name] for name in std.objectFields(kp.prometheusAdapter) }
+{ [name + '-ingress']: kp.ingress[name] for name in std.objectFields(kp.ingress) }

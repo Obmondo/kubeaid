@@ -25,13 +25,16 @@ spec:
   resources:
     limits:
       cpu: 100m
-      memory: 100Mi
+      memory: 50Mi
     requests:
-      cpu: 4m
-      memory: 100Mi
+      cpu: 10m
+      memory: 20Mi
+  secrets:
+  - obmondo-clientcert
   securityContext:
     fsGroup: 2000
     runAsNonRoot: true
     runAsUser: 1000
   serviceAccountName: alertmanager-main
+  useExistingSecret: true
   version: 0.23.0
