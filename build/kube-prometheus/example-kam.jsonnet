@@ -15,6 +15,12 @@ local kp =
       alertmanager+: {
         config: importstr 'alertmanager-config.yaml',
       },
+      "prometheusOperator"+: {
+        resources: {
+          limits: { cpu: '100m', memory: '80Mi' },
+          requests: { cpu: '10m', memory: '30Mi' },
+        },
+      },
       grafana+:{
         config+: {
             sections: {
