@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    kubernetes.io/ingress.class: traefik-cert-manager
+  name: grafana
+  namespace: monitoring
+spec:
+  rules:
+  - host: grafana.kbm.obmondo.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: grafana
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - grafana.kbm.obmondo.com
+    secretName: kube-prometheus-grafana-tls

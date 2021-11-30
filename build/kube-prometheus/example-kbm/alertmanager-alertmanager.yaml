@@ -1,0 +1,40 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Alertmanager
+metadata:
+  labels:
+    alertmanager: main
+    app.kubernetes.io/component: alert-router
+    app.kubernetes.io/name: alertmanager
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 0.23.0
+  name: main
+  namespace: monitoring
+spec:
+  image: quay.io/prometheus/alertmanager:v0.23.0
+  logLevel: debug
+  nodeSelector:
+    kubernetes.io/os: linux
+  podMetadata:
+    labels:
+      alertmanager: main
+      app.kubernetes.io/component: alert-router
+      app.kubernetes.io/name: alertmanager
+      app.kubernetes.io/part-of: kube-prometheus
+      app.kubernetes.io/version: 0.23.0
+  replicas: 3
+  resources:
+    limits:
+      cpu: 100m
+      memory: 50Mi
+    requests:
+      cpu: 10m
+      memory: 20Mi
+  secrets:
+  - obmondo-clientcert
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
+  serviceAccountName: alertmanager-main
+  useExistingSecret: true
+  version: 0.23.0
