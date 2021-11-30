@@ -48,6 +48,9 @@ local kp =
                 "disable_signout_menu": false,
                 "signout_redirect_url": "https://keycloak.kam.obmondo.com/auth/realms/devops/protocol/openid-connect/logout?redirect_uri=https://grafana.kam.obmondo.com"
               },
+              "analytics": {
+                "check_for_updates": false
+              },
               "server": {
                 "root_url": "https://grafana.kam.obmondo.com"
               },

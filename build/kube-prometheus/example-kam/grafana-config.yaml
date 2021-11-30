@@ -10,6 +10,8 @@ metadata:
   namespace: monitoring
 stringData:
   grafana.ini: |
+    [analytics]
+    check_for_updates = false
     [auth]
     disable_login_form = true
     disable_signout_menu = false
