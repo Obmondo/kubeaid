@@ -4,9 +4,9 @@
 
 set -euo pipefail
 
-if [ ! -e "${1}.jsonnet" ]
+if [ ! -e "clusters/${1}-vars.jsonnet" ]
 then
-    echo "no such file ${1}.jsonnet"
+    echo "no such variable file ${1}.jsonnet"
     exit 1
 fi
 
@@ -22,7 +22,7 @@ mkdir -p $OUTDIR/setup
 # Calling gojsontoyaml is optional, but we would like to generate yaml, not json
 #jsonnet -J vendor -m manifests "${1-example.jsonnet}" | xargs -I{} sh -c 'cat {} | gojsontoyaml > {}.yaml' -- {}
 
-jsonnet -J vendor -m $OUTDIR "${1}.jsonnet" | xargs -I{} sh -c 'cat {} | $(go env GOPATH)/bin/gojsontoyaml > {}.yaml; rm -f {}' -- {}
+jsonnet -J vendor --ext-code-file vars="clusters/${1}-vars.jsonnet" -m $OUTDIR "common-template.jsonnet" | xargs -I{} sh -c 'cat {} | $(go env GOPATH)/bin/gojsontoyaml > {}.yaml; rm -f {}' -- {}
 
 # Make sure to remove json files
 find $OUTDIR -type f ! -name '*.yaml' -delete
