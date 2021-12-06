@@ -126,4 +126,4 @@ until kops validate cluster "$FULLNAME" --wait=5m; do
   sleep 30
 done
 
-echo "The basic cluster is up and running, so let's get a basic Argo-CD up and running"
+echo "The $FULLNAME k8s cluster is up and running now"
