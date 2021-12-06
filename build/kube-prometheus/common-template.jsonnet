@@ -2,7 +2,22 @@ local utils = import 'utils.libsonnet';
 
 local ext_vars = std.extVar('vars');
 
-local vars = ext_vars;
+local default_vars = {
+  prometheus_operator_resources: {
+      limits: { cpu: '100m', memory: '80Mi' },
+      requests: { cpu: '10m', memory: '30Mi' },
+  },
+  alertmanager_resources: {
+      "limits": { "cpu" : "100m", "memory": "50Mi" },
+      "requests": { "cpu": "10m", "memory": "20Mi" }
+    },
+  prometheus_resources: {
+      "limits": { "memory": "1Gi" },
+      "requests": { "cpu": "100m", "memory": "200Mi" }
+    },
+};
+
+local vars = default_vars+ext_vars;
 
 local kp =
   (import 'kube-prometheus/main.libsonnet') +
