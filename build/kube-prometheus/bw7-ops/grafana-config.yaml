@@ -9,7 +9,5 @@ metadata:
   name: grafana-config
   namespace: monitoring
 stringData:
-  grafana.ini: |
-    [date_formats]
-    default_timezone = UTC
+  grafana.ini: "[analytics]\ncheck_for_updates = false\n[auth]\ndisable_login_form = true\ndisable_signout_menu = false\noauth_auto_login = true\nsignout_redirect_url = \n[auth.generic_oauth]\nallow_sign_up = true\napi_url = \nauth_url = \nclient_id = grafana\nenabled = true\nname = Keycloak\nrole_attribute_path = contains(not_null(roles[*],''), 'Admin') && 'Admin' || contains(not_null(roles[*],''), 'Editor') && 'Editor' || contains(not_null(roles[*],''), 'Viewer') && 'Viewer'|| ''\nscopes = openid profile email\ntoken_url = \n[date_formats]\ndefault_timezone = UTC\n[server]\nroot_url = \n"
 type: Opaque
