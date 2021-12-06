@@ -30,10 +30,7 @@ local kp =
         config: importstr 'alertmanager-config.yaml',
       },
       "prometheusOperator"+: {
-        resources: {
-            limits: { cpu: '100m', memory: '80Mi' },
-            requests: { cpu: '10m', memory: '30Mi' },
-        },
+        resources: vars.prometheus_operator_resources,
       },
       grafana+:{
         config+: {
@@ -101,10 +98,7 @@ local kp =
     alertmanager+: {
       alertmanager+: {
         spec+: {
-          "resources": {
-            "limits": { "cpu" : "100m", "memory": "50Mi" },
-            "requests": { "cpu": "10m", "memory": "20Mi" }
-          },
+          "resources": vars.alertmanager_resources,
           logLevel: 'debug',  // So firing alerts show up in log
           "useExistingSecret": true,
           "secrets": [
@@ -116,10 +110,7 @@ local kp =
     prometheus+:: {
       prometheus+: {
         spec+: { 
-          "resources": {
-            "limits": { "memory": "1Gi" },
-            "requests": { "cpu": "100m", "memory": "200Mi" }
-          }, 
+          "resources": vars.prometheus_resources, 
           storage: {  
             volumeClaimTemplate: { 
               apiVersion: 'v1',

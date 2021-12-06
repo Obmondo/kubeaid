@@ -6,5 +6,18 @@
     grafana_token_url: "https://keycloak.kam.obmondo.com/auth/realms/devops/protocol/openid-connect/token",
     grafana_api_url: "https://keycloak.kam.obmondo.com/auth/realms/devops/protocol/openid-connect/userinfo",
     grafana_ingress_host: "grafana.kam.obmondo.com",
+	
+	prometheus_operator_resources: {
+		limits: { cpu: '100m', memory: '80Mi' },
+		requests: { cpu: '10m', memory: '30Mi' },
+	},
+	alertmanager_resources: {
+		"limits": { "cpu" : "100m", "memory": "50Mi" },
+		"requests": { "cpu": "10m", "memory": "20Mi" }
+		},
+	prometheus_resources: {
+		"limits": { "memory": "1Gi" },
+		"requests": { "cpu": "100m", "memory": "200Mi" }
+		},
 
 }
