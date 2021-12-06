@@ -12,13 +12,13 @@ spec:
   project: default
   source:
     path: argocd-helm-charts/argo-cd
-    repoURL: https://github.com/blackwoodseven/k8s-init.git
+    repoURL: <repo_url>
     targetRevision: HEAD
     helm:
       valueFiles:
       - values.yaml
-      - ../../argocd-clusters-managed/k8s.ops.blackwoodseven.com/values-argo-cd.yaml
+      - ../../argocd-clusters-managed/<cluster_name>/values-argo-cd.yaml
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+    syncOptions:
+    - ApplyOutOfSyncOnly=true
+    - CreateNamespace=true
