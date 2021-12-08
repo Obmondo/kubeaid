@@ -37,14 +37,19 @@ CWDFAIL() {
 ARGFAIL() {
     echo -n "
 Usage $0 [OPTION]:
-  --cluster-name       full cluser-name                          [Required]
-  --recovery           true|false [Defaults: false]
-  --private-key-path   sealed-secrets-private-keys-dir           [Required when --recovery]
-  --public-key-path    sealed-secrets-public-keys-dir            [Required when --recovery]
-  --k8s-type           bare [self managed or via puppet],
-                       aws-kops [k8s cluster with kops on aws],
-                       aks-terraform [azure k8s with terraform]  [Optional]
-  --settings-file      path to settings-files                     [Required]
+  --cluster-name             full cluser-name                          [Required]
+  --recovery                 true|false [Defaults: false]
+  --private-key-path         sealed-secrets-private-keys-dir           [Required when --recovery]
+  --public-key-path          sealed-secrets-public-keys-dir            [Required when --recovery]
+  --install-k8s              install kubernetes cluster
+  --k8s-type                 bare [self managed or via puppet],
+                             aws-kops [k8s cluster with kops on aws],
+                             aks-terraform [azure k8s with terraform]  [Optional]
+  --settings-file            path to settings-files                     [Required]
+  --setup-argocd             setup argocd
+  --setup-sealed-secret      setup sealed secret
+  --setup-root-app           setup root app to manage other app
+  --generate-argocd-password generate admin password for argocd
   -h | --help
 
 Example:
@@ -348,8 +353,9 @@ if $SETUP_SEALED_SECRET; then
     mkdir -p ./sealed-secrets/"$CLUSTER_NAME"
     mkdir -p ./sealed-secrets/"$CLUSTER_NAME"/argocd
 
-    # Pods are ready, but things under the hood are yet to finalize.
+    # Pods are ready, but under the hood things are yet to finalize, so sleep for 2s.
     sleep 2
+
     kubectl get secret \
         --namespace system \
         -l sealedsecrets.bitnami.com/sealed-secrets-key=active \
@@ -378,38 +384,15 @@ if $SETUP_ARGOCD; then
         STAT $?
     fi
 
-    kubectl config set-context --current --namespace=argocd &>>/tmp/argocd.log
-
-    ARGOCD_CREATESECRET=$(DEFAULT_VALES '.argo-cd.secret.createSecret' true)
     ARGOCD_CTRL_REPLICAS=$(DEFAULT_VALES '.argo-cd.controller.replicas' 1)
     ARGOCD_REPO_REPLICAS=$(DEFAULT_VALES '.argo-cd.repoServer.replicas' 1)
-
-    if ! helm list --deployed -n argocd -q | grep argo-cd >/dev/null; then
-        HEAD "Installing argocd...         "
-        helm dep update ./argocd-helm-charts/argo-cd &>> /tmp/argocd.log
-
-        cp ./argocd-application-templates/argo-cd.yaml ./argocd-clusters-managed/"$CLUSTER_NAME"/templates/argo-cd.yaml
-
-        yq eval --inplace ".spec.source.repoURL = \"$REPO_URL\"" ./argocd-clusters-managed/"$CLUSTER_NAME"/templates/argo-cd.yaml
-        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"../../argocd-clusters-managed/$CLUSTER_NAME/values-argo-cd.yaml\"" ./argocd-clusters-managed/"$CLUSTER_NAME"/templates/argo-cd.yaml
-
-        helm install \
-            --namespace argocd \
-            --set argo-cd.configs.secret.createSecret="$ARGOCD_CREATESECRET" \
-            --set argo-cd.controller.replicas="$ARGOCD_CTRL_REPLICAS" \
-            --set argo-cd.repoServer.replicas="$ARGOCD_REPO_REPLICAS" \
-            argo-cd ./argocd-helm-charts/argo-cd &>> /tmp/argocd.log
-
-        # we can do the same with sed, but going ahead with yq
-        #sed -i "s/<cluster_name>/$CLUSTER_NAME/g" argocd-application-templates/argo-cd.yaml
-        STAT $?
-    else
-        HEAD "argocd is already installed... "
-        STAT $?
-    fi
-
-    ##### Add argocd-apps repo #####
     ARGOCD_REPO_NAME=$(yq eval '.argo-cd.repo.name' "$SETTINGS_FILE")
+
+    # This is the form in which argocd stores its admin password
+    PASSWORD=$(pwgen -y 30 1)
+    SECRET_KEY=$(pwgen 48 1)
+    ENCODED_PASSWORD_HASH=$(bcrypt-tool hash "$PASSWORD" 10)
+    echo "Argocd password: $PASSWORD"
 
     case "$GIT_SERVER" in
         https)
@@ -420,20 +403,58 @@ if $SETUP_ARGOCD; then
                 read -r -s -p "Password: " HTTPS_PASSWORD
 
                 kubectl create secret generic "$ARGOCD_SECRET_NAME" \
+                    --dry-run=client \
                     --from-literal=type='git' \
                     --from-literal=name="$ARGOCD_REPO_NAME" \
                     --from-literal=repo="$REPO_URL" \
                     --from-literal=username="$HTTPS_USERNAME" \
-                    --from-literal=password="$HTTPS_PASSWORD"
+                    --from-literal=password="$HTTPS_PASSWORD" \
+                    --output json \
+                    | kubeseal --controller-namespace system \
+                    --controller-name sealed-secrets \
+                    --cert ./sealed-secrets/"$CLUSTER_NAME"/"$CLUSTER_NAME".pem \
+                    - > ./sealed-secrets/"$CLUSTER_NAME"/argocd/"$ARGOCD_SECRET_NAME".json
+                STAT $?
 
-                kubectl -n argocd --overwrite=true label secret "$ARGOCD_SECRET_NAME" 'argocd.argoproj.io/secret-type=repository'
+                HEAD "Applying sealed-secrets for $ARGOCD_SECRET_NAME ...   "
+                {
+                    kubectl apply -f ./sealed-secrets/"$CLUSTER_NAME"/argocd/"$ARGOCD_SECRET_NAME".json
+                    kubectl -n argocd --overwrite=true annotate secret "$ARGOCD_SECRET_NAME" 'managed-by=argocd.argoproj.io'
+                    kubectl -n argocd --overwrite=true annotate secret "$ARGOCD_SECRET_NAME" 'sealedsecrets.bitnami.com/managed=true'
+                    kubectl -n argocd --overwrite=true label secret "$ARGOCD_SECRET_NAME" 'argocd.argoproj.io/secret-type=repository'
+                } &>>/tmp/argocd.log
                 STAT $?
             fi
+
+            ### Update the argocd-secret with our custom password and create a sealed secret file as well
+            if $GENERATE_ARGOCD_PASSWORD && ! $RECOVERY && ! kubectl get secrets -n argocd argocd-secret -o name &>/dev/null; then
+                kubectl create secret generic argocd-secret \
+                    --dry-run=client \
+                    --from-literal=admin.password="$ENCODED_PASSWORD_HASH" \
+                    --from-literal=admin.passwordMtime="$(date +%FT%T%Z)" \
+                    --from-literal=github.clientSecret="$GITHUB_CLIENT_SECRET" \
+                    --from-literal=server.secretkey="$SECRET_KEY" \
+                    --output yaml \
+                    | kubeseal --controller-namespace system \
+                        --controller-name sealed-secrets \
+                        --cert ./sealed-secrets/"$CLUSTER_NAME"/"$CLUSTER_NAME".pem \
+                        - > ./sealed-secrets/"$CLUSTER_NAME"/argocd/argocd-secret.json
+                STAT $?
+
+                HEAD "Applying sealed-secrets for argocd-secret...   "
+                {
+                    kubectl apply -f ./sealed-secrets/"$CLUSTER_NAME"/argocd/argocd-secret.json
+                    kubectl -n argocd --overwrite=true annotate secret argocd-secret 'managed-by=argocd.argoproj.io'
+                    kubectl -n argocd --overwrite=true annotate secret argocd-secret 'sealedsecrets.bitnami.com/managed=true'
+                } &>>/tmp/argocd.log
+                STAT $?
+            fi
+
             ;;
         github)
             # https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#generating-a-private-key
             if ! kubectl get secrets -n argocd "$ARGOCD_SECRET_NAME" -o name &>/dev/null; then
-                HEAD "Adding argocd-apps repo...   "
+                HEAD "Creating sealed-secret for $ARGOCD_SECRET_NAME ...  "
                 read -r -p "Github AppID: " GITHUB_APP_ID
                 read -r -p "Github AppInstallationID: " GITHUB_APP_INSTALL_ID
                 read -r -p "Github AppPrivateKey File: " GITHUB_APP_PRIVATEKEY
@@ -444,14 +465,56 @@ if $SETUP_ARGOCD; then
                 fi
 
                 kubectl create secret generic "$ARGOCD_SECRET_NAME" \
+                    --dry-run=client \
                     --from-literal=url="$REPO_URL" \
                     --from-literal=githubAppID="$GITHUB_APP_ID" \
                     --from-literal=githubAppInstallationID="$GITHUB_APP_INSTALL_ID" \
-                    --from-file=githubAppPrivateKey="$GITHUB_APP_PRIVATEKEY"
+                    --from-file=githubAppPrivateKey="$GITHUB_APP_PRIVATEKEY" \
+                    --output json \
+                    | kubeseal --controller-namespace system \
+                    --controller-name sealed-secrets \
+                    --cert ./sealed-secrets/"$CLUSTER_NAME"/"$CLUSTER_NAME".pem \
+                    - > ./sealed-secrets/"$CLUSTER_NAME"/argocd/"$ARGOCD_SECRET_NAME".json
+                STAT $?
 
-                kubectl -n argocd --overwrite=true label secret "$ARGOCD_SECRET_NAME" 'argocd.argoproj.io/secret-type=repo-creds'
+                HEAD "Applying sealed-secrets for $ARGOCD_SECRET_NAME ...   "
+                {
+                    kubectl apply -f ./sealed-secrets/"$CLUSTER_NAME"/argocd/"$ARGOCD_SECRET_NAME".json
+                    kubectl -n argocd --overwrite=true label secret "$ARGOCD_SECRET_NAME" 'argocd.argoproj.io/secret-type=repo-creds'
+                    kubectl -n argocd --overwrite=true annotate secret "$ARGOCD_SECRET_NAME" 'managed-by=argocd.argoproj.io'
+                    kubectl -n argocd --overwrite=true annotate secret "$ARGOCD_SECRET_NAME" 'sealedsecrets.bitnami.com/managed=true'
+                } &>>/tmp/argocd.log
                 STAT $?
             fi
+
+            ### Update the argocd-secret with our custom password and create a sealed secret file as well
+            if $GENERATE_ARGOCD_PASSWORD && ! $RECOVERY && ! kubectl get secrets -n argocd argocd-secret -o name &>/dev/null; then
+                HEAD "Creating sealed-secret for argocd-secret ...    "
+                read -r -s -p "Github client secret :" GITHUB_CLIENT_SECRET
+
+                # NOTE: maybe its better to create a yaml file, so all annotation is in place
+                kubectl create secret generic argocd-secret \
+                    --dry-run=client \
+                    --from-literal=admin.password="$ENCODED_PASSWORD_HASH" \
+                    --from-literal=admin.passwordMtime="$(date +%FT%T%Z)" \
+                    --from-literal=github.clientSecret="$GITHUB_CLIENT_SECRET" \
+                    --from-literal=server.secretkey="$SECRET_KEY" \
+                    --output yaml \
+                    | kubeseal --controller-namespace system \
+                    --controller-name sealed-secrets \
+                    --cert ./sealed-secrets/"$CLUSTER_NAME"/"$CLUSTER_NAME".pem \
+                    - > ./sealed-secrets/"$CLUSTER_NAME"/argocd/argocd-secret.json
+                STAT $?
+
+                HEAD "Applying sealed-secrets for argocd-secret...   "
+                {
+                    kubectl apply -f ./sealed-secrets/"$CLUSTER_NAME"/argocd/argocd-secret.json
+                    kubectl -n argocd --overwrite=true annotate secret argocd-secret 'managed-by=argocd.argoproj.io'
+                    kubectl -n argocd --overwrite=true annotate secret argocd-secret 'sealedsecrets.bitnami.com/managed=true'
+                } &>>/tmp/argocd.log
+                STAT $?
+            fi
+
             ;;
         ssh)
             echo "Error: we don't recommend using ssh options, since a user can get shell access with ssh access"
@@ -463,21 +526,31 @@ if $SETUP_ARGOCD; then
             ;;
     esac
 
-    {
-        kubectl -n argocd --overwrite=true annotate secret "$ARGOCD_SECRET_NAME" 'managed-by=argocd.argoproj.io'
-        kubectl -n argocd --overwrite=true annotate secret "$ARGOCD_SECRET_NAME" 'sealedsecrets.bitnami.com/managed=true'
-        kubectl -n argocd --overwrite=true annotate secret argocd-secret 'managed-by=argocd.argoproj.io'
-        kubectl -n argocd --overwrite=true annotate secret argocd-secret 'sealedsecrets.bitnami.com/managed=true'
-    } &>>/tmp/argocd.log
+    if ! helm list --deployed -n argocd -q | grep argo-cd >/dev/null; then
+        HEAD "Installing argocd...         "
+        helm dep update ./argocd-helm-charts/argo-cd &>> /tmp/argocd.log
 
-    # Get secret json
-    HEAD "Creating sealed-secret for $ARGOCD_SECRET_NAME ...  "
-    kubectl -n argocd get secret/"$ARGOCD_SECRET_NAME" -o json \
-      | kubeseal --controller-namespace system \
-      --controller-name sealed-secrets \
-      --cert ./sealed-secrets/"$CLUSTER_NAME"/"$CLUSTER_NAME".pem \
-      - > ./sealed-secrets/"$CLUSTER_NAME"/argocd/"$ARGOCD_SECRET_NAME".json
-    STAT $?
+        cp ./argocd-application-templates/argo-cd.yaml ./argocd-clusters-managed/"$CLUSTER_NAME"/templates/argo-cd.yaml
+
+        yq eval --inplace ".spec.source.repoURL = \"$REPO_URL\"" ./argocd-clusters-managed/"$CLUSTER_NAME"/templates/argo-cd.yaml
+        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"../../argocd-clusters-managed/$CLUSTER_NAME/values-argo-cd.yaml\"" ./argocd-clusters-managed/"$CLUSTER_NAME"/templates/argo-cd.yaml
+
+        # We want to setup the secret via sealed-secret, so we should make it default to false
+        # so argocd does not create argocd-secret and we create it ourselves.
+        helm install \
+            --namespace argocd \
+            --set argo-cd.configs.secret.createSecret=false \
+            --set argo-cd.controller.replicas="$ARGOCD_CTRL_REPLICAS" \
+            --set argo-cd.repoServer.replicas="$ARGOCD_REPO_REPLICAS" \
+            argo-cd ./argocd-helm-charts/argo-cd &>> /tmp/argocd.log
+
+        # we can do the same with sed, but going ahead with yq
+        #sed -i "s/<cluster_name>/$CLUSTER_NAME/g" argocd-application-templates/argo-cd.yaml
+        STAT $?
+    else
+        HEAD "argocd is already installed... "
+        STAT $?
+    fi
 fi
 
 ##### Install root app #####
@@ -501,56 +574,6 @@ if $SETUP_ROOT_APP; then
     helm template ./argocd-clusters-managed/"$CLUSTER_NAME" --show-only templates/root.yaml | kubectl apply -f - &>>/tmp/argocd.log
     STAT $?
 fi
-
-##### Put secrets in sealed secrets (or import old ones) #####
-kubectl config set-context --current --namespace=argocd &>>/tmp/argocd.log
-
-### Update the argocd-secret with our custom password and create a sealed secret file as well
-if $GENERATE_ARGOCD_PASSWORD && ! $RECOVERY; then
-    # This is the form in which argocd stores its admin password
-    PASSWORD=$(pwgen -y 30 1)
-    ENCODED_PASSWORD_HASH=$(bcrypt-tool hash "$PASSWORD" 10 | base64 -w 0)
-
-    # Get secret json
-    # Turn it into a sealed secret
-    HEAD "Creating sealed-secret for argocd-secret...  "
-    case "$GIT_SERVER" in
-        https)
-             kubectl -n argocd get secret/argocd-secret -o yaml \
-                | yq eval ".data.\"admin.password\" = \"$ENCODED_PASSWORD_HASH\"" - \
-                | kubeseal --controller-namespace system \
-                    --controller-name sealed-secrets \
-                    --cert ./sealed-secrets/"$CLUSTER_NAME"/"$CLUSTER_NAME".pem \
-                    - > ./sealed-secrets/"$CLUSTER_NAME"/argocd/argocd-secret.json
-            STAT $?
-
-            ;;
-        github)
-
-            read -r -s -p "Github client secret :" GITHUB_CLIENT_SECRET
-
-            kubectl -n argocd get secret/argocd-secret -o yaml \
-                | yq eval ".data.\"admin.password\" = \"$ENCODED_PASSWORD_HASH\"" - \
-                | yq eval ".data.\"github.clientSecret\" = \"$GITHUB_CLIENT_SECRET\"" - \
-                | kubeseal --controller-namespace system \
-                    --controller-name sealed-secrets \
-                    --cert ./sealed-secrets/"$CLUSTER_NAME"/"$CLUSTER_NAME".pem \
-                    - > ./sealed-secrets/"$CLUSTER_NAME"/argocd/argocd-secret.json
-            STAT $?
-            ;;
-        *)
-            echo "Error: unknown $GIT_SERVER, can not add admin password into argocd-secret. exiting... "
-            exit 1
-            ;;
-      esac
-
-    echo "Argocd password: $PASSWORD"
-fi
-
-HEAD "Applying sealed-secrets for $ARGOCD_SECRET_NAME and argocd-secret...   "
-kubectl apply -f ./sealed-secrets/"$CLUSTER_NAME"/argocd/argocd-secret.json &>>/tmp/argocd.log
-kubectl apply -f ./sealed-secrets/"$CLUSTER_NAME"/argocd/"$ARGOCD_SECRET_NAME".json &>>/tmp/argocd.log
-STAT $?
 
 ## Let's delete the initial-admin-secret secret, so we can have the one we want.
 if kubectl get secret -n argocd argocd-initial-admin-secret -o name &>/dev/null; then
