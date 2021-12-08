@@ -7,25 +7,23 @@
     dnsErrorThreshold: 1,
     p99QueryLatencyThreshold: 40,
     p99QueryRangeLatencyThreshold: 90,
-    dimensions: std.join(', ', std.objectFields(thanos.targetGroups) + ['job']),
   },
   prometheusAlerts+:: {
-    groups+: if thanos.query == null then [] else [
-      local location = if std.length(std.objectFields(thanos.targetGroups)) > 0 then ' in %s' % std.join('/', ['{{$labels.%s}}' % level for level in std.objectFields(thanos.targetGroups)]) else '';
+    groups+: [
       {
         name: 'thanos-query',
         rules: [
           {
             alert: 'ThanosQueryHttpRequestQueryErrorRateHigh',
             annotations: {
-              description: 'Thanos Query {{$labels.job}}%s is failing to handle {{$value | humanize}}%% of "query" requests.' % location,
+              description: 'Thanos Query {{$labels.job}} is failing to handle {{ $value | humanize }}% of "query" requests.',
               summary: 'Thanos Query is failing to handle requests.',
             },
             expr: |||
               (
-                sum by (%(dimensions)s) (rate(http_requests_total{code=~"5..", %(selector)s, handler="query"}[5m]))
+                sum(rate(http_requests_total{code=~"5..", %(selector)s, handler="query"}[5m]))
               /
-                sum by (%(dimensions)s) (rate(http_requests_total{%(selector)s, handler="query"}[5m]))
+                sum(rate(http_requests_total{%(selector)s, handler="query"}[5m]))
               ) * 100 > %(httpErrorThreshold)s
             ||| % thanos.query,
             'for': '5m',
@@ -36,14 +34,14 @@
           {
             alert: 'ThanosQueryHttpRequestQueryRangeErrorRateHigh',
             annotations: {
-              description: 'Thanos Query {{$labels.job}}%s is failing to handle {{$value | humanize}}%% of "query_range" requests.' % location,
+              description: 'Thanos Query {{$labels.job}} is failing to handle {{ $value | humanize }}% of "query_range" requests.',
               summary: 'Thanos Query is failing to handle requests.',
             },
             expr: |||
               (
-                sum by (%(dimensions)s) (rate(http_requests_total{code=~"5..", %(selector)s, handler="query_range"}[5m]))
+                sum(rate(http_requests_total{code=~"5..", %(selector)s, handler="query_range"}[5m]))
               /
-                sum by (%(dimensions)s) (rate(http_requests_total{%(selector)s, handler="query_range"}[5m]))
+                sum(rate(http_requests_total{%(selector)s, handler="query_range"}[5m]))
               ) * 100 > %(httpErrorThreshold)s
             ||| % thanos.query,
             'for': '5m',
@@ -54,14 +52,14 @@
           {
             alert: 'ThanosQueryGrpcServerErrorRate',
             annotations: {
-              description: 'Thanos Query {{$labels.job}}%s is failing to handle {{$value | humanize}}%% of requests.' % location,
+              description: 'Thanos Query {{$labels.job}} is failing to handle {{ $value | humanize }}% of requests.',
               summary: 'Thanos Query is failing to handle requests.',
             },
             expr: |||
               (
-                sum by (%(dimensions)s) (rate(grpc_server_handled_total{grpc_code=~"Unknown|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded", %(selector)s}[5m]))
+                sum by (job) (rate(grpc_server_handled_total{grpc_code=~"Unknown|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded", %(selector)s}[5m]))
               /
-                sum by (%(dimensions)s) (rate(grpc_server_started_total{%(selector)s}[5m]))
+                sum by (job) (rate(grpc_server_started_total{%(selector)s}[5m]))
               * 100 > %(grpcErrorThreshold)s
               )
             ||| % thanos.query,
@@ -73,14 +71,14 @@
           {
             alert: 'ThanosQueryGrpcClientErrorRate',
             annotations: {
-              description: 'Thanos Query {{$labels.job}}%s is failing to send {{$value | humanize}}%% of requests.' % location,
+              description: 'Thanos Query {{$labels.job}} is failing to send {{ $value | humanize }}% of requests.',
               summary: 'Thanos Query is failing to send requests.',
             },
             expr: |||
               (
-                sum by (%(dimensions)s) (rate(grpc_client_handled_total{grpc_code!="OK", %(selector)s}[5m]))
+                sum by (job) (rate(grpc_client_handled_total{grpc_code!="OK", %(selector)s}[5m]))
               /
-                sum by (%(dimensions)s) (rate(grpc_client_started_total{%(selector)s}[5m]))
+                sum by (job) (rate(grpc_client_started_total{%(selector)s}[5m]))
               ) * 100 > %(grpcErrorThreshold)s
             ||| % thanos.query,
             'for': '5m',
@@ -91,14 +89,14 @@
           {
             alert: 'ThanosQueryHighDNSFailures',
             annotations: {
-              description: 'Thanos Query {{$labels.job}}%s have {{$value | humanize}}%% of failing DNS queries for store endpoints.' % location,
+              description: 'Thanos Query {{$labels.job}} have {{ $value | humanize }}% of failing DNS queries for store endpoints.',
               summary: 'Thanos Query is having high number of DNS failures.',
             },
             expr: |||
               (
-                sum by (%(dimensions)s) (rate(thanos_query_store_apis_dns_failures_total{%(selector)s}[5m]))
+                sum by (job) (rate(thanos_query_store_apis_dns_failures_total{%(selector)s}[5m]))
               /
-                sum by (%(dimensions)s) (rate(thanos_query_store_apis_dns_lookups_total{%(selector)s}[5m]))
+                sum by (job) (rate(thanos_query_store_apis_dns_lookups_total{%(selector)s}[5m]))
               ) * 100 > %(dnsErrorThreshold)s
             ||| % thanos.query,
             'for': '15m',
@@ -109,14 +107,14 @@
           {
             alert: 'ThanosQueryInstantLatencyHigh',
             annotations: {
-              description: 'Thanos Query {{$labels.job}}%s has a 99th percentile latency of {{$value}} seconds for instant queries.' % location,
+              description: 'Thanos Query {{$labels.job}} has a 99th percentile latency of {{ $value }} seconds for instant queries.',
               summary: 'Thanos Query has high latency for queries.',
             },
             expr: |||
               (
-                histogram_quantile(0.99, sum by (%(dimensions)s, le) (rate(http_request_duration_seconds_bucket{%(selector)s, handler="query"}[5m]))) > %(p99QueryLatencyThreshold)s
+                histogram_quantile(0.99, sum by (job, le) (rate(http_request_duration_seconds_bucket{%(selector)s, handler="query"}[5m]))) > %(p99QueryLatencyThreshold)s
               and
-                sum by (%(dimensions)s) (rate(http_request_duration_seconds_bucket{%(selector)s, handler="query"}[5m])) > 0
+                sum by (job) (rate(http_request_duration_seconds_bucket{%(selector)s, handler="query"}[5m])) > 0
               )
             ||| % thanos.query,
             'for': '10m',
@@ -127,14 +125,14 @@
           {
             alert: 'ThanosQueryRangeLatencyHigh',
             annotations: {
-              description: 'Thanos Query {{$labels.job}}%s has a 99th percentile latency of {{$value}} seconds for range queries.' % location,
+              description: 'Thanos Query {{$labels.job}} has a 99th percentile latency of {{ $value }} seconds for range queries.',
               summary: 'Thanos Query has high latency for queries.',
             },
             expr: |||
               (
-                histogram_quantile(0.99, sum by (%(dimensions)s, le) (rate(http_request_duration_seconds_bucket{%(selector)s, handler="query_range"}[5m]))) > %(p99QueryRangeLatencyThreshold)s
+                histogram_quantile(0.99, sum by (job, le) (rate(http_request_duration_seconds_bucket{%(selector)s, handler="query_range"}[5m]))) > %(p99QueryRangeLatencyThreshold)s
               and
-                sum by (%(dimensions)s) (rate(http_request_duration_seconds_count{%(selector)s, handler="query_range"}[5m])) > 0
+                sum by (job) (rate(http_request_duration_seconds_count{%(selector)s, handler="query_range"}[5m])) > 0
               )
             ||| % thanos.query,
             'for': '10m',

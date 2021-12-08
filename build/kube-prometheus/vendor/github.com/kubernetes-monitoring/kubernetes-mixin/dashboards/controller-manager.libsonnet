@@ -30,7 +30,7 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable=true,
           legend_rightSide=true,
         )
-        .addTarget(prometheus.target('sum(rate(workqueue_adds_total{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, name)' % $._config, legendFormat='{{%(clusterLabel)s}} {{instance}} {{name}}' % $._config));
+        .addTarget(prometheus.target('sum(rate(workqueue_adds_total{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (instance, name)' % $._config, legendFormat='{{instance}} {{name}}'));
 
       local workQueueDepth =
         graphPanel.new(
@@ -45,7 +45,7 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable=true,
           legend_rightSide=true,
         )
-        .addTarget(prometheus.target('sum(rate(workqueue_depth{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, name)' % $._config, legendFormat='{{%(clusterLabel)s}} {{instance}} {{name}}' % $._config));
+        .addTarget(prometheus.target('sum(rate(workqueue_depth{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (instance, name)' % $._config, legendFormat='{{instance}} {{name}}'));
 
       local workQueueLatency =
         graphPanel.new(
@@ -59,7 +59,7 @@ local singlestat = grafana.singlestat;
           legend_alignAsTable=true,
           legend_rightSide=true,
         )
-        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (%(clusterLabel)s, instance, name, le))' % $._config, legendFormat='{{%(clusterLabel)s}} {{instance}} {{name}}' % $._config));
+        .addTarget(prometheus.target('histogram_quantile(0.99, sum(rate(workqueue_queue_duration_seconds_bucket{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s, instance=~"$instance"}[5m])) by (instance, name, le))' % $._config, legendFormat='{{instance}} {{name}}'));
 
       local rpcRate =
         graphPanel.new(
@@ -136,7 +136,7 @@ local singlestat = grafana.singlestat;
         {
           current: {
             text: 'default',
-            value: $._config.datasourceName,
+            value: 'default',
           },
           hide: 0,
           label: null,
@@ -144,7 +144,7 @@ local singlestat = grafana.singlestat;
           options: [],
           query: 'prometheus',
           refresh: 1,
-          regex: $._config.datasourceFilterRegex,
+          regex: '',
           type: 'datasource',
         },
       )
@@ -152,7 +152,7 @@ local singlestat = grafana.singlestat;
         template.new(
           'cluster',
           '$datasource',
-          'label_values(up{%(kubeControllerManagerSelector)s}, %(clusterLabel)s)' % $._config,
+          'label_values(kube_pod_info, %(clusterLabel)s)' % $._config,
           label='cluster',
           refresh='time',
           hide=if $._config.showMultiCluster then '' else 'variable',
@@ -163,7 +163,7 @@ local singlestat = grafana.singlestat;
         template.new(
           'instance',
           '$datasource',
-          'label_values(up{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s}, instance)' % $._config,
+          'label_values(process_cpu_seconds_total{%(clusterLabel)s="$cluster", %(kubeControllerManagerSelector)s}, instance)' % $._config,
           refresh='time',
           includeAll=true,
           sort=1,

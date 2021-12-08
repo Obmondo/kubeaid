@@ -2,23 +2,20 @@
   local thanos = self,
   sidecar+:: {
     selector: error 'must provide selector for Thanos Sidecar alerts',
-    thanosPrometheusCommonDimensions: error 'must provide commonDimensions between Thanos and Prometheus metrics for Sidecar alerts',
-    dimensions: std.join(', ', std.objectFields(thanos.targetGroups) + ['job', 'instance']),
   },
   prometheusAlerts+:: {
-    groups+: if thanos.sidecar == null then [] else [
-      local location = if std.length(std.objectFields(thanos.targetGroups)) > 0 then ' in %s' % std.join('/', ['{{$labels.%s}}' % level for level in std.objectFields(thanos.targetGroups)]) else '';
+    groups+: [
       {
         name: 'thanos-sidecar',
         rules: [
           {
-            alert: 'ThanosSidecarBucketOperationsFailed',
+            alert: 'ThanosSidecarPrometheusDown',
             annotations: {
-              description: 'Thanos Sidecar {{$labels.instance}}%s bucket operations are failing' % location,
-              summary: 'Thanos Sidecar bucket operations are failing',
+              description: 'Thanos Sidecar {{$labels.job}} {{$labels.pod}} cannot connect to Prometheus.',
+              summary: 'Thanos Sidecar cannot connect to Prometheus',
             },
             expr: |||
-              sum by (%(dimensions)s) (rate(thanos_objstore_bucket_operation_failures_total{%(selector)s}[5m])) > 0
+              sum by (job, pod) (thanos_sidecar_prometheus_up{%(selector)s} == 0)
             ||| % thanos.sidecar,
             'for': '5m',
             labels: {
@@ -26,17 +23,28 @@
             },
           },
           {
-            alert: 'ThanosSidecarNoConnectionToStartedPrometheus',
+            alert: 'ThanosSidecarBucketOperationsFailed',
             annotations: {
-              description: 'Thanos Sidecar {{$labels.instance}}%s is unhealthy.' % location,
-              summary: 'Thanos Sidecar cannot access Prometheus, even though Prometheus seems healthy and has reloaded WAL.',
+              description: 'Thanos Sidecar {{$labels.job}} {{$labels.pod}} bucket operations are failing',
+              summary: 'Thanos Sidecar bucket operations are failing',
             },
             expr: |||
-              thanos_sidecar_prometheus_up{%(selector)s} == 0
-              AND on (%(thanosPrometheusCommonDimensions)s)
-              prometheus_tsdb_data_replay_duration_seconds != 0
+              rate(thanos_objstore_bucket_operation_failures_total{%(selector)s}[5m]) > 0
             ||| % thanos.sidecar,
             'for': '5m',
+            labels: {
+              severity: 'critical',
+            },
+          },
+          {
+            alert: 'ThanosSidecarUnhealthy',
+            annotations: {
+              description: 'Thanos Sidecar {{$labels.job}} {{$labels.pod}} is unhealthy for {{ $value }} seconds.',
+              summary: 'Thanos Sidecar is unhealthy.',
+            },
+            expr: |||
+              time() - max(thanos_sidecar_last_heartbeat_success_time_seconds{%(selector)s}) by (job, pod) >= 600
+            ||| % thanos.sidecar,
             labels: {
               severity: 'critical',
             },

@@ -26,7 +26,7 @@ local platformPatch(p) = if p != null && std.objectHas(platforms, p) then platfo
     prometheusOperator: {},
     kubernetesControlPlane: {},
     kubePrometheus: {},
-  } + platformPatch($.values.common.platform),
+  } + platformPatch($.values.kubePrometheus.platform),
 
   alertmanager+: p.alertmanager,
   blackboxExporter+: p.blackboxExporter,

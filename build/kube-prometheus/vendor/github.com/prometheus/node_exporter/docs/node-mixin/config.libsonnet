@@ -52,12 +52,6 @@
     fsSpaceAvailableCriticalThreshold: 5,
     fsSpaceAvailableWarningThreshold: 3,
 
-    rateInterval: '5m',
-    // Opt-in for multi-cluster support.
-    showMultiCluster: false,
-    clusterLabel: 'cluster',
-
-    dashboardNamePrefix: 'Node Exporter / ',
-    dashboardTags: ['node-exporter-mixin'],
+    grafana_prefix: '',
   },
 }

@@ -18,22 +18,16 @@ local imageName(image) =
 // quay.io/coreos/addon-resizer -> $repository/addon-resizer
 // grafana/grafana -> grafana $repository/grafana
 local withImageRepository(repository) = {
-  local oldRepos = super.values.common.images,
+  local oldRepos = super._config.imageRepos,
   local substituteRepository(image, repository) =
     if repository == null then image else repository + '/' + imageName(image),
   values+:: {
-    common+:: {
-      images:: {
-        [field]: substituteRepository(oldRepos[field], repository)
-        for field in std.objectFields(oldRepos)
-      },
+    imageRepos:: {
+      [field]: substituteRepository(oldRepos[field], repository)
+      for field in std.objectFields(oldRepos)
     },
   },
 };
-
-{
-  imageName:: imageName,
-}
 
 {
   withImageRepository:: withImageRepository,

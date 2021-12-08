@@ -1,5 +1,4 @@
 {
-  local kubernetesMixin = self,
   local grafanaDashboards = super.grafanaDashboards,
 
   // Automatically add a uid to each dashboard based on the base64 encoding
@@ -7,7 +6,7 @@
   grafanaDashboards:: {
     [filename]: grafanaDashboards[filename] {
       uid: std.md5(filename),
-      timezone: kubernetesMixin._config.grafanaK8s.grafanaTimezone,
+      timezone: 'UTC',
 
       // Modify tooltip to only show a single value
       rows: [

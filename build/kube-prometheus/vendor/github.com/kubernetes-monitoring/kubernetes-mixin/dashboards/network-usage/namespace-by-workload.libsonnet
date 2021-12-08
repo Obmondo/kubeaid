@@ -6,6 +6,7 @@ local template = grafana.template;
 local graphPanel = grafana.graphPanel;
 local tablePanel = grafana.tablePanel;
 local annotation = grafana.annotation;
+local singlestat = grafana.singlestat;
 
 {
   grafanaDashboards+:: {
@@ -234,7 +235,7 @@ local annotation = grafana.annotation;
         template.new(
           name='cluster',
           datasource='$datasource',
-          query='label_values(up{%(cadvisorSelector)s}, %(clusterLabel)s)' % $._config,
+          query='label_values(kube_pod_info, %s)' % $._config.clusterLabel,
           hide=if $._config.showMultiCluster then '' else '2',
           refresh=2
         );
@@ -386,7 +387,7 @@ local annotation = grafana.annotation;
         {
           current: {
             text: 'default',
-            value: $._config.datasourceName,
+            value: 'default',
           },
           hide: 0,
           label: null,
@@ -394,7 +395,7 @@ local annotation = grafana.annotation;
           options: [],
           query: 'prometheus',
           refresh: 1,
-          regex: $._config.datasourceFilterRegex,
+          regex: '',
           type: 'datasource',
         },
       )

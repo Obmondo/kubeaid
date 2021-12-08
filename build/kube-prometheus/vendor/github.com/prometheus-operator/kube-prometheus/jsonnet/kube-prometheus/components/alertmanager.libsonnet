@@ -1,8 +1,6 @@
 local defaults = {
   local defaults = self,
-  // Convention: Top-level fields related to CRDs are public, other fields are hidden
-  // If there is no CRD for the component, everything is hidden in defaults.
-  namespace:: error 'must provide namespace',
+  namespace: error 'must provide namespace',
   image: error 'must provide image',
   version: error 'must provide version',
   resources: {
@@ -20,9 +18,8 @@ local defaults = {
     for labelName in std.objectFields(defaults.commonLabels)
     if !std.setMember(labelName, ['app.kubernetes.io/version'])
   },
-  name:: error 'must provide name',
-  reloaderPort:: 8080,
-  config:: {
+  name: error 'must provide name',
+  config: {
     global: {
       resolve_timeout: '5m',
     },
@@ -61,13 +58,13 @@ local defaults = {
     ],
   },
   replicas: 3,
-  mixin:: {
+  mixin: {
     ruleLabels: {},
     _config: {
       alertmanagerName: '{{ $labels.namespace }}/{{ $labels.pod}}',
       alertmanagerClusterLabels: 'namespace,service',
       alertmanagerSelector: 'job="alertmanager-' + defaults.name + '",namespace="' + defaults.namespace + '"',
-      runbookURLPattern: 'https://runbooks.prometheus-operator.dev/runbooks/alertmanager/%s',
+      runbookURLPattern: 'https://github.com/prometheus-operator/kube-prometheus/wiki/%s',
     },
   },
 };
@@ -79,23 +76,19 @@ function(params) {
   // Safety check
   assert std.isObject(am._config.resources),
   assert std.isObject(am._config.mixin._config),
-  _metadata:: {
-    name: 'alertmanager-' + am._config.name,
-    namespace: am._config.namespace,
-    labels: am._config.commonLabels,
-  },
 
   mixin:: (import 'github.com/prometheus/alertmanager/doc/alertmanager-mixin/mixin.libsonnet') +
-          (import 'github.com/kubernetes-monitoring/kubernetes-mixin/lib/add-runbook-links.libsonnet') {
+          (import 'github.com/kubernetes-monitoring/kubernetes-mixin/alerts/add-runbook-links.libsonnet') {
             _config+:: am._config.mixin._config,
           },
 
   prometheusRule: {
     apiVersion: 'monitoring.coreos.com/v1',
     kind: 'PrometheusRule',
-    metadata: am._metadata {
-      labels+: am._config.mixin.ruleLabels,
-      name: am._metadata.name + '-rules',
+    metadata: {
+      labels: am._config.commonLabels + am._config.mixin.ruleLabels,
+      name: 'alertmanager-' + am._config.name + '-rules',
+      namespace: am._config.namespace,
     },
     spec: {
       local r = if std.objectHasAll(am.mixin, 'prometheusRules') then am.mixin.prometheusRules.groups else [],
@@ -108,8 +101,10 @@ function(params) {
     apiVersion: 'v1',
     kind: 'Secret',
     type: 'Opaque',
-    metadata: am._metadata {
-      labels+: { alertmanager: am._config.name },
+    metadata: {
+      name: 'alertmanager-' + am._config.name,
+      namespace: am._config.namespace,
+      labels: { alertmanager: am._config.name } + am._config.commonLabels,
     },
     stringData: {
       'alertmanager.yaml': if std.type(am._config.config) == 'object'
@@ -123,25 +118,29 @@ function(params) {
   serviceAccount: {
     apiVersion: 'v1',
     kind: 'ServiceAccount',
-    metadata: am._metadata {
-      labels+: { alertmanager: am._config.name },
+    metadata: {
+      name: 'alertmanager-' + am._config.name,
+      namespace: am._config.namespace,
+      labels: { alertmanager: am._config.name } + am._config.commonLabels,
     },
   },
 
   service: {
     apiVersion: 'v1',
     kind: 'Service',
-    metadata: am._metadata {
-      labels+: { alertmanager: am._config.name },
+    metadata: {
+      name: 'alertmanager-' + am._config.name,
+      namespace: am._config.namespace,
+      labels: { alertmanager: am._config.name } + am._config.commonLabels,
     },
     spec: {
       ports: [
         { name: 'web', targetPort: 'web', port: 9093 },
-        { name: 'reloader-web', port: am._config.reloaderPort, targetPort: 'reloader-web' },
       ],
-      selector: am._config.selectorLabels {
+      selector: {
+        app: 'alertmanager',
         alertmanager: am._config.name,
-      },
+      } + am._config.selectorLabels,
       sessionAffinity: 'ClientIP',
     },
   },
@@ -149,30 +148,37 @@ function(params) {
   serviceMonitor: {
     apiVersion: 'monitoring.coreos.com/v1',
     kind: 'ServiceMonitor',
-    metadata: am._metadata,
+    metadata: {
+      name: 'alertmanager',
+      namespace: am._config.namespace,
+      labels: am._config.commonLabels,
+    },
     spec: {
       selector: {
-        matchLabels: am._config.selectorLabels {
+        matchLabels: {
           alertmanager: am._config.name,
-        },
+        } + am._config.selectorLabels,
       },
       endpoints: [
         { port: 'web', interval: '30s' },
-        { port: 'reloader-web', interval: '30s' },
       ],
     },
   },
 
   [if (defaults + params).replicas > 1 then 'podDisruptionBudget']: {
-    apiVersion: 'policy/v1',
+    apiVersion: 'policy/v1beta1',
     kind: 'PodDisruptionBudget',
-    metadata: am._metadata,
+    metadata: {
+      name: 'alertmanager-' + am._config.name,
+      namespace: am._config.namespace,
+      labels: am._config.commonLabels,
+    },
     spec: {
       maxUnavailable: 1,
       selector: {
-        matchLabels: am._config.selectorLabels {
+        matchLabels: {
           alertmanager: am._config.name,
-        },
+        } + am._config.selectorLabels,
       },
     },
   },
@@ -180,22 +186,23 @@ function(params) {
   alertmanager: {
     apiVersion: 'monitoring.coreos.com/v1',
     kind: 'Alertmanager',
-    metadata: am._metadata {
+    metadata: {
       name: am._config.name,
-      labels+: {
+      namespace: am._config.namespace,
+      labels: {
         alertmanager: am._config.name,
-      },
+      } + am._config.commonLabels,
     },
     spec: {
       replicas: am._config.replicas,
       version: am._config.version,
       image: am._config.image,
       podMetadata: {
-        labels: am.alertmanager.metadata.labels,
+        labels: am._config.commonLabels,
       },
       resources: am._config.resources,
       nodeSelector: { 'kubernetes.io/os': 'linux' },
-      serviceAccountName: am.serviceAccount.metadata.name,
+      serviceAccountName: 'alertmanager-' + am._config.name,
       securityContext: {
         runAsUser: 1000,
         runAsNonRoot: true,

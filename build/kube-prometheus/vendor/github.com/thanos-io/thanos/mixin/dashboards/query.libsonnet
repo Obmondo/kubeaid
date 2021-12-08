@@ -1,81 +1,73 @@
 local g = import '../lib/thanos-grafana-builder/builder.libsonnet';
-local utils = import '../lib/utils.libsonnet';
 
 {
   local thanos = self,
   query+:: {
+    jobPrefix: error 'must provide job prefix for Thanos Query dashboard',
     selector: error 'must provide selector for Thanos Query dashboard',
     title: error 'must provide title for Thanos Query dashboard',
-    dashboard:: {
-      selector: std.join(', ', thanos.dashboard.selector + ['job=~"$job"']),
-      dimensions: std.join(', ', thanos.dashboard.dimensions + ['job']),
-    },
   },
   grafanaDashboards+:: {
-    [if thanos.query != null then 'query.json']:
-      local queryHandlerSelector = utils.joinLabels([thanos.query.dashboard.selector, 'handler="query"']);
-      local queryRangeHandlerSelector = utils.joinLabels([thanos.query.dashboard.selector, 'handler="query_range"']);
-      local grpcUnarySelector = utils.joinLabels([thanos.query.dashboard.selector, 'grpc_type="unary"']);
-      local grpcServerStreamSelector = utils.joinLabels([thanos.query.dashboard.selector, 'grpc_type="server_stream"']);
+    'query.json':
       g.dashboard(thanos.query.title)
       .addRow(
         g.row('Instant Query API')
         .addPanel(
           g.panel('Rate', 'Shows rate of requests against /query for the given time.') +
-          g.httpQpsPanel('http_requests_total', queryHandlerSelector, thanos.query.dashboard.dimensions)
+          g.httpQpsPanel('http_requests_total', 'namespace="$namespace",job=~"$job",handler="query"')
         )
         .addPanel(
           g.panel('Errors', 'Shows ratio of errors compared to the the total number of handled requests against /query.') +
-          g.httpErrPanel('http_requests_total', queryHandlerSelector, thanos.query.dashboard.dimensions)
+          g.httpErrPanel('http_requests_total', 'namespace="$namespace",job=~"$job",handler="query"')
         )
         .addPanel(
           g.panel('Duration', 'Shows how long has it taken to handle requests in quantiles.') +
-          g.latencyPanel('http_request_duration_seconds', queryHandlerSelector, thanos.query.dashboard.dimensions)
+          g.latencyPanel('http_request_duration_seconds', 'namespace="$namespace",job=~"$job",handler="query"')
         )
       )
       .addRow(
         g.row('Range Query API')
         .addPanel(
           g.panel('Rate', 'Shows rate of requests against /query_range for the given time range.') +
-          g.httpQpsPanel('http_requests_total', queryRangeHandlerSelector, thanos.query.dashboard.dimensions)
+          g.httpQpsPanel('http_requests_total', 'namespace="$namespace",job=~"$job",handler="query_range"')
         )
         .addPanel(
           g.panel('Errors', 'Shows ratio of errors compared to the the total number of handled requests against /query_range.') +
-          g.httpErrPanel('http_requests_total', queryRangeHandlerSelector, thanos.query.dashboard.dimensions)
+          g.httpErrPanel('http_requests_total', 'namespace="$namespace",job=~"$job",handler="query_range"')
         )
         .addPanel(
           g.panel('Duration', 'Shows how long has it taken to handle requests in quantiles.') +
-          g.latencyPanel('http_request_duration_seconds', queryRangeHandlerSelector, thanos.query.dashboard.dimensions)
+          g.latencyPanel('http_request_duration_seconds', 'namespace="$namespace",job=~"$job",handler="query_range"')
         )
       )
       .addRow(
         g.row('gRPC (Unary)')
         .addPanel(
           g.panel('Rate', 'Shows rate of handled Unary gRPC requests from other queriers.') +
-          g.grpcRequestsPanel('grpc_client_handled_total', grpcUnarySelector, thanos.query.dashboard.dimensions)
+          g.grpcQpsPanel('client', 'namespace="$namespace",job=~"$job",grpc_type="unary"')
         )
         .addPanel(
           g.panel('Errors', 'Shows ratio of errors compared to the the total number of handled requests from other queriers.') +
-          g.grpcErrorsPanel('grpc_client_handled_total', grpcUnarySelector, thanos.query.dashboard.dimensions)
+          g.grpcErrorsPanel('client', 'namespace="$namespace",job=~"$job",grpc_type="unary"')
         )
         .addPanel(
           g.panel('Duration', 'Shows how long has it taken to handle requests from other queriers, in quantiles.') +
-          g.latencyPanel('grpc_client_handling_seconds', grpcUnarySelector, thanos.query.dashboard.dimensions)
+          g.grpcLatencyPanel('client', 'namespace="$namespace",job=~"$job",grpc_type="unary"')
         )
       )
       .addRow(
         g.row('gRPC (Stream)')
         .addPanel(
           g.panel('Rate', 'Shows rate of handled Streamed gRPC requests from other queriers.') +
-          g.grpcRequestsPanel('grpc_client_handled_total', grpcServerStreamSelector, thanos.query.dashboard.dimensions)
+          g.grpcQpsPanel('client', 'namespace="$namespace",job=~"$job",grpc_type="server_stream"')
         )
         .addPanel(
           g.panel('Errors', 'Shows ratio of errors compared to the the total number of handled requests from other queriers.') +
-          g.grpcErrorsPanel('grpc_client_handled_total', grpcServerStreamSelector, thanos.query.dashboard.dimensions)
+          g.grpcErrorsPanel('client', 'namespace="$namespace",job=~"$job",grpc_type="server_stream"')
         )
         .addPanel(
           g.panel('Duration', 'Shows how long has it taken to handle requests from other queriers, in quantiles') +
-          g.latencyPanel('grpc_client_handling_seconds', grpcServerStreamSelector, thanos.query.dashboard.dimensions)
+          g.grpcLatencyPanel('client', 'namespace="$namespace",job=~"$job",grpc_type="server_stream"')
         )
       )
       .addRow(
@@ -83,41 +75,42 @@ local utils = import '../lib/utils.libsonnet';
         .addPanel(
           g.panel('Rate', 'Shows rate of DNS lookups to discover stores.') +
           g.queryPanel(
-            'sum by (%s) (rate(thanos_query_store_apis_dns_lookups_total{%s}[$interval]))' % [thanos.query.dashboard.dimensions, thanos.query.dashboard.selector],
+            'sum(rate(thanos_query_store_apis_dns_lookups_total{namespace="$namespace",job=~"$job"}[$interval])) by (job)',
             'lookups {{job}}'
           )
         )
         .addPanel(
           g.panel('Errors', 'Shows ratio of failures compared to the the total number of executed DNS lookups.') +
           g.qpsErrTotalPanel(
-            'thanos_query_store_apis_dns_failures_total{%s}' % thanos.query.dashboard.selector,
-            'thanos_query_store_apis_dns_lookups_total{%s}' % thanos.query.dashboard.selector,
-            thanos.query.dashboard.dimensions
+            'thanos_query_store_apis_dns_failures_total{namespace="$namespace",job=~"$job"}',
+            'thanos_query_store_apis_dns_lookups_total{namespace="$namespace",job=~"$job"}',
           )
         )
       )
       .addRow(
-        g.resourceUtilizationRow(thanos.query.dashboard.selector, thanos.query.dashboard.dimensions)
-      ),
+        g.resourceUtilizationRow()
+      ) +
+      g.template('namespace', thanos.dashboard.namespaceQuery) +
+      g.template('job', 'up', 'namespace="$namespace",%(selector)s' % thanos.query, true, '%(jobPrefix)s.*' % thanos.query) +
+      g.template('pod', 'kube_pod_info', 'namespace="$namespace",created_by_name=~"%(jobPrefix)s.*"' % thanos.query, true, '.*'),
 
-    __overviewRows__+:: if thanos.query == null then [] else [
+    __overviewRows__+:: [
       g.row('Instant Query')
       .addPanel(
         g.panel('Requests Rate', 'Shows rate of requests against /query for the given time.') +
-        g.httpQpsPanel('http_requests_total', utils.joinLabels([thanos.dashboard.overview.selector, 'handler="query"']), thanos.dashboard.overview.dimensions) +
+        g.httpQpsPanel('http_requests_total', 'namespace="$namespace",%(selector)s,handler="query"' % thanos.query) +
         g.addDashboardLink(thanos.query.title)
       )
       .addPanel(
         g.panel('Requests Errors', 'Shows ratio of errors compared to the the total number of handled requests against /query.') +
-        g.httpErrPanel('http_requests_total', utils.joinLabels([thanos.dashboard.overview.selector, 'handler="query"']), thanos.dashboard.overview.dimensions) +
+        g.httpErrPanel('http_requests_total', 'namespace="$namespace",%(selector)s,handler="query"' % thanos.query) +
         g.addDashboardLink(thanos.query.title)
       )
       .addPanel(
         g.sloLatency(
           'Latency 99th Percentile',
           'Shows how long has it taken to handle requests.',
-          'http_request_duration_seconds_bucket{%s}' % utils.joinLabels([thanos.dashboard.overview.selector, 'handler="query"']),
-          thanos.dashboard.overview.dimensions,
+          'http_request_duration_seconds_bucket{namespace="$namespace",%(selector)s,handler="query"}' % thanos.query,
           0.99,
           0.5,
           1
@@ -128,20 +121,19 @@ local utils = import '../lib/utils.libsonnet';
       g.row('Range Query')
       .addPanel(
         g.panel('Requests Rate', 'Shows rate of requests against /query_range for the given time range.') +
-        g.httpQpsPanel('http_requests_total', utils.joinLabels([thanos.dashboard.overview.selector, 'handler="query_range"']), thanos.dashboard.overview.dimensions) +
+        g.httpQpsPanel('http_requests_total', 'namespace="$namespace",%(selector)s,handler="query_range"' % thanos.query) +
         g.addDashboardLink(thanos.query.title)
       )
       .addPanel(
         g.panel('Requests Errors', 'Shows ratio of errors compared to the the total number of handled requests against /query_range.') +
-        g.httpErrPanel('http_requests_total', utils.joinLabels([thanos.dashboard.overview.selector, 'handler="query_range"']), thanos.dashboard.overview.dimensions) +
+        g.httpErrPanel('http_requests_total', 'namespace="$namespace",%(selector)s,handler="query_range"' % thanos.query) +
         g.addDashboardLink(thanos.query.title)
       )
       .addPanel(
         g.sloLatency(
           'Latency 99th Percentile',
           'Shows how long has it taken to handle requests.',
-          'http_request_duration_seconds_bucket{%s}' % utils.joinLabels([thanos.dashboard.overview.selector, 'handler="query_range"']),
-          thanos.dashboard.overview.dimensions,
+          'http_request_duration_seconds_bucket{namespace="$namespace",%(selector)s,handler="query_range"}' % thanos.query,
           0.99,
           0.5,
           1

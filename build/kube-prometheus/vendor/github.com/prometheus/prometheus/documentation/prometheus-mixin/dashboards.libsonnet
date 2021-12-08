@@ -13,8 +13,8 @@ local template = grafana.template;
       g.dashboard(
         '%(prefix)sOverview' % $._config.grafanaPrometheus
       )
-      .addMultiTemplate('job', 'prometheus_build_info{%(prometheusSelector)s}' % $._config, 'job')
-      .addMultiTemplate('instance', 'prometheus_build_info{job=~"$job"}', 'instance')
+      .addMultiTemplate('job', 'prometheus_build_info', 'job')
+      .addMultiTemplate('instance', 'prometheus_build_info', 'instance')
       .addRow(
         g.row('Prometheus Stats')
         .addPanel(
@@ -54,13 +54,11 @@ local template = grafana.template;
         .addPanel(
           g.panel('Scrape failures') +
           g.queryPanel([
-            'sum by (job) (rate(prometheus_target_scrapes_exceeded_body_size_limit_total[1m]))',
             'sum by (job) (rate(prometheus_target_scrapes_exceeded_sample_limit_total[1m]))',
             'sum by (job) (rate(prometheus_target_scrapes_sample_duplicate_timestamp_total[1m]))',
             'sum by (job) (rate(prometheus_target_scrapes_sample_out_of_bounds_total[1m]))',
             'sum by (job) (rate(prometheus_target_scrapes_sample_out_of_order_total[1m]))',
           ], [
-            'exceeded body size limit: {{job}}',
             'exceeded sample limit: {{job}}',
             'duplicate timestamp: {{job}}',
             'out of bounds: {{job}}',

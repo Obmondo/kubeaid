@@ -1,4 +1,4 @@
-local utils = import '../lib/utils.libsonnet';
+local utils = import 'utils.libsonnet';
 
 {
   _config+:: {

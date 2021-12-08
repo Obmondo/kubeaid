@@ -1,6 +1,5 @@
 {
   _config+:: {
-    local c = self,
     // alertmanagerSelector is inserted as part of the label selector in
     // PromQL queries to identify metrics collected from Alertmanager
     // servers.
@@ -13,17 +12,13 @@
     // to keep for resulting cluster-level alerts.
     alertmanagerClusterLabels: 'job',
 
-    // alertmanagerNameLabels is a string with comma-separated
-    // labels used to identify different alertmanagers within the same
-    // Alertmanager HA cluster.
+    // alertmanagerName is inserted into annotations to name the Alertmanager
+    // instance affected by the alert.
+    alertmanagerName: '{{$labels.instance}}',
     // If you run Alertmanager on Kubernetes with the Prometheus
     // Operator, you can make use of the configured target labels for
     // nicer naming:
-    // alertmanagerNameLabels: 'namespace,pod'
-    alertmanagerNameLabels: 'instance',
-
-    // alertmanagerName is an identifier for alerts. By default, it is built from 'alertmanagerNameLabels'.
-    alertmanagerName: std.join('/', ['{{$labels.%s}}' % [label] for label in std.split(c.alertmanagerNameLabels, ',')]),
+    // alertmanagerName: '{{$labels.namespace}}/{{$labels.pod}}'
 
     // alertmanagerClusterName is inserted into annotations to name an
     // Alertmanager cluster. All labels used here must also be present
@@ -37,8 +32,5 @@
     // integration that is itself not used for critical alerts.
     // Example: @'pagerduty|webhook'
     alertmanagerCriticalIntegrationsRegEx: @'.*',
-
-    dashboardNamePrefix: 'Alertmanager / ',
-    dashboardTags: ['alertmanager-mixin'],
   },
 }

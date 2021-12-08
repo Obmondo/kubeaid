@@ -1,6 +1,5 @@
 local grafana = import 'grafonnet/grafana.libsonnet';
 local template = grafana.template;
-local utils = import '../utils.libsonnet';
 
 (import 'grafana-builder/grafana.libsonnet') +
 {
@@ -23,6 +22,37 @@ local utils = import '../utils.libsonnet';
     ],
   },
 
+  template(name, metricName, selector='', includeAll=false, allValues='')::
+    local t = if includeAll then
+      template.new(
+        name,
+        '$datasource',
+        'label_values(%s{%s}, %s)' % [metricName, selector, name],
+        label=name,
+        refresh=1,
+        sort=2,
+        current='all',
+        allValues=allValues,
+        includeAll=true
+      )
+    else
+      template.new(
+        name,
+        '$datasource',
+        'label_values(%s{%s}, %s)' % [metricName, selector, name],
+        label=name,
+        refresh=1,
+        sort=2,
+      );
+
+    {
+      templating+: {
+        list+: [
+          t,
+        ],
+      },
+    },
+
   spanSize(size):: {
     span: size,
   },
@@ -39,49 +69,39 @@ local utils = import '../utils.libsonnet';
     },
   },
 
-  latencyPanel(metricName, selector, dimensions, multiplier='1'):: {
-    local aggregatedLabels = std.split(dimensions, ','),
-    local dimensionsTemplate = std.join(' ', ['{{%s}}' % std.stripChars(label, ' ') for label in aggregatedLabels]),
-
+  latencyPanel(metricName, selector, multiplier='1'):: {
     nullPointMode: 'null as zero',
     targets: [
       {
-        expr: 'histogram_quantile(%.2f, sum by (%s) (rate(%s_bucket{%s}[$interval]))) * %s' % [percentile, utils.joinLabels([dimensions, 'le']), metricName, selector, multiplier],
+        expr: 'histogram_quantile(0.99, sum(rate(%s_bucket{%s}[$interval])) by (job, le)) * %s' % [metricName, selector, multiplier],
         format: 'time_series',
         intervalFactor: 2,
-        legendFormat: 'p%d %s' % [100 * percentile, dimensionsTemplate],
-        logBase: 10,
-        min: null,
-        max: null,
+        legendFormat: 'P99 {{job}}',
+        refId: 'A',
         step: 10,
-      }
-      for percentile in [0.5, 0.9, 0.99]
+      },
+      {
+        expr: 'sum(rate(%s_sum{%s}[$interval])) by (job) * %s / sum(rate(%s_count{%s}[$interval])) by (job)' % [metricName, selector, multiplier, metricName, selector],
+        format: 'time_series',
+        intervalFactor: 2,
+        legendFormat: 'mean {{job}}',
+        refId: 'B',
+        step: 10,
+      },
+      {
+        expr: 'histogram_quantile(0.50, sum(rate(%s_bucket{%s}[$interval])) by (job, le)) * %s' % [metricName, selector, multiplier],
+        format: 'time_series',
+        intervalFactor: 2,
+        legendFormat: 'P50 {{job}}',
+        refId: 'C',
+        step: 10,
+      },
     ],
     yaxes: $.yaxes('s'),
-    seriesOverrides: [
-      {
-        alias: 'p99',
-        color: '#FA6400',
-        fill: 1,
-        fillGradient: 1,
-      },
-      {
-        alias: 'p90',
-        color: '#E0B400',
-        fill: 1,
-        fillGradient: 1,
-      },
-      {
-        alias: 'p50',
-        color: '#37872D',
-        fill: 10,
-        fillGradient: 0,
-      },
-    ],
   },
 
-  qpsErrTotalPanel(selectorErr, selectorTotal, dimensions):: {
-    local expr(selector) = 'sum by (%s) (rate(%s[$interval]))' % [dimensions, selector],
+  qpsErrTotalPanel(selectorErr, selectorTotal):: {
+    local expr(selector) = 'sum(rate(' + selector + '[$interval]))',  // {{job}}
 
     aliasColors: {
       'error': '#E24D42',
@@ -92,14 +112,15 @@ local utils = import '../utils.libsonnet';
         format: 'time_series',
         intervalFactor: 2,
         legendFormat: 'error',
+        refId: 'A',
         step: 10,
       },
     ],
     yaxes: $.yaxes({ format: 'percentunit' }),
   } + $.stack,
 
-  qpsSuccErrRatePanel(selectorErr, selectorTotal, dimensions):: {
-    local expr(selector) = 'sum by (%s) (rate(%s[$interval]))' % [dimensions, selector],
+  qpsSuccErrRatePanel(selectorErr, selectorTotal):: {
+    local expr(selector) = 'sum(rate(' + selector + '[$interval]))',  // {{job}}
 
     aliasColors: {
       success: '#7EB26D',
@@ -111,6 +132,7 @@ local utils = import '../utils.libsonnet';
         format: 'time_series',
         intervalFactor: 2,
         legendFormat: 'error',
+        refId: 'A',
         step: 10,
       },
       {
@@ -118,32 +140,33 @@ local utils = import '../utils.libsonnet';
         format: 'time_series',
         intervalFactor: 2,
         legendFormat: 'success',
+        refId: 'B',
         step: 10,
       },
     ],
     yaxes: $.yaxes({ format: 'percentunit', max: 1 }),
   } + $.stack,
 
-  resourceUtilizationRow(selector, dimensions)::
+  resourceUtilizationRow()::
     $.row('Resources')
     .addPanel(
       $.panel('Memory Used') +
       $.queryPanel(
         [
-          'go_memstats_alloc_bytes{%s}' % selector,
-          'go_memstats_heap_alloc_bytes{%s}' % selector,
-          'rate(go_memstats_alloc_bytes_total{%s}[30s])' % selector,
-          'rate(go_memstats_heap_alloc_bytes{%s}[30s])' % selector,
-          'go_memstats_stack_inuse_bytes{%s}' % selector,
-          'go_memstats_heap_inuse_bytes{%s}' % selector,
+          'go_memstats_alloc_bytes{namespace="$namespace",job=~"$job",kubernetes_pod_name=~"$pod"}',
+          'go_memstats_heap_alloc_bytes{namespace="$namespace",job=~"$job",kubernetes_pod_name=~"$pod"}',
+          'rate(go_memstats_alloc_bytes_total{namespace="$namespace",job=~"$job",kubernetes_pod_name=~"$pod"}[30s])',
+          'rate(go_memstats_heap_alloc_bytes{namespace="$namespace",job=~"$job",kubernetes_pod_name=~"$pod"}[30s])',
+          'go_memstats_stack_inuse_bytes{namespace="$namespace",job=~"$job",kubernetes_pod_name=~"$pod"}',
+          'go_memstats_heap_inuse_bytes{namespace="$namespace",job=~"$job",kubernetes_pod_name=~"$pod"}',
         ],
         [
-          'alloc all {{instance}}',
-          'alloc heap {{instance}}',
-          'alloc rate all {{instance}}',
-          'alloc rate heap {{instance}}',
-          'inuse heap {{instance}}',
-          'inuse stack {{instance}}',
+          'alloc all {{pod}}',
+          'alloc heap {{pod}}',
+          'alloc rate all {{pod}}',
+          'alloc rate heap {{pod}}',
+          'inuse stack {{pod}}',
+          'inuse heap {{pod}}',
         ]
       ) +
       { yaxes: $.yaxes('bytes') },
@@ -151,15 +174,15 @@ local utils = import '../utils.libsonnet';
     .addPanel(
       $.panel('Goroutines') +
       $.queryPanel(
-        'go_goroutines{%s}' % selector,
-        '{{instance}}'
+        'go_goroutines{namespace="$namespace",job=~"$job"}',
+        '{{pod}}'
       )
     )
     .addPanel(
       $.panel('GC Time Quantiles') +
       $.queryPanel(
-        'go_gc_duration_seconds{%s}' % selector,
-        '{{quantile}} {{instance}}'
+        'go_gc_duration_seconds{namespace="$namespace",job=~"$job",kubernetes_pod_name=~"$pod"}',
+        '{{quantile}} {{pod}}'
       )
     ) +
     $.collapse,

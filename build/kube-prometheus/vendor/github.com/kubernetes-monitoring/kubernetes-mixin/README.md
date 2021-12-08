@@ -1,5 +1,5 @@
 # Prometheus Monitoring Mixin for Kubernetes
-[![ci](https://github.com/kubernetes-monitoring/kubernetes-mixin/actions/workflows/ci.yaml/badge.svg)](https://github.com/kubernetes-monitoring/kubernetes-mixin/actions/workflows/ci.yaml)
+[![CircleCI](https://circleci.com/gh/kubernetes-monitoring/kubernetes-mixin/tree/master.svg?style=shield)](https://circleci.com/gh/kubernetes-monitoring/kubernetes-mixin)
 
 > NOTE: This project is *pre-release* stage. Flags, configuration, behaviour and design may change significantly in following releases.
 
@@ -17,7 +17,6 @@ A set of Grafana dashboards and Prometheus alerts for Kubernetes.
 | release-0.6  | v1.19+             | v2.11.0+  |       |
 | release-0.7  | v1.19+             | v2.11.0+  | v1.x  |
 | release-0.8  | v1.20+             | v2.11.0+  | v2.0+ |
-| release-0.9  | v1.20+             | v2.11.0+  | v2.0+ |
 | master       | v1.20+             | v2.11.0+  | v2.0+ |
 
 In Kubernetes 1.14 there was a major [metrics overhaul](https://github.com/kubernetes/enhancements/issues/1206) implemented.
@@ -206,7 +205,7 @@ $ jsonnet -J vendor -m files/dashboards -e '(import "mixin.libsonnet").grafanaDa
 
 ### Customising alert annotations
 
-The steps described below extend on the existing mixin library without modifying the original git repository. This is to make consuming updates to your extended alert definitions easier. These definitions can reside outside of this repository and added to your own custom location, where you can define your alert dependencies in your `jsonnetfile.json` and add customisations to the existing definitions.
+The steps described bellow extend on the existing mixin library without modifying the original git repository. This is to make consuming updates to your extended alert definitions easier. These definitions can reside outside of this repository and added to your own custom location, where you can define your alert dependencies in your `jsonnetfile.json` and add customisations to the existing definitions.
 
 In your working directory, create a new file `kubernetes_mixin_override.libsonnet` with the following:
 

@@ -15,8 +15,6 @@
     // 1 : On Dashboard Load  (Will refresh Dashboards variables when dashboard are loaded)
     // 2 : On Time Range Change (Will refresh Dashboards variables when time range will be changed)
     dashboard_var_refresh: 2,
-    // clusterLabel is used to identify a cluster.
-    clusterLabel: 'job',
   },
 
   prometheusAlerts+:: {
@@ -35,13 +33,13 @@
                 )
               )
               > 0
-            ||| % { etcd_instance_labels: $._config.etcd_instance_labels, etcd_selector: $._config.etcd_selector, network_failure_range: $._config.scrape_interval_seconds * 4 },
+            ||| % {etcd_instance_labels: $._config.etcd_instance_labels, etcd_selector: $._config.etcd_selector, network_failure_range: $._config.scrape_interval_seconds*4},
             'for': '10m',
             labels: {
               severity: 'critical',
             },
             annotations: {
-              description: 'etcd cluster "{{ $labels.%s }}": members are down ({{ $value }}).' % $._config.clusterLabel,
+              description: 'etcd cluster "{{ $labels.job }}": members are down ({{ $value }}).',
               summary: 'etcd cluster members are down.',
             },
           },
@@ -55,7 +53,7 @@
               severity: 'critical',
             },
             annotations: {
-              description: 'etcd cluster "{{ $labels.%s }}": insufficient members ({{ $value }}).' % $._config.clusterLabel,
+              description: 'etcd cluster "{{ $labels.job }}": insufficient members ({{ $value }}).',
               summary: 'etcd cluster has insufficient number of members.',
             },
           },
@@ -69,7 +67,7 @@
               severity: 'critical',
             },
             annotations: {
-              description: 'etcd cluster "{{ $labels.%s }}": member {{ $labels.instance }} has no leader.' % $._config.clusterLabel,
+              description: 'etcd cluster "{{ $labels.job }}": member {{ $labels.instance }} has no leader.',
               summary: 'etcd cluster has no leader.',
             },
           },
@@ -83,14 +81,14 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'etcd cluster "{{ $labels.%s }}": {{ $value }} leader changes within the last 15 minutes. Frequent elections may be a sign of insufficient resources, high network latency, or disruptions by other components and should be investigated.' % $._config.clusterLabel,
+              description: 'etcd cluster "{{ $labels.job }}": {{ $value }} leader changes within the last 15 minutes. Frequent elections may be a sign of insufficient resources, high network latency, or disruptions by other components and should be investigated.',
               summary: 'etcd cluster has high number of leader changes.',
             },
           },
           {
             alert: 'etcdHighNumberOfFailedGRPCRequests',
             expr: |||
-              100 * sum(rate(grpc_server_handled_total{%(etcd_selector)s, grpc_code=~"Unknown|FailedPrecondition|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded"}[5m])) without (grpc_type, grpc_code)
+              100 * sum(rate(grpc_server_handled_total{%(etcd_selector)s, grpc_code!="OK"}[5m])) without (grpc_type, grpc_code)
                 /
               sum(rate(grpc_server_handled_total{%(etcd_selector)s}[5m])) without (grpc_type, grpc_code)
                 > 1
@@ -100,14 +98,14 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'etcd cluster "{{ $labels.%s }}": {{ $value }}%% of requests for {{ $labels.grpc_method }} failed on etcd instance {{ $labels.instance }}.' % $._config.clusterLabel,
+              description: 'etcd cluster "{{ $labels.job }}": {{ $value }}% of requests for {{ $labels.grpc_method }} failed on etcd instance {{ $labels.instance }}.',
               summary: 'etcd cluster has high number of failed grpc requests.',
             },
           },
           {
             alert: 'etcdHighNumberOfFailedGRPCRequests',
             expr: |||
-              100 * sum(rate(grpc_server_handled_total{%(etcd_selector)s, grpc_code=~"Unknown|FailedPrecondition|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded"}[5m])) without (grpc_type, grpc_code)
+              100 * sum(rate(grpc_server_handled_total{%(etcd_selector)s, grpc_code!="OK"}[5m])) without (grpc_type, grpc_code)
                 /
               sum(rate(grpc_server_handled_total{%(etcd_selector)s}[5m])) without (grpc_type, grpc_code)
                 > 5
@@ -117,14 +115,14 @@
               severity: 'critical',
             },
             annotations: {
-              description: 'etcd cluster "{{ $labels.%s }}": {{ $value }}%% of requests for {{ $labels.grpc_method }} failed on etcd instance {{ $labels.instance }}.' % $._config.clusterLabel,
+              description: 'etcd cluster "{{ $labels.job }}": {{ $value }}% of requests for {{ $labels.grpc_method }} failed on etcd instance {{ $labels.instance }}.',
               summary: 'etcd cluster has high number of failed grpc requests.',
             },
           },
           {
             alert: 'etcdGRPCRequestsSlow',
             expr: |||
-              histogram_quantile(0.99, sum(rate(grpc_server_handling_seconds_bucket{%(etcd_selector)s, grpc_method!="Defragment", grpc_type="unary"}[5m])) without(grpc_type))
+              histogram_quantile(0.99, sum(rate(grpc_server_handling_seconds_bucket{%(etcd_selector)s, grpc_type="unary"}[5m])) without(grpc_type))
               > 0.15
             ||| % $._config,
             'for': '10m',
@@ -132,7 +130,7 @@
               severity: 'critical',
             },
             annotations: {
-              description: 'etcd cluster "{{ $labels.%s }}": 99th percentile of gRPC requests is {{ $value }}s on etcd instance {{ $labels.instance }} for {{ $labels.grpc_method }} method.' % $._config.clusterLabel,
+              description: 'etcd cluster "{{ $labels.job }}": gRPC requests to {{ $labels.grpc_method }} are taking {{ $value }}s on etcd instance {{ $labels.instance }}.',
               summary: 'etcd grpc requests are slow',
             },
           },
@@ -147,7 +145,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'etcd cluster "{{ $labels.%s }}": member communication with {{ $labels.To }} is taking {{ $value }}s on etcd instance {{ $labels.instance }}.' % $._config.clusterLabel,
+              description: 'etcd cluster "{{ $labels.job }}": member communication with {{ $labels.To }} is taking {{ $value }}s on etcd instance {{ $labels.instance }}.',
               summary: 'etcd cluster member communication is slow.',
             },
           },
@@ -161,7 +159,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'etcd cluster "{{ $labels.%s }}": {{ $value }} proposal failures within the last 30 minutes on etcd instance {{ $labels.instance }}.' % $._config.clusterLabel,
+              description: 'etcd cluster "{{ $labels.job }}": {{ $value }} proposal failures within the last 30 minutes on etcd instance {{ $labels.instance }}.',
               summary: 'etcd cluster has high number of proposal failures.',
             },
           },
@@ -176,7 +174,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'etcd cluster "{{ $labels.%s }}": 99th percentile fsync durations are {{ $value }}s on etcd instance {{ $labels.instance }}.' % $._config.clusterLabel,
+              description: 'etcd cluster "{{ $labels.job }}": 99th percentile fsync durations are {{ $value }}s on etcd instance {{ $labels.instance }}.',
               summary: 'etcd cluster 99th percentile fsync durations are too high.',
             },
           },
@@ -191,7 +189,7 @@
               severity: 'critical',
             },
             annotations: {
-              description: 'etcd cluster "{{ $labels.%s }}": 99th percentile fsync durations are {{ $value }}s on etcd instance {{ $labels.instance }}.' % $._config.clusterLabel,
+              message: 'etcd cluster "{{ $labels.job }}": 99th percentile fsync durations are {{ $value }}s on etcd instance {{ $labels.instance }}.',
             },
           },
           {
@@ -205,11 +203,11 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'etcd cluster "{{ $labels.%s }}": 99th percentile commit durations {{ $value }}s on etcd instance {{ $labels.instance }}.' % $._config.clusterLabel,
+              description: 'etcd cluster "{{ $labels.job }}": 99th percentile commit durations {{ $value }}s on etcd instance {{ $labels.instance }}.',
               summary: 'etcd cluster 99th percentile commit durations are too high.',
             },
           },
-          {
+         {
             alert: 'etcdBackendQuotaLowSpace',
             expr: |||
               (etcd_mvcc_db_total_size_in_bytes/etcd_server_quota_backend_bytes)*100 > 95
@@ -219,10 +217,10 @@
               severity: 'critical',
             },
             annotations: {
-              description: 'etcd cluster "{{ $labels.%s }}": database size exceeds the defined quota on etcd instance {{ $labels.instance }}, please defrag or increase the quota as the writes to etcd will be disabled when it is full.' % $._config.clusterLabel,
+              message: 'etcd cluster "{{ $labels.job }}": database size exceeds the defined quota on etcd instance {{ $labels.instance }}, please defrag or increase the quota as the writes to etcd will be disabled when it is full.',
             },
-          },
-          {
+         },
+         {
             alert: 'etcdExcessiveDatabaseGrowth',
             expr: |||
               increase(((etcd_mvcc_db_total_size_in_bytes/etcd_server_quota_backend_bytes)*100)[240m:1m]) > 50
@@ -232,9 +230,9 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'etcd cluster "{{ $labels.%s }}": Observed surge in etcd writes leading to 50%% increase in database size over the past four hours on etcd instance {{ $labels.instance }}, please check as it might be disruptive.' % $._config.clusterLabel,
+              message: 'etcd cluster "{{ $labels.job }}": Observed surge in etcd writes leading to 50% increase in database size over the past four hours on etcd instance {{ $labels.instance }}, please check as it might be disruptive.',
             },
-          },
+         },
         ],
       },
     ],
@@ -245,7 +243,7 @@
       uid: std.md5('etcd.json'),
       title: 'etcd',
       description: 'etcd sample Grafana dashboard with Prometheus',
-      tags: ['etcd-mixin'],
+      tags: [ 'etcd-mixin' ],
       style: 'dark',
       timezone: 'browser',
       editable: true,
@@ -312,7 +310,7 @@
                 show: false,
               },
               targets: [{
-                expr: 'sum(etcd_server_has_leader{%s="$cluster"})' % $._config.clusterLabel,
+                expr: 'sum(etcd_server_has_leader{job="$cluster"})',
                 intervalFactor: 2,
                 legendFormat: '',
                 metric: 'etcd_server_has_leader',
@@ -362,7 +360,7 @@
               steppedLine: false,
               targets: [
                 {
-                  expr: 'sum(rate(grpc_server_started_total{%s="$cluster",grpc_type="unary"}[$__rate_interval]))' % $._config.clusterLabel,
+                  expr: 'sum(rate(grpc_server_started_total{job="$cluster",grpc_type="unary"}[5m]))',
                   format: 'time_series',
                   intervalFactor: 2,
                   legendFormat: 'RPC Rate',
@@ -371,7 +369,7 @@
                   step: 2,
                 },
                 {
-                  expr: 'sum(rate(grpc_server_handled_total{%s="$cluster",grpc_type="unary",grpc_code=~"Unknown|FailedPrecondition|ResourceExhausted|Internal|Unavailable|DataLoss|DeadlineExceeded"}[$__rate_interval]))' % $._config.clusterLabel,
+                  expr: 'sum(rate(grpc_server_handled_total{job="$cluster",grpc_type="unary",grpc_code!="OK"}[5m]))',
                   format: 'time_series',
                   intervalFactor: 2,
                   legendFormat: 'RPC Failed Rate',
@@ -448,7 +446,7 @@
               steppedLine: false,
               targets: [
                 {
-                  expr: 'sum(grpc_server_started_total{%(clusterLabel)s="$cluster",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{%(clusterLabel)s="$cluster",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"})' % $._config,
+                  expr: 'sum(grpc_server_started_total{job="$cluster",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{job="$cluster",grpc_service="etcdserverpb.Watch",grpc_type="bidi_stream"})',
                   intervalFactor: 2,
                   legendFormat: 'Watch Streams',
                   metric: 'grpc_server_handled_total',
@@ -456,7 +454,7 @@
                   step: 4,
                 },
                 {
-                  expr: 'sum(grpc_server_started_total{%(clusterLabel)s="$cluster",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{%(clusterLabel)s="$cluster",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"})' % $._config,
+                  expr: 'sum(grpc_server_started_total{job="$cluster",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"}) - sum(grpc_server_handled_total{job="$cluster",grpc_service="etcdserverpb.Lease",grpc_type="bidi_stream"})',
                   intervalFactor: 2,
                   legendFormat: 'Lease Streams',
                   metric: 'grpc_server_handled_total',
@@ -541,7 +539,7 @@
               stack: false,
               steppedLine: false,
               targets: [{
-                expr: 'etcd_mvcc_db_total_size_in_bytes{%s="$cluster"}' % $._config.clusterLabel,
+                expr: 'etcd_mvcc_db_total_size_in_bytes{job="$cluster"}',
                 hide: false,
                 interval: '',
                 intervalFactor: 2,
@@ -616,7 +614,7 @@
               steppedLine: true,
               targets: [
                 {
-                  expr: 'histogram_quantile(0.99, sum(rate(etcd_disk_wal_fsync_duration_seconds_bucket{%s="$cluster"}[$__rate_interval])) by (instance, le))' % $._config.clusterLabel,
+                  expr: 'histogram_quantile(0.99, sum(rate(etcd_disk_wal_fsync_duration_seconds_bucket{job="$cluster"}[5m])) by (instance, le))',
                   hide: false,
                   intervalFactor: 2,
                   legendFormat: '{{instance}} WAL fsync',
@@ -625,7 +623,7 @@
                   step: 4,
                 },
                 {
-                  expr: 'histogram_quantile(0.99, sum(rate(etcd_disk_backend_commit_duration_seconds_bucket{%s="$cluster"}[$__rate_interval])) by (instance, le))' % $._config.clusterLabel,
+                  expr: 'histogram_quantile(0.99, sum(rate(etcd_disk_backend_commit_duration_seconds_bucket{job="$cluster"}[5m])) by (instance, le))',
                   intervalFactor: 2,
                   legendFormat: '{{instance}} DB fsync',
                   metric: 'etcd_disk_backend_commit_duration_seconds_bucket',
@@ -698,7 +696,7 @@
               stack: false,
               steppedLine: false,
               targets: [{
-                expr: 'process_resident_memory_bytes{%s="$cluster"}' % $._config.clusterLabel,
+                expr: 'process_resident_memory_bytes{job="$cluster"}',
                 intervalFactor: 2,
                 legendFormat: '{{instance}} Resident Memory',
                 metric: 'process_resident_memory_bytes',
@@ -780,7 +778,7 @@
               stack: true,
               steppedLine: false,
               targets: [{
-                expr: 'rate(etcd_network_client_grpc_received_bytes_total{%s="$cluster"}[$__rate_interval])' % $._config.clusterLabel,
+                expr: 'rate(etcd_network_client_grpc_received_bytes_total{job="$cluster"}[5m])',
                 intervalFactor: 2,
                 legendFormat: '{{instance}} Client Traffic In',
                 metric: 'etcd_network_client_grpc_received_bytes_total',
@@ -854,7 +852,7 @@
               stack: true,
               steppedLine: false,
               targets: [{
-                expr: 'rate(etcd_network_client_grpc_sent_bytes_total{%s="$cluster"}[$__rate_interval])' % $._config.clusterLabel,
+                expr: 'rate(etcd_network_client_grpc_sent_bytes_total{job="$cluster"}[5m])',
                 intervalFactor: 2,
                 legendFormat: '{{instance}} Client Traffic Out',
                 metric: 'etcd_network_client_grpc_sent_bytes_total',
@@ -928,7 +926,7 @@
               stack: false,
               steppedLine: false,
               targets: [{
-                expr: 'sum(rate(etcd_network_peer_received_bytes_total{%s="$cluster"}[$__rate_interval])) by (instance)' % $._config.clusterLabel,
+                expr: 'sum(rate(etcd_network_peer_received_bytes_total{job="$cluster"}[5m])) by (instance)',
                 intervalFactor: 2,
                 legendFormat: '{{instance}} Peer Traffic In',
                 metric: 'etcd_network_peer_received_bytes_total',
@@ -1003,7 +1001,7 @@
               stack: false,
               steppedLine: false,
               targets: [{
-                expr: 'sum(rate(etcd_network_peer_sent_bytes_total{%s="$cluster"}[$__rate_interval])) by (instance)' % $._config.clusterLabel,
+                expr: 'sum(rate(etcd_network_peer_sent_bytes_total{job="$cluster"}[5m])) by (instance)',
                 hide: false,
                 interval: '',
                 intervalFactor: 2,
@@ -1086,7 +1084,7 @@
               steppedLine: false,
               targets: [
                 {
-                  expr: 'sum(rate(etcd_server_proposals_failed_total{%s="$cluster"}[$__rate_interval]))' % $._config.clusterLabel,
+                  expr: 'sum(rate(etcd_server_proposals_failed_total{job="$cluster"}[5m]))',
                   intervalFactor: 2,
                   legendFormat: 'Proposal Failure Rate',
                   metric: 'etcd_server_proposals_failed_total',
@@ -1094,7 +1092,7 @@
                   step: 2,
                 },
                 {
-                  expr: 'sum(etcd_server_proposals_pending{%s="$cluster"})' % $._config.clusterLabel,
+                  expr: 'sum(etcd_server_proposals_pending{job="$cluster"})',
                   intervalFactor: 2,
                   legendFormat: 'Proposal Pending Total',
                   metric: 'etcd_server_proposals_pending',
@@ -1102,7 +1100,7 @@
                   step: 2,
                 },
                 {
-                  expr: 'sum(rate(etcd_server_proposals_committed_total{%s="$cluster"}[$__rate_interval]))' % $._config.clusterLabel,
+                  expr: 'sum(rate(etcd_server_proposals_committed_total{job="$cluster"}[5m]))',
                   intervalFactor: 2,
                   legendFormat: 'Proposal Commit Rate',
                   metric: 'etcd_server_proposals_committed_total',
@@ -1110,7 +1108,7 @@
                   step: 2,
                 },
                 {
-                  expr: 'sum(rate(etcd_server_proposals_applied_total{%s="$cluster"}[$__rate_interval]))' % $._config.clusterLabel,
+                  expr: 'sum(rate(etcd_server_proposals_applied_total{job="$cluster"}[5m]))',
                   intervalFactor: 2,
                   legendFormat: 'Proposal Apply Rate',
                   refId: 'D',
@@ -1187,7 +1185,7 @@
               stack: false,
               steppedLine: false,
               targets: [{
-                expr: 'changes(etcd_server_leader_changes_seen_total{%s="$cluster"}[1d])' % $._config.clusterLabel,
+                expr: 'changes(etcd_server_leader_changes_seen_total{job="$cluster"}[1d])',
                 intervalFactor: 2,
                 legendFormat: '{{instance}} Total Leader Elections Per Day',
                 metric: 'etcd_server_leader_changes_seen_total',
@@ -1229,115 +1227,6 @@
                   show: true,
                 },
               ],
-            },
-            {
-              aliasColors: {},
-              bars: false,
-              dashLength: 10,
-              dashes: false,
-              datasource: '$datasource',
-              decimals: 0,
-              editable: true,
-              'error': false,
-              fieldConfig: {
-                defaults: {
-                  custom: {},
-                },
-                overrides: [],
-              },
-              fill: 0,
-              fillGradient: 0,
-              gridPos: {
-                h: 7,
-                w: 12,
-                x: 0,
-                y: 28,
-              },
-              hiddenSeries: false,
-              id: 42,
-              isNew: true,
-              legend: {
-                alignAsTable: false,
-                avg: false,
-                current: false,
-                max: false,
-                min: false,
-                rightSide: false,
-                show: false,
-                total: false,
-                values: false,
-              },
-              lines: true,
-              linewidth: 2,
-              links: [],
-              nullPointMode: 'connected',
-              options: {
-                alertThreshold: true,
-              },
-              percentage: false,
-              pluginVersion: '7.4.3',
-              pointradius: 5,
-              points: false,
-              renderer: 'flot',
-              seriesOverrides: [],
-              spaceLength: 10,
-              stack: false,
-              steppedLine: false,
-              targets: [
-                {
-                  expr: 'histogram_quantile(0.99, sum by (instance, le) (rate(etcd_network_peer_round_trip_time_seconds_bucket{%s="$cluster"}[$__rate_interval])))' % $._config.clusterLabel,
-                  interval: '',
-                  intervalFactor: 2,
-                  legendFormat: '{{instance}} Peer round trip time',
-                  metric: 'etcd_network_peer_round_trip_time_seconds_bucket',
-                  refId: 'A',
-                  step: 2,
-                },
-              ],
-              thresholds: [],
-              timeFrom: null,
-              timeRegions: [],
-              timeShift: null,
-              title: 'Peer round trip time',
-              tooltip: {
-                msResolution: false,
-                shared: true,
-                sort: 0,
-                value_type: 'individual',
-              },
-              type: 'graph',
-              xaxis: {
-                buckets: null,
-                mode: 'time',
-                name: null,
-                show: true,
-                values: [],
-              },
-              yaxes: [
-                {
-                  '$$hashKey': 'object:925',
-                  decimals: null,
-                  format: 's',
-                  label: null,
-                  logBase: 1,
-                  max: null,
-                  min: null,
-                  show: true,
-                },
-                {
-                  '$$hashKey': 'object:926',
-                  format: 'short',
-                  label: null,
-                  logBase: 1,
-                  max: null,
-                  min: null,
-                  show: true,
-                },
-              ],
-              yaxis: {
-                align: false,
-                alignLevel: null,
-              },
             },
           ],
           title: 'New row',
@@ -1381,7 +1270,7 @@
               value: 'Prometheus',
             },
             hide: 0,
-            label: 'Data Source',
+            label: null,
             name: 'datasource',
             options: [],
             query: 'prometheus',
@@ -1402,7 +1291,7 @@
             multi: false,
             name: 'cluster',
             options: [],
-            query: 'label_values(etcd_server_has_leader, %s)' % $._config.clusterLabel,
+            query: 'label_values(etcd_server_has_leader, job)',
             refresh: $._config.dashboard_var_refresh,
             regex: '',
             sort: 2,

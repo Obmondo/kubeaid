@@ -10,10 +10,6 @@
     'app.kubernetes.io/version': ksm.version,
   },
 
-  extraRecommendedLabels:: {
-    'app.kubernetes.io/component': 'exporter',
-  },
-
   podLabels:: {
     [labelName]: ksm.commonLabels[labelName]
     for labelName in std.objectFields(ksm.commonLabels)
@@ -26,7 +22,7 @@
       kind: 'ClusterRoleBinding',
       metadata: {
         name: ksm.name,
-        labels: ksm.commonLabels + ksm.extraRecommendedLabels,
+        labels: ksm.commonLabels,
       },
       roleRef: {
         apiGroup: 'rbac.authorization.k8s.io',
@@ -151,7 +147,7 @@
       kind: 'ClusterRole',
       metadata: {
         name: ksm.name,
-        labels: ksm.commonLabels + ksm.extraRecommendedLabels,
+        labels: ksm.commonLabels,
       },
       rules: rules,
     },
@@ -180,14 +176,14 @@
       metadata: {
         name: ksm.name,
         namespace: ksm.namespace,
-        labels: ksm.commonLabels + ksm.extraRecommendedLabels,
+        labels: ksm.commonLabels,
       },
       spec: {
         replicas: 1,
         selector: { matchLabels: ksm.podLabels },
         template: {
           metadata: {
-            labels: ksm.commonLabels + ksm.extraRecommendedLabels,
+            labels: ksm.commonLabels,
           },
           spec: {
             containers: [c],
@@ -205,7 +201,7 @@
       metadata: {
         name: ksm.name,
         namespace: ksm.namespace,
-        labels: ksm.commonLabels + ksm.extraRecommendedLabels,
+        labels: ksm.commonLabels,
       },
     },
 
@@ -216,7 +212,7 @@
       metadata: {
         name: ksm.name,
         namespace: ksm.namespace,
-        labels: ksm.commonLabels + ksm.extraRecommendedLabels,
+        labels: ksm.commonLabels,
       },
       spec: {
         clusterIP: 'None',
@@ -236,7 +232,7 @@
         metadata: {
           name: ksm.name,
           namespace: ksm.namespace,
-          labels: ksm.commonLabels + ksm.extraRecommendedLabels,
+          labels: ksm.commonLabels,
         },
         rules: [{
           apiGroups: [''],
@@ -257,7 +253,7 @@
         metadata: {
           name: ksm.name,
           namespace: ksm.namespace,
-          labels: ksm.commonLabels + ksm.extraRecommendedLabels,
+          labels: ksm.commonLabels,
         },
         roleRef: {
           apiGroup: 'rbac.authorization.k8s.io',
@@ -289,7 +285,7 @@
         metadata: {
           name: ksm.name,
           namespace: ksm.namespace,
-          labels: ksm.commonLabels + ksm.extraRecommendedLabels,
+          labels: ksm.commonLabels,
         },
         spec: {
           replicas: 2,
@@ -297,7 +293,7 @@
           serviceName: ksm.service.metadata.name,
           template: {
             metadata: {
-              labels: ksm.commonLabels + ksm.extraRecommendedLabels,
+              labels: ksm.commonLabels,
             },
             spec: {
               containers: [c],

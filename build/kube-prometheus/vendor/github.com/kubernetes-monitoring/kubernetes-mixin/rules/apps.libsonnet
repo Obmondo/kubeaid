@@ -13,10 +13,10 @@
             // Reduces cardinality of this timeseries by #cores, which makes it
             // more useable in dashboards.  Also, allows us to do things like
             // quantile_over_time(...) which would otherwise not be possible.
-            record: 'node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate',
+            record: 'node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate',
             expr: |||
               sum by (%(clusterLabel)s, namespace, pod, container) (
-                irate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!=""}[5m])
+                rate(container_cpu_usage_seconds_total{%(cadvisorSelector)s, image!=""}[5m])
               ) * on (%(clusterLabel)s, namespace, pod) group_left(node) topk by (%(clusterLabel)s, namespace, pod) (
                 1, max by(%(clusterLabel)s, namespace, pod, node) (kube_pod_info{node!=""})
               )
@@ -59,91 +59,27 @@
             ||| % $._config,
           },
           {
-            record: 'cluster:namespace:pod_memory:active:kube_pod_container_resource_requests',
-            expr: |||
-              kube_pod_container_resource_requests{resource="memory",%(kubeStateMetricsSelector)s}  * on (namespace, pod, %(clusterLabel)s)
-              group_left() max by (namespace, pod) (
-                (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
-              )
-            ||| % $._config,
-          },
-          {
             record: 'namespace_memory:kube_pod_container_resource_requests:sum',
             expr: |||
-              sum by (namespace, %(clusterLabel)s) (
-                  sum by (namespace, pod, %(clusterLabel)s) (
-                      max by (namespace, pod, container, %(clusterLabel)s) (
+              sum by (namespace, cluster) (
+                  sum by (namespace, pod, cluster) (
+                      max by (namespace, pod, container, cluster) (
                         kube_pod_container_resource_requests{resource="memory",%(kubeStateMetricsSelector)s}
-                      ) * on(namespace, pod, %(clusterLabel)s) group_left() max by (namespace, pod, %(clusterLabel)s) (
+                      ) * on(namespace, pod, cluster) group_left() max by (namespace, pod) (
                         kube_pod_status_phase{phase=~"Pending|Running"} == 1
                       )
                   )
-              )
-            ||| % $._config,
-          },
-          {
-            record: 'cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests',
-            expr: |||
-              kube_pod_container_resource_requests{resource="cpu",%(kubeStateMetricsSelector)s}  * on (namespace, pod, %(clusterLabel)s)
-              group_left() max by (namespace, pod) (
-                (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
               )
             ||| % $._config,
           },
           {
             record: 'namespace_cpu:kube_pod_container_resource_requests:sum',
             expr: |||
-              sum by (namespace, %(clusterLabel)s) (
-                  sum by (namespace, pod, %(clusterLabel)s) (
-                      max by (namespace, pod, container, %(clusterLabel)s) (
+              sum by (namespace, cluster) (
+                  sum by (namespace, pod, cluster) (
+                      max by (namespace, pod, container, cluster) (
                         kube_pod_container_resource_requests{resource="cpu",%(kubeStateMetricsSelector)s}
-                      ) * on(namespace, pod, %(clusterLabel)s) group_left() max by (namespace, pod, %(clusterLabel)s) (
-                        kube_pod_status_phase{phase=~"Pending|Running"} == 1
-                      )
-                  )
-              )
-            ||| % $._config,
-          },
-          {
-            record: 'cluster:namespace:pod_memory:active:kube_pod_container_resource_limits',
-            expr: |||
-              kube_pod_container_resource_limits{resource="memory",%(kubeStateMetricsSelector)s}  * on (namespace, pod, %(clusterLabel)s)
-              group_left() max by (namespace, pod) (
-                (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
-              )
-            ||| % $._config,
-          },
-          {
-            record: 'namespace_memory:kube_pod_container_resource_limits:sum',
-            expr: |||
-              sum by (namespace, %(clusterLabel)s) (
-                  sum by (namespace, pod, %(clusterLabel)s) (
-                      max by (namespace, pod, container, %(clusterLabel)s) (
-                        kube_pod_container_resource_limits{resource="memory",%(kubeStateMetricsSelector)s}
-                      ) * on(namespace, pod, %(clusterLabel)s) group_left() max by (namespace, pod, %(clusterLabel)s) (
-                        kube_pod_status_phase{phase=~"Pending|Running"} == 1
-                      )
-                  )
-              )
-            ||| % $._config,
-          },
-          {
-            record: 'cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits',
-            expr: |||
-              kube_pod_container_resource_limits{resource="cpu",%(kubeStateMetricsSelector)s}  * on (namespace, pod, %(clusterLabel)s)
-              group_left() max by (namespace, pod) (
-               (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
-               )
-            ||| % $._config,
-          },
-          {
-            record: 'namespace_cpu:kube_pod_container_resource_limits:sum',
-            expr: |||
-              sum by (namespace, %(clusterLabel)s) (
-                  sum by (namespace, pod, %(clusterLabel)s) (
-                      max by (namespace, pod, container, %(clusterLabel)s) (
-                        kube_pod_container_resource_limits{resource="cpu",%(kubeStateMetricsSelector)s}
-                      ) * on(namespace, pod, %(clusterLabel)s) group_left() max by (namespace, pod, %(clusterLabel)s) (
+                      ) * on(namespace, pod, cluster) group_left() max by (namespace, pod) (
                         kube_pod_status_phase{phase=~"Pending|Running"} == 1
                       )
                   )

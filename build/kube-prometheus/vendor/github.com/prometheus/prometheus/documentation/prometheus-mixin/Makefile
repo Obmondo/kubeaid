@@ -21,9 +21,5 @@ lint: prometheus_alerts.yaml
 
 	promtool check rules prometheus_alerts.yaml
 
-.PHONY: jb_install
-jb_install:
-	jb install
-
 clean:
 	rm -rf dashboards_out prometheus_alerts.yaml

@@ -117,11 +117,7 @@ local restrictedPodSecurityPolicy = {
             },
           }
         else
-          {
-            metadata+: {
-              name: 'blackbox-exporter-psp',
-            },
-          };
+          {};
 
       restrictedPodSecurityPolicy + blackboxExporterPspPrivileged,
   },

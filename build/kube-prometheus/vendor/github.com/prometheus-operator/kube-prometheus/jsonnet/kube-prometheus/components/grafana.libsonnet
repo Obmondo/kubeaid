@@ -1,14 +1,10 @@
-local kubernetesGrafana = import 'github.com/brancz/kubernetes-grafana/grafana/grafana.libsonnet';
-
 local defaults = {
   local defaults = self,
-  // Convention: Top-level fields related to CRDs are public, other fields are hidden
-  // If there is no CRD for the component, everything is hidden in defaults.
-  name:: 'grafana',
-  namespace:: error 'must provide namespace',
-  version:: error 'must provide version',
-  image:: error 'must provide image',
-  resources:: {
+  name: 'grafana',
+  namespace: error 'must provide namespace',
+  version: error 'must provide version',
+  image: error 'must provide image',
+  resources: {
     requests: { cpu: '100m', memory: '100Mi' },
     limits: { cpu: '200m', memory: '200Mi' },
   },
@@ -23,37 +19,84 @@ local defaults = {
     for labelName in std.objectFields(defaults.commonLabels)
     if !std.setMember(labelName, ['app.kubernetes.io/version'])
   },
-  prometheusName:: error 'must provide prometheus name',
+  prometheusName: error 'must provide prometheus name',
+  dashboards: {},
+  // TODO(paulfantom): expose those to have a stable API. After kubernetes-grafana refactor those could probably be removed.
+  rawDashboards: {},
+  folderDashboards: {},
+  containers: [],
+  datasources: [],
+  config: {},
+  plugins: [],
 };
 
-function(params)
-  local config = defaults + params;
+function(params) {
+  local g = self,
+  _config:: defaults + params,
   // Safety check
-  assert std.isObject(config.resources);
+  assert std.isObject(g._config.resources),
 
-  kubernetesGrafana(config) {
-    local g = self,
-    _config+:: config,
-    _metadata:: {
+  local glib = (import 'github.com/brancz/kubernetes-grafana/grafana/grafana.libsonnet') + {
+    _config+:: {
+      namespace: g._config.namespace,
+      versions+:: {
+        grafana: g._config.version,
+      },
+      imageRepos+:: {
+        grafana: std.split(g._config.image, ':')[0],
+      },
+      prometheus+:: {
+        name: g._config.prometheusName,
+      },
+      grafana+:: {
+        labels: g._config.commonLabels,
+        dashboards: g._config.dashboards,
+        resources: g._config.resources,
+        rawDashboards: g._config.rawDashboards,
+        folderDashboards: g._config.folderDashboards,
+        containers: g._config.containers,
+        config+: g._config.config,
+        plugins+: g._config.plugins,
+      } + (
+        // Conditionally overwrite default setting.
+        if std.length(g._config.datasources) > 0 then
+          { datasources: g._config.datasources }
+        else {}
+      ),
+    },
+  },
+
+  // Add object only if user passes config and config is not empty
+  [if std.objectHas(params, 'config') && std.length(params.config) > 0 then 'config']: glib.grafana.config,
+  service: glib.grafana.service,
+  serviceAccount: glib.grafana.serviceAccount,
+  deployment: glib.grafana.deployment,
+  dashboardDatasources: glib.grafana.dashboardDatasources,
+  dashboardSources: glib.grafana.dashboardSources,
+
+  dashboardDefinitions: if std.length(g._config.dashboards) > 0 then {
+    apiVersion: 'v1',
+    kind: 'ConfigMapList',
+    items: glib.grafana.dashboardDefinitions,
+  },
+  serviceMonitor: {
+    apiVersion: 'monitoring.coreos.com/v1',
+    kind: 'ServiceMonitor',
+    metadata: {
       name: 'grafana',
       namespace: g._config.namespace,
       labels: g._config.commonLabels,
     },
-
-    serviceMonitor: {
-      apiVersion: 'monitoring.coreos.com/v1',
-      kind: 'ServiceMonitor',
-      metadata: g._metadata,
-      spec: {
-        selector: {
-          matchLabels: {
-            'app.kubernetes.io/name': 'grafana',
-          },
+    spec: {
+      selector: {
+        matchLabels: {
+          'app.kubernetes.io/name': 'grafana',
         },
-        endpoints: [{
-          port: 'http',
-          interval: '15s',
-        }],
       },
+      endpoints: [{
+        port: 'http',
+        interval: '15s',
+      }],
     },
-  }
+  },
+}

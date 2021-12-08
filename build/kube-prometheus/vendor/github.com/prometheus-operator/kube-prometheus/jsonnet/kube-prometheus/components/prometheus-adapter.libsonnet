@@ -1,18 +1,16 @@
 local defaults = {
   local defaults = self,
-  // Convention: Top-level fields related to CRDs are public, other fields are hidden
-  // If there is no CRD for the component, everything is hidden in defaults.
-  name:: 'prometheus-adapter',
-  namespace:: error 'must provide namespace',
-  version:: error 'must provide version',
+  name: 'prometheus-adapter',
+  namespace: error 'must provide namespace',
+  version: error 'must provide version',
   image: error 'must provide image',
-  resources:: {
+  resources: {
     requests: { cpu: '102m', memory: '180Mi' },
     limits: { cpu: '250m', memory: '180Mi' },
   },
-  replicas:: 2,
-  listenAddress:: '127.0.0.1',
-  port:: 9100,
+  replicas: 2,
+  listenAddress: '127.0.0.1',
+  port: 9100,
   commonLabels:: {
     'app.kubernetes.io/name': 'prometheus-adapter',
     'app.kubernetes.io/version': defaults.version,
@@ -24,40 +22,13 @@ local defaults = {
     for labelName in std.objectFields(defaults.commonLabels)
     if !std.setMember(labelName, ['app.kubernetes.io/version'])
   },
-  // Default range intervals are equal to 4 times the default scrape interval.
-  // This is done in order to follow Prometheus rule of thumb with irate().
-  rangeIntervals:: {
-    kubelet: '4m',
-    nodeExporter: '4m',
-    windowsExporter: '4m',
-  },
 
-  prometheusURL:: error 'must provide prometheusURL',
-  config:: {
+  prometheusURL: error 'must provide prometheusURL',
+  config: {
     resourceRules: {
       cpu: {
-        containerQuery: |||
-          sum by (<<.GroupBy>>) (
-            irate (
-                container_cpu_usage_seconds_total{<<.LabelMatchers>>,container!="",pod!=""}[%(kubelet)s]
-            )
-          )
-        ||| % $.rangeIntervals,
-        nodeQuery: |||
-          sum by (<<.GroupBy>>) (
-            1 - irate(
-              node_cpu_seconds_total{mode="idle"}[%(nodeExporter)s]
-            )
-            * on(namespace, pod) group_left(node) (
-              node_namespace_pod:kube_pod_info:{<<.LabelMatchers>>}
-            )
-          )
-          or sum by (<<.GroupBy>>) (
-            1 - irate(
-              windows_cpu_time_total{mode="idle", job="windows-exporter",<<.LabelMatchers>>}[%(windowsExporter)s]
-            )
-          )
-        ||| % $.rangeIntervals,
+        containerQuery: 'sum(irate(container_cpu_usage_seconds_total{<<.LabelMatchers>>,container!="",pod!=""}[5m])) by (<<.GroupBy>>)',
+        nodeQuery: 'sum(1 - irate(node_cpu_seconds_total{mode="idle"}[5m]) * on(namespace, pod) group_left(node) node_namespace_pod:kube_pod_info:{<<.LabelMatchers>>}) by (<<.GroupBy>>) or sum (1- irate(windows_cpu_time_total{mode="idle", job="windows-exporter",<<.LabelMatchers>>}[5m])) by (<<.GroupBy>>)',
         resources: {
           overrides: {
             node: { resource: 'node' },
@@ -68,23 +39,8 @@ local defaults = {
         containerLabel: 'container',
       },
       memory: {
-        containerQuery: |||
-          sum by (<<.GroupBy>>) (
-            container_memory_working_set_bytes{<<.LabelMatchers>>,container!="",pod!=""}
-          )
-        |||,
-        nodeQuery: |||
-          sum by (<<.GroupBy>>) (
-            node_memory_MemTotal_bytes{job="node-exporter",<<.LabelMatchers>>}
-            -
-            node_memory_MemAvailable_bytes{job="node-exporter",<<.LabelMatchers>>}
-          )
-          or sum by (<<.GroupBy>>) (
-            windows_cs_physical_memory_bytes{job="windows-exporter",<<.LabelMatchers>>}
-            -
-            windows_memory_available_bytes{job="windows-exporter",<<.LabelMatchers>>}
-          )
-        |||,
+        containerQuery: 'sum(container_memory_working_set_bytes{<<.LabelMatchers>>,container!="",pod!=""}) by (<<.GroupBy>>)',
+        nodeQuery: 'sum(node_memory_MemTotal_bytes{job="node-exporter",<<.LabelMatchers>>} - node_memory_MemAvailable_bytes{job="node-exporter",<<.LabelMatchers>>}) by (<<.GroupBy>>) or sum(windows_cs_physical_memory_bytes{job="windows-exporter",<<.LabelMatchers>>} - windows_memory_available_bytes{job="windows-exporter",<<.LabelMatchers>>}) by (<<.GroupBy>>)',
         resources: {
           overrides: {
             instance: { resource: 'node' },
@@ -97,23 +53,6 @@ local defaults = {
       window: '5m',
     },
   },
-  tlsCipherSuites:: [
-    'TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305',
-    'TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305',
-    'TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256',
-    'TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384',
-    'TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256',
-    'TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384',
-    'TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA',
-    'TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256',
-    'TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA',
-    'TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA',
-    'TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA',
-    'TLS_RSA_WITH_AES_128_GCM_SHA256',
-    'TLS_RSA_WITH_AES_256_GCM_SHA384',
-    'TLS_RSA_WITH_AES_128_CBC_SHA',
-    'TLS_RSA_WITH_AES_256_CBC_SHA',
-  ],
 };
 
 function(params) {
@@ -121,12 +60,6 @@ function(params) {
   _config:: defaults + params,
   // Safety check
   assert std.isObject(pa._config.resources),
-
-  _metadata:: {
-    name: pa._config.name,
-    namespace: pa._config.namespace,
-    labels: pa._config.commonLabels,
-  },
 
   apiService: {
     apiVersion: 'apiregistration.k8s.io/v1',
@@ -151,8 +84,10 @@ function(params) {
   configMap: {
     apiVersion: 'v1',
     kind: 'ConfigMap',
-    metadata: pa._metadata {
+    metadata: {
       name: 'adapter-config',
+      namespace: pa._config.namespace,
+      labels: pa._config.commonLabels,
     },
     data: { 'config.yaml': std.manifestYamlDoc(pa._config.config) },
   },
@@ -160,7 +95,11 @@ function(params) {
   serviceMonitor: {
     apiVersion: 'monitoring.coreos.com/v1',
     kind: 'ServiceMonitor',
-    metadata: pa._metadata,
+    metadata: {
+      name: pa._config.name,
+      namespace: pa._config.namespace,
+      labels: pa._config.commonLabels,
+    },
     spec: {
       selector: {
         matchLabels: pa._config.selectorLabels,
@@ -174,21 +113,6 @@ function(params) {
             insecureSkipVerify: true,
           },
           bearerTokenFile: '/var/run/secrets/kubernetes.io/serviceaccount/token',
-          metricRelabelings: [
-            {
-              sourceLabels: ['__name__'],
-              action: 'drop',
-              regex: '(' + std.join('|',
-                                    [
-                                      'apiserver_client_certificate_.*',  // The only client supposed to connect to the aggregated API is the apiserver so it is not really meaningful to monitor its certificate.
-                                      'apiserver_envelope_.*',  // Prometheus-adapter isn't using envelope for storage.
-                                      'apiserver_flowcontrol_.*',  // Prometheus-adapter isn't using flowcontrol.
-                                      'apiserver_storage_.*',  // Prometheus-adapter isn't using the apiserver storage.
-                                      'apiserver_webhooks_.*',  // Prometeus-adapter doesn't make use of apiserver webhooks.
-                                      'workqueue_.*',  // Metrics related to the internal apiserver auth workqueues are not very useful to prometheus-adapter.
-                                    ]) + ')',
-            },
-          ],
         },
       ],
     },
@@ -197,7 +121,11 @@ function(params) {
   service: {
     apiVersion: 'v1',
     kind: 'Service',
-    metadata: pa._metadata,
+    metadata: {
+      name: pa._config.name,
+      namespace: pa._config.namespace,
+      labels: pa._config.commonLabels,
+    },
     spec: {
       ports: [
         { name: 'https', targetPort: 6443, port: 443 },
@@ -217,9 +145,7 @@ function(params) {
         '--metrics-relist-interval=1m',
         '--prometheus-url=' + pa._config.prometheusURL,
         '--secure-port=6443',
-        '--tls-cipher-suites=' + std.join(',', pa._config.tlsCipherSuites),
       ],
-      resources: pa._config.resources,
       ports: [{ containerPort: 6443 }],
       volumeMounts: [
         { name: 'tmpfs', mountPath: '/tmp', readOnly: false },
@@ -231,12 +157,14 @@ function(params) {
     {
       apiVersion: 'apps/v1',
       kind: 'Deployment',
-      metadata: pa._metadata,
+      metadata: {
+        name: pa._config.name,
+        namespace: pa._config.namespace,
+        labels: pa._config.commonLabels,
+      },
       spec: {
         replicas: pa._config.replicas,
-        selector: {
-          matchLabels: pa._config.selectorLabels,
-        },
+        selector: { matchLabels: pa._config.selectorLabels },
         strategy: {
           rollingUpdate: {
             maxSurge: 1,
@@ -262,13 +190,20 @@ function(params) {
   serviceAccount: {
     apiVersion: 'v1',
     kind: 'ServiceAccount',
-    metadata: pa._metadata,
+    metadata: {
+      name: pa._config.name,
+      namespace: pa._config.namespace,
+      labels: pa._config.commonLabels,
+    },
   },
 
   clusterRole: {
     apiVersion: 'rbac.authorization.k8s.io/v1',
     kind: 'ClusterRole',
-    metadata: pa._metadata,
+    metadata: {
+      name: pa._config.name,
+      labels: pa._config.commonLabels,
+    },
     rules: [{
       apiGroups: [''],
       resources: ['nodes', 'namespaces', 'pods', 'services'],
@@ -279,7 +214,10 @@ function(params) {
   clusterRoleBinding: {
     apiVersion: 'rbac.authorization.k8s.io/v1',
     kind: 'ClusterRoleBinding',
-    metadata: pa._metadata,
+    metadata: {
+      name: pa._config.name,
+      labels: pa._config.commonLabels,
+    },
     roleRef: {
       apiGroup: 'rbac.authorization.k8s.io',
       kind: 'ClusterRole',
@@ -295,8 +233,9 @@ function(params) {
   clusterRoleBindingDelegator: {
     apiVersion: 'rbac.authorization.k8s.io/v1',
     kind: 'ClusterRoleBinding',
-    metadata: pa._metadata {
+    metadata: {
       name: 'resource-metrics:system:auth-delegator',
+      labels: pa._config.commonLabels,
     },
     roleRef: {
       apiGroup: 'rbac.authorization.k8s.io',
@@ -313,8 +252,9 @@ function(params) {
   clusterRoleServerResources: {
     apiVersion: 'rbac.authorization.k8s.io/v1',
     kind: 'ClusterRole',
-    metadata: pa._metadata {
+    metadata: {
       name: 'resource-metrics-server-resources',
+      labels: pa._config.commonLabels,
     },
     rules: [{
       apiGroups: ['metrics.k8s.io'],
@@ -326,13 +266,13 @@ function(params) {
   clusterRoleAggregatedMetricsReader: {
     apiVersion: 'rbac.authorization.k8s.io/v1',
     kind: 'ClusterRole',
-    metadata: pa._metadata {
+    metadata: {
       name: 'system:aggregated-metrics-reader',
-      labels+: {
+      labels: {
         'rbac.authorization.k8s.io/aggregate-to-admin': 'true',
         'rbac.authorization.k8s.io/aggregate-to-edit': 'true',
         'rbac.authorization.k8s.io/aggregate-to-view': 'true',
-      },
+      } + pa._config.commonLabels,
     },
     rules: [{
       apiGroups: ['metrics.k8s.io'],
@@ -344,9 +284,10 @@ function(params) {
   roleBindingAuthReader: {
     apiVersion: 'rbac.authorization.k8s.io/v1',
     kind: 'RoleBinding',
-    metadata: pa._metadata {
+    metadata: {
       name: 'resource-metrics-auth-reader',
       namespace: 'kube-system',
+      labels: pa._config.commonLabels,
     },
     roleRef: {
       apiGroup: 'rbac.authorization.k8s.io',
@@ -361,9 +302,13 @@ function(params) {
   },
 
   [if (defaults + params).replicas > 1 then 'podDisruptionBudget']: {
-    apiVersion: 'policy/v1',
+    apiVersion: 'policy/v1beta1',
     kind: 'PodDisruptionBudget',
-    metadata: pa._metadata,
+    metadata: {
+      name: pa._config.name,
+      namespace: pa._config.namespace,
+      labels: pa._config.commonLabels,
+    },
     spec: {
       minAvailable: 1,
       selector: {

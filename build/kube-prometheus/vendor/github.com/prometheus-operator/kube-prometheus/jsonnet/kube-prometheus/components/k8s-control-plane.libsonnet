@@ -1,14 +1,12 @@
 local relabelings = import '../addons/dropping-deprecated-metrics-relabelings.libsonnet';
 
 local defaults = {
-  // Convention: Top-level fields related to CRDs are public, other fields are hidden
-  // If there is no CRD for the component, everything is hidden in defaults.
-  namespace:: error 'must provide namespace',
+  namespace: error 'must provide namespace',
   commonLabels:: {
     'app.kubernetes.io/name': 'kube-prometheus',
     'app.kubernetes.io/part-of': 'kube-prometheus',
   },
-  mixin:: {
+  mixin: {
     ruleLabels: {},
     _config: {
       cadvisorSelector: 'job="kubelet", metrics_path="/metrics/cadvisor"',
@@ -19,21 +17,16 @@ local defaults = {
       kubeControllerManagerSelector: 'job="kube-controller-manager"',
       kubeApiserverSelector: 'job="apiserver"',
       podLabel: 'pod',
-      runbookURLPattern: 'https://runbooks.prometheus-operator.dev/runbooks/kubernetes/%s',
+      runbookURLPattern: 'https://github.com/prometheus-operator/kube-prometheus/wiki/%s',
       diskDeviceSelector: 'device=~"mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|dasd.+"',
       hostNetworkInterfaceSelector: 'device!~"veth.+"',
     },
   },
-  kubeProxy:: false,
 };
 
 function(params) {
   local k8s = self,
   _config:: defaults + params,
-  _metadata:: {
-    labels: k8s._config.commonLabels,
-    namespace: k8s._config.namespace,
-  },
 
   mixin:: (import 'github.com/kubernetes-monitoring/kubernetes-mixin/mixin.libsonnet') {
     _config+:: k8s._config.mixin._config,
@@ -42,9 +35,10 @@ function(params) {
   prometheusRule: {
     apiVersion: 'monitoring.coreos.com/v1',
     kind: 'PrometheusRule',
-    metadata: k8s._metadata {
+    metadata: {
+      labels: k8s._config.commonLabels + k8s._config.mixin.ruleLabels,
       name: 'kubernetes-monitoring-rules',
-      labels+: k8s._config.mixin.ruleLabels,
+      namespace: k8s._config.namespace,
     },
     spec: {
       local r = if std.objectHasAll(k8s.mixin, 'prometheusRules') then k8s.mixin.prometheusRules.groups else {},
@@ -56,9 +50,10 @@ function(params) {
   serviceMonitorKubeScheduler: {
     apiVersion: 'monitoring.coreos.com/v1',
     kind: 'ServiceMonitor',
-    metadata: k8s._metadata {
+    metadata: {
       name: 'kube-scheduler',
-      labels+: { 'app.kubernetes.io/name': 'kube-scheduler' },
+      namespace: k8s._config.namespace,
+      labels: { 'app.kubernetes.io/name': 'kube-scheduler' },
     },
     spec: {
       jobLabel: 'app.kubernetes.io/name',
@@ -81,9 +76,10 @@ function(params) {
   serviceMonitorKubelet: {
     apiVersion: 'monitoring.coreos.com/v1',
     kind: 'ServiceMonitor',
-    metadata: k8s._metadata {
+    metadata: {
       name: 'kubelet',
-      labels+: { 'app.kubernetes.io/name': 'kubelet' },
+      namespace: k8s._config.namespace,
+      labels: { 'app.kubernetes.io/name': 'kubelet' },
     },
     spec: {
       jobLabel: 'app.kubernetes.io/name',
@@ -130,7 +126,9 @@ function(params) {
               action: 'drop',
               regex: '(' + std.join('|',
                                     [
+                                      'container_fs_.*',  // add filesystem read/write data (nodes*disks*services*4)
                                       'container_spec_.*',  // everything related to cgroup specification and thus static data (nodes*services*5)
+                                      'container_blkio_device_usage_total',  // useful for containers, but not for system services (nodes*disks*services*operations*2)
                                       'container_file_descriptors',  // file descriptors limits and global numbers are exposed via (nodes*services)
                                       'container_sockets',  // used sockets in cgroup. Usually not important for system services (nodes*services)
                                       'container_threads_max',  // max number of threads in cgroup. Usually for system services it is not limited (nodes*services)
@@ -138,14 +136,6 @@ function(params) {
                                       'container_start_time_seconds',  // container start. Possibly not needed for system services (nodes*services)
                                       'container_last_seen',  // not needed as system services are always running (nodes*services)
                                     ]) + ');;',
-            },
-            {
-              sourceLabels: ['__name__', 'container'],
-              action: 'drop',
-              regex: '(' + std.join('|',
-                                    [
-                                      'container_blkio_device_usage_total',
-                                    ]) + ');.+',
             },
           ],
         },
@@ -175,9 +165,10 @@ function(params) {
   serviceMonitorKubeControllerManager: {
     apiVersion: 'monitoring.coreos.com/v1',
     kind: 'ServiceMonitor',
-    metadata: k8s._metadata {
+    metadata: {
       name: 'kube-controller-manager',
-      labels+: { 'app.kubernetes.io/name': 'kube-controller-manager' },
+      namespace: k8s._config.namespace,
+      labels: { 'app.kubernetes.io/name': 'kube-controller-manager' },
     },
     spec: {
       jobLabel: 'app.kubernetes.io/name',
@@ -209,9 +200,10 @@ function(params) {
   serviceMonitorApiserver: {
     apiVersion: 'monitoring.coreos.com/v1',
     kind: 'ServiceMonitor',
-    metadata: k8s._metadata {
+    metadata: {
       name: 'kube-apiserver',
-      labels+: { 'app.kubernetes.io/name': 'apiserver' },
+      namespace: k8s._config.namespace,
+      labels: { 'app.kubernetes.io/name': 'apiserver' },
     },
     spec: {
       jobLabel: 'component',
@@ -259,53 +251,18 @@ function(params) {
     },
   },
 
-  [if (defaults + params).kubeProxy then 'podMonitorKubeProxy']: {
-    apiVersion: 'monitoring.coreos.com/v1',
-    kind: 'PodMonitor',
-    metadata: k8s._metadata {
-      labels+: { 'k8s-app': 'kube-proxy' },
-      name: 'kube-proxy',
-    },
-    spec: {
-      jobLabel: 'k8s-app',
-      namespaceSelector: {
-        matchNames: [
-          'kube-system',
-        ],
-      },
-      selector: {
-        matchLabels: {
-          'k8s-app': 'kube-proxy',
-        },
-      },
-      podMetricsEndpoints: [{
-        honorLabels: true,
-        targetPort: 10249,
-        relabelings: [
-          {
-            action: 'replace',
-            regex: '(.*)',
-            replacement: '$1',
-            sourceLabels: ['__meta_kubernetes_pod_node_name'],
-            targetLabel: 'instance',
-          },
-        ],
-      }],
-    },
-  },
-
-
   serviceMonitorCoreDNS: {
     apiVersion: 'monitoring.coreos.com/v1',
     kind: 'ServiceMonitor',
-    metadata: k8s._metadata {
+    metadata: {
       name: 'coredns',
-      labels+: { 'app.kubernetes.io/name': 'coredns' },
+      namespace: k8s._config.namespace,
+      labels: { 'app.kubernetes.io/name': 'coredns' },
     },
     spec: {
       jobLabel: 'app.kubernetes.io/name',
       selector: {
-        matchLabels: { 'k8s-app': 'kube-dns' },
+        matchLabels: { 'app.kubernetes.io/name': 'kube-dns' },
       },
       namespaceSelector: {
         matchNames: ['kube-system'],

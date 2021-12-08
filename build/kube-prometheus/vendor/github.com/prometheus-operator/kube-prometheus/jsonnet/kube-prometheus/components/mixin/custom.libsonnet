@@ -11,7 +11,7 @@ local defaults = {
     _config: {
       nodeExporterSelector: 'job="node-exporter"',
       hostNetworkInterfaceSelector: 'device!~"veth.+"',
-      runbookURLPattern: 'https://runbooks.prometheus-operator.dev/runbooks/general/%s',
+      runbookURLPattern: 'https://github.com/prometheus-operator/kube-prometheus/wiki/%s',
     },
   },
 };
@@ -23,7 +23,7 @@ function(params) {
   local alertsandrules = (import './alerts/alerts.libsonnet') + (import './rules/rules.libsonnet'),
 
   mixin:: alertsandrules +
-          (import 'github.com/kubernetes-monitoring/kubernetes-mixin/lib/add-runbook-links.libsonnet') {
+          (import 'github.com/kubernetes-monitoring/kubernetes-mixin/alerts/add-runbook-links.libsonnet') {
             _config+:: m._config.mixin._config,
           },
 

@@ -11,14 +11,11 @@ local prometheus = import './components/prometheus.libsonnet';
 
 local platformPatch = import './platforms/platforms.libsonnet';
 
-local utils = import './lib/utils.libsonnet';
-
 {
   // using `values` as this is similar to helm
   values:: {
     common: {
       namespace: 'default',
-      platform: null,
       ruleLabels: {
         role: 'alert-rules',
         prometheus: $.values.prometheus.name,
@@ -39,11 +36,11 @@ local utils = import './lib/utils.libsonnet';
       images: {
         alertmanager: 'quay.io/prometheus/alertmanager:v' + $.values.common.versions.alertmanager,
         blackboxExporter: 'quay.io/prometheus/blackbox-exporter:v' + $.values.common.versions.blackboxExporter,
-        grafana: 'grafana/grafana:' + $.values.common.versions.grafana,
+        grafana: 'grafana/grafana:v' + $.values.common.versions.grafana,
         kubeStateMetrics: 'k8s.gcr.io/kube-state-metrics/kube-state-metrics:v' + $.values.common.versions.kubeStateMetrics,
         nodeExporter: 'quay.io/prometheus/node-exporter:v' + $.values.common.versions.nodeExporter,
         prometheus: 'quay.io/prometheus/prometheus:v' + $.values.common.versions.prometheus,
-        prometheusAdapter: 'k8s.gcr.io/prometheus-adapter/prometheus-adapter:v' + $.values.common.versions.prometheusAdapter,
+        prometheusAdapter: 'directxman12/k8s-prometheus-adapter:v' + $.values.common.versions.prometheusAdapter,
         prometheusOperator: 'quay.io/prometheus-operator/prometheus-operator:v' + $.values.common.versions.prometheusOperator,
         prometheusOperatorReloader: 'quay.io/prometheus-operator/prometheus-config-reloader:v' + $.values.common.versions.prometheusOperator,
         kubeRbacProxy: 'quay.io/brancz/kube-rbac-proxy:v' + $.values.common.versions.kubeRbacProxy,
@@ -70,7 +67,7 @@ local utils = import './lib/utils.libsonnet';
       image: $.values.common.images.grafana,
       prometheusName: $.values.prometheus.name,
       // TODO(paulfantom) This should be done by iterating over all objects and looking for object.mixin.grafanaDashboards
-      dashboards: $.nodeExporter.mixin.grafanaDashboards + $.prometheus.mixin.grafanaDashboards + $.kubernetesControlPlane.mixin.grafanaDashboards + $.alertmanager.mixin.grafanaDashboards,
+      dashboards: $.nodeExporter.mixin.grafanaDashboards + $.prometheus.mixin.grafanaDashboards + $.kubernetesControlPlane.mixin.grafanaDashboards,
     },
     kubeStateMetrics: {
       namespace: $.values.common.namespace,
@@ -91,37 +88,34 @@ local utils = import './lib/utils.libsonnet';
       version: $.values.common.versions.prometheus,
       image: $.values.common.images.prometheus,
       name: 'k8s',
-      alerting: {
-        alertmanagers: [{
-          namespace: $.values.common.namespace,
-          name: 'alertmanager-' + $.values.alertmanager.name,
-          port: $.alertmanager.service.spec.ports[0].name,
-          apiVersion: 'v2',
-        }],
-      },
+      alertmanagerName: $.values.alertmanager.name,
       mixin+: { ruleLabels: $.values.common.ruleLabels },
     },
     prometheusAdapter: {
       namespace: $.values.common.namespace,
       version: $.values.common.versions.prometheusAdapter,
       image: $.values.common.images.prometheusAdapter,
-      prometheusURL: 'http://prometheus-' + $.values.prometheus.name + '.' + $.values.prometheus.namespace + '.svc:9090/',
-      rangeIntervals+: {
-        kubelet: utils.rangeInterval($.kubernetesControlPlane.serviceMonitorKubelet.spec.endpoints[0].interval),
-        nodeExporter: utils.rangeInterval($.nodeExporter.serviceMonitor.spec.endpoints[0].interval),
-      },
+      prometheusURL: 'http://prometheus-' + $.values.prometheus.name + '.' + $.values.common.namespace + '.svc.cluster.local:9090/',
     },
     prometheusOperator: {
       namespace: $.values.common.namespace,
       version: $.values.common.versions.prometheusOperator,
       image: $.values.common.images.prometheusOperator,
       configReloaderImage: $.values.common.images.prometheusOperatorReloader,
+      commonLabels+: {
+        'app.kubernetes.io/part-of': 'kube-prometheus',
+      },
       mixin+: { ruleLabels: $.values.common.ruleLabels },
       kubeRbacProxyImage: $.values.common.images.kubeRbacProxy,
     },
     kubernetesControlPlane: {
       namespace: $.values.common.namespace,
       mixin+: { ruleLabels: $.values.common.ruleLabels },
+    },
+    kubePrometheus: {
+      namespace: $.values.common.namespace,
+      mixin+: { ruleLabels: $.values.common.ruleLabels },
+      platform: null,
     },
   },
 
@@ -134,17 +128,12 @@ local utils = import './lib/utils.libsonnet';
   prometheusAdapter: prometheusAdapter($.values.prometheusAdapter),
   prometheusOperator: prometheusOperator($.values.prometheusOperator),
   kubernetesControlPlane: kubernetesControlPlane($.values.kubernetesControlPlane),
-  kubePrometheus: customMixin(
-    {
-      namespace: $.values.common.namespace,
-      mixin+: { ruleLabels: $.values.common.ruleLabels },
-    }
-  ) + {
+  kubePrometheus: customMixin($.values.kubePrometheus) + {
     namespace: {
       apiVersion: 'v1',
       kind: 'Namespace',
       metadata: {
-        name: $.values.common.namespace,
+        name: $.values.kubePrometheus.namespace,
       },
     },
   },

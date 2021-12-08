@@ -74,9 +74,6 @@
       // The default refresh time for all dashboards, default to 10s
       refresh: '10s',
       minimumTimeInterval: '1m',
-
-      // Timezone for Grafana dashboards:: UTC, browser, ...
-      grafanaTimezone: 'UTC',
     },
 
     // Opt-in to multiCluster dashboards by overriding this and the clusterLabel.
@@ -84,12 +81,6 @@
     clusterLabel: 'cluster',
 
     namespaceLabel: 'namespace',
-
-    // Default datasource name
-    datasourceName: 'default',
-
-    // Datasource instance filter regex
-    datasourceFilterRegex: '',
 
     // This list of filesystem is referenced in various expressions.
     fstypes: ['ext[234]', 'btrfs', 'xfs', 'zfs'],

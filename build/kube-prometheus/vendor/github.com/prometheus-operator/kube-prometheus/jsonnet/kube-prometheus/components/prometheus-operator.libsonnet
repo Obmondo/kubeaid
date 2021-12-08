@@ -3,15 +3,13 @@ local prometheusOperator = import 'github.com/prometheus-operator/prometheus-ope
 
 local defaults = {
   local defaults = self,
-  // Convention: Top-level fields related to CRDs are public, other fields are hidden
-  // If there is no CRD for the component, everything is hidden in defaults.
-  name:: 'prometheus-operator',
-  namespace:: error 'must provide namespace',
-  version:: error 'must provide version',
-  image:: error 'must provide image',
-  kubeRbacProxyImage:: error 'must provide kubeRbacProxyImage',
-  configReloaderImage:: error 'must provide config reloader image',
-  resources:: {
+  name: 'prometheus-operator',
+  namespace: error 'must provide namespace',
+  version: error 'must provide version',
+  image: error 'must provide image',
+  kubeRbacProxyImage: error 'must provide kubeRbacProxyImage',
+  configReloaderImage: error 'must provide config reloader image',
+  resources: {
     limits: { cpu: '200m', memory: '200Mi' },
     requests: { cpu: '100m', memory: '100Mi' },
   },
@@ -26,14 +24,14 @@ local defaults = {
     for labelName in std.objectFields(defaults.commonLabels)
     if !std.setMember(labelName, ['app.kubernetes.io/version'])
   },
-  mixin:: {
+  mixin: {
     ruleLabels: {
       role: 'alert-rules',
       prometheus: defaults.name,
     },
     _config: {
       prometheusOperatorSelector: 'job="prometheus-operator",namespace="' + defaults.namespace + '"',
-      runbookURLPattern: 'https://runbooks.prometheus-operator.dev/runbooks/prometheus-operator/%s',
+      runbookURLPattern: 'https://github.com/prometheus-operator/kube-prometheus/wiki/%s',
     },
   },
 };
@@ -47,13 +45,8 @@ function(params)
     local po = self,
     // declare variable as a field to allow overriding options and to have unified API across all components
     _config:: config,
-    _metadata:: {
-      labels: po._config.commonLabels,
-      name: po._config.name,
-      namespace: po._config.namespace,
-    },
     mixin:: (import 'github.com/prometheus-operator/prometheus-operator/jsonnet/mixin/mixin.libsonnet') +
-            (import 'github.com/kubernetes-monitoring/kubernetes-mixin/lib/add-runbook-links.libsonnet') {
+            (import 'github.com/kubernetes-monitoring/kubernetes-mixin/alerts/add-runbook-links.libsonnet') {
               _config+:: po._config.mixin._config,
             },
 

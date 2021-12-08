@@ -27,14 +27,14 @@ function(params) {
   config:: defaults + params,
 
   // Prefixing with 0 to ensure these manifests are listed and therefore created first.
-  '0alertmanagerCustomResourceDefinition': import 'alertmanagers-crd.json',
-  '0alertmanagerConfigCustomResourceDefinition': import 'alertmanagerconfigs-crd.json',
-  '0prometheusCustomResourceDefinition': import 'prometheuses-crd.json',
-  '0servicemonitorCustomResourceDefinition': import 'servicemonitors-crd.json',
-  '0podmonitorCustomResourceDefinition': import 'podmonitors-crd.json',
-  '0probeCustomResourceDefinition': import 'probes-crd.json',
-  '0prometheusruleCustomResourceDefinition': import 'prometheusrules-crd.json',
-  '0thanosrulerCustomResourceDefinition': import 'thanosrulers-crd.json',
+  '0alertmanagerCustomResourceDefinition': import 'alertmanager-crd.libsonnet',
+  '0alertmanagerConfigCustomResourceDefinition': import 'alertmanagerconfig-crd.libsonnet',
+  '0prometheusCustomResourceDefinition': import 'prometheus-crd.libsonnet',
+  '0servicemonitorCustomResourceDefinition': import 'servicemonitor-crd.libsonnet',
+  '0podmonitorCustomResourceDefinition': import 'podmonitor-crd.libsonnet',
+  '0probeCustomResourceDefinition': import 'probe-crd.libsonnet',
+  '0prometheusruleCustomResourceDefinition': import 'prometheusrule-crd.libsonnet',
+  '0thanosrulerCustomResourceDefinition': import 'thanosruler-crd.libsonnet',
 
   clusterRoleBinding: {
     apiVersion: 'rbac.authorization.k8s.io/v1',
@@ -151,12 +151,7 @@ function(params) {
         replicas: 1,
         selector: { matchLabels: po.config.selectorLabels },
         template: {
-          metadata: {
-            labels: po.config.commonLabels,
-            annotations: {
-              "kubectl.kubernetes.io/default-container": container.name,
-            }
-          },
+          metadata: { labels: po.config.commonLabels },
           spec: {
             containers: [container],
             nodeSelector: {

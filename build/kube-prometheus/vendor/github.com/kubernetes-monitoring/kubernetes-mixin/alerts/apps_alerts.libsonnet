@@ -12,13 +12,13 @@
         rules: [
           {
             expr: |||
-              max_over_time(kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff", %(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[5m]) >= 1
+              rate(kube_pod_container_status_restarts_total{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[10m]) * 60 * 5 > 0
             ||| % $._config,
             labels: {
               severity: 'warning',
             },
             annotations: {
-              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is in waiting state (reason: "CrashLoopBackOff").',
+              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) is restarting {{ printf "%.2f" $value }} times / 10 minutes.',
               summary: 'Pod is crash looping.',
             },
             'for': '15m',
@@ -68,7 +68,7 @@
             expr: |||
               (
                 kube_deployment_spec_replicas{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
-                  >
+                  !=
                 kube_deployment_status_replicas_available{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}
               ) and (
                 changes(kube_deployment_status_replicas_updated{%(prefixedNamespaceSelector)s%(kubeStateMetricsSelector)s}[10m])
@@ -198,7 +198,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'pod/{{ $labels.pod }} in namespace {{ $labels.namespace }} on container {{ $labels.container}} has been in waiting state for longer than 1 hour.',
+              description: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} container {{ $labels.container}} has been in waiting state for longer than 1 hour.',
               summary: 'Pod container waiting longer than 1 hour',
             },
             'for': '1h',
@@ -282,7 +282,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'HPA {{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler  }} has not matched the desired number of replicas for longer than 15 minutes.',
+              description: 'HPA {{ $labels.namespace }}/{{ $labels.hpa }} has not matched the desired number of replicas for longer than 15 minutes.',
               summary: 'HPA has not matched descired number of replicas.',
             },
             'for': '15m',
@@ -298,7 +298,7 @@
               severity: 'warning',
             },
             annotations: {
-              description: 'HPA {{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler  }} has been running at max replicas for longer than 15 minutes.',
+              description: 'HPA {{ $labels.namespace }}/{{ $labels.hpa }} has been running at max replicas for longer than 15 minutes.',
               summary: 'HPA is running at max replicas',
             },
             'for': '15m',

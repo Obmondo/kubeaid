@@ -53,7 +53,7 @@
                 node_filesystem_readonly{%(nodeExporterSelector)s,%(fsSelector)s} == 0
               )
             ||| % $._config,
-            'for': '30m',
+            'for': '1h',
             labels: {
               severity: 'warning',
             },
@@ -71,7 +71,7 @@
                 node_filesystem_readonly{%(nodeExporterSelector)s,%(fsSelector)s} == 0
               )
             ||| % $._config,
-            'for': '30m',
+            'for': '1h',
             labels: {
               severity: '%(nodeCriticalSeverity)s' % $._config,
             },
@@ -275,38 +275,6 @@
             annotations: {
               summary: 'Failed device in RAID array',
               description: "At least one device in RAID array on {{ $labels.instance }} failed. Array '{{ $labels.device }}' needs attention and possibly a disk swap.",
-            },
-          },
-          {
-            alert: 'NodeFileDescriptorLimit',
-            expr: |||
-              (
-                node_filefd_allocated{job="node-exporter"} * 100 / node_filefd_maximum{job="node-exporter"} > 70
-              )
-            ||| % $._config,
-            'for': '15m',
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              summary: 'Kernel is predicted to exhaust file descriptors limit soon.',
-              description: 'File descriptors limit at {{ $labels.instance }} is currently at {{ printf "%.2f" $value }}%.',
-            },
-          },
-          {
-            alert: 'NodeFileDescriptorLimit',
-            expr: |||
-              (
-                node_filefd_allocated{job="node-exporter"} * 100 / node_filefd_maximum{job="node-exporter"} > 90
-              )
-            ||| % $._config,
-            'for': '15m',
-            labels: {
-              severity: 'critical',
-            },
-            annotations: {
-              summary: 'Kernel is predicted to exhaust file descriptors limit soon.',
-              description: 'File descriptors limit at {{ $labels.instance }} is currently at {{ printf "%.2f" $value }}%.',
             },
           },
         ],
