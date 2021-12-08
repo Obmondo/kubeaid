@@ -12,12 +12,13 @@ spec:
   project: default
   source:
     path: argocd-helm-charts/kube-prometheus-stack
-    repoURL: https://github.com/blackwoodseven/k8s-init.git
+    repoURL: <repo_url>
     targetRevision: HEAD
     helm:
       valueFiles:
       - values.yaml
-      - ../../argocd-clusters-managed/k8s.ops.blackwoodseven.com/values-kube-prometheus-stack.yaml
+      - ../../argocd-clusters-managed/<cluster_name>/values-kube-prometheus-stack.yaml
   syncPolicy:
     syncOptions:
+    - ApplyOutOfSyncOnly=true
     - CreateNamespace=true
