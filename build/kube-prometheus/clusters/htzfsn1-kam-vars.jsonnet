@@ -16,8 +16,8 @@
 		"requests": { "cpu": "10m", "memory": "20Mi" }
 		},
 	prometheus_resources: {
-		"limits": { "memory": "1Gi" },
-		"requests": { "cpu": "100m", "memory": "200Mi" }
+		"limits": { "memory": "4Gi" },
+		"requests": { "cpu": "800m", "memory": "200Mi" }
 		},
 
 }
