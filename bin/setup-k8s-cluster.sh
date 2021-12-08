@@ -344,26 +344,9 @@ if $SETUP_SEALED_SECRET; then
         STAT $?
     fi
 
-    # Wait for sealed-secrets pod to start
-    until kubectl -n system get pods -l 'app.kubernetes.io/name=sealed-secrets' -o jsonpath="{..status.containerStatuses[0].ready}" >/dev/null; do
-        echo "Waiting for sealed-secrets pod to start..." &>>/tmp/argocd.log
-        sleep 1
-    done
-
-    echo "sealed secrets is ready, getting pub key for cluster" &>>/tmp/argocd.log
-
     # Create required directory
     mkdir -p ./sealed-secrets/"$CLUSTER_NAME"
     mkdir -p ./sealed-secrets/"$CLUSTER_NAME"/argocd
-
-    # Pods are ready, but under the hood things are yet to finalize, so sleep for 2s.
-    sleep 2
-
-    kubectl get secret \
-        --namespace system \
-        -l sealedsecrets.bitnami.com/sealed-secrets-key=active \
-        -o jsonpath='{'.items[0].data."tls\.crt"'}' \
-        | base64 -d > "./sealed-secrets/$CLUSTER_NAME/$CLUSTER_NAME.pem"
 
     #### BUG #####
     ## As per plan we need to have a single repo for all customer to manage the argocd-helm-charts
@@ -377,6 +360,12 @@ fi
 ##### Install argocd #####
 if $SETUP_ARGOCD; then
 
+    if ! kubectl -n system get pods -l 'app.kubernetes.io/name=sealed-secrets' -o jsonpath="{..status.containerStatuses[0].ready}" >/dev/null; then
+        echo "Error: seems like sealed-secrets pods are not running.":
+        echo "cannot install argocd app without sealed-secret.. exiting"
+        exit 1
+    fi
+
     mkdir -p ./argocd-clusters-managed/"$CLUSTER_NAME"
     mkdir -p ./argocd-clusters-managed/"$CLUSTER_NAME"/templates
 
@@ -386,6 +375,12 @@ if $SETUP_ARGOCD; then
         kubectl create namespace argocd &>>/tmp/argocd.log
         STAT $?
     fi
+
+    kubectl get secret \
+        --namespace system \
+        -l sealedsecrets.bitnami.com/sealed-secrets-key=active \
+        -o jsonpath='{'.items[0].data."tls\.crt"'}' \
+        | base64 -d > "./sealed-secrets/$CLUSTER_NAME/$CLUSTER_NAME.pem"
 
     ARGOCD_CTRL_REPLICAS=$(DEFAULT_VALES '.argo-cd.controller.replicas' 1)
     ARGOCD_REPO_REPLICAS=$(DEFAULT_VALES '.argo-cd.repoServer.replicas' 1)
@@ -527,7 +522,7 @@ if $SETUP_ARGOCD; then
             ;;
     esac
 
-    if [ -n "$OCI_URL" ] && [ ! "$(kubectl get secrets -n argocd helm-repos-cache -o name &>/dev/null)" ]; then
+    if [ -n "$OCI_URL" ] && ! kubectl get secrets -n argocd helm-repos-cache -o name &>/dev/null; then
         HEAD "Creating sealed-secret for OCI repo ...    "
         read -r -p "OCI repo username :" OCI_USERNAME
         read -r -s -p "OCI repo password :" OCI_PASSWORD
@@ -580,6 +575,8 @@ if $SETUP_ARGOCD; then
 
     # Switch to the original state of the file, after installing
     git restore ./argocd-helm-charts/argo-cd/Chart.yaml
+
+    rm -fr "./sealed-secrets/$CLUSTER_NAME/$CLUSTER_NAME.pem"
 fi
 
 ##### Install root app #####
