@@ -35,7 +35,7 @@ local kp =
         platform: vars.platform,
       },
     },
-  } +  
+  } +
   {
     values+:: {
       common+: {
@@ -47,6 +47,11 @@ local kp =
       "prometheusOperator"+: {
         resources: vars.prometheus_operator_resources,
       },
+    }  
+  } + (
+    if vars.extra_configs then 
+    {
+    values+:: {
       grafana+:{
         config+: {
             sections: {
@@ -80,36 +85,6 @@ local kp =
       }
     },
 
-    ingress+:: {
-      grafana: utils.ingress(
-        'grafana',
-        $.values.common.namespace,
-        [{
-          host: vars.grafana_ingress_host,
-          http: {
-            paths: [{
-              path: '/',
-              pathType: 'Prefix',
-              backend: {
-                service: {
-                  name: 'grafana',
-                  port: {
-                    name: 'http',
-                  },
-                },
-              },
-            }],
-          },
-        }],
-        [{
-          secretName: 'kube-prometheus-grafana-tls',
-          hosts: [
-            vars.grafana_ingress_host
-          ]
-        }]
-      ),
-    },
-
     alertmanager+: {
       alertmanager+: {
         spec+: {
@@ -140,7 +115,42 @@ local kp =
         },  
       },
     },
-  };
+  }
+  else {}
+  ) + (
+    if std.objectHas(vars,"grafana_ingress_host") then 
+    {
+      ingress+:: {
+        grafana: utils.ingress(
+          'grafana',
+          $.values.common.namespace,
+          [{
+            host: vars.grafana_ingress_host,
+            http: {
+              paths: [{
+                path: '/',
+                pathType: 'Prefix',
+                backend: {
+                  service: {
+                    name: 'grafana',
+                    port: {
+                      name: 'http',
+                    },
+                  },
+                },
+              }],
+            },
+          }],
+          [{
+            secretName: 'kube-prometheus-grafana-tls',
+            hosts: [
+              vars.grafana_ingress_host
+            ]
+          }]
+        ),
+      },
+    } else {}
+  );
 
 { 'setup/0namespace-namespace': kp.kubePrometheus.namespace } +
 {
@@ -152,11 +162,11 @@ local kp =
 { 'prometheus-operator-prometheusRule': kp.prometheusOperator.prometheusRule } +
 { 'kube-prometheus-prometheusRule': kp.kubePrometheus.prometheusRule } +
 { ['alertmanager-' + name]: kp.alertmanager[name] for name in std.objectFields(kp.alertmanager) } +
-{ ['blackbox-exporter-' + name]: kp.blackboxExporter[name] for name in std.objectFields(kp.blackboxExporter) } +
+(if vars["blackbox-exporter"] then { ['blackbox-exporter-' + name]: kp.blackboxExporter[name] for name in std.objectFields(kp.blackboxExporter) } else {}) +
 { ['grafana-' + name]: kp.grafana[name] for name in std.objectFields(kp.grafana) } +
 { ['kube-state-metrics-' + name]: kp.kubeStateMetrics[name] for name in std.objectFields(kp.kubeStateMetrics) } +
 { ['kubernetes-' + name]: kp.kubernetesControlPlane[name] for name in std.objectFields(kp.kubernetesControlPlane) }
 { ['node-exporter-' + name]: kp.nodeExporter[name] for name in std.objectFields(kp.nodeExporter) } +
 { ['prometheus-' + name]: kp.prometheus[name] for name in std.objectFields(kp.prometheus) } +
-{ ['prometheus-adapter-' + name]: kp.prometheusAdapter[name] for name in std.objectFields(kp.prometheusAdapter) }
-{ [name + '-ingress']: kp.ingress[name] for name in std.objectFields(kp.ingress) }
+{ ['prometheus-adapter-' + name]: kp.prometheusAdapter[name] for name in std.objectFields(kp.prometheusAdapter) } +
+(if std.objectHas(vars,"grafana_ingress_host") then { [name + '-ingress']: kp.ingress[name] for name in std.objectFields(kp.ingress) } else {})
