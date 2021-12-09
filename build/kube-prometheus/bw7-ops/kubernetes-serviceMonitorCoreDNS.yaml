@@ -3,7 +3,6 @@ kind: ServiceMonitor
 metadata:
   labels:
     app.kubernetes.io/name: coredns
-    app.kubernetes.io/part-of: kube-prometheus
   name: coredns
   namespace: monitoring
 spec:
@@ -17,4 +16,4 @@ spec:
     - kube-system
   selector:
     matchLabels:
-      k8s-app: kube-dns
+      app.kubernetes.io/name: kube-dns

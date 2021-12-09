@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/component: exporter
     app.kubernetes.io/name: node-exporter
     app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 1.2.2
+    app.kubernetes.io/version: 1.1.2
   name: node-exporter
   namespace: monitoring
 spec:
@@ -16,13 +16,11 @@ spec:
       app.kubernetes.io/part-of: kube-prometheus
   template:
     metadata:
-      annotations:
-        kubectl.kubernetes.io/default-container: node-exporter
       labels:
         app.kubernetes.io/component: exporter
         app.kubernetes.io/name: node-exporter
         app.kubernetes.io/part-of: kube-prometheus
-        app.kubernetes.io/version: 1.2.2
+        app.kubernetes.io/version: 1.1.2
     spec:
       containers:
       - args:
@@ -31,10 +29,10 @@ spec:
         - --path.rootfs=/host/root
         - --no-collector.wifi
         - --no-collector.hwmon
-        - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
+        - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
         - --collector.netclass.ignored-devices=^(veth.*|[a-f0-9]{15})$
         - --collector.netdev.device-exclude=^(veth.*|[a-f0-9]{15})$
-        image: quay.io/prometheus/node-exporter:v1.2.2
+        image: quay.io/prometheus/node-exporter:v1.1.2
         name: node-exporter
         resources:
           limits:
@@ -62,7 +60,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
-        image: quay.io/brancz/kube-rbac-proxy:v0.11.0
+        image: quay.io/brancz/kube-rbac-proxy:v0.8.0
         name: kube-rbac-proxy
         ports:
         - containerPort: 9100
