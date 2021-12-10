@@ -10,6 +10,25 @@ then
     exit 1
 fi
 
+#initially remove the jsonnetfile.json and jsonnetfile.lock.json  
+rm jsonnetfile.json
+rm jsonnetfile.lock.json
+
+case ${1} in
+
+  htzfsn1-kam)
+    echo -n "using @release-0.8 for htzfsn1-kam"
+    jb init
+    jb install github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@release-0.8
+    ;;
+
+  htzhel1-kbm)
+    echo -n "i @release-0.9 release for htzhel1-kbm"
+    jb init
+    jb install github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@release-0.9
+    ;;
+esac
+
 
 # Make sure to use project tooling
 PATH="$(pwd)/tmp/bin:${PATH}"
@@ -27,4 +46,3 @@ jsonnet -J vendor --ext-code-file vars="clusters/${1}-vars.jsonnet" -m $OUTDIR "
 # Make sure to remove json files
 find $OUTDIR -type f ! -name '*.yaml' -delete
 rm -f kustomization
-
