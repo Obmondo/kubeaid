@@ -16,8 +16,6 @@ spec:
       app.kubernetes.io/part-of: kube-prometheus
   template:
     metadata:
-      annotations:
-        kubectl.kubernetes.io/default-container: node-exporter
       labels:
         app.kubernetes.io/component: exporter
         app.kubernetes.io/name: node-exporter
@@ -31,7 +29,7 @@ spec:
         - --path.rootfs=/host/root
         - --no-collector.wifi
         - --no-collector.hwmon
-        - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
+        - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
         - --collector.netclass.ignored-devices=^(veth.*|[a-f0-9]{15})$
         - --collector.netdev.device-exclude=^(veth.*|[a-f0-9]{15})$
         image: quay.io/prometheus/node-exporter:v1.2.2

@@ -158,7 +158,7 @@ spec:
         severity: warning
     - alert: KubeContainerWaiting
       annotations:
-        description: pod/{{ $labels.pod }} in namespace {{ $labels.namespace }} on container {{ $labels.container}} has been in waiting state for longer than 1 hour.
+        description: Pod {{ $labels.namespace }}/{{ $labels.pod }} container {{ $labels.container}} has been in waiting state for longer than 1 hour.
         runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubecontainerwaiting
         summary: Pod container waiting longer than 1 hour
       expr: |
@@ -361,8 +361,6 @@ spec:
         ) < 0.03
         and
         kubelet_volume_stats_used_bytes{job="kubelet", metrics_path="/metrics"} > 0
-        unless on(namespace, persistentvolumeclaim)
-        kube_persistentvolumeclaim_access_mode{ access_mode="ReadOnlyMany"} == 1
       for: 1m
       labels:
         severity: critical
@@ -381,8 +379,6 @@ spec:
         kubelet_volume_stats_used_bytes{job="kubelet", metrics_path="/metrics"} > 0
         and
         predict_linear(kubelet_volume_stats_available_bytes{job="kubelet", metrics_path="/metrics"}[6h], 4 * 24 * 3600) < 0
-        unless on(namespace, persistentvolumeclaim)
-        kube_persistentvolumeclaim_access_mode{ access_mode="ReadOnlyMany"} == 1
       for: 1h
       labels:
         severity: warning
@@ -575,7 +571,7 @@ spec:
         ) > 0.95
       for: 15m
       labels:
-        severity: info
+        severity: warning
     - alert: KubeNodeReadinessFlapping
       annotations:
         description: The readiness status of node {{ $labels.node }} has changed {{ $value }} times in the last 15 minutes.
@@ -696,18 +692,6 @@ spec:
       for: 15m
       labels:
         severity: critical
-  - name: kubernetes-system-kube-proxy
-    rules:
-    - alert: KubeProxyDown
-      annotations:
-        description: KubeProxy has disappeared from Prometheus target discovery.
-        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeproxydown
-        summary: Target disappeared from Prometheus target discovery.
-      expr: |
-        absent(up{job="kube-proxy"} == 1)
-      for: 15m
-      labels:
-        severity: critical
   - name: kube-apiserver-burnrate.rules
     rules:
     - expr: |
@@ -725,7 +709,7 @@ spec:
               +
               sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="namespace",le="5"}[1d]))
               +
-              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="30"}[1d]))
+              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="40"}[1d]))
             )
           )
           +
@@ -752,7 +736,7 @@ spec:
               +
               sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="namespace",le="5"}[1h]))
               +
-              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="30"}[1h]))
+              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="40"}[1h]))
             )
           )
           +
@@ -779,7 +763,7 @@ spec:
               +
               sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="namespace",le="5"}[2h]))
               +
-              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="30"}[2h]))
+              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="40"}[2h]))
             )
           )
           +
@@ -806,7 +790,7 @@ spec:
               +
               sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="namespace",le="5"}[30m]))
               +
-              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="30"}[30m]))
+              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="40"}[30m]))
             )
           )
           +
@@ -833,7 +817,7 @@ spec:
               +
               sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="namespace",le="5"}[3d]))
               +
-              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="30"}[3d]))
+              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="40"}[3d]))
             )
           )
           +
@@ -860,7 +844,7 @@ spec:
               +
               sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="namespace",le="5"}[5m]))
               +
-              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="30"}[5m]))
+              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="40"}[5m]))
             )
           )
           +
@@ -887,7 +871,7 @@ spec:
               +
               sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="namespace",le="5"}[6h]))
               +
-              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="30"}[6h]))
+              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="40"}[6h]))
             )
           )
           +
@@ -1057,39 +1041,27 @@ spec:
         verb: write
       record: code:apiserver_request_total:increase30d
     - expr: |
-        sum by (cluster, verb, scope) (increase(apiserver_request_duration_seconds_count[1h]))
-      record: cluster_verb_scope:apiserver_request_duration_seconds_count:increase1h
-    - expr: |
-        sum by (cluster, verb, scope) (avg_over_time(cluster_verb_scope:apiserver_request_duration_seconds_count:increase1h[30d]) * 24 * 30)
-      record: cluster_verb_scope:apiserver_request_duration_seconds_count:increase30d
-    - expr: |
-        sum by (cluster, verb, scope, le) (increase(apiserver_request_duration_seconds_bucket[1h]))
-      record: cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase1h
-    - expr: |
-        sum by (cluster, verb, scope, le) (avg_over_time(cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase1h[30d]) * 24 * 30)
-      record: cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d
-    - expr: |
         1 - (
           (
             # write too slow
-            sum by (cluster) (cluster_verb_scope:apiserver_request_duration_seconds_count:increase30d{verb=~"POST|PUT|PATCH|DELETE"})
+            sum by (cluster) (increase(apiserver_request_duration_seconds_count{verb=~"POST|PUT|PATCH|DELETE"}[30d]))
             -
-            sum by (cluster) (cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d{verb=~"POST|PUT|PATCH|DELETE",le="1"})
+            sum by (cluster) (increase(apiserver_request_duration_seconds_bucket{verb=~"POST|PUT|PATCH|DELETE",le="1"}[30d]))
           ) +
           (
             # read too slow
-            sum by (cluster) (cluster_verb_scope:apiserver_request_duration_seconds_count:increase30d{verb=~"LIST|GET"})
+            sum by (cluster) (increase(apiserver_request_duration_seconds_count{verb=~"LIST|GET"}[30d]))
             -
             (
               (
-                sum by (cluster) (cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope=~"resource|",le="1"})
+                sum by (cluster) (increase(apiserver_request_duration_seconds_bucket{verb=~"LIST|GET",scope=~"resource|",le="1"}[30d]))
                 or
                 vector(0)
               )
               +
-              sum by (cluster) (cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope="namespace",le="5"})
+              sum by (cluster) (increase(apiserver_request_duration_seconds_bucket{verb=~"LIST|GET",scope="namespace",le="5"}[30d]))
               +
-              sum by (cluster) (cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope="cluster",le="30"})
+              sum by (cluster) (increase(apiserver_request_duration_seconds_bucket{verb=~"LIST|GET",scope="cluster",le="40"}[30d]))
             )
           ) +
           # errors
@@ -1102,19 +1074,19 @@ spec:
       record: apiserver_request:availability30d
     - expr: |
         1 - (
-          sum by (cluster) (cluster_verb_scope:apiserver_request_duration_seconds_count:increase30d{verb=~"LIST|GET"})
+          sum by (cluster) (increase(apiserver_request_duration_seconds_count{job="apiserver",verb=~"LIST|GET"}[30d]))
           -
           (
             # too slow
             (
-              sum by (cluster) (cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope=~"resource|",le="1"})
+              sum by (cluster) (increase(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope=~"resource|",le="1"}[30d]))
               or
               vector(0)
             )
             +
-            sum by (cluster) (cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope="namespace",le="5"})
+            sum by (cluster) (increase(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="namespace",le="5"}[30d]))
             +
-            sum by (cluster) (cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope="cluster",le="30"})
+            sum by (cluster) (increase(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="40"}[30d]))
           )
           +
           # errors
@@ -1129,9 +1101,9 @@ spec:
         1 - (
           (
             # too slow
-            sum by (cluster) (cluster_verb_scope:apiserver_request_duration_seconds_count:increase30d{verb=~"POST|PUT|PATCH|DELETE"})
+            sum by (cluster) (increase(apiserver_request_duration_seconds_count{verb=~"POST|PUT|PATCH|DELETE"}[30d]))
             -
-            sum by (cluster) (cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d{verb=~"POST|PUT|PATCH|DELETE",le="1"})
+            sum by (cluster) (increase(apiserver_request_duration_seconds_bucket{verb=~"POST|PUT|PATCH|DELETE",le="1"}[30d]))
           )
           +
           # errors

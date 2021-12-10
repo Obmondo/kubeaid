@@ -1,34 +1,13 @@
 apiVersion: v1
+data:
+  grafana.ini: W2FuYWx5dGljc10KY2hlY2tfZm9yX3VwZGF0ZXMgPSBmYWxzZQpbYXV0aF0KZGlzYWJsZV9sb2dpbl9mb3JtID0gdHJ1ZQpkaXNhYmxlX3NpZ25vdXRfbWVudSA9IGZhbHNlCm9hdXRoX2F1dG9fbG9naW4gPSB0cnVlCnNpZ25vdXRfcmVkaXJlY3RfdXJsID0gaHR0cHM6Ly9rZXljbG9hay5rYm0ub2Jtb25kby5jb20vYXV0aC9yZWFsbXMvZGV2b3BzL3Byb3RvY29sL29wZW5pZC1jb25uZWN0L2xvZ291dD9yZWRpcmVjdF91cmk9aHR0cHM6Ly9ncmFmYW5hLmtibS5vYm1vbmRvLmNvbQpbYXV0aC5nZW5lcmljX29hdXRoXQphbGxvd19zaWduX3VwID0gdHJ1ZQphcGlfdXJsID0gaHR0cHM6Ly9rZXljbG9hay5rYm0ub2Jtb25kby5jb20vYXV0aC9yZWFsbXMvZGV2b3BzL3Byb3RvY29sL29wZW5pZC1jb25uZWN0L3VzZXJpbmZvCmF1dGhfdXJsID0gaHR0cHM6Ly9rZXljbG9hay5rYm0ub2Jtb25kby5jb20vYXV0aC9yZWFsbXMvZGV2b3BzL3Byb3RvY29sL29wZW5pZC1jb25uZWN0L2F1dGgKY2xpZW50X2lkID0gZ3JhZmFuYQplbmFibGVkID0gdHJ1ZQpuYW1lID0gS2V5Y2xvYWsKcm9sZV9hdHRyaWJ1dGVfcGF0aCA9IGNvbnRhaW5zKG5vdF9udWxsKHJvbGVzWypdLCcnKSwgJ0FkbWluJykgJiYgJ0FkbWluJyB8fCBjb250YWlucyhub3RfbnVsbChyb2xlc1sqXSwnJyksICdFZGl0b3InKSAmJiAnRWRpdG9yJyB8fCBjb250YWlucyhub3RfbnVsbChyb2xlc1sqXSwnJyksICdWaWV3ZXInKSAmJiAnVmlld2VyJ3x8ICcnCnNjb3BlcyA9IG9wZW5pZCBwcm9maWxlIGVtYWlsCnRva2VuX3VybCA9IGh0dHBzOi8va2V5Y2xvYWsua2JtLm9ibW9uZG8uY29tL2F1dGgvcmVhbG1zL2Rldm9wcy9wcm90b2NvbC9vcGVuaWQtY29ubmVjdC90b2tlbgpbZGF0ZV9mb3JtYXRzXQpkZWZhdWx0X3RpbWV6b25lID0gVVRDCltzZXJ2ZXJdCnJvb3RfdXJsID0gaHR0cHM6Ly9ncmFmYW5hLmtibS5vYm1vbmRvLmNvbQo=
 kind: Secret
 metadata:
   labels:
     app.kubernetes.io/component: grafana
     app.kubernetes.io/name: grafana
     app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 8.2.3
+    app.kubernetes.io/version: 8.1.1
   name: grafana-config
   namespace: monitoring
-stringData:
-  grafana.ini: |
-    [analytics]
-    check_for_updates = false
-    [auth]
-    disable_login_form = true
-    disable_signout_menu = false
-    oauth_auto_login = true
-    signout_redirect_url = https://keycloak.kbm.obmondo.com/auth/realms/devops/protocol/openid-connect/logout?redirect_uri=https://grafana.kbm.obmondo.com
-    [auth.generic_oauth]
-    allow_sign_up = true
-    api_url = https://keycloak.kbm.obmondo.com/auth/realms/devops/protocol/openid-connect/userinfo
-    auth_url = https://keycloak.kbm.obmondo.com/auth/realms/devops/protocol/openid-connect/auth
-    client_id = grafana
-    enabled = true
-    name = Keycloak
-    role_attribute_path = contains(not_null(roles[*],''), 'Admin') && 'Admin' || contains(not_null(roles[*],''), 'Editor') && 'Editor' || contains(not_null(roles[*],''), 'Viewer') && 'Viewer'|| ''
-    scopes = openid profile email
-    token_url = https://keycloak.kbm.obmondo.com/auth/realms/devops/protocol/openid-connect/token
-    [date_formats]
-    default_timezone = UTC
-    [server]
-    root_url = https://grafana.kbm.obmondo.com
 type: Opaque

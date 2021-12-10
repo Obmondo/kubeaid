@@ -9,7 +9,7 @@
     grafana_token_url: "https://keycloak.kbm.obmondo.com/auth/realms/devops/protocol/openid-connect/token",
     grafana_api_url: "https://keycloak.kbm.obmondo.com/auth/realms/devops/protocol/openid-connect/userinfo",
     grafana_ingress_host: "grafana.kbm.obmondo.com",
-	kube_prometheus_version: 'release-0.9'
+	kube_prometheus_version: 'release-0.9',
 
 	prometheus_operator_resources: {
 		limits: { cpu: '100m', memory: '80Mi' },
