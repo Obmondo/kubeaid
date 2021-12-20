@@ -1,0 +1,33 @@
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.opensearch
+#  namespace: {{ .Values.namespace }}
+  namespace: graylog
+spec:
+  order: 100
+  selector:
+    app.kubernetes.io/name == 'opensearch'
+  types:
+  - Ingress
+  - Egress
+  ingress:
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 9200
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 9300
+      selector: app.kubernetes.io/name == 'opensearch'
+  egress:
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 9300
+    source:
+      selector: app.kubernetes.io/name == 'opensearch'
