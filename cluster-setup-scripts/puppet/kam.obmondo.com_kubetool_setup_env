@@ -1,8 +1,0 @@
-OS=debian
-INSTALL_DASHBOARD=true
-CNI_PROVIDER=calico
-ETCD_INITIAL_CLUSTER=kam.obmondo.com:kam.obmondo.com,localhost:localhost,176.9.67.43:176.9.67.43,htzsb44fsn1a.enableit.dk:78.46.72.21,htzsb45fsn1a.enableit.dk:176.9.124.207,htzsb45fsn1b.enableit.dk:85.10.211.48
-ETCD_IP="%{networking.ip}"
-KUBE_API_ADVERTISE_ADDRESS="%{networking.ip}"
-VERSION=1.22.5
-CONTAINER_RUNTIME=docker
