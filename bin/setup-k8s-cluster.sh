@@ -204,6 +204,11 @@ if [ -z "$SETTINGS_FILE" ]; then
     exit 1
 fi
 
+if [ -z "$CUSTOMER_ID" ]; then
+    echo "--customer-id is missing in the argument list"
+    exit 1
+fi
+
 # If cluster name is not given in the args list, pick it up from the settings file
 if [ -z "$CLUSTER_NAME" ]; then
     if yq e -e '.cluster.name' "$SETTINGS_FILE" &>/dev/null; then
@@ -336,9 +341,17 @@ if $SETUP_SEALED_SECRET; then
         cp ./argocd-application-templates/sealed-secrets.yaml "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
 
         yq eval --inplace ".spec.source.repoURL = \"$REPO_URL\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
-        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"$CLUSTER_NAME/argocd_apps/values-sealed-secrets.yaml\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
+        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"../../$CLUSTER_NAME/argocd_apps/values-sealed-secrets.yaml\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
 
-        helm install --namespace system sealed-secrets argocd-helm-charts/sealed-secrets &>>/tmp/argocd.log
+        # Lets touch a file, so sealed-secret is not broken when its getting synced from argocd
+        # some customer has their specific sealed-secrect, so touch won't do anyharm in case of recovery as well
+        touch "${ARGOCD_APPS}/values-sealed-secrets.yaml"
+
+        helm install \
+            --namespace system \
+            --values argocd-helm-charts/sealed-secrets/values.yaml \
+            --values "${ARGOCD_APPS}/values-sealed-secrets.yaml" \
+            sealed-secrets argocd-helm-charts/sealed-secrets &>>/tmp/argocd.log
 
         STAT $?
     else
@@ -558,15 +571,20 @@ if $SETUP_ARGOCD; then
         cp ./argocd-application-templates/argo-cd.yaml "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
 
         yq eval --inplace ".spec.source.repoURL = \"$REPO_URL\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
-        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"${CLUSTER_NAME}/argocd_apps/values-argo-cd.yaml\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
+        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"../../${CLUSTER_NAME}/argocd_apps/values-argo-cd.yaml\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
+
+        touch "${ARGOCD_APPS}/values-argo-cd.yaml"
 
         # We want to setup the secret via sealed-secret, so we should make it default to false
         # so argocd does not create argocd-secret and we create it ourselves.
+        # --values (or -f): Specify a YAML file with overrides. This can be specified multiple times and the rightmost file will take precedence
         helm install \
             --namespace argocd \
             --set argo-cd.configs.secret.createSecret=false \
             --set argo-cd.controller.replicas="$ARGOCD_CTRL_REPLICAS" \
             --set argo-cd.repoServer.replicas="$ARGOCD_REPO_REPLICAS" \
+            --values argocd-helm-charts/argo-cd/values.yaml \
+            --values "${ARGOCD_APPS}/values-argo-cd.yaml" \
             argo-cd ./argocd-helm-charts/argo-cd &>> /tmp/argocd.log
 
         STAT $?
