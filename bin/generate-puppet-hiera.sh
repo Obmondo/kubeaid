@@ -10,7 +10,7 @@
 # ssh://git@gitlab.enableit.dk:2223/kubernetes/argocd-apps.git
 #
 # Example
-# ./cluster-setup-scripts/puppet/generate-puppet-hiera.sh \
+# ./bin/generate-puppet-hiera.sh \
 #     --cluster-name kam.obmondo.com \
 #     --version 1.22.5 \
 #     --san-domains kam.obmondo.com,localhost,176.9.67.43,htzsb44fsn1a.enableit.dk:78.46.72.21,htzsb45fsn1a.enableit.dk:176.9.124.207,htzsb45fsn1b.enableit.dk:85.10.211.48
@@ -101,7 +101,7 @@ while [[ $# -gt 0 ]]; do
   -h|--help)
     ARGFAIL
 
-    shit
+    shift
     ;;
   esac
 done
@@ -146,9 +146,7 @@ else
 fi
 
 KUBERNETES_CONFIG_DIR="../kubernetes-config-${CUSTOMER_ID}/${CLUSTER_NAME}/hiera"
-BASEDIR=$(dirname "$0")
-_BASEDIR=${BASEDIR##./}
-_EYAML_PUBLIC_KEY="../../../argocd-apps/${_BASEDIR}/${EYAML_PUBLIC_KEY}"
+_EYAML_PUBLIC_KEY="../../../argocd-apps/cluster-setup-files/puppet/${EYAML_PUBLIC_KEY}"
 
 # Create the required directory
 mkdir -p "${KUBERNETES_CONFIG_DIR}"

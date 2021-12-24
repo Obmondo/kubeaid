@@ -38,6 +38,7 @@ ARGFAIL() {
     echo -n "
 Usage $0 [OPTION]:
   --cluster-name                  full cluser-name                          [Required]
+  --customer-id                   customer ID of obmondo customer           [Required]
   --recovery                      true|false [Defaults: false]
   --private-key-path              sealed-secrets-private-keys-dir           [Required when --recovery]
   --public-key-path               sealed-secrets-public-keys-dir            [Required when --recovery]
@@ -54,7 +55,7 @@ Usage $0 [OPTION]:
   -h | --help
 
 Example:
-# $0 --name your-cluster-name
+# $0 --cluster-name your-cluster-name
 "
 }
 
@@ -103,9 +104,9 @@ declare SETUP_ROOT_APP=true
 declare PRIVATE_KEY_PATH=
 declare PUBLIC_CERT_PATH=
 declare CLUSTER_NAME=
-declare PREFLIGHT_CHECK=true
 declare GENERATE_ARGOCD_PASSWORD=true
 declare SEALEDSECRETS_KEYS_CERTS=false
+declare CUSTOMER_ID=
 
 while [[ $# -gt 0 ]]; do
     arg="$1"
@@ -114,13 +115,6 @@ while [[ $# -gt 0 ]]; do
     case "$arg" in
       --cluster-name)
           CLUSTER_NAME=$(echo "$1" | tr '[:upper:]' '[:lower:]') # Convert to lower case
-
-          # Preflight checks
-          if [ ! -d "$CLUSTER" ]; then
-              echo "You want to create the $CLUSTER cluster, but I do not see a directory containing the necessary config files"
-              exit 1
-          fi
-
           shift
           ;;
       --recovery)
@@ -128,7 +122,7 @@ while [[ $# -gt 0 ]]; do
           ;;
       --private-key-path)
           PRIVATE_KEY_PATH=$1
-          if [ -n "$PRIVATE_KEY_PATH" ] && $RECOVERY; then
+          if ! $RECOVERY && [ -n "$PRIVATE_KEY_PATH" ]; then
               echo "Specified private keys dir, but this is not recovery mode!"
               exit 1
           fi
@@ -136,7 +130,7 @@ while [[ $# -gt 0 ]]; do
           ;;
       --public-key-path)
           PUBLIC_CERT_PATH=$1
-          if $RECOVERY && [ -n "$PUBLIC_CERT_PATH" ]; then
+          if ! $RECOVERY && [ -n "$PUBLIC_CERT_PATH" ]; then
               echo "Specified public cert dir, but this is not recovery mode!"
               exit 1
           fi
@@ -172,10 +166,6 @@ while [[ $# -gt 0 ]]; do
           SETUP_SEALED_SECRET=$1
           shift
           ;;
-      --preflight-check)
-          PREFLIGHT_CHECK=$1
-          shift
-          ;;
       --generate-argocd-password)
           GENERATE_ARGOCD_PASSWORD=$1
           shift
@@ -183,6 +173,10 @@ while [[ $# -gt 0 ]]; do
       --dump-sealedsecrets-keys-certs)
           SEALEDSECRETS_KEYS_CERTS=$1
           echo "Going to dump the public certs in ./public_certs dir and private keys in ./private_keys dir"
+          shift
+          ;;
+      --customer-id)
+          CUSTOMER_ID=$1
           shift
           ;;
       -h|--help)
@@ -197,27 +191,17 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if $PREFLIGHT_CHECK; then
-    # Preflight checks
-    for program in kubectl kubeseal helm bcrypt-tool pwgen yq
-    do
-        if ! command -v "$program" >/dev/null; then
-            DEPFAIL $program
-        fi
-    done
-
-    for folder in argocd-application-templates argocd-clusters-managed sealed-secrets
-    do
-        if [ ! -d "./$folder" ]; then
-            CWDFAIL "$folder"
-        fi
-    done
-fi
+for program in kubectl kubeseal helm bcrypt-tool pwgen yq
+do
+    if ! command -v "$program" >/dev/null; then
+        DEPFAIL $program
+    fi
+done
 
 if [ -z "$SETTINGS_FILE" ]; then
-  echo "Missing required arguments"
-  ARGFAIL
-  exit 1
+    echo "Missing required arguments"
+    ARGFAIL
+    exit 1
 fi
 
 # If cluster name is not given in the args list, pick it up from the settings file
@@ -231,16 +215,19 @@ if [ -z "$CLUSTER_NAME" ]; then
 fi
 
 ## Get some values from the settings file
+CUSTOMER_CONFIG_DIR="../kubernetes-config-${CUSTOMER_ID}/${CLUSTER_NAME}"
 REPO_URL=$(yq eval '.argo-cd.repo.url' "$SETTINGS_FILE")
 OCI_URL=$(yq eval '.argo-cd.repo.oci' "$SETTINGS_FILE")
 GIT_AUTH_TYPE=$(yq eval '.argo-cd.repo.auth.git' "$SETTINGS_FILE")
 GIT_AUTH_URL=$(yq eval '.argo-cd.repo.auth.url' "$SETTINGS_FILE")
 ARGOCD_SECRET_NAME=argocd-"$CLUSTER_NAME"-admin
+ARGOCD_APPS="${CUSTOMER_CONFIG_DIR}/argocd_apps"
+ARGOCD_APPS_TEMPLATE="${CUSTOMER_CONFIG_DIR}/argocd_apps/templates"
 
 if $INSTALL_K8S; then
     case "$K8S_TYPE" in
-      bare)
-        echo "We expect you have setup the k8s by yourself (kubeadm) or via puppet on bare metal node"
+      puppet)
+        echo "you can run ./bin/generate-puppet-hiera.sh"
       ;;
       aws-kops)
           CLUSTER_CONFIG_DIR=$(yq e '.cluster.configDir' "$SETTINGS_FILE")
@@ -278,6 +265,15 @@ export HELM_EXPERIMENTAL_OCI=1
 ##### Install sealed secrets #####
 if $SETUP_SEALED_SECRET; then
 
+    mkdir -p "${ARGOCD_APPS_TEMPLATE}"
+
+    # Create system namespace if it doesnt exist
+    if ! kubectl get namespaces system &>/dev/null; then
+        HEAD "Creating system namespace...        "
+        kubectl create namespace system &>>/tmp/argocd.log
+        STAT $?
+    fi
+
     if $SEALEDSECRETS_KEYS_CERTS; then
         mkdir -p public_certs private_keys
 
@@ -291,16 +287,16 @@ if $SETUP_SEALED_SECRET; then
     # Cancel if not recovery mode and cluster folder exists or if in recovery mode and some manifests are missing
     if $RECOVERY; then
 
-        if [ -d "$PRIVATE_KEY_PATH" ] && [ -d "$PUBLIC_CERT_PATH" ]; then
+        if [ ! -d "$PRIVATE_KEY_PATH" ] && [ ! -d "$PUBLIC_CERT_PATH" ]; then
             echo "Private key path is missing $PRIVATE_KEY_PATH or Public cert path is missing $PUBLIC_CERT_PATH"
             CANCEL_INSTALL
         fi
 
         echo "Using recovery mode: Existing manifests will be used."
         for required_folder in \
-            "./argocd-clusters-managed/${CLUSTER_NAME}" \
-            "./argocd-clusters-managed/${CLUSTER_NAME}/templates" \
-            "./sealed-secrets/${CLUSTER_NAME}"
+            "${CUSTOMER_CONFIG_DIR}/argocd_apps" \
+            "${CUSTOMER_CONFIG_DIR}/argocd_apps/templates" \
+            "${CUSTOMER_CONFIG_DIR}/sealed-secrets"
         do
             if [[ ! -d "$required_folder" ]]; then
                 echo "ERROR in recovery mode, missing $required_folder"
@@ -310,8 +306,8 @@ if $SETUP_SEALED_SECRET; then
         done
 
         for required_file in \
-            "./argocd-clusters-managed/${CLUSTER_NAME}/Chart.yaml" \
-            "./argocd-clusters-managed/${CLUSTER_NAME}/templates/root.yaml"
+            "${CUSTOMER_CONFIG_DIR}/argocd_apps/Chart.yaml" \
+            "${CUSTOMER_CONFIG_DIR}/argocd_apps/templates/root.yaml"
         do
             if [ ! -f "$required_file" ]; then
                 echo "ERROR in recovery mode, missing $required_file"
@@ -323,23 +319,12 @@ if $SETUP_SEALED_SECRET; then
         # Import old sealed-secrets private keys
         for keypath in "$PRIVATE_KEY_PATH"/*.key; do
             secret_name=$(basename "${keypath%.*}")
-            if ! kubectl get secret -n system "$secret_name" -o name | grep "$secret_name" >/dev/null; then
+            if ! kubectl get secret -n system "$secret_name" -o name &>/dev/null; then
                 kubectl -n system create secret tls "$secret_name" --cert="${PUBLIC_CERT_PATH}/${secret_name}.crt" --key="$keypath" &>>/tmp/argocd.log
                 kubectl -n system label secret "$secret_name" sealedsecrets.bitnami.com/sealed-secrets-key=active &>>/tmp/argocd.log
             fi
         done
     fi
-
-    mkdir -p ./argocd-clusters-managed/"$CLUSTER_NAME"
-    mkdir -p ./argocd-clusters-managed/"$CLUSTER_NAME"/templates
-
-    # Create system namespace if it doesnt exist
-    if ! kubectl get namespaces system &>/dev/null; then
-        HEAD "Creating system namespace...        "
-        kubectl create namespace system &>>/tmp/argocd.log
-        STAT $?
-    fi
-
 
     # Switch local helm chart to use upstream repo instead of OCI cache
     if ! helm list --deployed -n system -q | grep sealed-secrets >/dev/null; then
@@ -348,10 +333,10 @@ if $SETUP_SEALED_SECRET; then
         HEAD "Installing sealed-secrets... "
         helm dep update ./argocd-helm-charts/sealed-secrets &>>/tmp/argocd.log
 
-        cp ./argocd-application-templates/sealed-secrets.yaml ./argocd-clusters-managed/"$CLUSTER_NAME"/templates/sealed-secrets.yaml
+        cp ./argocd-application-templates/sealed-secrets.yaml "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
 
-        yq eval --inplace ".spec.source.repoURL = \"$REPO_URL\"" ./argocd-clusters-managed/"$CLUSTER_NAME"/templates/sealed-secrets.yaml
-        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"../../argocd-clusters-managed/$CLUSTER_NAME/values-sealed-secrets.yaml\"" ./argocd-clusters-managed/"$CLUSTER_NAME"/templates/sealed-secrets.yaml
+        yq eval --inplace ".spec.source.repoURL = \"$REPO_URL\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
+        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"$CLUSTER_NAME/argocd_apps/values-sealed-secrets.yaml\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
 
         helm install --namespace system sealed-secrets argocd-helm-charts/sealed-secrets &>>/tmp/argocd.log
 
@@ -362,13 +347,7 @@ if $SETUP_SEALED_SECRET; then
     fi
 
     # Create required directory
-    mkdir -p ./sealed-secrets/"$CLUSTER_NAME"
-    mkdir -p ./sealed-secrets/"$CLUSTER_NAME"/argocd
-
-    #### BUG #####
-    ## As per plan we need to have a single repo for all customer to manage the argocd-helm-charts
-    ## but every customer will have their own OCI repo, so not sure how to do deal with that
-    ## leaving it for now
+    mkdir -p "${CUSTOMER_CONFIG_DIR}/sealed-secrets/argocd"
 
     # Switch to the original state of the file, after installing
     git restore ./argocd-helm-charts/sealed-secrets/Chart.yaml
@@ -383,8 +362,7 @@ if $SETUP_ARGOCD; then
         exit 1
     fi
 
-    mkdir -p ./argocd-clusters-managed/"$CLUSTER_NAME"
-    mkdir -p ./argocd-clusters-managed/"$CLUSTER_NAME"/templates
+    mkdir -p "${ARGOCD_APPS_TEMPLATE}"
 
     ### Need to add steps, if we are recovering argocd ####
     if ! kubectl get namespaces argocd &>/dev/null; then
@@ -393,12 +371,8 @@ if $SETUP_ARGOCD; then
         STAT $?
     fi
 
-    kubectl get secret \
-        --namespace system \
-        -l sealedsecrets.bitnami.com/sealed-secrets-key=active \
-        -o jsonpath='{'.items[0].data."tls\.crt"'}' \
-        | base64 -d > "./sealed-secrets/$CLUSTER_NAME/$CLUSTER_NAME.pem"
-
+    SEALEDSECRET_CRT="${CUSTOMER_CONFIG_DIR}/$CLUSTER_NAME.pem"
+    SEALEDSECRET_ARGOCD="${CUSTOMER_CONFIG_DIR}/sealed-secrets/argocd"
     ARGOCD_CTRL_REPLICAS=$(DEFAULT_VALES '.argo-cd.controller.replicas' 1)
     ARGOCD_REPO_REPLICAS=$(DEFAULT_VALES '.argo-cd.repoServer.replicas' 1)
     ARGOCD_REPO_NAME=$(yq eval '.argo-cd.repo.name' "$SETTINGS_FILE")
@@ -407,6 +381,12 @@ if $SETUP_ARGOCD; then
     PASSWORD=$(pwgen -y 30 1)
     SECRET_KEY=$(pwgen 48 1)
     ENCODED_PASSWORD_HASH=$(bcrypt-tool hash "$PASSWORD" 10)
+
+    kubectl get secret \
+        --namespace system \
+        -l sealedsecrets.bitnami.com/sealed-secrets-key=active \
+        -o jsonpath='{'.items[0].data."tls\.crt"'}' \
+        | base64 -d > "${SEALEDSECRET_CRT}"
 
     case "$GIT_AUTH_TYPE" in
         https)
@@ -430,13 +410,13 @@ if $SETUP_ARGOCD; then
                     | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - \
                     | kubeseal --controller-namespace system \
                     --controller-name sealed-secrets \
-                    --cert ./sealed-secrets/"$CLUSTER_NAME"/"$CLUSTER_NAME".pem \
-                    - > ./sealed-secrets/"$CLUSTER_NAME"/argocd/"$ARGOCD_SECRET_NAME".json
+                    --cert "${SEALEDSECRET_CRT}" \
+                    - > "${SEALEDSECRET_ARGOCD}/${ARGOCD_SECRET_NAME}".json
                 STAT $?
             fi
 
             HEAD "Applying sealed-secrets for $ARGOCD_SECRET_NAME ...   "
-            kubectl apply --namespace argocd -f ./sealed-secrets/"$CLUSTER_NAME"/argocd/"$ARGOCD_SECRET_NAME".json &>>/tmp/argocd.log
+            kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/${ARGOCD_SECRET_NAME}".json &>>/tmp/argocd.log
             kubectl get secret --namespace argocd "$ARGOCD_SECRET_NAME" >/dev/null
             STAT $?
 
@@ -453,15 +433,15 @@ if $SETUP_ARGOCD; then
                     | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - \
                     | kubeseal --controller-namespace system \
                     --controller-name sealed-secrets \
-                    --cert ./sealed-secrets/"$CLUSTER_NAME"/"$CLUSTER_NAME".pem \
-                    - > ./sealed-secrets/"$CLUSTER_NAME"/argocd/argocd-secret.json
+                    --cert "${SEALEDSECRET_CRT}" \
+                    - > "${SEALEDSECRET_ARGOCD}/argocd-secret.json"
                 STAT $?
 
                 echo "Argocd password: $PASSWORD"
             fi
 
             HEAD "Applying sealed-secrets for argocd-secret...   "
-            kubectl apply --namespace argocd -f ./sealed-secrets/"$CLUSTER_NAME"/argocd/argocd-secret.json &>>/tmp/argocd.log
+            kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/argocd-secret.json" &>>/tmp/argocd.log
             kubectl get secret --namespace argocd argocd-secret >/dev/null
             STAT $?
 
@@ -492,13 +472,13 @@ if $SETUP_ARGOCD; then
                     | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - \
                     | kubeseal --controller-namespace system \
                     --controller-name sealed-secrets \
-                    --cert ./sealed-secrets/"$CLUSTER_NAME"/"$CLUSTER_NAME".pem \
-                    - > ./sealed-secrets/"$CLUSTER_NAME"/argocd/"$ARGOCD_SECRET_NAME".json
+                    --cert "${SEALEDSECRET_CRT}" \
+                    - > "${SEALEDSECRET_ARGOCD}/${ARGOCD_SECRET_NAME}".json
                 STAT $?
             fi
 
             HEAD "Applying sealed-secrets for $ARGOCD_SECRET_NAME ...   "
-            kubectl apply --namespace argocd -f ./sealed-secrets/"$CLUSTER_NAME"/argocd/"$ARGOCD_SECRET_NAME".json &>>/tmp/argocd.log
+            kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/${ARGOCD_SECRET_NAME}".json &>>/tmp/argocd.log
             kubectl get secret --namespace argocd "$ARGOCD_SECRET_NAME" >/dev/null
             STAT $?
 
@@ -519,15 +499,15 @@ if $SETUP_ARGOCD; then
                     | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - \
                     | kubeseal --controller-namespace system \
                     --controller-name sealed-secrets \
-                    --cert ./sealed-secrets/"$CLUSTER_NAME"/"$CLUSTER_NAME".pem \
-                    - > ./sealed-secrets/"$CLUSTER_NAME"/argocd/argocd-secret.json
+                    --cert "${SEALEDSECRET_CRT}" \
+                    - > "${SEALEDSECRET_ARGOCD}/argocd-secret.json"
                 STAT $?
 
                 echo "Argocd password: $PASSWORD"
             fi
 
             HEAD "Applying sealed-secrets for argocd-secret...   "
-            kubectl apply --namespace argocd -f ./sealed-secrets/"$CLUSTER_NAME"/argocd/argocd-secret.json &>>/tmp/argocd.log
+            kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/argocd-secret.json" &>>/tmp/argocd.log
             kubectl get secret --namespace argocd argocd-secret >/dev/null
             STAT $?
 
@@ -558,13 +538,13 @@ if $SETUP_ARGOCD; then
                 | yq eval '.metadata.labels.["argocd.argoproj.io/instance"]="secrets"' - \
                 | kubeseal --controller-namespace system \
                 --controller-name sealed-secrets \
-                --cert ./sealed-secrets/"$CLUSTER_NAME"/"$CLUSTER_NAME".pem \
-                - > ./sealed-secrets/"$CLUSTER_NAME"/argocd/helm-repos-cache.json
+                --cert "${SEALEDSECRET_CRT}" \
+                - > "${SEALEDSECRET_ARGOCD}/helm-repos-cache.json"
             STAT $?
         fi
 
         HEAD "Applying sealed-secrets for OCI repo...   "
-        kubectl apply --namespace argocd -f ./sealed-secrets/"$CLUSTER_NAME"/argocd/helm-repos-cache.json &>>/tmp/argocd.log
+        kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/helm-repos-cache.json" &>>/tmp/argocd.log
         kubectl get secret --namespace argocd helm-repos-cache >/dev/null
         STAT $?
     fi
@@ -575,10 +555,10 @@ if $SETUP_ARGOCD; then
         HEAD "Installing argocd...         "
         helm dep update ./argocd-helm-charts/argo-cd &>> /tmp/argocd.log
 
-        cp ./argocd-application-templates/argo-cd.yaml ./argocd-clusters-managed/"$CLUSTER_NAME"/templates/argo-cd.yaml
+        cp ./argocd-application-templates/argo-cd.yaml "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
 
-        yq eval --inplace ".spec.source.repoURL = \"$REPO_URL\"" ./argocd-clusters-managed/"$CLUSTER_NAME"/templates/argo-cd.yaml
-        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"../../argocd-clusters-managed/$CLUSTER_NAME/values-argo-cd.yaml\"" ./argocd-clusters-managed/"$CLUSTER_NAME"/templates/argo-cd.yaml
+        yq eval --inplace ".spec.source.repoURL = \"$REPO_URL\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
+        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"${CLUSTER_NAME}/argocd_apps/values-argo-cd.yaml\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
 
         # We want to setup the secret via sealed-secret, so we should make it default to false
         # so argocd does not create argocd-secret and we create it ourselves.
@@ -589,8 +569,6 @@ if $SETUP_ARGOCD; then
             --set argo-cd.repoServer.replicas="$ARGOCD_REPO_REPLICAS" \
             argo-cd ./argocd-helm-charts/argo-cd &>> /tmp/argocd.log
 
-        # we can do the same with sed, but going ahead with yq
-        #sed -i "s/<cluster_name>/$CLUSTER_NAME/g" argocd-application-templates/argo-cd.yaml
         STAT $?
     else
         HEAD "argocd is already installed... "
@@ -600,28 +578,27 @@ if $SETUP_ARGOCD; then
     # Switch to the original state of the file, after installing
     git restore ./argocd-helm-charts/argo-cd/Chart.yaml
 
-    rm -fr "./sealed-secrets/$CLUSTER_NAME/$CLUSTER_NAME.pem"
+    rm -fr "${SEALEDSECRET_CRT}"
 fi
 
 ##### Install root app #####
 if $SETUP_ROOT_APP; then
     if ! $RECOVERY; then
         HEAD "Writing root app manifests..."
-        mkdir -p ./argocd-clusters-managed/"$CLUSTER_NAME"
-        mkdir -p ./argocd-clusters-managed/"$CLUSTER_NAME"/templates
+        mkdir -p "${ARGOCD_APPS_TEMPLATE}"
 
-        cp ./argocd-application-templates/Chart.yaml ./argocd-clusters-managed/"$CLUSTER_NAME"/Chart.yaml
-        cp ./argocd-application-templates/root.yaml ./argocd-clusters-managed/"$CLUSTER_NAME"/templates/root.yaml
+        cp ./argocd-application-templates/Chart.yaml "${ARGOCD_APPS}/Chart.yaml"
+        cp ./argocd-application-templates/root.yaml "${ARGOCD_APPS_TEMPLATE}/root.yaml"
 
         # Edit the yaml in place with required settings
-        yq eval --inplace ".spec.source.path = \"argocd-clusters-managed/$CLUSTER_NAME\"" ./argocd-clusters-managed/"$CLUSTER_NAME"/templates/root.yaml
-        yq eval --inplace ".spec.source.repoURL = \"$REPO_URL\"" ./argocd-clusters-managed/"$CLUSTER_NAME"/templates/root.yaml
+        yq eval --inplace ".spec.source.path = \"${CLUSTER_NAME}/argocd_apps\"" "${ARGOCD_APPS_TEMPLATE}/root.yaml"
+        yq eval --inplace ".spec.source.repoURL = \"$REPO_URL\"" "${ARGOCD_APPS_TEMPLATE}/root.yaml"
 
         STAT $?
     fi
 
     HEAD "Installing root app...       "
-    helm template ./argocd-clusters-managed/"$CLUSTER_NAME" --show-only templates/root.yaml | kubectl apply -f - &>>/tmp/argocd.log
+    helm template "${ARGOCD_APPS}" --show-only templates/root.yaml | kubectl apply -f - &>>/tmp/argocd.log
     STAT $?
 fi
 
@@ -630,6 +607,6 @@ if kubectl get secret -n argocd argocd-initial-admin-secret -o name &>/dev/null;
     kubectl -n argocd delete secret/argocd-initial-admin-secret &>>/tmp/argocd.log
 fi
 
-rm -fr "./sealed-secrets/$CLUSTER_NAME/$CLUSTER_NAME.pem"
+rm -fr "${SEALEDSECRET_CRT}"
 
 echo "Installation finished"

@@ -8,50 +8,66 @@
 
 # Install argocd on a cluster and add it to this repository
 
-## Run the install script
-The install script requires kubectl, helm, kubeseal, bcrypt-tool and pwgen. See wiki/guides/kuberenetes-desktop-setup.md for how to install them. You must also have a working connection with your local kubectl to the kubernetes API on the cluster you want to install argocd on. The install script will install argocd with root app and sealed secrets on the kubernetes your kubeconfig is currently pointing to. So make sure your kubeconfig it set up correctly and you can use kubectl commands against the cluster you want to install argocd on before running the script.
-You run the script like this:
-```
-./bin/install-argocd.sh [cluster_name] [repo_token]
-```
-Here the cluster_name is a unique name/ID for your cluster, which will be the name of the clusters folder in argocd-apps/argocd-clusters-managed/ and repo_token is an access token to this repo.
-The script must run in the root of this repo.
+## PREREQUISITE
+* kubectl, helm, kubeseal, bcrypt-tool and pwgen
+* you can connect to k8s from your work station/laptop/desktop
+  ```
+  # To verify
+  # kubctx <switch to correct k8s cluster> # there is a switch command as well
+  # kubectl get nodes
+  ```
+* Generate access token for https and for github repo follow [this guide](https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#generating-a-private-key)
+  ```
+  # https://gitlab.enableit.dk/kubernetes/kubernetes-config-enableit/-/settings/access_tokens
+  > Give token name
+  > "read_repository" scopes
+  > "Maintainer" role
+  > submit
+  ```
+* Generate username and password for OCI
+  ```
+  # TODO:
+  # I haven't setup this, need someone to fill this up
+  ```
+* create git repo for customer k8s data. it SHOULD be in this format only kubernetes-config-<customer-id> and sits at the same level where your argocd-apps is cloned
+  ```
+  # https://gitlab.enableit.dk/kubernetes/kubernetes-config-enableit.git
+  ```
+* Wiki wiki/guides/kuberenetes-desktop-setup.md
 
-## Uninstall script
+## Setup K8s cluster
+
+### Puppet
+1. For puppet managed cluster
+```
+# ./bin/generate-puppet-hiera.sh --cluster-name kam.obmondo.com --version 1.22.5 --san-domains kam.obmondo.com,localhost,176.9.67.43,htzsb44fsn1a.enableit.dk:78.46.72.21,htzsb45fsn1a.enableit.dk:176.9.124.207,htzsb45fsn1b.enableit.dk:85.10.211.48 --customer-id enableit
+```
+2. Login onto server and run puppet
+3. If things got broken refer this doc (Emil's doc)
+4. ./bin/setup-k8s-cluster.sh --customer-id enableit --cluster-name kam.obmondo.com --settings-file <path-to-file>/customer-settings.yaml --install-k8s false
+5. push all the files to git repo from the kubernetes-config-<customer-id> git repo
+6. Add the argocd password in pass repo [you will get the password on step 4]
+
+### KOPS
+1. Get the k8s cluster up and running with KOPS with one single command line.
+```
+./bin/setup-k8s-cluster.sh --customer-id <customer-id> --cluster-name <cluster-name> --settings-file <path-to-settings-file> --k8s-type kops
+```
+2. Add the argocd password in pass repo [you will get the password on step 1]
+
+## Uninstall script ### NOT TESTED ###
 If something goes wrong you can uninstall again with `./bin/uninstall-argocd.sh`. You run it just like that, and it will prompt you for cluster_name and argocd password (which you recieved from the install script.)
 
-## recovery mode
+## Recovery mode
 Both scripts have a recovery mode which you use by calling them like this.
 ```
-./bin/install-argocd.sh [cluster_name] [repo_token] --recovery
+./bin/setup-k8s-cluster.sh --customer-id enableit --cluster-name kam.obmondo.com --settings-file customer-settings.yaml --recovery --private-key-path private_keys --public-key-path public_keys --install-k8s false
 or
 ./bin/uninstall-argocd.sh --recovery
 ```
 In recovery mode the uninstall script will remove argocd from kubernetes but not from you local repo clone, and the install script will install argocd using the existing manifests in your local repo clone.
 
-## Create namespace for argocd installation
-
-```sh
-kubectl create namespace argocd
-kubectl config set-context --current --namespace=argocd
-```
-
-## Create secret for git repo access
-
-### for https access to git repos
-
-Add secret with a username and a password (a personal-access-token) that is
-valid and has access to that repo.
-
-* To get the personal-access-token
-  1. Go to Profile->Access Tokens
-  2. Give any name (e.g. `argo-cd-microk8s`) and select `read_repository`, `write_repository`
-* Create secret via HTTPS
-  ```sh
-  kubectl create secret generic argo-cd-blackwoodseven-github --from-literal=username=KlavsKlavsen --from-literal=password='234dfaf23rf2323232323232323xxxxxxxxxxxxx'
-  ```
-
-### for SSH access to git repos
+### for SSH access to git repos ### We don't support this
 
 Setup gitlab user and generate SSH keyset (and add public part to that gitlab user).
 Grant that user ONLY developer access to the projects it needs. Make sure those have master branch and tags protected in config.
@@ -68,24 +84,6 @@ added, matching above secretname.
 A command to get the existing ssh private key
 ```
 kubectl get secrets -n argocd argo-cd-enableit-gitlab-ssh -o jsonpath="{.data.ssh-privatekey}" | base64 --decode
-```
-
-## Install `argo-cd`
-
-```sh
-helm dep update argocd-helm-charts/argo-cd
-helm install -n argocd argo-cd argocd-helm-charts/argo-cd
-```
-
-## Get the pods status
-
-```sh
-kubectl get pods
-NAME                                                    READY   STATUS              RESTARTS   AGE
-argo-cd-argocd-server-76687b5447-7h5pb                  0/1     ContainerCreating   0          2m20s
-argo-cd-argocd-repo-server-6bd696f59b-wwr9r             0/1     ContainerCreating   0          2m20s
-argo-cd-argocd-application-controller-d6c576f5d-5q28r   0/1     ContainerCreating   0          2m20s
-argo-cd-argocd-redis-7dfd84cf48-wtfvq                   1/1     Running             0          2m20s
 ```
 
 Login to the UI. To get the credentials refer
@@ -134,7 +132,7 @@ To resolve out-of-sync complaint in ArgoCD - AND backup/recovery do this:
   argo-cd-argocd-application-controller-d6c576f5d-5xwq5   0/1     Evicted   0          44m
   argo-cd-argocd-application-controller-d6c576f5d-7cm78   0/1     Evicted   0          100m
   ```
-* It's important to ensure that: `acme.cert-manager.io/http01-edit-in-place: true` is placed in annotations for ingress when traefik is used 
+* It's important to ensure that: `acme.cert-manager.io/http01-edit-in-place: true` is placed in annotations for ingress when traefik is used
 
 * Please refer: [Wiki for kubernetes](https://gitlab.enableit.dk/obmondo/wiki/-/tree/master/internal/kubernetes)
 
