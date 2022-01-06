@@ -22,11 +22,17 @@ mkdir -p "${OUTDIR}/setup"
 # Calling gojsontoyaml is optional, but we would like to generate yaml, not json
 #jsonnet -J vendor -m manifests "${1-example.jsonnet}" | xargs -I{} sh -c 'cat {} | gojsontoyaml > {}.yaml' -- {}
 
-JSONNET_LIB_PATH="libraries/$(jsonnet "clusters/${1}-vars.jsonnet" | jq -r .kube_prometheus_version)/vendor"
-if [ ! -e "${JSONNET_LIB_PATH}" ]; then
+RELEASE=$(jsonnet "clusters/${1}-vars.jsonnet" | jq -r .kube_prometheus_version)
+JSONNET_LIB_PATH="libraries/${RELEASE}/vendor"
+if ! [ -e "${JSONNET_LIB_PATH}" ]; then
     jb init
-    jb install "github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@$(jsonnet "clusters/${1}-vars.jsonnet" | jq -r .kube_prometheus_version)"
+    jb install "github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@${RELEASE}"
+    mkdir "libraries/${RELEASE}"
+    mv vendor "libraries/${RELEASE}/"
+    mv jsonnetfile* "libraries/${RELEASE}/"
 fi
+
+cp "libraries/${RELEASE}/jsonnet"* .
 
 # shellcheck disable=SC2016
 jsonnet -J \
