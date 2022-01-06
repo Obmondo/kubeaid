@@ -20,6 +20,16 @@ lint_yamllint:
   only:
     - merge_requests
 
+lint:jsonnetfmt:
+  stage: lint
+  image:
+    name: bitnami/jsonnet:latest
+    entrypoint: ['']
+  script:
+    - './bin/lint-jsonnetfmt.sh'
+  only:
+    - merge_requests
+
 check_diff:
   image: registry.obmondo.com/obmondo/dockerfiles/obmondo-build:latest
   stage: diff
