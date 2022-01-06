@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -68,6 +69,7 @@ spec:
       - configMap:
           name: adapter-config
         name: config
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -89,6 +91,7 @@ rules:
   - /metrics
   verbs:
   - get
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -99,6 +102,7 @@ metadata:
     app.kubernetes.io/version: 2.31.1
   name: prometheus-k8s
   namespace: prometheus-1
+---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -168,6 +172,7 @@ spec:
       record: count:up1
     - expr: count without(instance, pod, node) (up == 0)
       record: count:up0
+---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -186,6 +191,7 @@ spec:
       app.kubernetes.io/component: alert-router
       app.kubernetes.io/name: alertmanager
       app.kubernetes.io/part-of: kube-prometheus
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -209,6 +215,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: kube-scheduler
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -244,6 +251,7 @@ spec:
       app.kubernetes.io/component: exporter
       app.kubernetes.io/name: kube-state-metrics
       app.kubernetes.io/part-of: kube-prometheus
+---
 apiVersion: rbac.authorization.k8s.io/v1
 items:
 - apiVersion: rbac.authorization.k8s.io/v1
@@ -301,6 +309,7 @@ items:
     name: prometheus-k8s
     namespace: prometheus-1
 kind: RoleBindingList
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -319,6 +328,7 @@ subjects:
 - kind: ServiceAccount
   name: prometheus-k8s
   namespace: prometheus-1
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -421,6 +431,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: kubelet
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -440,6 +451,7 @@ spec:
     app.kubernetes.io/component: grafana
     app.kubernetes.io/name: grafana
     app.kubernetes.io/part-of: kube-prometheus
+---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -540,6 +552,7 @@ spec:
       for: 10m
       labels:
         severity: warning
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -557,6 +570,7 @@ subjects:
 - kind: ServiceAccount
   name: kube-state-metrics
   namespace: prometheus-1
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -567,6 +581,7 @@ metadata:
     app.kubernetes.io/version: 0.19.0
   name: blackbox-exporter
   namespace: prometheus-1
+---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -883,6 +898,7 @@ spec:
           rate(node_network_transmit_drop_total{job="node-exporter", device!="lo"}[5m])
         )
       record: instance:node_network_transmit_drop_excluding_lo:rate5m
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -901,6 +917,7 @@ subjects:
 - kind: ServiceAccount
   name: prometheus-adapter
   namespace: prometheus-1
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -925,6 +942,7 @@ spec:
       app.kubernetes.io/name: prometheus-operator
       app.kubernetes.io/part-of: kube-prometheus
       app.kubernetes.io/version: 0.52.0
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1142,6 +1160,7 @@ spec:
       - name: grafana-config
         secret:
           secretName: grafana-config
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1231,6 +1250,7 @@ spec:
       nodeSelector:
         kubernetes.io/os: linux
       serviceAccountName: kube-state-metrics
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -1341,6 +1361,7 @@ rules:
   verbs:
   - list
   - watch
+---
 apiVersion: v1
 items:
 - apiVersion: v1
@@ -36919,6 +36940,7 @@ items:
     name: grafana-dashboard-workload-total
     namespace: prometheus-1
 kind: ConfigMapList
+---
 apiVersion: v1
 kind: Secret
 metadata:
@@ -36946,6 +36968,7 @@ stringData:
         ]
     }
 type: Opaque
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -36987,6 +37010,7 @@ prometheusSpec:
           requests:
             storage: 10Gi
         storageClassName: rook-ceph-block
+---
 apiVersion: v1
 kind: Secret
 metadata:
@@ -37002,6 +37026,7 @@ stringData:
     [date_formats]
     default_timezone = UTC
 type: Opaque
+---
 apiVersion: v1
 data:
   dashboards.yaml: |-
@@ -37029,6 +37054,7 @@ metadata:
     app.kubernetes.io/version: 8.2.3
   name: grafana-dashboards
   namespace: prometheus-1
+---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -38423,6 +38449,7 @@ spec:
       labels:
         quantile: "0.5"
       record: node_quantile:kubelet_pleg_relist_duration_seconds:histogram_quantile
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -38433,6 +38460,7 @@ metadata:
     app.kubernetes.io/version: 8.2.3
   name: grafana
   namespace: prometheus-1
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -38451,6 +38479,7 @@ subjects:
 - kind: ServiceAccount
   name: node-exporter
   namespace: prometheus-1
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -42103,6 +42132,7 @@ status:
     plural: ""
   conditions: []
   storedVersions: []
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -47432,6 +47462,7 @@ status:
     plural: ""
   conditions: []
   storedVersions: []
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -47521,6 +47552,7 @@ status:
     plural: ""
   conditions: []
   storedVersions: []
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -47593,6 +47625,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 65534
       serviceAccountName: prometheus-operator
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -48070,6 +48103,7 @@ status:
     plural: ""
   conditions: []
   storedVersions: []
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -48090,6 +48124,7 @@ spec:
     app.kubernetes.io/component: controller
     app.kubernetes.io/name: prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -48550,6 +48585,7 @@ status:
     plural: ""
   conditions: []
   storedVersions: []
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -50594,6 +50630,7 @@ status:
     plural: ""
   conditions: []
   storedVersions: []
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -54388,10 +54425,12 @@ status:
     plural: ""
   conditions: []
   storedVersions: []
+---
 apiVersion: v1
 kind: Namespace
 metadata:
   name: prometheus-1
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -54409,6 +54448,7 @@ subjects:
 - kind: ServiceAccount
   name: prometheus-operator
   namespace: prometheus-1
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -54501,6 +54541,7 @@ rules:
   - subjectaccessreviews
   verbs:
   - create
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -54989,6 +55030,7 @@ status:
     plural: ""
   conditions: []
   storedVersions: []
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -54999,6 +55041,7 @@ metadata:
     app.kubernetes.io/version: 0.52.0
   name: prometheus-operator
   namespace: prometheus-1
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -55027,6 +55070,7 @@ spec:
       app.kubernetes.io/component: metrics-adapter
       app.kubernetes.io/name: prometheus-adapter
       app.kubernetes.io/part-of: kube-prometheus
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -55087,6 +55131,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: kube-controller-manager
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -55098,6 +55143,7 @@ metadata:
     app.kubernetes.io/version: 0.23.0
   name: alertmanager-main
   namespace: prometheus-1
+---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -55163,6 +55209,7 @@ spec:
       for: 15m
       labels:
         severity: critical
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -55181,6 +55228,7 @@ subjects:
 - kind: ServiceAccount
   name: prometheus-adapter
   namespace: prometheus-1
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -55199,6 +55247,7 @@ subjects:
 - kind: ServiceAccount
   name: prometheus-adapter
   namespace: prometheus-1
+---
 apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
 metadata:
@@ -55247,6 +55296,7 @@ spec:
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
   version: 2.31.1
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -55302,6 +55352,7 @@ ingress:
   - hosts:
     - grafana.kam.obmondo.com
     secretName: kube-prometheus-grafana-tls
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -55325,6 +55376,7 @@ spec:
     app.kubernetes.io/component: exporter
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-prometheus
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -55348,6 +55400,7 @@ rules:
   - get
   - list
   - watch
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -55365,6 +55418,7 @@ rules:
   - configmaps
   verbs:
   - get
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -55387,6 +55441,7 @@ spec:
     app.kubernetes.io/component: exporter
     app.kubernetes.io/name: blackbox-exporter
     app.kubernetes.io/part-of: kube-prometheus
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -55407,6 +55462,7 @@ spec:
     app.kubernetes.io/component: exporter
     app.kubernetes.io/name: node-exporter
     app.kubernetes.io/part-of: kube-prometheus
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -55431,6 +55487,7 @@ spec:
       app.kubernetes.io/component: exporter
       app.kubernetes.io/name: blackbox-exporter
       app.kubernetes.io/part-of: kube-prometheus
+---
 apiVersion: v1
 data:
   config.yaml: |-
@@ -55500,6 +55557,7 @@ metadata:
     app.kubernetes.io/version: 0.9.1
   name: adapter-config
   namespace: prometheus-1
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -55575,6 +55633,7 @@ spec:
     matchLabels:
       component: apiserver
       provider: kubernetes
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -55598,6 +55657,7 @@ rules:
   - subjectaccessreviews
   verbs:
   - create
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -55620,6 +55680,7 @@ spec:
       app.kubernetes.io/name: prometheus
       app.kubernetes.io/part-of: kube-prometheus
       prometheus: k8s
+---
 apiVersion: rbac.authorization.k8s.io/v1
 items:
 - apiVersion: rbac.authorization.k8s.io/v1
@@ -55734,6 +55795,7 @@ items:
     - list
     - watch
 kind: RoleList
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -55751,6 +55813,7 @@ rules:
   - '*'
   verbs:
   - '*'
+---
 apiVersion: monitoring.coreos.com/v1
 kind: Alertmanager
 metadata:
@@ -55787,6 +55850,7 @@ spec:
     runAsUser: 1000
   serviceAccountName: alertmanager-main
   version: 0.23.0
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -55804,6 +55868,7 @@ rules:
   - subjectaccessreviews
   verbs:
   - create
+---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -55822,6 +55887,7 @@ spec:
       app.kubernetes.io/name: prometheus
       app.kubernetes.io/part-of: kube-prometheus
       prometheus: k8s
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -55832,6 +55898,7 @@ metadata:
     app.kubernetes.io/version: 2.2.4
   name: kube-state-metrics
   namespace: prometheus-1
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -55850,6 +55917,7 @@ subjects:
 - kind: ServiceAccount
   name: blackbox-exporter
   namespace: prometheus-1
+---
 apiVersion: apiregistration.k8s.io/v1
 kind: APIService
 metadata:
@@ -55868,6 +55936,7 @@ spec:
     namespace: prometheus-1
   version: v1beta1
   versionPriority: 100
+---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -56006,6 +56075,7 @@ spec:
       for: 5m
       labels:
         severity: critical
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -56016,6 +56086,7 @@ metadata:
     app.kubernetes.io/version: 0.9.1
   name: prometheus-adapter
   namespace: prometheus-1
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -56041,6 +56112,7 @@ spec:
     app.kubernetes.io/part-of: kube-prometheus
     prometheus: k8s
   sessionAffinity: ClientIP
+---
 apiVersion: v1
 kind: Secret
 metadata:
@@ -56090,6 +56162,7 @@ stringData:
           "severity": "critical"
         "receiver": "Critical"
 type: Opaque
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -56112,6 +56185,7 @@ rules:
   - get
   - list
   - watch
+---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -56361,6 +56435,7 @@ spec:
       for: 15m
       labels:
         severity: critical
+---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -56463,6 +56538,7 @@ spec:
     rollingUpdate:
       maxUnavailable: 10%
     type: RollingUpdate
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -56485,6 +56561,7 @@ spec:
       app.kubernetes.io/component: alert-router
       app.kubernetes.io/name: alertmanager
       app.kubernetes.io/part-of: kube-prometheus
+---
 apiVersion: v1
 data:
   config.yml: |-
@@ -56536,6 +56613,7 @@ metadata:
     app.kubernetes.io/version: 0.19.0
   name: blackbox-exporter-configuration
   namespace: prometheus-1
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -56556,6 +56634,7 @@ spec:
   selector:
     matchLabels:
       k8s-app: kube-dns
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -56655,6 +56734,7 @@ spec:
       - configMap:
           name: blackbox-exporter-configuration
         name: config
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -56665,6 +56745,7 @@ metadata:
     app.kubernetes.io/version: 1.2.2
   name: node-exporter
   namespace: prometheus-1
+---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -56682,6 +56763,7 @@ spec:
       app.kubernetes.io/component: metrics-adapter
       app.kubernetes.io/name: prometheus-adapter
       app.kubernetes.io/part-of: kube-prometheus
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -56707,6 +56789,7 @@ spec:
     app.kubernetes.io/name: alertmanager
     app.kubernetes.io/part-of: kube-prometheus
   sessionAffinity: ClientIP
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -56726,6 +56809,7 @@ spec:
     app.kubernetes.io/component: metrics-adapter
     app.kubernetes.io/name: prometheus-adapter
     app.kubernetes.io/part-of: kube-prometheus
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
