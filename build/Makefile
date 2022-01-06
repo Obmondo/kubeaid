@@ -6,13 +6,9 @@ MANIFESTS_DIR := manifests/
 JSONNET_VENDOR := vendor/
 MAIN_DIR := my-kube-prometheus/
 
-
-
-
 #run "make setup" to init jb,install jb, jsonnet library(kube-prometheus), update jb, install gojsontoyaml.
 #run "make build" to compile/build the manifests
 #run "make kubectl-apply" to apply the manifests for creating the resources
-
 
 .PHONY: setup
 setup:

@@ -28,7 +28,7 @@ local kp =
   // (import 'kube-prometheus/addons/static-etcd.libsonnet') +
   // (import 'kube-prometheus/addons/custom-metrics.libsonnet') +
   // (import 'kube-prometheus/addons/external-metrics.libsonnet') +
-  
+
   {
     values+:: {
       common+: {
@@ -47,9 +47,9 @@ local kp =
       "prometheusOperator"+: {
         resources: vars.prometheus_operator_resources,
       },
-    }  
+    }
   } + (
-    if vars.extra_configs then 
+    if vars.extra_configs then
     {
     values+:: {
       grafana+:{
@@ -80,7 +80,7 @@ local kp =
                 "role_attribute_path": "contains(not_null(roles[*],''), 'Admin') && 'Admin' || contains(not_null(roles[*],''), 'Editor') && 'Editor' || contains(not_null(roles[*],''), 'Viewer') && 'Viewer'|| ''"
 
             }
-          } 
+          }
         }
       }
     },
@@ -99,10 +99,10 @@ local kp =
     },
     prometheus+:: {
       prometheus+: {
-        spec+: { 
-          "resources": vars.prometheus_resources, 
-          storage: {  
-            volumeClaimTemplate: { 
+        spec+: {
+          "resources": vars.prometheus_resources,
+          storage: {
+            volumeClaimTemplate: {
               apiVersion: 'v1',
               kind: 'PersistentVolumeClaim',
               spec: {
@@ -111,14 +111,14 @@ local kp =
                 storageClassName: 'rook-ceph-block',
               },
             },
-          },  
-        },  
+          },
+        },
       },
     },
   }
   else {}
   ) + (
-    if std.objectHas(vars,"grafana_ingress_host") then 
+    if std.objectHas(vars,"grafana_ingress_host") then
     {
       ingress+:: {
         grafana: utils.ingress(
