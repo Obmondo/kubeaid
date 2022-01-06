@@ -8,7 +8,7 @@ lint_sh:
   stage: lint
   image: koalaman/shellcheck-alpine
   script:
-    - 'find . -name \*.sh -o -name \*.bash | xargs shellcheck'
+    - 'find . -not -path ./build/kube-prometheus/libraries/\* -a -not -path ./build/vendor/\* -name \*.sh -o -name \*.bash | xargs shellcheck'
   only:
     - merge_requests
 
