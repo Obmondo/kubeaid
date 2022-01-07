@@ -7,8 +7,8 @@ set -euo pipefail
 
 if [ ! -e "clusters/${1}-vars.jsonnet" ]
 then
-    echo "no such variable file ${1}.jsonnet"
-    exit 1
+  echo "no such variable file ${1}.jsonnet"
+  exit 1
 fi
 
 # Make sure to use project tooling
@@ -25,11 +25,11 @@ mkdir -p "${OUTDIR}/setup"
 RELEASE=$(jsonnet "clusters/${1}-vars.jsonnet" | jq -r .kube_prometheus_version)
 JSONNET_LIB_PATH="libraries/${RELEASE}/vendor"
 if ! [ -e "${JSONNET_LIB_PATH}" ]; then
-    jb init
-    jb install "github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@${RELEASE}"
-    mkdir "libraries/${RELEASE}"
-    mv vendor "libraries/${RELEASE}/"
-    mv jsonnetfile* "libraries/${RELEASE}/"
+  jb init
+  jb install "github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@${RELEASE}"
+  mkdir "libraries/${RELEASE}"
+  mv vendor "libraries/${RELEASE}/"
+  mv jsonnetfile* "libraries/${RELEASE}/"
 fi
 
 cp "libraries/${RELEASE}/jsonnet"* .
