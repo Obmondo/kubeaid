@@ -2,24 +2,25 @@ apiVersion: monitoring.coreos.com/v1
 kind: Alertmanager
 metadata:
   labels:
-    alertmanager: main
     app.kubernetes.io/component: alert-router
+    app.kubernetes.io/instance: main
     app.kubernetes.io/name: alertmanager
     app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 0.22.2
+    app.kubernetes.io/version: 0.23.0
   name: main
   namespace: monitoring
 spec:
-  image: quay.io/prometheus/alertmanager:v0.22.2
+  image: quay.io/prometheus/alertmanager:v0.23.0
   logLevel: debug
   nodeSelector:
     kubernetes.io/os: linux
   podMetadata:
     labels:
       app.kubernetes.io/component: alert-router
+      app.kubernetes.io/instance: main
       app.kubernetes.io/name: alertmanager
       app.kubernetes.io/part-of: kube-prometheus
-      app.kubernetes.io/version: 0.22.2
+      app.kubernetes.io/version: 0.23.0
   replicas: 3
   resources:
     limits:
@@ -36,4 +37,4 @@ spec:
     runAsUser: 1000
   serviceAccountName: alertmanager-main
   useExistingSecret: true
-  version: 0.22.2
+  version: 0.23.0

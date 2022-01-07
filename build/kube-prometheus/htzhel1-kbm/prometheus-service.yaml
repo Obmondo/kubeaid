@@ -3,10 +3,10 @@ kind: Service
 metadata:
   labels:
     app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: k8s
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
-    app.kubernetes.io/version: 2.29.1
-    prometheus: k8s
+    app.kubernetes.io/version: 2.32.1
   name: prometheus-k8s
   namespace: monitoring
 spec:
@@ -14,10 +14,12 @@ spec:
   - name: web
     port: 9090
     targetPort: web
+  - name: reloader-web
+    port: 8080
+    targetPort: reloader-web
   selector:
-    app: prometheus
     app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: k8s
     app.kubernetes.io/name: prometheus
     app.kubernetes.io/part-of: kube-prometheus
-    prometheus: k8s
   sessionAffinity: ClientIP

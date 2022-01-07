@@ -158,7 +158,7 @@ spec:
         severity: warning
     - alert: KubeContainerWaiting
       annotations:
-        description: Pod {{ $labels.namespace }}/{{ $labels.pod }} container {{ $labels.container}} has been in waiting state for longer than 1 hour.
+        description: pod/{{ $labels.pod }} in namespace {{ $labels.namespace }} on container {{ $labels.container}} has been in waiting state for longer than 1 hour.
         runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubecontainerwaiting
         summary: Pod container waiting longer than 1 hour
       expr: |
@@ -258,7 +258,7 @@ spec:
         severity: warning
     - alert: KubeMemoryOvercommit
       annotations:
-        description: Cluster has overcommitted memory resource requests for Pods by {{ $value }} bytes and cannot tolerate node failure.
+        description: Cluster has overcommitted memory resource requests for Pods by {{ $value | humanize }} bytes and cannot tolerate node failure.
         runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubememoryovercommit
         summary: Cluster has overcommitted memory resource requests.
       expr: |
@@ -274,9 +274,9 @@ spec:
         runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubecpuquotaovercommit
         summary: Cluster has overcommitted CPU resource requests.
       expr: |
-        sum(kube_resourcequota{job="kube-state-metrics", type="hard", resource="cpu"})
+        sum(min without(resource) (kube_resourcequota{job="kube-state-metrics", type="hard", resource=~"(cpu|requests.cpu)"}))
           /
-        sum(kube_node_status_allocatable{resource="cpu"})
+        sum(kube_node_status_allocatable{resource="cpu", job="kube-state-metrics"})
           > 1.5
       for: 5m
       labels:
@@ -287,9 +287,9 @@ spec:
         runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubememoryquotaovercommit
         summary: Cluster has overcommitted memory resource requests.
       expr: |
-        sum(kube_resourcequota{job="kube-state-metrics", type="hard", resource="memory"})
+        sum(min without(resource) (kube_resourcequota{job="kube-state-metrics", type="hard", resource=~"(memory|requests.memory)"}))
           /
-        sum(kube_node_status_allocatable{resource="memory",job="kube-state-metrics"})
+        sum(kube_node_status_allocatable{resource="memory", job="kube-state-metrics"})
           > 1.5
       for: 5m
       labels:
@@ -361,6 +361,10 @@ spec:
         ) < 0.03
         and
         kubelet_volume_stats_used_bytes{job="kubelet", metrics_path="/metrics"} > 0
+        unless on(namespace, persistentvolumeclaim)
+        kube_persistentvolumeclaim_access_mode{ access_mode="ReadOnlyMany"} == 1
+        unless on(namespace, persistentvolumeclaim)
+        kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
       for: 1m
       labels:
         severity: critical
@@ -379,6 +383,10 @@ spec:
         kubelet_volume_stats_used_bytes{job="kubelet", metrics_path="/metrics"} > 0
         and
         predict_linear(kubelet_volume_stats_available_bytes{job="kubelet", metrics_path="/metrics"}[6h], 4 * 24 * 3600) < 0
+        unless on(namespace, persistentvolumeclaim)
+        kube_persistentvolumeclaim_access_mode{ access_mode="ReadOnlyMany"} == 1
+        unless on(namespace, persistentvolumeclaim)
+        kube_persistentvolumeclaim_labels{label_excluded_from_alerts="true"} == 1
       for: 1h
       labels:
         severity: warning
@@ -479,7 +487,7 @@ spec:
     rules:
     - alert: KubeClientCertificateExpiration
       annotations:
-        description: A client certificate used to authenticate to the apiserver is expiring in less than 7.0 days.
+        description: A client certificate used to authenticate to kubernetes apiserver is expiring in less than 7.0 days.
         runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeclientcertificateexpiration
         summary: Client certificate is about to expire.
       expr: |
@@ -488,27 +496,27 @@ spec:
         severity: warning
     - alert: KubeClientCertificateExpiration
       annotations:
-        description: A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.
+        description: A client certificate used to authenticate to kubernetes apiserver is expiring in less than 24.0 hours.
         runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeclientcertificateexpiration
         summary: Client certificate is about to expire.
       expr: |
         apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0 and on(job) histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{job="apiserver"}[5m]))) < 86400
       labels:
         severity: critical
-    - alert: AggregatedAPIErrors
+    - alert: KubeAggregatedAPIErrors
       annotations:
-        description: An aggregated API {{ $labels.name }}/{{ $labels.namespace }} has reported errors. It has appeared unavailable {{ $value | humanize }} times averaged over the past 10m.
-        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/aggregatedapierrors
-        summary: An aggregated API has reported errors.
+        description: Kubernetes aggregated API {{ $labels.name }}/{{ $labels.namespace }} has reported errors. It has appeared unavailable {{ $value | humanize }} times averaged over the past 10m.
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeaggregatedapierrors
+        summary: Kubernetes aggregated API has reported errors.
       expr: |
         sum by(name, namespace)(increase(aggregator_unavailable_apiservice_total[10m])) > 4
       labels:
         severity: warning
-    - alert: AggregatedAPIDown
+    - alert: KubeAggregatedAPIDown
       annotations:
-        description: An aggregated API {{ $labels.name }}/{{ $labels.namespace }} has been only {{ $value | humanize }}% available over the last 10m.
-        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/aggregatedapidown
-        summary: An aggregated API is down.
+        description: Kubernetes aggregated API {{ $labels.name }}/{{ $labels.namespace }} has been only {{ $value | humanize }}% available over the last 10m.
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeaggregatedapidown
+        summary: Kubernetes aggregated API is down.
       expr: |
         (1 - max by(name, namespace)(avg_over_time(aggregator_unavailable_apiservice[10m]))) * 100 < 85
       for: 5m
@@ -526,9 +534,9 @@ spec:
         severity: critical
     - alert: KubeAPITerminatedRequests
       annotations:
-        description: The apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests.
+        description: The kubernetes apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests.
         runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeapiterminatedrequests
-        summary: The apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests.
+        summary: The kubernetes apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests.
       expr: |
         sum(rate(apiserver_request_terminations_total{job="apiserver"}[10m]))  / (  sum(rate(apiserver_request_total{job="apiserver"}[10m])) + sum(rate(apiserver_request_terminations_total{job="apiserver"}[10m])) ) > 0.20
       for: 5m
@@ -571,7 +579,7 @@ spec:
         ) > 0.95
       for: 15m
       labels:
-        severity: warning
+        severity: info
     - alert: KubeNodeReadinessFlapping
       annotations:
         description: The readiness status of node {{ $labels.node }} has changed {{ $value }} times in the last 15 minutes.
@@ -692,6 +700,18 @@ spec:
       for: 15m
       labels:
         severity: critical
+  - name: kubernetes-system-kube-proxy
+    rules:
+    - alert: KubeProxyDown
+      annotations:
+        description: KubeProxy has disappeared from Prometheus target discovery.
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeproxydown
+        summary: Target disappeared from Prometheus target discovery.
+      expr: |
+        absent(up{job="kube-proxy"} == 1)
+      for: 15m
+      labels:
+        severity: critical
   - name: kube-apiserver-burnrate.rules
     rules:
     - expr: |
@@ -709,7 +729,7 @@ spec:
               +
               sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="namespace",le="5"}[1d]))
               +
-              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="40"}[1d]))
+              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="30"}[1d]))
             )
           )
           +
@@ -736,7 +756,7 @@ spec:
               +
               sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="namespace",le="5"}[1h]))
               +
-              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="40"}[1h]))
+              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="30"}[1h]))
             )
           )
           +
@@ -763,7 +783,7 @@ spec:
               +
               sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="namespace",le="5"}[2h]))
               +
-              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="40"}[2h]))
+              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="30"}[2h]))
             )
           )
           +
@@ -790,7 +810,7 @@ spec:
               +
               sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="namespace",le="5"}[30m]))
               +
-              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="40"}[30m]))
+              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="30"}[30m]))
             )
           )
           +
@@ -817,7 +837,7 @@ spec:
               +
               sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="namespace",le="5"}[3d]))
               +
-              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="40"}[3d]))
+              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="30"}[3d]))
             )
           )
           +
@@ -844,7 +864,7 @@ spec:
               +
               sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="namespace",le="5"}[5m]))
               +
-              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="40"}[5m]))
+              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="30"}[5m]))
             )
           )
           +
@@ -871,7 +891,7 @@ spec:
               +
               sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="namespace",le="5"}[6h]))
               +
-              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="40"}[6h]))
+              sum by (cluster) (rate(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="30"}[6h]))
             )
           )
           +
@@ -1041,27 +1061,39 @@ spec:
         verb: write
       record: code:apiserver_request_total:increase30d
     - expr: |
+        sum by (cluster, verb, scope) (increase(apiserver_request_duration_seconds_count[1h]))
+      record: cluster_verb_scope:apiserver_request_duration_seconds_count:increase1h
+    - expr: |
+        sum by (cluster, verb, scope) (avg_over_time(cluster_verb_scope:apiserver_request_duration_seconds_count:increase1h[30d]) * 24 * 30)
+      record: cluster_verb_scope:apiserver_request_duration_seconds_count:increase30d
+    - expr: |
+        sum by (cluster, verb, scope, le) (increase(apiserver_request_duration_seconds_bucket[1h]))
+      record: cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase1h
+    - expr: |
+        sum by (cluster, verb, scope, le) (avg_over_time(cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase1h[30d]) * 24 * 30)
+      record: cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d
+    - expr: |
         1 - (
           (
             # write too slow
-            sum by (cluster) (increase(apiserver_request_duration_seconds_count{verb=~"POST|PUT|PATCH|DELETE"}[30d]))
+            sum by (cluster) (cluster_verb_scope:apiserver_request_duration_seconds_count:increase30d{verb=~"POST|PUT|PATCH|DELETE"})
             -
-            sum by (cluster) (increase(apiserver_request_duration_seconds_bucket{verb=~"POST|PUT|PATCH|DELETE",le="1"}[30d]))
+            sum by (cluster) (cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d{verb=~"POST|PUT|PATCH|DELETE",le="1"})
           ) +
           (
             # read too slow
-            sum by (cluster) (increase(apiserver_request_duration_seconds_count{verb=~"LIST|GET"}[30d]))
+            sum by (cluster) (cluster_verb_scope:apiserver_request_duration_seconds_count:increase30d{verb=~"LIST|GET"})
             -
             (
               (
-                sum by (cluster) (increase(apiserver_request_duration_seconds_bucket{verb=~"LIST|GET",scope=~"resource|",le="1"}[30d]))
+                sum by (cluster) (cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope=~"resource|",le="1"})
                 or
                 vector(0)
               )
               +
-              sum by (cluster) (increase(apiserver_request_duration_seconds_bucket{verb=~"LIST|GET",scope="namespace",le="5"}[30d]))
+              sum by (cluster) (cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope="namespace",le="5"})
               +
-              sum by (cluster) (increase(apiserver_request_duration_seconds_bucket{verb=~"LIST|GET",scope="cluster",le="40"}[30d]))
+              sum by (cluster) (cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope="cluster",le="30"})
             )
           ) +
           # errors
@@ -1074,19 +1106,19 @@ spec:
       record: apiserver_request:availability30d
     - expr: |
         1 - (
-          sum by (cluster) (increase(apiserver_request_duration_seconds_count{job="apiserver",verb=~"LIST|GET"}[30d]))
+          sum by (cluster) (cluster_verb_scope:apiserver_request_duration_seconds_count:increase30d{verb=~"LIST|GET"})
           -
           (
             # too slow
             (
-              sum by (cluster) (increase(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope=~"resource|",le="1"}[30d]))
+              sum by (cluster) (cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope=~"resource|",le="1"})
               or
               vector(0)
             )
             +
-            sum by (cluster) (increase(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="namespace",le="5"}[30d]))
+            sum by (cluster) (cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope="namespace",le="5"})
             +
-            sum by (cluster) (increase(apiserver_request_duration_seconds_bucket{job="apiserver",verb=~"LIST|GET",scope="cluster",le="40"}[30d]))
+            sum by (cluster) (cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d{verb=~"LIST|GET",scope="cluster",le="30"})
           )
           +
           # errors
@@ -1101,9 +1133,9 @@ spec:
         1 - (
           (
             # too slow
-            sum by (cluster) (increase(apiserver_request_duration_seconds_count{verb=~"POST|PUT|PATCH|DELETE"}[30d]))
+            sum by (cluster) (cluster_verb_scope:apiserver_request_duration_seconds_count:increase30d{verb=~"POST|PUT|PATCH|DELETE"})
             -
-            sum by (cluster) (increase(apiserver_request_duration_seconds_bucket{verb=~"POST|PUT|PATCH|DELETE",le="1"}[30d]))
+            sum by (cluster) (cluster_verb_scope_le:apiserver_request_duration_seconds_bucket:increase30d{verb=~"POST|PUT|PATCH|DELETE",le="1"})
           )
           +
           # errors
@@ -1171,7 +1203,7 @@ spec:
       record: node_namespace_pod_container:container_memory_swap
     - expr: |
         kube_pod_container_resource_requests{resource="memory",job="kube-state-metrics"}  * on (namespace, pod, cluster)
-        group_left() max by (namespace, pod) (
+        group_left() max by (namespace, pod, cluster) (
           (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
         )
       record: cluster:namespace:pod_memory:active:kube_pod_container_resource_requests
@@ -1188,7 +1220,7 @@ spec:
       record: namespace_memory:kube_pod_container_resource_requests:sum
     - expr: |
         kube_pod_container_resource_requests{resource="cpu",job="kube-state-metrics"}  * on (namespace, pod, cluster)
-        group_left() max by (namespace, pod) (
+        group_left() max by (namespace, pod, cluster) (
           (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
         )
       record: cluster:namespace:pod_cpu:active:kube_pod_container_resource_requests
@@ -1205,7 +1237,7 @@ spec:
       record: namespace_cpu:kube_pod_container_resource_requests:sum
     - expr: |
         kube_pod_container_resource_limits{resource="memory",job="kube-state-metrics"}  * on (namespace, pod, cluster)
-        group_left() max by (namespace, pod) (
+        group_left() max by (namespace, pod, cluster) (
           (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
         )
       record: cluster:namespace:pod_memory:active:kube_pod_container_resource_limits
@@ -1222,7 +1254,7 @@ spec:
       record: namespace_memory:kube_pod_container_resource_limits:sum
     - expr: |
         kube_pod_container_resource_limits{resource="cpu",job="kube-state-metrics"}  * on (namespace, pod, cluster)
-        group_left() max by (namespace, pod) (
+        group_left() max by (namespace, pod, cluster) (
          (kube_pod_status_phase{phase=~"Pending|Running"} == 1)
          )
       record: cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits

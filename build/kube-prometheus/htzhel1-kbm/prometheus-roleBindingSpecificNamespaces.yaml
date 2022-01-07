@@ -5,9 +5,10 @@ items:
   metadata:
     labels:
       app.kubernetes.io/component: prometheus
+      app.kubernetes.io/instance: k8s
       app.kubernetes.io/name: prometheus
       app.kubernetes.io/part-of: kube-prometheus
-      app.kubernetes.io/version: 2.29.1
+      app.kubernetes.io/version: 2.32.1
     name: prometheus-k8s
     namespace: default
   roleRef:
@@ -23,9 +24,10 @@ items:
   metadata:
     labels:
       app.kubernetes.io/component: prometheus
+      app.kubernetes.io/instance: k8s
       app.kubernetes.io/name: prometheus
       app.kubernetes.io/part-of: kube-prometheus
-      app.kubernetes.io/version: 2.29.1
+      app.kubernetes.io/version: 2.32.1
     name: prometheus-k8s
     namespace: kube-system
   roleRef:
@@ -41,9 +43,10 @@ items:
   metadata:
     labels:
       app.kubernetes.io/component: prometheus
+      app.kubernetes.io/instance: k8s
       app.kubernetes.io/name: prometheus
       app.kubernetes.io/part-of: kube-prometheus
-      app.kubernetes.io/version: 2.29.1
+      app.kubernetes.io/version: 2.32.1
     name: prometheus-k8s
     namespace: monitoring
   roleRef:
