@@ -13,3 +13,4 @@ kubectl -n argocd patch secret argocd-secret -p '{"stringData": { "admin.passwor
 
 ```
 and KILL the pod(s) called `argo-cd-argocd-server-*`
+
