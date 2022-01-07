@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-set -x
-
-# This script uses arg $1 (name of *.jsonnet file to use) to generate the manifests/*.yaml files.
+#
+# This script uses arg $1 (name of *.jsonnet file to use) to generate the
+# manifests/*.yaml files.
 
 set -euo pipefail
 
@@ -29,6 +29,8 @@ if ! [ -e "${JSONNET_LIB_PATH}" ]; then
     echo 'Release dir exists; exiting'
     exit 1
   fi
+
+  echo "INFO: '${JSONNET_LIB_PATH}' doesn't exist; executing jsonnet-bundler"
   jb init
   jb install "github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@${RELEASE}"
   mkdir "libraries/${RELEASE}"
@@ -36,14 +38,14 @@ if ! [ -e "${JSONNET_LIB_PATH}" ]; then
   mv jsonnetfile.json jsonnetfile.lock.json "libraries/${RELEASE}/"
 fi
 
+echo "INFO: compiling jsonnet files into '${OUTDIR}'"
 # shellcheck disable=SC2016
 jsonnet -J \
         "${JSONNET_LIB_PATH}" \
         --ext-code-file vars="clusters/${1}-vars.jsonnet" \
         -m "${OUTDIR}" \
         "common-template.jsonnet" |
-  xargs -I{} sh -c 'cat {} | $(go env GOPATH)/bin/gojsontoyaml > {}.yaml; rm -f {}' -- {}
-
-# Make sure to remove json files
-find "${OUTDIR}" -type f ! -name '*.yaml' -delete
-rm -f kustomization
+  while read -r f; do
+    "$(go env GOPATH)/bin/gojsontoyaml" < "${f}" > "${f}.yaml"
+    rm "${f}"
+  done
