@@ -25,14 +25,16 @@ mkdir -p "${OUTDIR}/setup"
 RELEASE=$(jsonnet "clusters/${1}-vars.jsonnet" | jq -r .kube_prometheus_version)
 JSONNET_LIB_PATH="libraries/${RELEASE}/vendor"
 if ! [ -e "${JSONNET_LIB_PATH}" ]; then
+  if [[ -d "libraries/${RELEASE}" ]]; then
+    echo 'Release dir exists; exiting'
+    exit 1
+  fi
   jb init
   jb install "github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@${RELEASE}"
   mkdir "libraries/${RELEASE}"
   mv vendor "libraries/${RELEASE}/"
-  mv jsonnetfile* "libraries/${RELEASE}/"
+  mv jsonnetfile.json jsonnetfile.lock.json "libraries/${RELEASE}/"
 fi
-
-cp "libraries/${RELEASE}/jsonnet"* .
 
 # shellcheck disable=SC2016
 jsonnet -J \
