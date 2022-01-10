@@ -2,6 +2,7 @@
 
 ## replace admin password
 
+Run our script to do this:
 Source: https://github.com/argoproj/argo-cd/blob/master/docs/faq.md#i-forgot-the-admin-password-how-do-i-reset-it
 
 generate new becrypt string by:
