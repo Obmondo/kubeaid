@@ -1,7 +1,5 @@
 # Updating argocd-helm-charts applications
 
-- All the concerned applications to be updated are located in https://gitlab.enableit.dk/kubernetes/argocd-apps/-/tree/master/argocd-helm-charts
-
 ## Test update - with current values files
 
 - generate current helm yaml output
@@ -33,3 +31,23 @@
 - updating charts.yaml for the 2 versions and helm dep up will update Chart.lock
 
 - if it doesn't automatiically, CI will fail and it will then inform you what exactly should be included in the Chart.lock file - for it to succed.
+
+**While running ```helm dep up <repo>``` - if you encounter The error below during the update on helm chart version:**
+
+```bash
+  Error: cannot get a valid version for repositories metrics-server. Try changing the version constraint in Chart.yaml
+```
+ 
+- add the repo to your local helm 
+
+```bash
+  helm add <repo> <repo url>
+```
+
+- check for available versions 
+
+```bash
+  helm search repo <repo>
+```
+
+- update the versions to delete outdated charts
