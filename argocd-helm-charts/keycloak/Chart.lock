@@ -1,6 +1,6 @@
 dependencies:
 - name: keycloak
-  repository: oci://ghcr.io/Obmondo
-  version: 10.3.0
-digest: sha256:cdffe74d77cb64c8577cf32af45640ed9827c9b1996067814ed5771ec074059d
-generated: "2021-05-25T19:05:02.36050711+05:30"
+  repository: https://codecentric.github.io/helm-charts
+  version: 16.0.5
+digest: sha256:d71606a76829bd6ac4b3cbae44210a0406100dedecd8861be8135e1ecfed3a9d
+generated: "2022-01-10T16:04:58.880145389+05:30"

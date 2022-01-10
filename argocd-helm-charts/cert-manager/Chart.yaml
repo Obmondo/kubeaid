@@ -4,6 +4,6 @@ version: 1.0.0
 # see latest chart here: https://artifacthub.io/packages/helm/wener/cert-manager
 dependencies:
   - name: cert-manager
-    version: v1.3.1
-    #repository: https://charts.jetstack.io
-    repository: "oci://ghcr.io/Obmondo"
+    version: v1.6.1
+    repository: https://charts.jetstack.io
+    #repository: "oci://ghcr.io/Obmondo"

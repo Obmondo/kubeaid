@@ -1,6 +1,6 @@
 dependencies:
 - name: yetibot
-  repository: oci://ghcr.io/Obmondo
-  version: 1.0.56
-digest: sha256:d796acf87709b819a51e1e8e52a4eebd9394fcfcc68c1dd305d4f0c3cbd9608c
-generated: "2021-05-20T15:12:41.978652986+05:30"
+  repository: https://yetibot.com/yetibot-helm/
+  version: 1.0.68
+digest: sha256:350e34666d76779a39e5132fa5cc70641db6a4641fb255ff4998a8df6a1a07c1
+generated: "2022-01-10T11:00:51.928971329Z"

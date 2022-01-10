@@ -4,5 +4,5 @@ version: 1.0.0
 dependencies:
   - name: rook-ceph
     version: v1.5.7
-    #repository: https://charts.rook.io/release
-    repository: "oci://ghcr.io/Obmondo"
+    repository: https://charts.rook.io/release
+    #repository: "oci://ghcr.io/Obmondo"

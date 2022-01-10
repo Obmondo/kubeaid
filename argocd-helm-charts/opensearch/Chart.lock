@@ -1,6 +1,6 @@
 dependencies:
 - name: opensearch
-  repository: oci://ghcr.io/blackwoodseven
-  version: 1.5.4
-digest: sha256:ae14d39cb20a6f65c30ef933c8a278a5e6d021a9f9c17d88ec2ef951ea6cd970
-generated: "2021-12-14T13:33:39.114006625Z"
+  repository: https://opensearch-project.github.io/helm-charts
+  version: 1.6.0
+digest: sha256:c75bd214bfdf1dfc45691f0092ce19b56b75bd1a76ee254a7805d7fe5785df0f
+generated: "2022-01-10T16:05:51.744934536+05:30"

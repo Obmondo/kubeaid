@@ -1,6 +1,6 @@
 dependencies:
 - name: external-dns
-  repository: oci://ghcr.io/Obmondo
+  repository: https://charts.bitnami.com/bitnami
   version: 4.7.0
-digest: sha256:9788c8d7b7a18954a7fa9acf6b5cf64d8a76886d24140a3049f5e2e077fff48e
-generated: "2021-05-17T15:27:48.064664852+05:30"
+digest: sha256:f379936d168b97878518c335c0a1ae4b11a4208ff0ec18635046edbec8215f35
+generated: "2022-01-10T16:04:25.454899432+05:30"
