@@ -226,8 +226,8 @@ OCI_URL=$(yq eval '.argo-cd.repo.oci' "$SETTINGS_FILE")
 GIT_AUTH_TYPE=$(yq eval '.argo-cd.repo.auth.git' "$SETTINGS_FILE")
 GIT_AUTH_URL=$(yq eval '.argo-cd.repo.auth.url' "$SETTINGS_FILE")
 ARGOCD_SECRET_NAME=argocd-"$CLUSTER_NAME"-admin
-ARGOCD_APPS="${CUSTOMER_CONFIG_DIR}/argocd_apps"
-ARGOCD_APPS_TEMPLATE="${CUSTOMER_CONFIG_DIR}/argocd_apps/templates"
+ARGOCD_APPS="${CUSTOMER_CONFIG_DIR}/argocd-apps"
+ARGOCD_APPS_TEMPLATE="${CUSTOMER_CONFIG_DIR}/argocd-apps/templates"
 
 if $INSTALL_K8S; then
     case "$K8S_TYPE" in
@@ -299,8 +299,8 @@ if $SETUP_SEALED_SECRET; then
 
         echo "Using recovery mode: Existing manifests will be used."
         for required_folder in \
-            "${CUSTOMER_CONFIG_DIR}/argocd_apps" \
-            "${CUSTOMER_CONFIG_DIR}/argocd_apps/templates" \
+            "${ARGOCD_APPS}" \
+            "${ARGOCD_APPS_TEMPLATE}" \
             "${CUSTOMER_CONFIG_DIR}/sealed-secrets"
         do
             if [[ ! -d "$required_folder" ]]; then
@@ -311,8 +311,8 @@ if $SETUP_SEALED_SECRET; then
         done
 
         for required_file in \
-            "${CUSTOMER_CONFIG_DIR}/argocd_apps/Chart.yaml" \
-            "${CUSTOMER_CONFIG_DIR}/argocd_apps/templates/root.yaml"
+            "${ARGOCD_APPS}/Chart.yaml" \
+            "${ARGOCD_APPS_TEMPLATE}/root.yaml"
         do
             if [ ! -f "$required_file" ]; then
                 echo "ERROR in recovery mode, missing $required_file"
@@ -341,7 +341,7 @@ if $SETUP_SEALED_SECRET; then
         cp ./argocd-application-templates/sealed-secrets.yaml "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
 
         yq eval --inplace ".spec.source.repoURL = \"$REPO_URL\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
-        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"../../$CLUSTER_NAME/argocd_apps/values-sealed-secrets.yaml\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
+        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"../../$CLUSTER_NAME/argocd-apps/values-sealed-secrets.yaml\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
 
         # Lets touch a file, so sealed-secret is not broken when its getting synced from argocd
         # some customer has their specific sealed-secrect, so touch won't do anyharm in case of recovery as well
@@ -571,7 +571,7 @@ if $SETUP_ARGOCD; then
         cp ./argocd-application-templates/argo-cd.yaml "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
 
         yq eval --inplace ".spec.source.repoURL = \"$REPO_URL\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
-        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"../../${CLUSTER_NAME}/argocd_apps/values-argo-cd.yaml\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
+        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"../../${CLUSTER_NAME}/argocd-apps/values-argo-cd.yaml\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
 
         touch "${ARGOCD_APPS}/values-argo-cd.yaml"
 
@@ -609,7 +609,7 @@ if $SETUP_ROOT_APP; then
         cp ./argocd-application-templates/root.yaml "${ARGOCD_APPS_TEMPLATE}/root.yaml"
 
         # Edit the yaml in place with required settings
-        yq eval --inplace ".spec.source.path = \"${CLUSTER_NAME}/argocd_apps\"" "${ARGOCD_APPS_TEMPLATE}/root.yaml"
+        yq eval --inplace ".spec.source.path = \"${CLUSTER_NAME}/argocd-apps\"" "${ARGOCD_APPS_TEMPLATE}/root.yaml"
         yq eval --inplace ".spec.source.repoURL = \"$REPO_URL\"" "${ARGOCD_APPS_TEMPLATE}/root.yaml"
 
         STAT $?
