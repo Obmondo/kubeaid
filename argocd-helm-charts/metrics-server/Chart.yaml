@@ -3,8 +3,6 @@ name: metrics-server
 version: 1.0.0
 dependencies:
   - name: metrics-server
-    version: 3.2.2
-    #repository: https://stevehipwell.github.io/helm-charts/
-    repository: "oci://ghcr.io/Obmondo"
-    # NB. This needs to be changed to pull from new location once this issue is resolved/merged: https://github.com/kubernetes-sigs/metrics-server/pull/670
-    # Using the stevehipwell repo until https://github.com/kubernetes-sigs/metrics-server/issues/572 is resolved
+    version: 3.7.0
+    repository: https://kubernetes-sigs.github.io/metrics-server/
+    #repository: "oci://ghcr.io/Obmondo"

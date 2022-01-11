@@ -1,6 +1,6 @@
 dependencies:
 - name: rook-ceph
-  repository: oci://ghcr.io/Obmondo
+  repository: https://charts.rook.io/release
   version: v1.5.7
-digest: sha256:642ab0998d4c3d9b2e59408a07009cdae87f97c14a81c5ce3ae4e8d3f9e7e984
-generated: "2021-06-01T16:38:10.941620539+05:30"
+digest: sha256:09c054e3cfc3533148e78940aff79e6c6cf0e9b4e3b69f6c68dbd1d6322d99d5
+generated: "2022-01-10T16:06:15.190167927+05:30"

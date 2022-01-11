@@ -1,6 +1,6 @@
 dependencies:
 - name: traefik
-  repository: oci://ghcr.io/Obmondo
-  version: 9.18.2
-digest: sha256:12db6a537493a678bdc3a342e446b7bb419355dc59ef9fe24f5fd4d2aeee7d84
-generated: "2021-05-24T16:22:30.452835556+05:30"
+  repository: https://helm.traefik.io/traefik
+  version: 10.9.1
+digest: sha256:732b0363832aee5e5fab919d302ad6d68af0cc3c107abc54e1696893904d5ed1
+generated: "2022-01-10T16:06:46.394846204+05:30"

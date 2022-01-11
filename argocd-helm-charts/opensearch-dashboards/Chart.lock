@@ -1,6 +1,6 @@
 dependencies:
 - name: opensearch-dashboards
-  repository: oci://ghcr.io/Obmondo
-  version: 1.0.4
-digest: sha256:878ffba5c80f456dfe51f47bc1828c2c3e47a38cab20136d9e4933f479af7cdd
-generated: "2021-10-19T08:51:28.025843233+02:00"
+  repository: https://opensearch-project.github.io/helm-charts/
+  version: 1.2.0
+digest: sha256:2510fadee1b05b4cdbe88016c782c4a0ca686190a9d7a938ef6968ca69e37852
+generated: "2022-01-10T16:05:58.754833144+05:30"

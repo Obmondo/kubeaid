@@ -1,6 +1,6 @@
 dependencies:
 - name: cert-manager
-  repository: oci://ghcr.io/Obmondo
-  version: v1.3.1
-digest: sha256:6628145829f0f2ad3b0ed974f104d6cfab74483667ef4a7bdab0d3f7aa5b737b
-generated: "2021-05-25T18:53:52.06176106+05:30"
+  repository: https://charts.jetstack.io
+  version: v1.6.1
+digest: sha256:42efdf240ca1f4a8d19e8566204dcd50af1532e1e6b0fc9985ba59a00eee2593
+generated: "2022-01-10T16:04:07.745946061+05:30"

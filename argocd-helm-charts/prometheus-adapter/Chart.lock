@@ -1,6 +1,6 @@
 dependencies:
 - name: prometheus-adapter
-  repository: oci://ghcr.io/Obmondo
-  version: 2.12.1
-digest: sha256:aab720f0d7ff803bbea02ab57ec2dd362d18b502fb5c0f2461eefd699e169fbb
-generated: "2021-05-17T15:28:46.047579819+05:30"
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 3.0.0
+digest: sha256:9c86e75288afc2bc59aea055697a1a533a963813cde0aaf6b3f0e97b9fe55c6d
+generated: "2022-01-10T16:06:05.288935396+05:30"

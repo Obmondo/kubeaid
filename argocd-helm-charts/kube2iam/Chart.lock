@@ -1,6 +1,6 @@
 dependencies:
 - name: kube2iam
-  repository: oci://ghcr.io/Obmondo
+  repository: https://jtblin.github.io/kube2iam/
   version: 2.6.0
-digest: sha256:80d9dd0f42aa19e82360ec62ae825b4e825b774b5217fd5195f5d7323ab6d26a
-generated: "2021-05-17T15:28:18.805946124+05:30"
+digest: sha256:dd2f7def59a101307bd738ef808877771e21b2daa6c7eb25a0627601d6ac1fbb
+generated: "2022-01-10T16:05:05.955846986+05:30"
