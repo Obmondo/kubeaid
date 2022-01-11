@@ -172,7 +172,6 @@ while [[ $# -gt 0 ]]; do
           ;;
       --dump-sealedsecrets-keys-certs)
           SEALEDSECRETS_KEYS_CERTS=$1
-          echo "Going to dump the public certs in ./public_certs dir and private keys in ./private_keys dir"
           shift
           ;;
       --customer-id)
@@ -221,13 +220,15 @@ fi
 
 ## Get some values from the settings file
 CUSTOMER_CONFIG_DIR="../kubernetes-config-${CUSTOMER_ID}/${CLUSTER_NAME}"
-REPO_URL=$(yq eval '.argo-cd.repo.url' "$SETTINGS_FILE")
+CUSTOMER_REPO_URL=$(yq eval '.argo-cd.repo.url' "$SETTINGS_FILE")
 OCI_URL=$(yq eval '.argo-cd.repo.oci' "$SETTINGS_FILE")
 GIT_AUTH_TYPE=$(yq eval '.argo-cd.repo.auth.git' "$SETTINGS_FILE")
 GIT_AUTH_URL=$(yq eval '.argo-cd.repo.auth.url' "$SETTINGS_FILE")
 ARGOCD_SECRET_NAME=argocd-"$CLUSTER_NAME"-admin
 ARGOCD_APPS="${CUSTOMER_CONFIG_DIR}/argocd-apps"
 ARGOCD_APPS_TEMPLATE="${CUSTOMER_CONFIG_DIR}/argocd-apps/templates"
+EXTERNAL_VALUE_GIT_REPO_URL=$(echo "${CUSTOMER_REPO_URL}" | sed -e 's/\//_/g' -e 's/:/_/g')
+OBMONDO_ARGOCD_REPO="https://gitlab.enableit.dk/kubernetes/argocd-apps.git"
 
 if $INSTALL_K8S; then
     case "$K8S_TYPE" in
@@ -280,12 +281,14 @@ if $SETUP_SEALED_SECRET; then
     fi
 
     if $SEALEDSECRETS_KEYS_CERTS; then
+        echo "Going to dump the public certs in ./public_certs dir and private keys in ./private_keys dir"
         mkdir -p public_certs private_keys
 
         for s in $(kubectl get -n system secrets | grep key | cut -d " " -f 1); do
             kubectl get -n system secret "$s" -o yaml | yq eval '.data."tls.crt"' - | base64 -d > public_certs/"$s".crt
             kubectl get -n system secret "$s" -o yaml | yq eval '.data."tls.key"' - | base64 -d > private_keys/"$s".key
         done
+        exit 0
     fi
 
     ##### Recovery mode checks #####
@@ -340,8 +343,8 @@ if $SETUP_SEALED_SECRET; then
 
         cp ./argocd-application-templates/sealed-secrets.yaml "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
 
-        yq eval --inplace ".spec.source.repoURL = \"$REPO_URL\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
-        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"../../$CLUSTER_NAME/argocd-apps/values-sealed-secrets.yaml\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
+        yq eval --inplace ".spec.source.repoURL = \"$OBMONDO_ARGOCD_REPO\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
+        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"/tmp/${EXTERNAL_VALUE_GIT_REPO_URL}/$CLUSTER_NAME/argocd-apps/values-sealed-secrets.yaml\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
 
         # Lets touch a file, so sealed-secret is not broken when its getting synced from argocd
         # some customer has their specific sealed-secrect, so touch won't do anyharm in case of recovery as well
@@ -401,6 +404,38 @@ if $SETUP_ARGOCD; then
         -o jsonpath='{'.items[0].data."tls\.crt"'}' \
         | base64 -d > "${SEALEDSECRET_CRT}"
 
+    # Add Obmondo.com argocd-apps repo, which holds all the helm apps
+    # This repo is common for all customers.
+    if ! "$RECOVERY" && ! kubectl get secrets -n argocd obmondo-argocd-common-repo -o name &>/dev/null; then
+        HEAD "Adding argocd-apps repo...   "
+        read -r -p "Username: " OBMONDO_ARGOCD_REPO_USERNAME
+        read -r -s -p "Password: " OBMONDO_ARGOCD_REPO_PASSWORD
+
+        kubectl create secret generic obmondo-argocd-common-repo \
+            --namespace=argocd \
+            --dry-run=client \
+            --from-literal=type='git' \
+            --from-literal=name='obmondo-argocd-apps' \
+            --from-literal=url="$OBMONDO_ARGOCD_REPO" \
+            --from-literal=username="$OBMONDO_ARGOCD_REPO_USERNAME" \
+            --from-literal=password="$OBMONDO_ARGOCD_REPO_PASSWORD" \
+            --output yaml \
+            | yq eval '.metadata.labels.["argocd.argoproj.io/secret-type"]="repository"' - \
+            | yq eval '.metadata.annotations.["sealedsecrets.bitnami.com/managed"]="true"' - \
+            | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - \
+            | kubeseal --controller-namespace system \
+            --controller-name sealed-secrets \
+            --cert "${SEALEDSECRET_CRT}" \
+            --format yaml \
+            - > "${SEALEDSECRET_ARGOCD}/obmondo-argocd-common-repo.yaml"
+        STAT $?
+    fi
+
+    HEAD "Applying sealed-secrets for obmondo-argocd-common-repo ...   "
+    kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/obmondo-argocd-common-repo.yaml" &>>/tmp/argocd.log
+    kubectl get secret --namespace argocd obmondo-argocd-common-repo >/dev/null
+    STAT $?
+
     case "$GIT_AUTH_TYPE" in
         https)
             if ! "$RECOVERY" && ! kubectl get secrets -n argocd "$ARGOCD_SECRET_NAME" -o name &>/dev/null; then
@@ -414,7 +449,7 @@ if $SETUP_ARGOCD; then
                     --dry-run=client \
                     --from-literal=type='git' \
                     --from-literal=name="$ARGOCD_REPO_NAME" \
-                    --from-literal=url="$REPO_URL" \
+                    --from-literal=url="$CUSTOMER_REPO_URL" \
                     --from-literal=username="$HTTPS_USERNAME" \
                     --from-literal=password="$HTTPS_PASSWORD" \
                     --output yaml \
@@ -570,8 +605,8 @@ if $SETUP_ARGOCD; then
 
         cp ./argocd-application-templates/argo-cd.yaml "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
 
-        yq eval --inplace ".spec.source.repoURL = \"$REPO_URL\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
-        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"../../${CLUSTER_NAME}/argocd-apps/values-argo-cd.yaml\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
+        yq eval --inplace ".spec.source.repoURL = \"$OBMONDO_ARGOCD_REPO\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
+        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"/tmp/${EXTERNAL_VALUE_GIT_REPO_URL}/${CLUSTER_NAME}/argocd-apps/values-argo-cd.yaml\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
 
         touch "${ARGOCD_APPS}/values-argo-cd.yaml"
 
@@ -610,7 +645,7 @@ if $SETUP_ROOT_APP; then
 
         # Edit the yaml in place with required settings
         yq eval --inplace ".spec.source.path = \"${CLUSTER_NAME}/argocd-apps\"" "${ARGOCD_APPS_TEMPLATE}/root.yaml"
-        yq eval --inplace ".spec.source.repoURL = \"$REPO_URL\"" "${ARGOCD_APPS_TEMPLATE}/root.yaml"
+        yq eval --inplace ".spec.source.repoURL = \"$CUSTOMER_REPO_URL\"" "${ARGOCD_APPS_TEMPLATE}/root.yaml"
 
         STAT $?
     fi
