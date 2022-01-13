@@ -17,7 +17,7 @@ Any ideas/suggestions are welcomed...
 ## Running
 
 ```sh
-./build htzhel1-kbm
+./build.sh htzhel1-kbm
 ```
 
 Example:
@@ -43,7 +43,13 @@ GET https://github.com/kubernetes-monitoring/kubernetes-mixin/archive/3346c8cbcc
 INFO: compiling jsonnet files into 'htzhel1-kbm'
 ```
 
-### Cleaning up
+## Upgrading
+
+```sh
+make update
+```
+
+## Cleaning up
 
 ```sh
 rm -rf libraries/release-0.10/

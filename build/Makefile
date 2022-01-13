@@ -13,11 +13,14 @@ MAIN_DIR := my-kube-prometheus/
 .PHONY: setup
 setup:
 	go install -a github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest
-	jb init
-	jb install github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@main
-	jb update
 	go install github.com/brancz/gojsontoyaml@latest
 	go install github.com/google/go-jsonnet/cmd/jsonnet@latest
+	jb init
+	jb install github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@main
+
+.PHONY: update
+update:
+	jb update
 
 .PHONY: build
 build:
