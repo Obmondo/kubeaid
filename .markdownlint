@@ -1,0 +1,7 @@
+{
+  "line-length": {
+    "line_length": 120,
+    "code_blocks": false
+  },
+  "no-bare-urls": false
+}
