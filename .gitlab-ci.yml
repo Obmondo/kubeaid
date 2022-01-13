@@ -1,3 +1,4 @@
+---
 stages:
   - lint
   - diff
@@ -9,15 +10,15 @@ lint_sh:
   script:
     - 'find . -name \*.sh -o -name \*.bash | xargs shellcheck'
   only:
-  - merge_requests
+    - merge_requests
 
-lint_yaml:
+lint_yamllint:
   stage: lint
-  image: runejuhl/alpine-ci
+  image: registry.obmondo.com/obmondo/dockerfiles/yamllint:latest
   script:
-    - ./bin/check_yaml.rb
+    - yamllint --strict --config-file .yamllint .
   only:
-  - merge_requests
+    - merge_requests
 
 check_diff:
   image: registry.obmondo.com/obmondo/dockerfiles/obmondo-build:latest
@@ -25,7 +26,7 @@ check_diff:
   script:
     - ./bin/script.sh
   only:
-  - merge_requests
+    - merge_requests
 
 build:
   stage: build

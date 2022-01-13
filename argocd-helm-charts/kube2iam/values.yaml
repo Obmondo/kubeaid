@@ -10,4 +10,4 @@ kube2iam:
   - effect: NoSchedule
     operator: Exists
   - effect: NoExecute
-    operator: Exists  
+    operator: Exists

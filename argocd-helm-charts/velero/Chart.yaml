@@ -1,4 +1,4 @@
-# See new chart versions here: https://github.com/vmware-tanzu/helm-charts/tree/main/charts/velero 
+# See new chart versions here: https://github.com/vmware-tanzu/helm-charts/tree/main/charts/velero
 apiVersion: v2
 name: velero
 version: 1.0.0

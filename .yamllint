@@ -1,0 +1,22 @@
+---
+extends: default
+
+ignore: |-2
+  build/vendor/**
+  build/kube-prometheus/libraries
+  argocd-helm-charts/**/charts
+  **/templates/**
+  .git/**
+
+rules:
+  line-length: disable
+  document-start: false
+  indentation: false
+  comments:
+    ignore: |-2
+      **/Chart.yaml
+      **/values.yaml
+
+# Local Variables:
+# mode: yaml
+# End:
