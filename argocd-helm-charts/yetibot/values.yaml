@@ -1,9 +1,9 @@
 # See options here: https://github.com/yetibot/core/blob/master/config/sample.env and in chart itself
-yetibot: 
+yetibot:
   # Overriding fullname so we KNOW the name of the secret we must create to store secret env vars
   fullnameOverride: "yetibot"
   yetibot:
-    service: 
+    service:
       type: ClusterIP
     env:
       # In the context of running on Kuberenetes, we must ensure Yetibot ignores
@@ -17,8 +17,8 @@ yetibot:
       # Enable Mattermost adapter
       # YETIBOT_ADAPTERS_MYMATTERMOST_TYPE: "mattermost"
       # YETIBOT_ADAPTERS_MYMATTERMOST_HOST: "chat.obmondo.com"
-      # This is delivered by sealed-secrets 
-      #YETIBOT_ADAPTERS_MYMATTERMOST_TOKEN: ""
+      # This is delivered by sealed-secrets
+      # YETIBOT_ADAPTERS_MYMATTERMOST_TOKEN: ""
       # YETIBOT_ADAPTERS_MYMATTERMOST_SECURE: "true" # true by default
       YB_URL: "http://localhost:3003"
 
@@ -35,10 +35,10 @@ yetibot:
 #    - secretName: yetibot.kam.obmondo.com-cert
 #      hosts:
 #      - yetibot.kam.obmondo.com
- 
-#  podSecurityContext: 
+
+#  podSecurityContext:
 #    fsGroup: 2000
-#  securityContext: 
+#  securityContext:
 #    capabilities:
 #      drop:
 #      - ALL

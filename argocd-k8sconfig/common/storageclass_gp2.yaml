@@ -1,13 +1,13 @@
-apiVersion: storage.k8s.io/v1     
-kind: StorageClass    
-metadata: 
-  annotations:  
-    storageclass.beta.kubernetes.io/is-default-class: "true"    
-  labels: 
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    storageclass.beta.kubernetes.io/is-default-class: "true"
+  labels:
     k8s-addon: storage-aws.addons.k8s.io
-  name: gp2     
-parameters:     
-  type: gp2     
+  name: gp2
+parameters:
+  type: gp2
 provisioner: kubernetes.io/aws-ebs
 reclaimPolicy: Delete
 allowVolumeExpansion: true

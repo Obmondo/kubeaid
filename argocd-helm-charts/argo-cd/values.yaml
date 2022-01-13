@@ -1,7 +1,7 @@
 argo-cd:
   # to make this chart work with helm 3 - it does still install CRDs
   installCRDs: false
-#find latest tag here: https://github.com/argoproj/argo-helm/blob/master/charts/argo-cd/Chart.yaml (AppVersion)
+  # find latest tag here: https://github.com/argoproj/argo-helm/blob/master/charts/argo-cd/Chart.yaml (AppVersion)
   dex:
     enabled: false
   repoServer:
