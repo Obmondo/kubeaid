@@ -57,8 +57,8 @@ local kp =
               sections: {
                 date_formats: { default_timezone: 'UTC' },
                 auth: {
-                  disable_login_form: true,
-                  oauth_auto_login: true,
+                  disable_login_form: false,
+                  // oauth_auto_login: true,
                   disable_signout_menu: false,
                   signout_redirect_url: vars.grafana_signout_redirect_url,
                 },
@@ -68,18 +68,18 @@ local kp =
                 server: {
                   root_url: vars.grafana_root_url,
                 },
-                'auth.generic_oauth': {
-                  enabled: true,
-                  allow_sign_up: true,
-                  scopes: 'openid profile email',
-                  name: 'Keycloak',
-                  auth_url: vars.grafana_auth_url,
-                  token_url: vars.grafana_token_url,
-                  api_url: vars.grafana_api_url,
-                  client_id: 'grafana',
-                  role_attribute_path: "contains(not_null(roles[*],''), 'Admin') && 'Admin' || contains(not_null(roles[*],''), 'Editor') && 'Editor' || contains(not_null(roles[*],''), 'Viewer') && 'Viewer'|| ''",
+                // 'auth.generic_oauth': {
+                //   enabled: true,
+                //   allow_sign_up: true,
+                //   scopes: 'openid profile email',
+                //   name: 'Keycloak',
+                //   auth_url: vars.grafana_auth_url,
+                //   token_url: vars.grafana_token_url,
+                //   api_url: vars.grafana_api_url,
+                //   client_id: 'grafana',
+                //   role_attribute_path: "contains(not_null(roles[*],''), 'Admin') && 'Admin' || contains(not_null(roles[*],''), 'Editor') && 'Editor' || contains(not_null(roles[*],''), 'Viewer') && 'Viewer'|| ''",
 
-                },
+                // },
               },
             },
           },
@@ -90,7 +90,6 @@ local kp =
             spec+: {
               resources: vars.alertmanager_resources,
               logLevel: 'debug',  // So firing alerts show up in log
-              useExistingSecret: true,
               secrets: [
                 'obmondo-clientcert',
               ],
