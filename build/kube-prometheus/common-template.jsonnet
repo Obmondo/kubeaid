@@ -1,3 +1,4 @@
+// -*- flycheck-jsonnet-external-code-files: ("vars=clusters/htzfsn1-kam-vars.jsonnet"); -*-
 local utils = import 'utils.libsonnet';
 
 local ext_vars = std.extVar('vars');
@@ -68,19 +69,24 @@ local kp =
                 server: {
                   root_url: vars.grafana_root_url,
                 },
-                // 'auth.generic_oauth': {
-                //   enabled: true,
-                //   allow_sign_up: true,
-                //   scopes: 'openid profile email',
-                //   name: 'Keycloak',
-                //   auth_url: vars.grafana_auth_url,
-                //   token_url: vars.grafana_token_url,
-                //   api_url: vars.grafana_api_url,
-                //   client_id: 'grafana',
-                //   role_attribute_path: "contains(not_null(roles[*],''), 'Admin') && 'Admin' || contains(not_null(roles[*],''), 'Editor') && 'Editor' || contains(not_null(roles[*],''), 'Viewer') && 'Viewer'|| ''",
+              } + (
+                if vars.grafana_keycloak_enable then
+                  {
+                    'auth.generic_oauth': {
+                      enabled: true,
+                      allow_sign_up: true,
+                      scopes: 'openid profile email',
+                      name: 'Keycloak',
+                      auth_url: vars.grafana_auth_url,
+                      token_url: vars.grafana_token_url,
+                      api_url: vars.grafana_api_url,
+                      client_id: 'grafana',
+                      role_attribute_path: "contains(not_null(roles[*],''), 'Admin') && 'Admin' || contains(not_null(roles[*],''), 'Editor') && 'Editor' || contains(not_null(roles[*],''), 'Viewer') && 'Viewer'|| ''",
 
-                // },
-              },
+                    },
+                  }
+                else {}
+              ),
             },
           },
         },
@@ -90,10 +96,15 @@ local kp =
             spec+: {
               resources: vars.alertmanager_resources,
               logLevel: 'debug',  // So firing alerts show up in log
-              secrets: [
-                'obmondo-clientcert',
-              ],
-            },
+            } + (
+              if std.objectHas(vars, 'alertmanager_cert') && vars.alertmanager_cert then
+                {
+                  secrets: [
+                    'obmondo-clientcert',
+                  ],
+                }
+              else {}
+            ),
           },
         },
         prometheus+:: {
