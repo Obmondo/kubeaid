@@ -32,13 +32,13 @@ if [[ "$oci" == true ]]; then
     echo "### Doing dep up for upstream for ${path} and ${versionnum} ###"
 
     if [ -f "${path}/Chart.yaml" ]; then
-      sed -ri -e 's/#(repository: https?:)/\1/g' "${path}/Chart.yaml"
-      sed -ri -e 's/(repository: "oci)/#\1/g' "${path}/Chart.yaml"
+      sed -ri -e 's/# *(repository: https?:)/\1/g' "${path}/Chart.yaml"
+      sed -ri -e 's/(repository: "oci)/# \1/g' "${path}/Chart.yaml"
     fi
   elif [ "$upstream" == false ]; then
     echo "### Doing dep up for ghcr for ${path} and ${versionnum} ###"
-    sed -ri -e 's/#(repository: "oci)/\1/g' "${path}/Chart.yaml"
-    sed -ri -e 's/(repository: https?:)/#\1/g' "${path}/Chart.yaml"
+    sed -ri -e 's/# *(repository: "oci)/\1/g' "${path}/Chart.yaml"
+    sed -ri -e 's/(repository: https?:)/# \1/g' "${path}/Chart.yaml"
   else
     echo "### Ignoring dep up for upstream since ${versionnum} is already present for $path ###"
     exit 0
