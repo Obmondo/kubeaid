@@ -1,8 +1,8 @@
 apiVersion: v2
 name: cluster-autoscaler
-version: 1.0.0
+version: 1.21.1
 dependencies:
   - name: cluster-autoscaler
-    version: 9.4.0
+    version: 9.10.9
     repository: https://kubernetes.github.io/autoscaler
     #repository: "oci://ghcr.io/Obmondo"

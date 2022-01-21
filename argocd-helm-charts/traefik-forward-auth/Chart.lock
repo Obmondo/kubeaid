@@ -1,6 +1,6 @@
 dependencies:
 - name: traefik-forward-auth
   repository: https://k8s-at-home.com/charts/
-  version: 1.0.5
-digest: sha256:1ec48baf2065af0796aed5d3d6f3d0f48f66a66cfcf09d951fb6b0530393ba0d
-generated: "2022-01-10T16:06:54.948320277+05:30"
+  version: 1.0.10
+digest: sha256:59fed614a616d4162380506ea31deea895e4a8cacd0fd094aaac92d22f6a5a2e
+generated: "2022-01-07T23:34:06.297768621+01:00"
