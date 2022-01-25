@@ -1,0 +1,15 @@
+postgres-operator:
+  configAwsOrGcp:
+    aws_region: 'eu-west-1'
+  configKubernetes:
+    enable_pod_antiaffinity: true
+  configLoadBalancer:
+    master_dns_name_format: '{cluster}.{hostedzone}'
+    replica_dns_name_format: '{cluster}-repl.{hostedzone}'
+    custom_service_annotations:
+      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+      service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+  configMajorVersionUpgrade:
+    minimal_major_version: "12"
+  enableJsonLogging: true
+
