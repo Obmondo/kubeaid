@@ -1,0 +1,6 @@
+dependencies:
+- name: sonarqube
+  repository: oci://ghcr.io/blackwoodseven
+  version: 9.9.0
+digest: sha256:d0f05f356ef4c469666d49e5347df24b1694483f5e8cd4f1bd101b7931822687
+generated: "2021-12-14T09:54:39.792423122Z"

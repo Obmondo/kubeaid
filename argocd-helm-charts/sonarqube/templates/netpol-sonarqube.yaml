@@ -1,0 +1,27 @@
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.sonarqube-sonarqube
+  namespace: sonarqube
+spec:
+  order: 100
+  selector:
+    app == 'sonarqube'
+  types:
+  - Egress
+  - Ingress
+  egress:
+  - action: Allow
+    protocol: TCP
+    destination:
+      selector: app.kubernetes.io/name == 'postgresql'
+      ports:
+      - 5432
+  ingress:
+  - action: Allow
+    protocol: TCP
+    source:
+      selector: app.kubernetes.io/name == 'nginx'
+    destination:
+      ports:
+      - 9000

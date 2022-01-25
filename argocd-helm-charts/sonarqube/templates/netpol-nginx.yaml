@@ -1,0 +1,26 @@
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.sonarqube-nginx
+  namespace: sonarqube
+spec:
+  order: 100
+  selector:
+    app.kubernetes.io/name == 'nginx'
+  types:
+  - Egress
+  - Ingress
+  egress:
+  - action: Allow
+    protocol: TCP
+    destination:
+      selector: app == 'sonarqube'
+      ports:
+      - 9000
+  ingress:
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 8080
+      - 8443

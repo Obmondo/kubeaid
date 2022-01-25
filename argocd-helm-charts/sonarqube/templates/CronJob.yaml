@@ -1,0 +1,45 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: backup-sonarqube-db
+  namespace: sonarqube
+spec:
+  schedule: {{ .Values.backup.schedule | quote }}
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 20
+  successfulJobsHistoryLimit: 2
+  startingDeadlineSeconds: 180
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          annotations:
+            iam.amazonaws.com/role: {{ .Values.backup.role }}
+          labels:
+            app: backup-sonarqube-db
+        spec:
+          containers:
+          - name: backup-sonarqube-db
+            image: {{ .Values.backup.image }}
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/bash
+            - /mnt/script
+            volumeMounts:
+            - name: backup-sonarqube-db
+              mountPath: /mnt
+            env:
+            - name: PG_PASS
+              valueFrom:
+                secretKeyRef:
+                  key: postgresql-password
+                  name: postgresql-credentials
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+          volumes:
+          - name: backup-sonarqube-db
+            configMap:
+              name: backup-sonarqube-db
+

@@ -1,0 +1,7 @@
+apiVersion: v2
+name: sonarqube
+version: 1.0.0
+dependencies:
+  - name: sonarqube
+    version: 9.9.0
+    repository: https://oteemo.github.io/charts

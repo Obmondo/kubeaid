@@ -1,0 +1,19 @@
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.sonarqube-postgresql
+  namespace: sonarqube
+spec:
+  order: 100
+  selector:
+    app.kubernetes.io/name == 'postgresql'
+  types:
+  - Ingress
+  ingress:
+  - action: Allow
+    protocol: TCP
+    source:
+      selector: app in { 'sonarqube', 'backup-sonarqube-db' }
+    destination:
+      ports:
+      - 5432
