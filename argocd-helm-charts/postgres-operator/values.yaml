@@ -1,6 +1,4 @@
 postgres-operator:
-  configAwsOrGcp:
-    aws_region: 'eu-west-1'
   configKubernetes:
     enable_pod_antiaffinity: true
   configLoadBalancer:
@@ -12,4 +10,4 @@ postgres-operator:
   configMajorVersionUpgrade:
     minimal_major_version: "12"
   enableJsonLogging: true
-
+  
