@@ -343,6 +343,8 @@ if $SETUP_SEALED_SECRET; then
 
         cp ./argocd-application-templates/sealed-secrets.yaml "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
 
+        # this is already in the template files, but adding it incase someone screw the template file
+        yq eval --inplace ".spec.destination.namespace = system" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
         yq eval --inplace ".spec.source.repoURL = \"$OBMONDO_ARGOCD_REPO\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
         yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"/tmp/${EXTERNAL_VALUE_GIT_REPO_URL}/$CLUSTER_NAME/argocd-apps/values-sealed-secrets.yaml\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
 
@@ -605,6 +607,8 @@ if $SETUP_ARGOCD; then
 
         cp ./argocd-application-templates/argo-cd.yaml "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
 
+        # this is already in the template files, but adding it incase someone screw the template file
+        yq eval --inplace ".spec.destination.namespace = argocd" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
         yq eval --inplace ".spec.source.repoURL = \"$OBMONDO_ARGOCD_REPO\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
         yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"/tmp/${EXTERNAL_VALUE_GIT_REPO_URL}/${CLUSTER_NAME}/argocd-apps/values-argo-cd.yaml\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
 
