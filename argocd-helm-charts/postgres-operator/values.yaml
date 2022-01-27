@@ -1,3 +1,4 @@
+networkpolicies: true
 postgres-operator:
   configKubernetes:
     enable_pod_antiaffinity: true

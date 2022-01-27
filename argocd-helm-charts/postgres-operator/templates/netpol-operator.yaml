@@ -1,3 +1,4 @@
+{{ if .Values.networkpolicies }}
 apiVersion: crd.projectcalico.org/v1
 kind: NetworkPolicy
 metadata:
@@ -26,3 +27,4 @@ spec:
       ports:
       - 5432 # PostgreSQL
       - 8008 # Patroni
+{{ end }}
