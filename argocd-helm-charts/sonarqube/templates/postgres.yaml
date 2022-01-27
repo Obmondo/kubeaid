@@ -1,0 +1,21 @@
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: posgresql
+  namespace: sonarqube
+spec:
+  volume:
+    size: 2Gi
+  numberOfInstances: 1
+  users:
+    owner:  
+    - superuser
+    postgres:
+    - login
+    sonarqube:
+    - login
+  databases:
+    postgresql: owner  
+  postgresql:
+    version: "12"
+  enableMasterLoadBalancer: false
