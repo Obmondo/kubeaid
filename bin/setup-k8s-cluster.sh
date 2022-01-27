@@ -42,10 +42,10 @@ Usage $0 [OPTION]:
   --recovery                      true|false [Defaults: false]
   --private-key-path              sealed-secrets-private-keys-dir           [Required when --recovery]
   --public-key-path               sealed-secrets-public-keys-dir            [Required when --recovery]
-  --install-k8s                   install kubernetes cluster
+  --install-k8s                   install kubernetes cluster [Defaults: true]
   --k8s-type                      bare [self managed or via puppet],
                                   aws-kops [k8s cluster with kops on aws],
-                                  aks-terraform [azure k8s with terraform]  [Optional]
+                                  aks-terraform [azure k8s with terraform]  [Required, unless --install-k8s false]
   --settings-file                 path to settings-files                    [Required]
   --setup-argocd                  setup argocd
   --setup-sealed-secret           setup sealed secret
@@ -349,7 +349,7 @@ if $SETUP_SEALED_SECRET; then
         yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"/tmp/${EXTERNAL_VALUE_GIT_REPO_URL}/$CLUSTER_NAME/argocd-apps/values-sealed-secrets.yaml\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
 
         # Lets touch a file, so sealed-secret is not broken when its getting synced from argocd
-        # some customer has their specific sealed-secrect, so touch won't do anyharm in case of recovery as well
+        # some customer has their specific sealed-secret, so touch won't do any harm in case of recovery as well
         touch "${ARGOCD_APPS}/values-sealed-secrets.yaml"
 
         helm install \
