@@ -4,6 +4,7 @@ metadata:
   name: posgresql
   namespace: sonarqube
 spec:
+  teamId: obmondo
   volume:
     size: 2Gi
   numberOfInstances: 1
