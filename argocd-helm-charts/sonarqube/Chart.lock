@@ -1,6 +1,6 @@
 dependencies:
 - name: sonarqube
-  repository: oci://ghcr.io/blackwoodseven
+  repository: https://oteemo.github.io/charts
   version: 9.9.0
-digest: sha256:d0f05f356ef4c469666d49e5347df24b1694483f5e8cd4f1bd101b7931822687
-generated: "2021-12-14T09:54:39.792423122Z"
+digest: sha256:2269a98313218efd65dcb3b107d336d8f10a62632fa49a371f8bee1b565b14c0
+generated: "2022-01-27T14:47:26.279209473+01:00"
