@@ -5,3 +5,4 @@ dependencies:
   - name: sonarqube
     version: 9.9.0
     repository: https://oteemo.github.io/charts
+# see latest chart here: https://github.com/Oteemo/charts/blob/master/charts/sonarqube/Chart.yaml 
