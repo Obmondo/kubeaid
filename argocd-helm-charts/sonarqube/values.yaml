@@ -7,8 +7,8 @@ sonarqube:
       memory: 128Mi
   postgresql:
     enabled: false
-    existingSecret: postgresql-credentials
-    existingSecretPasswordKey: postgresql-password
+    existingSecret: sonarqube.obmondo-posgresql.credentials.postgresql.acid.zalan.do
+    existingSecretPasswordKey: password
     postgresqlServer: sonarqube-postgresql
     postgresqlUsername: sonarqube
     postgresqlDatabase: sonarqube
