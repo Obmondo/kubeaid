@@ -6,7 +6,6 @@ metadata:
 spec:
   teamId: obmondo
   volume:
-    storageClass: rook-ceph-block
     size: 2Gi
   numberOfInstances: 1
   users:
