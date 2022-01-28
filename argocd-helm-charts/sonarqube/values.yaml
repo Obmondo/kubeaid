@@ -1,3 +1,4 @@
+networkpolicies: false
 sonarqube:
   resources:
     requests:
