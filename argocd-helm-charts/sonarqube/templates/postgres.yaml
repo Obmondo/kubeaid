@@ -20,3 +20,4 @@ spec:
   postgresql:
     version: "12"
   enableMasterLoadBalancer: false
+  

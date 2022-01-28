@@ -40,4 +40,3 @@ kind: ConfigMap
 metadata:
   name: backup-sonarqube-db
   namespace: sonarqube
-

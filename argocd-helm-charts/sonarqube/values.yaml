@@ -1,4 +1,5 @@
 networkpolicies: false
+certificate: false
 sonarqube:
   resources:
     requests:

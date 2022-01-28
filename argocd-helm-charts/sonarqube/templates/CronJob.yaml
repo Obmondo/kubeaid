@@ -42,4 +42,3 @@ spec:
           - name: backup-sonarqube-db
             configMap:
               name: backup-sonarqube-db
-
