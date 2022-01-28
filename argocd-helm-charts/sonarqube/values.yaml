@@ -14,16 +14,15 @@ sonarqube:
     postgresqlDatabase: sonarqube
   persistence:
     enabled: true
-    storageClass: rook-ceph-block
   image:
     tag: 8.9.0-community
   deploymentStrategy:
     type: Recreate
 
 postgresql:
-  persistence:
-    size: 20Gi
-    storageClass: rook-ceph-block
+# persistence:
+#   size: 20Gi
+#   storageClass: rook-ceph-block
   image:
     tag: 13.3.0
   global:
