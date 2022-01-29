@@ -1,3 +1,4 @@
+{{ if .Values.configmap }}
 apiVersion: v1
 data:
   script: |-
@@ -40,3 +41,4 @@ kind: ConfigMap
 metadata:
   name: backup-sonarqube-db
   namespace: sonarqube
+{{ end }}

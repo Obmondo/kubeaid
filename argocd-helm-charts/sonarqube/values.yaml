@@ -1,5 +1,7 @@
 networkpolicies: false
 certificate: false
+configmap: false
+cronjob: false
 sonarqube:
   postgresql:
     existingSecret: sonarqube.obmondo-posgresql.credentials.postgresql.acid.zalan.do
