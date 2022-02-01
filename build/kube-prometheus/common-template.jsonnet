@@ -94,6 +94,7 @@ local kp =
         alertmanager+: {
           alertmanager+: {
             spec+: {
+              replicas: 1,
               resources: vars.alertmanager_resources,
               logLevel: 'debug',  // So firing alerts show up in log
             } + (
@@ -110,6 +111,7 @@ local kp =
         prometheus+:: {
           prometheus+: {
             spec+: {
+              replicas: 1,
               resources: vars.prometheus_resources,
               storage: {
                 volumeClaimTemplate: {

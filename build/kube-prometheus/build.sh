@@ -60,6 +60,22 @@ then
   exit 2
 fi
 
+# sanity checks
+if ! tmp=$(jsonnet --version); then
+  echo "missing jsonnet"
+  exit 2
+fi
+if ! [[ "${tmp}" =~ v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+  echo "unable to parse jsonnet version ('${tmp}')"
+  exit 2
+fi
+
+declare -i _version=$(( (BASH_REMATCH[1]*10**6) + (BASH_REMATCH[2]*10**3) + BASH_REMATCH[3] ))
+if (( _version < 18000 )); then
+  echo "jsonnet version too old; aborting"
+  exit 2
+fi
+
 # Make sure to use project tooling
 PATH="$(pwd)/tmp/bin:${PATH}"
 OUTDIR=$(basename "${cluster}")
