@@ -9,14 +9,6 @@ declare -i apply=0
 declare dry_run='' \
         cluster=''
 
-#We NEED right jsonnet version to build properly
-if ! jsonnet --version | grep "v0.18"
-then
-    echo "You do NOT have the correct jsonnet version. We NEED jsonnet v0.18.x"
-    exit 1
-fi
-
-
 function usage() {
   cat <<EOF
 ${0} [-a|--apply] [-c|--create-namespaces] <CLUSTER>
@@ -65,6 +57,22 @@ fi
 if [ ! -e "clusters/${cluster}-vars.jsonnet" ]
 then
   echo "no such variable file ${cluster}.jsonnet"
+  exit 2
+fi
+
+# sanity checks
+if ! tmp=$(jsonnet --version); then
+  echo "missing jsonnet"
+  exit 2
+fi
+if ! [[ "${tmp}" =~ v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+  echo "unable to parse jsonnet version ('${tmp}')"
+  exit 2
+fi
+
+declare -i _version=$(( (BASH_REMATCH[1]*10**6) + (BASH_REMATCH[2]*10**3) + BASH_REMATCH[3] ))
+if (( _version < 18000 )); then
+  echo "jsonnet version too old; aborting"
   exit 2
 fi
 
