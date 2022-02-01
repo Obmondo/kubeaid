@@ -9,6 +9,14 @@ declare -i apply=0
 declare dry_run='' \
         cluster=''
 
+#We NEED right jsonnet version to build properly
+if ! jsonnet --version | grep "v0.18"
+then
+    echo "You do NOT have the correct jsonnet version. We NEED jsonnet v0.18.x"
+    exit 1
+fi
+
+
 function usage() {
   cat <<EOF
 ${0} [-a|--apply] [-c|--create-namespaces] <CLUSTER>
