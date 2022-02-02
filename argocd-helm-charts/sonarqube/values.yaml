@@ -7,7 +7,7 @@ sonarqube:
     enabled: false
   jdbcOverwrite:
     enable: true
-    # The JDBC url of the external DB
     jdbcUrl: "jdbc:postgresql://obmondo-postgresql/sonarqube?socketTimeout=1500"
-    # The DB user that should be used for the JDBC connection
     jdbcUsername: "sonarqube_admin"
+    jdbcSecretPasswordKey: password
+    jdbcSecretName: postgres.obmondo-postgresql.credentials.postgresql.acid.zalan.do
