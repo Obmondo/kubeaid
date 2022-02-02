@@ -104,6 +104,11 @@ if ! [ -e "${JSONNET_LIB_PATH}" ]; then
 fi
 
 echo "INFO: compiling jsonnet files into '${OUTDIR}'"
+
+# remove previous output to avoid leftover files
+rm -f "${OUTDIR}/*"
+mkdir -p "${OUTDIR}"
+
 # shellcheck disable=SC2016
 jsonnet -J \
         "${JSONNET_LIB_PATH}" \
