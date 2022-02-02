@@ -5,17 +5,17 @@ only be read by the controller, so we can safely store them in repo.
 
 ## How to add a sealed secret
 
-You generate a sealed secret manifest from a normal secret manifest and apply it. But you dont have to apply it, you
-just add it to this repo and argocd should find it automatically.
+You generate a sealed secret manifest from a normal secret manifest and apply it. But you don't have to apply it, you
+just add it to this repo and ArgoCD should find it automatically.
 
-**Note: default format is json!**
+**Note: default format is JSON!**
 
 ```sh
 # for using local public cert
 kubeseal --cert secret-certificate.pem <mysecret.json >mysealedsecret.json
 
-# for pulling public cert from service in cluster
-kubeseal --controller-name sealed-secrets <mysecret.json >mysealedsecret.json
+#for pulling public cert from service in cluster
+kubeseal --controller-namespace system --controller-name sealed-secrets < mysecret.json > mysealedsecret.json
 ```
 
 ### Important - verify
