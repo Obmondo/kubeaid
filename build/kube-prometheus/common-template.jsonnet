@@ -94,18 +94,11 @@ local kp =
         alertmanager+: {
           alertmanager+: {
             spec+: {
+              secret:: {},
               replicas: 1,
               resources: vars.alertmanager_resources,
               logLevel: 'debug',  // So firing alerts show up in log
-            } + (
-              if std.objectHas(vars, 'alertmanager_cert') && vars.alertmanager_cert then
-                {
-                  secrets: [
-                    'obmondo-clientcert',
-                  ],
-                }
-              else {}
-            ),
+            },
           },
         },
         prometheus+:: {
