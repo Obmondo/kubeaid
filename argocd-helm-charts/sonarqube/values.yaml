@@ -10,6 +10,6 @@ sonarqube:
     # The JDBC url of the external DB
     jdbcUrl: "jdbc:postgresql://obmondo-postgresql/sonarqube?socketTimeout=1500"
     # The DB user that should be used for the JDBC connection
-    jdbcUsername: "sonaruser_admin"
+    jdbcUsername: "sonarqube_admin"
     # Use this if you don't mind the DB password getting stored in plain text within the values file
     jdbcPassword: "sonarPass"
