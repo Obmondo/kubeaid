@@ -4,8 +4,12 @@ configmap: false
 cronjob: false
 sonarqube:
   postgresql:
-    existingSecret: postgres.obmondo-postgresql.credentials.postgresql.acid.zalan.do
-    existingSecretPasswordKey: password
     enabled: false
-    postgresqlServer: "obmondo-postgresql.sonarqube.svc.cluster.local"
-    postgresqlUsername: "postgres"
+  jdbcOverwrite:
+		enable: true
+		# The JDBC url of the external DB
+		jdbcUrl: "jdbc:postgresql://obmondo-postgresql/sonarqube?socketTimeout=1500"
+		# The DB user that should be used for the JDBC connection
+		jdbcUsername: "sonarUser"
+		# Use this if you don't mind the DB password getting stored in plain text within the values file
+		jdbcPassword: "sonarPass"

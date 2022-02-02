@@ -7,16 +7,15 @@ spec:
   teamId: obmondo
   volume:
     size: 2Gi
+    storageClass: rook-ceph-block
   numberOfInstances: 1
   users:
-    owner:  
-    - superuser
-    postgres:
-    - login
-    sonarqube:
-    - login
+    sonarqube_admin: # database owner
+      - superuser
+      - createdb
+    sonarqube_test: []
   databases:
-    postgresql: owner  
+    sonarqube: sonarqube_admin
   postgresql:
-    version: "12"
+    version: "13"
   enableMasterLoadBalancer: false
