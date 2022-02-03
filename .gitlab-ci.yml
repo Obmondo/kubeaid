@@ -46,6 +46,14 @@ check_diff:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
+diff:jsonnet:
+  image: registry.obmondo.com/obmondo/dockerfiles/obmondo-build:latest
+  stage: diff
+  script:
+    - ./bin/build-jsonnet.sh
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
 build:
   stage: build
   image: registry.obmondo.com/obmondo/dockerfiles/obmondo-build:latest
