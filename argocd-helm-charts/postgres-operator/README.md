@@ -2,9 +2,9 @@
 
 ## Summary
 
--   Postgres-operator is used to manage Postgres instances, including high-availability setups with master and multiple slaves, and automatic failover and backups of data to offsite location.
+Postgres-operator is used to manage Postgres instances, including high-availability setups with master and multiple slaves, and automatic failover and backups of data to offsite location.
 
--   Here is an example of how to setup a postgresql instance, using this operator:
+Here is an example of how to setup a postgresql instance, using this operator:
 
 ```bash
 apiVersion: "acid.zalan.do/v1"
@@ -29,4 +29,4 @@ spec:
   enableMasterLoadBalancer: false
 ```
 
--   The Postgres-operator is instatlled on the ```system``` namespace as it is to be used for MANY postgresql instances.
+NB. The Postgres-operator is instatlled in the ```system``` namespace as it is to be used for MANY postgresql instances - preferrably ALL in the cluster - so backup and high-availability works the same for all.
