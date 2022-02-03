@@ -3,6 +3,10 @@ certificate: false
 configmap: false
 cronjob: false
 sonarqube:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
   postgresql:
     enabled: false
   jdbcOverwrite:
