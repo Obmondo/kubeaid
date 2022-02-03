@@ -6,9 +6,7 @@
 
 -   It is needed to be integrated with CI in order to validate codes.
 
--   Our sonarqube was deployed from the official chart https://SonarSource.github.io/helm-chart-sonarqube
-
--   it has been configured to spin up a postgresql instance controlled by the statefulset but for this project, postgres-operator is setup to address the provisioning of that and it has being disabled in the ```values.yaml``` file with:
+-   it has been configured to spin up a postgresql instance controlled by the statefulset but for this project, a postgres that depends on postgres-operator being installed - to work has been added to sonarqube repo and the default one is being disabled in the ```values.yaml``` file with:
 
 ```bash
 sonarqube:
@@ -24,10 +22,10 @@ sonarqube:
 apiVersion: "acid.zalan.do/v1"
 kind: postgresql
 metadata:
-  name: obmondo-postgresql
+  name: teamname-postgresql
   namespace: sonarqube
 spec:
-  teamId: obmondo
+  teamId: teamname
   volume:
     size: 2Gi
     storageClass: rook-ceph-block
@@ -44,7 +42,7 @@ spec:
   enableMasterLoadBalancer: false
 ```
 
-we also needed to set its user, password key and secret name CORRECTLY under ```jdbcOverwrite``` in order to avoid the ```user authentication failed``` error as we initially had it in the logs.
+The user, password key and secret name was set CORRECTLY under ```jdbcOverwrite``` in order to avoid the ```user authentication failed``` error as we initially had it in the logs.
 
 -   For the current setup, the below is its config:
 
@@ -57,4 +55,4 @@ jdbcOverwrite:
     jdbcSecretName: sonarqube-admin.obmondo-postgresql.credentials.postgresql.acid.zalan.do
 ```
 
-the backup of the database is managed by postgres operator, so we dont need to configure the configmap and cronjob.
+The Postgres operator manages the database backup, so we dont need to configure the configmap and cronjob.
