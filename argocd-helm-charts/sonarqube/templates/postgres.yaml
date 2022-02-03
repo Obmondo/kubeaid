@@ -7,7 +7,6 @@ spec:
   teamId: obmondo
   volume:
     size: 2Gi
-    storageClass: rook-ceph-block
   numberOfInstances: 1
   users:
     sonarqube_admin: # database owner

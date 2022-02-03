@@ -1,12 +1,10 @@
 networkpolicies: false
-certificate: false
-configmap: false
-cronjob: false
 sonarqube:
   resources:
     requests:
       cpu: 100m
       memory: 128Mi
+  # NOT using the default, included postgresql instance for this setup. We depend on postgres-operator pgsql instance instead.
   postgresql:
     enabled: false
   jdbcOverwrite:
