@@ -14,7 +14,6 @@ sonarqube:
     enable: false
 ```
 
--   And so we had to enable ```jdbcOverwrite``` for external Database that is being created by the postgres-operator. JDBC is the API to connect and execute the query with the database.
 
 -   The pgsql user to be created is stated in the ```postgres.yaml``` in ```sonarqube/templates``` as ```sonarqube_admin```.
 
