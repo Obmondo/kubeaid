@@ -92,9 +92,9 @@ local kp =
         },
 
         alertmanager+: {
+          secret:: {},
           alertmanager+: {
             spec+: {
-              secret:: {},
               replicas: 1,
               resources: vars.alertmanager_resources,
               logLevel: 'debug',  // So firing alerts show up in log
