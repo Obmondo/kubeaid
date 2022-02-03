@@ -1,1 +1,7 @@
 networkpolicies: false
+postgres-operator:
+  configMajorVersionUpgrade:
+    minimal_major_version: "12"
+  enableJsonLogging: true
+  configKubernetes:
+    enable_pod_antiaffinity: true

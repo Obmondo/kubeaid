@@ -30,3 +30,22 @@ spec:
 ```
 
 NB. The Postgres-operator is instatlled in the ```system``` namespace as it is to be used for MANY postgresql instances - preferrably ALL in the cluster - so backup and high-availability works the same for all.
+
+Example per-cluster values for AWS cluster:
+```
+postgres-operator:
+  configAwsOrGcp:
+    aws_region: 'eu-west-1'
+    kube_iam_role: "arn:aws:iam::438423213058:role/k8s-zalando-operator-dmz"
+    wal_s3_bucket: "postgres-backup"
+  # setup AWS loadbalancer - so postgres instances can be reachable from other clusters
+  configLoadBalancer:
+    db_hosted_zone: 'example.tld'
+    master_dns_name_format: '{cluster}.{hostedzone}'
+    replica_dns_name_format: '{cluster}-repl.{hostedzone}'
+    custom_service_annotations:
+      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+      service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+  configLogicalBackup:
+    logical_backup_s3_bucket: "postgres-backup"
+```
