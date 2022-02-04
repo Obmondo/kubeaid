@@ -13,3 +13,14 @@ sonarqube:
     jdbcUsername: "sonarqube_admin"
     jdbcSecretPasswordKey: password
     jdbcSecretName: sonarqube-admin.obmondo-postgresql.credentials.postgresql.acid.zalan.do
+ingress:
+  enabled: true
+fullnameOverride: sonarqube-sonarqube
+service:
+  externalPort: 9000
+
+
+
+
+
+
