@@ -14,21 +14,15 @@ sonarqube:
     jdbcSecretPasswordKey: password
     jdbcSecretName: sonarqube-admin.obmondo-postgresql.credentials.postgresql.acid.zalan.do
 
-ingress:
-  enabled: true
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
-    kubernetes.io/ingress.class: traefik-cert-manager
-  hosts:
-  - sonarqube.kam.obmondo.com
-  tls:
-  - secretName: argocd-ssl
+  ingress:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      kubernetes.io/ingress.class: traefik-cert-manager
     hosts:
-    - sonarqube.kam.obmondo.com
-
-
-
-
-
-
-
+    - name: sonarqube.kam.obmondo.com
+      path: /
+    tls:
+    - secretName: sonarqube-ssl
+      hosts:
+      - sonarqube.kam.obmondo.com
