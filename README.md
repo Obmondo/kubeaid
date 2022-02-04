@@ -1,3 +1,48 @@
+# Welcome to k8sops
+
+This repository ( https://gitlab.com/Obmondo/k8sops) implements a solution to run any Kubernetes cluster, using gitops principles and allowing for costumization, in a seperate repository.
+
+This way you can always pull the latest commits, and get security updates, fixes, new features etc. - while having your own adjustments still.
+
+This is copyright EnableIT ApS (of Denmark) and released under GPL 3 license of fsf.org.
+
+https://Obmondo.com offers subscriptions, where we manage your Kubernetes cluster, using this code, and react to incidents 24/7/365 if this should be of interest.
+In this way, we typicly help out smaller setups, where there is only 1 or 2 operations people, and hence 24/7 operations isn't possible to run reliably - with out subscription, we take care of the 24/7 monitoring and our knowledgeable developers and operations guys are ready to resolve any issues that may arise - while you can work on the day 2 day stuff, as you'd usually do - and still get your vacations, weekends etc. - without having to be on-call.
+
+# Security design goals
+
+This operations design, is designed to deliver a setup, that delivers on all 3 aspects of security Conidentiality, Integrity and Availability.
+
+## Confidentiality
+
+This setup uses Calico CNI - and ensure network filtering - on both ingress and egress - which means we work hard to avoid any pod in this cluster, has (or needs) internet access. In this way, should a compromise of a pod happen - its harder to get data out, or pull necessary code from the internet to further exploit your systems.
+
+You can disable network filtering for any application - but do so at your own peril - with above risk in mind.
+
+## Integrity
+
+### Helm chart security
+
+We store EVERY Helm chart from an application upstream inside this repository. This has the following benefits:
++  You can always install your application / do recovery - with no internet needed. If an upstream chart repo is down - this will not affect you (and this happens quite often when you have many sources/charts in use).
++  On EVERY upgrade, we review the diff of the chart for any unexpected changes, and this way we HOPE to catch a compromised upstream release, before its included in this repository. 
+   -  Atleast we can see from how other it has been found that other codebases has been compromised - that this is the structure that enabled it to be detected.
++ We run a CI job, that daily fetches the same charts we have in our repo, from upstream chart repo - and check if upstream matches OUR copy. If it does not:
+  - Upstream updated an existing release - which is a VERY BAD idea.
+  - Upstream Helm repo suffered a supply-chain attack
+
+### Docker image security
+
+We change EVERY docker image, to use the sha256sum of the docker image instead of the tag. This means if upstream mirror/dockerhub is compromised (and tag pointing to different docker image) - we will still get the original image - or fail.
+
+This repository has a CI job, that on every MR / PR - fetches docker images used and pushes to YOUR docker registry (in gitlab, github docker service or what you prefer) - so your Kubernetes cluster doesn't talk to anything on the internet to pull the necessary docker images for operations.
+
+Here we also run a daily CI job to compare tag to the sha256sum we have, to detect any supply chain attacks (which won't affect those using this setup) - so they can be reported upstream.
+
+We scan docker images used, for known vulnerabilities (software in image with known CVE f.ex.) and report upstream, and if upstream will accept it - we will gladly submit fixes to upstream - to avoid users of this repository deploying vulnerable code.
+
+## Availability
+
 # Repository structure
 
 | `argocd-clusters-managed`      | Primary folder - containing applications and configs for each managed cluster, which MAY make use of common resources, such as `argocd-helm-charts` and `argocd-k8s-config`. Each cluster folder is actually a Helm chart - hence applications are put as YAML in `templates` folder. |
