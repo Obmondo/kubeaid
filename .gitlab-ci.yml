@@ -3,6 +3,7 @@ stages:
   - lint
   - diff
   - build
+  - deploy
 
 lint:markdown:
   stage: lint
@@ -61,4 +62,17 @@ build:
     - echo "$CI_COMMIT_REF_NAME"
     - bash helm-chart-cache.sh -u Obmondo -p $PASSWORD -r ghcr.io/Obmondo
   rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+git:push:
+  stage: deploy
+  image:
+    name: runejuhl/kubernetes-build:latest
+  script:
+    - ./bin/deploy.sh
+  dependencies:
+    - diff:jsonnet
+  rules:
+    # FIXME: remove this when testing is done!
+    - if: '$CI_COMMIT_BRANCH =~ /^more-alertmanager$/'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
