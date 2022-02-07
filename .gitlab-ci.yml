@@ -4,6 +4,12 @@ stages:
   - diff
   - build
 
+lint:markdown:
+  stage: lint
+  image: registry.obmondo.com/obmondo/dockerfiles/markdownlint:latest
+  script:
+    - markdownlint --config .markdownlint  --ignore 'build/vendor/**' --ignore 'build/kube-prometheus/**'
+
 lint_sh:
   stage: lint
   image: koalaman/shellcheck-alpine
