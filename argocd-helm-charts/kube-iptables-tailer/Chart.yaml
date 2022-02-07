@@ -1,0 +1,8 @@
+apiVersion: v1
+name: kube-iptables-tailer
+version: 0.2.2
+
+dependencies:
+  - name: kube-iptables-tailer
+    version: 0.1.0
+    repository: http://honestica.github.io/lifen-charts/

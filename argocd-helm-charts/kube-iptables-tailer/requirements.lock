@@ -1,0 +1,6 @@
+dependencies:
+- name: kube-iptables-tailer
+  repository: http://honestica.github.io/lifen-charts/
+  version: 0.1.0
+digest: sha256:dc765da39da5a78831316927e5df7b3e552613215e858658f9b9a91c6b608a91
+generated: "2022-02-10T09:45:02.464848268+01:00"
