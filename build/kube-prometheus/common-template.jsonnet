@@ -16,6 +16,7 @@ local default_vars = {
     limits: { memory: '1Gi' },
     requests: { cpu: '100m', memory: '200Mi' },
   },
+  grafana_keycloak_enable: false,
 };
 
 local vars = default_vars + ext_vars;
