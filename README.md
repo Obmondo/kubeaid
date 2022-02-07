@@ -66,6 +66,11 @@ or
 ./bin/uninstall-argocd.sh --recovery
 ```
 In recovery mode the uninstall script will remove argocd from kubernetes but not from you local repo clone, and the install script will install argocd using the existing manifests in your local repo clone.
+### Recover argocd password
+
+```sh
+./bin/setup-k8s-cluster.sh --cluster-name k8s.staging.blackwoodseven.com --settings-file customer-settings.yaml --setup-root-app false --recovery --private-key-path ./private_keys --public-key-path ./public_certs --customer-id bw7 --install-k8s false --setup-sealed-secret false
+```
 
 ### for SSH access to git repos ### We don't support this
 
