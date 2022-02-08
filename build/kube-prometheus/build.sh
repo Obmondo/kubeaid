@@ -39,7 +39,7 @@ while (( $# > 0 )); do
       exit 0
       ;;
     *)
-      if [[ "${cluster}" ]] || ! [[ "${1}" =~ ^[a-z0-9-]+$ ]]; then
+      if [[ "${cluster}" ]] || ! [[ "${1}" =~ ^[a-z0-9.-]+$ ]]; then
         echo "Invalid argument ${1}"
         exit 2
       fi
