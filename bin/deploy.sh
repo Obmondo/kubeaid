@@ -43,6 +43,10 @@ git -C "${upstream_repo_path}" checkout -b "deploy-${CI_MERGE_REQUEST_SOURCE_BRA
 # Loop over all clusters that are defined in upstream repo and copy
 # corresponding compiled files into cloned repo.
 find "${upstream_repo_path}" -maxdepth 1 -type d | while read -r cluster; do
+  # FIXME: how do we do this properly?
+  #
+  # ./bin/build-jsonnet.sh "${cluster}"
+
   rsync -Pa "build/kube-prometheus/${cluster}/" "${upstream_repo_path}/${cluster}/"
   git -C "${upstream_repo_path}" add -f "${cluster}"
 done

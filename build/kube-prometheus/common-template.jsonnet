@@ -1,4 +1,4 @@
-// -*- flycheck-jsonnet-external-code-files: ("vars=clusters/htzfsn1-kam-vars.jsonnet"); -*-
+// -*- flycheck-jsonnet-external-code-files: ("vars=clusters/kam.obmondo.com-vars.jsonnet"); -*-
 local utils = import 'utils.libsonnet';
 
 local ext_vars = std.extVar('vars');
