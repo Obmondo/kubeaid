@@ -73,4 +73,4 @@ git:push:
   dependencies:
     - diff:jsonnet
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '${CI_PIPELINE_SOURCE} == "merge_request_event" && ${KUBERNETES_CONFIG_REPO_TOKEN} && ${KUBERNETES_CONFIG_REPO_URL}'
