@@ -9,22 +9,24 @@ lint:markdown:
   image: registry.obmondo.com/obmondo/dockerfiles/markdownlint:latest
   script:
     - markdownlint --config .markdownlint  --ignore 'build/vendor/**' --ignore 'build/kube-prometheus/**'
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 lint_sh:
   stage: lint
   image: koalaman/shellcheck-alpine
   script:
     - 'find . -not -path ./build/kube-prometheus/libraries/\* -a -not -path ./build/vendor/\* -name \*.sh -o -name \*.bash | xargs shellcheck'
-  only:
-    - merge_requests
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 lint_yamllint:
   stage: lint
   image: registry.obmondo.com/obmondo/dockerfiles/yamllint:latest
   script:
     - yamllint --strict --config-file .yamllint .
-  only:
-    - merge_requests
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 lint:jsonnetfmt:
   stage: lint
@@ -33,23 +35,22 @@ lint:jsonnetfmt:
     entrypoint: ['']
   script:
     - './bin/lint-jsonnetfmt.sh'
-  only:
-    - merge_requests
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 check_diff:
   image: registry.obmondo.com/obmondo/dockerfiles/obmondo-build:latest
   stage: diff
   script:
     - ./bin/script.sh
-  only:
-    - merge_requests
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 build:
   stage: build
   image: registry.obmondo.com/obmondo/dockerfiles/obmondo-build:latest
-  only:
-    refs:
-      - 'merge_requests'
   script:
     - echo "$CI_COMMIT_REF_NAME"
     - bash helm-chart-cache.sh -u Obmondo -p $PASSWORD -r ghcr.io/Obmondo
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
