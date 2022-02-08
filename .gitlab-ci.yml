@@ -73,6 +73,4 @@ git:push:
   dependencies:
     - diff:jsonnet
   rules:
-    # FIXME: remove this when testing is done!
-    - if: '$CI_COMMIT_BRANCH =~ /^more-alertmanager$/'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
