@@ -58,7 +58,7 @@ if (( CHANGES > 0)); then
                 -o merge_request.target="${deploy_target_branch}" \
                 -o merge_request.title="${TITLE}" \
                 -o merge_request.description="Auto-generated pull request from Obmondo, created from changes by ${GITLAB_USER_NAME} (${GITLAB_USER_EMAIL})." \
-                origin)
+                origin HEAD)
   echo "${output}"
 
   if grep -q WARNINGS <<< "${output}"; then
