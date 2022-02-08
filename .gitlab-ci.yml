@@ -67,10 +67,10 @@ build:
 git:push:
   stage: deploy
   image:
-    name: runejuhl/kubernetes-build:latest
+    name: registry.obmondo.com/obmondo/dockerfiles/kubernetes-build:1644319710
   script:
     - ./bin/deploy.sh ./.deploy_config
   dependencies:
     - diff:jsonnet
   rules:
-    - if: '${CI_PIPELINE_SOURCE} == "merge_request_event" && ${KUBERNETES_CONFIG_REPO_TOKEN} && ${KUBERNETES_CONFIG_REPO_URL}'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $KUBERNETES_CONFIG_REPO_TOKEN && $KUBERNETES_CONFIG_REPO_URL'
