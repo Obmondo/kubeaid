@@ -29,6 +29,7 @@ upstream_repo='gitlab.enableit.dk/kubernetes/kubernetes-config-enableit.git'
 upstream_repo_path="/tmp/${cluster}"
 
 git clone "https://${upstream_repo_username}:${deploy_token}@${upstream_repo}" "${upstream_repo_path}"
+git -C "${upstream_repo_path}" checkout -b "deploy-${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}"
 
 # Set the displayed user with the commits that are about to be made
 git config --global user.email "${GITLAB_USER_EMAIL}"
