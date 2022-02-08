@@ -52,5 +52,5 @@ if (( CHANGES > 0)); then
       -o merge_request.remove_source_branch \
       -o merge_request.title="${TITLE}" \
       -o merge_request.description="Auto-generated pull request from Obmondo, created from changes by ${GITLAB_USER_NAME} (${GITLAB_USER_EMAIL})." \
-       origin "${deploy_target_branch}"
+       origin
 fi
