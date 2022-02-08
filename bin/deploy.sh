@@ -16,6 +16,13 @@ deploy_token_variable="DEPLOY_TOKEN_${cluster}"
 deploy_token="${!deploy_token_variable}"
 deploy_target_branch_variable="DEPLOY_TARGET_BRANCH_${cluster}"
 deploy_target_branch="${!deploy_target_branch_variable}"
+deploy_target_platform_variable="DEPLOY_TARGET_PLATFORM_${cluster}"
+deploy_target_platform="${!deploy_target_platform_variable}"
+
+if ! [[ "${deploy_token}" || "${deploy_target_branch}" || "${deploy_target_platform}" ]]; then
+  >&2 echo "Required variables are unset. Please check config file '${CONFIG}' and ensure it has keys for cluster '${cluster}'."
+  exit 42
+fi
 
 upstream_repo_username=oauth2
 upstream_repo='gitlab.enableit.dk/kubernetes/kubernetes-config-enableit.git'
