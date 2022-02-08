@@ -2,6 +2,11 @@
 
 set -euo pipefail
 
+CONFIG="$1"
+
+# shellcheck disable=SC1090
+. "${CONFIG}"
+
 # set cluster name and replace dashes with underscore, since they're not allowed
 # in GitLab CI variable names
 # cluster="${DEPLOY_CLUSTER_NAME/-/__}"
@@ -38,9 +43,10 @@ if (( CHANGES > 0)); then
   # Update the repository and make sure to skip the pipeline create for this commit
   # shellcheck disable=SC2094
   git -C "${upstream_repo_path}" push \
+      --force \
       -o ci.skip \
       -o merge_request.create \
-      -o merge_request.target=<branch_name> \
+      -o merge_request.target="${}" \
       -o merge_request.merge_when_pipeline_succeeds \
       -o merge_request.remove_source_branch \
       -o merge_request.title="${TITLE}" \

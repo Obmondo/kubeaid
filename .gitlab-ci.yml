@@ -69,7 +69,7 @@ git:push:
   image:
     name: runejuhl/kubernetes-build:latest
   script:
-    - ./bin/deploy.sh
+    - ./bin/deploy.sh ./.deploy_config
   dependencies:
     - diff:jsonnet
   rules:
