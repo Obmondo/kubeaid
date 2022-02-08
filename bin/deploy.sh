@@ -43,14 +43,18 @@ if (( CHANGES > 0)); then
 
   # Update the repository and make sure to skip the pipeline create for this commit
   # shellcheck disable=SC2094
-  git -C "${upstream_repo_path}" push \
-      --force \
-      -o ci.skip \
-      -o merge_request.create \
-      -o merge_request.target="${deploy_target_branch}" \
-      -o merge_request.merge_when_pipeline_succeeds \
-      -o merge_request.remove_source_branch \
-      -o merge_request.title="${TITLE}" \
-      -o merge_request.description="Auto-generated pull request from Obmondo, created from changes by ${GITLAB_USER_NAME} (${GITLAB_USER_EMAIL})." \
-       origin
+  output=$(git -C "${upstream_repo_path}" push \
+               --force \
+               -o ci.skip \
+               -o merge_request.create \
+               -o merge_request.target="${deploy_target_branch}" \
+               -o merge_request.merge_when_pipeline_succeeds \
+               -o merge_request.remove_source_branch \
+               -o merge_request.title="${TITLE}" \
+               -o merge_request.description="Auto-generated pull request from Obmondo, created from changes by ${GITLAB_USER_NAME} (${GITLAB_USER_EMAIL})." \
+               origin)
+  echo "${output}"
+  if grep -q WARNINGS <<< "${output}"; then
+    exit 1
+  fi
 fi
