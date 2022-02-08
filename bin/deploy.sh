@@ -8,10 +8,15 @@ CONFIG="$1"
 # shellcheck disable=SC1090
 . "${CONFIG}"
 
+# FIXME: should loop over all clusters
+DEPLOY_CLUSTER_NAME=htzfsn1-kam
+
+# FIXME: cluster folder should contain customer-id
+customer_id=enableit
 # set cluster name and replace dashes with underscore, since they're not allowed
 # in GitLab CI variable names
-# cluster="${DEPLOY_CLUSTER_NAME/-/__}"
-cluster=ENABLEIT_HTZFSN1__KAM
+cluster_sanitized="${DEPLOY_CLUSTER_NAME/-/__}"
+cluster="${customer_id^^}_${cluster_sanitized^^}"
 deploy_token_variable="DEPLOY_TOKEN_${cluster}"
 deploy_token="${!deploy_token_variable}"
 deploy_target_branch_variable="DEPLOY_TARGET_BRANCH_${cluster}"
@@ -49,14 +54,14 @@ if (( CHANGES > 0)); then
   git -C "${upstream_repo_path}" status
   git -C "${upstream_repo_path}" commit -m "${TITLE}"
 
-  # Update the repository and make sure to skip the pipeline create for this commit
   # shellcheck disable=SC2094
   output=$(2>&1 git -C "${upstream_repo_path}" push \
                 --force-with-lease \
-                -o ci.skip \
                 -o merge_request.create \
                 -o merge_request.target="${deploy_target_branch}" \
                 -o merge_request.title="${TITLE}" \
+                -o merge_request.merge_when_pipeline_succeeds \
+                -o merge_request.remove_source_branch \
                 -o merge_request.description="Auto-generated pull request from Obmondo, created from changes by ${GITLAB_USER_NAME} (${GITLAB_USER_EMAIL})." \
                 origin HEAD)
   echo "${output}"
@@ -65,6 +70,3 @@ if (( CHANGES > 0)); then
     exit 1
   fi
 fi
-
-                # -o merge_request.merge_when_pipeline_succeeds \
-                # -o merge_request.remove_source_branch \
