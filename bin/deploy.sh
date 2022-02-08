@@ -12,10 +12,10 @@ CONFIG="$1"
 # in GitLab CI variable names
 # cluster="${DEPLOY_CLUSTER_NAME/-/__}"
 cluster=ENABLEIT_HTZFSN1__KAM
-deploy_token_name="DEPLOY_TOKEN_${cluster}"
-deploy_token="${!deploy_token_name}"
-deploy_target_branch_name="DEPLOY_TARGET_BRANCH_${cluster}"
-deploy_target_branch="${deploy_target_branch_name}"
+deploy_token_variable="DEPLOY_TOKEN_${cluster}"
+deploy_token="${!deploy_token_variable}"
+deploy_target_branch_variable="DEPLOY_TARGET_BRANCH_${cluster}"
+deploy_target_branch="${deploy_target_branch_variable}"
 
 upstream_repo_username=oauth2
 upstream_repo='gitlab.enableit.dk/kubernetes/kubernetes-config-enableit.git'
@@ -47,7 +47,7 @@ if (( CHANGES > 0)); then
       --force \
       -o ci.skip \
       -o merge_request.create \
-      -o merge_request.target="${}" \
+      -o merge_request.target="${deploy_target_branch}" \
       -o merge_request.merge_when_pipeline_succeeds \
       -o merge_request.remove_source_branch \
       -o merge_request.title="${TITLE}" \
