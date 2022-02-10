@@ -1,23 +1,34 @@
 # kube-prometheus build
 
-I have added the `kube-prometheus` that contains the `build.sh`,
-`example.jsonnet` and `obmondo.jsonnet` (with our config).
+Use `build.sh` to build prometheus manifests for a kubernetes cluster.
+See the comment at the top of `build.sh` for how to use it.
 
 For the Makefile, run `make setup` to install `jb`, initialize it and fetch the
 `build.sh`, vendor and other files, although they have been created in the
 `kube-prometheus` folder. `make build` compiles the manifests
 
-The command `./build.sh example.jsonnet` when run, will build the manifest
-(YAML) files. `obmondo.jsonnet` is where our config is being added to the
-default one. A `./build.sh obmondo.jsonnet` should build it but it isn't
-reflecting yet, still working on it.
-
 Any ideas/suggestions are welcomed...
 
 ## Running
 
+### Install prerequisites
+
+This installs go
 ```sh
-./build.sh htzhel1-kbm
+snap install go
+export PATH=$PATH:$(go env GOPATH)/bin
+```
+
+This installs jsonnet
+```sh
+go install -a github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest
+go install github.com/brancz/gojsontoyaml@latest
+go install github.com/google/go-jsonnet/cmd/jsonnet@latest
+```
+
+### Run the build script
+```sh
+./build.sh ../kubernetes-config-enableit/k8s/kam.obmondo.com
 ```
 
 Example:
@@ -54,3 +65,8 @@ make update
 ```sh
 rm -rf libraries/release-0.10/
 ```
+
+## Prometheus operator options, set in common-template.jsonnet options
+Options available as part of values.alertmanager are listed in https://github.com/prometheus-operator/kube-prometheus/blob/main/jsonnet/kube-prometheus/components/alertmanager.libsonnet#L1-L72
+Additionally ALL options for Alertmanager CR listed in https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#alertmanagerspec are available in jsonnet as alertmanager.alertmanager.spec
+Alertmanager mixin options are inherited from the mixin itself and are available in https://github.com/prometheus/alertmanager/blob/main/doc/alertmanager-mixin/config.libsonnet
