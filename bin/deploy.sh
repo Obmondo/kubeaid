@@ -38,7 +38,7 @@ fi
 config_repo_url_with_auth="https://${config_repo_auth}@${KUBERNETES_CONFIG_REPO_URL:8}"
 deploy_target_branch="${OBMONDO_DEPLOY_TARGET_BRANCH:-main}"
 config_repo_name=$(echo "$KUBERNETES_CONFIG_REPO_URL" | sed -r "s/.+\/(.+)\..+/\1/")
-config_repo_path="../${config_repo_name}"
+config_repo_path="/tmp/${config_repo_name}"
 
 git config --global user.email "${GITLAB_USER_EMAIL}"
 git config --global user.name "${GITLAB_USER_NAME}"
