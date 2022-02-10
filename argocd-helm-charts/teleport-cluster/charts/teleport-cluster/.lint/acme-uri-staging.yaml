@@ -1,4 +1,0 @@
-clusterName: test-acme-cluster
-acme: true
-acmeEmail: test@email.com
-acmeURI: https://acme-staging-v02.api.letsencrypt.org/directory
