@@ -46,7 +46,7 @@ while (( $# > 0 )); do
       exit 0
       ;;
     *)
-      if [[ "${cluster_dir}" ]] || ! [[ "${1}" =~ ^[a-z0-9.-]+$ ]]; then
+      if ! [[ -d "${1}" ]]; then
         echo "Invalid argument ${1}"
         exit 2
       fi
@@ -64,8 +64,7 @@ fi
 cluster=$(basename "$cluster_dir")
 cluster_jsonnet="${cluster_dir}/${cluster}-vars.jsonnet"
 
-if [ ! -e "${cluster_jsonnet}" ]
-then
+if [ ! -e "${cluster_jsonnet}" ]; then
   echo "no such variable file ${cluster_jsonnet}"
   exit 2
 fi
