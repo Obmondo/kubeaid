@@ -47,13 +47,19 @@ check_diff:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
-diff:jsonnet:
-  image: registry.obmondo.com/obmondo/dockerfiles/obmondo-build:latest
-  stage: diff
-  script:
-    - ./bin/build-jsonnet.sh
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+# FIXME: this is disabled for now because the build-jsonnet script expects a
+# cluster config, which we can't do, since it requires us to clone a remote,
+# which happens in the deploy pipeline. We could test for changes in just
+# clusters we have vars config files for in this repo, but that seems a bit
+# silly...
+#
+# diff:jsonnet:
+#   image: registry.obmondo.com/obmondo/dockerfiles/obmondo-build:latest
+#   stage: diff
+#   script:
+#     - ./bin/build-jsonnet.sh
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 build:
   stage: build
@@ -70,7 +76,5 @@ git:push:
     name: registry.obmondo.com/obmondo/dockerfiles/kubernetes-build:1644319710
   script:
     - ./bin/deploy.sh ./.deploy_config
-  dependencies:
-    - diff:jsonnet
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $KUBERNETES_CONFIG_REPO_TOKEN && $KUBERNETES_CONFIG_REPO_URL'
