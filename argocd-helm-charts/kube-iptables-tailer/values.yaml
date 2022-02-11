@@ -1,0 +1,4 @@
+calico:
+  # loggingEnable: false
+  # check your apiversion with `kubectl api-versions`
+  apiVersion: projectcalico.org/v1
