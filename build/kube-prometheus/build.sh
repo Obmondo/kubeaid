@@ -16,6 +16,8 @@ declare -i apply=0
 declare dry_run='' \
         cluster_dir=''
 
+basedir="$(dirname "$(readlink -f "${0}")")"
+
 function usage() {
   cat <<EOF
 ${0} [-a|--apply] [-c|--create-namespaces] <CLUSTER>
@@ -122,7 +124,7 @@ jsonnet -J \
         "${JSONNET_LIB_PATH}" \
         --ext-code-file vars="${cluster_jsonnet}" \
         -m "${OUTDIR}" \
-        "common-template.jsonnet" |
+        "${basedir}/common-template.jsonnet" |
   while read -r f; do
     "$(go env GOPATH)/bin/gojsontoyaml" < "${f}" > "${f}.yaml"
     rm "${f}"
