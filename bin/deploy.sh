@@ -57,7 +57,7 @@ done
 CHANGES=$(git -C "${config_repo_path}" status --porcelain | wc -l)
 
 if (( CHANGES > 0)); then
-  title="${COMMIT_MESSAGE:-$CI_MERGE_REQUEST_TITLE}"
+  title='Updated Prometheus builds'
 
   git -C "${config_repo_path}" status
   git -C "${config_repo_path}" commit -m "${title}"
