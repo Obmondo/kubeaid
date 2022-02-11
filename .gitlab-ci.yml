@@ -73,7 +73,7 @@ build:
 git:push:
   stage: deploy
   image:
-    name: registry.obmondo.com/obmondo/dockerfiles/kubernetes-build:1644319710
+    name: registry.obmondo.com/obmondo/dockerfiles/kubernetes-build:1644571507
   script:
     - ./bin/deploy.sh ./.deploy_config
   rules:
