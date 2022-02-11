@@ -126,7 +126,7 @@ jsonnet -J \
         -m "${OUTDIR}" \
         "${basedir}/common-template.jsonnet" |
   while read -r f; do
-    "$(go env GOPATH)/bin/gojsontoyaml" < "${f}" > "${f}.yaml"
+    gojsontoyaml < "${f}" > "${f}.yaml"
     rm "${f}"
   done
 
