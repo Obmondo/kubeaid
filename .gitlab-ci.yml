@@ -3,6 +3,7 @@ stages:
   - lint
   - diff
   - build
+  - deploy
 
 lint:markdown:
   stage: lint
@@ -54,3 +55,12 @@ build:
     - bash helm-chart-cache.sh -u Obmondo -p $PASSWORD -r ghcr.io/Obmondo
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+git:push:
+  stage: deploy
+  image:
+    name: registry.obmondo.com/obmondo/dockerfiles/kubernetes-build:1644571507
+  script:
+    - ./bin/deploy.sh ./.deploy_config
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $KUBERNETES_CONFIG_REPO_TOKEN && $KUBERNETES_CONFIG_REPO_URL'

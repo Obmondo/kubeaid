@@ -1,4 +1,4 @@
-// -*- flycheck-jsonnet-external-code-files: ("vars=clusters/htzfsn1-kam-vars.jsonnet"); -*-
+// -*- flycheck-jsonnet-external-code-files: ("vars=clusters/kam.obmondo.com-vars.jsonnet"); -*-
 local utils = import 'utils.libsonnet';
 
 local ext_vars = std.extVar('vars');
@@ -16,6 +16,7 @@ local default_vars = {
     limits: { memory: '1Gi' },
     requests: { cpu: '100m', memory: '200Mi' },
   },
+  grafana_keycloak_enable: false,
 };
 
 local vars = default_vars + ext_vars;
@@ -92,12 +93,13 @@ local kp =
         },
 
         alertmanager+: {
+          secret:: {},
           alertmanager+: {
             spec+: {
-              secret:: {},
               replicas: 1,
               resources: vars.alertmanager_resources,
               logLevel: 'debug',  // So firing alerts show up in log
+              secrets: ['obmondo-alertmanager'],
             },
           },
         },

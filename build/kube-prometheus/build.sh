@@ -1,13 +1,22 @@
 #!/usr/bin/env bash
 #
-# This script uses arg $1 (name of *.jsonnet file to use) to generate the
-# manifests/*.yaml files.
+# This script should be run from the root of the argocd-apps repo
+# This script takes path to cluster folder in customer-kubernetes-config-repo as
+# arg $1. It assumes there is a cluster-name-vars.jsonnet file in that folder
+# and will put all the new manifests in kube-promehteus dir in that folder.
+# For example you might give it ../kubernetes-config-enableit/kam.obmondo.com/
+# and it will look for the file
+# ../kubernetes-config-enableit/kam.obmondo.com/kam.obmondo.com-vars.jsonnet and
+# put the resulting manifests in
+# ../kubernetes-config-enableit/kam.obmondo.com/kube-prometheus
 
 set -euo pipefail
 
 declare -i apply=0
 declare dry_run='' \
-        cluster=''
+        cluster_dir=''
+
+basedir="$(dirname "$(readlink -f "${0}")")"
 
 function usage() {
   cat <<EOF
@@ -39,30 +48,32 @@ while (( $# > 0 )); do
       exit 0
       ;;
     *)
-      if [[ "${cluster}" ]] || ! [[ "${1}" =~ ^[a-z0-9-]+$ ]]; then
+      if ! [[ -d "${1}" ]]; then
         echo "Invalid argument ${1}"
         exit 2
       fi
-      cluster="${1}"
+      cluster_dir="${1}"
       ;;
   esac
   shift
 done
 
-if ! [[ "${cluster}" ]]; then
-  echo "missing argument cluster"
+if ! [[ "${cluster_dir}" ]]; then
+  echo "missing argument cluster_dir"
   exit 2
 fi
 
-if [ ! -e "clusters/${cluster}-vars.jsonnet" ]
-then
-  echo "no such variable file ${cluster}.jsonnet"
+cluster=$(basename "$cluster_dir")
+cluster_jsonnet="${cluster_dir}/${cluster}-vars.jsonnet"
+
+if [ ! -e "${cluster_jsonnet}" ]; then
+  echo "no such variable file ${cluster_jsonnet}"
   exit 2
 fi
 
 # sanity checks
 if ! tmp=$(jsonnet --version); then
-  echo "missing jsonnet"
+  echo "missing the program 'jsonnet'"
   exit 2
 fi
 if ! [[ "${tmp}" =~ v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
@@ -77,8 +88,7 @@ if (( _version < 18000 )); then
 fi
 
 # Make sure to use project tooling
-PATH="$(pwd)/tmp/bin:${PATH}"
-OUTDIR=$(basename "${cluster}")
+OUTDIR="${cluster_dir}/kube-prometheus"
 
 # Make sure to start with a clean 'manifests' dir
 rm -rf "${OUTDIR:?}/"
@@ -87,10 +97,10 @@ mkdir -p "${OUTDIR}/setup"
 # Calling gojsontoyaml is optional, but we would like to generate yaml, not json
 #jsonnet -J vendor -m manifests "${1-example.jsonnet}" | xargs -I{} sh -c 'cat {} | gojsontoyaml > {}.yaml' -- {}
 
-RELEASE=$(jsonnet "clusters/${cluster}-vars.jsonnet" | jq -r .kube_prometheus_version)
-JSONNET_LIB_PATH="libraries/${RELEASE}/vendor"
+RELEASE=$(jsonnet "${cluster_jsonnet}" | jq -r .kube_prometheus_version)
+JSONNET_LIB_PATH="build/kube-prometheus/libraries/${RELEASE}/vendor"
 if ! [ -e "${JSONNET_LIB_PATH}" ]; then
-  if [[ -d "libraries/${RELEASE}" ]]; then
+  if [[ -d "build/kube-prometheus/libraries/${RELEASE}" ]]; then
     echo 'Release dir exists; exiting'
     exit 73
   fi
@@ -98,20 +108,25 @@ if ! [ -e "${JSONNET_LIB_PATH}" ]; then
   echo "INFO: '${JSONNET_LIB_PATH}' doesn't exist; executing jsonnet-bundler"
   jb init
   jb install "github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@${RELEASE}"
-  mkdir "libraries/${RELEASE}"
-  mv vendor "libraries/${RELEASE}/"
-  mv jsonnetfile.json jsonnetfile.lock.json "libraries/${RELEASE}/"
+  mkdir "build/kube-prometheus/libraries/${RELEASE}"
+  mv vendor "build/kube-prometheus/libraries/${RELEASE}/"
+  mv jsonnetfile.json jsonnetfile.lock.json "build/kube-prometheus/libraries/${RELEASE}/"
 fi
 
 echo "INFO: compiling jsonnet files into '${OUTDIR}'"
+
+# remove previous output to avoid leftover files
+rm -f "${OUTDIR}/*"
+mkdir -p "${OUTDIR}"
+
 # shellcheck disable=SC2016
 jsonnet -J \
         "${JSONNET_LIB_PATH}" \
-        --ext-code-file vars="clusters/${cluster}-vars.jsonnet" \
+        --ext-code-file vars="${cluster_jsonnet}" \
         -m "${OUTDIR}" \
-        "common-template.jsonnet" |
+        "${basedir}/common-template.jsonnet" |
   while read -r f; do
-    "$(go env GOPATH)/bin/gojsontoyaml" < "${f}" > "${f}.yaml"
+    gojsontoyaml < "${f}" > "${f}.yaml"
     rm "${f}"
   done
 
