@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
 #
-# This script should be run from the root of the argocd-apps repo
-# This script takes path to cluster folder in customer-kubernetes-config-repo as
-# arg $1. It assumes there is a cluster-name-vars.jsonnet file in that folder
-# and will put all the new manifests in kube-promehteus dir in that folder.
-# For example you might give it ../kubernetes-config-enableit/kam.obmondo.com/
-# and it will look for the file
-# ../kubernetes-config-enableit/kam.obmondo.com/kam.obmondo.com-vars.jsonnet and
-# put the resulting manifests in
-# ../kubernetes-config-enableit/kam.obmondo.com/kube-prometheus
+
+# This script requires path to cluster folder in clone of customers
+# kubernetes-config repo in arg $1 (which must be named clustername and contain
+# a clustername-var.jsonnet file) to generate the prometheus manifests for that
+# cluster. The manifests will be put in the cluster folder in a kube-prometheus
+# subdir.
 
 set -euo pipefail
 
