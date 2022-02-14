@@ -44,7 +44,7 @@ git config --global user.email "${GITLAB_USER_EMAIL}"
 git config --global user.name "${GITLAB_USER_NAME}"
 
 git clone "${config_repo_url_with_auth}" "${config_repo_path}"
-git -C "${config_repo_path}" checkout -b "deploy-${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" --track "origin/${deploy_target_branch}"
+git -C "${config_repo_path}" checkout -b "deploy-${CI_COMMIT_REF_NAME}" --track "origin/${deploy_target_branch}"
 
 # Loop over all clusters that are defined in config repo and copy
 # corresponding compiled files into cloned repo.
