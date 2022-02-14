@@ -37,7 +37,7 @@ lint:jsonnetfmt:
   script:
     - './bin/lint-jsonnetfmt.sh'
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "merge_request_event"'
 
 check_diff:
   image: registry.obmondo.com/obmondo/dockerfiles/obmondo-build:latest
@@ -45,7 +45,7 @@ check_diff:
   script:
     - ./bin/script.sh
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "merge_request_event"'
 
 build:
   stage: build
@@ -54,7 +54,7 @@ build:
     - echo "$CI_COMMIT_REF_NAME"
     - bash helm-chart-cache.sh -u Obmondo -p $PASSWORD -r ghcr.io/Obmondo
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "merge_request_event"'
 
 git:push:
   stage: deploy
@@ -63,4 +63,4 @@ git:push:
   script:
     - ./bin/deploy.sh ./.deploy_config
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $KUBERNETES_CONFIG_REPO_TOKEN && $KUBERNETES_CONFIG_REPO_URL'
+    - if: '($CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "merge_request_event") && $KUBERNETES_CONFIG_REPO_TOKEN && $KUBERNETES_CONFIG_REPO_URL'
