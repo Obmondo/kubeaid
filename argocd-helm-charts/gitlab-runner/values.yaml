@@ -146,3 +146,9 @@ gitlab-runner:
   ## See https://gitlab.com/gitlab-org/charts/gitlab-runner/-/blob/main/templates/configmap.yaml
   ## for a current list.
   configMaps: {}
+
+runner:
+  nameSpace:
+    create: false
+  serviceAccount:
+    create: false

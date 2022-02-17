@@ -1,0 +1,15 @@
+{{- if .Values.runner.serviceAccount.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.runner.serviceAccount.name }}
+  namespace: {{ .Values.runner.nameSpace.name }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Values.runner.serviceAccount.name }}-ci-admin
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.runner.serviceAccount.name }}
+  namespace: kube-system
+  {{- end -}}

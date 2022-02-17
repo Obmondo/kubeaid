@@ -18,3 +18,31 @@ gitlab-runner:
 ```
 
 Let argocd do the rest
+
+## CI User setup
+
+Copy the files from the gitlab-runner/templates to the desired helm chart and raise the MR to get it merged. Once merged, create the kubeconfig with the script below and it should then be set as variables on the CI.
+
+```bash
+#!/bin/bash
+
+set -eou pipefail
+
+CLUSTERNAME=$1
+SERVICEACCOUNT=$2
+NAMESPACE=$3
+KUBECONFIG="/tmp/$CLUSTERNAE.config"
+
+kubectl get secret $(kubectl get serviceaccount $SERVICEACCOUNT -n $NAMESPACE -o yaml | yq eval '.secrets.[].name' -) -n $NAMESPACE -o yaml | yq eval '.data."ca.crt"' - | base64 --decode > /tmp/k8s-$CLUSTERNAME.ca.crt
+
+kubectl config --kubeconfig $KUBECONFIG set-cluster $CLUSTERNAME --embed-certs=true --server="https://kubernetes.default.svc" --certificate-authority=/tmp/k8s-$CLUSTERNAME.ca.crt
+
+kubectl config --kubeconfig $KUBECONFIG set-credentials $SERVICEACCOUNT --token=$(kubectl get secret $(kubectl get serviceaccount $SERVICEACCOUNT -n $NAMESPACE -o yaml | yq eval '.secrets.[].name' -) -n $NAMESPACE -o yaml | yq eval '.data."token"' - | base64 --decode)
+
+kubectl config --kubeconfig $KUBECONFIG set-context $CLUSTERNAME --cluster=$CLUSTERNAME --user=$SERVICEACCOUNT
+
+kubectl config --kubeconfig $KUBECONFIG use-context $CLUSTERNAME
+
+cat $KUBECONFIG | base64 --wrap=0
+
+```
