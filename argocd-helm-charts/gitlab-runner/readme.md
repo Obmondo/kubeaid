@@ -31,18 +31,18 @@ set -eou pipefail
 CLUSTERNAME=$1
 SERVICEACCOUNT=$2
 NAMESPACE=$3
-KUBECONFIG="/tmp/$CLUSTERNAE.config"
+CONFIG="/tmp/$CLUSTERNAME.config"
 
 kubectl get secret $(kubectl get serviceaccount $SERVICEACCOUNT -n $NAMESPACE -o yaml | yq eval '.secrets.[].name' -) -n $NAMESPACE -o yaml | yq eval '.data."ca.crt"' - | base64 --decode > /tmp/k8s-$CLUSTERNAME.ca.crt
 
-kubectl config --kubeconfig $KUBECONFIG set-cluster $CLUSTERNAME --embed-certs=true --server="https://kubernetes.default.svc" --certificate-authority=/tmp/k8s-$CLUSTERNAME.ca.crt
+kubectl config --kubeconfig $CONFIG set-cluster $CLUSTERNAME --embed-certs=true --server="https://kubernetes.default.svc" --certificate-authority=/tmp/k8s-$CLUSTERNAME.ca.crt
 
-kubectl config --kubeconfig $KUBECONFIG set-credentials $SERVICEACCOUNT --token=$(kubectl get secret $(kubectl get serviceaccount $SERVICEACCOUNT -n $NAMESPACE -o yaml | yq eval '.secrets.[].name' -) -n $NAMESPACE -o yaml | yq eval '.data."token"' - | base64 --decode)
+kubectl config --kubeconfig $CONFIG set-credentials $SERVICEACCOUNT --token=$(kubectl get secret $(kubectl get serviceaccount $SERVICEACCOUNT -n $NAMESPACE -o yaml | yq eval '.secrets.[].name' -) -n $NAMESPACE -o yaml | yq eval '.data."token"' - | base64 --decode)
 
-kubectl config --kubeconfig $KUBECONFIG set-context $CLUSTERNAME --cluster=$CLUSTERNAME --user=$SERVICEACCOUNT
+kubectl config --kubeconfig $CONFIG set-context $CLUSTERNAME --cluster=$CLUSTERNAME --user=$SERVICEACCOUNT
 
-kubectl config --kubeconfig $KUBECONFIG use-context $CLUSTERNAME
+kubectl config --kubeconfig $CONFIG use-context $CLUSTERNAME
 
-cat $KUBECONFIG | base64 --wrap=0
+cat $CONFIG | base64 --wrap=0
 
 ```
