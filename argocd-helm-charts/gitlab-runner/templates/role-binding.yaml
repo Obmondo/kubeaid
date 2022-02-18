@@ -11,5 +11,5 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ .Values.runner.serviceAccount.name }}
-  namespace: kube-system
+  namespace: {{ .Values.runner.nameSpace.name }}
   {{- end -}}
