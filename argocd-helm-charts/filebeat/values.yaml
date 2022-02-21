@@ -1,0 +1,15 @@
+networkpolicies: false
+filebeat:
+  daemonset:
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+    - effect: NoExecute
+      operator: Exists
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "130Mi"
+      limits:
+        cpu: "2000m"
+        memory: "250Mi"
