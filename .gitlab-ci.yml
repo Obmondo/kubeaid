@@ -62,5 +62,8 @@ git:push:
     name: registry.obmondo.com/obmondo/dockerfiles/kubernetes-build:1644571507
   script:
     - ./bin/deploy.sh ./.deploy_config
-  rules:
-    - if: '($CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "merge_request_event") && $KUBERNETES_CONFIG_REPO_TOKEN && $KUBERNETES_CONFIG_REPO_URL'
+  only:
+    refs:
+      - master
+    variables:
+      - $KUBERNETES_CONFIG_REPO_TOKEN && $KUBERNETES_CONFIG_REPO_URL
