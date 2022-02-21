@@ -1,0 +1,31 @@
+{{ if .Values.networkpolicies }}
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.copy-snapshot
+  namespace: velero
+spec:
+  order: 100
+  selector:
+    app == 'copy-snapshot'
+  types:
+  - Egress
+  egress:
+  # Connect to kube2iam proxy
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 8181
+      selector: kubernetes.io/role == 'node'
+      namespaceSelector: global()
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 443
+      nets:
+      - 52.218.0.0/16 # AWS eu-west-1 stuff
+      - 52.46.0.0/16  # AWS eu-west-3 stuff
+      - 54.239.0.0/16 # AWS again
+{{ end }}

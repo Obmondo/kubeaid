@@ -1,0 +1,35 @@
+{{ if .Values.networkpolicies }}
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.opensearch-dashboards
+#  namespace: {{ .Values.namespace }}
+  namespace: graylog
+spec:
+  order: 100
+  selector:
+    app == 'opensearch-dashboards'
+  types:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow traefik to connect the the web endpoint
+  - action: Allow
+    protocol: TCP
+    source:
+#      selector: app.kubernetes.io/name == 'traefik'
+#      namespaceSelector: projectcalico.org/name == 'traefik'
+      nets:
+      - '100.0.0.0/8'
+    destination:
+      ports:
+      - 5601
+  egress:
+  # Connections to opensearch nodes
+  - action: Allow
+    protocol: TCP
+    destination:
+      selector: app.kubernetes.io/name == 'opensearch'
+      ports:
+      - 9200
+{{ end }}

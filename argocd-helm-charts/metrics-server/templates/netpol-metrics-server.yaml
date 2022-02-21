@@ -1,0 +1,43 @@
+{{ if .Values.networkpolicies }}
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.metrics-server
+  namespace: {{ .Release.Namespace }}
+spec:
+  order: 100
+  selector:
+    app == 'metrics-server'
+  types:
+  - Ingress
+  - Egress
+  egress:
+  # Allow access to the apiserver
+  - action: Allow
+    protocol: TCP
+    destination:
+      selector: kubernetes.io/role == 'master'
+      namespaceSelector: global()
+      ports:
+      - 443
+  # Allow access to kubelet on all nodes
+  - action: Allow
+    protocol: TCP
+    destination:
+      selector: kubernetes.io/role in { 'master', 'node' }
+      namespaceSelector: global()
+      ports:
+      - 10250
+  - action: Log
+  ingress:
+  # Allow access from master
+  - action: Allow
+    protocol: TCP
+    source:
+      selector: kubernetes.io/role == 'master'
+      namespaceSelector: global()
+    destination:
+      ports:
+      - 8443
+  - action: Log
+{{ end }}
