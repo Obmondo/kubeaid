@@ -20,4 +20,16 @@ rules:
   - cronjobs
   verbs:
   - '*'
+- apiGroups:
+    - networking.k8s.io
+  resources:
+    - ingresses
+  verbs:
+    - get
+    - list
+    - watch
+    - create
+    - delete
+    - update
+    - patch
 {{- end -}}
