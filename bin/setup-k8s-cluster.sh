@@ -16,6 +16,31 @@ set -euo pipefail
 # Setup Argocd
 # Setup Root app in argocd
 
+# Sample yaml file, this script expects
+# ---
+# cluster:
+#   configDir: ./kops/staging
+#   name: k8s.staging.com
+#   shortName: staging
+#
+# argo-cd:
+#   secret:
+#     createSecret: false
+#   repo:
+#     auth:
+#       git: github
+#       url: https://github.com/Obmondo/
+#     data:
+#       url: https://github.com/Obmondo/kubernetes-config-obmondo.git
+#       name: obmondo-helm-values
+#     charts:
+#       url: https://github.com/Obmondo/obmondo-apps.git
+#       name: obmondo-helm-charts
+#   controller:
+#     replicas: 3
+#   repoServer:
+#     replicas: 6
+
 CANCEL_INSTALL() {
     echo "Canceling install"
     exit 1
@@ -42,10 +67,10 @@ Usage $0 [OPTION]:
   --recovery                      true|false [Defaults: false]
   --private-key-path              sealed-secrets-private-keys-dir           [Required when --recovery]
   --public-key-path               sealed-secrets-public-keys-dir            [Required when --recovery]
-  --install-k8s                   install kubernetes cluster [Defaults: true]
+  --install-k8s                   install kubernetes cluster
   --k8s-type                      bare [self managed or via puppet],
                                   aws-kops [k8s cluster with kops on aws],
-                                  aks-terraform [azure k8s with terraform]  [Required, unless --install-k8s false]
+                                  aks-terraform [azure k8s with terraform]  [Optional]
   --settings-file                 path to settings-files                    [Required]
   --setup-argocd                  setup argocd
   --setup-sealed-secret           setup sealed secret
@@ -192,6 +217,14 @@ done
 
 for program in kubectl kubeseal helm bcrypt-tool pwgen yq
 do
+    if [ "$program" == "kubeseal" ]; then
+        if ! kubeseal --version | grep 0.17 >/dev/null; then
+            echo "kubeseal is older version, you should have atleast 0.17.x"
+            echo "https://github.com/bitnami-labs/sealed-secrets.git"
+            exit 1
+        fi
+    fi
+
     if ! command -v "$program" >/dev/null; then
         DEPFAIL $program
     fi
@@ -214,21 +247,27 @@ if [ -z "$CLUSTER_NAME" ]; then
         CLUSTER_NAME=$(yq e '.cluster.name' "$SETTINGS_FILE" | tr '[:upper:]' '[:lower:]') # Convert to lower case
     else
         echo "no cluster.name is given in the customer-settings files, please give one"
-       exit 1
+        exit 1
     fi
 fi
 
+DEFAULT_VALES '.argo-cd.repo.charts.name'
+DEFAULT_VALES '.argo-cd.repo.charts.url'
+DEFAULT_VALES '.argo-cd.repo.data.name'
+DEFAULT_VALES '.argo-cd.repo.data.url'
+
 ## Get some values from the settings file
-CUSTOMER_CONFIG_DIR="../kubernetes-config-${CUSTOMER_ID}/${CLUSTER_NAME}"
-CUSTOMER_REPO_URL=$(yq eval '.argo-cd.repo.url' "$SETTINGS_FILE")
+CUSTOMER_CONFIG_DIR="../kubernetes-config-${CUSTOMER_ID}/k8s/${CLUSTER_NAME}"
+CUSTOMER_HELM_VALUE_REPO_URL=$(yq eval '.argo-cd.data.url' "$SETTINGS_FILE")
+CUSTOMER_HELM_VALUE_REPO_NAME=$(yq eval '.argo-cd.repo.data.name' "$SETTINGS_FILE")
 OCI_URL=$(yq eval '.argo-cd.repo.oci' "$SETTINGS_FILE")
 GIT_AUTH_TYPE=$(yq eval '.argo-cd.repo.auth.git' "$SETTINGS_FILE")
 GIT_AUTH_URL=$(yq eval '.argo-cd.repo.auth.url' "$SETTINGS_FILE")
-ARGOCD_SECRET_NAME=argocd-"$CLUSTER_NAME"-admin
 ARGOCD_APPS="${CUSTOMER_CONFIG_DIR}/argocd-apps"
 ARGOCD_APPS_TEMPLATE="${CUSTOMER_CONFIG_DIR}/argocd-apps/templates"
-EXTERNAL_VALUE_GIT_REPO_URL=$(echo "${CUSTOMER_REPO_URL}" | sed -e 's/\//_/g' -e 's/:/_/g')
-OBMONDO_ARGOCD_REPO="https://gitlab.enableit.dk/kubernetes/argocd-apps.git"
+EXTERNAL_VALUE_GIT_REPO_URL=$(echo "${CUSTOMER_HELM_VALUE_REPO_URL}" | sed -e 's/\//_/g' -e 's/:/_/g')
+OBMONDO_ARGOCD_HELM_REPO_URL=$(yq eval '.argo-cd.charts.url' "$SETTINGS_FILE")
+OBMONDO_ARGOCD_HELM_REPO_NAME=$(yq eval '.argo-cd.repo.charts.name' "$SETTINGS_FILE")
 
 if $INSTALL_K8S; then
     case "$K8S_TYPE" in
@@ -343,13 +382,11 @@ if $SETUP_SEALED_SECRET; then
 
         cp ./argocd-application-templates/sealed-secrets.yaml "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
 
-        # this is already in the template files, but adding it incase someone screw the template file
-        yq eval --inplace ".spec.destination.namespace = system" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
-        yq eval --inplace ".spec.source.repoURL = \"$OBMONDO_ARGOCD_REPO\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
-        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"/tmp/${EXTERNAL_VALUE_GIT_REPO_URL}/$CLUSTER_NAME/argocd-apps/values-sealed-secrets.yaml\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
+        yq eval --inplace ".spec.source.repoURL = \"$OBMONDO_ARGOCD_HELM_REPO_URL\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
+        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"/tmp/${EXTERNAL_VALUE_GIT_REPO_URL}/${ARGOCD_APPS}/values-sealed-secrets.yaml\"" "${ARGOCD_APPS_TEMPLATE}/sealed-secrets.yaml"
 
         # Lets touch a file, so sealed-secret is not broken when its getting synced from argocd
-        # some customer has their specific sealed-secret, so touch won't do any harm in case of recovery as well
+        # some customer has their specific sealed-secret, so touch won't do anyharm in case of recovery as well
         touch "${ARGOCD_APPS}/values-sealed-secrets.yaml"
 
         helm install \
@@ -393,7 +430,6 @@ if $SETUP_ARGOCD; then
     SEALEDSECRET_ARGOCD="${CUSTOMER_CONFIG_DIR}/sealed-secrets/argocd"
     ARGOCD_CTRL_REPLICAS=$(DEFAULT_VALES '.argo-cd.controller.replicas' 1)
     ARGOCD_REPO_REPLICAS=$(DEFAULT_VALES '.argo-cd.repoServer.replicas' 1)
-    ARGOCD_REPO_NAME=$(yq eval '.argo-cd.repo.name' "$SETTINGS_FILE")
 
     # This is the form in which argocd stores its admin password
     PASSWORD=$(pwgen -y 30 1)
@@ -406,52 +442,51 @@ if $SETUP_ARGOCD; then
         -o jsonpath='{'.items[0].data."tls\.crt"'}' \
         | base64 -d > "${SEALEDSECRET_CRT}"
 
-    # Add Obmondo.com argocd-apps repo, which holds all the helm apps
-    # This repo is common for all customers.
-    if ! "$RECOVERY" && ! kubectl get secrets -n argocd obmondo-argocd-common-repo -o name &>/dev/null; then
-        HEAD "Adding argocd-apps repo...   "
-        read -r -p "Username: " OBMONDO_ARGOCD_REPO_USERNAME
-        read -r -s -p "Password: " OBMONDO_ARGOCD_REPO_PASSWORD
-
-        kubectl create secret generic obmondo-argocd-common-repo \
-            --namespace=argocd \
-            --dry-run=client \
-            --from-literal=type='git' \
-            --from-literal=name='obmondo-argocd-apps' \
-            --from-literal=url="$OBMONDO_ARGOCD_REPO" \
-            --from-literal=username="$OBMONDO_ARGOCD_REPO_USERNAME" \
-            --from-literal=password="$OBMONDO_ARGOCD_REPO_PASSWORD" \
-            --output yaml \
-            | yq eval '.metadata.labels.["argocd.argoproj.io/secret-type"]="repository"' - \
-            | yq eval '.metadata.annotations.["sealedsecrets.bitnami.com/managed"]="true"' - \
-            | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - \
-            | kubeseal --controller-namespace system \
-            --controller-name sealed-secrets \
-            --cert "${SEALEDSECRET_CRT}" \
-            --format yaml \
-            - > "${SEALEDSECRET_ARGOCD}/obmondo-argocd-common-repo.yaml"
-        STAT $?
-    fi
-
-    HEAD "Applying sealed-secrets for obmondo-argocd-common-repo ...   "
-    kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/obmondo-argocd-common-repo.yaml" &>>/tmp/argocd.log
-    kubectl get secret --namespace argocd obmondo-argocd-common-repo >/dev/null
-    STAT $?
-
     case "$GIT_AUTH_TYPE" in
         https)
-            if ! "$RECOVERY" && ! kubectl get secrets -n argocd "$ARGOCD_SECRET_NAME" -o name &>/dev/null; then
+            # Add customer values git repo
+            if ! "$RECOVERY" && ! kubectl get secrets -n argocd "$CUSTOMER_HELM_VALUE_REPO_NAME" -o name &>/dev/null; then
+                HEAD "Creating sealed-secret for $CUSTOMER_HELM_VALUE_REPO_NAME ...  "
+                read -r -p "Username: " OBMONDO_ARGOCD_HELM_REPO_URL_USERNAME
+                read -r -s -p "Password: " OBMONDO_ARGOCD_HELM_REPO_URL_PASSWORD
+
+                kubectl create secret generic "$CUSTOMER_HELM_VALUE_REPO_NAME" \
+                    --namespace=argocd \
+                    --dry-run=client \
+                    --from-literal=type='git' \
+                    --from-literal=name="$CUSTOMER_HELM_VALUE_REPO_NAME" \
+                    --from-literal=url="$CUSTOMER_HELM_VALUE_REPO_URL" \
+                    --from-literal=username="$OBMONDO_ARGOCD_HELM_REPO_URL_USERNAME" \
+                    --from-literal=password="$OBMONDO_ARGOCD_HELM_REPO_URL_PASSWORD" \
+                    --output yaml \
+                    | yq eval '.metadata.labels.["argocd.argoproj.io/secret-type"]="repository"' - \
+                    | yq eval '.metadata.annotations.["sealedsecrets.bitnami.com/managed"]="true"' - \
+                    | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - \
+                    | kubeseal --controller-namespace system \
+                    --controller-name sealed-secrets \
+                    --format yaml \
+                    - > "${SEALEDSECRET_ARGOCD}/${CUSTOMER_HELM_VALUE_REPO_NAME}.yaml"
+                STAT $?
+            fi
+
+            HEAD "Applying sealed-secrets for $CUSTOMER_HELM_VALUE_REPO_NAME ...   "
+            kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/${CUSTOMER_HELM_VALUE_REPO_NAME}.yaml" &>>/tmp/argocd.log
+            kubectl get secret --namespace argocd "$CUSTOMER_HELM_VALUE_REPO_NAME" >/dev/null
+            STAT $?
+
+            # Add customer helm charts git repo
+            if ! "$RECOVERY" && ! kubectl get secrets -n argocd "$OBMONDO_ARGOCD_HELM_REPO_NAME" -o name &>/dev/null; then
                 HEAD "Adding argocd-apps repo...   "
                 # It can support tls as well, leaving it for next time
                 read -r -p "Username: " HTTPS_USERNAME
                 read -r -s -p "Password: " HTTPS_PASSWORD
 
-                kubectl create secret generic "$ARGOCD_SECRET_NAME" \
+                kubectl create secret generic "$OBMONDO_ARGOCD_HELM_REPO_NAME" \
                     --namespace=argocd \
                     --dry-run=client \
                     --from-literal=type='git' \
-                    --from-literal=name="$ARGOCD_REPO_NAME" \
-                    --from-literal=url="$CUSTOMER_REPO_URL" \
+                    --from-literal=name="$OBMONDO_ARGOCD_HELM_REPO_NAME" \
+                    --from-literal=url="$OBMONDO_ARGOCD_HELM_REPO_URL" \
                     --from-literal=username="$HTTPS_USERNAME" \
                     --from-literal=password="$HTTPS_PASSWORD" \
                     --output yaml \
@@ -460,14 +495,13 @@ if $SETUP_ARGOCD; then
                     | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - \
                     | kubeseal --controller-namespace system \
                     --controller-name sealed-secrets \
-                    --cert "${SEALEDSECRET_CRT}" \
-                    - > "${SEALEDSECRET_ARGOCD}/${ARGOCD_SECRET_NAME}".json
+                    - > "${SEALEDSECRET_ARGOCD}/${OBMONDO_ARGOCD_HELM_REPO_NAME}".json
                 STAT $?
             fi
 
             HEAD "Applying sealed-secrets for $ARGOCD_SECRET_NAME ...   "
-            kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/${ARGOCD_SECRET_NAME}".json &>>/tmp/argocd.log
-            kubectl get secret --namespace argocd "$ARGOCD_SECRET_NAME" >/dev/null
+            kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/${OBMONDO_ARGOCD_HELM_REPO_NAME}".json &>>/tmp/argocd.log
+            kubectl get secret --namespace argocd "$OBMONDO_ARGOCD_HELM_REPO_NAME" >/dev/null
             STAT $?
 
             ### Update the argocd-secret with our custom password and create a sealed secret file as well
@@ -483,7 +517,6 @@ if $SETUP_ARGOCD; then
                     | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - \
                     | kubeseal --controller-namespace system \
                     --controller-name sealed-secrets \
-                    --cert "${SEALEDSECRET_CRT}" \
                     - > "${SEALEDSECRET_ARGOCD}/argocd-secret.json"
                 STAT $?
 
@@ -497,9 +530,8 @@ if $SETUP_ARGOCD; then
 
             ;;
         github)
-            # https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#generating-a-private-key
-            if ! "$RECOVERY" && ! kubectl get secrets -n argocd "$ARGOCD_SECRET_NAME" -o name &>/dev/null; then
-                HEAD "Creating sealed-secret for $ARGOCD_SECRET_NAME ...  "
+            # NOTE: we are expecting customer would be having their repo on the same git provider.
+            if ! "$RECOVERY"; then
                 read -r -p "Github AppID: " GITHUB_APP_ID
                 read -r -p "Github AppInstallationID: " GITHUB_APP_INSTALL_ID
                 read -r -p "Github AppPrivateKey File: " GITHUB_APP_PRIVATEKEY
@@ -508,8 +540,41 @@ if $SETUP_ARGOCD; then
                     echo "Error: given $GITHUB_APP_PRIVATEKEY file does not exist"
                     exit 1
                 fi
+            fi
 
-                kubectl create secret generic "$ARGOCD_SECRET_NAME" \
+            # Add customer values git repo
+            if ! "$RECOVERY" && ! kubectl get secrets -n argocd "$CUSTOMER_HELM_VALUE_REPO_NAME" -o name &>/dev/null; then
+                HEAD "Creating sealed-secret for $CUSTOMER_HELM_VALUE_REPO_NAME ...  "
+
+                kubectl create secret generic "$CUSTOMER_HELM_VALUE_REPO_NAME" \
+                    --namespace=argocd \
+                    --dry-run=client \
+                    --from-literal=url="$GIT_AUTH_URL" \
+                    --from-literal=githubAppID="$GITHUB_APP_ID" \
+                    --from-literal=githubAppInstallationID="$GITHUB_APP_INSTALL_ID" \
+                    --from-file=githubAppPrivateKey="$GITHUB_APP_PRIVATEKEY" \
+                    --output yaml \
+                    | yq eval '.metadata.labels.["argocd.argoproj.io/secret-type"]="repository"' - \
+                    | yq eval '.metadata.annotations.["sealedsecrets.bitnami.com/managed"]="true"' - \
+                    | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - \
+                    | kubeseal --controller-namespace system \
+                    --controller-name sealed-secrets \
+                    --format yaml \
+                    - > "${SEALEDSECRET_ARGOCD}/${CUSTOMER_HELM_VALUE_REPO_NAME}.yaml"
+                STAT $?
+            fi
+
+            HEAD "Applying sealed-secrets for $CUSTOMER_HELM_VALUE_REPO_NAME ...   "
+            kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/${CUSTOMER_HELM_VALUE_REPO_NAME}.yaml" &>>/tmp/argocd.log
+            kubectl get secret --namespace argocd "$CUSTOMER_HELM_VALUE_REPO_NAME" >/dev/null
+            STAT $?
+
+            # https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#generating-a-private-key
+            # Add customer helm charts git repo
+            if ! "$RECOVERY" && ! kubectl get secrets -n argocd "$OBMONDO_ARGOCD_HELM_REPO_NAME" -o name &>/dev/null; then
+                HEAD "Creating sealed-secret for $OBMONDO_ARGOCD_HELM_REPO_NAME ...  "
+
+                kubectl create secret generic "$OBMONDO_ARGOCD_HELM_REPO_NAME" \
                     --namespace=argocd \
                     --dry-run=client \
                     --from-literal=url="$GIT_AUTH_URL" \
@@ -522,14 +587,14 @@ if $SETUP_ARGOCD; then
                     | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - \
                     | kubeseal --controller-namespace system \
                     --controller-name sealed-secrets \
-                    --cert "${SEALEDSECRET_CRT}" \
-                    - > "${SEALEDSECRET_ARGOCD}/${ARGOCD_SECRET_NAME}".json
+                    --format yaml \
+                    - > "${SEALEDSECRET_ARGOCD}/${OBMONDO_ARGOCD_HELM_REPO_NAME}.yaml"
                 STAT $?
             fi
 
-            HEAD "Applying sealed-secrets for $ARGOCD_SECRET_NAME ...   "
-            kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/${ARGOCD_SECRET_NAME}".json &>>/tmp/argocd.log
-            kubectl get secret --namespace argocd "$ARGOCD_SECRET_NAME" >/dev/null
+            HEAD "Applying sealed-secrets for $OBMONDO_ARGOCD_HELM_REPO_NAME ...   "
+            kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/${OBMONDO_ARGOCD_HELM_REPO_NAME}".json &>>/tmp/argocd.log
+            kubectl get secret --namespace argocd "$OBMONDO_ARGOCD_HELM_REPO_NAME" >/dev/null
             STAT $?
 
             ### Update the argocd-secret with our custom password and create a sealed secret file as well
@@ -549,8 +614,8 @@ if $SETUP_ARGOCD; then
                     | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - \
                     | kubeseal --controller-namespace system \
                     --controller-name sealed-secrets \
-                    --cert "${SEALEDSECRET_CRT}" \
-                    - > "${SEALEDSECRET_ARGOCD}/argocd-secret.json"
+                    --format yaml \
+                    - > "${SEALEDSECRET_ARGOCD}/argocd-secret.yaml"
                 STAT $?
 
                 echo "Argocd password: $PASSWORD"
@@ -588,7 +653,6 @@ if $SETUP_ARGOCD; then
                 | yq eval '.metadata.labels.["argocd.argoproj.io/instance"]="secrets"' - \
                 | kubeseal --controller-namespace system \
                 --controller-name sealed-secrets \
-                --cert "${SEALEDSECRET_CRT}" \
                 - > "${SEALEDSECRET_ARGOCD}/helm-repos-cache.json"
             STAT $?
         fi
@@ -607,10 +671,8 @@ if $SETUP_ARGOCD; then
 
         cp ./argocd-application-templates/argo-cd.yaml "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
 
-        # this is already in the template files, but adding it incase someone screw the template file
-        yq eval --inplace ".spec.destination.namespace = argocd" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
-        yq eval --inplace ".spec.source.repoURL = \"$OBMONDO_ARGOCD_REPO\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
-        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"/tmp/${EXTERNAL_VALUE_GIT_REPO_URL}/${CLUSTER_NAME}/argocd-apps/values-argo-cd.yaml\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
+        yq eval --inplace ".spec.source.repoURL = \"$OBMONDO_ARGOCD_HELM_REPO_URL\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
+        yq eval --inplace ".spec.source.helm.valueFiles.[1] = \"/tmp/${EXTERNAL_VALUE_GIT_REPO_URL}/${ARGOCD_APPS}/values-argo-cd.yaml\"" "${ARGOCD_APPS_TEMPLATE}/argo-cd.yaml"
 
         touch "${ARGOCD_APPS}/values-argo-cd.yaml"
 
@@ -648,8 +710,8 @@ if $SETUP_ROOT_APP; then
         cp ./argocd-application-templates/root.yaml "${ARGOCD_APPS_TEMPLATE}/root.yaml"
 
         # Edit the yaml in place with required settings
-        yq eval --inplace ".spec.source.path = \"${CLUSTER_NAME}/argocd-apps\"" "${ARGOCD_APPS_TEMPLATE}/root.yaml"
-        yq eval --inplace ".spec.source.repoURL = \"$CUSTOMER_REPO_URL\"" "${ARGOCD_APPS_TEMPLATE}/root.yaml"
+        yq eval --inplace ".spec.source.path = \"${ARGOCD_APPS}\"" "${ARGOCD_APPS_TEMPLATE}/root.yaml"
+        yq eval --inplace ".spec.source.repoURL = \"$CUSTOMER_HELM_VALUE_REPO_URL\"" "${ARGOCD_APPS_TEMPLATE}/root.yaml"
 
         STAT $?
     fi
