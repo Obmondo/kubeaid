@@ -3,5 +3,6 @@ name: sonarqube
 version: 1.0.0
 dependencies:
   - name: sonarqube
-    version: 2.0.0
+    version: 2.0.0+248
     repository: https://SonarSource.github.io/helm-chart-sonarqube
+    # repository: "oci://ghcr.io/Obmondo"
