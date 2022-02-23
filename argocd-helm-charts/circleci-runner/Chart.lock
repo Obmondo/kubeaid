@@ -1,6 +1,6 @@
 dependencies:
 - name: circleci-runner
-  repository: oci://ghcr.io/blackwoodseven
+  repository: https://raw.githubusercontent.com/obmondo/circleci-runner-k8s/main/
   version: 0.1.0
-digest: sha256:3a40e08dfa41ba8a1c3e283a08cd1a3a54309727bdc7f3c4d3bf3e7c5cb79cc9
-generated: "2022-01-26T01:13:04.283573461+05:30"
+digest: sha256:5e2f7c0d9cd49426b98f5c15d5c9c99aca407db1a2abe47843be169980e3d482
+generated: "2022-02-23T17:24:32.499672383+01:00"

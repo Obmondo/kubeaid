@@ -1,6 +1,6 @@
 dependencies:
 - name: whoami
-  repository: oci://ghcr.io/blackwoodseven
+  repository: https://cowboysysop.github.io/charts/
   version: 2.2.0
-digest: sha256:64be7658d76738633f0b5c0481e35e31c7759bffeddc92c093a8d9d8631a11b5
-generated: "2021-05-26T15:32:04.104990672+05:30"
+digest: sha256:db9cb735de6a42402871dcecf1d69d0f9a1ce80fbc92014f981111ffcfb0af96
+generated: "2022-02-23T17:24:50.244072378+01:00"
