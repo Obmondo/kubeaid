@@ -1,0 +1,53 @@
+aws-ebs-csi-driver:
+  enableVolumeScheduling: true
+  enableVolumeResizing: true
+  enableVolumeSnapshot: true
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  tolerateAllTaints: true
+
+  node:
+    tolerateAllTaints: true
+
+  storageClasses:
+# Add StorageClass resources like:
+# - name: ebs-sc
+#   # annotation metadata
+#   annotations:
+#     storageclass.kubernetes.io/is-default-class: "true"
+#   # label metadata
+#   labels:
+#     my-label-is: supercool
+#   # defaults to WaitForFirstConsumer
+#   volumeBindingMode: WaitForFirstConsumer
+#   # defaults to Delete
+#   reclaimPolicy: Retain
+#   parameters:
+#     encrypted: "true"
+  - name: gp3
+    volumeBindingMode: Immediate
+    reclaimPolicy: Delete
+    allowVolumeExpansion: true
+    parameters:
+      type: gp3
+      encrypted: "true"
+  - name: standard
+    volumeBindingMode: Immediate
+    reclaimPolicy: Delete
+    allowVolumeExpansion: true
+    parameters:
+      type: standard
+      encrypted: "true"
+
+#  k8sTagClusterId: "k8s.ops.blackwoodseven.com"
+#  region: "eu-west-1"
+#  podAnnotations:
+#    iam.amazonaws.com/role: "arn:aws:iam::438423213058:role/aws-ebs-csi-ops"
+

@@ -1,0 +1,16 @@
+environment:
+  AWS_CONFIG_FILE: /aws/config
+
+namespace: velero
+
+schedule: "15 * * * *"
+
+aws:
+  region: eu-west-1
+  backupRegion: eu-west-3
+
+deleteDays: 30
+
+image: 438423213058.dkr.ecr.eu-west-1.amazonaws.com/k8s/scripting-image:20210917153102
+
+suspend: false

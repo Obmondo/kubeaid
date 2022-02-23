@@ -1,0 +1,7 @@
+whoami:
+  lables:
+    traefik.http.routers.whoami.middlewares: traefik-forward-auth
+  ingress:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt

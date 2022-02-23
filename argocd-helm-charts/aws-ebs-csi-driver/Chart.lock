@@ -1,0 +1,6 @@
+dependencies:
+- name: aws-ebs-csi-driver
+  repository: oci://ghcr.io/blackwoodseven
+  version: 0.10.1
+digest: sha256:2157585fe08d583630f67fb504cfd622dcf7751bfc4f646b98dc58488e0b2f72
+generated: "2021-05-26T15:06:58.117557829+05:30"

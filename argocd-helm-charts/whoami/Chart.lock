@@ -1,0 +1,6 @@
+dependencies:
+- name: whoami
+  repository: oci://ghcr.io/blackwoodseven
+  version: 2.2.0
+digest: sha256:64be7658d76738633f0b5c0481e35e31c7759bffeddc92c093a8d9d8631a11b5
+generated: "2021-05-26T15:32:04.104990672+05:30"
