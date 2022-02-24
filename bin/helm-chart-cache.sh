@@ -31,10 +31,10 @@ find argocd-helm-charts -maxdepth 1 -mindepth 1 -type d | while read -r path; do
       fi
       chartname=${tgzfile/-$version.tgz}
       echo "### Pulling chart $chartname:$version ###"
-      if ! helm chart pull "${registry}/${chartname}:${version}" > /dev/null; then
+      if ! helm pull "${registry}/${chartname}:${version}" > /dev/null; then
         echo "### Saving and pushing chart $chartname:$version ###"
-        helm chart save "$tarfile" "${registry}/${chartname}:${version}"
-        helm chart push "${registry}/${chartname}:${version}"
+        helm create "$tarfile" "${registry}/${chartname}:${version}"
+        helm push "${registry}/${chartname}:${version}"
         echo "###  Doing dep up for ghcr for $path ###"
         bash helm-dep-up.sh -u false -p "$path" -r "$registry";
         echo "### Checking for changes in $path/Chart.lock file for $CI_COMMIT_SHA:$path/Chart.lock ###"

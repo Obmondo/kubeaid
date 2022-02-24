@@ -28,7 +28,7 @@ if [[ "$oci" == true ]]; then
   version=$(grep -E "  version:.+" "${path}/Chart.yaml")
   versionnum=$(cut -d':' -f2 <<< "${version}" | sed -e 's/^[[:space:]]*//')
   chartname=$(basename "$path")
-  if ! helm chart pull "${registry}/${chartname}:${versionnum}" && [ "${upstream}" == true ]; then
+  if ! helm pull "${registry}/${chartname}:${versionnum}" && [ "${upstream}" == true ]; then
     echo "### Doing dep up for upstream for ${path} and ${versionnum} ###"
 
     if [ -f "${path}/Chart.yaml" ]; then
