@@ -1,0 +1,14 @@
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: {{ include "sealed-secrets.networkPolicy.apiVersion" . }}
+kind: NetworkPolicy
+metadata:
+  name: {{ include "sealed-secrets.fullname" . }}
+  namespace: {{ include "sealed-secrets.namespace" . }}
+  labels: {{- include "sealed-secrets.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels: {{- include "sealed-secrets.matchLabels" . | nindent 6 }}
+  ingress:
+    - ports:
+      - port: 8080
+{{- end }}

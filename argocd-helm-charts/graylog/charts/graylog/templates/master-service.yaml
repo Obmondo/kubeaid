@@ -1,0 +1,53 @@
+{{- if .Values.graylog.service.master.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+{{- if .Values.graylog.service.master.annotations }}
+  annotations:
+{{ toYaml .Values.graylog.service.master.annotations | indent 4 }}
+{{- end }}
+  name: {{ template "graylog.fullname" . }}-master
+  labels:
+{{ include "graylog.metadataLabels" . | indent 4 }}
+    graylog-role: "master"
+spec:
+  ports:
+    - name: graylog
+{{- if .Values.graylog.service.master.port }}
+      port: {{ default 9000 .Values.graylog.service.master.port }}
+{{- else }}
+      port: {{ default 9000 .Values.graylog.service.port }}
+{{- end }}
+      protocol: TCP
+      targetPort: 9000
+{{- if eq "NodePort" .Values.graylog.service.master.type }}
+  {{- if .Values.graylog.service.master.nodePort }}
+      nodePort:  {{ .Values.graylog.service.master.nodePort }}
+  {{- end }}
+{{- end }}
+{{- if .Values.graylog.service.master.externalIPs }}
+  externalIPs:
+{{ toYaml .Values.graylog.service.master.externalIPs | indent 4 }}
+{{- end }}
+{{- if eq "ClusterIP" .Values.graylog.service.master.type }}
+  {{- if .Values.graylog.service.master.clusterIP }}
+  clusterIP:  {{ .Values.graylog.service.master.clusterIP }}
+  {{- end }}
+{{- end }}
+  selector:
+    app.kubernetes.io/name: {{ template "graylog.name" . }}
+    app.kubernetes.io/instance: "{{ .Release.Name }}"
+    graylog-role: "master"
+  type: "{{ .Values.graylog.service.type }}"
+{{- if eq "LoadBalancer" .Values.graylog.service.master.type }}
+  {{- if .Values.graylog.service.master.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.graylog.service.master.loadBalancerIP }}
+  {{- end -}}
+  {{- if .Values.graylog.service.master.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+  {{- range .Values.graylog.service.master.loadBalancerSourceRanges }}
+  - {{ . }}
+  {{- end }}
+  {{- end -}}
+{{- end -}}
+{{- end -}}

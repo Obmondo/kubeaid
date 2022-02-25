@@ -1,0 +1,18 @@
+apiVersion: v2
+appVersion: 0.9.4
+description: A Helm chart for Cerebro - a web admin tool that replaces Kopf.
+home: https://github.com/lmenezes/cerebro
+icon: https://github.com/lmenezes/cerebro/blob/master/public/img/logo.png
+maintainers:
+- email: cdesaintmartin@wiremind.io
+  name: desaintmartin
+- email: amrini@wiremind.io
+  name: machine424
+- email: fminaud@wiremind.io
+  name: francoisminaud
+name: cerebro
+sources:
+- https://github.com/wiremind/wiremind-helm-charts/tree/main/charts/cerebro
+- https://github.com/lmenezes/cerebro-docker
+- https://github.com/lmenezes/cerebro
+version: 1.10.0

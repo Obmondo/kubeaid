@@ -1,0 +1,60 @@
+# Default values for circleci-runner.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+# You can extend a custom image from our runner and use
+# that repository instead. See:
+# https://circleci.com/docs/2.0/runner-installation/?section=executors-and-images#create-a-dockerfile-that-extends-the-circleci-runner-image
+image:
+  repository: circleci/runner
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "launch-agent"
+
+configSecret:
+  create: true
+  name: config-values
+
+# Refers to the resource class you created for your runner. See:
+# https://circleci.com/docs/2.0/runner-installation/?section=executors-and-images#authentication
+resourceClass: ""
+# Runner API token. See:
+# https://circleci.com/docs/2.0/runner-installation/
+runnerToken: ""
+
+# The agent version to use for CircleCI Enterprise installations
+agentVersion: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+env:
+  - name: "MY_VAR"
+    value: "the value of MY_VAR"

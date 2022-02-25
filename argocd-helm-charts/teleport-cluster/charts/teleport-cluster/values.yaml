@@ -47,8 +47,6 @@ enterprise: false
 podSecurityPolicy:
   enabled: true
 
-useExistingConfigMap: false
-
 # Labels is a map of key-value pairs about this cluster
 labels: {}
 

@@ -1,0 +1,21 @@
+apiVersion: v2
+appVersion: 2.4.0
+dependencies:
+- condition: metrics-server.enabled
+  name: metrics-server
+  repository: https://kubernetes-sigs.github.io/metrics-server/
+  version: 3.5.0
+description: General-purpose web UI for Kubernetes clusters
+home: https://github.com/kubernetes/dashboard
+icon: https://raw.githubusercontent.com/kubernetes/kubernetes/master/logo/logo.svg
+keywords:
+- kubernetes
+- dashboard
+kubeVersion: '>=1.19.0-0'
+maintainers:
+- email: cdesaintmartin@wiremind.fr
+  name: desaintmartin
+name: kubernetes-dashboard
+sources:
+- https://github.com/kubernetes/dashboard
+version: 5.0.5
