@@ -1,0 +1,178 @@
+################################################################
+# Values that must always be provided by the user.
+################################################################
+
+# Join token for the cluster.
+# Leave empty if the secret "teleport-kube-agent-join-token"
+# has been created before and contains a valid join token
+authToken: ""
+# Address of the teleport proxy with port (usually :3080).
+proxyAddr: ""
+# Comma-separated list of roles to enable (any of: kube,db,app)
+roles: "kube"
+
+################################################################
+# Values that must be provided if Kubernetes access is enabled.
+################################################################
+
+# Name for this kubernetes cluster to be used by teleport users.
+kubeClusterName: ""
+
+################################################################
+# Values that must be provided if Application access is enabled.
+################################################################
+
+# Details of at least one app to be proxied. Example:
+# apps:
+#  - name: grafana
+#    uri: http://localhost:3000
+apps: []
+
+################################################################
+# Values that must be provided if Database access is enabled.
+################################################################
+
+# Details of at least one database to be proxied. Example:
+# databases:
+#  - name: aurora
+#    uri: "postgres-aurora-instance-1.xxx.us-east-1.rds.amazonaws.com:5432"
+#    protocol: "postgres"
+databases: []
+
+################################################################
+# Values that you may need to change.
+################################################################
+
+# Version of teleport image, if different from appVersion in Chart.yaml.
+teleportVersionOverride: ""
+# When set to true, the agent will skip the verification of proxy TLS
+# certificate.
+insecureSkipProxyTLSVerify: false
+
+# If set, will use an existing volume mounted via extraVolumes
+# as the Teleport data directory.
+existingDataVolume: ""
+
+# If true, create & use Pod Security Policy resources
+# https://kubernetes.io/docs/concepts/policy/pod-security-policy/
+podSecurityPolicy:
+  enabled: true
+
+# Labels is a map of key values pairs about this cluster
+labels: {}
+
+################################################################
+# Values that must be provided if using persistent storage for Teleport state.
+#
+# Assigning a persistent volume to Teleport agent allows the agent to store its security association with the Teleport
+# cluster for re-use when the pod is restarted. Without a persistent storage for this state, every time Teleport agent
+# starts it must use the authToken to create a new registration with the cluster. By using the persistent volume the
+# authToken can be routinely rotated without breaking agents' ability to restart, as the token is only used on the first
+# startup. When persistent volumes are enabled, the agent will be deployed as a StatefulSet instead of a Deployment to
+# Kubernetes.
+#
+# Fields:
+#   enabled: Set to true to enable the use of StatefulSets and Persistent volumes.
+#   storageClassName: The name of the kubernetes storage class to use when creating volumes. See https://kubernetes.io/docs/concepts/storage/storage-classes/
+#   requests: The size of the volume to request from the persistent storage system
+################################################################
+storage:
+  enabled: false
+  storageClassName: ""
+  requests: 128Mi
+
+################################################################
+# Values that you shouldn't need to change.
+################################################################
+
+# Container image for the agent. Since this runs without the auth_service, we
+# don't need the enterprise version.
+image: quay.io/gravitational/teleport
+# Optional array of imagePullSecrets, to use when pulling from a private registry
+imagePullSecrets: []
+# - name: myRegistryKeySecretName
+# Number of replicas for the agent deployment.
+replicaCount: 1
+# (optional) Override the name of the ClusterRole used by the agent's service account.
+clusterRoleName: ""
+# (optional) Override the name of the ClusterRoleBinding used by the agent's service account.
+clusterRoleBindingName: ""
+# (optional) Override the name of the service account used by the agent.
+serviceAccountName: ""
+# Name of the Secret to store the teleport join token.
+secretName: teleport-kube-agent-join-token
+
+# Teleport logging configuration
+log:
+  # Log level for the Teleport process.
+  # Available log levels are: DEBUG, INFO, WARNING, ERROR.
+  # The default is INFO, which is recommended in production.
+  # DEBUG is useful during first-time setup or to see more detailed logs for debugging.
+  level: INFO
+  # Log output
+  # Use a file path to log to disk: e.g. '/var/lib/teleport/teleport.log'
+  # Other supported values: 'stdout', 'stderr' and 'syslog'
+  output: stderr
+  # Log format configuration
+  # Possible output values are 'json' and 'text' (default).
+  format: text
+  # Possible extra_fields values include: timestamp, component, caller, and level.
+  # All extra fields are included by default.
+  extraFields: ["timestamp", "level", "component", "caller"]
+
+##################################
+# Extra Kubernetes configuration #
+##################################
+
+# Affinity for pod assignment
+# https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}
+
+# nodeSelector to apply for pod assignment
+# https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+nodeSelector: {}
+
+# Kubernetes annotations to apply
+# https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+annotations:
+  # Annotations for the ConfigMap
+  config: {}
+  # Annotations for the Deployment
+  deployment: {}
+  # Annotations for each Pod in the Deployment
+  pod: {}
+  # Annotations for the ServiceAccount object
+  serviceAccount: {}
+
+# Extra volumes to mount into the Teleport pods
+# https://kubernetes.io/docs/concepts/storage/volumes/
+extraVolumes: []
+#- name: myvolume
+#  secret:
+#    secretName: testSecret
+
+# Extra volume mounts corresponding to the volumes mounted above
+extraVolumeMounts: []
+#- name: myvolume
+#  mountPath: /path/on/host
+
+# Allow the imagePullPolicy to be overridden
+imagePullPolicy: IfNotPresent
+
+# A list of initContainers to run before each Teleport pod starts
+# https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+initContainers: []
+#- name: "teleport-init"
+#  image: "alpine"
+#  args: ["echo test"]
+
+# Resources to request for each pod in the deployment
+# https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+resources: {}
+#  requests:
+#    cpu: "1"
+#    memory: "2Gi"
+
+# Tolerations for pod assignment
+# https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: []

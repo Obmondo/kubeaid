@@ -1,0 +1,8 @@
+apiVersion: v2
+name: postgres-operator
+version: 1.0.0
+dependencies:
+  - name: postgres-operator
+    version: 1.7.1
+    repository: https://opensource.zalando.com/postgres-operator/charts/postgres-operator/
+    #https://github.com/zalando/postgres-operator

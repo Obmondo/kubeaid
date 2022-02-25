@@ -1,0 +1,173 @@
+#!/usr/bin/env bash5
+
+SOURCE_REGION=eu-west-1
+DESTINATION_REGION=eu-west-3
+
+export AWS_PAGER=""
+
+if [[ $# != 2 ]]; then
+  echo 'You need to specify the <backup name> and <PVC name> parameters'
+  exit 1
+fi
+
+BACKUP=$1
+PVC=$2
+
+echo Restoring PVC \"$2\" from the \"$1\" backup
+
+SNAP=$(aws ec2 describe-snapshots --region ${DESTINATION_REGION} --filters Name="tag-key",Values="velero.io/schedule-name" | jq -re '.Snapshots[] | { tags: (.Tags | from_entries), SnapshotId: .SnapshotId } | select( .tags."velero.io/backup" == "'$1'" and .tags."kubernetes.io/created-for/pvc/name" == "'$2'") | .SnapshotId')
+
+echo Found it in replicated snapshot: $SNAP
+
+TAGS=$(aws ec2 describe-snapshots --region ${DESTINATION_REGION} --snapshot-ids ${SNAP} | jq -e '.Snapshots[].Tags + [ {Key:"RestoreTime",Value:"'$(/bin/date -u +%Y-%m-%dT%H:%M:%SZ)'"} ]')
+TAGS_LIST=$(echo ${TAGS} | sed 's!:!=!g;s!"Key"!Key!g;s!"Value"!Value!g')
+AZ=$(echo ${TAGS} | jq -re '. | from_entries | ."origin/AvailabilityZone"')
+NAMESPACE=$(echo ${TAGS} | jq -re '. | from_entries | ."kubernetes.io/created-for/pvc/namespace"')
+CLUSTER=$(echo ${TAGS} | jq -re '. | from_entries | .KubernetesCluster')
+PV=$(echo ${TAGS} | jq -re '. | from_entries | ."kubernetes.io/created-for/pv/name"')
+SIZE=$(aws ec2 describe-snapshots --region=${DESTINATION_REGION} --snapshot-ids ${SNAP} | jq -re '.Snapshots[].VolumeSize')
+
+#BOUND=$(kubectl get pvc ${PVC} -n ${NAMESPACE} -o json | jq -re '.status.phase')
+#if [ -z ${BOUND} ]; then
+#  echo The PVC \"${PVC}\" in the \"${NAMESPACE}\" namespace does not exist. Which means that we can proceed
+#elif [ ${BOUND} = 'Bound' ]; then
+#  echo The PVC \"${PVC}\" in the \"${NAMESPACE}\" namespace is bound, the pod using it needs to be stopped!!!
+#  exit 1
+#fi
+
+## Let's make sure that nothing will attach to the PVC shortly
+#echo Rechecking the PVC in 15 seconds
+#sleep 15
+#BOUND=$(kubectl get pvc ${PVC} -n ${NAMESPACE} -o json | jq -re '.status.phase')
+#if [ -z ${BOUND} ]; then
+#  echo The PVC \"${PVC}\" in the \"${NAMESPACE}\" namespace does not exist. Which means that we can proceed
+#elif [ ${BOUND} = 'Bound' ]; then
+#  echo The PVC \"${PVC}\" in the \"${NAMESPACE}\" namespace is bound, the pod using it needs to be stopped!!!
+#  exit 1
+#fi
+
+# Changing active cluster, is necessary
+if [ ${CLUSTER} != $(kubectx -c | tr -d '\n') ]; then
+  echo Switching to k8s cluster $CLUSTER
+  kubectx $CLUSTER
+fi
+
+if [[ ${AZ} =~ ^${SOURCE_REGION}[a-c]$ ]]; then
+  echo AZ is in region
+else
+  echo The AvailabilityZone is not in the region ${SOURCE_REGION}!!!!
+  exit 1
+fi
+
+RESTORE_SNAP=$(aws ec2 copy-snapshot --region ${SOURCE_REGION} --source-region ${DESTINATION_REGION} --source-snapshot-id ${SNAP} --tag-specifications "ResourceType=snapshot,Tags=${TAGS_LIST}" | jq -re '.SnapshotId')
+
+echo Restoring snapshot to ${SOURCE_REGION} region as snapshot ${RESTORE_SNAP}
+
+echo "Check command:  aws ec2 describe-snapshots --region ${SOURCE_REGION} --snapshot-ids ${RESTORE_SNAP}"
+STATE=started
+until [ ${STATE} = 'completed' ]; do
+  sleep 2
+  STATE=$(aws ec2 describe-snapshots --region ${SOURCE_REGION} --snapshot-ids ${RESTORE_SNAP} | jq -re '.Snapshots[].State')
+  echo The new snapshot is currently ${STATE}
+done
+
+VOLUME=$(aws ec2 create-volume --region ${SOURCE_REGION} --availability-zone ${AZ} --snapshot-id ${RESTORE_SNAP} --tag-specifications "ResourceType=volume,Tags=$TAGS_LIST" | jq -re '.VolumeId' )
+
+echo "Creating new volume (${VOLUME}) from snapshot"
+
+STATE=started
+until [ ${STATE} = 'available' ]; do
+  sleep 2
+  STATE=$(aws ec2 describe-volumes --region ${SOURCE_REGION} --volume-ids ${VOLUME} | jq -re '.Volumes[].State')
+  echo The state of the new volume is now ${STATE}
+done
+
+echo Now it is time to delete the ${SNAP} snapshot
+
+aws ec2 delete-snapshot --region ${SOURCE_REGION} --snapshot-id ${RESTORE_SNAP}
+
+echo "Creating PersistentVolume for ${VOLUME} in namespace $NAMESPACE on the $CLUSTER cluster"
+
+kubectl create -f - <<EOF
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    kubernetes.io/createdby: aws-ebs-dynamic-provisioner
+    pv.kubernetes.io/bound-by-controller: "yes"
+    pv.kubernetes.io/provisioned-by: kubernetes.io/aws-ebs
+  finalizers:
+  - kubernetes.io/pv-protection
+  labels:
+    failure-domain.beta.kubernetes.io/region: ${SOURCE_REGION}
+    failure-domain.beta.kubernetes.io/zone: ${AZ}
+  name: restored-${PV}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  awsElasticBlockStore:
+    fsType: ext4
+    volumeID: aws://${AZ}/${VOLUME}
+  capacity:
+    storage: ${SIZE}Gi
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: failure-domain.beta.kubernetes.io/zone
+          operator: In
+          values:
+          - ${AZ}
+        - key: failure-domain.beta.kubernetes.io/region
+          operator: In
+          values:
+          - ${SOURCE_REGION}
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: gp2
+  volumeMode: Filesystem
+EOF
+
+if kubectl get namespace ${NAMESPACE} >/dev/null 2>/dev/null; then
+  echo -n > pvc.yaml
+else
+  echo The namespace ${NAMESACE} does not exist, adding a namespace definition to the top of pvc.yaml
+  cat <<EOF >pvc.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${NAMESPACE}
+spec:
+  finalizers:
+  - kubernetes
+---
+EOF
+fi
+
+echo Writing PVC config to the pvc.yml file
+cat <<EOF >>pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    pv.kubernetes.io/bind-completed: "yes"
+    pv.kubernetes.io/bound-by-controller: "yes"
+    volume.beta.kubernetes.io/storage-provisioner: kubernetes.io/aws-ebs
+  finalizers:
+  - kubernetes.io/pvc-protection
+  labels:
+    app.kubernetes.io/instance: graylog
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: graylog
+  name: ${PVC}
+  namespace: ${NAMESPACE}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: ${SIZE}Gi
+  storageClassName: gp2
+  volumeMode: Filesystem
+  volumeName: restored-${PV}
+EOF
+

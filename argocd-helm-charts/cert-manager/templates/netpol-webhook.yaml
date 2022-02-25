@@ -1,0 +1,29 @@
+{{ if .Values.networkpolicies }}
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.webhook
+  namespace: cert-manager
+spec:
+  order: 100
+  selector:
+    app.kubernetes.io/name == 'webhook'
+  types:
+  - Egress
+  - Ingress
+  egress:
+  # Allow access to the apiserver
+  - action: Allow
+    protocol: TCP
+    destination:
+      selector: kubernetes.io/role == 'master'
+      namespaceSelector: global()
+      ports:
+      - 443
+  ingress:
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 10250
+{{ end }}

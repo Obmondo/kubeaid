@@ -1,0 +1,33 @@
+{{ if .Values.networkpolicies }}
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.cainjector
+  namespace: cert-manager
+spec:
+  order: 100
+  selector:
+    app.kubernetes.io/name == 'cainjector'
+  types:
+  - Ingress
+  - Egress
+  ingress:
+  # Going through the cert-manager-webhook service
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 10250
+    source:
+      nets:
+      - 100.64.0.0/10
+  egress:
+  # Allow access to the apiserver
+  - action: Allow
+    protocol: TCP
+    destination:
+      selector: kubernetes.io/role == 'master'
+      namespaceSelector: global()
+      ports:
+      - 443
+{{ end }}

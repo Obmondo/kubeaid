@@ -1,0 +1,13 @@
+# needs at least 1 adapter to pass a liveness check
+yetibot:
+  env:
+    YB_ADAPTERS_MYIRC_TYPE: irc
+    YB_ADAPTERS_MYIRC_USERNAME: yetihelm
+    YB_ADAPTERS_MYIRC_HOST: chat.freenode.net
+    YB_ADAPTERS_MYIRC_PORT: "7070"
+    YB_ADAPTERS_MYIRC_SSL: "true"
+
+
+postgresql:
+  persistence:
+    enabled: false

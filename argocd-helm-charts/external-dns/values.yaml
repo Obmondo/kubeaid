@@ -6,3 +6,4 @@ external-dns:
   txtPrefix: _owner.
   podAnnotations:
     cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+networkpolicies: false

@@ -1,0 +1,6 @@
+dependencies:
+- name: circleci-runner
+  repository: https://raw.githubusercontent.com/obmondo/circleci-runner-k8s/main/
+  version: 0.1.0
+digest: sha256:5e2f7c0d9cd49426b98f5c15d5c9c99aca407db1a2abe47843be169980e3d482
+generated: "2022-02-23T17:24:32.499672383+01:00"

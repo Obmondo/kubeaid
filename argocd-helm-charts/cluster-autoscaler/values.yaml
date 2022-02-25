@@ -8,3 +8,4 @@ cluster-autoscaler:
     scale-down-unneeded-time: 20s
     scale-down-utilization-threshold: 0.9
     expander: priority
+networkpolicies: false

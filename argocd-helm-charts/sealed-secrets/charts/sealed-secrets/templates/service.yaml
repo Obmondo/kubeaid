@@ -1,0 +1,23 @@
+{{- if .Values.createController -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "sealed-secrets.fullname" . }}
+  namespace: {{ include "sealed-secrets.namespace" . }}
+  labels: {{- include "sealed-secrets.labels" . | nindent 4 }}
+    {{- if .Values.service.labels }}
+    {{- include "sealed-secrets.render" ( dict "value" .Values.service.labels "context" $) | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: http
+      {{- if and (or (eq .Values.service.type "NodePort") (eq .Values.service.type "LoadBalancer")) (not (empty .Values.service.nodePort)) }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- else if eq .Values.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+  selector: {{- include "sealed-secrets.matchLabels" . | nindent 4 }}
+{{- end }}

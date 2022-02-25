@@ -1,0 +1,31 @@
+{{ if .Values.networkpolicies }}
+# This policy is needed to execute the job, that is triggered by a Argo-CD sync
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.velero-update
+  namespace: velero
+spec:
+  order: 100
+  selector:
+    job-name == 'velero-upgrade-crds'
+  types:
+  - Egress
+  egress:
+  # S3 endpoint
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 443
+      nets:
+      - 52.218.0.0/16 # AWS S3 is using several IP's in this range
+  # Allow access to the apiserver
+  - action: Allow
+    protocol: TCP
+    destination:
+      selector: kubernetes.io/role == 'master'
+      namespaceSelector: global()
+      ports:
+      - 443
+{{ end }}

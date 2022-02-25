@@ -1,0 +1,8 @@
+apiVersion: v2
+name: circleci-runner
+version: 1.0.0
+dependencies:
+  - name: circleci-runner
+    version: 0.1.0
+    repository: https://raw.githubusercontent.com/obmondo/circleci-runner-k8s/main/
+    #repository: "oci://ghcr.io/blackwoodseven"

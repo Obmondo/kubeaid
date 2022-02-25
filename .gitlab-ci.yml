@@ -47,15 +47,6 @@ check_diff:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "merge_request_event"'
 
-build:
-  stage: build
-  image: registry.obmondo.com/obmondo/dockerfiles/obmondo-build:latest
-  script:
-    - echo "$CI_COMMIT_REF_NAME"
-    - bash helm-chart-cache.sh -u Obmondo -p $PASSWORD -r ghcr.io/Obmondo
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "merge_request_event"'
-
 git:push:
   stage: deploy
   image:

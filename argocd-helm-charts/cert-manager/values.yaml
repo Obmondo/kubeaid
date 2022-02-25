@@ -6,3 +6,4 @@ cert-manager:
 
 issuer:
   production: false
+networkpolicies: false
