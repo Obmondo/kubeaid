@@ -1,0 +1,19 @@
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.sftp-cron
+  namespace: {{ .Values.namespace }}
+spec:
+  order: 100
+  selector:
+    app == 'sftp-cron'
+  types:
+  - Egress
+  egress:
+  - action: Allow
+    protocol: TCP
+    destination:
+      selector: application == 'spilo'
+      ports:
+      - 5432
+

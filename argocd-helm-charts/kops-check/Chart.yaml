@@ -1,0 +1,4 @@
+apiVersion: v2
+name: kops-check
+version: "0.1"
+dependencies:

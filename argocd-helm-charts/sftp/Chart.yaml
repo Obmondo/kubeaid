@@ -1,0 +1,7 @@
+apiVersion: v2
+name: sftp
+version: "0.1"
+dependencies:
+  - name: clamav
+    version: 2.2.0
+    repository: https://wiremind.github.io/wiremind-helm-charts

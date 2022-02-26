@@ -1,0 +1,41 @@
+apiVersion: v1
+data:
+  queue.sh: |
+    #! /usr/bin/env bash
+    set -euo pipefail
+
+    QUEUE=/home/.queue
+
+    echo queue.sh main loop starting
+    while IFS= read -r string; do
+      if [[ $string =~ ^/home/[a-zA-Z0-9/_-]+\.[cC][sS][vV]$ ]]; then
+        ARRAY=($(echo $string | perl -pe 's!/home/!!;s!^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_/-]+/)*?([a-zA-Z0-9_.-]+)$!$1 $2 $3!'))
+
+        GROUP=${ARRAY[0]}
+        DIR=$(echo ${ARRAY[1]} | perl -pe 's!/$!!;s!/!_!g' )
+        FILE=${ARRAY[2]}
+
+        #echo Full path: $string
+        #echo Group: $GROUP
+        #echo Dir: $DIR
+        #echo File: $FILE
+
+        DEST="$GROUP/"$(date +%Y%m%d%H%M%S)"_"$DIR"_$FILE"
+
+        echo Destination: $DEST
+
+        if [ ! -d "$QUEUE/$GROUP" ]; then
+          echo Creating directory $QUEUE/$GROUP
+          mkdir -p "$QUEUE/$GROUP"
+        fi
+
+        echo Linking file $string to queue at $QUEUE/$DEST
+        ln $string $QUEUE/$DEST
+      else
+        echo Ignoring input: $string
+      fi
+    done
+kind: ConfigMap
+metadata:
+  name: monitor
+  namespace: {{ .Values.namespace }}

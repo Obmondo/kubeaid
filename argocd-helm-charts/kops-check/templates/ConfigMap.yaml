@@ -1,0 +1,77 @@
+apiVersion: v1
+data:
+  script: |-
+    #!/usr/bin/bash
+    set -euo pipefail
+
+    BUCKET={{ .Values.kopsBucket }}
+    BACKUP_BUCKET={{ .Values.kopsCheckBucket }}
+    DATE=$(date +%Y%m%d%H%M)
+    declare -A CHANGED
+
+    if [ -d 'backup/' ]; then
+      echo Backup dir exists - deleting it!
+      rm -fr backup/
+    fi
+
+    mkdir /tmp/backup
+    aws s3 cp $BACKUP_BUCKET /tmp/backup/ --exclude "*" --include "*/checksum" --include "*/date" --recursive --quiet
+
+    for cluster in $(aws s3 ls s3://kops.blackwoodseven.com/ | grep PRE | awk '{print $2}' | tr -d '/'); do
+      echo Checking cluster $cluster
+      DIR='/tmp/backup/'$cluster'/'$DATE
+      echo Backup directory: $DIR
+      mkdir -p $DIR
+      aws s3 cp $BUCKET$cluster'/config' $DIR --quiet
+      aws s3 cp $BUCKET$cluster'/instancegroup' $DIR --quiet --recursive
+  
+      HASH=$(find $DIR -type f | sort | xargs cat | sha256sum)
+      CHECKFILE='/tmp/backup/'$cluster'/checksum'
+      if [[ -f $CHECKFILE && "$HASH" == "$(cat $CHECKFILE)" ]]; then
+        echo There are no changes since the last backup, deleting new backup dir
+        rm -fr $DIR
+      else
+        echo There are config changes on the $cluster cluster
+
+        # Do we have a previous config version to compare against?
+        if [ -f '/tmp/backup/'$cluster'/date' ]; then
+          LAST=$(cat '/tmp/backup/'$cluster'/date')
+          aws s3 cp $BACKUP_BUCKET$cluster'/'$LAST /tmp/backup/$cluster'/'$LAST'/' --recursive --quiet
+          CHANGED["$cluster"]=$LAST
+        fi
+        echo -n "$HASH" > $CHECKFILE
+        echo -n "$DATE" > '/tmp/backup/'$cluster'/date'
+      fi
+    done
+
+    aws s3 sync /tmp/backup/ $BACKUP_BUCKET
+
+    if [ -z ${!CHANGED[@]} ]; then
+      echo No changes found in kops config
+    else
+      SLACK='{ "blocks": [ '
+      for C in ${!CHANGED[@]}; do
+        echo Changes found in cluster ${C}
+        # cd to the directory, to make the paths in the diff output simpler
+        cd /tmp/backup/${C}
+        # Remove the 'generation: 1234' lines, to make the diff output more readable
+        find . -mindepth 2 -type f | xargs -n 1 perl -pe 's/ +generation: \d+\n//' -i
+        DIFF=$(diff -Nru ${CHANGED[${C}]} $DATE || true)
+
+        SLACK+='{ "type": "header", "text": { "type": "plain_text", "text": "Changes in kOps configuration for cluster '${C}' detected:" } },'
+        SLACK+='{ "type": "section", "text": { "type": "mrkdwn", "text": "'
+        SLACK+=$(echo "$DIFF" | perl -pe 's/^/>/g;s/"/\\"/g;s/\n/\\n/g')
+        SLACK+='" } },'
+      done
+      DATA=$(echo -n "$SLACK" | perl -pe 's/,$//';echo ']}')
+      echo Announcing changes to slack
+      curl -X POST -H 'Content-type: application/json' --data "$DATA" $WEBHOOK_URL
+    fi
+  config: |-
+    [profile default]
+    credential_source = Ec2InstanceMetadata
+    region = eu-west-1
+kind: ConfigMap
+metadata:
+  name: kops-check
+  namespace: {{ .Values.namespace }}

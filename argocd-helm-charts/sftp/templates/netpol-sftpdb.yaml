@@ -1,0 +1,94 @@
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.sftpdb
+  namespace: {{ .Values.namespace }}
+spec:
+  order: 100
+  selector:
+    application == 'spilo'
+  types:
+  - Ingress
+  - Egress
+  ingress:
+  - action: Allow
+    protocol: TCP
+    source:
+      selector: app == 'proftpd'
+    destination:
+      ports:
+      - 5432 # PostgreSQL
+  - action: Allow
+    protocol: TCP
+    source:
+      selector: app == 'sftp-cron'
+    destination:
+      ports:
+      - 5432 # PostgreSQL
+  - action: Allow
+    protocol: TCP
+    source:
+      selector: application == 'spilo'
+    destination:
+      ports:
+      - 5432 # PostgreSQL
+      - 8080 # REST API
+  - action: Allow
+    protocol: TCP
+    source:
+      selector: app.kubernetes.io/name == 'postgres-operator'
+      namespaceSelector: projectcalico.org/name == 'postgres-operator'
+    destination:
+      ports:
+      - 5432 # PostgreSQL
+      - 8008 # Patroni
+  # Checks from the AWS load balancer endpoints
+  - action: Allow
+    protocol: TCP
+    source:
+      nets:
+      - {{ .Values.ip_network | quote }}
+    destination:
+      ports:
+      - 5432 # PostgreSQL
+  - action: Allow
+    protocol: TCP
+    source:
+      selector: kubernetes.io/role in { 'master', 'node' }
+      namespaceSelector: global()
+    destination:
+      ports:
+      - 5432
+  egress:
+  # Allow access to the apiserver
+  - action: Allow
+    protocol: TCP
+    destination:
+      selector: kubernetes.io/role == 'master'
+      namespaceSelector: global()
+      ports:
+      - 443
+  - action: Allow
+    protocol: TCP
+    destination:
+      selector: application == 'spilo'
+      ports:
+      - 5432 # PostgreSQL
+      - 8080 # REST API
+  # Connect to kube2iam
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 8181
+      selector: kubernetes.io/role in { 'node', 'master' }
+      namespaceSelector: global()
+  # S3 endpoint
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 443
+      nets:
+      - 52.0.0.0/8 # AWS S3 is using several IP's in this range
+      - 54.0.0.0/8 # AWS S3 is using several IP's in this range

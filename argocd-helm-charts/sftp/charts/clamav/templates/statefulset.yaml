@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "clamav.fullname" . }}
+  labels:
+    {{- include "clamav.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  serviceName: {{ include "clamav.fullname" . }}
+  selector:
+    matchLabels:
+      {{- include "clamav.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "clamav.selectorLabels" . | nindent 8 }}
+        {{- if .Values.podLabels }}
+        {{ toYaml .Values.podLabels | indent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+          {{- if .Values.freshclamConfig }}
+          - name: freshclam-config-volume
+            mountPath: /etc/clamav/freshclam.conf
+            subPath: freshclam.conf
+          {{- end }}
+          {{- if .Values.clamdConfig }}
+          - name: clamd-config-volume
+            mountPath: /etc/clamav/clamd.conf
+            subPath: clamd.conf
+          {{- end }}
+          {{- if .Values.extraVolumeMounts }}
+          {{- toYaml .Values.extraVolumeMounts | nindent 10 }}
+          {{- end }}
+          - name: clamav-data
+            mountPath: /data
+          ports:
+            - name: clamavport
+              containerPort: 3310
+              protocol: TCP
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            tcpSocket:
+              port: clamavport
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            tcpSocket:
+              port: clamavport
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{ toYaml . | indent 8 }}
+      {{- end }}
+      volumes:
+        {{- if .Values.freshclamConfig }}
+        - name: freshclam-config-volume
+          configMap:
+            name: {{ include "clamav.fullname" . }}-freshclam
+        {{- end }}
+        {{- if .Values.clamdConfig }}
+        - name: clamd-config-volume
+          configMap:
+            name: {{ include "clamav.fullname" . }}-clamd
+        {{- end }}
+        {{- if .Values.extraVolumes }}
+        {{- toYaml .Values.extraVolumes | nindent 8 }}
+        {{- end }}
+  {{- if not .Values.persistentVolume.enabled }}
+        - name: clamav-data
+          emptyDir: {}
+  {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: clamav-data
+        labels:
+          {{- include "clamav.labels" . | nindent 10 }}
+        {{- if .Values.persistentVolume.annotations }}
+        annotations:
+          {{- .Values.persistentVolume.annotations | toYaml | nindent 10 }}
+        {{- end }}
+      spec:
+        accessModes:
+        {{- range .Values.persistentVolume.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        {{- if .Values.persistentVolume.storageClass }}
+        {{- if (eq "-" .Values.persistentVolume.storageClass) }}
+        storageClassName: ""
+        {{- else }}
+        storageClassName: "{{ .Values.persistentVolume.storageClass }}"
+        {{- end }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.persistentVolume.size | quote }}
+  {{- end }}

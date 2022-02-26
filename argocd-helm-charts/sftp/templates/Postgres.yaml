@@ -1,0 +1,25 @@
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: {{ .Values.pgsql.host }}
+  namespace: {{ .Values.namespace }}
+spec:
+  teamId: {{ .Values.team | quote }}
+  volume:
+    size: 2Gi
+  numberOfInstances: 2
+  users:
+    owner:  # database owner
+    - superuser
+    proftpd:
+    - login
+    sftp-cron:
+    - login
+    neo:
+    - login
+  databases:
+    proftpd: owner  # dbname: owner
+  postgresql:
+    version: "12"
+  enableMasterLoadBalancer: false
+

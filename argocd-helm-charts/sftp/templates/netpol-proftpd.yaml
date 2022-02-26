@@ -1,0 +1,31 @@
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.proftpd
+  namespace: {{ .Values.namespace }}
+spec:
+  order: 100
+  selector:
+    app == 'proftpd'
+  types:
+  - Ingress
+  - Egress
+  ingress:
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 2222
+  egress:
+  - action: Allow
+    protocol: TCP
+    destination:
+      selector: application == 'spilo'
+      ports:
+      - 5432
+  - action: Allow
+    protocol: TCP
+    destination:
+      selector: app.kubernetes.io/name == 'clamav'
+      ports:
+      - 3310 # ClamAV

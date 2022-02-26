@@ -1,0 +1,149 @@
+apiVersion: v1
+data:
+  script: |-
+    #! /usr/bin/perl
+    use strict;
+    use warnings;
+    use DBI;
+    use Data::Dumper;
+
+    my $database = '{{ .Values.pgsql.database_name }}';
+    my $host     = '{{ .Values.pgsql.host }}';
+
+    my $dbh = DBI->connect("dbi:Pg:dbname=$database;host=$host", '{{ .Values.cron.database_user }}', $ENV{POSTGRES_PASSWORD}, {PrintError => 1, RaiseError => 1}) or die "failed to connect to PostgreSQL database DBI->errstr()";
+    print "Connected to the database\n";
+
+    my $update = $dbh->prepare('UPDATE "group" SET update_done=? WHERE gid=?;');
+
+    foreach my $row (@{$dbh->selectall_arrayref('SELECT gid, groupname, update_num FROM "group" WHERE update_num > update_done AND enabled IS TRUE;')}) {
+      my ($gid, $groupname, $update_num) = @$row;
+      print "Updating: $groupname($gid)\n";
+
+      my %dirs;
+      my %superdirs;
+      foreach my $dir (@{$dbh->selectcol_arrayref("SELECT directory FROM directory WHERE gid = $gid;")}) {
+        if ( $dir =~ m!^(.+)/! ) {
+          $superdirs{$1}=undef;
+        }
+        $dirs{$dir}={};
+      }
+
+      my %users;
+      foreach my $limit (@{$dbh->selectall_arrayref("SELECT login, directory FROM \"limit\" WHERE gid = $gid;")}) {
+        my ($login, $dir) = @$limit;
+        $users{$login}=undef;
+        $dirs{$dir}->{$login}=undef;
+      }
+
+      if (-d "/home/$groupname") {
+        print "The directory /home/$groupname already eists\n";
+      } else {
+        print "Creating directory /home/$groupname\n";
+        mkdir "/home/$groupname" or die "Could not create /home/$groupname: $!\n";
+      }
+
+      print "Adjusting permissions and ownership of /home/$groupname\n";
+      chmod 0750, "/home/$groupname" or die "Could not chmod /home/$groupname: $!\n";
+      chown 0, $gid, "/home/$groupname" or die "Could not chown /home/$groupname: $!\n";
+
+      for my $dir (keys %superdirs) {
+        my $path = "/home/$groupname/$dir";
+        if (-d $path) {
+          print "The superdirectory $path already exists\n";
+        } else {
+          print "Creating superdirectory $path\n";
+          mkdir $path or die "Could not create directory $path: $!\n";
+        }
+
+        print "Adjusting permissions and ownership of superdir $path\n";
+        chmod 0750, $path or die "Could not chmod $path: $!\n";
+        chown 0, $gid, $path or die "Could not chown $path: $!\n";
+
+        if ( -f "$path/.ftpaccess" ) {
+          unlink "$path/.ftpaccess" or die "Could not unlink $path/.ftpaccess: $!";
+          print "Unlinked left over $path/.ftpaccess\n";
+        }
+      }
+
+      my %all;
+      for my $dir (keys %dirs) {
+        my $path = "/home/$groupname/$dir";
+        $all{$dir}=undef;
+        if (-d $path) {
+          print "The directory $path already exists\n";
+        } else {
+          print "Creating directory $path\n";
+          mkdir $path or die "Could not create directory $path: $!\n";
+        }
+
+        print "Adjusting permissions and ownership of $path\n";
+        chmod 0770, $path or die "Could not chmod $path: $!\n";
+        chown 0, $gid, $path or die "Could not chown $path: $!\n";
+
+        if (-f "$path/.ftpaccess.tmp") {
+          print "Unlinking left over file: $path/.ftpaccess.tmp\n";
+          unlink "$path/.ftpaccess.tmp" or die "Could not unlink $path/.ftpaccess.tmp: $!\n"
+        }
+        my $count=0;
+        open(my $fh, '>',  "$path/.ftpaccess.tmp") or die "Could not create file $path/.ftpaccess.tmp: $!\n";
+        print $fh "<Limit ALL>\n";
+        foreach my $user (sort keys %users) {
+          unless (exists $dirs{$dir}->{$user}) {
+            print $fh "  DenyUser $user\n";
+            $count++;
+          }
+        }
+        print $fh "</Limit>\n";
+        close $fh;
+        print "Replacing $path/.ftpaccess\n";
+        rename "$path/.ftpaccess.tmp", "$path/.ftpaccess" or die "Could not rename $path/.ftpaccess: $!\n";
+      }
+      print "Marking the update of GID $gid as done\n";
+      $update->execute($update_num, $gid);
+
+      my @to_disable;
+      print "Scanning directories\n";
+      opendir my $dirhandle, "/home/$groupname" or die "Could not opendir '/home/$groupname': $!\n";
+      while ( my $entry = readdir $dirhandle ) {
+        next if $entry =~ /^\.{1,2}$/;
+        next unless -d "/home/$groupname/$entry";
+
+        my $found=0;
+        my $active=0;
+        opendir my $subhandle, "/home/$groupname/$entry" or die "Could not opendir '/home/$groupname/$entry': $!\n";
+        while ( my $subentry = readdir $subhandle ) {
+          next if $subentry =~ /^\.{1,2}$/;
+          next unless -d "/home/$groupname/$entry/$subentry";
+          if ( exists $all{"$entry/$subentry"} ) {
+            $active++;
+          }
+          $found++;
+          unless ( exists $all{"$entry/$subentry"} ) {
+            push @to_disable, "$entry/$subentry";
+            print "Added $entry/$subentry to to_disable. (A)\n";
+          }
+        }
+        closedir $subhandle;
+        unless ( exists $all{$entry} or $active ) {
+          push @to_disable, $entry;
+          print "Added $entry to to_disable. Active: $active Found: $found (B)\n";
+        }
+      }
+
+      for my $dir ( @to_disable ) {
+        print "Disabling old directory /home/$groupname/$dir\n";
+        open(my $fh, '>',  "/home/$groupname/$dir/.ftpaccess.tmp") or die "Could not create file /home/$groupname/$dir/.ftpaccess.tmp: $!\n";
+        print $fh "<Limit ALL>\n";
+        print $fh "  DenyAll\n";
+        print $fh "</Limit>\n";
+        close $fh;
+        rename "/home/$groupname/$dir/.ftpaccess.tmp", "/home/$groupname/$dir/.ftpaccess" or die "Could not rename to /home/$groupname/$dir/.ftpaccess: $!\n";
+      }
+    }
+    $dbh->disconnect();
+    print "Script finished\n";
+kind: ConfigMap
+metadata:
+  name: sftp-cron
+  namespace: {{ .Values.namespace }}
+

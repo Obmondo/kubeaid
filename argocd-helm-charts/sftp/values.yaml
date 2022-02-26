@@ -1,0 +1,32 @@
+namespace: sftp
+team: sre
+dns_name: "needs.to.be.changed"
+pgsql:
+  host: "sre-sftpdb"
+  database_name: "proftpd"
+  dns_name: "needs.to.be.changed"
+schedule: "*/5 * * * *"
+nfs:
+  server: "nfs server fqdn missing"
+proftpd:
+  password_secret: "proftpd.sre-sftpdb.credentials.postgresql.acid.zalan.do"
+  password_key: "password"
+  database_user: "proftpd"
+  image: "438423213058.dkr.ecr.eu-west-1.amazonaws.com/k8s/proftpd-image:20220128131047"
+cron:
+  password_secret: "sftp-cron.sre-sftpdb.credentials.postgresql.acid.zalan.do"
+  password_key: "password"
+  database_user: "sftp-cron"
+  image: "438423213058.dkr.ecr.eu-west-1.amazonaws.com/k8s/scripting-image:20211115160304"
+clamav:
+  resources:
+    requests:
+      cpu: 250m
+      memory: 1.5Gi
+    limits:
+      cpu: 1250m
+      memory: 3Gi
+  hpa:
+    enabled: false
+monitor:
+  image: 438423213058.dkr.ecr.eu-west-1.amazonaws.com/k8s/scripting-image:20211209164250
