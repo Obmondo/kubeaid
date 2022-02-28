@@ -53,8 +53,8 @@ git:push:
     name: registry.obmondo.com/obmondo/dockerfiles/kubernetes-build:1644571507
   script:
     - ./bin/deploy.sh ./.deploy_config
+    - echo "$CI_COMMIT_REF_NAME"
+    # - bash helm-chart-cache.sh -u Obmondo -p $PASSWORD -r ghcr.io/Obmondo
   only:
     refs:
-      - master
-    variables:
-      - $KUBERNETES_CONFIG_REPO_TOKEN && $KUBERNETES_CONFIG_REPO_URL
+      - 'merge_requests'
