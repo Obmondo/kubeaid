@@ -1,0 +1,33 @@
+aws-ebs-csi-driver:
+  enableVolumeScheduling: true
+  enableVolumeResizing: true
+  enableVolumeSnapshot: true
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  tolerateAllTaints: true
+
+  node:
+    tolerateAllTaints: true
+
+  storageClasses:
+  - name: gp3
+    volumeBindingMode: Immediate
+    reclaimPolicy: Delete
+    allowVolumeExpansion: true
+    parameters:
+      type: gp3
+      encrypted: "true"
+  - name: standard
+    volumeBindingMode: Immediate
+    reclaimPolicy: Delete
+    allowVolumeExpansion: true
+    parameters:
+      type: standard
+      encrypted: "true"

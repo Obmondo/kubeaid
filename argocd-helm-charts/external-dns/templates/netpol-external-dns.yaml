@@ -1,0 +1,39 @@
+{{ if .Values.networkpolicies }}
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.external-dns
+  namespace: {{ .Release.Namespace }}
+spec:
+  order: 100
+  selector:
+    app.kubernetes.io/name == 'external-dns'
+  types:
+  - Egress
+  egress:
+  # Route 53 API endpoint
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 443
+      nets:
+      - 52.0.0.0/8 # AWS S3 is using several IP's in this range
+      - 54.0.0.0/8 # AWS S3 is using several IP's in this range
+  # Allow access to the apiserver
+  - action: Allow
+    protocol: TCP
+    destination:
+      selector: kubernetes.io/role == 'master'
+      namespaceSelector: global()
+      ports:
+      - 443
+  # Connect to kube2iam
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 8181
+      selector: kubernetes.io/role in { 'node', 'master' }
+      namespaceSelector: global()
+{{ end }}

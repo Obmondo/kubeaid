@@ -1,0 +1,103 @@
+apiVersion: v1
+data:
+  script: |-
+    #!/usr/bin/bash
+
+    VELERO_BUCKET={{ .Values.velero.bucket }}
+    SCHEDULE={{ .Values.velero.schedule }}
+
+    SOURCE_REGION={{ .Values.aws.region }}
+    DESTINATION_REGION={{ .Values.aws.backupRegion }}
+    DELETE_DAYS={{ .Values.deleteDays }}
+    REPLICATE_MAX=$(expr $DELETE_DAYS \* 80 \/ 100) # Only go through backups that are less then 80% of delete days old
+
+    TMPFILE=$(mktemp)
+    echo Temporary file $TMPFILE
+
+    # Which snapshots are already copied to the destination region
+    declare -A EXISTING
+    # JQ pseudocode
+    #   Get all snapshot tags | convert normal object notation | Extract the origin/SnapshotId tag, which containe the SnapshotId from the source region
+    for snap in $(aws ec2 describe-snapshots --region ${DESTINATION_REGION} --filters Name="tag-key",Values="velero.io/schedule-name" | jq -re '.Snapshots[].Tags | from_entries | ."origin/SnapshotId"'); do
+      echo Found snapshot replica of: $snap
+      EXISTING[${snap}]=""
+    done
+
+    for file in $(aws s3api list-objects --bucket {{ .Values.velero.bucket }} | jq -re '.Contents[].Key' | grep -E "^backups/$SCHEDULE-[0-9]+/$SCHEDULE-[0-9]+-volumesnapshots.json.gz$"); do
+      BACKUP=$(echo $file | cut -d '/' -f 2)
+      TIMESTAMP=$(echo $BACKUP | sed -e 's!^.*-\([0-9]\+\)!\1!')
+      AGE=$(dateutils.ddiff $TIMESTAMP now -i '%Y%m%d%H%M%S' -f '%d')
+      if [[ $AGE -gt $REPLICATE_MAX ]]; then
+        echo "Not checking backup $BACKUP - it is too old"
+      else
+        echo Checking backup $BACKUP
+        aws s3api get-object --bucket {{ .Values.velero.bucket }} --key $file $TMPFILE > /dev/null
+        # Loop through all the snapshot ID, listed in the Velero JSON file
+        for snap in $(gzip -cd $TMPFILE | jq -re '.[].status.providerSnapshotID'); do
+          if [ ${EXISTING[${snap}]+_} ]; then
+            echo The snapshot ${snap} is already at ${DESTINATION_REGION}
+          else
+            echo Copying snapshot $snap to ${DESTINATION_REGION}
+
+            # Get the snapshot data, and check if the snapshot actually exists
+            DATA=$(aws ec2 describe-snapshots --region ${SOURCE_REGION} --snapshot-ids ${snap} 2>/dev/null)
+            if [[ -z $DATA ]]; then
+              echo The snapshot ${snap} does not exist!!!!!
+            else
+              # Extract the tags from the snapshot, with OwnerId, VolumeId and StartTime keys added as 'origin/<key name>' entries
+              # JQ pseudocode
+              #   Extract list of snapshot ojects | filter out any snapshots that are not completed | Take all tags on the source snapshot + add the OwnerId, SnapshutId, VolumeId, StartTime from the AWS S3 date, adding them to the tag object, using "Origin/<field name>" keys
+              TAGS1=$(echo $DATA | jq -ce '.Snapshots[] | select( .State == "completed") | .Tags + [{Key:"origin/OwnerId",Value:.OwnerId},{Key:"origin/SnapshotId",Value:.SnapshotId},{Key:"origin/VolumeId",Value:.VolumeId},{Key:"origin/StartTime",Value:.StartTime}]')
+
+              VOLUME=$(echo $TAGS1 | jq -re '. | from_entries | ."origin/VolumeId"')
+              NAMESPACE=$(echo $TAGS1 | jq -re '. | from_entries | ."kubernetes.io/created-for/pvc/namespace"')
+              PVC=$(echo $TAGS1 | jq -re '. | from_entries | ."kubernetes.io/created-for/pvc/name"')
+
+              # Extract the AvailabilityZone and VolumeType, preparing to add them to the tag values
+              TAGS2=$(aws ec2 describe-volumes --region ${SOURCE_REGION} --volume-ids $VOLUME 2>/dev/null | jq -e '.Volumes[] | [ {Key:"origin/AvailabilityZone",Value:."AvailabilityZone"}, {Key:"origin/VolumeType",Value:."VolumeType"},{Key:"origin/Iops",Value:.Iops} ]')
+
+              if [ -z "${TAGS2}" ]; then
+                echo "The volume does no longer exist !!!!!"
+                TAGS2='[ {"Key":"origin/AvailabilityZone","Value":"Unknown"}, {"Key":"origin/VolumeType","Value":"gp2"} ]'
+              fi
+
+              # Join the 2 sets of tags
+              # JQ pseudocode
+              #   Send the first list of tags > STDIN, add the 2nd list to the tags2 variable. Add the data from STDIN to the parsed tags2 variable
+              # Then use a few regex'es, to convert from JSON format, to the list format used by the AWS CLI command 
+              TAGS=$(echo $TAGS1 | jq --arg tags2 "$TAGS2" -e '. + ($tags2 | fromjson) | from_entries | to_entries' | sed 's!:!=!g;s!"Key"!Key!gi;s!"Value"!Value!gi')
+
+              # See if the PVC has been annotated, to tell us not to copy it's snapshots
+              DISABLE=$(kubectl get pvc -n ${NAMESPACE} ${PVC} -o json 2>/dev/null | jq -re '.metadata.annotations."copy-snapshot-disable"' | tr '[:upper:]' '[:lower:]')
+
+              if [[ ! -z ${DISABLED} && ${DISABLED} == 'true' ]]; then
+                echo Will not replicate ${snap}, since it was disabled by the annotation on PVC ${PVC}
+              else
+                AWS_DEFAULT_REGION=${DESTINATION_REGION} aws ec2 copy-snapshot\
+                  --source-region ${SOURCE_REGION}\
+                  --source-snapshot-id ${snap}\
+                  --tag-specifications "ResourceType=snapshot,Tags=$TAGS"\
+                  --query "SnapshotId"
+              fi
+            fi
+          fi
+        done
+      fi
+    done
+
+    # Identify the snapshots that are over DELETE_DAYS days old
+    # JQ pseudocode
+    #   Extract list of snapshot objects | Store the destination snapshot id, and calculate the age of the snapshot, by extracting the current unix time, from the "origin/StartTime" converted to unix time. | removing all snapshots that are yunger then ${DELETE_DAYS} | returning the destination snapshots id's.
+    #   StartTime timestamp looks like this: "2021-04-09T00=00=50.785000+00=00", and JQ's date parsing is quite simple, so the string needs to be converted before it can handle it. First capture eveything matching /^[0-9T=-]+/, convert the '=' to ':' and add a 'Z'. And then the JQ's fromdate function can parse it.
+    for snap in $(aws ec2 describe-snapshots --region ${DESTINATION_REGION} --filters Name="tag-key",Values="velero.io/schedule-name" | jq -re '.Snapshots[] | {LocalSnapshotId:."SnapshotId", age: ('$(date +%s)'-(.Tags | from_entries | ."origin/StartTime" | capture("^(?<date>[0-9T=-]+)") | .date | gsub("="; ":")+"Z" | fromdate)) } | select(.age >= 86400*'${DELETE_DAYS}') | .LocalSnapshotId'); do
+      echo It is time to delete the snapshot ${snap}
+      AWS_DEFAULT_REGION=${DESTINATION_REGION} aws ec2 delete-snapshot --snapshot-id ${snap}
+    done
+  config: |-
+    [profile default]
+    credential_source = Ec2InstanceMetadata
+    region = eu-west-1
+kind: ConfigMap
+metadata:
+  name: copy-snapshot
+  namespace: {{ .Values.namespace }}

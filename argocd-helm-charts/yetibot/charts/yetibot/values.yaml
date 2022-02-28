@@ -1,0 +1,125 @@
+# Default values for yetibot.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+replicaCount: 1
+
+image:
+  repository: yetibot/yetibot
+  pullPolicy: Always
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+deployment:
+  # Annotations to add to the deployment
+  annotations: {}
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  name: yetibot
+  type: LoadBalancer
+  port: 80
+  annotations: {}
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Configure extra manifests to be deployed, such as secrets
+extraManifests: []
+
+# Manage `yetibot` secret (set to false if you populate this secret some other way (like using sealed-secrets, vault etc.)
+manageSecrets: true
+
+# Yetibot config
+
+# Use env vars to populate any of Yetibot's configuration options.
+#
+# See all options at:
+# https://github.com/yetibot/yetibot.core/blob/master/config/sample.env
+#
+# Note: the sample config uses `YETIBOT_` prefix where in this chart we use the
+# `YB_` prefix (we explain why below).
+
+yetibot:
+  env:
+    # By default Yetibot picks up all YB_ and YETIBOT_ env vars. This is
+    # overridable by setting `YETIBOT_ENV_PREFIX`.
+    #
+    # In the context of running on Kuberenetes, we must ensure Yetibot ignores
+    # all `YETIBOT_` env vars, since by convention Kubernetes will expose a
+    # bunch of them inside the pod, unrelated to Yetibot's own config. If we
+    # don't override the env prefix, Yetibot will throw exceptions at runtime
+    # and the pod will CrashLoop.
+    YETIBOT_ENV_PREFIX: yb
+    YB_DB_URL: "jdbc:postgresql://yetibot:yetibot@yetibot-postgresql:5432/yetibot"
+    # You must set this to the URL that you expose Yetibot on in order for the
+    # dashboard to work
+    # This default enables you to do: kubectl port-forward -n yetibot svc/yetibot 3003:3003
+    # and then you can view dashboard in your local browser on http://localhost:3003
+    YB_URL: "http://localhost:3003"
+    # Only log to stdout
+    YB_LOG_ROLLING_ENABLED: true
+
+# postgresql sub chart config:
+postgresql:
+  persistence:
+    # you may need to set a storageClass if you don't have a default storage
+    # class:
+    # storageClass: fast
+    size: 16Gi
+  postgresqlDatabase: yetibot
+  postgresqlPassword: yetibot
+  postgresqlUsername: yetibot
+  resources:
+    limits:
+      memory: 500Mi
+      cpu: 1000m

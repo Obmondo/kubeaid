@@ -1,0 +1,4 @@
+networkpolicies: false
+k8s-event-logger:
+  env:
+    KUBERNETES_API_URL: https://kubernetes.default.svc

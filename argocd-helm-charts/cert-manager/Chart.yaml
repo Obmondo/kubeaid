@@ -1,7 +1,7 @@
 apiVersion: v2
 name: cert-manager
-version: 1.0.0
-# see latest chart here: https://artifacthub.io/packages/helm/wener/cert-manager
+version: 1.6.1
+# see latest chart here: https://artifacthub.io/packages/search?org=cert-manager
 dependencies:
   - name: cert-manager
     version: v1.6.1

@@ -1,0 +1,54 @@
+{{- if .Values.graylog.ingress.enabled -}}
+{{- $extraPaths := .Values.graylog.ingress.extraPaths -}}
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/IngressClass" }}
+apiVersion: networking.k8s.io/v1
+{{- else }}
+apiVersion: networking.k8s.io/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  annotations:
+  {{- range $key, $value := .Values.graylog.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+  labels:
+{{ include "graylog.metadataLabels" . | indent 4 }}
+    app.kubernetes.io/component: "web"
+{{- if .Values.graylog.ingress.labels }}
+{{ toYaml .Values.graylog.ingress.labels | indent 4 }}
+{{- end }}
+  name: {{ template "graylog.fullname" . }}-web
+spec:
+  {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/IngressClass" }}
+  ingressClassName: {{ .Values.graylog.ingress.ingressClassName }}
+  {{- end }}
+  rules:
+  {{- range .Values.graylog.ingress.hosts }}
+    - host: {{ . }}
+      http:
+        paths:
+          {{ if $extraPaths }}
+{{ toYaml $extraPaths | indent 10 }}
+          {{- end }}
+          {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/IngressClass" }}
+          - backend:
+              service:
+                name: {{ template "graylog.fullname" $ }}-web
+                port:
+                  name: graylog
+            path: {{ default "/" $.Values.graylog.ingress.path }}
+            pathType: {{ default "Prefix" $.Values.graylog.ingress.pathType }}
+          {{- else }}
+          - backend:
+              serviceName: {{ template "graylog.fullname" $ }}-web
+              servicePort: graylog
+            {{- if $.Values.graylog.ingress.path }}
+            path: {{ $.Values.graylog.ingress.path }}
+            {{- end -}}
+          {{- end -}}
+  {{- end -}}
+  {{- if .Values.graylog.ingress.tls }}
+  tls:
+{{ toYaml .Values.graylog.ingress.tls | indent 4 }}
+  {{- end -}}
+{{- end -}}

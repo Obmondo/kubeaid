@@ -1,0 +1,7 @@
+apiVersion: v2
+name: filebeat
+version: 1.0.0
+dependencies:
+  - name: filebeat
+    version: 7.15.0
+    repository: https://helm.elastic.co

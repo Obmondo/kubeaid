@@ -1,0 +1,4 @@
+apiVersion: v2
+name: copy-snapshot
+version: "0.1"
+dependencies:
