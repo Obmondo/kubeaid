@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "kube-iptables-tailer.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "kube-iptables-tailer.name" . }}
+    helm.sh/chart: {{ include "kube-iptables-tailer.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  {{- with .Values.updateStrategy }}
+  updateStrategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "kube-iptables-tailer.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "kube-iptables-tailer.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+{{- with .Values.podAnnotations }}
+      annotations:
+{{ toYaml . | indent 10 }}
+{{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ template "kube-iptables-tailer.serviceAccountName" . }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+      {{- end }}
+{{- if .Values.image.pullSecrets }}
+      imagePullSecrets:
+{{ toYaml .Values.image.pullSecrets | indent 8 }}
+{{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - "/kube-iptables-tailer"
+            {{- with .Values.extraArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+          {{- if .Values.iptablesLogPath }}
+            - name: "IPTABLES_LOG_PATH"
+              value: "{{ .Values.iptablesLogPath }}"
+          {{- end }}
+          {{- if .Values.journalDirectory }}
+            - name: "JOURNAL_DIRECTORY"
+              value: "{{ .Values.journalDirectory }}"
+          {{- end }}
+            - name: "IPTABLES_LOG_PREFIX"
+              # log prefix defined in your iptables chains
+              value: "{{ .Values.iptablesLogPrefix }}"
+            - name: "KUBE_API_SERVER"
+              value: "{{ .Values.kubeApiServicer }}"
+          {{- if .Values.packetDropLogTimeLayout }}
+            - name: "PACKET_DROP_LOG_TIME_LAYOUT"
+              value: "{{ .Values.packetDropLogTimeLayout }}"
+          {{- else }}
+          {{- if .Values.syslogSidecar.enabled }}
+            - name: "PACKET_DROP_LOG_TIME_LAYOUT"
+              value: "2006-01-02T15:04:05Z07:00"
+          {{- end }}
+          {{- end }}
+          {{- if .Values.logTimeRegex }}
+            - name: "LOG_TIME_REGEX"
+              value: '{{ .Values.logTimeRegex }}'
+          {{- end }}
+          volumeMounts:
+            - name: "iptables-logs"
+              mountPath: "/var/log"
+              readOnly: true
+            {{- if .Values.extraVolumeMounts }}
+            {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        {{- if .Values.syslogSidecar.enabled }}
+        - name: syslog
+          image: {{ .Values.syslogSidecar.image }}:{{ .Values.syslogSidecar.tag }}
+          env:
+            - name: RSYSLOG_CONF
+              value: /rsyslog-conf/rsyslog.conf
+          securityContext:
+            capabilities:
+              add: ["SYSLOG"]
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: rsyslog-conf
+              mountPath: /rsyslog-conf
+            - name: "iptables-logs"
+              mountPath: /logs
+            - name: work
+              mountPath: /work
+            {{- if .Values.extraVolumeMounts }}
+            {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
+            {{- end }}
+        {{- end }}
+      volumes:
+        {{- if not .Values.syslogSidecar.enabled }}
+        - name: "iptables-logs"
+          hostPath:
+            # absolute path of the directory containing iptables log file on your host
+            path: "/var/log"
+        {{- else }}
+        - name: rsyslog-conf
+          configMap:
+            name: {{ include "kube-iptables-tailer.fullname" . }}
+        - name: config
+          emptyDir: {}
+        - name: iptables-logs
+          emptyDir: {}
+        - name: work
+          emptyDir: {}
+        {{- end }}
+        {{- if .Values.extraVolumes }}
+        {{- toYaml .Values.extraVolumes | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
