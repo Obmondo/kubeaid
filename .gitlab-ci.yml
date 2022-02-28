@@ -46,4 +46,4 @@ build:
       - 'merge_requests'
   script:
     - echo "$CI_COMMIT_REF_NAME"
-    - bash helm-chart-cache.sh -u Obmondo -p $PASSWORD -r ghcr.io/Obmondo
+    # - bash helm-chart-cache.sh -u Obmondo -p $PASSWORD -r ghcr.io/Obmondo
