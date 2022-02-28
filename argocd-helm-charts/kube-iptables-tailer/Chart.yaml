@@ -1,8 +1,18 @@
 apiVersion: v1
+appVersion: v0.1.0
+description: A Helm chart for Kubernetes
+home: https://github.com/honestica/lifen-charts
+keywords:
+- kube-iptables-tailer
+- iptables
+- calico
+- networkpolicy
+maintainers:
+- email: matthieu.paret@lifen.fr
+  name: mtparet
+- email: dali@lifen.fr
+  name: dadicool
 name: kube-iptables-tailer
-version: 0.2.2
-
-dependencies:
-  - name: kube-iptables-tailer
-    version: 0.1.0
-    repository: http://honestica.github.io/lifen-charts/
+sources:
+- https://github.com/box/kube-iptables-tailer
+version: 0.1.0

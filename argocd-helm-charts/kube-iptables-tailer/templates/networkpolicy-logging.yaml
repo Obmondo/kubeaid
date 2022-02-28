@@ -1,5 +1,5 @@
-{{- if .Values.calico.loggingEnable -}}
-apiVersion: {{ .Values.calico.apiVersion }}
+{{- if .Values.kubeIptablesTailer.loggingEnable -}}
+apiVersion: {{ .Values.kubeIptablesTailer.apiVersion }}
 kind: GlobalNetworkPolicy
 metadata:
   name: {{ include "kube-iptables-tailer.fullname" . }}-logging
