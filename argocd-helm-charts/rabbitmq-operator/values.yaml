@@ -1,0 +1,2 @@
+rabbitmq-cluster-operator:
+  useCertManager: "true"

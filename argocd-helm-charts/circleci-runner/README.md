@@ -16,10 +16,10 @@ Obmondo fork.
 
 # circleci setup
 
-# circleci namespace create ci-feature-branch-deployment github blackwoodseven
+# circleci namespace create ci-feature-branch-deployment github <customer_name>
 You are creating a namespace called "ci-feature-branch-deployment".
 
-This is the only namespace permitted for your github organization, blackwoodseven.
+This is the only namespace permitted for your github organization, <customer_name>.
 
 To change the namespace, you will have to contact CircleCI customer support.
 

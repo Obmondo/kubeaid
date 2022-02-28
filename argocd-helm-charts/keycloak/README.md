@@ -69,14 +69,14 @@ Details about setup if you are interested:
   * Click `Set Password`
 
 * Create a new realm
-  * Skip this if the `BlackwoodSeven` realm already exists
+  * Skip this if the `<customer_name>` realm already exists
   * Move the pointer to the `Master  ∨` in the top left corner, and click `Add realm`
-  * Name: `BlackwoodSeven`  - without any " " character
+  * Name: `<customer_name>`  - without any " " character
 
 ## Setup Keycloak with Google as it's identity provider
 
 * Log into the keycloak server, using your personal admin account
-* Switch to the `BlackwoodSeven` realm
+* Switch to the `<customer_name>` realm
 * Follow this description:
   * https://access.redhat.com/documentation/en-us/red_hat_single_sign-on/7.3/html/server_administration_guide/identity_broker#google
     * There is a backup of the documentation [here](static/GoogleSetup.pdf).
@@ -95,7 +95,7 @@ Details about setup if you are interested:
 ## Setup the Kubernetes client
 
 * Log into the keycloak server using your personal admin user
-* Go to the `BlackwoodSeven` realm
+* Go to the `<customer_name>` realm
 * Go to clients and click on `Create`.
 * Provide the `Client ID` as `kubernetes`, leave `Client Protocol ` as
   `openid-connect`, `Root URL` as blank, and click on save.
@@ -108,22 +108,22 @@ Details about setup if you are interested:
 
 ## Make logins easier for the user
 
-Since we only allow users to login to the BlackwoodSeven using Google oauth, we can make the login flow faster, by setting it as default:
+Since we only allow users to login to the <customer_name> using Google oauth, we can make the login flow faster, by setting it as default:
 
 * Log into the keycloak server using your personal admin user
-* Go to the `BlackwoodSeven` realm
+* Go to the `<customer_name>` realm
 * Configure -> Authentication -> Flows -> Browser -> Identity Provider Redirector -> Actions -> Config
   * Alias: `google`
   * Default Identity Provider: `google`
 
 ## Add normal users to the Keycloak setup
 
-* Have the user access https://keycloak.ops.bw7.io/auth/realms/BlackwoodSeven/account/
+* Have the user access https://keycloak.ops.bw7.io/auth/realms/<customer_name>/account/
   * Click `Personal Info` link
   * The user is now done, and the basic user account has been created
 * Add the user to the group, that that describe their access needs
   * Log into the keycloak server using your personal admin user
-  * Go to the `BlackwoodSeven` realm
+  * Go to the `<customer_name>` realm
   * Manage -> Users -> View all users
   * Clik `edit`, on the row describing the user
   * Groups -> Available groups
@@ -137,13 +137,13 @@ Since we only allow users to login to the BlackwoodSeven using Google oauth, we 
   * Execute: ```terraform refresh```
   * Execute: ```terraform show -json | jq -e '.values.root_module.child_modules[].resources[] | select(.name=="keycloak-smtp") | select(.type=="aws_iam_access_key")|{cluster:.index,smtp_user:.values.id,smtp_pass:.values.ses_smtp_password_v4}'```
 * Log into the keycloak server using your personal admin user
-* Go to the `BlackwoodSeven` realm
+* Go to the `<customer_name>` realm
 * Configure -> "Realm Settings" -> Email
   * Host: `email-smtp.eu-west-1.amazonaws.com`
   * Port: `587`
-  * From Display Name: `Blackwood Seven Keycloak`
-  * From: `info@blackwoodseven.com`
-  * Envelope From: `info@blackwoodseven.com`
+  * From Display Name: `<Customer Name> Keycloak`
+  * From: `info@<customer_name>.com`
+  * Envelope From: `info@<customer_name>.com`
   * Enable StartTLS: `On`
   * Enable Authentication: `On`
   * Username: &lt;*Extracted from Terraform state*&gt;

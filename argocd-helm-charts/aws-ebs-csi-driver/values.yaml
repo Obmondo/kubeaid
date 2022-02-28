@@ -31,8 +31,3 @@ aws-ebs-csi-driver:
     parameters:
       type: standard
       encrypted: "true"
-
-#  k8sTagClusterId: "k8s.ops.blackwoodseven.com"
-#  region: "eu-west-1"
-#  podAnnotations:
-#    iam.amazonaws.com/role: "arn:aws:iam::438423213058:role/aws-ebs-csi-ops"
