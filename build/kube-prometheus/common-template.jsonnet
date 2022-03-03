@@ -1,4 +1,5 @@
 // -*- flycheck-jsonnet-external-code-files: ("vars=clusters/kam.obmondo.com-vars.jsonnet"); -*-
+
 local utils = import 'utils.libsonnet';
 
 local ext_vars = std.extVar('vars');
@@ -16,6 +17,17 @@ local default_vars = {
     limits: { memory: '1Gi' },
     requests: { cpu: '200m', memory: '400Mi' },
   },
+  node_exporter_resources: {
+    limits: { cpu: '500m', memory: '180Mi' },
+    requests: { cpu: '102m', memory: '180Mi' },
+  },
+
+
+  kube_state_metrics_resources: {
+    limits: { cpu: '80m', memory: '40Mi' },
+    requests: { cpu: '20m', memory: '20Mi' },
+  },
+
   grafana_keycloak_enable: false,
 };
 
@@ -40,6 +52,12 @@ local kp =
   } +
   {
     values+:: {
+      // This is ONLY supported in release-0.11+ and main
+      kubeStateMetrics+: {
+        kubeRbacProxyMain+: {
+          resources+: vars.kube_state_metrics_resources,
+        },
+      },
       common+: {
         namespace: 'monitoring',
       },
@@ -48,6 +66,9 @@ local kp =
       },
       prometheusOperator+: {
         resources: vars.prometheus_operator_resources,
+      },
+      nodeExporter+: {
+        resources: vars.node_exporter_resources,
       },
     },
   } + (
