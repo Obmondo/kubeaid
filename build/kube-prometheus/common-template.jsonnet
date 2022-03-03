@@ -10,11 +10,11 @@ local default_vars = {
   },
   alertmanager_resources: {
     limits: { cpu: '100m', memory: '50Mi' },
-    requests: { cpu: '10m', memory: '20Mi' },
+    requests: { cpu: '20m', memory: '30Mi' },
   },
   prometheus_resources: {
     limits: { memory: '1Gi' },
-    requests: { cpu: '100m', memory: '200Mi' },
+    requests: { cpu: '200m', memory: '400Mi' },
   },
   grafana_keycloak_enable: false,
 };
