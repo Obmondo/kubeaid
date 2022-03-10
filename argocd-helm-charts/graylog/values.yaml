@@ -1,35 +1,53 @@
-networkpolicies: false
+# leaving mongodb without resource definitions per recommendation in mongodb values - it uses so little so it should be okay for it to run on "available resources"
 graylog:
   graylog:
+    resources:
+      limits:
+        # NO memory or CPU limit - this peaks >4GB memory usage and CPU is based on processing needs. Memory usage really should be fixed - no upstream bug reported though.
+      requests:
+        cpu: "100m"
+        memory: "1500Mi"
     podAnnotations:
       cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
-    # replicas: 1
+    #replicas: 1
     persistence:
       size: "50Gi"
-      # storageClass: "gp2"
+      #storageClass: "gp2"
     plugins: []
-    # - name: graylog-plugin-slack-notification-4.0.1.jar
+    #- name: graylog-plugin-slack-notification-4.0.1.jar
     #  url: https://github.com/KongZ/graylog-plugin-slack-notification/releases/download/v4.0.1/graylog-plugin-slack-notification-4.0.1.jar
-    # - name: graylog-plugin-function-check-diff-1.0.1.jar
+    #- name: graylog-plugin-function-check-diff-1.0.1.jar
     #  url: https://github.com/KongZ/graylog-plugin-function-check-diff/releases/download/v1.0.1/graylog-plugin-function-check-diff-1.0.1.jar
     # - name: graylog-plugin-google-cloud-pubsub-1.0.4.jar
     #   url: https://github.com/KongZ/graylog-plugin-google-cloud-pubsub/releases/download/v1.0.4/graylog-plugin-google-cloud-pubsub-1.0.4.jar
-    # - name: graylog-plugin-auth-sso-3.3.0.jar
+    #- name: graylog-plugin-auth-sso-3.3.0.jar
     #  url: https://github.com/Graylog2/graylog-plugin-auth-sso/releases/download/3.3.0/graylog-plugin-auth-sso-3.3.0.jar
-    # externalUri: address-used-in-browser
-    #
-    # ingress:
-    #   enabled: true
-    #   annotations:
-    #     cert-manager.io/cluster-issuer: letsencrypt
-    #   hosts:
-    #   - graylog.ops.bw7.io
-    #   tls:
-    #   - secretName: argocd-helm-chart-tls
-    #     hosts:
-    #     - graylog.ops.bw7.io
-    # metrics:
-    #   enabled: true
+    #externalUri: address-used-in-browser
+#    ingress:
+#      enabled: true
+#      annotations:
+#        cert-manager.io/cluster-issuer: letsencrypt
+#        traefik.ingress.kubernetes.io/router.middlewares: traefik-traefik-forward-auth@kubernetescrd
+#      hosts:
+#      - graylog.ops.bw7.io
+#      tls:
+#      - secretName: argocd-helm-chart-tls
+#        hosts:
+#        - graylog.ops.bw7.io
+#    metrics:
+#      enabled: true
+#    input:
+#      tcp:
+#        service:
+#          type: LoadBalancer
+#          annotations:
+#            service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+#            service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
+#            service.beta.kubernetes.io/aws-load-balancer-type: nlb
+#            external-dns.alpha.kubernetes.io/internal-hostname: graylog-gelf.<cluster-domain>.
+#        ports:
+#        - name: gelf
+#          port: 12222
     journal:
       ## Sometime Graylog journal continually grow up or corrupt and cause Graylog unable to start.
       ## You need to clean up all journal files in order to run the Graylog.
@@ -50,3 +68,6 @@ graylog:
 #       xpackEnable: false
 #  mongodb:
 #    replicaCount: 1
+    options:
+      allowHighlighting: true
+      allowLeadingWildcardSearches: true
