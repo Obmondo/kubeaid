@@ -22,10 +22,14 @@ local default_vars = {
     requests: { cpu: '102m', memory: '180Mi' },
   },
 
-
-  kube_state_metrics_resources: {
-    limits: { cpu: '80m', memory: '40Mi' },
+  kube_state_metrics_kubeRbacProxyMain_resources: {
+    limits: { cpu: '320m', memory: '40Mi' },
     requests: { cpu: '20m', memory: '20Mi' },
+  },
+
+  kube_state_metrics_kubeRbacProxySelf_resources: {
+    limits: { cpu: '80m', memory: '40Mi' },
+    requests: { cpu: '10m', memory: '20Mi' },
   },
 
   grafana_keycloak_enable: false,
@@ -55,9 +59,13 @@ local kp =
       // This is ONLY supported in release-0.11+ and main
       kubeStateMetrics+: {
         kubeRbacProxyMain+: {
-          resources+: vars.kube_state_metrics_resources,
+          resources+: vars.kube_state_metrics_kubeRbacProxyMain_resources,
+        },
+        kubeRbacProxySelf+: {
+          resources+: vars.kube_state_metrics_kubeRbacProxySelf_resources,
         },
       },
+
       common+: {
         namespace: 'monitoring',
       },
