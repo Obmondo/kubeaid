@@ -122,6 +122,10 @@ spec:
             - {{ . }}
           {{- end }}
           {{- end }}
+          {{- if .Values.containerEnv }}
+          env:
+            {{- toYaml .Values.containerEnv | nindent 12 }}
+          {{- end }}
           ports:
           {{- range $key, $value := .Values.containerPorts }}
             - name: {{ $key }}
