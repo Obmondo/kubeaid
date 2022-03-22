@@ -6,20 +6,20 @@ metadata:
   namespace: {{ .Values.runner.nameSpace.name }}
 rules:
 - apiGroups:
-  - ""
-  - extensions
-  - apps
+    - ""
+    - extensions
+    - apps
   resources:
-  - '*'
+    - '*'
   verbs:
-  - '*'
+    - '*'
 - apiGroups:
-  - batch
+    - batch
   resources:
-  - jobs
-  - cronjobs
+    - jobs
+    - cronjobs
   verbs:
-  - '*'
+    - '*'
 - apiGroups:
     - networking.k8s.io
   resources:
@@ -32,4 +32,10 @@ rules:
     - delete
     - update
     - patch
+- apiGroups:
+    - acid.zalan.do
+  resources:
+    - postgresqls
+  verbs:
+    - '*'
 {{- end -}}
