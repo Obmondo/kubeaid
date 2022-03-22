@@ -1,8 +1,9 @@
+{{ if .Values.networkpolicies }}
 apiVersion: crd.projectcalico.org/v1
 kind: NetworkPolicy
 metadata:
   name: default.opensearch
-#  namespace: {{ .Values.namespace }}
+  # namespace: {{ .Values.namespace }}
   namespace: graylog
 spec:
   order: 100
@@ -31,3 +32,4 @@ spec:
       - 9300
     source:
       selector: app.kubernetes.io/name == 'opensearch'
+{{ end }}
