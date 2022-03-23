@@ -1,0 +1,10 @@
+name: haproxy
+apiVersion: v2
+version: 1.12.0
+description: Haproxy running in kubernetes
+keywords:
+  - haproxy
+dependencies:
+  - name: haproxy
+    version: 1.12.0
+    repository: https://haproxytech.github.io/helm-charts

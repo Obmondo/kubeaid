@@ -4,7 +4,7 @@ set -x
 set -euo pipefail
 
 # Don't run for merge requests that target a branch that is not master/main.
-if ! [[ "${CI_COMMIT_REF_NAME}" == master ]] || [[ "${I_MERGE_REQUEST_SOURCE_BRANCH_NAME}" == main ]]; then
+if [[ "${CI_COMMIT_REF_NAME}" != master ]] && [[ "${CI_COMMIT_REF_NAME}" != main ]]; then
   exit
 fi
 
