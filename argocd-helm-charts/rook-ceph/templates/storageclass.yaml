@@ -73,5 +73,4 @@ parameters:
 # to restart your application pods. Therefore, this option is not recommended.
 #mounter: rbd-nbd
 allowVolumeExpansion: true
-expandInUsePersistentVolumes: true
 reclaimPolicy: Delete
