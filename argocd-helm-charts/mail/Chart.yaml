@@ -6,4 +6,4 @@ dependencies:
   - name: mail
     version: 3.4.0
     # no known repository
-    # repository: 
+    # repository:
