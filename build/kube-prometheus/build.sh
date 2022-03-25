@@ -85,42 +85,47 @@ if (( _version < 18000 )); then
 fi
 
 # Make sure to use project tooling
-OUTDIR="${cluster_dir}/kube-prometheus"
+outdir="${cluster_dir}/kube-prometheus"
 
 # Make sure to start with a clean 'manifests' dir
-rm -rf "${OUTDIR:?}/"
-mkdir -p "${OUTDIR}/setup"
+rm -rf "${outdir:?}/"
+mkdir -p "${outdir}/setup"
 
 # Calling gojsontoyaml is optional, but we would like to generate yaml, not json
 #jsonnet -J vendor -m manifests "${1-example.jsonnet}" | xargs -I{} sh -c 'cat {} | gojsontoyaml > {}.yaml' -- {}
 
-RELEASE=$(jsonnet "${cluster_jsonnet}" | jq -r .kube_prometheus_version)
-JSONNET_LIB_PATH="build/kube-prometheus/libraries/${RELEASE}/vendor"
-if ! [ -e "${JSONNET_LIB_PATH}" ]; then
-  if [[ -d "build/kube-prometheus/libraries/${RELEASE}" ]]; then
+kube_prometheus_release=$(jsonnet "${cluster_jsonnet}" | jq -r .kube_prometheus_version)
+if [[ -z "${kube_prometheus_release}" ]]; then
+  echo "Unable to parse kube-prometheus version, please verify '${cluster_jsonnet}'"
+  exit 3
+fi
+
+jsonnet_lib_path="build/kube-prometheus/libraries/${kube_prometheus_release}/vendor"
+if ! [ -e "${jsonnet_lib_path}" ]; then
+  if [[ -d "build/kube-prometheus/libraries/${kube_prometheus_release}" ]]; then
     echo 'Release dir exists; exiting'
     exit 73
   fi
 
-  echo "INFO: '${JSONNET_LIB_PATH}' doesn't exist; executing jsonnet-bundler"
+  echo "INFO: '${jsonnet_lib_path}' doesn't exist; executing jsonnet-bundler"
   jb init
-  jb install "github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@${RELEASE}"
-  mkdir "build/kube-prometheus/libraries/${RELEASE}"
-  mv vendor "build/kube-prometheus/libraries/${RELEASE}/"
-  mv jsonnetfile.json jsonnetfile.lock.json "build/kube-prometheus/libraries/${RELEASE}/"
+  jb install "github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@${kube_prometheus_release}"
+  mkdir "build/kube-prometheus/libraries/${kube_prometheus_release}"
+  mv vendor "build/kube-prometheus/libraries/${kube_prometheus_release}/"
+  mv jsonnetfile.json jsonnetfile.lock.json "build/kube-prometheus/libraries/${kube_prometheus_release}/"
 fi
 
-echo "INFO: compiling jsonnet files into '${OUTDIR}'"
+echo "INFO: compiling jsonnet files into '${outdir}'"
 
 # remove previous output to avoid leftover files
-rm -f "${OUTDIR}/*"
-mkdir -p "${OUTDIR}"
+rm -f "${outdir}/*"
+mkdir -p "${outdir}"
 
 # shellcheck disable=SC2016
 jsonnet -J \
-        "${JSONNET_LIB_PATH}" \
+        "${jsonnet_lib_path}" \
         --ext-code-file vars="${cluster_jsonnet}" \
-        -m "${OUTDIR}" \
+        -m "${outdir}" \
         "${basedir}/common-template.jsonnet" |
   while read -r f; do
     gojsontoyaml < "${f}" > "${f}.yaml"
@@ -132,5 +137,5 @@ if (( apply )); then
   if [[ "$dry_run" ]]; then
     kubectl_args+=("--dry-run=${dry_run}")
   fi
-  kubectl apply "${kubectl_args[@]}" -f "${OUTDIR}"
+  kubectl apply "${kubectl_args[@]}" -f "${outdir}"
 fi
