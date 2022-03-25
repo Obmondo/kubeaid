@@ -65,8 +65,13 @@ spec:
               value: relate;{{ .Values.ingress.hostname }};{{ range .Values.ingress.extraHosts }}{{ .name }};{{ end }}
           {{- end }}
           volumeMounts:
-            - mountPath: /tmp
-              name: tmp
+            - mountPath: /var/www/relate/git-roots
+              name: data
       volumes:
-        - name: tmp
-          emptyDir: {}
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ template "relate.fullname" . }}{{- end }}
+          {{- else }}
+          emptyDir: {{- toYaml .Values.emptyDir | nindent 10 }}
+          {{- end  }}

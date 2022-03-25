@@ -35,6 +35,15 @@ resources:
   limits: {}
   requests: {}
 
+persistence:
+    enabled: true
+    accessMode: ReadWriteOnce
+    size: 100Mi
+    storageClass:
+
+# default settings for emptydir volume
+emptyDir: {}
+
 ## Environment variables - db user+pass loaded from secret
 environment:
   - name: SMTPHOST
