@@ -1,0 +1,30 @@
+apiVersion: v2
+name: mail
+description: An outgoing SMTP mail relay for your applications in Kubernetes cluster
+icon: https://bokysan.github.io/docker-postfix/postfix.png
+home: https://github.com/bokysan/docker-postfix
+sources:
+  - https://github.com/bokysan/docker-postfix
+maintainers:
+  - name: Bokysan
+    url: https://github.com/bokysan
+
+# A chart can be either an 'application' or a 'library' chart.
+#
+# Application charts are a collection of templates that can be packaged into versioned archives
+# to be deployed.
+#
+# Library charts provide useful utilities or functions for the chart developer. They're included as
+# a dependency of application charts to inject those utilities and functions into the rendering
+# pipeline. Library charts do not define any templates and therefore cannot be deployed.
+type: application
+
+# This is the chart version.
+# The version will be automatically set by the build script in .github/workflows/tags.yml when a
+# new version of the app is released.
+version: v1.0.0
+
+# This is the version number of the application being deployed.
+# The version will be automatically set by the build script in .github/workflows/tags.yml when a
+# new version of the app is released.
+appVersion: v1.0.0
