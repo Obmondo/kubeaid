@@ -37,6 +37,10 @@ resources:
 
 ## Environment variables - db user+pass loaded from secret
 environment:
+  - name: SMTPHOST
+    value: 'mail.system'
+  - name: SMTPPORT
+    value: '587'
   - name: DBHOST
     value: 'obmondo-postgresql'
   - name: DBUSER
