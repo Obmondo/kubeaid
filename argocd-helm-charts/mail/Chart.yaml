@@ -1,0 +1,9 @@
+apiVersion: v2
+name: mail
+version: 3.4.0
+# source: https://github.com/bokysan/docker-postfix/blob/master/helm/mail
+dependencies:
+  - name: mail
+    version: 3.4.0
+    # no known repository
+    # repository: 

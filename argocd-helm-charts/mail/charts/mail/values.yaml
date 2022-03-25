@@ -1,0 +1,179 @@
+replicaCount: 1
+
+image:
+  repository: boky/postfix
+  # tag: "" # If not specified uses chart's AppVersion as the tag
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true # Specifies whether a service account should be created
+  annotations: {} # Annotations to add to the service account
+  name: "" # The name of the service account to use. If not set and create is true, a name is generated using the fullname template
+
+service:
+  type: ClusterIP
+  port: 587
+  labels: {}
+  annotations: {}
+  # nodePort:
+
+# Tell helm to restart (recreate) pods on every deploy. Setting this to true will inject
+# `date/deploy-date: <timestamp>` annotation into pod specification for StateFulset. This
+# ensures that the Pod is recreated with the new changes.
+#
+# Feel free to disable this but doing so **IS IT YOUR OWN RISK**. By disabling this feature
+# you might run into issues where some changes are not reflected on the Pod. If you experience
+# this with this setting set to `false` the first thing to try out is to restart / delete
+# a pod and let `StatefulSet` recreate it.
+recreateOnRedeploy: true
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+  labels: {}
+  annotations: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+extraVolumes: []
+extraVolumeMounts: []
+extraInitContainers: []
+extraEnv: []
+extraContainers: []
+
+deployment:
+  labels: {}
+  annotations: {}
+
+pod:
+  securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+  labels: {}
+  annotations: {}
+
+container:
+  postfix:
+    securityContext: {}
+
+# Auto-generate certificates for the server and mount them into Postfix volume
+certs:
+  create: false
+
+# Define data which should be stored in a Secret
+# (and shared with the pod as environment variables)
+# secret:
+#   hello: world
+secret: {}
+
+# Use an existing secret to share with the pod
+# as environment variables.
+existingSecret: ""
+
+# Define a secret which should be deployed together with the
+# chart amd mounted into a specific directory in the pod.
+mountSecret:
+  enabled: false
+  path: /var/lib/secret
+  data: {}
+    # e.g.
+    # dkim-private: |
+    #   -----BEGIN RSA PRIVATE KEY-----
+    #   < redacted >
+    #   -----END RSA PRIVATE KEY-----
+
+config:
+  general: {}
+    # e.g.
+    # TZ:
+    # FORCE_COLOR:
+    # INBOUND_DEBUGGING:
+    # ALLOWED_SENDER_DOMAINS:
+    # ALLOW_EMPTY_SENDER_DOMAINS:
+    # LOG_FORMAT:
+    # RELAYHOST:
+    # SASL_RELAYHOST: # when specified overwrites the RELAYHOST in the sasl_passwd file
+    # RELAYHOST_USERNAME:
+    # RELAYHOST_PASSWORD:
+    # MASQUERADED_DOMAINS:
+    # SMTP_HEADER_CHECKS:
+    # DKIM_SELECTOR:
+    # DKIM_AUTOGENERATE:
+  postfix: {}
+    # e.g.
+    # myhostname: "postfix"
+    # smtp_tls_security_level: "encrypt"
+  opendkim: {}
+    # e.g.
+    # RequireSafeKeys: "yes"
+
+persistence:
+  enabled: true
+  accessModes:
+    - ReadWriteOnce
+  existingClaim: ""
+  size: 1Gi
+  storageClass: ""
+
+readinessProbe:
+  initialDelaySeconds: 10
+  periodSeconds: 60
+  failureThreshold: 6
+  exec:
+    command:
+      - sh
+      - -c
+      - >-
+        [ ! -f /tmp/container_is_terminating ] &&
+        printf "EHLO healthcheck\n" | nc 127.0.0.1 587 | grep -qE "^220.*ESMTP Postfix"
+livenessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  failureThreshold: 2
+  exec:
+    command:
+      - sh
+      - -c
+      - >-
+        ps axf | fgrep -v grep | egrep -q '\{supervisord\}|/usr/bin/supervisord' &&
+        ps axf | fgrep -v grep | egrep -q '(/usr/lib/postfix/sbin/|/usr/libexec/postfix/)master'
+
+startupProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  failureThreshold: 12
+  exec:
+    command:
+      - sh
+      - -c
+      - >-
+        ps axf | fgrep -v grep | egrep -q '\{supervisord\}|/usr/bin/supervisord' &&
+        ps axf | fgrep -v grep | fgrep -q "postfix-script" &&
+        ps axf | fgrep -v grep | fgrep -q 'opendkim.sh'
+
+lifecycle:
+  postStart: {}
