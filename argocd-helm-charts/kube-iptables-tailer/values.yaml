@@ -1,0 +1,2 @@
+kube-iptables-tailer:
+  journalDirectory: "/var/log/journal"
