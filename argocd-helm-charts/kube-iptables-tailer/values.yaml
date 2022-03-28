@@ -1,2 +1,3 @@
 kube-iptables-tailer:
+  iptablesLogPrefix: 'CALICO-PACKETS: '
   journalDirectory: "/var/log/journal"
