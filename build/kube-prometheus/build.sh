@@ -6,6 +6,8 @@
 # a clustername-var.jsonnet file) to generate the prometheus manifests for that
 # cluster. The manifests will be put in the cluster folder in a kube-prometheus
 # subdir.
+# And it must be run from the root of the argocd-apps repo. Example:
+# ./build/kube-prometheus/build.sh ../kubernetes-config-enableit/k8s/kam.obmondo.com
 
 set -euo pipefail
 
