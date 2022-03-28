@@ -1,62 +1,85 @@
 # Welcome to k8sops
 
-This repository ( https://gitlab.com/Obmondo/k8sops) implements a solution to run any Kubernetes cluster, using gitops principles and allowing for costumization, in a seperate repository.
+This repository ( https://gitlab.com/Obmondo/k8sops) implements a solution to run any Kubernetes cluster, using gitops
+principles and allowing for customization, in a separate repository.
 
-This way you can always pull the latest commits, and get security updates, fixes, new features etc. - while having your own adjustments still.
+This way you can always pull the latest commits, and get security updates, fixes, new features etc., while still being
+able to do your own adjustments.
 
 This is copyright EnableIT ApS (of Denmark) and released under GPL 3 license of fsf.org.
 
-https://Obmondo.com offers subscriptions, where we manage your Kubernetes cluster, using this code, and react to incidents 24/7/365 if this should be of interest.
-In this way, we typicly help out smaller setups, where there is only 1 or 2 operations people, and hence 24/7 operations isn't possible to run reliably - with out subscription, we take care of the 24/7 monitoring and our knowledgeable developers and operations guys are ready to resolve any issues that may arise - while you can work on the day 2 day stuff, as you'd usually do - and still get your vacations, weekends etc. - without having to be on-call.
+[Obmondo.com](https://obmondo.com) offers subscriptions, where we manage your Kubernetes cluster, using this code, and
+react to incidents 24/7/365 if this should be of interest.
 
-# Security design goals
+In this way, we typically help out smaller setups, where there is only 1 or 2 operations people, and hence 24/7
+operations isn't possible to run reliably - with our subscription, we take care of the 24/7 monitoring and our
+knowledgeable developers and operations people are ready to resolve any issues that may arise - while you can work on
+the day 2 day stuff, as you'd usually do - and still get your vacations, weekends etc. without having to be on-call
+yourself.
 
-This operations design, is designed to deliver a setup, that delivers on all 3 aspects of security Conidentiality, Integrity and Availability.
+## Security design goals
 
-## Confidentiality
+This operations design, is designed to deliver a setup, that delivers on all 3 aspects of security Confidentiality,
+Integrity and Availability.
 
-This setup uses Calico CNI - and ensure network filtering - on both ingress and egress - which means we work hard to avoid any pod in this cluster, has (or needs) internet access. In this way, should a compromise of a pod happen - its harder to get data out, or pull necessary code from the internet to further exploit your systems.
+### Confidentiality
+
+This setup uses Calico CNI - and ensure network filtering - on both ingress and egress - which means we work hard to
+avoid any pod in this cluster, has (or needs) internet access. In this way, should a compromise of a pod happen - its
+harder to get data out, or pull necessary code from the internet to further exploit your systems.
 
 You can disable network filtering for any application - but do so at your own peril - with above risk in mind.
 
-## Integrity
+### Integrity
 
-### Helm chart security
+#### Helm chart security
 
 We store EVERY Helm chart from an application upstream inside this repository. This has the following benefits:
-+  You can always install your application / do recovery - with no internet needed. If an upstream chart repo is down - this will not affect you (and this happens quite often when you have many sources/charts in use).
-+  On EVERY upgrade, we review the diff of the chart for any unexpected changes, and this way we HOPE to catch a compromised upstream release, before its included in this repository. 
-   -  Atleast we can see from how other it has been found that other codebases has been compromised - that this is the structure that enabled it to be detected.
-+ We run a CI job, that daily fetches the same charts we have in our repo, from upstream chart repo - and check if upstream matches OUR copy. If it does not:
+
+- You can always install your application/do recovery - with no internet needed. If an upstream chart repo is down
+  this will not affect you (and this happens quite often when you have many sources/charts in use).
+- On EVERY upgrade, we review the diff of the chart for any unexpected changes, and this way we HOPE to catch a
+  compromised upstream release, before its included in this repository.
+  - At the very least we can see from how other it has been found that other codebases has been compromised - that this
+    is the structure that enabled it to be detected.
+- We run a CI job, that daily fetches the same charts we have in our repo, from upstream chart repo - and check if
+  upstream matches OUR copy. If it does not:
   - Upstream updated an existing release - which is a VERY BAD idea.
   - Upstream Helm repo suffered a supply-chain attack
 
 ### Docker image security
 
-We change EVERY docker image, to use the sha256sum of the docker image instead of the tag. This means if upstream mirror/dockerhub is compromised (and tag pointing to different docker image) - we will still get the original image - or fail.
+We change EVERY docker image, to use the `sha256sum` of the docker image instead of the tag. This means if upstream mirror
+(e.g. Docker Hub) is compromised (and tag pointing to different docker image) - we will still get the original image -
+or fail.
 
-This repository has a CI job, that on every MR / PR - fetches docker images used and pushes to YOUR docker registry (in gitlab, github docker service or what you prefer) - so your Kubernetes cluster doesn't talk to anything on the internet to pull the necessary docker images for operations.
+This repository has a CI job, that on every MR / PR fetches docker images used and pushes to YOUR docker registry (in
+GitLab, Github Docker service or whatever you prefer), so your Kubernetes cluster doesn't talk to anything on the
+Internet to pull the necessary Docker images for operations.
 
-Here we also run a daily CI job to compare tag to the sha256sum we have, to detect any supply chain attacks (which won't affect those using this setup) - so they can be reported upstream.
+Here we also run a daily CI job to compare tag to the `sha256sum` we have, to detect any supply chain attacks (which
+won't affect those using this setup) so they can be reported upstream.
 
-We scan docker images used, for known vulnerabilities (software in image with known CVE f.ex.) and report upstream, and if upstream will accept it - we will gladly submit fixes to upstream - to avoid users of this repository deploying vulnerable code.
+We scan Docker images used for known vulnerabilities (software in image with known CVE f.ex.) and report upstream, and
+if upstream will accept it we will gladly submit fixes to upstream to avoid users of this repository deploying
+vulnerable code.
 
-## Availability
+### Availability
 
-# Repository structure
+## Repository structure
 
 | `argocd-clusters-managed`      | Primary folder - containing applications and configs for each managed cluster, which MAY make use of common resources, such as `argocd-helm-charts` and `argocd-k8s-config`. Each cluster folder is actually a Helm chart - hence applications are put as YAML in `templates` folder. |
 |--------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `argocd-helm-charts`           | Contains ArgoCD helm charts, that points to the actual helm charts (as a dependency listed in `Charts.yaml`) - and with the default values we want. Each cluster can add override/extra values by listing an extra valuesfile in their `argocd-clusters-managed/$clustername` folder. |
+| `argocd-helm-charts`           | Contains ArgoCD helm charts, that points to the actual helm charts (as a dependency listed in `Charts.yaml`) - and with the default values we want. Each cluster can add override/extra values by listing an extra values file in their `argocd-clusters-managed/$clustername` folder. |
 | `argocd-k8sconfig`             | Kubernetes config objects. Used by all in `common` and per-cluster in their individual `$clustername` folder.                                                                                                                                                                         |
 | `argocd-application-templates` | collection of applications, to be optionally modified and copied into `argocd-clusters-managed/$clustername/templates` to be installed on that cluster.                                                                                                                               |
 
-## Install argocd on a cluster and add it to this repository
+## Install ArgoCD on a cluster and add it to this repository
 
 ### PREREQUISITE
 
-* `kubectl`, `helm`, `kubeseal`, `bcrypt-tool` and `pwgen`
-* you can connect to k8s from your work station/laptop/desktop
+- `kubectl`, `helm`, `kubeseal`, `bcrypt-tool` and `pwgen`
+- you can connect to k8s from your work station/laptop/desktop
 
   ```sh
   # optionally switch cluster
@@ -65,7 +88,7 @@ We scan docker images used, for known vulnerabilities (software in image with kn
   kubectl get nodes
   ```
 
-* Generate access token for https and for github repo follow [this guide](https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#generating-a-private-key)
+- To generate access token for `https` access and for GitHub repo follow [this guide](https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps#generating-a-private-key)
 
   ```fundamental
   # https://gitlab.enableit.dk/kubernetes/kubernetes-config-enableit/-/settings/access_tokens
@@ -75,21 +98,21 @@ We scan docker images used, for known vulnerabilities (software in image with kn
   > submit
   ```
 
-* Generate username and password for OCI
+- Generate username and password for OCI
 
   ```fundamental
   # TODO:
   # I haven't setup this, need someone to fill this up
   ```
 
-* create git repo for customer k8s data. it SHOULD be in this format only `kubernetes-config-<customer-id>` and sits at
-  the same level where your argocd-apps is cloned
+- create git repo for customer k8s data. it SHOULD be in this format only `kubernetes-config-<customer-id>` and sits at
+  the same level where your `argocd-apps` is cloned
 
   ```fundamental
   # https://gitlab.enableit.dk/kubernetes/kubernetes-config-enableit.git
   ```
 
-* Wiki wiki/guides/kuberenetes-desktop-setup.md
+- Wiki `wiki/guides/kuberenetes-desktop-setup.md`
 
 ## Setup K8s cluster
 
@@ -120,14 +143,14 @@ We scan docker images used, for known vulnerabilities (software in image with kn
    ./bin/setup-k8s-cluster.sh --customer-id <customer-id> --cluster-name <cluster-name> --settings-file <path-to-settings-file> --k8s-type kops
    ```
 
-2. Add the argocd password in pass repo (you will get the password in step 1)
+2. Add the ArgoCD password in pass repo (you will get the password in step 1)
 
 ## Uninstall script
 
 Note: **not tested**
 
 If something goes wrong you can uninstall again with `./bin/uninstall-argocd.sh`. You run it just like that, and it will
-prompt you for cluster_name and argocd password (which you recieved from the install script.)
+prompt you for cluster_name and argocd password (which you received from the install script.)
 
 ## Recovery mode
 
@@ -139,26 +162,26 @@ Both scripts have a recovery mode which you use by calling them like this.
 ./bin/uninstall-argocd.sh --recovery
 ```
 
-In recovery mode the uninstall script will remove argocd from kubernetes but not from you local repo clone, and the
-install script will install argocd using the existing manifests in your local repo clone.
+In recovery mode the uninstall script will remove ArgoCD from Kubernetes but not from you local repo clone, and the
+install script will install ArgoCD using the existing manifests in your local repo clone.
 
-### Recover argocd password
+### Recover ArgoCD password
 
 ```sh
 ./bin/setup-k8s-cluster.sh --cluster-name k8s.staging.blackwoodseven.com --settings-file customer-settings.yaml --setup-root-app false --recovery --private-key-path ./private_keys --public-key-path ./public_certs --customer-id bw7 --install-k8s false --setup-sealed-secret false
 ```
 
-In recovery mode the uninstall script will remove argocd from kubernetes but not from you local repo clone, and the
-install script will install argocd using the existing manifests in your local repo clone.
+In recovery mode the uninstall script will remove ArgoCD from Kubernetes but not from you local repo clone, and the
+install script will install ArgoCD using the existing manifests in your local repo clone.
 
 ### For SSH access to git repositories
 
 Note: **we don't support this**
 
-Setup gitlab user and generate SSH keyset (and add public part to that gitlab user). Grant that user ONLY developer
+Setup GitLab user and generate SSH key set (and add public part to that GitLab user). Grant that user ONLY developer
 access to the projects it needs. Make sure those have master branch and tags protected in config.
 
-add secret with ssh keys for gitlab argocd SSH access:
+add secret with ssh keys for GitLab ArgoCD SSH access:
 
 ```sh
 kubectl create secret generic argocd-sshkey --from-file=ssh-privatekey=/path/to/.ssh/id_rsa --from-file=ssh-publickey=/path/to/.ssh/id_rsa.pub
@@ -174,20 +197,20 @@ kubectl get secrets -n argocd argo-cd-enableit-gitlab-ssh -o jsonpath="{.data.ss
 ```
 
 Login to the UI. To get the credentials refer
-[argocd admin credentials](https://argoproj.github.io/argo-cd/getting_started/#4-login-using-the-cli).
+[ArgoCD admin credentials](https://argoproj.github.io/argo-cd/getting_started/#4-login-using-the-cli).
 
-## Install root argocd application - that manages the rest
+## Install root ArgoCD application - that manages the rest
 
-Install argo-cd root app using:
+Install ArgoCD root app using:
 
 ```sh
 helm template argo-cd-helm-apps/your-cluster-name --show-only templates/root.yaml | kubectl apply -f -
 ```
 
-And its `Chart.yaml` points to this repo argo-cd-helm-apps so once Root app is
-installed it'll pick up the apps in there and start setting them up.
+And its `Chart.yaml` points to this repo `argo-cd-helm-apps` so once the root app is installed it'll pick up the apps in
+there and start setting them up.
 
-Now we can remove helm management of argo-cd - as argo-cd manages itself (as argo-cd is one of the apps in above apps folder).
+Now we can remove helm management of ArgoCD as ArgoCD manages itself as it is one of the apps in above apps folder.
 
 ```sh
 kubectl delete secret -l owner=helm,name=argo-cd
@@ -195,15 +218,15 @@ kubectl delete secret -l owner=helm,name=argo-cd
 
 ## Secrets handling
 
-* IF a helm chart creates a secret - ArgoCD will expect it to remain unchanged
+- If a helm chart creates a secret - ArgoCD will expect it to remain unchanged
   (otherwise complain application is out-of-sync).
-* IF this happens - it means you have a secret thats changed via the application
-  (typicly user login password) - and we NEED backup of these.
+- If this happens it means you have a secret that's changed via the application (typically user login password), and we
+  **NEED** backup of these.
 
 To resolve out-of-sync complaint in ArgoCD - AND backup/recovery do this:
 
 1. let helm chart create secret and application generate it - so you get out-of-sync complaint from ArgoCD.
-2. dump secret in json format, remove unnecessary metadata/Helm labels and
+2. dump secret in JSON format, remove unnecessary metadata/Helm labels and
    encode into cluster secrets repo and delete the secret from k8s (before
    pushing to secrets repo).
 3. update values for chart as to NOT generate secret. Typically the setting is
@@ -211,7 +234,7 @@ To resolve out-of-sync complaint in ArgoCD - AND backup/recovery do this:
 
 ## Debugging
 
-* you might see pods getting evicted, mostly likely disk is used around 70% or you have less disk size (`> 5GB`). to fix
+- you might see pods getting evicted, mostly likely disk is used around 70% or you have less disk size (`> 5GB`). to fix
   it increase the disk size
 
   ```fundamental
@@ -222,14 +245,14 @@ To resolve out-of-sync complaint in ArgoCD - AND backup/recovery do this:
   argo-cd-argocd-application-controller-d6c576f5d-7cm78   0/1     Evicted   0          100m
   ```
 
-* It's important to ensure that: `acme.cert-manager.io/http01-edit-in-place: true` is placed in annotations for ingress
+- It's important to ensure that: `acme.cert-manager.io/http01-edit-in-place: true` is placed in annotations for ingress
   when `traefik` is used
 
-* Please refer: [Wiki for kubernetes](https://gitlab.enableit.dk/obmondo/wiki/-/tree/master/internal/kubernetes)
+- Please refer: [Wiki for kubernetes](https://gitlab.enableit.dk/obmondo/wiki/-/tree/master/internal/kubernetes)
 
 ## Testing applications - before doing a PR / MR
 
-### Test helm values genereate the yaml you want
+### Test helm values generate the YAML you want
 
 1. run `helm dep`
 
@@ -243,18 +266,18 @@ To resolve out-of-sync complaint in ArgoCD - AND backup/recovery do this:
    helm template argocd-helm-charts/<nameofchart> --values argocd-clusters-managed/<targetcluster>/values-<nameofchart>.yaml >/tmp/before.yaml
    ```
 
-3. READ yaml and see if you like it.. adjust values to your liking and run 2.
-   again - saving to `/tmp/after.yaml`
-4. run: `diff -bduNr /tmp/before.yaml /tmp/after.yaml` - verify the changes your
-   value update should have caused - did actually happen
+3. Read YAML and see if you like it.
+4. Adjust values to your liking and run step 2 again, saving the result to `/tmp/after.yaml`.
+4. Check the difference by running `diff -bduNr /tmp/before.yaml /tmp/after.yaml` and verify the changes your value
+   update should have caused are present.
 
 ### Install the application manually to verify
 
 1. create/copy application YAML and set: `targetRevision` to `$yourbranchname`
    instead of `HEAD`
-2. Load that yaml manually (`kubectl create -ns argocd -f yourapplication.yaml`)
+2. Load that YAML manually (`kubectl create -ns argocd -f yourapplication.yaml`)
 3. Work in your branch - adjust values as needed etc.
-4. When it works: simply update the application yaml to pointing to
+4. When it works: simply update the application YAML to pointing to
    `targetRevision: HEAD` and make your MR/PR
 
 ## General idea/Working of pointing apps to GHRC
@@ -285,11 +308,11 @@ registry.
 
 ## Fix ssh mismatch key when the Change/Update of git server
 
-* Repository which are configured via ssh might end up not working, since the ssh known_host key is changed.
-* To fix
+- Repository which are configured via ssh might end up not working, since the ssh known_host key is changed.
+- To fix
   1. `ssh-keyscan -p <your-port-number> <git-server>`
-  2. Copy the `ecdsa-sha2-nistp256` other sha might work, but haven't tried it.
-  3. Now the argocd won't be working, since it can't connect to the git server.
-  4. Goto repository and click on 'Certificates' and remove the old entery and create a new one and add the key that you
-     got from the ssh-keyscan
-  5. Goto application and click on the `argo-cd` and sync the `argocd-ssh-known-hosts-cm` and then it should work
+  2. Copy the `ecdsa-sha2-nistp256` key pair type. Other types might work too, but we haven't tried it.
+  3. Now the ArgoCD won't be working, since it can't connect to the git server.
+  4. Go to repository and click on 'Certificates' and remove the old entry and create a new one and add the key that you
+     got from `ssh-keyscan`
+  5. Go to application and click on the `argo-cd` and sync the `argocd-ssh-known-hosts-cm` and then it should work
