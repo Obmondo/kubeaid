@@ -1,0 +1,37 @@
+{{- if and .Values.rbac.create .Values.rbac.pspEnabled -}}
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: {{ include "kube-iptables-tailer.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "kube-iptables-tailer.name" . }}
+    helm.sh/chart: {{ include "kube-iptables-tailer.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  requiredDropCapabilities:
+  - ALL
+  volumes:
+  - "emptyDir"
+  - "secret"
+  - "hostPath"
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: "RunAsAny"
+  seLinux:
+    rule: "RunAsAny"
+  supplementalGroups:
+    rule: "MustRunAs"
+    ranges:
+      - min: 0
+        max: 65535
+  fsGroup:
+    rule: "MustRunAs"
+    ranges:
+      - min: 0
+        max: 65535
+{{- end -}}
