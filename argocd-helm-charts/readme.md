@@ -51,3 +51,37 @@
 ```
 
 - update the versions to delete outdated charts
+
+## Adding new charts to argocd-helm-charts
+
+Locally add the repo of the chart first.
+
+```
+helm repo add repo url
+```
+
+using ```bitnami``` f. ex:
+
+```
+helm repo add bitnami https://charts.bitnami.com/bitnami
+```
+
+You should then pull the chart locally with the ```--untar``` option to unpack it under folder in ```argocd-helm-charts/``` manually with:
+
+```
+helm pull --untar repo/chart
+```
+
+Working with ```dokuwiki``` for example:
+
+```
+helm pull --untar bitnami/dokuwiki
+```
+
+You should put the unpacked folder under a ```charts``` folder - ```argocd-helm-charts/dokuwiki/charts/dokuwiki``` then add ```templates``` folder, ```Chart.yaml``` and ```values.yaml``` to setup our umbrella chart. Kindly check other charts to correctly define the ```Chart.yaml```.
+
+Then locally run the dependency update to get the charts updated from the upstream repo:
+
+```
+helm dep up dokuwiki
+```
