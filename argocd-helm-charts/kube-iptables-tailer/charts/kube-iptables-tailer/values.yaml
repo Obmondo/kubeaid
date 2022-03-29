@@ -17,7 +17,7 @@ updateStrategy:
   type: RollingUpdate
 
 # Only one of the next configuration should be enabled
-iptablesLogPath: "/var/log/iptables.log"
+# iptablesLogPath: "/var/log/iptables.log"
 
 # If using EKS uncomment this line
 # journalDirectory: "/var/log/journal"
@@ -38,8 +38,8 @@ serviceAccount:
   name:
 
 # Should alway enabled or you have to do manual iptable configuration on each host
-kube-iptables-tailer:
-  loggingEnable: false
+calico:
+  loggingEnable: true
   # check your apiversion with `kubectl api-versions`
   apiVersion: projectcalico.org/v3
 

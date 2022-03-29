@@ -2,6 +2,8 @@
 
 set -eou pipefail
 
+HELM_APP="${1:-argocd-helm-charts}"
+
 for program in helm tar; do
   if ! command -v "$program" >/dev/null; then
     echo "Missing $program"
@@ -14,9 +16,17 @@ if ! helm version --template='Version: {{.Version}}' | grep 'v3.8' >/dev/null; t
   exit 1
 fi
 
-find argocd-helm-charts -maxdepth 1 -mindepth 1 -type d | while read -r path; do
-  HELM_CHART_PATH="$path"
-  HELM_CHART_YAML="$path/Chart.yaml"
+function usage {
+  echo -n "Usage:
+$0 argocd-helm-charts/kube-iptables-tailer
+or
+$0
+"
+}
+
+function update_helm_chart {
+  HELM_CHART_PATH="$1"
+  HELM_CHART_YAML="$1/Chart.yaml"
 
   # Exit if no chart.yaml is present
   if ! test -f "$HELM_CHART_YAML"; then
@@ -41,7 +51,7 @@ find argocd-helm-charts -maxdepth 1 -mindepth 1 -type d | while read -r path; do
 
     # helm search repo whoami/whoami --output yaml | yq eval '.[].version' -
 
-    # Check if we have a upstream chart already present or not
+    # Check if we have an upstream chart already present or not
     if test -f "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME/Chart.yaml"; then
       HELM_UPSTREAM_APP_VERSION=$(yq eval '.version' "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME/Chart.yaml")
 
@@ -79,4 +89,18 @@ find argocd-helm-charts -maxdepth 1 -mindepth 1 -type d | while read -r path; do
       helm dependencies update "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME"
     fi
   fi
-done
+}
+
+if [ -n "$HELM_APP" ]; then
+  if test -d "$HELM_APP"; then
+    update_helm_chart "$HELM_APP"
+  else
+    echo "Error: $HELM_APP does not exists, please check the path"
+    usage
+    exit 1
+  fi
+else
+  find "$HELM_APP" -maxdepth 1 -mindepth 1 -type d | while read -r path; do
+    update_helm_chart $path
+  done
+fi
