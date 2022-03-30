@@ -1,0 +1,6 @@
+ingress:
+  enabled: true
+  hostname: dokuwiki.kam.obmondo.com
+  tls: true
+  pathType: ImplementationSpecific
+  path: /
