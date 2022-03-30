@@ -1,3 +1,8 @@
 kube-iptables-tailer:
-  iptablesLogPrefix: 'CALICO-PACKETS: '
   journalDirectory: "/var/log/journal"
+  image:
+    repository: registry.obmondo.com/obmondo/dockerfiles/kube-iptables-tailer
+    tag: v1.0.0
+    pullPolicy: IfNotPresent
+  imagePullSecrets:
+    - name: obmondo-web-app-gitlab-registry

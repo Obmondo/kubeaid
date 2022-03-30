@@ -101,6 +101,6 @@ if [ -n "$HELM_APP" ]; then
   fi
 else
   find "$HELM_APP" -maxdepth 1 -mindepth 1 -type d | while read -r path; do
-    update_helm_chart $path
+    update_helm_chart "$path"
   done
 fi

@@ -15,11 +15,19 @@ spec:
   ingress:
   - action: Log
     protocol: TCP
+  - action: Allow
+    protocol: TCP
   - action: Log
+    protocol: UDP
+  - action: Allow
     protocol: UDP
   egress:
   - action: Log
     protocol: TCP
+  - action: Allow
+    protocol: TCP
   - action: Log
+    protocol: UDP
+  - action: Allow
     protocol: UDP
 {{- end -}}
