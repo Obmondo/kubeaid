@@ -1,6 +1,11 @@
-ingress:
-  enabled: true
-  hostname: dokuwiki.kam.obmondo.com
-  tls: true
-  pathType: ImplementationSpecific
-  path: /
+dokuwiki:
+  ingress:
+    enabled: true
+    hostname: dokuwiki.kam.obmondo.com
+    tls: true
+    pathType: ImplementationSpecific
+    path: /
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      kubernetes.io/ingress.class: traefik-cert-manager
+  dokuwikiUsername: admin
