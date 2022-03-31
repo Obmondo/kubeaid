@@ -1,6 +1,16 @@
-ingress:
-  enabled: true
-  hostname: dokuwiki.kam.obmondo.com
-  tls: true
-  pathType: ImplementationSpecific
-  path: /
+dokuwiki:
+  ingress:
+    enabled: true
+    hostname: dokuwiki.kam.obmondo.com
+    tls: true
+    pathType: ImplementationSpecific
+    path: /
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      kubernetes.io/ingress.class: traefik-cert-manager
+  dokuwikiUsername: admin
+  podLabels:
+    traefik.http.routers.whoami.entrypoints: web
+    traefik.http.routers.whoami.rule: Host(`whoami.localhost`)
+    traefik.http.routers.whoami.middlewares: auth"
+    traefik.http.middlewares.auth.basicauth.users: admin:508782a4cfde938c517e3386d66eb1dbb8a915fa6390d45dfec8eab97e33296d"
