@@ -1,5 +1,5 @@
-{{- if .Values.loggingEnable -}}
-apiVersion: {{ .Values.apiVersion }}
+{{- if .Values.calico.loggingEnable -}}
+apiVersion: {{ .Values.calico.apiVersion }}
 kind: GlobalNetworkPolicy
 metadata:
   name: {{ include "kube-iptables-tailer.fullname" . }}-logging
@@ -15,11 +15,19 @@ spec:
   ingress:
   - action: Log
     protocol: TCP
+  - action: Allow
+    protocol: TCP
   - action: Log
+    protocol: UDP
+  - action: Allow
     protocol: UDP
   egress:
   - action: Log
     protocol: TCP
+  - action: Allow
+    protocol: TCP
   - action: Log
+    protocol: UDP
+  - action: Allow
     protocol: UDP
 {{- end -}}
