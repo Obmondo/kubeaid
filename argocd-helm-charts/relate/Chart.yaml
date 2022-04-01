@@ -1,0 +1,9 @@
+apiVersion: v2
+name: relate
+version: 0.9.0
+# source: https://github.com/inducer/relate
+dependencies:
+  - name: relate
+    version: 0.9.0
+    # no known repository
+    # repository:
