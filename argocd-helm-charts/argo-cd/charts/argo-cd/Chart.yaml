@@ -1,14 +1,14 @@
 annotations:
   artifacthub.io/changes: |
-    - "[Changed]: Update to app version 2.2.2"
+    - "[Added]: Ability to use external/existing Redis (eg. a managed cloud service)"
 apiVersion: v2
-appVersion: v2.2.2
+appVersion: v2.3.3
 dependencies:
 - condition: redis-ha.enabled
   name: redis-ha
   repository: https://dandydeveloper.github.io/charts/
   version: 4.12.17
-description: A Helm chart for ArgoCD, a declarative, GitOps continuous delivery tool
+description: A Helm chart for Argo CD, a declarative, GitOps continuous delivery tool
   for Kubernetes.
 home: https://github.com/argoproj/argo-helm
 icon: https://argo-cd.readthedocs.io/en/stable/assets/logo.png
@@ -22,4 +22,4 @@ maintainers:
 - name: jessesuen
 - name: seanson
 name: argo-cd
-version: 3.29.5
+version: 4.4.0
