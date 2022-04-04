@@ -52,6 +52,6 @@ git:push:
   image:
     name: registry.obmondo.com/obmondo/dockerfiles/kubernetes-build:1644571507
   script:
-    - ./bin/deploy.sh
+    - ./bin/gitlab-build-and-create-mr.sh
   only:
     - 'master'

@@ -316,3 +316,15 @@ registry.
   4. Go to repository and click on 'Certificates' and remove the old entry and create a new one and add the key that you
      got from `ssh-keyscan`
   5. Go to application and click on the `argo-cd` and sync the `argocd-ssh-known-hosts-cm` and then it should work
+
+## Automatic pull requests on change
+
+### GitHub
+
+See https://github.com/Obmondo/github-action-obmondo-deploy
+
+### GitLab
+
+- `KUBERNETES_CONFIG_REPO_TOKEN` At [/project access
+  token/](https://docs.gitlab.com/ee/user/project/settings/project_access_tokens.html) used for accessing the config
+  repo.

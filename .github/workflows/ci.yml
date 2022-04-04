@@ -1,0 +1,23 @@
+---
+name: Build Obmondo configuration and pull request against GitOps repo
+'on':
+  - push
+env:
+  GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
+  OBMONDO_DEPLOY_REPO_TARGET: ${{ secrets.OBMONDO_DEPLOY_REPO_TARGET }}
+  OBMONDO_DEPLOY_REPO_TARGET_BRANCH: ${{ secrets.OBMONDO_DEPLOY_REPO_TARGET_BRANCH }}
+  OBMONDO_DEPLOY_PULL_REQUEST_REVIEWERS: ${{ secrets.OBMONDO_DEPLOY_PULL_REQUEST_REVIEWERS }}
+jobs:
+  pull-request:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Create pull request
+      uses: Obmondo/github-action-obmondo-deploy@main
+      env:
+        API_TOKEN_GITHUB: ${{ env.GITHUB_TOKEN }}
+        OBMONDO_DEPLOY_REPO_TARGET: ${{ env.OBMONDO_DEPLOY_REPO_TARGET }}
+        OBMONDO_DEPLOY_REPO_TARGET2: ${{ env.OBMONDO_DEPLOY_REPO_TARGET }}
+        OBMONDO_DEPLOY_REPO_TARGET_BRANCH: ${{ env.OBMONDO_DEPLOY_REPO_TARGET_BRANCH }}
+        OBMONDO_DEPLOY_PULL_REQUEST_REVIEWERS: ${{ env.OBMONDO_DEPLOY_PULL_REQUEST_REVIEWERS }}
