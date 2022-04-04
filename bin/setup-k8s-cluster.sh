@@ -77,6 +77,7 @@ Usage $0 [OPTION]:
   --setup-root-app                setup root app to manage other app
   --generate-argocd-password      generate admin password for argocd
   --dump-sealedsecrets-keys-certs dump the private key and public certs     [Optional]
+  --resource-group                the resource group under which terraform creates cluster [Optional]
   -h | --help
 
 Example:
@@ -140,6 +141,7 @@ declare CLUSTER_NAME=
 declare GENERATE_ARGOCD_PASSWORD=true
 declare SEALEDSECRETS_KEYS_CERTS=false
 declare CUSTOMER_ID=
+declare RESOURCE_GROUP=
 
 while [[ $# -gt 0 ]]; do
     arg="$1"
@@ -209,6 +211,10 @@ while [[ $# -gt 0 ]]; do
           ;;
       --customer-id)
           CUSTOMER_ID=$1
+          shift
+          ;;
+      --resource-group)
+          RESOURCE_GROUP=$1
           shift
           ;;
       -h|--help)
@@ -299,8 +305,8 @@ if $INSTALL_K8S; then
 
       ;;
       aks-terraform)
-          echo "We dont't support aks-terraform as of now. but wait tight. its coming soon"
-          exit 0
+          terraform -chdir=cluster-setup-files/terraform/aks apply -var-file=aks.tfvars
+          az aks get-credentials --resource-group "$RESOURCE_GROUP" --name "$CLUSTER_NAME"
       ;;
       *)
           echo "Unsupported $K8S_TYPE k8s-type given, which we don't understand. exiting"
@@ -502,13 +508,15 @@ if $SETUP_ARGOCD; then
                 STAT $?
             fi
 
-            HEAD "Applying sealed-secrets for $ARGOCD_SECRET_NAME ...   "
             kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/${OBMONDO_ARGOCD_HELM_REPO_NAME}".json &>>/tmp/argocd.log
             kubectl get secret --namespace argocd "$OBMONDO_ARGOCD_HELM_REPO_NAME" >/dev/null
             STAT $?
 
             ### Update the argocd-secret with our custom password and create a sealed secret file as well
             if $GENERATE_ARGOCD_PASSWORD && ! $RECOVERY && ! kubectl get secrets -n argocd argocd-secret -o name &>/dev/null; then
+                PASSWORD=$(pwgen -y 30 1)
+                SECRET_KEY=$(pwgen 48 1)
+                ENCODED_PASSWORD_HASH=$(bcrypt-tool hash "$PASSWORD" 10)
                 kubectl create secret generic argocd-secret \
                     --namespace=argocd \
                     --dry-run=client \
