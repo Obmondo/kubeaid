@@ -27,31 +27,33 @@ go install github.com/google/go-jsonnet/cmd/jsonnet@latest
 ```
 
 ### Run the build script
+Run this in the root of the argocd-apps repo, with the k8s config repo cloned next to it
 ```sh
-./build.sh ../kubernetes-config-enableit/k8s/kam.obmondo.com
+./build/kube-prometheus/build.sh ../kubernetes-config-enableit/k8s/kam.obmondo.com
 ```
 
 Example:
 
 ```log
-$ ./build.sh htzhel1-kbm
-INFO: 'libraries/release-0.10/vendor' doesn't exist; executing jsonnet-bundler
-GET https://github.com/prometheus-operator/kube-prometheus/archive/42ea595d60265b803ad460a971a7186488f6be7e.tar.gz 200
-GET https://github.com/thanos-io/thanos/archive/fb97c9a5ef51849ccb7960abbeb9581ad7f511b9.tar.gz 200
-GET https://github.com/prometheus-operator/prometheus-operator/archive/d8ba1c766a141cb35072ae2f2578ec8588c9efcd.tar.gz 200
-GET https://github.com/kubernetes-monitoring/kubernetes-mixin/archive/b538a10c89508f8d12885680cca72a134d3127f5.tar.gz 200
-GET https://github.com/kubernetes/kube-state-metrics/archive/e080c3ce73ad514254e38dccb37c93bec6b257ae.tar.gz 200
-GET https://github.com/kubernetes/kube-state-metrics/archive/e080c3ce73ad514254e38dccb37c93bec6b257ae.tar.gz 200
-GET https://github.com/prometheus/prometheus/archive/41f1a8125e664985dd30674e5bdf6b683eff5d32.tar.gz 200
-GET https://github.com/prometheus/alertmanager/archive/16fa045db47d68a09a102c7b80b8899c1f57c153.tar.gz 200
-GET https://github.com/brancz/kubernetes-grafana/archive/199e363523104ff8b3a12483a4e3eca86372b078.tar.gz 200
-GET https://github.com/etcd-io/etcd/archive/7291ed3c4ae7ba61df72e7b610d6c351f995a3db.tar.gz 200
-GET https://github.com/prometheus-operator/prometheus-operator/archive/d8ba1c766a141cb35072ae2f2578ec8588c9efcd.tar.gz 200
-GET https://github.com/prometheus/node_exporter/archive/a2321e7b940ddcff26873612bccdf7cd4c42b6b6.tar.gz 200
-GET https://github.com/grafana/grafonnet-lib/archive/3626fc4dc2326931c530861ac5bebe39444f6cbf.tar.gz 200
-GET https://github.com/grafana/jsonnet-libs/archive/b46355107c024e0aa4932adadd939294c3b8260d.tar.gz 200
-GET https://github.com/kubernetes-monitoring/kubernetes-mixin/archive/3346c8cbcc1660caeddf2ffc9443dabe583e1a35.tar.gz 200
-INFO: compiling jsonnet files into 'htzhel1-kbm'
+$ ./build/kube-prometheus/build.sh ../kubernetes-config-enableit/k8s/kam.obmondo.com
+INFO: 'build/kube-prometheus/libraries/main/vendor' doesn't exist; executing jsonnet-bundler
+GET https://github.com/prometheus-operator/kube-prometheus/archive/64b19b69d5a6d82af8bbfb3a67538b0feca31042.tar.gz 200
+GET https://github.com/prometheus/alertmanager/archive/a6d10bd5bc3f651e0ca04d47b981ed66e85a09a6.tar.gz 200
+GET https://github.com/thanos-io/thanos/archive/f0e673a2e4860d8cffafba4c97955171e5c6cb2b.tar.gz 200
+GET https://github.com/brancz/kubernetes-grafana/archive/1c4d84de1c059b55ce83fdd76fbb4f58530b7d55.tar.gz 200
+GET https://github.com/grafana/grafana/archive/8c622c1ef626a6982e0a6353877dd02313988010.tar.gz 200
+GET https://github.com/prometheus-operator/prometheus-operator/archive/90e243ea91e4f332d517b0a2c190df9d5c3026a9.tar.gz 200
+GET https://github.com/kubernetes/kube-state-metrics/archive/eff2c0ed6d1af04f10773e73aeae8b17f23c2409.tar.gz 200
+GET https://github.com/prometheus/prometheus/archive/c7be45d957dd90e605738d8b74482e7579da0db0.tar.gz 200
+GET https://github.com/etcd-io/etcd/archive/be2929568f81080b20ef6812992f2e09c8dac91b.tar.gz 200
+GET https://github.com/prometheus-operator/prometheus-operator/archive/90e243ea91e4f332d517b0a2c190df9d5c3026a9.tar.gz 200
+GET https://github.com/kubernetes-monitoring/kubernetes-mixin/archive/a2196d1b3493c15117550df2fd35dbdf54e4fa0e.tar.gz 200
+GET https://github.com/kubernetes/kube-state-metrics/archive/eff2c0ed6d1af04f10773e73aeae8b17f23c2409.tar.gz 200
+GET https://github.com/prometheus/node_exporter/archive/9aae303a46c3153b75e4d32b0936b40e4ee0beeb.tar.gz 200
+GET https://github.com/kubernetes-monitoring/kubernetes-mixin/archive/a2196d1b3493c15117550df2fd35dbdf54e4fa0e.tar.gz 200
+GET https://github.com/grafana/grafonnet-lib/archive/6db00c292d3a1c71661fc875f90e0ec7caa538c2.tar.gz 200
+GET https://github.com/grafana/jsonnet-libs/archive/98c3060877aa178f6bdfc6ac618fbe0043fc3de7.tar.gz 200
+INFO: compiling jsonnet files into '../kubernetes-config-enableit/k8s/kam.obmondo.com/kube-prometheus'
 ```
 
 ## Upgrading
