@@ -1,4 +1,4 @@
-# Welcome to k8sops
+              #      W elcome to k8sops
 
 This repository ( https://gitlab.com/Obmondo/k8sops) implements a solution to run any Kubernetes cluster, using gitops
 principles and allowing for customization, in a separate repository.
@@ -68,18 +68,23 @@ vulnerable code.
 
 ## Repository structure
 
-| `argocd-clusters-managed`      | Primary folder - containing applications and configs for each managed cluster, which MAY make use of common resources, such as `argocd-helm-charts` and `argocd-k8s-config`. Each cluster folder is actually a Helm chart - hence applications are put as YAML in `templates` folder. |
-|--------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+This repo contains all the kubernetes applications helm charts that are used on Enableit managed clusters, and the install script for setting up a new cluster with root app. In `build` there is also a script for setting up kube-prometheus.
+Each customer has their own kubernetes-config repo, and each cluster has a folder in such a repo. This repo works in tandem with those cluster folders, they reference the charts stored here, and the install scripts here create the content in those folders.
+
+| `folder`                       | `description`                                                                                                                                                                                                                                                                          |
+|--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `argocd-helm-charts`           | Contains ArgoCD helm charts, that points to the actual helm charts (as a dependency listed in `Charts.yaml`) - and with the default values we want. Each cluster can add override/extra values by listing an extra values file in their `argocd-clusters-managed/$clustername` folder. |
-| `argocd-k8sconfig`             | Kubernetes config objects. Used by all in `common` and per-cluster in their individual `$clustername` folder.                                                                                                                                                                         |
-| `argocd-application-templates` | collection of applications, to be optionally modified and copied into `argocd-clusters-managed/$clustername/templates` to be installed on that cluster.                                                                                                                               |
+| `argocd-k8sconfig`             | Kubernetes config objects. Used by all in `common` and per-cluster in their individual `$clustername` folder.                                                                                                                                                                          |
+| `argocd-application-templates` | collection of applications, to be optionally modified and copied into `argocd-clusters-managed/$clustername/templates` to be installed on that cluster.                                                                                                                                |
+| `build`                        | contains script and config files for installing kube-prometheus on a cluster, has its own README with usage guide                                                                                                                                                                      |
 
 ## Install ArgoCD on a cluster and add it to this repository
 
 ### PREREQUISITE
 
 - `kubectl`, `helm`, `kubeseal`, `bcrypt-tool` and `pwgen`
-- you can connect to k8s from your work station/laptop/desktop
+- you can connect to k8s from your work station/laptop/desktop.
+- See wiki/guides/kubernetes-desktop-setup on how to install everything including switch
 
   ```sh
   # optionally switch cluster
@@ -101,8 +106,7 @@ vulnerable code.
 - Generate username and password for OCI
 
   ```fundamental
-  # TODO:
-  # I haven't setup this, need someone to fill this up
+  # TODO: We dont use OCI currently. Update this when it is implemented.
   ```
 
 - create git repo for customer k8s data. it SHOULD be in this format only `kubernetes-config-<customer-id>` and sits at
@@ -125,7 +129,7 @@ vulnerable code.
    ```
 
 2. Login onto server and run puppet
-3. If things got broken refer this doc (Emil's doc)
+3. If things got broken refer to wiki/guides/kubernetes-cluster-setup.md
 4. Run cluster setup script:
 
    ```sh
@@ -147,23 +151,24 @@ vulnerable code.
 
 ## Uninstall script
 
-Note: **not tested**
+Always run uninstall script with `--keep-files` or it wont save the keys for reading sealed secrets.
 
-If something goes wrong you can uninstall again with `./bin/uninstall-argocd.sh`. You run it just like that, and it will
-prompt you for cluster_name and argocd password (which you received from the install script.)
+```
+./bin/uninstall-argocd.sh --keep-files
+```
+
+This will remove sealed-secrets and all argocd apps and argocd itself from the current k8s context (undoing install script)
+It will prompt for cluster_name and argocd password (which you recieved from the install script)
 
 ## Recovery mode
 
-Both scripts have a recovery mode which you use by calling them like this.
+The install script has a `--recovery` mode which you use by calling them like this.
 
 ```sh
 ./bin/setup-k8s-cluster.sh --customer-id enableit --cluster-name kam.obmondo.com --settings-file customer-settings.yaml --recovery --private-key-path private_keys --public-key-path public_keys --install-k8s false
-# or
-./bin/uninstall-argocd.sh --recovery
 ```
 
-In recovery mode the uninstall script will remove ArgoCD from Kubernetes but not from you local repo clone, and the
-install script will install ArgoCD using the existing manifests in your local repo clone.
+In recovery mode the install script will install argocd using the existing manifests in your local repo clone.
 
 ### Recover ArgoCD password
 
@@ -171,7 +176,6 @@ install script will install ArgoCD using the existing manifests in your local re
 ./bin/setup-k8s-cluster.sh --cluster-name k8s.staging.blackwoodseven.com --settings-file customer-settings.yaml --setup-root-app false --recovery --private-key-path ./private_keys --public-key-path ./public_certs --customer-id bw7 --install-k8s false --setup-sealed-secret false
 ```
 
-In recovery mode the uninstall script will remove ArgoCD from Kubernetes but not from you local repo clone, and the
 install script will install ArgoCD using the existing manifests in your local repo clone.
 
 ### For SSH access to git repositories
@@ -199,22 +203,10 @@ kubectl get secrets -n argocd argo-cd-enableit-gitlab-ssh -o jsonpath="{.data.ss
 Login to the UI. To get the credentials refer
 [ArgoCD admin credentials](https://argoproj.github.io/argo-cd/getting_started/#4-login-using-the-cli).
 
-## Install root ArgoCD application - that manages the rest
+## About the root app
 
-Install ArgoCD root app using:
-
-```sh
-helm template argo-cd-helm-apps/your-cluster-name --show-only templates/root.yaml | kubectl apply -f -
-```
-
-And its `Chart.yaml` points to this repo `argo-cd-helm-apps` so once the root app is installed it'll pick up the apps in
-there and start setting them up.
-
-Now we can remove helm management of ArgoCD as ArgoCD manages itself as it is one of the apps in above apps folder.
-
-```sh
-kubectl delete secret -l owner=helm,name=argo-cd
-```
+The install script adds root.yaml to the cluster folder under argocd-apps/templates in kubernetes-config-customerid.
+This argocd app has the clusters argocd-apps folder as its path. Making argocd detect all the apps in there automatically. So we can install apps just by adding them to the clusters argocd-apps folder in the customers kubernetes-config repo, and then syncing with argocd.
 
 ## Secrets handling
 
@@ -257,13 +249,13 @@ To resolve out-of-sync complaint in ArgoCD - AND backup/recovery do this:
 1. run `helm dep`
 
    ```sh
-   up argocd-helm-charts/<nameofchart>
+   helm dep up argocd-helm-charts/<nameofchart>
    ```
 
 2. run `helm template`
 
    ```sh
-   helm template argocd-helm-charts/<nameofchart> --values argocd-clusters-managed/<targetcluster>/values-<nameofchart>.yaml >/tmp/before.yaml
+   helm template argocd-helm-charts/<nameofchart> --values ../kubernetes-config-<customer-id>/k8s/<targetcluster>/argocd-apps/values-<nameofchart>.yaml >/tmp/before.yaml
    ```
 
 3. Read YAML and see if you like it.
