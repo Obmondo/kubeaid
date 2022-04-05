@@ -141,7 +141,6 @@ declare CLUSTER_NAME=
 declare GENERATE_ARGOCD_PASSWORD=true
 declare SEALEDSECRETS_KEYS_CERTS=false
 declare CUSTOMER_ID=
-declare RESOURCE_GROUP=
 
 while [[ $# -gt 0 ]]; do
     arg="$1"
@@ -213,10 +212,6 @@ while [[ $# -gt 0 ]]; do
           CUSTOMER_ID=$1
           shift
           ;;
-      --resource-group)
-          RESOURCE_GROUP=$1
-          shift
-          ;;
       -h|--help)
           ARGFAIL
           exit
@@ -282,6 +277,7 @@ ARGOCD_APPS_TEMPLATE="${CUSTOMER_CONFIG_DIR}/argocd-apps/templates"
 EXTERNAL_VALUE_GIT_REPO_URL=$(echo "${CUSTOMER_HELM_VALUE_REPO_URL}" | sed -e 's/\//_/g' -e 's/:/_/g' -e 's/$.git//g')
 OBMONDO_ARGOCD_HELM_REPO_URL=$(yq eval '.argo-cd.repo.charts.url' "$SETTINGS_FILE")
 OBMONDO_ARGOCD_HELM_REPO_NAME=$(yq eval '.argo-cd.repo.charts.name' "$SETTINGS_FILE")
+RESOURCE_GROUP=$(yq eval '.cluster.resource-group' "$SETTINGS_FILE")
 
 if $INSTALL_K8S; then
     case "$K8S_TYPE" in
@@ -305,8 +301,13 @@ if $INSTALL_K8S; then
 
       ;;
       aks-terraform)
-          terraform -chdir=cluster-setup-files/terraform/aks apply -var-file=aks.tfvars
-          az aks get-credentials --resource-group "$RESOURCE_GROUP" --name "$CLUSTER_NAME"
+          if [ "$RESOURCE_GROUP" == "null" ]; then
+            echo "Resource group is missing in the settings files"
+            CANCEL_INSTALL
+          else
+            terraform -chdir=cluster-setup-files/terraform/aks apply -var-file=aks.tfvars
+            az aks get-credentials --resource-group "$RESOURCE_GROUP" --name "$CLUSTER_NAME"
+          fi
       ;;
       *)
           echo "Unsupported $K8S_TYPE k8s-type given, which we don't understand. exiting"

@@ -1,6 +1,7 @@
 cluster:
   name: testing
   shortName: testing
+  resource-group: testing
 
 argo-cd:
   secret:
