@@ -1,4 +1,4 @@
-Welcome to K8id.io
+# Welcome to K8id.io - Kubernetes Aid
 
 K8id is a Kubernetes management suite, offering a way to setup and operate K8s clusters, following gitops and automation principles.
 
