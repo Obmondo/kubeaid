@@ -509,37 +509,10 @@ if $SETUP_ARGOCD; then
                 STAT $?
             fi
 
+            HEAD "Applying sealed-secrets for $OBMONDO_ARGOCD_HELM_REPO_NAME ...   "
             kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/${OBMONDO_ARGOCD_HELM_REPO_NAME}".json &>>/tmp/argocd.log
             kubectl get secret --namespace argocd "$OBMONDO_ARGOCD_HELM_REPO_NAME" >/dev/null
             STAT $?
-
-            ### Update the argocd-secret with our custom password and create a sealed secret file as well
-            if $GENERATE_ARGOCD_PASSWORD && ! $RECOVERY && ! kubectl get secrets -n argocd argocd-secret -o name &>/dev/null; then
-                PASSWORD=$(pwgen -y 30 1)
-                SECRET_KEY=$(pwgen 48 1)
-                ENCODED_PASSWORD_HASH=$(bcrypt-tool hash "$PASSWORD" 10)
-                kubectl create secret generic argocd-secret \
-                    --namespace=argocd \
-                    --dry-run=client \
-                    --from-literal=admin.password="$ENCODED_PASSWORD_HASH" \
-                    --from-literal=admin.passwordMtime="$(date +%FT%T%Z)" \
-                    --from-literal=server.secretkey="$SECRET_KEY" \
-                    --output yaml \
-                    | yq eval '.metadata.annotations.["sealedsecrets.bitnami.com/managed"]="true"' - \
-                    | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - \
-                    | kubeseal --controller-namespace system \
-                    --controller-name sealed-secrets \
-                    - > "${SEALEDSECRET_ARGOCD}/argocd-secret.json"
-                STAT $?
-
-                echo "Argocd password: $PASSWORD"
-            fi
-
-            HEAD "Applying sealed-secrets for argocd-secret...   "
-            kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/argocd-secret.json" &>>/tmp/argocd.log
-            kubectl get secret --namespace argocd argocd-secret >/dev/null
-            STAT $?
-
             ;;
         github)
             # NOTE: we are expecting customer would be having their repo on the same git provider.
@@ -581,40 +554,6 @@ if $SETUP_ARGOCD; then
             kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/${OBMONDO_ARGOCD_HELM_REPO_NAME}".yaml &>>/tmp/argocd.log
             kubectl get secret --namespace argocd "$OBMONDO_ARGOCD_HELM_REPO_NAME" >/dev/null
             STAT $?
-
-            ### Update the argocd-secret with our custom password and create a sealed secret file as well
-            if $GENERATE_ARGOCD_PASSWORD && ! $RECOVERY && ! kubectl get secrets -n argocd argocd-secret -o name &>/dev/null; then
-                # This is the form in which argocd stores its admin password
-                PASSWORD=$(pwgen -y 30 1)
-                SECRET_KEY=$(pwgen 48 1)
-                ENCODED_PASSWORD_HASH=$(bcrypt-tool hash "$PASSWORD" 10)
-
-                HEAD "Creating sealed-secret for argocd-secret ...    "
-                #read -r -s -p "Github client secret :" GITHUB_CLIENT_SECRET
-
-                kubectl create secret generic argocd-secret \
-                    --namespace=argocd \
-                    --dry-run=client \
-                    --from-literal=admin.password="$ENCODED_PASSWORD_HASH" \
-                    --from-literal=admin.passwordMtime="$(date +%FT%T%Z)" \
-                    --from-literal=server.secretkey="$SECRET_KEY" \
-                    --output yaml \
-                    | yq eval '.metadata.annotations.["sealedsecrets.bitnami.com/managed"]="true"' - \
-                    | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - \
-                    | kubeseal --controller-namespace system \
-                    --controller-name sealed-secrets \
-                    --format yaml \
-                    - > "${SEALEDSECRET_ARGOCD}/argocd-secret.yaml"
-                STAT $?
-
-                echo "Argocd password: $PASSWORD"
-            fi
-
-            HEAD "Applying sealed-secrets for argocd-secret...   "
-            kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/argocd-secret.yaml" &>>/tmp/argocd.log
-            kubectl get secret --namespace argocd argocd-secret >/dev/null
-            STAT $?
-
             ;;
         ssh)
             echo "Error: we don't recommend using ssh options, since a user can get shell access with ssh access"
@@ -625,6 +564,39 @@ if $SETUP_ARGOCD; then
             exit 1
             ;;
     esac
+
+    ### Update the argocd-secret with our custom password and create a sealed secret file as well
+    if $GENERATE_ARGOCD_PASSWORD && ! $RECOVERY && ! kubectl get secrets -n argocd argocd-secret -o name &>/dev/null; then
+        # This is the form in which argocd stores its admin password
+        PASSWORD=$(pwgen -y 30 1)
+        SECRET_KEY=$(pwgen 48 1)
+        ENCODED_PASSWORD_HASH=$(bcrypt-tool hash "$PASSWORD" 10)
+
+        HEAD "Creating sealed-secret for argocd-secret ...    "
+        #read -r -s -p "Github client secret :" GITHUB_CLIENT_SECRET
+
+        kubectl create secret generic argocd-secret \
+            --namespace=argocd \
+            --dry-run=client \
+            --from-literal=admin.password="$ENCODED_PASSWORD_HASH" \
+            --from-literal=admin.passwordMtime="$(date +%FT%T%Z)" \
+            --from-literal=server.secretkey="$SECRET_KEY" \
+            --output yaml \
+            | yq eval '.metadata.annotations.["sealedsecrets.bitnami.com/managed"]="true"' - \
+            | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - \
+            | kubeseal --controller-namespace system \
+            --controller-name sealed-secrets \
+            --format yaml \
+            - > "${SEALEDSECRET_ARGOCD}/argocd-secret.yaml"
+        STAT $?
+
+        echo "Argocd password: $PASSWORD"
+    fi
+
+    HEAD "Applying sealed-secrets for argocd-secret...   "
+    kubectl apply --namespace argocd -f "${SEALEDSECRET_ARGOCD}/argocd-secret.yaml" &>>/tmp/argocd.log
+    kubectl get secret --namespace argocd argocd-secret >/dev/null
+    STAT $?
 
     # Setup only when OCI repo is given
     if [ "$OCI_URL" != "null" ]; then
