@@ -13,7 +13,7 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     default_node_pool {
         name            = "agentpool"
         node_count      = var.agent_count
-        vm_size         = "standard_e2as_v5"
+        vm_size         = var.vm_size
     }
 
     linux_profile {
@@ -28,10 +28,6 @@ resource "azurerm_kubernetes_cluster" "k8s" {
      type = "SystemAssigned"
     }
 
-    network_profile {
-        load_balancer_sku = "Standard"
-        network_plugin = "kubenet"
-    }
 
     tags = {
         Environment = "Development"
