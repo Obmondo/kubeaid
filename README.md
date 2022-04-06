@@ -26,6 +26,12 @@ be updated simply by running `git pull` on your copy of this repository.
 
 All customizations happens in your `kubernetes-config` repo.
 
+## support
+
+Besides the community support, the primary developers of this project offers support via services on https://obmondo.com - where you can opt to have us react to your alerts, and/or help you with developing new features or other tasks on clusters, setup using this project.
+
+There are ZERO vendor lockin - so any subscription you sign - can be cancelled at any time - you only pay for 1 month at a time.
+
 ## License
 
 **K8id.io** is licensed under the GPLv3 license, as we believe this is the best way to protect against the patent
