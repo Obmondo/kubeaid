@@ -1,34 +1,37 @@
-# Welcome to K8id.io - Kubernetes Aid
+# Welcome to **K8id.io** — Kubernetes Aid
 
-K8id is a Kubernetes management suite, offering a way to setup and operate K8s clusters, following gitops and automation principles.
+**K8id.io** is a Kubernetes management suite, offering a way to setup and operate K8s clusters, following gitops and
+automation principles.
 
 K8id offers:
-- Setup of k8s clusters on physical servers (on-prem or @hetzner) and in cloud providers like Azure AKS, AWS or GCE 
-- Autoscaling for all cloud k8s clusters and easy manual scaleup for physical servers.
-- Manage an evergrowing list of Open Source k8s applications (see argocd-helm-charts/ folder for a list)
-- Build advanced, customized Prometheus monitoring - using just a per-cluster config file
-- regular appiication updates, with security and bugfixes - ready to be issued to your cluster(s) at your will
-- Air-gapped operation of your clusters, to ensure operational stabilty
-- Backup, Recovery and live-migration of applications or entire clusters
-- Major cluster upgrades, via a shadow k8s setup - utilizing the recovery and live-migration features
+
+- Setup of k8s clusters on physical servers (on-premise or at e.g. [Hetzner.com](https://hetzner.com)) and in cloud
+  providers like Azure AKS, Amazon AWS or Google GCE
+- Auto-scaling for all cloud k8s clusters and easy manual scale-up for physical servers
+- Manage an ever-growing list of Open Source k8s applications (see `argocd-helm-charts/` folder for a list)
+- Build advanced, customized Prometheus monitoring, using just a per-cluster config file
+- Regular application updates with security and bug fixes, ready to be issued to your cluster(s) at will
+- Air-gapped operation of your clusters, to ensure operational stability
+- Backup, recovery and live-migration of applications or entire clusters
+- Major cluster upgrades, via a shadow Kubernetes setup utilizing the recovery and live-migration features
 - Supply chain attack protection and discovery
 
-# Setup of k8s clusters
+## Setup of Kubernetes clusters
 
-Mirror this repo and kubernetes-config repo into a GIT host of your choice, and follow the readme in kubernetes-config repo, to write the config for your k8s cluster(s).
-You must NEVER alter your copy of this mirror, as we deliver updates to you - by you simply doing 'git pull' on your copy of this repo.
+Mirror this repo and the `kubernetes-config` repo into a Git platform of your choice, and follow the `README` file in
+the `kubernetes-config` repository on how to write the config for your Kubernetes cluster.
 
-All customizations happens in your kubernets-config repo.
+You must NEVER alter your copy of this mirror as we use this to deliver updates to you. This means that your cluster can
+be updated simply by running `git pull` on your copy of this repository.
 
-# Technical details of how this works
+All customizations happens in your `kubernetes-config` repo.
 
-If you want to know HOW k8id currently does its magic - read this section
+## License
 
-## setup of k8s clusters
+**K8id.io** is licensed under the GPLv3 license, as we believe this is the best way to protect against the patent
+attacks we see hurting the industry; where companies submit code that uses technology they have patented, and then turn
+and litigate companies that use the software.
 
-We manage AWS and GCP clusters, using kOPS - which spins up ec2/gce or instances.
-We manage Azure AKS, using Terraform 
-
-# License
-
-K8id is licensed under the GPLv3 license, as we believe this is the best way to protect against the patent attacks we see, where companies submit code that uses technology they have patented, and then turn and litigate companies that use the software. GPL has always been focused on ensuring everyone gets the same priviliges, protecting against methods like tivoization - which means its very much aligned with the goals of this project - to allow everyone to work on a level playing ground.
+The GNU Public License has always been focused on ensuring everyone gets the same privileges, protecting against methods
+like [TiVoization](https://en.wikipedia.org/wiki/Tivoization), which means it's very much aligned with the goals of this
+project, namely to allow everyone to work on a level playing ground.
