@@ -14,9 +14,7 @@ spec:
     metadata:
       {{- with (mergeOverwrite (deepCopy .Values.global.podAnnotations) .Values.dex.podAnnotations) }}
       annotations:
-        {{- range $key, $value := . }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "argo-cd.labels" (dict "context" . "component" .Values.dex.name "name" .Values.dex.name) | nindent 8 }}
@@ -56,9 +54,6 @@ spec:
         command:
         - /shared/argocd-dex
         - rundex
-        {{- with .Values.dex.extraArgs }}
-        {{- . | toYaml | nindent 8 }}
-        {{- end }}
         {{- if .Values.dex.containerSecurityContext }}
         securityContext: {{- toYaml .Values.dex.containerSecurityContext | nindent 10 }}
         {{- end }}

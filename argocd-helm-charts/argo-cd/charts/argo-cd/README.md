@@ -212,7 +212,6 @@ NAME: my-release
 | configs.tlsCerts | object | See [values.yaml] | TLS certificate |
 | configs.tlsCertsAnnotations | object | `{}` | TLS certificate configmap annotations |
 | createAggregateRoles | bool | `false` | Create clusterroles that extend existing clusterroles to interact with argo-cd crds |
-| extraObjects | list | `[]` | Array of extra K8s manifests to deploy |
 | fullnameOverride | string | `""` | String to fully override `"argo-cd.fullname"` |
 | global.additionalLabels | object | `{}` | Additional labels to add to all resources |
 | global.hostAliases | list | `[]` | Mapping between IP and hostnames that will be injected as entries in the pod's hosts files |
@@ -263,7 +262,7 @@ NAME: my-release
 | controller.logFormat | string | `"text"` | Application controller log format. Either `text` or `json` |
 | controller.logLevel | string | `"info"` | Application controller log level |
 | controller.metrics.applicationLabels.enabled | bool | `false` | Enables additional labels in argocd_app_labels metric |
-| controller.metrics.applicationLabels.labels | list | `[]` | Additional labels |
+| controller.metrics.applicationLabels.labels | object | `{}` | Additional labels |
 | controller.metrics.enabled | bool | `false` | Deploy metrics service |
 | controller.metrics.rules.enabled | bool | `false` | Deploy a PrometheusRule for the application controller |
 | controller.metrics.rules.spec | list | `[]` | PrometheusRule.Spec for the application controller |
@@ -279,9 +278,6 @@ NAME: my-release
 | controller.metrics.serviceMonitor.selector | object | `{}` | Prometheus ServiceMonitor selector |
 | controller.name | string | `"application-controller"` | Application controller name string |
 | controller.nodeSelector | object | `{}` | [Node selector] |
-| controller.pdb.annotations | object | `{}` | Annotations to be added to application controller pdb |
-| controller.pdb.enabled | bool | `false` | Deploy a Poddisruptionbudget for the application controller |
-| controller.pdb.labels | object | `{}` | Labels to be added to application controller pdb |
 | controller.podAnnotations | object | `{}` | Annotations to be added to application controller pods |
 | controller.podLabels | object | `{}` | Labels to be added to application controller pods |
 | controller.priorityClassName | string | `""` | Priority class for the application controller pods |
@@ -320,7 +316,6 @@ NAME: my-release
 | repoServer.clusterRoleRules.rules | list | `[]` | List of custom rules for the Repo server's Cluster Role resource |
 | repoServer.containerPort | int | `8081` | Configures the repo server port |
 | repoServer.containerSecurityContext | object | `{}` | Repo server container-level security context |
-| repoServer.copyutil.resources | object | `{}` | Resource limits and requests for the copyutil initContainer |
 | repoServer.env | list | `[]` | Environment variables to pass to repo server |
 | repoServer.envFrom | list | `[]` (See [values.yaml]) | envFrom to pass to repo server |
 | repoServer.extraArgs | list | `[]` | Additional command line arguments to pass to repo server |
@@ -349,9 +344,6 @@ NAME: my-release
 | repoServer.metrics.serviceMonitor.selector | object | `{}` | Prometheus ServiceMonitor selector |
 | repoServer.name | string | `"repo-server"` | Repo server name |
 | repoServer.nodeSelector | object | `{}` | [Node selector] |
-| repoServer.pdb.annotations | object | `{}` | Annotations to be added to Repo server pdb |
-| repoServer.pdb.enabled | bool | `false` | Deploy a Poddisruptionbudget for the Repo server |
-| repoServer.pdb.labels | object | `{}` | Labels to be added to Repo server pdb |
 | repoServer.podAnnotations | object | `{}` | Annotations to be added to repo server pods |
 | repoServer.podLabels | object | `{}` | Labels to be added to repo server pods |
 | repoServer.priorityClassName | string | `""` | Priority class for the repo server |
@@ -369,7 +361,7 @@ NAME: my-release
 | repoServer.service.portName | string | `"https-repo-server"` | Repo server service port name |
 | repoServer.serviceAccount.annotations | object | `{}` | Annotations applied to created service account |
 | repoServer.serviceAccount.automountServiceAccountToken | bool | `true` | Automount API credentials for the Service Account |
-| repoServer.serviceAccount.create | bool | `true` | Create repo server service account |
+| repoServer.serviceAccount.create | bool | `false` | Create repo server service account |
 | repoServer.serviceAccount.name | string | `""` | Repo server service account name |
 | repoServer.tolerations | list | `[]` | [Tolerations] for use with node taints |
 | repoServer.topologySpreadConstraints | list | `[]` | Assign custom [TopologySpreadConstraints] rules to the repo server |
@@ -382,10 +374,6 @@ NAME: my-release
 |-----|------|---------|-------------|
 | server.GKEbackendConfig.enabled | bool | `false` | Enable BackendConfig custom resource for Google Kubernetes Engine |
 | server.GKEbackendConfig.spec | object | `{}` | [BackendConfigSpec] |
-| server.GKEfrontendConfig.enabled | bool | `false` | Enable FrontConfig custom resource for Google Kubernetes Engine |
-| server.GKEfrontendConfig.spec | object | `{}` | [FrontendConfigSpec] |
-| server.GKEmanagedCertificate.domains | list | `["argocd.example.com"]` | Domains for the Google Managed Certificate |
-| server.GKEmanagedCertificate.enabled | bool | `false` | Enable ManagedCertificate custom resource for Google Kubernetes Engine. |
 | server.affinity | object | `{}` | Assign custom [affinity] rules to the deployment |
 | server.autoscaling.enabled | bool | `false` | Enable Horizontal Pod Autoscaler ([HPA]) for the Argo CD server |
 | server.autoscaling.maxReplicas | int | `5` | Maximum number of replicas for the Argo CD server [HPA] |
@@ -462,9 +450,6 @@ NAME: my-release
 | server.metrics.serviceMonitor.selector | object | `{}` | Prometheus ServiceMonitor selector |
 | server.name | string | `"server"` | Argo CD server name |
 | server.nodeSelector | object | `{}` | [Node selector] |
-| server.pdb.annotations | object | `{}` | Annotations to be added to server pdb |
-| server.pdb.enabled | bool | `false` | Deploy a Poddisruptionbudget for the server |
-| server.pdb.labels | object | `{}` | Labels to be added to server pdb |
 | server.podAnnotations | object | `{}` | Annotations to be added to server pods |
 | server.podLabels | object | `{}` | Labels to be added to server pods |
 | server.priorityClassName | string | `""` | Priority class for the Argo CD server |
@@ -520,7 +505,6 @@ NAME: my-release
 | dex.enabled | bool | `true` | Enable dex |
 | dex.env | list | `[]` | Environment variables to pass to the Dex server |
 | dex.envFrom | list | `[]` (See [values.yaml]) | envFrom to pass to the Dex server |
-| dex.extraArgs | list | `[]` | Additional command line arguments to pass to the Dex server |
 | dex.extraContainers | list | `[]` | Additional containers to be added to the dex pod |
 | dex.extraVolumeMounts | list | `[]` | Extra volumeMounts to the dex pod |
 | dex.extraVolumes | list | `[]` | Extra volumes to the dex pod |
@@ -549,9 +533,6 @@ NAME: my-release
 | dex.metrics.serviceMonitor.selector | object | `{}` | Prometheus ServiceMonitor selector |
 | dex.name | string | `"dex-server"` | Dex name |
 | dex.nodeSelector | object | `{}` | [Node selector] |
-| dex.pdb.annotations | object | `{}` | Annotations to be added to Dex server pdb |
-| dex.pdb.enabled | bool | `false` | Deploy a Poddisruptionbudget for the Dex server |
-| dex.pdb.labels | object | `{}` | Labels to be added to Dex server pdb |
 | dex.podAnnotations | object | `{}` | Annotations to be added to the Dex server pods |
 | dex.podLabels | object | `{}` | Labels to be added to the Dex server pods |
 | dex.priorityClassName | string | `""` | Priority class for dex |
@@ -590,7 +571,7 @@ NAME: my-release
 | redis.extraContainers | list | `[]` | Additional containers to be added to the redis pod |
 | redis.image.imagePullPolicy | string | `"IfNotPresent"` | Redis imagePullPolicy |
 | redis.image.repository | string | `"redis"` | Redis repository |
-| redis.image.tag | string | `"6.2.6-alpine"` | Redis tag |
+| redis.image.tag | string | `"6.2.4-alpine"` | Redis tag |
 | redis.initContainers | list | `[]` | Init containers to add to the redis pod |
 | redis.metrics.containerPort | int | `9121` | Port to use for redis-exporter sidecar |
 | redis.metrics.enabled | bool | `false` | Deploy metrics service and redis-exporter sidecar |
@@ -613,9 +594,6 @@ NAME: my-release
 | redis.metrics.serviceMonitor.selector | object | `{}` | Prometheus ServiceMonitor selector |
 | redis.name | string | `"redis"` | Redis name |
 | redis.nodeSelector | object | `{}` | [Node selector] |
-| redis.pdb.annotations | object | `{}` | Annotations to be added to Redis server pdb |
-| redis.pdb.enabled | bool | `false` | Deploy a Poddisruptionbudget for the Redis server |
-| redis.pdb.labels | object | `{}` | Labels to be added to Redis server pdb |
 | redis.podAnnotations | object | `{}` | Annotations to be added to the Redis server pods |
 | redis.podLabels | object | `{}` | Labels to be added to the Redis server pods |
 | redis.priorityClassName | string | `""` | Priority class for redis |
@@ -636,7 +614,7 @@ NAME: my-release
 | redis-ha.exporter.enabled | bool | `true` | If `true`, the prometheus exporter sidecar is enabled |
 | redis-ha.haproxy.enabled | bool | `true` | Enabled HAProxy LoadBalancing/Proxy |
 | redis-ha.haproxy.metrics.enabled | bool | `true` | HAProxy enable prometheus metric scraping |
-| redis-ha.image.tag | string | `"6.2.6-alpine"` | Redis tag |
+| redis-ha.image.tag | string | `"6.2.4-alpine"` | Redis tag |
 | redis-ha.persistentVolume.enabled | bool | `false` | Configures persistency on Redis nodes |
 | redis-ha.redis.config | object | See [values.yaml] | Any valid redis config options in this section will be applied to each server (see `redis-ha` chart) |
 | redis-ha.redis.config.save | string | `"\"\""` | Will save the DB if both the given number of seconds and the given number of write operations against the DB occurred. `""`  is disabled |
@@ -673,7 +651,6 @@ Autogenerated from chart metadata using [helm-docs](https://github.com/norwoodj/
 [BackendConfigSpec]: https://cloud.google.com/kubernetes-engine/docs/concepts/backendconfig#backendconfigspec_v1beta1_cloudgooglecom
 [CSS styles]: https://argo-cd.readthedocs.io/en/stable/operator-manual/custom-styles/
 [external cluster credentials]: https://argoproj.github.io/argo-cd/operator-manual/declarative-setup/#clusters
-[FrontendConfigSpec]: https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-features#configuring_ingress_features_through_frontendconfig_parameters
 [General Argo CD configuration]: https://argoproj.github.io/argo-cd/operator-manual/declarative-setup/#repositories
 [gRPC-ingress]: https://argoproj.github.io/argo-cd/operator-manual/ingress/
 [HPA]: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
