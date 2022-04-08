@@ -58,34 +58,6 @@ apiVersionOverrides:
 ## Ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#aggregated-clusterroles
 createAggregateRoles: false
 
-# -- Array of extra K8s manifests to deploy
-extraObjects: []
-  # - apiVersion: secrets-store.csi.x-k8s.io/v1
-  #   kind: SecretProviderClass
-  #   metadata:
-  #     name: argocd-secrets-store
-  #   spec:
-  #     provider: aws
-  #     parameters:
-  #       objects: |
-  #         - objectName: "argocd"
-  #           objectType: "secretsmanager"
-  #           jmesPath:
-  #               - path: "client_id"
-  #                 objectAlias: "client_id"
-  #               - path: "client_secret"
-  #                 objectAlias: "client_secret"
-  #     secretObjects:
-  #     - data:
-  #       - key: client_id
-  #         objectName: client_id
-  #       - key: client_secret
-  #         objectName: client_secret
-  #       secretName: argocd-secrets-store
-  #       type: Opaque
-  #       labels:
-  #         app.kubernetes.io/part-of: argocd
-
 ## Controller
 controller:
   # -- Application controller name string
@@ -251,7 +223,7 @@ controller:
       # -- Enables additional labels in argocd_app_labels metric
       enabled: false
       # -- Additional labels
-      labels: []
+      labels: {}
     service:
       # -- Metrics service annotations
       annotations: {}
@@ -345,26 +317,12 @@ controller:
   #    name: custom-tools
   #    subPath: helm
 
-  pdb:
-    # -- Labels to be added to application controller pdb
-    labels: {}
-    # -- Annotations to be added to application controller pdb
-    annotations: {}
-
-    # -- Deploy a Poddisruptionbudget for the application controller
-    enabled: false
-    # minAvailable: 1
-    # maxUnavailable: 0
-
 ## Dex
 dex:
   # -- Enable dex
   enabled: true
   # -- Dex name
   name: dex-server
-
-  # -- Additional command line arguments to pass to the Dex server
-  extraArgs: []
 
   metrics:
     # -- Deploy metrics service
@@ -553,17 +511,6 @@ dex:
   #    name: custom-tools
   #    subPath: helm
 
-  pdb:
-    # -- Labels to be added to Dex server pdb
-    labels: {}
-    # -- Annotations to be added to Dex server pdb
-    annotations: {}
-
-    # -- Deploy a Poddisruptionbudget for the Dex server
-    enabled: false
-    # minAvailable: 1
-    # maxUnavailable: 0
-
 ## Redis
 redis:
   # -- Enable redis
@@ -575,7 +522,7 @@ redis:
     # -- Redis repository
     repository: redis
     # -- Redis tag
-    tag: 6.2.6-alpine
+    tag: 6.2.4-alpine
     # -- Redis imagePullPolicy
     imagePullPolicy: IfNotPresent
 
@@ -737,17 +684,6 @@ redis:
       # -- Prometheus ServiceMonitor labels
       additionalLabels: {}
 
-  pdb:
-    # -- Labels to be added to Redis server pdb
-    labels: {}
-    # -- Annotations to be added to Redis server pdb
-    annotations: {}
-
-    # -- Deploy a Poddisruptionbudget for the Redis server
-    enabled: false
-    # minAvailable: 1
-    # maxUnavailable: 0
-
 # This key configures Redis-HA subchart and when enabled (redis-ha.enabled=true)
 # the custom redis deployment is omitted
 # Check the redis-ha chart for more properties
@@ -776,7 +712,7 @@ redis-ha:
       enabled: true
   image:
     # -- Redis tag
-    tag: 6.2.6-alpine
+    tag: 6.2.4-alpine
 
 ## Server
 server:
@@ -1178,7 +1114,7 @@ server:
   ## Ref: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/rbac.md
   rbacConfig:
     {}
-    # policy.csv is a file containing user-defined RBAC policies and role definitions (optional).
+    # policy.csv is an file containing user-defined RBAC policies and role definitions (optional).
     # Policy rules are in the form:
     #   p, subject, resource, action, object, effect
     # Role definitions and bindings are in the form:
@@ -1297,27 +1233,6 @@ server:
   #      oauthclientCredentials:
   #        secretName: argocd-secret
 
-  ## Create a Google Managed Certificate for use with the GKE Ingress Controller
-  ## https://cloud.google.com/kubernetes-engine/docs/how-to/managed-certs
-  GKEmanagedCertificate:
-    # -- Enable ManagedCertificate custom resource for Google Kubernetes Engine.
-    enabled: false
-    # -- Domains for the Google Managed Certificate
-    domains:
-    - argocd.example.com
-
-  ## Create a Google FrontendConfig Custom Resource, for use with the GKE Ingress Controller
-  ## https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-features#configuring_ingress_features_through_frontendconfig_parameters
-  GKEfrontendConfig:
-    # -- Enable FrontConfig custom resource for Google Kubernetes Engine
-    enabled: false
-    # -- [FrontendConfigSpec]
-    spec: {}
-  # spec:
-  #   redirectToHttps:
-  #     enabled: true
-  #     responseCodeName: RESPONSE_CODE
-
   # -- Additional containers to be added to the server pod
   ## See https://github.com/lemonldap-ng-controller/lemonldap-ng-controller as example.
   extraContainers: []
@@ -1387,17 +1302,6 @@ server:
     contents: []
     # - name: argo-rollouts
     #   url: https://github.com/argoproj-labs/rollout-extension/releases/download/v0.1.0/extension.tar
-
-  pdb:
-    # -- Labels to be added to server pdb
-    labels: {}
-    # -- Annotations to be added to server pdb
-    annotations: {}
-
-    # -- Deploy a Poddisruptionbudget for the server
-    enabled: false
-    # minAvailable: 1
-    # maxUnavailable: 0
 
 ## Repo Server
 repoServer:
@@ -1588,7 +1492,7 @@ repoServer:
   ## If create is set to true, make sure to uncomment the name and update the rbac section below
   serviceAccount:
     # -- Create repo server service account
-    create: true
+    create: false
     # -- Repo server service account name
     name: "" # "argocd-repo-server"
     # -- Annotations applied to created service account
@@ -1610,17 +1514,6 @@ repoServer:
   #     - list
   #     - watch
 
-  # Init container to copy argocd binary
-  copyutil:
-    # -- Resource limits and requests for the copyutil initContainer
-    resources: {}
-    #  limits:
-    #    cpu: 50m
-    #    memory: 64Mi
-    #  requests:
-    #    cpu: 10m
-    #    memory: 32Mi
-
   # -- Init containers to add to the repo server pods
   initContainers: []
   #  - name: download-tools
@@ -1636,17 +1529,6 @@ repoServer:
   #  - mountPath: /usr/local/bin/helm
   #    name: custom-tools
   #    subPath: helm
-
-  pdb:
-    # -- Labels to be added to Repo server pdb
-    labels: {}
-    # -- Annotations to be added to Repo server pdb
-    annotations: {}
-
-    # -- Deploy a Poddisruptionbudget for the Repo server
-    enabled: false
-    # minAvailable: 1
-    # maxUnavailable: 0
 
 ## Argo Configs
 configs:
@@ -1670,7 +1552,6 @@ configs:
     #   labels: {}
     #   annotations: {}
     #   namespaces: namespace1,namespace2
-    #   clusterResources: true
     #   config:
     #     bearerToken: "<authentication token>"
     #     tlsClientConfig:

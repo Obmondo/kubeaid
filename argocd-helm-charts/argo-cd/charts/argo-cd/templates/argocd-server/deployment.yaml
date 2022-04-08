@@ -18,9 +18,7 @@ spec:
     metadata:
       {{- with (mergeOverwrite (deepCopy .Values.global.podAnnotations) .Values.server.podAnnotations) }}
       annotations:
-        {{- range $key, $value := . }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "argo-cd.labels" (dict "context" . "component" .Values.server.name "name" .Values.server.name) | nindent 8 }}
@@ -85,8 +83,10 @@ spec:
         - mountPath: /app/config/ssh
           name: ssh-known-hosts
         {{- end }}
+        {{- if .Values.configs.tlsCerts }}
         - mountPath: /app/config/tls
           name: tls-certs
+        {{- end }}
         - mountPath: /app/config/server/tls
           name: argocd-repo-server-tls
         {{- if .Values.configs.styles }}
@@ -202,9 +202,11 @@ spec:
           name: argocd-ssh-known-hosts-cm
         name: ssh-known-hosts
       {{- end }}
+      {{- if .Values.configs.tlsCerts }}
       - configMap:
           name: argocd-tls-certs-cm
         name: tls-certs
+      {{- end }}
       - name: argocd-repo-server-tls
         secret:
           items:

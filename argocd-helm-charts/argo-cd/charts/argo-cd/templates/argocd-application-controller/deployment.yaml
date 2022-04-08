@@ -19,9 +19,7 @@ spec:
     metadata:
       {{- with (mergeOverwrite (deepCopy .Values.global.podAnnotations) .Values.controller.podAnnotations) }}
       annotations:
-        {{- range $key, $value := . }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "argo-cd.labels" (dict "context" . "component" .Values.controller.name "name" .Values.controller.name) | nindent 8 }}
@@ -57,9 +55,9 @@ spec:
         - --loglevel
         - {{ .Values.controller.logLevel }}
         {{- if .Values.controller.metrics.applicationLabels.enabled }}
-        {{- range .Values.controller.metrics.applicationLabels.labels }}
         - --metrics-application-labels
-        - {{ . }}
+        {{- range .Values.controller.metrics.applicationLabels.labels }}
+        - {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- end }}
         {{- if or (and .Values.redis.enabled (not $redisHa.enabled)) (and $redisHa.enabled $redisHa.haproxy.enabled) }}
