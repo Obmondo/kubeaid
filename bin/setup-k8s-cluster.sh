@@ -286,18 +286,12 @@ if $INSTALL_K8S; then
       ;;
       aws-kops)
           CLUSTER_CONFIG_DIR=$(yq e '.cluster.configDir' "$SETTINGS_FILE")
-          SHORT_CLUSTER_NAME=$(yq eval '.cluster.shortName' "$SETTINGS_FILE")
 
           # Setup the Cluster with KOPS
           echo "Creating cluster $CLUSTER_NAME with KOPS on AWS"
           ./bin/k8s-install-kops.sh \
             --cluster-config-path "$CLUSTER_CONFIG_DIR" \
             --cluster-name "$CLUSTER_NAME"
-
-          # Restore the private keys from, to enable secrets manage to actually decrypt the SealedSecrets
-          if $RECOVERY; then
-              aws secretsmanager get-secret-value --secret-id sealed-secrets-"$SHORT_CLUSTER_NAME" | jq -re '.SecretString' | base64 -d | gzip -cd | kubectl create -f -
-          fi
 
       ;;
       aks-terraform)
@@ -441,16 +435,9 @@ if $SETUP_ARGOCD; then
         STAT $?
     fi
 
-    SEALEDSECRET_CRT="${CUSTOMER_CONFIG_DIR}/$CLUSTER_NAME.pem"
     SEALEDSECRET_ARGOCD="${CUSTOMER_CONFIG_DIR}/sealed-secrets/argocd"
     ARGOCD_CTRL_REPLICAS=$(DEFAULT_VALES '.argo-cd.controller.replicas' 1)
     ARGOCD_REPO_REPLICAS=$(DEFAULT_VALES '.argo-cd.repoServer.replicas' 1)
-
-    kubectl get secret \
-        --namespace system \
-        -l sealedsecrets.bitnami.com/sealed-secrets-key=active \
-        -o jsonpath='{'.items[0].data."tls\.crt"'}' \
-        | base64 -d > "${SEALEDSECRET_CRT}"
 
     case "$GIT_AUTH_TYPE" in
         https)
@@ -658,7 +645,6 @@ if $SETUP_ARGOCD; then
     # Switch to the original state of the file, after installing
     git restore ./argocd-helm-charts/argo-cd/Chart.yaml
 
-    rm -fr "${SEALEDSECRET_CRT}"
 fi
 
 ##### Install root app #####
