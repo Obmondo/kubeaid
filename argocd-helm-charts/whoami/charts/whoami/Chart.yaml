@@ -1,9 +1,21 @@
+annotations:
+  artifacthub.io/signKey: |
+    fingerprint: 9E57D2479D48B84463EF491F66D280CE667AD6C8
+    url: https://cowboysysop.github.io/charts/pgp-public-key-2022-02-19.asc
+  kubeVersion: '>=1.16'
 apiVersion: v2
 appVersion: 1.5.0
+dependencies:
+- name: common
+  repository: https://charts.bitnami.com/bitnami/
+  version: 1.7.1
 description: Tiny Go webserver that prints os information and HTTP request to output
 home: https://github.com/containous/whoami
 maintainers:
 - email: sebastien.prudhomme@gmail.com
   name: sebastien-prudhomme
 name: whoami
-version: 2.2.0
+sources:
+- https://github.com/containous/whoami
+- https://github.com/cowboysysop/charts/tree/master/charts/whoami
+version: 2.5.5
