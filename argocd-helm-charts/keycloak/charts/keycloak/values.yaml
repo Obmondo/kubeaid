@@ -9,8 +9,8 @@ replicas: 1
 
 image:
   # The Keycloak image repository
-  repository: docker.io/jboss/keycloak
-  # Overrides the Keycloak image tag whose default is the chart version
+  repository: quay.io/keycloak/keycloak
+  # Overrides the Keycloak image tag whose default is the chart appVersion
   tag: ""
   # The Keycloak image pull policy
   pullPolicy: IfNotPresent
@@ -318,6 +318,11 @@ ingress:
         paths:
           - path: /auth/admin/
             pathType: Prefix
+    # Console TLS configuration
+    tls: []
+#      - hosts:
+#          - console.keycloak.example.com
+#        secretName: ""
 
 ## Network policy configuration
 networkPolicy:
@@ -502,3 +507,5 @@ test:
   securityContext:
     runAsUser: 1000
     runAsNonRoot: true
+  # See https://helm.sh/docs/topics/charts_hooks/#hook-deletion-policies
+  deletionPolicy: before-hook-creation
