@@ -50,6 +50,8 @@ deployment:
     #   volumeMounts:
     #     - name: data
     #       mountPath: /data
+  # Use process namespace sharing
+  shareProcessNamespace: false
   # Custom pod DNS policy. Apply if `hostNetwork: true`
   # dnsPolicy: ClusterFirstWithHostNet
   # Additional imagePullSecrets
@@ -81,13 +83,14 @@ pilot:
 
 # Enable experimental features
 experimental:
+  http3:
+    enabled: false
   plugins:
     enabled: false
   kubernetesGateway:
     enabled: false
-    appLabelSelector: "traefik"
-    certificates: []
-    # - group: "core"
+    # certificate:
+    #   group: "core"
     #   kind: "Secret"
     #   name: "mysecret"
     # By default, Gateway would be created to the Namespace you are deploying Traefik to.
@@ -107,6 +110,20 @@ rollingUpdate:
   maxUnavailable: 1
   maxSurge: 1
 
+# Customize liveness and readiness probe values.
+readinessProbe:
+  failureThreshold: 1
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 2
+
+livenessProbe:
+  failureThreshold: 3
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 2
 
 #
 # Configure providers
@@ -124,6 +141,8 @@ providers:
   kubernetesIngress:
     enabled: true
     allowExternalNameServices: false
+    allowEmptyServices: false
+    # ingressClass: traefik-internal
     # labelSelector: environment=production,method=traefik
     namespaces: []
       # - "default"
@@ -206,8 +225,18 @@ metrics:
   #   protocol: udp
   prometheus:
     entryPoint: metrics
+  #  addRoutersLabels: true
   # statsd:
   #   address: localhost:8125
+
+tracing: {}
+  # instana:
+  #   enabled: true
+  # datadog:
+  #   localAgentHostPort: 127.0.0.1:8126
+  #   debug: false
+  #   globalTag: ""
+  #   prioritySampling: false
 
 globalArguments:
   - "--global.checknewversion"
@@ -295,6 +324,10 @@ ports:
     # The port protocol (TCP/UDP)
     protocol: TCP
     # nodePort: 32443
+    # Enable HTTP/3.
+    # Requires enabling experimental http3 feature and tls.
+    # Note that you cannot have a UDP entrypoint with the same port.
+    # http3: true
     # Set TLS at the entrypoint
     # https://doc.traefik.io/traefik/routing/entrypoints/#tls
     tls:
@@ -361,6 +394,11 @@ service:
     # - 1.2.3.4
   # One of SingleStack, PreferDualStack, or RequireDualStack.
   # ipFamilyPolicy: SingleStack
+  # List of IP families (e.g. IPv4 and/or IPv6).
+  # ref: https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services
+  # ipFamilies:
+  #   - IPv4
+  #   - IPv6
 
 ## Create HorizontalPodAutoscaler object.
 ##
@@ -435,13 +473,13 @@ affinity: {}
 # # It should be used when hostNetwork: true to prevent port conflicts
 #   podAntiAffinity:
 #     requiredDuringSchedulingIgnoredDuringExecution:
-#     - labelSelector:
-#         matchExpressions:
-#         - key: app
-#           operator: In
-#           values:
-#           - {{ template "traefik.name" . }}
-#       topologyKey: failure-domain.beta.kubernetes.io/zone
+#       - labelSelector:
+#           matchExpressions:
+#             - key: app.kubernetes.io/name
+#               operator: In
+#               values:
+#                 - {{ template "traefik.name" . }}
+#         topologyKey: kubernetes.io/hostname
 nodeSelector: {}
 tolerations: []
 
