@@ -2,14 +2,14 @@
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: ebs-csi-snapshotter-binding
+  name: ebs-csi-node-getter-binding
   labels:
     {{- include "aws-ebs-csi-driver.labels" . | nindent 4 }}
 subjects:
   - kind: ServiceAccount
-    name: {{ .Values.controller.serviceAccount.name }}
+    name: {{ .Values.node.serviceAccount.name }}
     namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
-  name: ebs-external-snapshotter-role
+  name: ebs-csi-node-role
   apiGroup: rbac.authorization.k8s.io

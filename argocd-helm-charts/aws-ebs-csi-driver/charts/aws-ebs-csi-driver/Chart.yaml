@@ -1,5 +1,9 @@
-apiVersion: v1
-appVersion: 0.10.1
+annotations:
+  artifacthub.io/changes: |
+    - kind: added
+      description: Custom controller.updateStrategy to set controller deployment strategy.
+apiVersion: v2
+appVersion: 1.5.1
 description: A Helm chart for AWS EBS CSI Driver
 home: https://github.com/kubernetes-sigs/aws-ebs-csi-driver
 keywords:
@@ -15,4 +19,4 @@ maintainers:
 name: aws-ebs-csi-driver
 sources:
 - https://github.com/kubernetes-sigs/aws-ebs-csi-driver
-version: 0.10.1
+version: 2.6.4
