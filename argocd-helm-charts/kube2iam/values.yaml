@@ -1,6 +1,6 @@
 kube2iam:
   host:
-    interface: weave
+    interface: cali+
     iptables: true
   rbac:
     create: true
