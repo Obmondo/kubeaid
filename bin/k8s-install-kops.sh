@@ -86,7 +86,7 @@ if ! kops get cluster --name "$FULLNAME" >/dev/null; then
   kops create -f "$CLUSTER_CONFIG_PATH"/cluster.yaml
   kops create -f "$CLUSTER_CONFIG_PATH"/master-ig.yaml
   kops create -f "$CLUSTER_CONFIG_PATH"/nodes-ig.yaml
-  kops create secret --name "$FULLNAME" sshpublickey admin -i kops.pub
+  kops create secret --name "$FULLNAME" sshpublickey admin -i "$CLUSTER_CONFIG_PATH"/kops.pub
   kops update cluster "$FULLNAME" --yes --admin=48h
 else
   echo "Cluster $FULLNAME is already present, replacing the config with the local changes"
@@ -119,11 +119,17 @@ While you go ahead and do the above steps, I'll wait here and when you are done,
 ###################################################################
 EOF
 
-read -r -p "Enter 'yes' : "
+read -r -p "Enter 'yes' : " GO_VALIDATE
 
-until kops validate cluster "$FULLNAME" --wait=5m; do
-  echo "Seems like validation is failing, going to sleep for 30 seconds and try again"
-  sleep 30
-done
+if [ "$GO_VALIDATE" == "yes" ]; then
+  until kops validate cluster "$FULLNAME" --wait=5m; do
+    echo "Seems like validation is failing, going to sleep for 30 seconds and try again"
+    sleep 30
+  done
 
-echo "The $FULLNAME k8s cluster is up and running now"
+  echo "The $FULLNAME k8s cluster is up and running now"
+else
+  echo "Can not validate $FULLNAME k8s cluster, I guess because you are not ready"
+  echo "You can run this script again once you have done the required steps"
+  exit 1
+fi
