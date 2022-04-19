@@ -6,7 +6,11 @@ metadata:
   labels:
     {{- include "aws-ebs-csi-driver.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.controller.replicaCount }}
+  {{- with .Values.controller.updateStrategy }}
+  strategy:
+    {{ toYaml . | nindent 4 }}
+  {{- end }}
   selector:
     matchLabels:
       app: ebs-csi-controller
@@ -16,43 +20,50 @@ spec:
       labels:
         app: ebs-csi-controller
         {{- include "aws-ebs-csi-driver.labels" . | nindent 8 }}
-      {{- if .Values.podAnnotations }}
-      annotations: {{ toYaml .Values.podAnnotations | nindent 8 }}
+        {{- if .Values.controller.podLabels }}
+        {{- toYaml .Values.controller.podLabels | nindent 8 }}
+        {{- end }}
+      {{- if .Values.controller.podAnnotations }}
+      annotations:
+        {{- toYaml .Values.controller.podAnnotations | nindent 8 }}
       {{- end }}
     spec:
       nodeSelector:
         kubernetes.io/os: linux
-        {{- with .Values.nodeSelector }}
-{{ toYaml . | indent 8 }}
+        {{- with .Values.controller.nodeSelector }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
-      serviceAccountName: {{ .Values.serviceAccount.controller.name }}
-      priorityClassName: {{ .Values.priorityClassName | default "system-cluster-critical" }}
-      {{- with .Values.affinity }}
-      affinity: {{ toYaml . | nindent 8 }}
+      serviceAccountName: {{ .Values.controller.serviceAccount.name }}
+      priorityClassName: {{ .Values.controller.priorityClassName }}
+      {{- with default .Values.controller.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       tolerations:
-        {{- if .Values.tolerateAllTaints }}
-        - operator: Exists
-        {{- else }}
         - key: CriticalAddonsOnly
           operator: Exists
         - operator: Exists
           effect: NoExecute
           tolerationSeconds: 300
+        {{- with .Values.controller.tolerations }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- with .Values.tolerations }}
-{{ toYaml . | indent 8 }}
-        {{- end }}
-{{- if .Values.topologySpreadConstraints }}
-{{- $tscLabelSelector := dict "labelSelector" ( dict "matchLabels" ( dict "app" "ebs-csi-controller" ) ) }}
+      {{- if .Values.controller.topologySpreadConstraints }}
+      {{- $tscLabelSelector := dict "labelSelector" ( dict "matchLabels" ( dict "app" "ebs-csi-controller" ) ) }}
+      {{- $constraints := list }}
+      {{- range .Values.controller.topologySpreadConstraints }}
+        {{- $constraints = mustAppend $constraints (mergeOverwrite . $tscLabelSelector) }}
+      {{- end }}
       topologySpreadConstraints:
-        {{- range .Values.topologySpreadConstraints }}
-        - {{ mergeOverwrite . $tscLabelSelector | toJson }}
-        {{- end }}
-{{- end }}
+        {{- $constraints | toYaml | nindent 8 }}
+      {{- end }}
+      {{- with .Values.controller.securityContext }}
+      securityContext:  
+        {{- toYaml . | nindent 8 }}
+      {{- end }} 
       containers:
         - name: ebs-plugin
-          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          image: {{ printf "%s:%s" .Values.image.repository (default (printf "v%s" .Chart.AppVersion) (.Values.image.tag | toString)) }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             {{- if ne .Release.Name "kustomize" }}
@@ -61,17 +72,27 @@ spec:
             # - {all,controller,node} # specify the driver mode
             {{- end }}
             - --endpoint=$(CSI_ENDPOINT)
-            {{- if .Values.extraVolumeTags }}
+            {{- if .Values.controller.extraVolumeTags }}
               {{- include "aws-ebs-csi-driver.extra-volume-tags" . | nindent 12 }}
             {{- end }}
-            {{- if .Values.k8sTagClusterId }}
-            - --k8s-tag-cluster-id={{ .Values.k8sTagClusterId }}
+            {{- with .Values.controller.k8sTagClusterId }}
+            - --k8s-tag-cluster-id={{ . }}
+            {{- end }}
+            {{- with .Values.controller.httpEndpoint }}
+            - --http-endpoint={{ . }}
             {{- end }}
             - --logtostderr
-            - --v=5
+            - --v={{ .Values.controller.logLevel }}
+            {{- range .Values.controller.additionalArgs }}
+            - {{ . }}
+            {{- end }}
           env:
             - name: CSI_ENDPOINT
               value: unix:///var/lib/csi/sockets/pluginproxy/csi.sock
+            - name: CSI_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -84,24 +105,16 @@ spec:
                   name: aws-secret
                   key: access_key
                   optional: true
-            {{- if .Values.region }}
+            {{- with .Values.controller.region }}
             - name: AWS_REGION
-              value: {{ .Values.region }}
+              value: {{ . }}
             {{- end }}
-            {{- if .Values.controller.extraVars }}
-            {{- range $key, $val :=  .Values.controller.extraVars }}
-            - name: {{ $key }}
-              value: "{{ $val }}"
+            {{- if .Values.proxy.http_proxy }}
+            {{- include "aws-ebs-csi-driver.http-proxy" . | nindent 12 }}
             {{- end }}
+            {{- with .Values.controller.env }}
+            {{- . | toYaml | nindent 12 }}
             {{- end }}
-{{- if .Values.proxy.http_proxy }}
-            - name: HTTP_PROXY
-              value: {{ .Values.proxy.http_proxy | quote }}
-            - name: HTTPS_PROXY
-              value: {{ .Values.proxy.http_proxy | quote }}
-            - name: NO_PROXY
-              value: {{ .Values.proxy.no_proxy | quote }}
-{{- end }}
           volumeMounts:
             - name: socket-dir
               mountPath: /var/lib/csi/sockets/pluginproxy/
@@ -125,120 +138,118 @@ spec:
             timeoutSeconds: 3
             periodSeconds: 10
             failureThreshold: 5
-          {{- with .Values.resources }}
-          resources: {{ toYaml . | nindent 12 }}
+          {{- with .Values.controller.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
         - name: csi-provisioner
-          image: {{ printf "%s:%s" .Values.sidecars.provisionerImage.repository .Values.sidecars.provisionerImage.tag }}
+          image: {{ printf "%s:%s" .Values.sidecars.provisioner.image.repository .Values.sidecars.provisioner.image.tag }}
+          imagePullPolicy: {{ default .Values.image.pullPolicy .Values.sidecars.provisioner.image.pullPolicy }}
           args:
             - --csi-address=$(ADDRESS)
-            - --v=5
-            {{- if .Values.enableVolumeScheduling }}
+            - --v={{ .Values.sidecars.provisioner.logLevel }}
             - --feature-gates=Topology=true
-            {{- end}}
-            {{- if .Values.extraCreateMetadata }}
+            {{- if .Values.controller.extraCreateMetadata }}
             - --extra-create-metadata
             {{- end}}
             - --leader-election=true
-            - --default-fstype=ext4
+            - --default-fstype={{ .Values.controller.defaultFsType }}
           env:
             - name: ADDRESS
               value: /var/lib/csi/sockets/pluginproxy/csi.sock
-{{- if .Values.proxy.http_proxy }}
-            - name: HTTP_PROXY
-              value: {{ .Values.proxy.http_proxy | quote }}
-            - name: HTTPS_PROXY
-              value: {{ .Values.proxy.http_proxy | quote }}
-            - name: NO_PROXY
-              value: {{ .Values.proxy.no_proxy | quote }}
-{{- end }}
+            {{- if .Values.proxy.http_proxy }}
+            {{- include "aws-ebs-csi-driver.http-proxy" . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.sidecars.provisioner.env }}
+            {{- . | toYaml | nindent 12 }}
+            {{- end }}
           volumeMounts:
             - name: socket-dir
               mountPath: /var/lib/csi/sockets/pluginproxy/
-          {{- with .Values.resources }}
-          resources: {{ toYaml . | nindent 12 }}
+          {{- with default .Values.controller.resources .Values.sidecars.provisioner.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
         - name: csi-attacher
-          image: {{ printf "%s:%s" .Values.sidecars.attacherImage.repository .Values.sidecars.attacherImage.tag }}
+          image: {{ printf "%s:%s" .Values.sidecars.attacher.image.repository .Values.sidecars.attacher.image.tag }}
+          imagePullPolicy: {{ default .Values.image.pullPolicy .Values.sidecars.attacher.image.pullPolicy }}
           args:
             - --csi-address=$(ADDRESS)
-            - --v=5
+            - --v={{ .Values.sidecars.attacher.logLevel }}
             - --leader-election=true
           env:
             - name: ADDRESS
               value: /var/lib/csi/sockets/pluginproxy/csi.sock
-{{- if .Values.proxy.http_proxy }}
-            - name: HTTP_PROXY
-              value: {{ .Values.proxy.http_proxy | quote }}
-            - name: HTTPS_PROXY
-              value: {{ .Values.proxy.http_proxy | quote }}
-            - name: NO_PROXY
-              value: {{ .Values.proxy.no_proxy | quote }}
-{{- end }}
+            {{- if .Values.proxy.http_proxy }}
+            {{- include "aws-ebs-csi-driver.http-proxy" . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.sidecars.attacher.env }}
+            {{- . | toYaml | nindent 12 }}
+            {{- end }}
           volumeMounts:
             - name: socket-dir
               mountPath: /var/lib/csi/sockets/pluginproxy/
-          {{- with .Values.resources }}
-          resources: {{ toYaml . | nindent 12 }}
+          {{- with default .Values.controller.resources .Values.sidecars.attacher.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
-        {{- if .Values.enableVolumeSnapshot }}
+        {{- if or (.Capabilities.APIVersions.Has "snapshot.storage.k8s.io/v1beta1") (.Capabilities.APIVersions.Has "snapshot.storage.k8s.io/v1") }}
         - name: csi-snapshotter
-          image: {{ printf "%s:%s" .Values.sidecars.snapshotterImage.repository .Values.sidecars.snapshotterImage.tag }}
+          image: {{ printf "%s:%s" .Values.sidecars.snapshotter.image.repository .Values.sidecars.snapshotter.image.tag }}
+          imagePullPolicy: {{ default .Values.image.pullPolicy .Values.sidecars.snapshotter.image.pullPolicy }}
           args:
             - --csi-address=$(ADDRESS)
             - --leader-election=true
           env:
             - name: ADDRESS
               value: /var/lib/csi/sockets/pluginproxy/csi.sock
-{{- if .Values.proxy.http_proxy }}
-            - name: HTTP_PROXY
-              value: {{ .Values.proxy.http_proxy | quote }}
-            - name: HTTPS_PROXY
-              value: {{ .Values.proxy.http_proxy | quote }}
-            - name: NO_PROXY
-              value: {{ .Values.proxy.no_proxy | quote }}
-{{- end }}
+            {{- if .Values.proxy.http_proxy }}
+            {{- include "aws-ebs-csi-driver.http-proxy" . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.sidecars.snapshotter.env }}
+            {{- . | toYaml | nindent 12 }}
+            {{- end }}
           volumeMounts:
             - name: socket-dir
               mountPath: /var/lib/csi/sockets/pluginproxy/
-          {{- with .Values.resources }}
-          resources: {{ toYaml . | nindent 12 }}
+          {{- with default .Values.controller.resources .Values.sidecars.snapshotter.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
         {{- end }}
-        {{- if .Values.enableVolumeResizing }}
         - name: csi-resizer
-          image: {{ printf "%s:%s" .Values.sidecars.resizerImage.repository .Values.sidecars.resizerImage.tag }}
-          imagePullPolicy: Always
+          image: {{ printf "%s:%s" .Values.sidecars.resizer.image.repository .Values.sidecars.resizer.image.tag }}
+          imagePullPolicy: {{ default .Values.image.pullPolicy .Values.sidecars.resizer.image.pullPolicy }}
           args:
             - --csi-address=$(ADDRESS)
-            - --v=5
+            - --v={{ .Values.sidecars.resizer.logLevel }}
           env:
             - name: ADDRESS
               value: /var/lib/csi/sockets/pluginproxy/csi.sock
-{{- if .Values.proxy.http_proxy }}
-            - name: HTTP_PROXY
-              value: {{ .Values.proxy.http_proxy | quote }}
-            - name: HTTPS_PROXY
-              value: {{ .Values.proxy.http_proxy | quote }}
-            - name: NO_PROXY
-              value: {{ .Values.proxy.no_proxy | quote }}
-{{- end }}
+            {{- if .Values.proxy.http_proxy }}
+            {{- include "aws-ebs-csi-driver.http-proxy" . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.sidecars.resizer.env }}
+            {{- . | toYaml | nindent 12 }}
+            {{- end }}
           volumeMounts:
             - name: socket-dir
               mountPath: /var/lib/csi/sockets/pluginproxy/
-          {{- with .Values.resources }}
-          resources: {{ toYaml . | nindent 12 }}
+          {{- with default .Values.controller.resources .Values.sidecars.resizer.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
-        {{- end }}
         - name: liveness-probe
-          image: {{ printf "%s:%s" .Values.sidecars.livenessProbeImage.repository .Values.sidecars.livenessProbeImage.tag }}
+          image: {{ printf "%s:%s" .Values.sidecars.livenessProbe.image.repository .Values.sidecars.livenessProbe.image.tag }}
+          imagePullPolicy: {{ default .Values.image.pullPolicy .Values.sidecars.livenessProbe.image.pullPolicy }}
           args:
             - --csi-address=/csi/csi.sock
           volumeMounts:
             - name: socket-dir
               mountPath: /csi
-          {{- with .Values.resources }}
-          resources: {{ toYaml . | nindent 12 }}
+          {{- with default .Values.controller.resources .Values.sidecars.livenessProbe.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
       {{- if .Values.imagePullSecrets }}
       imagePullSecrets:

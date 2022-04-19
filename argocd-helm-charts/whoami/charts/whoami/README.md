@@ -2,6 +2,8 @@
 
 [Whoami](https://github.com/containous/whoami) is a tiny Go webserver that prints os information and HTTP request to output.
 
+**DISCLAIMER**: This is an unofficial chart not supported by Whoami authors.
+
 ## TL;DR;
 
 ```bash
@@ -15,8 +17,8 @@ This chart bootstraps a Whoami deployment on a [Kubernetes](http://kubernetes.io
 
 ## Prerequisites
 
-- Kubernetes 1.12+
-- Helm 3.0+
+- Kubernetes >= 1.16
+- Helm >= 3.1
 
 ## Installing
 
@@ -61,17 +63,27 @@ The command deletes the release named `my-release` and frees all the kubernetes 
 
 ## Configuration
 
-The following table lists all the configurable parameters expose by the Whoami chart and their default values.
+The following tables lists all the configurable parameters expose by the chart and their default values.
+
+### Common parameters
+
+| Name                | Description                                                                                 | Default |
+|---------------------|---------------------------------------------------------------------------------------------|---------|
+| `kubeVersion`       | Override Kubernetes version                                                                 | `""`    |
+| `imagePullSecrets`  | Docker registry secret names as an array                                                    | `[]`    |
+| `nameOverride`      | Partially override `whoami.fullname` template with a string (will prepend the release name) | `nil`   |
+| `fullnameOverride`  | Fully override `whoami.fullname` template with a string                                     | `nil`   |
+| `commonAnnotations` | Annotations to add to all deployed objects                                                  | `{}`    |
+| `commonLabels`      | Labels to add to all deployed objects                                                       | `{}`    |
+
+### Parameters
 
 | Name                                 | Description                                                                                           | Default                                        |
 |--------------------------------------|-------------------------------------------------------------------------------------------------------|------------------------------------------------|
 | `replicaCount`                       | Number of replicas                                                                                    | `1`                                            |
-| `image.repository`                   | Whoami image name                                                                                     | `containous/whoami`                            |
-| `image.tag`                          | Whoami image tag                                                                                      | `v1.5.0`                                       |
+| `image.repository`                   | Image name                                                                                            | `containous/whoami`                            |
+| `image.tag`                          | Image tag                                                                                             | `v1.5.0`                                       |
 | `image.pullPolicy`                   | Image pull policy                                                                                     | `IfNotPresent`                                 |
-| `imagePullSecrets`                   | Docker registry secret names as an array                                                              | `[]`                                           |
-| `nameOverride`                       | Partially override `whoami.fullname` template with a string (will prepend the release name)           | `nil`                                          |
-| `fullnameOverride`                   | Fully override `whoami.fullname` template with a string                                               | `nil`                                          |
 | `pdb.create`                         | Specifies whether a pod disruption budget should be created                                           | `false`                                        |
 | `pdb.minAvailable`                   | Minimum number/percentage of pods that should remain scheduled                                        | `1`                                            |
 | `pdb.maxUnavailable`                 | Maximum number/percentage of pods that may be made unavailable                                        | `nil`                                          |
@@ -95,7 +107,7 @@ The following table lists all the configurable parameters expose by the Whoami c
 | `readinessProbe.timeoutSeconds`      | When the readiness probe times out                                                                    | `1`                                            |
 | `readinessProbe.failureThreshold`    | Minimum consecutive failures for the readiness probe to be considered failed after having succeeded   | `3`                                            |
 | `readinessProbe.successThreshold`    | Minimum consecutive successes for the readiness probe to be considered successful after having failed | `1`                                            |
-| `service.annotations`                | Service annotations                                                                                   | {}                                             |
+| `service.annotations`                | Service annotations                                                                                   | `{}`                                           |
 | `service.type`                       | Service type                                                                                          | `ClusterIP`                                    |
 | `service.clusterIP`                  | Static cluster IP address or None for headless service when service type is ClusterIP                 | `nil`                                          |
 | `service.loadBalancerIP`             | Static load balancer IP address when service type is LoadBalancer                                     | `nil`                                          |
@@ -104,9 +116,11 @@ The following table lists all the configurable parameters expose by the Whoami c
 | `service.port`                       | Service port                                                                                          | `80`                                           |
 | `service.nodePort`                   | Service node port when service type is LoadBalancer or NodePort                                       | `nil`                                          |
 | `ingress.enabled`                    | Enable ingress controller resource                                                                    | `false`                                        |
+| `ingress.ingressClassName`           | IngressClass that will be be used to implement the Ingress                                            | `""`                                           |
+| `ingress.pathType`                   | Ingress path type                                                                                     | `ImplementationSpecific`                       |
 | `ingress.annotations`                | Ingress annotations                                                                                   | `{}`                                           |
 | `ingress.hosts[0].host`              | Hostname to your Whoami installation                                                                  | `whoami.local`                                 |
-| `ingress.hosts[0].paths`             | Paths within the url structure                                                                        | `[]`                                           |
+| `ingress.hosts[0].paths`             | Paths within the url structure                                                                        | `[/]`                                          |
 | `ingress.tls[0].secretName`          | TLS Secret (certificates)                                                                             | `nil`                                          |
 | `ingress.tls[0].hosts[0]`            | TLS hosts                                                                                             | `nil`                                          |
 | `resources`                          | CPU/Memory resource requests/limits                                                                   | `{}`                                           |
@@ -114,15 +128,28 @@ The following table lists all the configurable parameters expose by the Whoami c
 | `tolerations`                        | Tolerations for pod assignment                                                                        | `[]`                                           |
 | `affinity`                           | Map of node/pod affinities                                                                            | `{}`                                           |
 | `extraArgs`                          | Additional container arguments                                                                        | `{}`                                           |
+| `extraEnvVars`                       | Additional container environment variables                                                            | `[]`                                           |
+| `extraEnvVarsCM`                     | Name of existing ConfigMap containing additional container environment variables                      | `nil`                                          |
+| `extraEnvVarsSecret`                 | Name of existing Secret containing additional container environment variables                         | `nil`                                          |
+
+### Tests parameters
+
+| Name                     | Description       | Default                      |
+|--------------------------|-------------------|------------------------------|
+| `tests.image.repository` | Image name        | `ghcr.io/cowboysysop/pytest` |
+| `tests.image.tag`        | Image tag         | `1.0.0`                      |
+| `tests.image.pullPolicy` | Image pull policy | `IfNotPresent`               |
+
+### Setting parameters
 
 Specify the parameters you which to customize using the `--set` argument to the `helm install` command. For instance,
 
 ```bash
 $ helm install my-release \
-    --set replicaCount=3 cowboysysop/whoami
+    --set nameOverride=my-name cowboysysop/whoami
 ```
 
-The above command sets the `replicaCount` to `3`.
+The above command sets the `nameOverride` to `my-name`.
 
 Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the chart. For example,
 
@@ -131,4 +158,4 @@ $ helm install my-release \
     --values values.yaml cowboysysop/whoami
 ```
 
-**Tip**: You can use the default [values.yaml](values.yaml).
+**TIP**: You can use the default [values.yaml](values.yaml).
