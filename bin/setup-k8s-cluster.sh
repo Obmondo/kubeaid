@@ -404,6 +404,7 @@ if $SETUP_SEALED_SECRET; then
         # some customer has their specific sealed-secret, so touch won't do anyharm in case of recovery as well
         touch "${ARGOCD_APPS}/values-sealed-secrets.yaml"
 
+        # Networkpolicy should be set to false, otherwise in recovery, certs are not getting read
         helm install \
             --namespace system \
             --values argocd-helm-charts/sealed-secrets/values.yaml \
