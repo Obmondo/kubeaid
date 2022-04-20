@@ -1,4 +1,7 @@
 keycloak:
+  podAnnotations:
+    iam.amazonaws.com/allowed-roles: |
+      ["arn:aws:iam::438423213058:role/aws-ebs-csi-staging"]
   postgresql:
     enabled: false
   extraEnv: |
