@@ -1,0 +1,17 @@
+apiVersion: acid.zalan.do/v1
+kind: postgresql
+metadata:
+  name: keycloak-pgsql
+spec:
+  databases:
+    redash: keycloak
+  enableMasterLoadBalancer: false
+  numberOfInstances: 2
+  postgresql:
+    version: "12"
+  teamId: keycloak
+  users:
+    keycloak:
+    - superuser
+  volume:
+    size: 8Gi
