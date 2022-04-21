@@ -91,7 +91,7 @@ function update_helm_chart {
   fi
 }
 
-if [ -n "$HELM_APP" ]; then
+if [ "$HELM_APP" != "argocd-helm-charts" ]; then
   if test -d "$HELM_APP"; then
     update_helm_chart "$HELM_APP"
   else
