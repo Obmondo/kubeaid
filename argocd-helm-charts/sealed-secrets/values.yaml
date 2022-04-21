@@ -1,4 +1,8 @@
 sealed-secrets:
+  image:
+    registry: docker.io
+    repository: bitnami/sealed-secrets-controller
+    tag: v0.17.5
   namespace: system
   #should be default from v1.17 - fixes "progressing" hanging in argocd 'secrets' applications
   commandArgs:
