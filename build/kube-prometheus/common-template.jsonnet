@@ -1,6 +1,10 @@
-// -*- flycheck-jsonnet-external-code-files: ("vars=clusters/kam.obmondo.com-vars.jsonnet"); -*-
-
 local utils = import 'utils.libsonnet';
+local addMixin = (import 'kube-prometheus/lib/mixin.libsonnet');
+
+local remove_nulls = (
+  function(arr)
+    std.filter((function(o) o != null), arr)
+);
 
 local ext_vars = std.extVar('vars');
 
@@ -33,9 +37,38 @@ local default_vars = {
   },
 
   grafana_keycloak_enable: false,
+  addMixins: {
+    ceph: true,
+    sealedSecrets: true,
+    etcd: true,
+  },
 };
 
 local vars = default_vars + ext_vars;
+
+local mixins = remove_nulls([
+  if vars.addMixins.ceph then
+    addMixin({
+      name: 'ceph',
+      mixin: (import 'github.com/ceph/ceph-mixins/mixin.libsonnet') + {
+        _config+: {},  // mixin configuration object
+      },
+    }),
+  if vars.addMixins.sealedSecrets then
+    addMixin({
+      name: 'sealedsecrets',
+      mixin: (import 'github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin/mixin.libsonnet') + {
+        _config+: {},  // mixin configuration object
+      },
+    }),
+  if vars.addMixins.etcd then
+    addMixin({
+      name: 'etcd',
+      mixin: (import 'github.com/etcd-io/etcd/contrib/mixin/mixin.libsonnet') + {
+        _config+: {},  // mixin configuration object
+      },
+    }),
+]);
 
 local kp =
   (import 'kube-prometheus/main.libsonnet') +
@@ -206,3 +239,5 @@ local kp =
 { ['prometheus-' + name]: kp.prometheus[name] for name in std.objectFields(kp.prometheus) } +
 { ['prometheus-adapter-' + name]: kp.prometheusAdapter[name] for name in std.objectFields(kp.prometheusAdapter) } +
 (if std.objectHas(vars, 'grafana_ingress_host') then { [name + '-ingress']: kp.ingress[name] for name in std.objectFields(kp.ingress) } else {})
+// Rendering prometheusRules object. This is an object compatible with prometheus-operator CRD definition for prometheusRule
++ { [o._config.name + '-prometheus-rules']: o.prometheusRules for o in std.filter((function(o) o.prometheusRules != null), mixins) }
