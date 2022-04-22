@@ -57,6 +57,9 @@ spec:
         {{- if .Values.config }}
         configchecksum: {{ include (print .Template.BasePath "/configmap.yaml") . | sha256sum | trunc 63 }}
         {{- end }}
+        {{- if .Values.securityConfig.config.data }}
+        securityconfigchecksum: {{ include (print .Template.BasePath "/securityconfig.yaml") . | sha256sum | trunc 63 }}
+        {{- end }}
     spec:
       {{- if .Values.schedulerName }}
       schedulerName: "{{ .Values.schedulerName }}"
@@ -71,9 +74,9 @@ spec:
         {{- if .Values.fsGroup }}
         fsGroup: {{ .Values.fsGroup }} # Deprecated value, please use .Values.podSecurityContext.fsGroup
         {{- end }}
-      {{- if .Values.rbac.create }}
+      {{- if and .Values.rbac.create (eq .Values.rbac.serviceAccountName "") }}
       serviceAccountName: "{{ template "opensearch.uname" . }}"
-      {{- else if not (eq .Values.rbac.serviceAccountName "") }}
+      {{- else }}
       serviceAccountName: {{ .Values.rbac.serviceAccountName | quote }}
       {{- end }}
       {{- with .Values.tolerations }}
@@ -125,6 +128,10 @@ spec:
         nodeAffinity:
 {{ toYaml . | indent 10 }}
       {{- end }}
+      {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml .Values.topologySpreadConstraints | nindent 8 }}
+      {{- end }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriod }}
       volumes:
       {{- range .Values.secretMounts }}
@@ -144,7 +151,7 @@ spec:
       {{ fail "Only one of .Values.securityConfig.config.data and .Values.securityConfig.config.securityConfigSecret may be defined. Please see the comment in values.yaml describing usage." }}
       {{- end }}
       {{- if .Values.securityConfig.config.data }}
-      - name: security-config-complete
+      - name: security-config-data
         secret:
           secretName: {{ include "opensearch.uname" . }}-securityconfig
       {{- end }}
@@ -290,7 +297,7 @@ spec:
           bash opensearch-docker-entrypoint.sh
       {{- end }}
         image: "{{ template "opensearch.dockerRegistry" . }}{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-        imagePullPolicy: "{{ .Values.image.PullPolicy }}"
+        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
         ports:
         - name: http
           containerPort: {{ .Values.httpPort }}
@@ -365,7 +372,18 @@ spec:
           name: tenants
           subPath: tenants.yml
         {{- end }}
-        {{- if .Values.securityConfig.config.data  }}
+        {{- if .Values.securityConfig.config.data }}
+        {{-   if .Values.securityConfig.config.dataComplete }}
+        - mountPath: {{ .Values.securityConfig.path }}
+          name: security-config-data
+        {{-   else }}
+        {{-     range $key, $_ := .Values.securityConfig.config.data  }}
+        - mountPath: {{ $.Values.securityConfig.path }}/{{ $key }}
+          name: security-config-data
+          subPath: {{ $key }}
+        {{-     end }}
+        {{-   end }}
+        {{- else if .Values.securityConfig.config.securityConfigSecret }}
         - mountPath: {{ .Values.securityConfig.path }}
           name: security-config-complete
         {{- end }}
@@ -393,7 +411,7 @@ spec:
         {{- end }}
         {{- end }}
       {{- if .Values.masterTerminationFix }}
-      {{- if eq .Values.roles.master "true" }}
+      {{- if has "master" .Values.roles }}
       # This sidecar will prevent slow master re-election
       - name: opensearch-master-graceful-termination-handler
         image: "{{ template "opensearch.dockerRegistry" . }}{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
