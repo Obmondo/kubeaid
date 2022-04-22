@@ -1,0 +1,26 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  namespace: graylog
+  name: backup-s3
+spec:
+  schedule: {{ .Values.schedule | quote }}
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 10
+  successfulJobsHistoryLimit: 5
+  startingDeadlineSeconds: 180
+  suspend: false 
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: backup-s3 
+        spec:       
+          containers:
+          - name: es-curator
+            image: {{ .Values.cron.image }}
+            imagePullPolicy: IfNotPresent 
+            command:
+              - docker-compose run --rm es-curator snapshot ALL bw7-k8s-graylog-backup True
+          restartPolicy: OnFailure
