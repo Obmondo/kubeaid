@@ -1,0 +1,42 @@
+{{- if .Values.backup.enable -}}
+# snapshot
+# https://davidlu1001.github.io/2020/12/12/ElasticSearch-backup-with-AWS-S3/
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: curator-actions-snapshot
+data:
+  actions_snapshot.yaml: |-
+    actions:
+      1:
+        action: snapshot
+        description: >-
+          Snapshot all indices for {{ .Values.backup.name }}. Wait for the snapshot to complete. Skip the repository filesystem access check. Use the other options to create the snapshot.
+        options:
+          repository: {{ .Values.backup.repository }}
+          name: {{ .Values.backup.name }}-%Y%m%d%H%M
+          ignore_unavailable: False
+          include_global_state: False
+          partial: False
+          wait_for_completion: True
+          skip_repo_fs_check: True
+          disable_action: False
+        filters:
+          - filtertype: none
+      2:
+        action: delete_snapshots
+        description: >-
+          Delete snapshots from the selected repository older than {{ .Values.backup.retention }} days (based on creation_date), for all snapshots.
+        options:
+          repository: {{ .Values.backup.repository | quote }}
+          disable_action: False
+          ignore_empty_list: True
+        filters:
+          - filtertype: age
+            source: creation_date
+            direction: older
+            unit: days
+            unit_count: {{ .Values.backup.retention }}
+
+{{- end -}}
