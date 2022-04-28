@@ -1,0 +1,48 @@
+{{- if .Values.backup.enable -}}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  namespace: graylog
+  name: backup-s3
+spec:
+  schedule: "0 03 * * *"
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 1
+  startingDeadlineSeconds: 180
+  suspend: false
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          annotations:
+            iam.amazonaws.com/role: arn:aws:iam::438423213058:role/k8s-graylog-backup
+          labels:
+            app.kubernetes.io/name: 'opensearch'
+        spec:
+          volumes:
+          - name: s3-backup
+            secret:
+              secretName: s3-backup
+          - name: curator-action-snapshot
+            configMap:
+              name: curator-actions-snapshot
+          containers:
+          - name: es-curator
+            # 5.8.4 was not working, so sticking it to 5.8.3
+            image: bitnami/elasticsearch-curator:5.8.3
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            - -c
+            - /opt/bitnami/python/bin/curator --config /etc/curator/config/config.yml /etc/curator/actions/actions_snapshot.yaml
+            volumeMounts:
+            - name: s3-backup
+              readOnly: true
+              mountPath: "/etc/curator/config"
+            - name: curator-action-snapshot
+              readOnly: true
+              mountPath: "/etc/curator/actions"
+          restartPolicy: OnFailure
+{{- end -}}
+

@@ -1,4 +1,4 @@
-Example config 
+Example config
 ```
 opensearch:
   opensearchJavaOpts: "-Xms4g -Xmx4g"
@@ -42,7 +42,7 @@ opensearch:
 
       # Report as elasticsearch 7.10 - for graylog not to complain (until v4.3 of graylog with opensearch support is released)
       compatibility.override_main_response_version: true
-      
+
       # https://archivedocs.graylog.org/en/2.4/pages/faq.html#how-do-i-fix-the-deflector-exists-as-an-index-and-is-not-an-alias-error-message
       action.auto_create_index: false
       plugins:
@@ -63,7 +63,6 @@ opensearch:
           authcz:
             admin_dn:
               - CN=kirk,OU=client,O=client,L=test,C=de
-          audit.type: internal_opensearch
           enable_snapshot_restore_privilege: true
           check_snapshot_restore_write_privileges: true
           restapi:
@@ -99,12 +98,12 @@ opensearch:
 The issue is related to elasticseach settings and those are stored internally (in a settings index/db) and can only be adjusted via ES API request.
 1. Login to the opensearch `opensearch-cluster-master-0` pod
 
-2. Verify the existing setting of the index for which it is complaining. You can do so by running 
+2. Verify the existing setting of the index for which it is complaining. You can do so by running
 ```sh
 curl -u $username:$password -XGET http://localhost:9200/$index_name/_settings?pretty=true
 ```
 
-3. Increase the limit by running - 
+3. Increase the limit by running -
 ```sh
 curl -u $username:$password -X PUT "http://localhost:9200/$index_num/_settings?pretty" -H 'Content-Type: application/json' -d'
  {
@@ -127,4 +126,30 @@ chmod +x hash.sh
 # use the generate hash from above - when modifying internal_users.yml to suit your needs
 vi /usr/share/opensearch/plugins/opensearch-security/securityconfig/internal_users.yml
 ../securityadmin.sh -cd ../securityconfig/ -icl -nhnv -cacert ../../../config/root-ca.pem -cert ../../../config/kirk.pem -key ../../../config/kirk-key.pem
+```
+
+
+## snapshot/restore elk stack to s3
+
+Create a secret with template functionality
+
+1. Create a secret and save it in a file
+
+```
+# kubectl create secret generic s3-backup -n graylog --dry-run=client --from-literal=username=admin --from-literal=password=xxxx -o yaml  | kubeseal --controller-namespace system --controller-name sealed-secrets -o yaml - > s3-backup.yaml
+```
+2. Edit the above file add the below config under spec.template.data and save it
+```
+      config.yml: |
+        client:
+          hosts: opensearch-cluster-master
+          username: {{ index . "username" }}
+          password: {{ index . "password" }}
+          port: 9200
+          timeout: 10
+        logging:
+          blacklist: ["elasticsearch", "urllib3"]
+          logformat: default
+          logfile:
+          loglevel: INFO
 ```

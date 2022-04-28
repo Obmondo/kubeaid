@@ -1,0 +1,26 @@
+{{ if and .Values.backup.enable .Values.networkpolicies }}
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.curator
+  namespace: graylog
+spec:
+  order: 100
+  selector:
+    app.kubernetes.io/name == 'opensearch'
+  types:
+  - Egress
+  - Ingress
+  ingress:
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 9200
+  egress:
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 9200
+{{- end -}}
