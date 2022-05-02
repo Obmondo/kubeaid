@@ -102,9 +102,9 @@ if [[ -z "${kube_prometheus_release}" ]]; then
   exit 3
 fi
 
-jsonnet_lib_path="build/kube-prometheus/libraries/${kube_prometheus_release}/vendor"
+jsonnet_lib_path="${basedir}/libraries/${kube_prometheus_release}/vendor"
 if ! [ -e "${jsonnet_lib_path}" ]; then
-  if [[ -d "build/kube-prometheus/libraries/${kube_prometheus_release}" ]]; then
+  if [[ -d "${basedir}/libraries/${kube_prometheus_release}" ]]; then
     echo 'Release dir exists; exiting'
     exit 73
   fi
@@ -114,9 +114,9 @@ if ! [ -e "${jsonnet_lib_path}" ]; then
   jb install "github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@${kube_prometheus_release}"
   jb install "github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin@main"
   jb install "github.com/ceph/ceph-mixins@master"
-  mkdir "build/kube-prometheus/libraries/${kube_prometheus_release}"
-  mv vendor "build/kube-prometheus/libraries/${kube_prometheus_release}/"
-  mv jsonnetfile.json jsonnetfile.lock.json "build/kube-prometheus/libraries/${kube_prometheus_release}/"
+  mkdir "${basedir}/libraries/${kube_prometheus_release}"
+  mv vendor "${basedir}/libraries/${kube_prometheus_release}/"
+  mv jsonnetfile.json jsonnetfile.lock.json "${basedir}/libraries/${kube_prometheus_release}/"
 fi
 
 echo "INFO: compiling jsonnet files into '${outdir}' from sources at ${jsonnet_lib_path}"
