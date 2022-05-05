@@ -1,43 +1,21 @@
-resource "azurerm_resource_group" "resourcegroup" {
-    name     = var.resource_group
-    location = var.location
+data "azurerm_resource_group" "rg-gitlab" {
+  name     = var.resource_group
 }
 
 resource "azurerm_kubernetes_cluster" "k8s" {
     name                = var.cluster_name
     location            = var.location
-    resource_group_name = azurerm_resource_group.resourcegroup.name
+    resource_group_name = var.resource_group
     dns_prefix          = var.dns_prefix
+    kubernetes_version  = var.kubernetes_version
 
-    
     default_node_pool {
         name            = "agentpool"
         node_count      = var.agent_count
         vm_size         = var.vm_size
     }
 
-    linux_profile {
-        admin_username = "ubuntu"
-
-        ssh_key {
-            key_data = file(var.ssh_public_key)
-        }
-    }
-
     identity {
      type = "SystemAssigned"
     }
-
-
-    tags = {
-        Environment = "Development"
-    }
-
-    
-
-}
-
-output "kube_config" {
-      value = azurerm_kubernetes_cluster.k8s.kube_config_raw
-      sensitive = true
 }

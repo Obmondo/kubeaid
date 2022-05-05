@@ -136,3 +136,92 @@ We currently store all helm charts from upstreams in this repository, and upon u
 TODO: Add something like Threadmapper - to scan clusters for security issues
 TODO: Add detection of in-use docker images in cluster and cache all in local registry
 TODO: Add vulnerability scanning of docker images used
+
+## Create a VM with gitlab server setup and running
+
+Start with initializing your terraform providers
+
+```sh
+terraform -chdir=cluster-setup-files/terraform/gitlab-ci-server init
+```
+
+```sh
+terraform -chdir=<dir location of main.tf file> plan -var-file=<config file location>
+```
+
+Check if everything looks good to you, when it does you can go ahead and apply
+
+```sh
+terraform -chdir=<dir location of main.tf file> apply -var-file=<config file location> -auto-approve 
+```
+
+If you are in the same dir as `main.tf` file then you don't need to pass the `chdir` flag
+
+Look at the `variables.tf` file to see what all variables your config file must have.
+
+### Example
+
+Sample config file `example.tfvars`
+
+```text
+gitlab_vm_name = "kilroy-gitlab"
+location = "North Europe"
+resource_group_name = "obmondo-aks"
+create_public_ip = true
+vnet_name = "obmondo-vnet"
+vnet_address_space = "10.240.0.0/16"
+subnet_name = "obmondo-subnet"
+subnet_prefixes = "10.240.0.0/16"
+vm_size = "Standard_DS2_v2"
+dns_label = ""
+source_addresses = ["109.238.49.194", "95.216.10.96", "109.238.49.196"]
+```
+
+To get all the available locations run 
+
+```sh
+az account list-locations -o table
+```
+
+The config file is present in your respective `k8id-config` repo. So, you must clone and provide that file.If i am standing in the `k8id` repo then my commands will be
+
+```sh
+terraform -chdir=cluster-setup-files/terraform/gitlab-ci-server plan -var-file=../k8id-config/vms/gitlab.tfvars
+```
+
+```sh
+terraform -chdir=cluster-setup-files/terraform/gitlab-ci-server apply -var-file=../k8id-config/vms/gitlab.tfvars -auto-approve
+```
+
+## Create an Azure AKS (Kubernetes) cluster
+
+```sh
+terraform -chdir=cluster-setup-files/terraform/aks init
+```
+
+Sample config file
+
+```text
+cluster_name = "k8s-prod"
+location = "North Europe"
+agent_count = 2
+dns_prefix = "k8s"
+resource_group = "obmondo-aks"
+vm_size = "Standard_DS2_v2"
+kubernetes_version = "1.22.6"
+```
+
+Sometimes the kube version you want to install may not availabe on the location and you may get error when thats the case.
+You can check which kube versions are supported in your location by running - 
+
+```sh
+az aks get-versions --location $location
+```
+
+```sh
+terraform -chdir=cluster-setup-files/terraform/aks plan -var-file=../k8id-config/k8s/kube.tfvars
+```
+
+```sh
+terraform -chdir=cluster-setup-files/terraform/aks apply -var-file=../k8id-config/k8s/kube.tfvars -auto-approve
+```
