@@ -1,7 +1,7 @@
-cluster_name = "kam"
-location = "West Europe"
+cluster_name = "kilroy-prod"
+location = "North Europe"
 agent_count = 2
-dns_prefix = "k8stest"
-resource_group = "testing"
-ssh_public_key = "~/.ssh/id_rsa.pub"
-vm_size = "standard_e2as_v5"
+dns_prefix = "k8s"
+resource_group = "obmondo-aks"
+vm_size = "Standard_DS2_v2"
+kubernetes_version = "1.22.6"
