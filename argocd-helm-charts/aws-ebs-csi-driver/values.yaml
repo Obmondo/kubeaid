@@ -1,0 +1,2 @@
+aws-ebs-csi-driver:
+  networkpolicies: false

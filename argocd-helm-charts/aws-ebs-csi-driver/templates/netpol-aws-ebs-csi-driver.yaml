@@ -1,7 +1,8 @@
+{{ if .Values.networkpolicies }}
 apiVersion: crd.projectcalico.org/v1
 kind: NetworkPolicy
 metadata:
-  name: default.autoscaler
+  name: default.aws-ebs-csi-driver
   namespace: aws
 spec:
   order: 100
@@ -30,3 +31,4 @@ spec:
       - 8181
       selector: kubernetes.io/role in { 'node', 'master' }
       namespaceSelector: global()
+{{- end -}}
