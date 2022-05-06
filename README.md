@@ -55,6 +55,10 @@ There are ZERO vendor lockin - so any subscription you sign - can be cancelled a
 
 With a subscription we will be there, to ensure your smooth operations, in timeso f sickness and employee shortages - and able to scale your development efforts on k8id if needed.
 
+## Secrets
+
+We use sealedsecrets - which means secrets are encrypted locally (by the developer who knows them) - see docs in /argocd-helm-charts/sealed-secrets - and commited to your k8id-config repo - under the path /k8id-config/k8s/<clustername>/sealed-secrets/<namespace>/<nameofsecret>.json
+
 ## License
 
 **K8id** is licensed under the GPLv3 license, as we believe this is the best way to protect against the patent
