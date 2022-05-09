@@ -1,6 +1,6 @@
-              #      W elcome to k8sops
+# Welcome to k8sops
 
-This repository ( https://gitlab.com/Obmondo/k8sops) implements a solution to run any Kubernetes cluster, using gitops
+This repository (https://gitlab.com/Obmondo/k8sops) implements a solution to run any Kubernetes cluster, using gitops
 principles and allowing for customization, in a separate repository.
 
 This way you can always pull the latest commits, and get security updates, fixes, new features etc., while still being
@@ -68,8 +68,11 @@ vulnerable code.
 
 ## Repository structure
 
-This repo contains all the kubernetes applications helm charts that are used on Enableit managed clusters, and the install script for setting up a new cluster with root app. In `build` there is also a script for setting up kube-prometheus.
-Each customer has their own kubernetes-config repo, and each cluster has a folder in such a repo. This repo works in tandem with those cluster folders, they reference the charts stored here, and the install scripts here create the content in those folders.
+This repo contains all the kubernetes applications helm charts that are used on Enableit managed clusters, and the
+install script for setting up a new cluster with root app. In `build` there is also a script for setting up
+kube-prometheus. Each customer has their own kubernetes-config repo, and each cluster has a folder in such a repo. This
+repo works in tandem with those cluster folders, they reference the charts stored here, and the install scripts here
+create the content in those folders.
 
 | `folder`                       | `description`                                                                                                                                                                                                                                                                          |
 |--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -153,7 +156,7 @@ Each customer has their own kubernetes-config repo, and each cluster has a folde
 
 Always run uninstall script with `--keep-files` or it wont save the keys for reading sealed secrets.
 
-```
+```sh
 ./bin/uninstall-argocd.sh --keep-files
 ```
 
@@ -206,7 +209,9 @@ Login to the UI. To get the credentials refer
 ## About the root app
 
 The install script adds root.yaml to the cluster folder under argocd-apps/templates in kubernetes-config-customerid.
-This argocd app has the clusters argocd-apps folder as its path. Making argocd detect all the apps in there automatically. So we can install apps just by adding them to the clusters argocd-apps folder in the customers kubernetes-config repo, and then syncing with argocd.
+This argocd app has the clusters argocd-apps folder as its path. Making argocd detect all the apps in there
+automatically. So we can install apps just by adding them to the clusters argocd-apps folder in the customers
+kubernetes-config repo, and then syncing with argocd.
 
 ## Secrets handling
 
@@ -260,7 +265,7 @@ To resolve out-of-sync complaint in ArgoCD - AND backup/recovery do this:
 
 3. Read YAML and see if you like it.
 4. Adjust values to your liking and run step 2 again, saving the result to `/tmp/after.yaml`.
-4. Check the difference by running `diff -bduNr /tmp/before.yaml /tmp/after.yaml` and verify the changes your value
+5. Check the difference by running `diff -bduNr /tmp/before.yaml /tmp/after.yaml` and verify the changes your value
    update should have caused are present.
 
 ### Install the application manually to verify
