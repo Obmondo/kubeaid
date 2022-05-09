@@ -96,11 +96,17 @@ project, namely to allow everyone to work on a level playing ground.
 
 Read here for current status on all features of k8id
 
-### Setup of k8s clusters on physical servers (on-premise or at e.g. [Hetzner.com](https://hetzner.com)) and in cloud providers like Azure AKS, Amazon AWS or Google GCE
+### Setup of k8s clusters on physical servers and in cloud providers
+
+K8id support both physical server (on-premise or at e.g. [Hetzner.com](https://hetzner.com)) and cloud providers like
+Azure AKS, Amazon AWS or Google GCE.
 
 We currently integrate Terraform, for setting up AKS cluster in Azure, and use kOPS for k8s in AWS and GCP
 
-### Gitops setup - ALL changes in cluster, is done via Git AND we detect if anyone adds anything in cluster or modifies existing resources, without doing it through Git
+### GitOps setup and change detection
+
+**All** changes in cluster is done via Git AND we detect if anyone adds anything in cluster or modifies existing
+resources without doing it through Git.
 
 We use ArgoCD to do this, which means we are able to alert on anything being out of sync (or unmanaged) with Git.
 
@@ -146,7 +152,9 @@ backups of PVCs.
 
 TODO: maintain copy of all used docker images and override images on all charts used to use that instead.
 
-### Cluster security - ensuring least priviledge between applications in your clusters, via resource limits and per-namespace/pod firewalling
+### Cluster security
+
+Ensuring least priviledge between applications in your clusters, via resource limits and per-namespace/pod firewalling.
 
 We use Calico and NetworkPolicy objects, to firewall each pod, so they cannot access anything in the cluster, that they
 do not need to.
@@ -226,7 +234,8 @@ To get all the available locations run
 az account list-locations -o table
 ```
 
-The config file is present in your respective `k8id-config` repo. So, you must clone and provide that file.If i am standing in the `k8id` repo then my commands will be
+The config file is present in your respective `k8id-config` repo. So, you must clone and provide that file. If I am
+standing in the `k8id` repo then my commands will be
 
 ```sh
 terraform -chdir=cluster-setup-files/terraform/gitlab-ci-server plan -var-file=../k8id-config/vms/gitlab.tfvars

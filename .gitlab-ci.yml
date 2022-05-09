@@ -9,7 +9,7 @@ lint:markdown:
   stage: lint
   image: registry.obmondo.com/obmondo/dockerfiles/markdownlint:latest
   script:
-    - markdownlint --config .markdownlint  --ignore 'build/vendor/**' --ignore 'build/kube-prometheus/**'
+    - markdownlint --config .markdownlint --ignore 'argocd-helm-charts/**' --ignore 'build/vendor/**' --ignore 'build/kube-prometheus/**' .
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
