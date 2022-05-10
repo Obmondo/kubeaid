@@ -14,12 +14,14 @@ Any ideas/suggestions are welcomed...
 ### Install prerequisites
 
 This installs go
+
 ```sh
 snap install go
 export PATH=$PATH:$(go env GOPATH)/bin
 ```
 
-This installs jsonnet
+This installs jsonnet tooling:
+
 ```sh
 go install -a github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest
 go install github.com/brancz/gojsontoyaml@latest
@@ -27,7 +29,9 @@ go install github.com/google/go-jsonnet/cmd/jsonnet@latest
 ```
 
 ### Run the build script
+
 Run this in the root of the argocd-apps repo, with the k8s config repo cloned next to it
+
 ```sh
 ./build/kube-prometheus/build.sh ../kubernetes-config-enableit/k8s/kam.obmondo.com
 ```
@@ -69,6 +73,50 @@ rm -rf libraries/release-0.10/
 ```
 
 ## Prometheus operator options, set in common-template.jsonnet options
-Options available as part of values.alertmanager are listed in https://github.com/prometheus-operator/kube-prometheus/blob/main/jsonnet/kube-prometheus/components/alertmanager.libsonnet#L1-L72
-Additionally ALL options for Alertmanager CR listed in https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#alertmanagerspec are available in jsonnet as alertmanager.alertmanager.spec
-Alertmanager mixin options are inherited from the mixin itself and are available in https://github.com/prometheus/alertmanager/blob/main/doc/alertmanager-mixin/config.libsonnet
+
+Options available as part of values.alertmanager are listed in
+https://github.com/prometheus-operator/kube-prometheus/blob/main/jsonnet/kube-prometheus/components/alertmanager.libsonnet#L1-L72
+Additionally ALL options for Alertmanager CR listed in
+https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#alertmanagerspec are available
+in jsonnet as alertmanager.alertmanager.spec Alertmanager mixin options are inherited from the mixin itself and are
+available in https://github.com/prometheus/alertmanager/blob/main/doc/alertmanager-mixin/config.libsonnet
+
+## Adding new mixins
+
++ Install mixin into `kube-prometheus` release directories (currently manual). In the below we install it only into
+  `main`, but this should be repeated for all the versions in use.
+
+   ```sh
+   cd build/kube-prometheus/libraries/main
+   jb install github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin@main
+   ```
+
++ Add the mixin to `common-template.json`. For adding the Bitnami `sealed-secrets` mixin this diff was required:
+
+   ```diff
+   @@ -46,6 +46,7 @@ local kp =
+      // (import 'kube-prometheus/addons/static-etcd.libsonnet') +
+      // (import 'kube-prometheus/addons/custom-metrics.libsonnet') +
+      // (import 'kube-prometheus/addons/external-metrics.libsonnet') +
+   +  (import 'github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin/mixin.libsonnet') +
+
+      {
+        values+:: {
+   ```
+
+  Note that the search path contains the full path of the file from the top of the `vendor` folder.
+
+## Jsonnet debugging
+
+You can dump an entire object to see whats actually there, by wrapping a statement in a call to [`std.trace`](https://jsonnet.org/ref/stdlib.html#trace):
+
+```jsonnet
+dashboards+: std.trace(std.toString(CephMixin), CephMixin.grafanaDashboards),
+```
+
+You can also simply output an object to a file by adding a line to the bottom of the return value in
+`common-template.jsonnet`. The below will write the contents of `mixins` to the file `debug`:
+
+```jsonnet
++ { debug: mixins }
+```
