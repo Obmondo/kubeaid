@@ -4,12 +4,32 @@
     {
       "source": {
         "git": {
+          "remote": "https://github.com/bitnami-labs/sealed-secrets.git",
+          "subdir": "contrib/prometheus-mixin"
+        }
+      },
+      "version": "e68de2c17df40a22192b860ece47d726973ead85",
+      "sum": "nEL+LnPwnNqp7JXymClVcWs9mHWWprDA9Aig/wvU0hQ="
+    },
+    {
+      "source": {
+        "git": {
           "remote": "https://github.com/brancz/kubernetes-grafana.git",
           "subdir": "grafana"
         }
       },
       "version": "90f38916f1f8a310a715d18e36f787f84df4ddf5",
       "sum": "0kZ1pnuIirDtbg6F9at5+NQOwKNONIGEPq0eECzvRkI="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/ceph/ceph-mixins.git",
+          "subdir": ""
+        }
+      },
+      "version": "77016201cd87c9aa7cd8e91f909a5c3740225ee5",
+      "sum": "ELegh2+E/3snTDHxcaNIYsNdtgSrFXfzCUxdX5dRdcg="
     },
     {
       "source": {
