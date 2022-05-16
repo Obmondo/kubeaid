@@ -234,7 +234,34 @@ local kp =
 (if vars['blackbox-exporter'] then { ['blackbox-exporter-' + name]: kp.blackboxExporter[name] for name in std.objectFields(kp.blackboxExporter) } else {}) +
 { ['grafana-' + name]: kp.grafana[name] for name in std.objectFields(kp.grafana) } +
 { ['kube-state-metrics-' + name]: kp.kubeStateMetrics[name] for name in std.objectFields(kp.kubeStateMetrics) } +
-{ ['kubernetes-' + name]: kp.kubernetesControlPlane[name] for name in std.objectFields(kp.kubernetesControlPlane) }
+{ ['kubernetes-' + name]: kp.kubernetesControlPlane[name] for name in std.objectFields(kp.kubernetesControlPlane) } +
+// Ordering matters! This next absurd object **has** to come after the inclusion
+// of `kubernetesControlPlane` above -- otherwise we'll overwrite the object and
+// remove our filtering.
+{ 'kubernetes-prometheusRule': kp.kubernetesControlPlane.prometheusRule {
+  spec+: {
+    groups: std.filter((
+              function(o)
+                std.objectHas(o, 'rules') && o.name != 'kubernetes-system-apiserver'
+            ), kp.kubernetesControlPlane.prometheusRule.spec.groups)
+            +
+            [{
+              name: 'kubernetes-system-apiserver',
+              rules:
+                std.filter(
+                  (
+                    function(o)
+                      std.objectHas(o, 'alert') &&
+                      o.alert != 'KubeClientCertificateExpiration'
+                  ),
+                  std.filter((
+                    function(o)
+                      std.objectHas(o, 'rules') && o.name == 'kubernetes-system-apiserver'
+                  ), kp.kubernetesControlPlane.prometheusRule.spec.groups)[0].rules
+                ),
+            }],
+  },
+} } +
 { ['node-exporter-' + name]: kp.nodeExporter[name] for name in std.objectFields(kp.nodeExporter) } +
 { ['prometheus-' + name]: kp.prometheus[name] for name in std.objectFields(kp.prometheus) } +
 { ['prometheus-adapter-' + name]: kp.prometheusAdapter[name] for name in std.objectFields(kp.prometheusAdapter) } +
