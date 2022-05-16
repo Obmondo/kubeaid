@@ -4,7 +4,7 @@ metadata:
   name: keycloak-pgsql
 spec:
   databases:
-    redash: keycloak
+    keycloak: keycloak
   enableMasterLoadBalancer: false
   numberOfInstances: 2
   postgresql:
