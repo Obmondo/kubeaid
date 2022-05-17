@@ -1,0 +1,43 @@
+replicaCount: 1
+
+image:
+  repository: k8s.gcr.io/sig-storage/snapshot-validation-webhook
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+webhook:
+  timeoutSeconds: 2
+  failurePolicy: Fail
+
+tls:
+  certificateSecret: ""
+  autogenerate: true
+  renew: false
+  certManagerIssuerRef: {}
+
+imagePullSecrets: []
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+serviceAccount:
+  create: true
+  name: ""
