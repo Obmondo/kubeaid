@@ -1,0 +1,38 @@
+Validation for VolumeSnapshots installed.
+
+{{- if and (not .Values.tls.certManagerIssuerRef) (lookup "v1" "Secret" .Release.Namespace (include "snapshot-validation-webhook.certifcateName" .)) }}
+No TLS secret was specified, defaulting to '{{ include "snapshot-validation-webhook.certifcateName" . }}'. Please ensure that secret exists, then upgrade
+the chart.
+{{- end }}
+
+Please run `helm test {{ .Release.Name }}` to ensure it's properly working.
+
+{{- if .Capabilities.APIVersions.Has "snapshot.storage.k8s.io/v1beta1" }}
+
+Your cluster is using snapshot.storage.k8s.io/v1beta resources. Before upgrading to a >= v4.0.0 release of the CRDs
+you MUST ensure that all existing snapshot resources are valid.
+
+The snapshot controller (>= v3.0.0) will label any invalid resources, which you can then inspect and delete as necessary:
+
+kubectl get volumesnapshots --selector=snapshot.storage.kubernetes.io/invalid-snapshot-resource="" --all-namespaces
+kubectl get volumesnapshotcontents --selector=snapshot.storage.kubernetes.io/invalid-snapshot-resource="" --all-namespaces
+
+After you deleted every invalid resource, you can upgrade the CRDs:
+
+kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/{{ .Chart.AppVersion }}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
+kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/{{ .Chart.AppVersion }}/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml
+kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/{{ .Chart.AppVersion }}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml
+
+{{- else if not (.Capabilities.APIVersions.Has "snapshot.storage.k8s.io/v1") }}
+
+If everything is working as it should, you can proceed by adding the snapshot.storage.k8s.io CRDs to your cluster:
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/{{ .Chart.AppVersion }}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/{{ .Chart.AppVersion }}/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/{{ .Chart.AppVersion }}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml
+
+{{- else }}
+
+You already seem to have the latest snapshot.storage.k8s.io CRDs deployed on your cluster, so you are good to go.
+
+{{ end }}
