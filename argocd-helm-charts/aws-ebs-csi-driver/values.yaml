@@ -1,2 +1,6 @@
 aws-ebs-csi-driver:
   networkpolicies: false
+  sidecars:
+    snapshotter:
+      image:
+        tag: "v5.0.1"
