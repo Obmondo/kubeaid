@@ -37,6 +37,8 @@ metadata:
 rules:
   - apiGroups:
       - ""
+    resourceNames:
+      - {{ include "sealed-secrets.fullname" . }}
     resources:
       - services
     verbs:
@@ -45,6 +47,7 @@ rules:
       - ""
     resourceNames:
       - 'http:{{ include "sealed-secrets.fullname" . }}:'
+      - 'http:{{ include "sealed-secrets.fullname" . }}:http'
       - {{ include "sealed-secrets.fullname" . }}
     resources:
       - services/proxy

@@ -19,7 +19,7 @@ extraDeploy: []
 ## @section Sealed Secrets Parameters
 
 ## Sealed Secrets image
-## ref: https://quay.io/repository/bitnami/sealed-secrets-controller?tab=tags
+## ref: https://hub.docker.com/r/bitnami/sealed-secrets-controller/tags
 ## @param image.registry Sealed Secrets image registry
 ## @param image.repository Sealed Secrets image repository
 ## @param image.tag Sealed Secrets image tag (immutable tags are recommended)
@@ -27,9 +27,9 @@ extraDeploy: []
 ## @param image.pullSecrets [array]  Sealed Secrets image pull secrets
 ##
 image:
-  registry: quay.io
+  registry: docker.io
   repository: bitnami/sealed-secrets-controller
-  tag: v0.17.3
+  tag: v0.17.5
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -49,6 +49,73 @@ createController: true
 ## @param secretName The name of an existing TLS secret containing the key used to encrypt secrets
 ##
 secretName: "sealed-secrets-key"
+## @param updateStatus Specifies whether the Sealed Secrets controller should update the status subresource
+##
+updateStatus: true
+## @param keyrenewperiod Specifies key renewal period. Default 30 days
+## e.g
+## keyrenewperiod: "720h30m"
+##
+keyrenewperiod: ""
+## @param command Override default container command
+##
+command: []
+## @param args Override default container args
+##
+args: []
+## Configure extra options for Sealed Secret containers' liveness, readiness and startup probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+## @param livenessProbe.enabled Enable livenessProbe on Sealed Secret containers
+## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+## @param livenessProbe.periodSeconds Period seconds for livenessProbe
+## @param livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+## @param livenessProbe.failureThreshold Failure threshold for livenessProbe
+## @param livenessProbe.successThreshold Success threshold for livenessProbe
+##
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3
+  successThreshold: 1
+## @param readinessProbe.enabled Enable readinessProbe on Sealed Secret containers
+## @param readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+## @param readinessProbe.periodSeconds Period seconds for readinessProbe
+## @param readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+## @param readinessProbe.failureThreshold Failure threshold for readinessProbe
+## @param readinessProbe.successThreshold Success threshold for readinessProbe
+##
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3
+  successThreshold: 1
+## @param startupProbe.enabled Enable startupProbe on Sealed Secret containers
+## @param startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+## @param startupProbe.periodSeconds Period seconds for startupProbe
+## @param startupProbe.timeoutSeconds Timeout seconds for startupProbe
+## @param startupProbe.failureThreshold Failure threshold for startupProbe
+## @param startupProbe.successThreshold Success threshold for startupProbe
+##
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3
+  successThreshold: 1
+## @param customLivenessProbe Custom livenessProbe that overrides the default one
+##
+customLivenessProbe: {}
+## @param customReadinessProbe Custom readinessProbe that overrides the default one
+##
+customReadinessProbe: {}
+## @param customStartupProbe Custom startupProbe that overrides the default one
+##
+customStartupProbe: {}
 ## Sealed Secret resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ## @param resources.limits [object] The resources limits for the Sealed Secret containers
@@ -88,6 +155,9 @@ podAnnotations: {}
 ## @param priorityClassName Sealed Secret pods' priorityClassName
 ##
 priorityClassName: ""
+## @param runtimeClassName Sealed Secret pods' runtimeClassName
+##
+runtimeClassName: ""
 ## @param affinity [object] Affinity for Sealed Secret pods assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 ##
@@ -100,15 +170,6 @@ nodeSelector: {}
 ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 ##
 tolerations: []
-
-## @param updateStatus Specifies whether the Sealed Secrets controller should update the status subresource
-##
-updateStatus: true
-
-## @param keyrenewperiod Specifies key renewal period. Default 30 days
-## e.g
-## keyrenewperiod: "720h30m"
-keyrenewperiod: ""
 
 ## @section Traffic Exposure Parameters
 
