@@ -154,17 +154,6 @@ local kp =
           },
         },
 
-        alertmanager+: {
-          secret:: {},
-          alertmanager+: {
-            spec+: {
-              replicas: 1,
-              resources: vars.alertmanager_resources,
-              logLevel: 'debug',  // So firing alerts show up in log
-              secrets: ['obmondo-alertmanager', 'obmondo-clientcert'],
-            },
-          },
-        },
         prometheus+:: {
           prometheus+: {
             spec+: {
@@ -181,6 +170,19 @@ local kp =
                   },
                 },
               },
+            },
+          },
+        },
+      }
+    else if vars.alertmanager_extra_spec then
+      {
+        alertmanager+: {
+          alertmanager+: {
+            spec+: {
+              replicas: 1,
+              resources: vars.alertmanager_resources,
+              logLevel: 'debug',  // So firing alerts show up in log
+              secrets: ['obmondo-alertmanager', 'obmondo-clientcert'],
             },
           },
         },
