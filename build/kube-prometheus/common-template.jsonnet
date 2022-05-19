@@ -174,7 +174,7 @@ local kp =
           },
         },
       }
-    else if vars.alertmanager_extra_spec then
+    else if vars.connect_obmondo then
       {
         alertmanager+: {
           alertmanager+: {
