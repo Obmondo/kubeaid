@@ -1,0 +1,21 @@
+{{ if .Values.networkpolicies }}
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.snapshot-validation-webhook
+spec:
+  ingress:
+  # Allow the apiserver to connect to the validating webhook
+  - action: Allow
+    source:
+      namespaceSelector: global()
+      selector: kubernetes.io/role == 'master'
+    destination:
+      ports:
+      - 8443
+    protocol: TCP
+  order: 100
+  selector: app.kubernetes.io/name == 'snapshot-validation-webhook'
+  types:
+  - Ingress
+{{- end -}}
