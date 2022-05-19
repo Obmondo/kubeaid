@@ -1,0 +1,52 @@
+---
+kind: SealedSecret
+apiVersion: bitnami.com/v1alpha1
+metadata:
+  name: obmondo-alertmanager
+  namespace: monitoring
+  creationTimestamp:
+spec:
+  encryptedData:
+    slack-url: AgCSodaIgeT2ZHJq4TqQ4IDfWXKSZhd6zIXgK8JxyXl82h1k1QoDHKvKxzo+z7aWFUIHqRsvhOR8ayWeFneHrWb1qhxbCFN4rGVvROFurJaWS9uM02Xsto1KWgfDMIGJSEQQ1g7FBcJkNW8tLKGQDhcVOsubQzeWqKYoPS7XyP7ubj4E+LmF4+YBbiCu2zdyl3AEd/UE5lkCUORFD1uDkBIwHH+Ds7Vdc9y94IHjnlNMPsbNl4reyq5UwMiZBi4StcvVvbyMXcMdI/2ECWUL2kudMzXSDmujXEojUjlsq8fyJBX61GacJTHfKVPqH2u/9HmVVqRLoiHbhRS6XMrGFWfW7ONN2rE27b4iiJR4/tX9DxphRFAFkmCufZKDxhwM0J42YjyclYzqpvtEh5B8OqaiUCSrKYBlHTx149tV0qKIqL7J43a7vmNcBp0SFAzpJk9ugrckWR/S0LE9Z+DNcFYDxW+n8fCJ7m9KFmPxnbvX+TL0EnbYCNOEKetx2LF7RDpzNbScHmxHh4Bm2RiRdAsOOPaGIle1w+fZptNxJnMMF2Kq4EmHRCoR/48D2Vn9NgEEp0ce0+Zm0UVO6qNlFPH9kIUf4fq6RXWYqR23cazCdZMOOuSEsUGqxXPBJIGoLEmpVIqmyrCwXlZ+CII6fQHlzguU2SMZ5uPuont/URD8fC3JH11XMVXyww0x3AHRE7216iV4hJIzIUVnG8sZPhwO1pQUOPHJpZQ1oqRnr6zx3QuLba83KcBj3qStE7DYXay9rUMdO68oiYiNRzKKW30Szueqd61sD/6GhFzqPepp
+  template:
+    metadata:
+      creationTimestamp: null
+      name: abc
+    data:
+      alertmanager.yaml: |
+        global:
+          resolve_timeout: 5m
+
+        route:
+          receiver: 'obmondo'
+          group_by: ['alertname']
+          group_wait: 10s
+          group_interval: 10s
+          repeat_interval: 15m
+          routes:
+            - receiver: obmondo
+              match:
+                alertname: Watchdog
+            - receiver: slack
+              continue: true
+            - receiver: obmondo
+              continue: true
+
+        receivers:
+          - name: "null"
+          - name: slack
+            slack_configs:
+              - send_resolved: true
+                api_url: {{ index . "slack-url" }}
+                channel: '#sre-operations-alerts'
+          - name: obmondo
+            webhook_configs:
+              - url: https://alerts.obmondo.com/hooks/alertmanager
+                send_resolved: true
+                max_alerts: 0
+                http_config:
+                  tls_config:
+                    server_name: alerts.obmondo.com
+                    cert_file: /etc/alertmanager/secrets/obmondo-clientcert/tls.crt
+                    key_file: /etc/alertmanager/secrets/obmondo-clientcert/tls.key
+                    insecure_skip_verify: false
