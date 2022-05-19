@@ -102,9 +102,6 @@ local kp =
       common+: {
         namespace: 'monitoring',
       },
-      alertmanager+: {
-        config: importstr 'alertmanager-config.yaml',
-      },
       prometheusOperator+: {
         resources: vars.prometheus_operator_resources,
       },
@@ -177,6 +174,7 @@ local kp =
     else if vars.connect_obmondo then
       {
         alertmanager+: {
+          secret:: {},
           alertmanager+: {
             spec+: {
               replicas: 1,
