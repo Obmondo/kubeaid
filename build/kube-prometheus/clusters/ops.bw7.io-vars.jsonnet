@@ -1,6 +1,7 @@
 {
   platform: 'aws',
   extra_configs: false,
+  alertmanager_extra_spec: true,
   'blackbox-exporter': false,
 
   prometheus_operator_resources: {
