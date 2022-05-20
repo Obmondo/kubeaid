@@ -102,9 +102,6 @@ local kp =
       common+: {
         namespace: 'monitoring',
       },
-      alertmanager+: {
-        config: importstr 'alertmanager-config.yaml',
-      },
       prometheusOperator+: {
         resources: vars.prometheus_operator_resources,
       },
@@ -154,17 +151,6 @@ local kp =
           },
         },
 
-        alertmanager+: {
-          secret:: {},
-          alertmanager+: {
-            spec+: {
-              replicas: 1,
-              resources: vars.alertmanager_resources,
-              logLevel: 'debug',  // So firing alerts show up in log
-              secrets: ['obmondo-alertmanager'],
-            },
-          },
-        },
         prometheus+:: {
           prometheus+: {
             spec+: {
@@ -181,6 +167,20 @@ local kp =
                   },
                 },
               },
+            },
+          },
+        },
+      }
+    else if vars.connect_obmondo then
+      {
+        alertmanager+: {
+          secret:: {},
+          alertmanager+: {
+            spec+: {
+              replicas: 1,
+              resources: vars.alertmanager_resources,
+              logLevel: 'debug',  // So firing alerts show up in log
+              secrets: ['obmondo-alertmanager', 'obmondo-clientcert'],
             },
           },
         },
