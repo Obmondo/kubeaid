@@ -33,3 +33,19 @@ variable "kubernetes_version" {
   type = string
   description = "Kubernetes version which you want to install"
 }
+
+variable "enable_auto_scaling" {
+  type = bool
+  description = "Should the Kubernetes Auto Scaler be enabled for the Node Pool"
+  default = false
+}
+
+variable "min_node_count" {
+  default = 1
+  description = "The minimum number of nodes which should exist in the Node Pool. Valid only when auto scaling is enabled"
+}
+
+variable "max_node_count" {
+  default = 3
+  description = "The maximum number of nodes which should exist in the Node Pool. Valid only when auto scaling is enabled"
+}
