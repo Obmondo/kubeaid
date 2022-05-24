@@ -277,3 +277,17 @@ terraform -chdir=cluster-setup-files/terraform/aks plan -var-file=../k8id-config
 ```sh
 terraform -chdir=cluster-setup-files/terraform/aks apply -var-file=../k8id-config/k8s/kube.tfvars -auto-approve
 ```
+
+## Build kube promethues in CI and generates PR automatically
+
+To automatically build the kube prometheus in CI and push MR for that,we need 4 secrets to be added in the github actions.
+For gitlab you will need to add these variables in your ci_cd settings add these in variables field
+
+Those 4 secrets names are -
+
+```text
+1. API_TOKEN_GITHUB - You must select the scopes: 'repo = Full control of private repositories', 'admin:org = read:org' and 'write:discussion = Read:discussion'
+2. OBMONDO_DEPLOY_REPO_TARGET - This must be your config repo like <org-name>/k8id-config
+3. OBMONDO_DEPLOY_REPO_TARGET_BRANCH - master or branch name of k8id-config against which you want to build
+4. OBMONDO_DEPLOY_PULL_REQUEST_REVIEWERS - The username of the user which will be added the reviewer for the PR which will be created
+```
