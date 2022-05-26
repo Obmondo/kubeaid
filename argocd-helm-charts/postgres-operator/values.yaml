@@ -5,3 +5,4 @@ postgres-operator:
   enableJsonLogging: true
   configKubernetes:
     enable_pod_antiaffinity: true
+    enable_pod_disruption_budget: false
