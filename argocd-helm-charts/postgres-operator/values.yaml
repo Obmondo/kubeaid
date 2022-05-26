@@ -5,4 +5,7 @@ postgres-operator:
   enableJsonLogging: true
   configKubernetes:
     enable_pod_antiaffinity: true
-    enable_pod_disruption_budget: false
+    # ONLY disable when we are doing a node update or kops rolling update
+    # default is set to true
+    # https://github.com/zalando/postgres-operator/pull/583/files
+    enable_pod_disruption_budget: true
