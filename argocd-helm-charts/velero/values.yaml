@@ -11,9 +11,10 @@ velero:
       config:
         region: "eu-west-1"
     logLevel: debug
-    metrics:
-      serviceMonitor:
-        enabled: true
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
   credentials:
     userSecret: false
   podAnnotations:
