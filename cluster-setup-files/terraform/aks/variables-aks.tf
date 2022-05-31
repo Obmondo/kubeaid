@@ -49,20 +49,3 @@ variable "max_node_count" {
   default = 3
   description = "The maximum number of nodes which should exist in the Node Pool. Valid only when auto scaling is enabled"
 }
-
-variable "letsencrypt_email" {
-  type        = string
-  description = "Email address that Let's Encrypt will use to send notifications about expiring certificates and account-related issues to."
-  sensitive   = true
-}
-
-variable "letsencrypt_cloudflare_api_token" {
-  type        = string
-  description = "Cloudflare API token with Zone-DNS-Edit and Zone-Zone-Read permissions, which is required for DNS01 challenge validation."
-  sensitive   = true
-}
-
-variable "cloudflare_zone_id" {
-  type = string
-  description = "Cloudflare Zone ID"
-}
