@@ -41,6 +41,6 @@ spec:
         cloudflare:
           email: {{ .Values.issuer.issuerEmail }}
           apiTokenSecretRef:
-            name: {{ .Values.issuer.secret }}
+            name: {{ .Values.issuer.cloudflareSecret }}
             key: api-token
 {{ end }}
