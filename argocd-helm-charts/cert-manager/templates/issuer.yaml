@@ -1,4 +1,4 @@
-{{- if and (.Values.issuer.enabled) (not .Values.issuer.name) }}
+{{- if .Values.issuer.enabled -}}
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
@@ -14,33 +14,19 @@ spec:
     {{ else }}
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     {{ end }}
+    {{ if .Values.issuer.cloudProvider }}
+    solvers:
+    - dns01:
+        {{ .Values.issuer.cloudProvider }}:
+          email: {{ .Values.issuer.issuerEmail }}
+          apiTokenSecretRef:
+            name: {{ .Values.issuer.cloudProviderSecret }}
+            key: api-token
+
+    {{ else }}
     solvers:
     - http01:
         ingress:
           class: traefik-cert-manager
-{{ end }}
-
-{{- if and (.Values.issuer.enabled) (eq (.Values.issuer.name | toString) "cloudflare") }}
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: letsencrypt
-spec:
-  acme:
-    email: {{ .Values.issuer.issuerEmail }}
-    preferredChain: ""
-    privateKeySecretRef:
-      name: {{ .Values.issuer.secret }}
-    {{ if .Values.issuer.production }}
-    server: https://acme-v02.api.letsencrypt.org/directory
-    {{ else }}
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
     {{ end }}
-    solvers:
-    - dns01:
-        cloudflare:
-          email: {{ .Values.issuer.issuerEmail }}
-          apiTokenSecretRef:
-            name: {{ .Values.issuer.cloudflareSecret }}
-            key: api-token
 {{ end }}
