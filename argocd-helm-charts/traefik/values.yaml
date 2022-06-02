@@ -1,31 +1,31 @@
-traefik:
-  podDisruptionBudget:
-   enabled: true
-   maxUnavailable: 1
-  logs:
-    access:
-      enabled: true
-  providers:
-    kubernetesIngress:
-      publishedService:
-        enabled: true
-  ports:
-    websecure:
-      tls:
-        enabled: true
-    web:
-      redirectTo: websecure
-  deployment:
-    replicas: 2
-  service:
-    annotations:
-      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
-      service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
-      service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
-      service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
-  globalArguments:
-  additionalArguments:
-  - "--entrypoints.web.proxyprotocol=true"
-  - "--entrypoints.web.proxyprotocol.insecure=true"
-  - "--entrypoints.websecure.proxyprotocol=true"
-  - "--entrypoints.websecure.proxyprotocol.insecure=true"
+#traefik:
+#  podDisruptionBudget:
+#   enabled: true
+#   maxUnavailable: 1
+#  logs:
+#    access:
+#      enabled: true
+#  providers:
+#    kubernetesIngress:
+#      publishedService:
+#        enabled: true
+#  ports:
+#    websecure:
+#      tls:
+#        enabled: true
+#    web:
+#      redirectTo: websecure
+#  deployment:
+#    replicas: 2
+#  service:
+#    annotations:
+#      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+#      service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
+#      service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+#      service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
+#  globalArguments:
+#  additionalArguments:
+#  - "--entrypoints.web.proxyprotocol=true"
+#  - "--entrypoints.web.proxyprotocol.insecure=true"
+#  - "--entrypoints.websecure.proxyprotocol=true"
+#  - "--entrypoints.websecure.proxyprotocol.insecure=true"
