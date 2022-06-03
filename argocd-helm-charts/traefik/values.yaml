@@ -1,26 +1,57 @@
 traefik:
-  podDisruptionBudget:
-   enabled: true
-   maxUnavailable: 1
-   logs:
+  deployment:
+    replicas: 2
+  logs:
     access:
       enabled: true
-  #Update these providers based on your needs in your customer-repo/value file for traefik
-  # providers:
-  # kubernetesIngress:
-  # publishedService:
-  # enabled: true
+      level: DEBUG
   ports:
     websecure:
       tls:
         enabled: true
     web:
       redirectTo: websecure
+  additionalArguments:
+    - "--entrypoints.web.proxyprotocol=true"
+    - "--entrypoints.web.proxyprotocol.insecure=true"
+    - "--entrypoints.websecure.proxyprotocol=true"
+    - "--entrypoints.websecure.proxyprotocol.insecure=true"
+    - "--entryPoints.websecure.forwardedHeaders.trustedIPs=104.0.0.0/8"
+  # https://github.com/argoproj/argo-cd/issues/1704#issuecomment-904741817
+  providers:
+    kubernetesIngress:
+      publishedService:
+        enabled: true
+  ingressRoute:
+    dashboard:
+      enabled: true
+      annotations:
+        traefik.ingress.kubernetes.io/router.tls: "true"
+        service.beta.kubernetes.io/azure-load-balancer-resource-group: obmondo-aks
 
-      # Num of deployement replicas you want
-      #  deployment:
-      #    replicas: 2
-
+#traefik:
+#  podDisruptionBudget:
+#   enabled: true
+#   maxUnavailable: 1
+#   logs:
+#    access:
+#      enabled: true
+#  #Update these providers based on your needs in your customer-repo/value file for traefik
+#  # providers:
+#  # kubernetesIngress:
+#  # publishedService:
+#  # enabled: true
+#  ports:
+#    websecure:
+#      tls:
+#        enabled: true
+#    web:
+#      redirectTo: websecure
+#
+#      # Num of deployement replicas you want
+#      #  deployment:
+#      #    replicas: 2
+#
 #These are examples for AWS - Please set you own if needed in your customer-repo/value file for traefik
 #  service:
 #    annotations:
