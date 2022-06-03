@@ -171,7 +171,7 @@ local kp =
           },
         },
       }
-    else if vars.connect_obmondo then
+    else if std.objectHas(vars, 'connect_obmondo') && vars.connect_obmondo then
       {
         alertmanager+: {
           secret:: {},
