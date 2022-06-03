@@ -4,7 +4,7 @@ traefik:
   logs:
     access:
       enabled: true
-      level: DEBUG
+      #level: DEBUG
   ports:
     websecure:
       tls:
@@ -27,6 +27,7 @@ traefik:
       enabled: true
       annotations:
         traefik.ingress.kubernetes.io/router.tls: "true"
+        cert-manager.io/cluster-issuer: letsencrypt
   service:
     service.beta.kubernetes.io/azure-load-balancer-resource-group: obmondo-aks
 
