@@ -27,7 +27,9 @@ traefik:
       enabled: true
       annotations:
         traefik.ingress.kubernetes.io/router.tls: "true"
-        service.beta.kubernetes.io/azure-load-balancer-resource-group: obmondo-aks
+  service:
+    service.beta.kubernetes.io/azure-load-balancer-resource-group: obmondo-aks
+
 
 #traefik:
 #  podDisruptionBudget:
