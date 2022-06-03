@@ -28,10 +28,6 @@ traefik:
       annotations:
         traefik.ingress.kubernetes.io/router.tls: "true"
         service.beta.kubernetes.io/azure-load-balancer-resource-group: obmondo-aks
-  service:
-    externalIPs:
-      - 172.67.130.154
-      - 104.21.8.191
 
 #traefik:
 #  podDisruptionBudget:
