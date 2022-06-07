@@ -3,3 +3,6 @@
 *.tgz
 defaults
 .idea
+*.tfstate
+*.tfstate.backup
+.terraform
