@@ -11,15 +11,27 @@
 
 set -euo pipefail
 
-declare -i apply=0
+declare -i apply=0 \
+        debug=0
+
 declare dry_run='' \
         cluster_dir=''
 
 basedir="$(dirname "$(readlink -f "${0}")")"
 
+function _exit() {
+  if ! (( debug )); then
+    if [[ -v tmpdir ]] && [[ -d "${tmpdir}" ]]; then
+      rm -rf "${tmpdir}"
+    fi
+  fi
+}
+
+trap _exit EXIT
+
 function usage() {
   cat <<EOF
-${0} [-a|--apply] [-c|--create-namespaces] <CLUSTER>
+${0} [-a|--apply] [-c|--create-namespaces] [-d|--debug] <CLUSTER>
 
 Compile kube-prometheus manifests from jsonnet template.
 
@@ -28,6 +40,8 @@ Arguments:
     Apply the resulting manifests.
   -c|--create-namespaces
     Automatically create any namespaces that doesn't exist when applying.
+  -d|--debug
+    Leave temporary output folder when exiting.
   --dry-run=<client|server>
     Dry run.
 EOF
@@ -37,6 +51,9 @@ while (( $# > 0 )); do
   case "${1}" in
     -a|--apply)
       apply=1
+      ;;
+    -d|--debug)
+      debug=1
       ;;
     --dry-run=*)
       [[ "${1}" =~ --dry-run=(.+) ]]
@@ -89,13 +106,6 @@ fi
 # Make sure to use project tooling
 outdir="${cluster_dir}/kube-prometheus"
 
-# Make sure to start with a clean 'manifests' dir
-rm -rf "${outdir:?}/"
-mkdir -p "${outdir}/setup"
-
-# Calling gojsontoyaml is optional, but we would like to generate yaml, not json
-#jsonnet -J vendor -m manifests "${1-example.jsonnet}" | xargs -I{} sh -c 'cat {} | gojsontoyaml > {}.yaml' -- {}
-
 kube_prometheus_release=$(jsonnet "${cluster_jsonnet}" | jq -r .kube_prometheus_version)
 if [[ -z "${kube_prometheus_release}" ]]; then
   echo "Unable to parse kube-prometheus version, please verify '${cluster_jsonnet}'"
@@ -121,20 +131,23 @@ fi
 
 echo "INFO: compiling jsonnet files into '${outdir}' from sources at ${jsonnet_lib_path}"
 
-# remove previous output to avoid leftover files
-rm -f "${outdir}/*"
-mkdir -p "${outdir}"
+# use a temporary dir when compiling to make it an atomic operation
+tmpdir=$(mktemp -d)
+mkdir "${tmpdir}/setup"
 
 # shellcheck disable=SC2016
 jsonnet -J \
         "${jsonnet_lib_path}" \
         --ext-code-file vars="${cluster_jsonnet}" \
-        -m "${outdir}" \
+        -m "${tmpdir}" \
         "${basedir}/common-template.jsonnet" |
   while read -r f; do
     gojsontoyaml < "${f}" > "${f}.yaml"
     rm "${f}"
   done
+
+rm -rf "${outdir}"
+mv "${tmpdir}" "${outdir}"
 
 if (( apply )); then
   kubectl_args=()
