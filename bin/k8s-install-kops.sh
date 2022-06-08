@@ -6,6 +6,7 @@ function usage {
 Usage $0:
   --cluster-config-path     cluser config path [directory which consists yaml files]
   --cluster-name            full cluster name
+  --ignore-git-branch       look for kops file in any git branch [default to master/main branch]
   -h | --help
 
 Example:
@@ -17,6 +18,9 @@ if [ -z "$1" ]; then
   usage
   exit
 fi
+
+declare FULLNAME=
+declare IGNORE_GIT_BRANCH=false
 
 while [[ $# -gt 0 ]]; do
   arg="$1"
@@ -38,6 +42,10 @@ while [[ $# -gt 0 ]]; do
         FULLNAME=$1
         shift
         ;;
+    --ignore-git-branch)
+        IGNORE_GIT_BRANCH=$1
+        shift
+        ;;
     -h|--help)
         usage
         exit
@@ -50,7 +58,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ -z "$FULLNAME" || -z "$CLUSTER_CONFIG_PATH" ]]; then
+if [ -z $FULLNAME ]; then
+  FULLNAME=$(cat ${CLUSTER_CONFIG_PATH}/cluster.yaml | yq .metadata.name)
+fi
+
+if [[ -z "$CLUSTER_CONFIG_PATH" ]]; then
   echo "Missing required arguments"
   usage
   exit 1
@@ -61,9 +73,7 @@ function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4
 
 KOPS=$(kops version | cut -d ' ' -f 2)
 
-if [ "$(version "$KOPS")" -ge "$(version "1.20")" ]; then
-  echo "Kops version $KOPS is good"
-else
+if ! [ "$(version "$KOPS")" -ge "$(version "1.20")" ]; then
   echo "This script needs at least kops 1.20"
   exit
 fi
@@ -72,21 +82,24 @@ fi
 if ! kops get cluster --name "$FULLNAME" >/dev/null; then
   echo "Creating $FULLNAME now with KOPS"
 
-  if git rev-parse --abbrev-ref HEAD | grep master; then
-    echo "First make sure that the git repo is up to date"
-    git pull
-    # If the grep does not match, the script will stop
-    git status | grep "Your branch is up to date with"
-  else
-    echo "You are not working on a master branch"
-    echo "git checkout master"
-    exit 1
+  if ! $IGNORE_GIT_BRANCH; then
+    if git rev-parse --abbrev-ref HEAD | grep master; then
+      echo "First make sure that the git repo is up to date"
+      git pull
+      # If the grep does not match, the script will stop
+      git status | grep "Your branch is up to date with"
+    else
+      echo "You are not working on a master branch"
+      echo "git checkout master"
+      exit 1
+    fi
   fi
 
   kops create -f "$CLUSTER_CONFIG_PATH"/cluster.yaml
   kops create -f "$CLUSTER_CONFIG_PATH"/master-ig.yaml
   kops create -f "$CLUSTER_CONFIG_PATH"/nodes-ig.yaml
-  kops create secret --name "$FULLNAME" sshpublickey admin -i "$CLUSTER_CONFIG_PATH"/kops.pub
+  kops create -f "$CLUSTER_CONFIG_PATH"/bastion.yaml
+  #kops create secret --name "$FULLNAME" sshpublickey admin -i "$CLUSTER_CONFIG_PATH"/kops.pub
   kops update cluster "$FULLNAME" --yes --admin=48h
 else
   echo "Cluster $FULLNAME is already present, replacing the config with the local changes"
@@ -94,6 +107,7 @@ else
   kops replace -f "$CLUSTER_CONFIG_PATH"/cluster.yaml
   kops replace -f "$CLUSTER_CONFIG_PATH"/master-ig.yaml
   kops replace -f "$CLUSTER_CONFIG_PATH"/nodes-ig.yaml
+  kops replace -f "$CLUSTER_CONFIG_PATH"/bastion.yaml
   if ! kops update cluster "$FULLNAME" 2>/dev/null | grep 'No changes'; then
     echo -n "if there is a change in the yaml file, you might have to run
       # kops update cluster --yes --admin
