@@ -1,0 +1,23 @@
+{{- if and
+  .Values.velero.metrics.enabled
+  .Values.velero.metrics.serviceMonitor.enabled
+  .Values.networkpolicies
+}}
+kind: NetworkPolicy
+apiVersion: crd.projectcalico.org/v1
+metadata:
+  name: velero-exporter-monitoring-net
+  namespace: velero
+spec:
+  order: 100
+  selector: app.kubernetes.io/name == 'velero'
+  ingress:
+  - action: Allow
+    protocol: TCP
+    source:
+      selector: app.kubernetes.io/name == 'prometheus'
+      namespaceSelector: monitoring == 'kube-prometheus-stack'
+    destination:
+      ports:
+      - 8085
+{{ end }}

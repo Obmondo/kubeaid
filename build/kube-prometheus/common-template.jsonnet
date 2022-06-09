@@ -1,5 +1,5 @@
 local utils = import 'utils.libsonnet';
-local addMixin = (import 'kube-prometheus/lib/mixin.libsonnet');
+local addMixin = (import 'lib/addmixin.libsonnet');
 
 local remove_nulls = (
   function(arr)
@@ -39,35 +39,42 @@ local default_vars = {
   grafana_keycloak_enable: false,
   addMixins: {
     ceph: true,
-    sealedSecrets: true,
+    sealedsecrets: true,
     etcd: true,
+    velero: false,
+  },
+  mixin_configs: {
+    // Example:
+    //
+    // velero+: {
+    //   selector: 'schedule=~"^ops.+"',
+    // },
   },
 };
 
 local vars = default_vars + ext_vars;
 
 local mixins = remove_nulls([
-  if vars.addMixins.ceph then
-    addMixin({
-      name: 'ceph',
-      mixin: (import 'github.com/ceph/ceph-mixins/mixin.libsonnet') + {
-        _config+: {},  // mixin configuration object
-      },
-    }),
-  if vars.addMixins.sealedSecrets then
-    addMixin({
-      name: 'sealedsecrets',
-      mixin: (import 'github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin/mixin.libsonnet') + {
-        _config+: {},  // mixin configuration object
-      },
-    }),
-  if vars.addMixins.etcd then
-    addMixin({
-      name: 'etcd',
-      mixin: (import 'github.com/etcd-io/etcd/contrib/mixin/mixin.libsonnet') + {
-        _config+: {},  // mixin configuration object
-      },
-    }),
+  addMixin(
+    'ceph',
+    (import 'github.com/ceph/ceph-mixins/mixin.libsonnet'),
+    vars,
+  ),
+  addMixin(
+    'sealedsecrets',
+    (import 'github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin/mixin.libsonnet'),
+    vars,
+  ),
+  addMixin(
+    'etcd',
+    (import 'github.com/etcd-io/etcd/contrib/mixin/mixin.libsonnet'),
+    vars,
+  ),
+  addMixin(
+    'velero',
+    (import 'mixins/velero/mixin.libsonnet'),
+    vars,
+  ),
 ]);
 
 local kp =
@@ -224,7 +231,15 @@ local kp =
       } else {}
   );
 
-{ 'setup/0namespace-namespace': kp.kubePrometheus.namespace } +
+{
+  'setup/0namespace-namespace': kp.kubePrometheus.namespace +
+                                ({
+                                   metadata+: {
+                                     labels:
+                                       { monitoring: 'kube-prometheus-stack' },
+                                   },
+                                 }),
+} +
 {
   ['setup/prometheus-operator-' + name]: kp.prometheusOperator[name]
   for name in std.filter((function(name) name != 'serviceMonitor' && name != 'prometheusRule'), std.objectFields(kp.prometheusOperator))
