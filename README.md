@@ -278,16 +278,28 @@ terraform -chdir=cluster-setup-files/terraform/aks plan -var-file=../k8id-config
 terraform -chdir=cluster-setup-files/terraform/aks apply -var-file=../k8id-config/k8s/kube.tfvars -auto-approve
 ```
 
-## Build kube promethues in CI and generates PR automatically
+## CI build and automatic pull requests
 
-To automatically build the kube prometheus in CI and push MR for that,we need 4 secrets to be added in the github actions.
-For gitlab you will need to add these variables in your ci_cd settings add these in variables field
+To automatically build K8id in CI and create a pull request against your own config repository additional configuration
+may be required.
 
-Those 4 secrets names are -
+### GitHub
 
-```text
-1. API_TOKEN_GITHUB - You must select the scopes: 'repo = Full control of private repositories', 'admin:org = read:org' and 'write:discussion = Read:discussion'
-2. OBMONDO_DEPLOY_REPO_TARGET - This must be your config repo like <org-name>/k8id-config
-3. OBMONDO_DEPLOY_REPO_TARGET_BRANCH - master or branch name of k8id-config against which you want to build
-4. OBMONDO_DEPLOY_PULL_REQUEST_REVIEWERS - The username of the user which will be added the reviewer for the PR which will be created
-```
+K8id implements a GitHub Action that is used to automatically create pull requests. For this to work the following
+variables should be set:
+
+- `API_TOKEN_GITHUB`: GitHub PAT with the following permissions: `repo` (Full control of private repositories),
+  `admin:org` and `read:org`
+- `OBMONDO_DEPLOY_REPO_TARGET`: Target repository short name, e.g. `awesomecorp/k8id-config-awesomecorp`
+- `OBMONDO_DEPLOY_REPO_TARGET_BRANCH`: Branch name of k8id-config against which you want to build, often `main` or `master`
+- `OBMONDO_DEPLOY_PULL_REQUEST_REVIEWERS` (optional): A comma-separated list of usernames of the users that are added as
+  reviewers for PRs
+
+### GitLab
+
+K8id requires two CI/CD secrets to be configured in order for GitLab CI to be able to create merge requests against a
+config repository:
+
+- `KUBERNETES_CONFIG_REPO_TOKEN`: GitLab access token with permissions `api` and `read_repository`
+- `KUBERNETES_CONFIG_REPO_URL`: Complete URL to target git repo, e.g.
+  `https://gitlab.example.org/it/k8id-config-awesomecorp.git`
