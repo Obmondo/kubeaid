@@ -288,12 +288,19 @@ may be required.
 K8id implements a GitHub Action that is used to automatically create pull requests. For this to work the following
 variables should be set:
 
-- `API_TOKEN_GITHUB`: GitHub PAT with the following permissions: `repo` (Full control of private repositories),
-  `admin:org` and `read:org`
+- `API_TOKEN_GITHUB`: GitHub PAT with permission `repo` (Full control of private repositories).
 - `OBMONDO_DEPLOY_REPO_TARGET`: Target repository short name, e.g. `awesomecorp/k8id-config-awesomecorp`
 - `OBMONDO_DEPLOY_REPO_TARGET_BRANCH`: Branch name of k8id-config against which you want to build, often `main` or `master`
 - `OBMONDO_DEPLOY_PULL_REQUEST_REVIEWERS` (optional): A comma-separated list of usernames of the users that are added as
   reviewers for PRs
+
+As GitHub does not have a concept of repository access tokens like GitLab it's considered best practice to instead
+create a user account specifically for this purpose. The user account should only have access to this repository and the
+repository referenced in `OBMONDO_DEPLOY_REPO_TARGET`.
+
+In order to be able to create PRs the setting *"Automatically delete head branches"* must be enabled in the target
+repository. This can be done by in repository settings under the heading "Pull Requests". Having this disabled will
+result in the CI job not creating new PRs as long as a branch named `obmondo-deploy` exists.
 
 ### GitLab
 
