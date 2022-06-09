@@ -15,7 +15,7 @@ lint:markdown:
 
 lint_sh:
   stage: lint
-  image: koalaman/shellcheck-alpine
+  image: registry.obmondo.com/obmondo/dockerfiles/shlint:latest
   script:
     - 'find . -not -path ./build/kube-prometheus/libraries/\* -a -not -path ./build/vendor/\* -name \*.sh -o -name \*.bash | xargs shellcheck'
   rules:
