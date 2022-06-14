@@ -8,6 +8,10 @@ terraform {
       source = "eddycharly/kops"
       version = "1.23.5"
     }
+    argocd = {
+      source = "oboukili/argocd"
+      version = "3.0.1"
+    }
   }
 
   required_version = ">= 1.2.2"

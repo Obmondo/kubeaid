@@ -61,10 +61,6 @@ resource "kops_cluster" "cluster" {
     masters = "private"
     nodes   = "private"
 
-    bastion {
-      bastion_public_name = "bastion.${var.cluster_name}"
-    }
-
     dns {
       type = "Public"
     }
@@ -143,7 +139,8 @@ resource "kops_cluster" "cluster" {
   }
 
   depends_on = [
-    aws_route53_record.subzone-ns-records
+    aws_route53_record.subzone-ns-records,
+    aws_instance.wireguard
   ]
 }
 
@@ -194,16 +191,6 @@ resource "kops_instance_group" "node-0" {
   subnets      = ["k8s-${var.environment}-private-0", "k8s-${var.environment}-private-1", "k8s-${var.environment}-private-2"]
 }
 
-resource "kops_instance_group" "bastion-0" {
-  cluster_name = kops_cluster.cluster.id
-  name         = "bastion-0"
-  role         = "Bastion"
-  min_size     = 1
-  max_size     = 1
-  machine_type = "t2.micro"
-  subnets      = ["k8s-${var.environment}-utility-0", "k8s-${var.environment}-utility-1", "k8s-${var.environment}-utility-2"]
-}
-
 resource "kops_cluster_updater" "updater" {
   cluster_name = kops_cluster.cluster.id
 
@@ -229,7 +216,8 @@ resource "kops_cluster_updater" "updater" {
   }
 
   depends_on = [
-    aws_route53_record.subzone-ns-records
+    aws_route53_record.subzone-ns-records,
+    aws_instance.wireguard
   ]
 }
 

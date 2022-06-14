@@ -111,13 +111,19 @@ variable "tags" {
   default     = ({})
 }
 
-variable "wg_clients" {
+variable "wg_peers" {
   type        = list(object({
-    friendly_name = string,
-    public_key    = string,
-    client_ip     = string
+    name        = string,
+    public_key  = string,
+    allowed_ips = string
   }))
   description = "List of client objects with IP and public key. See Usage in README for details."
+}
+
+variable "wg_cidr" {
+  type        = string
+  description = "Wireguard CIDR for k8s cluster"
+  default     = "172.16.16.0/20"
 }
 
 variable "wg_server_port" {
@@ -132,6 +138,26 @@ variable "wg_persistent_keepalive" {
 
 variable "wg_server_private_key" {
   type        = string
-  default     = null
+  default     = "UBvb1y0QmA/cwan0TdI5/gF4RaHbBfOZNRT4R0BPoWc="
   description = "WG server private key."
+}
+
+variable "wg_server_public_key" {
+  type        = string
+  default     = "+FjoIdKG3+MQdpvFI/rltaA6YElvVrybi3WdMEkktUs="
+  description = "WG server private key."
+}
+
+variable "argocd_repo" {
+  type        = object({
+    k8id = object({
+      url             = string,
+      ssh_private_key = string,
+    }),
+    k8id-config = object({
+      url             = string,
+      ssh_private_key = string,
+    })
+  })
+  description = "Git repo for K8id and respective owner git repo for data"
 }
