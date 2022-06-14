@@ -4,4 +4,4 @@ provider "helm" {
   }
 }
 
-provider "argocd" {}
+# provider "argocd" {}

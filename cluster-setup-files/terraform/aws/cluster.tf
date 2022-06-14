@@ -1,6 +1,6 @@
 resource "kops_cluster" "cluster" {
   name               = var.cluster_name
-  admin_ssh_key      = file("./ssh_pub.key")
+  admin_ssh_key      = var.admin_ssh_key
   cloud_provider     = "aws"
   kubernetes_version = var.kubernetes_version
   dns_zone           = local.subdomain

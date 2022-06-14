@@ -30,23 +30,6 @@ variable "worker" {
   }
 }
 
-variable "bastion" {
-  type = object({
-    image_id     = string
-    max_size     = number
-    min_size     = number
-    machine_type = string
-  })
-  description = "K8s master node spec"
-  default = {
-    image_id     = "099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20220404"
-    max_size     = 1
-    min_size     = 1
-    machine_type = "t2.micro"
-  }
-}
-
-
 variable "region" {
   type        = string
   default     = "eu-west-1"
@@ -136,15 +119,16 @@ variable "wg_persistent_keepalive" {
   description = "Persistent Keepalive - useful for helping connection stability over NATs."
 }
 
+# EXPORT ENV Variable
+# export TF_VAR_wg_server_private_key
 variable "wg_server_private_key" {
   type        = string
-  default     = "UBvb1y0QmA/cwan0TdI5/gF4RaHbBfOZNRT4R0BPoWc="
   description = "WG server private key."
+  sensitive   = true
 }
 
 variable "wg_server_public_key" {
   type        = string
-  default     = "+FjoIdKG3+MQdpvFI/rltaA6YElvVrybi3WdMEkktUs="
   description = "WG server private key."
 }
 
@@ -160,4 +144,9 @@ variable "argocd_repo" {
     })
   })
   description = "Git repo for K8id and respective owner git repo for data"
+}
+
+variable "admin_ssh_key" {
+  type        = string
+  description = "Only one ssh key is supported as of now"
 }
