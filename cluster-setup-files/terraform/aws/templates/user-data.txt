@@ -1,0 +1,60 @@
+#!/bin/bash -v
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get upgrade -y -o Dpkg::Options::="--force-confnew"
+apt-get install -y \
+  apt-transport-https \
+  ca-certificates \
+  build-essential \
+  software-properties-common \
+  unzip \
+  curl \
+  wget \
+  gnupg \
+  net-tools \
+  jq \
+  wireguard-dkms \
+  wireguard-tools && \
+  rm -rf /var/lib/apt/lists/*
+
+cat > /etc/wireguard/wg0.conf <<- EOF
+[Interface]
+Address = ${wg_server_net}
+PrivateKey = ${wg_server_private_key}
+ListenPort = ${wg_server_port}
+PostUp = sysctl -w -q net.ipv4.ip_forward=1
+PostUp = sysctl -w -q net.ipv6.conf.all.forwarding=1
+PostUp = iptables -P FORWARD DROP
+PostUp = ip6tables -P FORWARD DROP
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT
+PostUp = ip6tables -A FORWARD -i wg0 -j ACCEPT
+PostUp = iptables -t nat -A POSTROUTING -o ENI -j MASQUERADE
+PostUp = ip6tables -t nat -A POSTROUTING -o ENI -j MASQUERADE
+PostDown = sysctl -w -q net.ipv4.ip_forward=0
+PostDown = sysctl -w -q net.ipv6.conf.all.forwarding=0
+PostDown = iptables -P FORWARD ACCEPT
+PostDown = ip6tables -P FORWARD ACCEPT
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT
+PostDown = ip6tables -D FORWARD -i wg0 -j ACCEPT
+PostDown = iptables -t nat -D POSTROUTING -o ENI -j MASQUERADE
+PostDown = ip6tables -t nat -D POSTROUTING -o ENI -j MASQUERADE
+
+${peers}
+EOF
+
+export ENI=$(ip route get 8.8.8.8 | grep 8.8.8.8 | awk '{print $5}')
+sed -i "s/ENI/$ENI/g" /etc/wireguard/wg0.conf
+
+chown -R root:root /etc/wireguard/
+chmod -R og-rwx /etc/wireguard/*
+sysctl -p
+systemctl enable wg-quick@wg0.service
+systemctl start wg-quick@wg0.service
+
+until systemctl is-active --quiet wg-quick@wg0.service
+do
+  sleep 1
+done
+
+ufw allow ssh
+ufw allow ${wg_server_port}/udp
+ufw --force enable
