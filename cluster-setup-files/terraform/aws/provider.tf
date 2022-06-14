@@ -1,3 +1,7 @@
+provider "aws" {
+  region = var.region
+}
+
 provider "kops" {
   state_store = "s3://${var.kops_state_bucket_name}"
   aws {
