@@ -3,7 +3,9 @@ cert-manager:
     cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
   installCRDs: true
   clusterResourceNamespace: cert-manager
-
+  global:
+    leaderElection:
+      namespace: cert-manager
 issuer:
   production: false
 networkpolicies: false
