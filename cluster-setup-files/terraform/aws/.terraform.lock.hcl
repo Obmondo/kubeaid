@@ -72,3 +72,18 @@ provider "registry.terraform.io/hashicorp/template" {
     "zh:c979425ddb256511137ecd093e23283234da0154b7fa8b21c2687182d9aea8b2",
   ]
 }
+
+provider "registry.terraform.io/oboukili/argocd" {
+  version     = "3.0.1"
+  constraints = "3.0.1"
+  hashes = [
+    "h1:uzlq6hTuiU/ApiYDqDRi4qZ09Dyyfc10FoN+pBNa+kw=",
+    "zh:377b731a81978c2f2e08d39545571e83991a60db7b0922726052503cb4296e94",
+    "zh:38e639f258d5fb50c648fec217c582243f8fbca9aac4c1c795739a93259985a4",
+    "zh:6607170171989d90f6fc8e1e9f186d82431e4e2eaf9776bc0cf426974c4a7d62",
+    "zh:99d176c3e4cc5a6946fa6f1266d573c030c37fef8e09d5ba799b9f9762b8619a",
+    "zh:ce16ae5a895579b6435043d314f7bd5171be797025434af462d2580e5838daee",
+    "zh:d97a5f9bd192ef8052543d6eb3a1df5da6ebd6949bb1284bb4a20dbb77d222ef",
+    "zh:f808cc8b3df5934ebe425f67b81dd942c61e1cc829bf8a65566076c1138b8fc9",
+  ]
+}
