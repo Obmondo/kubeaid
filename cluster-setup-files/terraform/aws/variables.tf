@@ -30,6 +30,23 @@ variable "worker" {
   }
 }
 
+variable "bastion" {
+  type = object({
+    image_id     = string
+    max_size     = number
+    min_size     = number
+    machine_type = string
+  })
+  description = "K8s master node spec"
+  default = {
+    image_id     = "099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20220404"
+    max_size     = 1
+    min_size     = 1
+    machine_type = "t2.micro"
+  }
+}
+
+
 variable "region" {
   type        = string
   default     = "eu-west-1"
@@ -92,4 +109,29 @@ variable "tags" {
   type        = map
   description = "Tags for the k8s cluster"
   default     = ({})
+}
+
+variable "wg_clients" {
+  type        = list(object({
+    friendly_name = string,
+    public_key    = string,
+    client_ip     = string
+  }))
+  description = "List of client objects with IP and public key. See Usage in README for details."
+}
+
+variable "wg_server_port" {
+  default     = 51820
+  description = "Port for the vpn server."
+}
+
+variable "wg_persistent_keepalive" {
+  default     = 25
+  description = "Persistent Keepalive - useful for helping connection stability over NATs."
+}
+
+variable "wg_server_private_key" {
+  type        = string
+  default     = null
+  description = "WG server private key."
 }
