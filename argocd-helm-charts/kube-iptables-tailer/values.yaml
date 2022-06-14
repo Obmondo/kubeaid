@@ -6,3 +6,4 @@ kube-iptables-tailer:
     pullPolicy: IfNotPresent
   imagePullSecrets:
     - name: obmondo-web-app-gitlab-registry
+networkpolicies: false
