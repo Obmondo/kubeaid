@@ -1,9 +1,12 @@
+# Terraform to setup K8s cluster using Kops (works only with AWS)
+
 ## Setup Permissions
-# https://kops.sigs.k8s.io/getting_started/aws/
+
+https://kops.sigs.k8s.io/getting_started/aws/
 
 ## Defaults settings
 
-```
+```sh
 cluster_name           = "k8s.staging.example-dev.com"
 domain_name            = "example-dev.com"
 environment            = "staging"
@@ -53,7 +56,7 @@ argocd_repo            = {
 
 ## Installation
 
-```
+```sh
 export TF_VAR_wg_server_private_key=your-wg-private-key
 export AWS_PROFILE=profile name # your profile name when you did aws configure
 export KOPS_STATE_STORE=s3://kops.example.com # S3 bucket name where kops will store the state file
@@ -63,24 +66,57 @@ terraform plan --var-file /path/to/values.tfvars
 terraform apply --var-file /path/to/values.tfvars
 ```
 
+## How to add your workstation into wireguard
+
+* Generate the pub and private key for client
+
+```sh
+sudo apt install wireguard-tools
+wg genkey | tee client1-privatekey | wg pubkey > client1-publickey
+```
+
+```sh
+[Interface]
+PrivateKey = CLIENT_PRIVATE_KEY
+Address = THIS_WOULD_BE_THE_IP_OF_YOUR_CLIENT
+
+[Peer]
+PublicKey = WG_SERVER_PUBLIC_KEY
+Endpoint  = WG_SERVER_PUBLIC_IP:51820
+AllowedIPs = THIS_WOULD_BE_YOUR_VPC_CIDR
+```
+
+```sh
+sudo wg-quick up wg0
+sudo systemctl enable wg-quick@wg0.service
+sudo systemctl start wg-quick@wg0.service
+```
+
 ## Cavets
+
 * It can not support to add more then 1 ssh pub key (it will be fixed in future)
+* wireguard ec2 instance has no ssh key added (its added manually for now, will be fixed in future)
+  so simply give me your wg public key and I will add it manually
 * Argocd is simply deployed, you will have to manually add the repo (it will be fixed in future)
 
 ## Troubleshooting
 
 * You might encounter that sometime that cluster is not accessible ?
   Check the wireguard status locally on your client
-  ```
+
+  ```sh
   curl -L -k -v https://api.k8s.staging.example.com/api/v1/nodes
   ```
+
   If the above is NOT working, login onto wireguard client
   and run the above command and see if you can reach k8s from wireguard node.
 
 * Wireguard is not working
   You can still access the k8s api using socks5 proxy
-  ```
+
+  ```sh
   ssh -D 9094 ubuntu@wg.staging.example.com
   ```
+
   edit the .kube/config
   add proxy-url: socks5://localhost:9094
