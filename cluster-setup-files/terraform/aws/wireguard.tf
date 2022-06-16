@@ -10,17 +10,6 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-data "aws_subnets" "public_subnet_ids" {
-  filter {
-    name = "vpc-id"
-    values = [module.vpc.vpc_id]
-  }
-
-  tags = {
-    SubnetType = "Utility"
-  }
-}
-
 data "template_file" "wireguard_userdata_peers" {
   template = file("templates/wireguard-user-data-peers.tpl")
   count = length(var.wg_peers)
@@ -44,12 +33,16 @@ data "template_file" "wireguard_userdata" {
 
 resource "aws_instance" "wireguard" {
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t2.nano"
-  subnet_id              = tolist(data.aws_subnets.public_subnet_ids.ids)[0]
+  instance_type          = "t2.micro"
+  subnet_id              = tolist(module.vpc.public_subnets)[0]
   vpc_security_group_ids = [aws_security_group.sg_wireguard.id]
   user_data              = data.template_file.wireguard_userdata.rendered
+
   tags                   = {
-    Name = "wireguard-${local.subdomain}"
+    environment = var.environment
+    application = "wireguard"
+    terraform   = true
+    Name        = "wireguard-${local.subdomain}"
   }
 }
 
