@@ -6,4 +6,18 @@ kube-iptables-tailer:
     pullPolicy: IfNotPresent
   imagePullSecrets:
     - name: obmondo-web-app-gitlab-registry
+  tolerations:
+  - effect: NoSchedule
+    operator: Exists
+  - effect: NoExecute
+    operator: Exists
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/arch
+            operator: In
+            values:
+            - amd64
 networkpolicies: false
