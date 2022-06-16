@@ -23,9 +23,11 @@ spec:
     destination:
       ports:
       - 443
-      nets:
-      - 52.0.0.0/8 # AWS S3 is using several IP's in this range
-      - 54.0.0.0/8 # AWS S3 is using several IP's in this range
+      notNets:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+      - 100.64.0.0/10
   # Allow access to the apiserver
   - action: Allow
     protocol: TCP
