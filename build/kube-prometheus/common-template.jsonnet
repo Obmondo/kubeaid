@@ -189,7 +189,7 @@ local kp =
               replicas: 1,
               resources: vars.alertmanager_resources,
               logLevel: 'debug',  // So firing alerts show up in log
-              secrets: ['obmondo-alertmanager', 'obmondo-clientcert'],
+              secrets: ['obmondo-clientcert'],
             },
           },
         },
