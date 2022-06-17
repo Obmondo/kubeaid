@@ -8,6 +8,11 @@ resource "helm_release" "argocd" {
 #  depends_on       = [
 #    helm_release.sealed_secrets
 #  ]
+
+  set {
+    name = "podAnnotations"
+    value = "meta.helm.sh/release-name: argo-cd"
+  }
 }
 
 #resource "argocd_repository" "argocd_repos" {

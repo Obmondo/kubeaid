@@ -106,7 +106,7 @@ variable "wg_peers" {
 variable "wg_cidr" {
   type        = string
   description = "Wireguard CIDR for k8s cluster"
-  default     = "172.16.16.0/20"
+  default     = "172.16.16.1/20"
 }
 
 variable "wg_server_port" {
