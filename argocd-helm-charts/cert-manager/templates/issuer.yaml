@@ -22,7 +22,8 @@ spec:
           apiTokenSecretRef:
             name: {{ .Values.issuer.cloudProviderSecret }}
             key: api-token
-    {{- else if eq .Values.issuer.cloudProvider "route53" }}
+    {{- end }}
+    {{- if eq .Values.issuer.cloudProvider "route53" }}
     solvers:
     - dns01:
         {{ .Values.issuer.cloudProvider }}:
