@@ -2,7 +2,7 @@ traefik:
   podDisruptionBudget:
     enabled: true
     maxUnavailable: 1
-  # NOTE: this is for not to enable the anonymous usage of traefik
+  # NOTE: this is to disable the anonymous usage reporting - https://doc.traefik.io/traefik/contributing/data-collection/
   globalArguments: []
   deployment:
     replicas: 2
