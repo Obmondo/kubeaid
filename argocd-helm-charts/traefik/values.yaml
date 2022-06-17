@@ -2,6 +2,8 @@ traefik:
   podDisruptionBudget:
     enabled: true
     maxUnavailable: 1
+  # NOTE: this is for not to enable the anonymous usage of traefik
+  globalArguments: []
   deployment:
     replicas: 2
   logs:
