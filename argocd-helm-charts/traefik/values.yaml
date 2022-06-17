@@ -1,4 +1,7 @@
 traefik:
+  podDisruptionBudget:
+    enabled: true
+    maxUnavailable: 1
   deployment:
     replicas: 2
   logs:
