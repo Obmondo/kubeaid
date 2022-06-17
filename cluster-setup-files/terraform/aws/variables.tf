@@ -150,3 +150,9 @@ variable "admin_ssh_key" {
   type        = string
   description = "Only one ssh key is supported as of now"
 }
+
+variable "cluster_dns_type" {
+  type        = string
+  default     = "private"
+  description = "Type of cluster private or public"
+}
