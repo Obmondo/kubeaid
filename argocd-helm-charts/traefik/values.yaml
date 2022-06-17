@@ -4,7 +4,6 @@ traefik:
   logs:
     access:
       enabled: true
-      #level: DEBUG
   ports:
     websecure:
       tls:
@@ -16,7 +15,6 @@ traefik:
     - "--entrypoints.web.proxyprotocol.insecure=true"
     - "--entrypoints.websecure.proxyprotocol=true"
     - "--entrypoints.websecure.proxyprotocol.insecure=true"
-    - "--entryPoints.websecure.forwardedHeaders.trustedIPs=104.0.0.0/8"
   # https://github.com/argoproj/argo-cd/issues/1704#issuecomment-904741817
   providers:
     kubernetesIngress:
@@ -28,45 +26,3 @@ traefik:
       annotations:
         traefik.ingress.kubernetes.io/router.tls: "true"
         cert-manager.io/cluster-issuer: letsencrypt
-  service:
-    service.beta.kubernetes.io/azure-load-balancer-resource-group: obmondo-aks
-
-
-#traefik:
-#  podDisruptionBudget:
-#   enabled: true
-#   maxUnavailable: 1
-#   logs:
-#    access:
-#      enabled: true
-#  #Update these providers based on your needs in your customer-repo/value file for traefik
-#  # providers:
-#  # kubernetesIngress:
-#  # publishedService:
-#  # enabled: true
-#  ports:
-#    websecure:
-#      tls:
-#        enabled: true
-#    web:
-#      redirectTo: websecure
-#
-#      # Num of deployement replicas you want
-#      #  deployment:
-#      #    replicas: 2
-#
-#These are examples for AWS - Please set you own if needed in your customer-repo/value file for traefik
-#  service:
-#    annotations:
-#      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
-#      service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
-#      service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
-#      service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
-
-# Adjust These based on your requirements in your customer-repo/value file for traefik
-#  globalArguments:
-#  additionalArguments:
-#  - "--entrypoints.web.proxyprotocol=true"
-#  - "--entrypoints.web.proxyprotocol.insecure=true"
-#  - "--entrypoints.websecure.proxyprotocol=true"
-#  - "--entrypoints.websecure.proxyprotocol.insecure=true"
