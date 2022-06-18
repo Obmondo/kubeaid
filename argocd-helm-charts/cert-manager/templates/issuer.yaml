@@ -27,6 +27,9 @@ spec:
     - dns01:
         {{ .Values.issuer.cloudProvider }}:
           region: {{ .Values.issuer.region }}
+          {{- if .Values.issuer.hostedZoneID }}
+          hostedZoneID: {{ .Values.issuer.hostedZoneID }}
+          {{- end }}
       selector:
         dnsZones:
           {{- range.Values.issuer.dnsZones }}
