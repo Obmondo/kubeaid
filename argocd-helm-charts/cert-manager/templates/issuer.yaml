@@ -30,7 +30,7 @@ spec:
       selector:
         dnsZones:
           {{- range.Values.issuer.dnsZones }}
-          - {{- . | quote }}
+          - {{ . | quote }}
           {{- end }}
     {{- else }}
     solvers:
