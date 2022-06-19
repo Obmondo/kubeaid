@@ -1,5 +1,5 @@
 resource "aws_iam_role" "cluster-autoscaler" {
-  name               = "${var.environment}.cluster-autoscaler"
+  name               = "${var.environment}-cluster-autoscaler"
   path               = "/"
   description        = "This allows the cluster-autoscaler on the ${var.cluster_name} cluster to manage it's autoscaling groups"
   assume_role_policy = <<-EOF
@@ -33,7 +33,7 @@ resource "aws_iam_role" "cluster-autoscaler" {
 }
 
 resource "aws_iam_policy" "cluster-autoscaler" {
-  name        = "${var.environment}.cluster-autoscaler"
+  name        = "${var.environment}-cluster-autoscaler"
   path        = "/"
   description = "This policy is required by the cluster autoscaler in the ${var.cluster_name} k8s cluster"
   depends_on  = [

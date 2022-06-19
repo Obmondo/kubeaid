@@ -62,7 +62,7 @@ resource "kops_cluster" "cluster" {
     nodes   = "private"
 
     dns {
-      type = title(var.cluster_dns_type)
+      type = "Public"
     }
   }
 
