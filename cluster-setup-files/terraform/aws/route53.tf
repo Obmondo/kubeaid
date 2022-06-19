@@ -14,9 +14,6 @@ data "aws_route53_zone" "parent_zone" {
 resource "aws_route53_zone" "zone" {
   name    = local.subdomain
   comment = "Created on behalf of the ${var.cluster_name} Kubernetes cluster"
-  vpc {
-    vpc_id  = (var.cluster_dns_type == "private" ? module.vpc.vpc_id : null)
-  }
 }
 
 data "aws_instance" "wireguard" {
@@ -28,7 +25,7 @@ data "aws_instance" "wireguard" {
   instance_id = aws_instance.wireguard.id
 }
 
-resource "aws_route53_record" "subzone-A-record" {
+resource "aws_route53_record" "wireguard-A-record" {
   zone_id = data.aws_route53_zone.parent_zone.zone_id
   name    = "wg.${var.domain_name}"
   type    = "A"
