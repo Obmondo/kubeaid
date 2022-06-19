@@ -106,7 +106,7 @@ variable "wg_peers" {
 variable "wg_cidr" {
   type        = string
   description = "Wireguard CIDR for k8s cluster"
-  default     = "172.16.16.0/20"
+  default     = "172.16.16.1/20"
 }
 
 variable "wg_server_port" {
@@ -149,4 +149,10 @@ variable "argocd_repo" {
 variable "admin_ssh_key" {
   type        = string
   description = "Only one ssh key is supported as of now"
+}
+
+variable "cluster_dns_type" {
+  type        = string
+  default     = "private"
+  description = "Type of cluster private or public"
 }

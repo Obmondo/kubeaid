@@ -1,6 +1,9 @@
 resource "aws_iam_policy" "kube2iam" {
   name        = "${var.environment}-kube2iam"
   path        = "/"
+  depends_on  = [
+    kops_cluster.cluster
+  ]
   description = "This is a policy made specifically for kube2iam, a system which grants roles to specific pods in Kubernetes."
   policy      = <<EOF
 {
@@ -19,9 +22,12 @@ EOF
 }
 
 resource "aws_iam_role" "kube2iam" {
-    name               = "${var.environment}-kube2iam"
-    path               = "/"
-    assume_role_policy = <<POLICY
+  name               = "${var.environment}-kube2iam"
+  path               = "/"
+  depends_on         = [
+    kops_cluster.cluster
+  ]
+  assume_role_policy = <<POLICY
 {
   "Version": "2012-10-17",
   "Statement": [
