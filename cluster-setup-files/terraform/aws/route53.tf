@@ -16,10 +16,6 @@ resource "aws_route53_zone" "zone" {
   comment = "Created on behalf of the ${var.cluster_name} Kubernetes cluster"
 }
 
-data "aws_route53_zone" "zone" {
-  name = local.subdomain
-}
-
 data "aws_instance" "wireguard" {
   filter {
     name   = "tag:Name"
@@ -29,9 +25,9 @@ data "aws_instance" "wireguard" {
   instance_id = aws_instance.wireguard.id
 }
 
-resource "aws_route53_record" "subzone-A-record" {
-  zone_id = data.aws_route53_zone.zone.zone_id
-  name    = "wg.${local.subdomain}"
+resource "aws_route53_record" "wireguard-A-record" {
+  zone_id = data.aws_route53_zone.parent_zone.zone_id
+  name    = "wg.${var.domain_name}"
   type    = "A"
   ttl     = "300"
   records = [aws_eip.wireguard.public_ip]

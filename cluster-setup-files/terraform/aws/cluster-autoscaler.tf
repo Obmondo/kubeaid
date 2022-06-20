@@ -1,5 +1,5 @@
 resource "aws_iam_role" "cluster-autoscaler" {
-  name               = "${var.environment}.cluster-autoscaler"
+  name               = "${var.environment}-cluster-autoscaler"
   path               = "/"
   description        = "This allows the cluster-autoscaler on the ${var.cluster_name} cluster to manage it's autoscaling groups"
   assume_role_policy = <<-EOF
@@ -27,12 +27,18 @@ resource "aws_iam_role" "cluster-autoscaler" {
     ]
   }
   EOF
+  depends_on         = [
+    kops_cluster.cluster
+  ]
 }
 
 resource "aws_iam_policy" "cluster-autoscaler" {
-  name        = "${var.environment}.cluster-autoscaler"
+  name        = "${var.environment}-cluster-autoscaler"
   path        = "/"
   description = "This policy is required by the cluster autoscaler in the ${var.cluster_name} k8s cluster"
+  depends_on  = [
+    kops_cluster.cluster
+  ]
   policy      = <<-EOF
   {
     "Version": "2012-10-17",
@@ -70,4 +76,7 @@ resource "aws_iam_policy" "cluster-autoscaler" {
 resource "aws_iam_role_policy_attachment" "cluster-autoscaler-attachment" {
   role       = aws_iam_role.cluster-autoscaler.name
   policy_arn = aws_iam_policy.cluster-autoscaler.arn
+  depends_on = [
+    kops_cluster.cluster
+  ]
 }
