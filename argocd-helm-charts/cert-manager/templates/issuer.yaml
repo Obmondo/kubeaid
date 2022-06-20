@@ -14,7 +14,7 @@ spec:
     {{- else }}
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     {{- end }}
-    {{- if eq .Values.issuer.cloudProvider "cloudflare"}}
+    {{- if eq .Values.issuer.cloudProvider "cloudflare" }}
     solvers:
     - dns01:
         {{ .Values.issuer.cloudProvider }}:
@@ -27,10 +27,13 @@ spec:
     - dns01:
         {{ .Values.issuer.cloudProvider }}:
           region: {{ .Values.issuer.region }}
+          {{- if .Values.issuer.hostedZoneID }}
+          hostedZoneID: {{ .Values.issuer.hostedZoneID }}
+          {{- end }}
       selector:
         dnsZones:
           {{- range.Values.issuer.dnsZones }}
-          - {{- . | quote }}
+          - {{ . | quote }}
           {{- end }}
     {{- else }}
     solvers:
