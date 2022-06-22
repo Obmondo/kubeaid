@@ -283,6 +283,17 @@ terraform -chdir=cluster-setup-files/terraform/aks apply -var-file=../k8id-confi
 To automatically build K8id in CI and create a pull request against your own config repository additional configuration
 may be required.
 
+### Secrets Required
+
+The `kube-prometheus` needs two secrets thats needs to be present
+
+1. alertmanager-main - It is the secret that contains the alertmanager config file.
+   An example template for the alertmanager config can be found here
+   https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/build/kube-prometheus/example-alertmanager-config/alertmanager-main.yaml
+
+2. obmondo-clientcert - This secret contains the `tls.crt` which is the certificate and `tls.key` which is the private key.
+   This cert and key must be generated from the puppetserver. And then copied over to the secret
+
 ### GitHub
 
 K8id implements a GitHub Action that is used to automatically create pull requests. For this to work the following
