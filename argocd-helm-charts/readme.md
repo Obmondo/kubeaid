@@ -1,5 +1,7 @@
 # Updating argocd-helm-charts applications
 
+This repository is only for public apps, supported by Obmondo. Private apps go in users k8id-config repo, under k8s/argocd-helm-charts/<chartname>
+
 ## Test update - with current values files
 
 - generate current helm yaml output
