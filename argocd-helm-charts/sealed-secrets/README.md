@@ -61,3 +61,13 @@ Example:
 ```sh
 kubectl create secret generic keycloak-admin -n keycloak --from-file=keycloak-admin=/dev/stdin -o json > secrets/keycloak/keycloak-secret.json
 ```
+
+## Add a secret to pull an image from a Private Registry
+
+Some container images are a part of private registry. To pull images from those repos, we need to create a secret and specify the same in our pod under `imagePullSecrets`.
+
+The secret can be generated using this command :
+
+```sh
+kubectl create secret --namespace system --dry-run=client docker-registry myDockerSecret --docker-server=<registry-url> --docker-username=xxx --docker-password=xxx -o yaml | kubeseal --controller-name sealed-secrets --controller-namespace system -o yaml > myDockerSealedSecret.yaml
+```
