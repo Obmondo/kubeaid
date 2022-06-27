@@ -38,13 +38,27 @@ are some examples of how to create a secret.
 **note: use of `--dry-run` - this is just a local file!**
 
 ```sh
+# create a generic secret foo=bar by using the STDIN
+# echo -n prevents newline character from being encoded as secret
 echo -n bar | kubectl create secret generic mysecret -n target-namespace-in-k8s --dry-run=client --from-file=foo=/dev/stdin -o json >mysecret.json
+
+# create a generic secret username=mydevuser passed as the literal value
 kubectl create secret generic mysecret -n target-namespace-in-k8s --dry-run=client --from-literal=username=mydevuser -o json >mysecret.json
+
+# create a tls secret with specified tls.key and tls.crt files
 kubectl create secret tls mysecret -n target-namespace-in-k8s --dry-run=client --key="tls.key" --cert="tls.crt" -o json >mysecret.json
+
+# create a generic secret using a YAML file
 kubectl create secret generic alertmanagerconfig -n target-namespace --from-file=./alertmanager.yml --dry-run=client -o json >mysecret.json
 ```
 
-and add `mysealedsecret.json` to repo under `secrets/$namespace/`
+Some container images are a part of private registry. To pull images from those repos, we need to create a secret and specify the same in our pod under `imagePullSecrets`.
+The secret can be generated using this command :
+
+```sh
+kubectl create secret --namespace system --dry-run=client docker-registry myDockerSecret --docker-server=<registry-url> --docker-username=xxx --docker-password=xxx -o yaml > myDockerSecret.yaml
+```
+Using kubeseal, the secret can then be converted to a sealed secret.
 
 ### From stdin
 
@@ -62,13 +76,3 @@ Example:
 kubectl create secret generic keycloak-admin -n keycloak --from-file=keycloak-admin=/dev/stdin -o json > secrets/keycloak/keycloak-secret.json
 ```
 
-## Add a secret to pull an image from a Private Registry
-
-Some container images are a part of private registry. To pull images from those repos, we need to create a secret and specify the same in our pod under `imagePullSecrets`.
-
-The secret can be generated using this command :
-
-```sh
-kubectl create secret --namespace system --dry-run=client docker-registry myDockerSecret --docker-server=<registry-url> --docker-username=xxx --docker-password=xxx -o yaml > myDockerSecret.yaml
-```
-Using kubeseal, the sealed secret can be generated as mentioned above.
