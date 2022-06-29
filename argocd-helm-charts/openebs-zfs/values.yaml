@@ -1,0 +1,18 @@
+zfsNode:
+  nodeSelector: {}
+  tolerations: []
+  securityContext: {}
+  labels: {}
+  priorityClass:
+    create: true
+    name: zfs-csi-node-critical
+
+# zfsController contains the configurables for
+# the zfs controller statefulset
+zfsController:
+  nodeSelector: {}
+  tolerations: []
+  securityContext: {}
+  priorityClass:
+    create: true
+    name: zfs-csi-controller-critical
