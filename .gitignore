@@ -5,4 +5,5 @@ defaults
 .idea
 *.tfstate
 *.tfstate.backup
-.terraform
+.terraform*
+.terragrunt*
