@@ -3,6 +3,7 @@ apiVersion: velero.io/v1
 kind: BackupStorageLocation
 metadata:
   name: {{ include "velero.backupStorageLocation.name" . }}
+  namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": post-install,post-upgrade,post-rollback
     "helm.sh/hook-delete-policy": before-hook-creation
@@ -16,6 +17,7 @@ spec:
   {{- with .Values.configuration.backupStorageLocation.default }}
   default: {{ . }}
   {{- end }}
+  accessMode: {{ .Values.configuration.backupStorageLocation.accessMode }}
 {{- with .Values.configuration.backupStorageLocation }}
   objectStorage:
     bucket: {{ .bucket | quote }}
