@@ -6,11 +6,3 @@ velero:
     enabled: true
     serviceMonitor:
       enabled: true
-  credentials:
-    userSecret: false
-  tolerations:
-  - key: node-role.kubernetes.io/master
-    operator: Exists
-    effect: NoSchedule
-  nodeSelector:
-    kubernetes.io/role: master
