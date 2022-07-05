@@ -1,0 +1,44 @@
+{{ if .Values.schedule.daily }}
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: daily-backup
+  namespace: velero
+spec:
+  schedule: '0 0 * * 1-6'
+  template:
+    hooks: {}
+    includedNamespaces:
+    - '*'
+    ttl: 720h0m0s
+{{ end }}
+{{ if .Values.schedule.weekly }}
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: weekly-backup
+  namespace: velero
+spec:
+  schedule: '0 0 * * 0'
+  template:
+    hooks: {}
+    includedNamespaces:
+    - '*'
+    ttl: 2160h0m0s
+{{ end }}
+{{ if .Values.schedule.sixhourly }}
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: 6hrly-backup
+  namespace: velero
+spec:
+  schedule: '0 6,12,18 * * *'
+  template:
+    hooks: {}
+    includedNamespaces:
+    - '*'
+    ttl: 336h0m0s
+{{ end }}
