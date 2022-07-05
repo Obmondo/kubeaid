@@ -8,7 +8,7 @@ resource "sealedsecret_local" "argocd_repos" {
   name      = "argocd-secret"
   namespace = "argocd"
   data      = {
-    "admin": var.argocd_admin_bcrypt_password
+    "admin.password": var.argocd_admin_bcrypt_password
     "admin.passwordMtime": time_static.mtime.id
     "server.secretkey": random_string.random.result
   }
@@ -31,19 +31,18 @@ resource "helm_release" "argocd" {
   create_namespace = true
   namespace        = "argocd"
   version          = "3.29.5"
+  values           = [
+    file("argocd.yaml")
+  ]
   depends_on       = [
     sealedsecret_local.argocd_repos,
     kubectl_manifest.argocd_secret
   ]
-
-  set {
-    name = "podAnnotations"
-    value = "meta.helm.sh/release-name: argo-cd"
-  }
 }
 
 resource "kubectl_manifest" "argocd_secret" {
   yaml_body         = sealedsecret_local.argocd_repos.yaml_content
+  force_new         = true
   server_side_apply = true
   wait              = true
 }

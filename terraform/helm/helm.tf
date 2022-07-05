@@ -46,7 +46,8 @@ provider "argocd" {
   server_addr = "localhost:8080"
   username    = "admin"
   password    = var.argocd_admin_password
-  port_forward = true
+
+  port_forward                = true
   port_forward_with_namespace = "argocd"
 
   kubernetes {
