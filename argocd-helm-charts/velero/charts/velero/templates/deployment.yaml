@@ -6,6 +6,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "velero.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   {{- with .Values.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -169,7 +170,7 @@ spec:
           {{- with .Values.configuration.extraEnvVars }}
           {{- range $key, $value := . }}
             - name: {{ default "none" $key }}
-              value: {{ default "none" $value }}
+              value: {{ default "none" $value | quote }}
           {{- end }}
           {{- end }}
           {{- with .Values.credentials.extraEnvVars }}
