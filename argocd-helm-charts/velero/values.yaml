@@ -1,4 +1,8 @@
 networkpolicies: false
+schedule:
+  daily: true
+  weekly: false
+  sixhourly: false
 velero:
   configuration:
     logLevel: debug
