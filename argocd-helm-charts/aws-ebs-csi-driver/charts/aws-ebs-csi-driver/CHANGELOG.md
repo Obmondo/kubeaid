@@ -1,5 +1,39 @@
 # Helm chart
 
+## v2.8.0
+
+* Feature: Support custom affinity definition on node daemon set ([#1277](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/1277), [@vauchok](https://github.com/vauchok))
+
+## v2.7.1
+* Bump app/driver to version `v1.8.0`
+
+## v2.7.0
+* Support optional ec2 endpoint configuration.
+* Fix node driver registrar socket path.
+* Fix hardcoded kubelet path.
+
+## v2.6.11
+* Bump app/driver to version `v1.7.0`
+* Set handle-volume-inuse-error to `false`
+
+## v2.6.10
+
+* Add quotes around the `extra-tags` argument in order to prevent special characters such as `":"` from breaking the manifest YAML after template rendering.
+
+## v2.6.9
+
+* Update csi-snapshotter to version `v6.0.1`
+* Update external-attacher to version `v3.4.0`
+* Update external-resizer to version `v1.4.0`
+* Update external-provisioner to version `v3.1.0`
+* Update node-driver-registrar to version `v2.5.1`
+* Update livenessprobe to version `v2.5.0`
+
+## v2.6.8
+
+* Bump app/driver to version `v1.6.2`
+* Bump sidecar version for nodeDriverRegistrar, provisioner to be consistent with EKS CSI Driver Add-on
+
 ## v2.6.7
 
 * Bump app/driver to version `v1.6.1`
