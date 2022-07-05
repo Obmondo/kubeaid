@@ -19,7 +19,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: k8s.gcr.io/sig-storage/csi-provisioner
-      tag: "v2.1.1"
+      tag: "v3.1.0"
     logLevel: 2
     resources: {}
   attacher:
@@ -27,7 +27,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: k8s.gcr.io/sig-storage/csi-attacher
-      tag: "v3.1.0"
+      tag: "v3.4.0"
     logLevel: 2
     resources: {}
   snapshotter:
@@ -35,21 +35,21 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: k8s.gcr.io/sig-storage/csi-snapshotter
-      tag: "v3.0.3"
+      tag: "v6.0.1"
     logLevel: 2
     resources: {}
   livenessProbe:
     image:
       pullPolicy: IfNotPresent
       repository: k8s.gcr.io/sig-storage/livenessprobe
-      tag: "v2.4.0"
+      tag: "v2.5.0"
     resources: {}
   resizer:
     env: []
     image:
       pullPolicy: IfNotPresent
       repository: k8s.gcr.io/sig-storage/csi-resizer
-      tag: "v1.1.0"
+      tag: "v1.4.0"
     logLevel: 2
     resources: {}
   nodeDriverRegistrar:
@@ -57,7 +57,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: k8s.gcr.io/sig-storage/csi-node-driver-registrar
-      tag: "v2.1.0"
+      tag: "v2.5.1"
     logLevel: 2
     resources: {}
 
@@ -143,6 +143,15 @@ node:
   kubeletPath: /var/lib/kubelet
   logLevel: 2
   priorityClassName:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: eks.amazonaws.com/compute-type
+            operator: NotIn
+            values:
+            - fargate
   nodeSelector: {}
   podAnnotations: {}
   podLabels: {}
