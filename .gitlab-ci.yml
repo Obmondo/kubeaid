@@ -17,7 +17,7 @@ lint_sh:
   stage: lint
   image: registry.obmondo.com/obmondo/dockerfiles/shlint:latest
   script:
-    - 'find . -not -path ./build/kube-prometheus/libraries/\* -a -not -path ./build/vendor/\* -a -not -path ./argocd-helm-charts/\* -name \*.sh -o -name \*.bash | xargs shellcheck'
+    - 'find . -not -path ./argocd-helm-charts/\* -a -not -path ./build/kube-prometheus/libraries/\* -a -not -path ./build/vendor/\* -name \*.sh -o -name \*.bash | xargs shellcheck'
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
