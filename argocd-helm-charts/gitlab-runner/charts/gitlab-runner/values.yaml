@@ -1,15 +1,20 @@
 ## GitLab Runner Image
 ##
-## By default it's using gitlab/gitlab-runner:alpine-v{VERSION}
+## By default it's using registry.gitlab.com/gitlab-org/gitlab-runner:alpine-v{VERSION}
 ## where {VERSION} is taken from Chart.yaml from appVersion field
 ##
-## ref: https://hub.docker.com/r/gitlab/gitlab-runner/tags/
+## DEPRECATED: Setting `image: registry.gitlab.com/gitlab-org/gitlab-runner:alpine-v11.6.0` is deprecated
+##
+## ref: https://gitlab.com/gitlab-org/gitlab-runner/container_registry/29383?orderBy=NAME&sort=asc&search[]=alpine-v&search[]=
 ##
 ## Note: If you change the image to the ubuntu release
 ##       don't forget to change the securityContext;
 ##       these images run on different user IDs.
 ##
-# image: gitlab/gitlab-runner:alpine-v11.6.0
+image:
+  registry: registry.gitlab.com
+  image: gitlab-org/gitlab-runner
+  # tag: alpine-v11.6.0
 
 ## Specify a imagePullPolicy for the main runner deployment
 ## 'Always' if imageTag is 'latest', else set to 'IfNotPresent'
@@ -57,6 +62,19 @@ imagePullPolicy: IfNotPresent
 ##
 # runnerToken: ""
 #
+
+## Unregister runner before termination
+##
+## Updating the runner's chart version or configuration will cause the runner container
+## to be terminated and created again. This may cause your GitLab instance to reference
+## non-existant runners. Un-registering the runner before termination mitigates this issue.
+## ref: https://docs.gitlab.com/runner/commands/README.html#gitlab-runner-unregister
+##
+## Please set unregisterRunners to false if you set unregisterRunner to true as only
+## one preStop action is supported.
+##
+# unregisterRunner: true
+
 ## Unregister all runners before termination
 ##
 ## Updating the runner's chart version or configuration will cause the runner container
@@ -112,6 +130,24 @@ checkInterval: 30
 #preEntrypointScript: |
 #  echo "hello"
 
+## Specify whether the runner should start the session server.
+## Defaults to false
+## ref:
+##
+## When sessionServer is enabled, the user can either provide a public publicIP
+## or either rely on the external IP auto discovery
+## When a serviceAccountName is used with the automounting to the pod disable,
+## we recommend the usage of the publicIP
+sessionServer:
+  enabled: false
+  # annotations: {}
+  # timeout: 1800
+  # internalPort: 8093
+  # externalPort: 9000
+  # publicIP: ""
+  # loadBalancerSourceRanges:
+  #   - 1.2.3.4/32
+
 ## For RBAC support:
 rbac:
   create: false
@@ -127,7 +163,7 @@ rbac:
   ## - resources: default "*" if missing or empty.
   ## - verbs: default "*" if missing or empty.
   rules: []
-  # - resources: ["pods", "secrets"]
+  # - resources: ["configmaps", "pods", "pods/attach", "secrets", "services"]
   #   verbs: ["get", "list", "watch", "create", "patch", "delete"]
   # - apiGroups: [""]
   #   resources: ["pods/exec"]
@@ -165,7 +201,7 @@ rbac:
 ## ref: https://docs.gitlab.com/runner/monitoring/#configuration-of-the-metrics-http-server
 ##
 metrics:
-  enabled: true
+  enabled: false
 
   ## Define a name for the metrics port
   ##
@@ -324,7 +360,7 @@ runners:
 
   ## Specify the tags associated with the runner. Comma-separated list of tags.
   ##
-  ## ref: https://docs.gitlab.com/ce/ci/runners/#use-tags-to-limit-the-number-of-jobs-using-the-runner
+  ## ref: https://docs.gitlab.com/ee/ci/runners/configure_runners.html#use-tags-to-control-which-jobs-a-runner-can-run
   ##
   # tags: ""
 
@@ -332,18 +368,22 @@ runners:
   ##
   # name: ""
 
+  ## Specify the maximum timeout (in seconds) that will be set for job when using this Runner
+  ##
+  # maximumTimeout: ""
+
   ## Specify if jobs without tags should be run.
   ## If not specified, Runner will default to true if no tags were specified. In other case it will
   ## default to false.
   ##
-  ## ref: https://docs.gitlab.com/ce/ci/runners/#runner-is-allowed-to-run-untagged-jobs
+  ## ref: https://docs.gitlab.com/ee/ci/runners/configure_runners.html#set-a-runner-to-run-untagged-jobs
   ##
   # runUntagged: true
 
   ## Specify whether the runner should only run protected branches.
-  ## Defaults to False.
+  ## Defaults to false.
   ##
-  ## ref: https://docs.gitlab.com/ee/ci/runners/#prevent-runners-from-revealing-sensitive-information
+  ## ref: https://docs.gitlab.com/ee/ci/runners/configure_runners.html#prevent-runners-from-revealing-sensitive-information
   ##
   # protected: true
 
@@ -477,7 +517,7 @@ runners:
     # memoryLimit: 256Mi
     # cpuRequests: 100m
     # memoryRequests: 128Mi
-    # image: "gitlab/gitlab-runner-helper:x86_64-${CI_RUNNER_REVISION}"
+    # image: "registry.gitlab.com/gitlab-org/gitlab-runner-helper:x86_64-${CI_RUNNER_REVISION}"
 
   ## Helper container security context configuration
   ## Refer to https://docs.gitlab.com/runner/executors/kubernetes.html#using-security-context
@@ -538,10 +578,21 @@ runners:
 ## ref: https://kubernetes.io/docs/reference/scheduling
 # schedulerName: "my-custom-scheduler"
 
-## Configure securitycontext
+## Configure securitycontext for the main container
 ## ref: http://kubernetes.io/docs/user-guide/security-context/
 ##
 securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  privileged: false
+  capabilities:
+    drop: ["ALL"]
+
+## Configure securitycontext valid for the whole pod
+## ref: http://kubernetes.io/docs/user-guide/security-context/
+##
+podSecurityContext:
   runAsUser: 100
   # runAsGroup: 65533
   fsGroup: 65533
@@ -632,6 +683,10 @@ podLabels: {}
   #     metricName: gitlab_runner_jobs
   #     targetAverageValue: 400m
 
+## Configure priorityClassName for manager pod. See k8s docs for more info on how pod priority works:
+##  https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+priorityClassName: ""
+
 ## Secrets to be additionally mounted to the containers.
 ## All secrets are mounted through init-runner-secrets volume
 ## and placed as readonly at /init-secrets in the init container
@@ -651,3 +706,18 @@ secrets: []
 ## See https://gitlab.com/gitlab-org/charts/gitlab-runner/-/blob/main/templates/configmap.yaml
 ## for a current list.
 configMaps: {}
+
+## Additional volumeMounts to add to the runner container
+##
+volumeMounts: []
+  # Example:
+  # - name: my-volume
+  #   mountPath: /mount/path
+
+## Additional volumes to add to the runner deployment
+##
+volumes: []
+  # Example:
+  # - name: my-volume
+  #   persistentVolumeClaim:
+  #     claimName: my-pvc

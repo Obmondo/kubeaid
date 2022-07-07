@@ -32,12 +32,12 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
-            - --tls-private-key-file=/etc/snapshot-validation/tls.key
-            - --tls-cert-file=/etc/snapshot-validation/tls.crt
-            - --port=8443
+            {{- range $flag, $val := .Values.args }}
+            - --{{ $flag | kebabcase }}={{ $val }}
+            {{- end }}
           ports:
             - name: https
-              containerPort: 8443
+              containerPort: {{ .Values.args.port | default 8443 }}
               protocol: TCP
           volumeMounts:
             - mountPath: /etc/snapshot-validation

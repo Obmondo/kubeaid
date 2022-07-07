@@ -42,7 +42,7 @@ See [supported configurations][] for more details.
 
 ## Installing
 
-This chart is tested with the latest 7.15.0 version.
+This chart is tested with the latest 7.17.3 version.
 
 ### Install released version using Helm repository
 
@@ -57,10 +57,10 @@ This chart is tested with the latest 7.15.0 version.
 
 * Clone the git repo: `git clone git@github.com:elastic/helm-charts.git`
 
-* Checkout the branch : `git checkout 7.15`
+* Checkout the branch : `git checkout 7.17`
 * Install it:
-  - with Helm 3: `helm install filebeat ./helm-charts/filebeat --set imageTag=7.15.0`
-  - with Helm 2 (deprecated): `helm install --name filebeat ./helm-charts/filebeat --set imageTag=7.15.0`
+  - with Helm 3: `helm install filebeat ./helm-charts/filebeat --set imageTag=7.17.3`
+  - with Helm 2 (deprecated): `helm install --name filebeat ./helm-charts/filebeat --set imageTag=7.17.3`
 
 
 ## Upgrading
@@ -135,7 +135,7 @@ as a reference. They are also used in the automated testing of this chart.
 | `hostPathRoot`                 | Fully-qualified [hostPath][] that will be used to persist filebeat registry data                                                                                             | `/var/lib`                         |
 | `imagePullPolicy`              | The Kubernetes [imagePullPolicy][] value                                                                                                                                     | `IfNotPresent`                     |
 | `imagePullSecrets`             | Configuration for [imagePullSecrets][] so that you can use a private registry for your image                                                                                 | `[]`                               |
-| `imageTag`                     | The filebeat Docker image tag                                                                                                                                                | `7.15.0`                  |
+| `imageTag`                     | The filebeat Docker image tag                                                                                                                                                | `7.17.3`                           |
 | `image`                        | The filebeat Docker image                                                                                                                                                    | `docker.elastic.co/beats/filebeat` |
 | `livenessProbe`                | Parameters to pass to liveness [probe][] checks for values such as timeouts and thresholds                                                                                   | see [values.yaml][]                |
 | `managedServiceAccount`        | Whether the `serviceAccount` should be managed by this helm chart. Set this to `false` in order to manage your own service account and related roles                         | `true`                             |
@@ -233,7 +233,7 @@ readinessProbe:
 Please check [CONTRIBUTING.md][] before any contribution or for any questions
 about our development and testing process.
 
-[7.15]: https://github.com/elastic/helm-charts/releases
+[7.17]: https://github.com/elastic/helm-charts/releases
 [BREAKING_CHANGES.md]: https://github.com/elastic/helm-charts/blob/master/BREAKING_CHANGES.md
 [CHANGELOG.md]: https://github.com/elastic/helm-charts/blob/master/CHANGELOG.md
 [CONTRIBUTING.md]: https://github.com/elastic/helm-charts/blob/master/CONTRIBUTING.md
@@ -243,19 +243,19 @@ about our development and testing process.
 [dnsConfig]: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/
 [environment variables]: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#using-environment-variables-inside-of-your-config
 [environment from variables]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables
-[examples]: https://github.com/elastic/helm-charts/tree/7.15/filebeat/examples
-[examples/oss]: https://github.com/elastic/helm-charts/tree/7.15/filebeat/examples/oss
-[examples/security]: https://github.com/elastic/helm-charts/tree/7.15/filebeat/examples/security
-[filebeat docker image]: https://www.elastic.co/guide/en/beats/filebeat/7.15/running-on-docker.html
+[examples]: https://github.com/elastic/helm-charts/tree/7.17/filebeat/examples
+[examples/oss]: https://github.com/elastic/helm-charts/tree/7.17/filebeat/examples/oss
+[examples/security]: https://github.com/elastic/helm-charts/tree/7.17/filebeat/examples/security
+[filebeat docker image]: https://www.elastic.co/guide/en/beats/filebeat/7.17/running-on-docker.html
 [filebeat oss docker image]: https://www.docker.elastic.co/r/beats/filebeat-oss
-[filebeat outputs]: https://www.elastic.co/guide/en/beats/filebeat/7.15/configuring-output.html
+[filebeat outputs]: https://www.elastic.co/guide/en/beats/filebeat/7.17/configuring-output.html
 [helm]: https://helm.sh
 [hostAliases]: https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
 [hostNetwork]: https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
 [hostPath]: https://kubernetes.io/docs/concepts/storage/volumes/#hostpath
 [imagePullPolicy]: https://kubernetes.io/docs/concepts/containers/images/#updating-images
 [imagePullSecrets]: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-pod-that-uses-your-secret
-[kafka output]: https://www.elastic.co/guide/en/beats/filebeat/7.15/kafka-output.html
+[kafka output]: https://www.elastic.co/guide/en/beats/filebeat/7.17/kafka-output.html
 [kubernetes secrets]: https://kubernetes.io/docs/concepts/configuration/secret/
 [labels]: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 [maxUnavailable]: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
@@ -264,8 +264,8 @@ about our development and testing process.
 [priorityClass]: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/#priorityclass
 [probe]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
 [resources]: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
-[supported configurations]: https://github.com/elastic/helm-charts/tree/7.15/README.md#supported-configurations
+[supported configurations]: https://github.com/elastic/helm-charts/tree/7.17/README.md#supported-configurations
 [serviceAccount]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 [tolerations]: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 [updateStrategy]: https://kubernetes.io/docs/tasks/manage-daemon/update-daemon-set/#daemonset-update-strategy
-[values.yaml]: https://github.com/elastic/helm-charts/tree/7.15/filebeat/values.yaml
+[values.yaml]: https://github.com/elastic/helm-charts/tree/7.17/filebeat/values.yaml

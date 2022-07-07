@@ -15,7 +15,7 @@ To install the Graylog Chart with all dependencies
 ```bash
 kubectl create namespace graylog
 
-helm install --namespace "graylog" -n "graylog" kongz/graylog
+helm install --namespace "graylog" graylog kongz/graylog
 ```
 
 ## Manually Install Dependencies
@@ -25,7 +25,7 @@ This method is *recommended* when you want to expand the availability, scalabili
 To install MongoDB, run
 
 ```bash
-helm install --namespace "graylog" -n "mongodb" bitnami/mongodb
+helm install --namespace "graylog" mongodb bitnami/mongodb
 ```
 
 Note: There are many alternative MongoDB available on [artifacthub.io](https://artifacthub.io/packages/search?page=1&ts_query_web=mongodb). If you found the `bitnami/mongodb` is not suitable, you can use another MongoDB chart. Modify `graylog.mongodb.uri` to match your MongoDB endpoint.
@@ -33,8 +33,11 @@ Note: There are many alternative MongoDB available on [artifacthub.io](https://a
 To install Elasticsearch, run
 
 ```bash
-helm install --namespace "graylog" -n "elasticsearch" stable/elasticsearch
+helm install --namespace "graylog" elasticsearch elastic/elasticsearch
 ```
+
+The Elasticsearch installation command above will install all Elasticsearch
+nodes types in single node. It is strongly recommend to follow the Elasticsearch [guide](https://github.com/elastic/helm-charts/tree/main/elasticsearch#how-to-deploy-dedicated-nodes-types) to install dedicated node on production.
 
 Note: There are many alternative Elasticsearch available on [artifacthub.io](https://artifacthub.io/packages/search?page=1&ts_query_web=elasticsearch). If you found the `stable/elasticsearch` is not suitable, you can search other charts from GitHub repositories.
 
@@ -43,24 +46,24 @@ Note: There are many alternative Elasticsearch available on [artifacthub.io](htt
 To install the Graylog Chart into your Kubernetes cluster (This Chart requires persistent volume by default, you may need to create a storage class before install chart.
 
 ```bash
-helm install --namespace "graylog" -n "graylog" kongz/graylog \
+helm install --namespace "graylog" graylog kongz/graylog \
   --set tags.install-mongodb=false\
   --set tags.install-elasticsearch=false\
   --set graylog.mongodb.uri=mongodb://mongodb-mongodb-replicaset-0.mongodb-mongodb-replicaset.graylog.svc.cluster.local:27017/graylog?replicaSet=rs0 \
-  --set graylog.elasticsearch.hosts=http://elasticsearch-client.graylog.svc.cluster.local:9200
+  --set graylog.elasticsearch.hosts=http://elasticsearch-master.graylog.svc.cluster.local:9200
   --set graylog.elasticsearch.version=7
 ```
 
 After installation succeeds, you can get a status of Chart
 
 ```bash
-helm status "graylog"
+helm status graylog
 ```
 
 If you want to delete your Chart, use this command
 
 ```bash
-helm delete --purge "graylog"
+helm delete graylog
 ```
 
 ## Install Chart with specific Graylog cluster size
@@ -71,7 +74,7 @@ For example:
 Set cluster size to 5
 
 ```bash
-helm install --namespace "graylog" -n "graylog" --set graylog.replicas=5 kongz/graylog
+helm install --namespace "graylog" graylog --set graylog.replicas=5 kongz/graylog
 ```
 
 The command above will install 1 master and 4 coordinating.
@@ -110,13 +113,12 @@ The following table lists the configurable parameters of the Graylog chart and t
 | Parameter                                      | Description                                                                                                                                           | Default                           |
 |------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|
 | `graylog.image.repository`                     | `graylog` image repository                                                                                                                            | `graylog/graylog`                 |
-| `graylog.image.repository.tag`                 | `graylog` image repository                                                                                                                            | `4.2.3-1`         |
-| `graylog.imagePullPolicy`                      | Image pull policy                                                                                                                                     | `IfNotPresent`                    |
+| `graylog.image.tag`                 | `graylog` image tag                                                                                                                            | `4.2.7-1`         |
+| `graylog.image.pullPolicy`                      | Image pull policy                                                                                                                                     | `IfNotPresent`                    |
 | `graylog.replicas`                             | The number of Graylog instances in the cluster. The chart will automatic create assign master to one of replicas                                      | `2`                               |
 | `graylog.resources`                            | CPU/Memory resource requests/limits                                                                                                                   | Memory: `1024Mi`, CPU: `500m`     |
 | `graylog.heapSize`                             | Override Java heap size. If this value empty, chart will allocate heap size using `-XX:+UseCGroupMemoryLimitForHeap`                                  |                                   |
 | `graylog.externalUri`                          | External URI that Graylog is available at                                                                                                             |                                   |
-| `graylog.externalUriTLS`                       | Using TLS offload on External URI? set this to `true` to get https:// on ExternalUri at                                                               |                                   |
 | `graylog.nodeSelector`                         | Graylog server pod assignment                                                                                                                         | `{}`                              |
 | `graylog.affinity`                             | Graylog server affinity                                                                                                                               | `{}`                              |
 | `graylog.tolerations`                          | Graylog server tolerations                                                                                                                            | `[]`                              |
@@ -161,7 +163,7 @@ The following table lists the configurable parameters of the Graylog chart and t
 | `graylog.metrics.enabled`                      | If true, add Prometheus annotations to pods                                                                                                           | `false`                           |
 | `graylog.geoip.enabled`                        | If true, Maxmind Geoip Lite will be installed to ${GRAYLOG_HOME}/etc/GeoLite2-City.mmdb                                                               | `false`                           |
 | `graylog.geoip.mmdbUri`                        | If set and geoip enabled,  Maxmind Geoip Lite will be installed from the URL you have defined to ${GRAYLOG_HOME}/etc/GeoLite2-City.mmdb               |                                   |
-| `graylog.plugins`                              | A list of Graylog installation plugins                                                                                                                | `[]`                              |
+| `graylog.plugins.locations`                              | A list of Graylog installation plugins                                                                                                                | `[]`                              |
 | `graylog.plugins.proxy.enabled`                | If true, configure a proxy server to download the plugins                                                                                             | `false`                           |
 | `graylog.plugins.proxy.host`                   | The proxy server that should be used to download the plugins                                                                                          | `http://your.proxy.host:8080`     |
 | `graylog.rootUsername`                         | Graylog root user name                                                                                                                                | `admin`                           |
@@ -219,6 +221,10 @@ The following table lists the configurable parameters of the Graylog chart and t
 | `imagePullSecrets`                             | Configuration for [imagePullSecrets][3] so that you can use a private registry for your images                                                        | `[]`                              |
 | `graylog.options.allowHighlighting`            | If true, enable [search result highlighting][6].                                                                                                      | `false`                           |
 | `graylog.options.allowLeadingWildcardSearches` | if true, allow searches with leading wildcards. This can be extremely resource hungry and should only be enabled with care.                           | `false`                           |
+| `graylog.options.ringSize`                    | Size of internal ring buffers.       |          `65536`                    |
+| `graylog.options.inputBufferRingSize`         | Size of input internal ring buffers. |          `65536`                    |
+
+
 
 ## How it works
 

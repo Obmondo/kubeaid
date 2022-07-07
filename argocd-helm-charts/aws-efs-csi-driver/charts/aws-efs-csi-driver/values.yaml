@@ -9,26 +9,26 @@ replicaCount: 2
 
 image:
   repository: amazon/aws-efs-csi-driver
-  tag: "v1.3.4"
+  tag: "v1.4.0"
   pullPolicy: IfNotPresent
 
 sidecars:
   livenessProbe:
     image:
       repository: public.ecr.aws/eks-distro/kubernetes-csi/livenessprobe
-      tag: v2.2.0-eks-1-18-2
+      tag: v2.2.0-eks-1-18-13
       pullPolicy: IfNotPresent
     resources: {}
   nodeDriverRegistrar:
     image:
       repository: public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar
-      tag: v2.1.0-eks-1-18-2
+      tag: v2.1.0-eks-1-18-13
       pullPolicy: IfNotPresent
     resources: {}
   csiProvisioner:
     image:
       repository: public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
-      tag: v2.1.1-eks-1-18-2
+      tag: v2.1.1-eks-1-18-13
       pullPolicy: IfNotPresent
     resources: {}
 
@@ -51,6 +51,7 @@ controller:
   # Enable if you want the controller to also delete the
   # path on efs when deleteing an access point
   deleteAccessPointRootDir: false
+  volMetricsOptIn: false
   podAnnotations: {}
   resources:
     {}
@@ -75,7 +76,7 @@ controller:
     ## Enable if EKS IAM for SA is used
     #  eks.amazonaws.com/role-arn: arn:aws:iam::111122223333:role/efs-csi-role
   healthPort: 9909
-
+  regionalStsEndpoints: false
 ## Node daemonset variables
 
 node:

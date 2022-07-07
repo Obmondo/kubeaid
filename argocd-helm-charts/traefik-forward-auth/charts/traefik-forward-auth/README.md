@@ -1,40 +1,59 @@
 # traefik-forward-auth
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 1.0.5](https://img.shields.io/badge/Version-1.0.5-informational?style=flat-square) ![AppVersion: 2.2.0](https://img.shields.io/badge/AppVersion-2.2.0-informational?style=flat-square) [![ArtifactHub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/traefik-forward-auth)](https://artifacthub.io/packages/helm/k8s-at-home/traefik-forward-auth)
+![Version: 2.1.2](https://img.shields.io/badge/Version-2.1.2-informational?style=flat-square) ![AppVersion: 2.2.0](https://img.shields.io/badge/AppVersion-2.2.0-informational?style=flat-square)
 
 A minimal forward authentication service that provides OAuth/SSO login and authentication for the traefik reverse proxy/load balancer
 
-The default values and container images used in this chart will allow for running in a multi-arch cluster (amd64, arm, arm64)
+**This chart is not maintained by the upstream project and any issues with the chart should be raised [here](https://github.com/k8s-at-home/charts/issues/new/choose)**
 
-Chart that
-* Adds docker image information leveraging the [official image](https://github.com/thomseddon/traefik-forward-auth)
-* Deploys [traefik-forward-auth](https://github.com/thomseddon/traefik-forward-auth)
+## Source Code
+
+* <https://github.com/thomseddon/traefik-forward-auth>
+* <https://hub.docker.com/r/thomseddon/traefik-forward-auth>
+
+## Requirements
+
+Kubernetes: `>=1.16.0-0`
+
+## Dependencies
+
+| Repository | Name | Version |
+|------------|------|---------|
+| https://library-charts.k8s-at-home.com | common | 4.4.2 |
 
 ## TL;DR
+
 ```console
-$ helm repo add k8s-at-home https://k8s-at-home.com/charts/
-$ helm install k8s-at-home/traefik-forward-auth
+helm repo add k8s-at-home https://k8s-at-home.com/charts/
+helm repo update
+helm install traefik-forward-auth k8s-at-home/traefik-forward-auth
 ```
 
 ## Installing the Chart
-To install the chart with the release name `traefik-forward-auth`:
+
+To install the chart with the release name `traefik-forward-auth`
+
 ```console
 helm install traefik-forward-auth k8s-at-home/traefik-forward-auth
 ```
 
 ## Uninstalling the Chart
-To uninstall the `traefik-forward-auth` deployment:
+
+To uninstall the `traefik-forward-auth` deployment
+
 ```console
 helm uninstall traefik-forward-auth
 ```
-The command removes all the Kubernetes components associated with the chart and deletes the release.
+
+The command removes all the Kubernetes components associated with the chart **including persistent volumes** and deletes the release.
 
 ## Configuration
 
-Read through the [values.yaml](https://github.com/k8s-at-home/charts/blob/master/charts/traefik-forward-auth/values.yaml)
-file. It has several commented out suggested values.
+Read through the [values.yaml](./values.yaml) file. It has several commented out suggested values.
+Other values may be used from the [values.yaml](https://github.com/k8s-at-home/library-charts/tree/main/charts/stable/common/values.yaml) from the [common library](https://github.com/k8s-at-home/library-charts/tree/main/charts/stable/common).
 
-Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
+Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
+
 ```console
 helm install traefik-forward-auth \
   --set env.TZ="America/New York" \
@@ -42,85 +61,55 @@ helm install traefik-forward-auth \
 ```
 
 Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the chart.
-For example,
+
 ```console
-helm install traefik-forward-auth k8s-at-home/traefik-forward-auth --values values.yaml
+helm install traefik-forward-auth k8s-at-home/traefik-forward-auth -f values.yaml
 ```
+
+## Custom configuration
+
+N/A
 
 ## Values
 
+**Important**: When deploying an application Helm chart you can add more values from our common library chart [here](https://github.com/k8s-at-home/library-charts/tree/main/charts/stable/common)
+
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| affinity | object | `{}` |  |
-| authHost | string | `""` | Single host to use when returning from 3rd party auth |
-| autoscaling.enabled | bool | `false` |  |
-| autoscaling.maxReplicas | int | `100` |  |
-| autoscaling.minReplicas | int | `1` |  |
-| autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
-| cookie.csrfName | string | `""` | CSRF Cookie Name (default: _forward_auth_csrf) |
-| cookie.domain | string | `""` | Domain(s) to set auth cookie on. (Comma delimited) |
-| cookie.insecure | string | `""` | Use insecure cookies |
-| cookie.name | string | `""` | Cookie Name (default: _forward_auth) |
-| cookie.secret | string | `""` | Cookie Secret used for authentication across multiple instances / clusters (default: randomly generated) |
-| default.action | string | `""` | [auth|allow] Default action (default: auth) |
-| default.provider | string | `""` | [google|oidc|generic-oauth] Default provider (default: google) |
-| env | list | `[]` |  |
-| envFrom | string | `nil` |  |
-| fullnameOverride | string | `""` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"thomseddon/traefik-forward-auth"` |  |
-| image.tag | string | `""` |  |
-| imagePullSecrets | list | `[]` |  |
-| ingress.annotations | object | `{}` |  |
-| ingress.enabled | bool | `false` |  |
-| ingress.hosts[0].host | string | `"chart-example.local"` |  |
-| ingress.hosts[0].paths | list | `[]` |  |
-| ingress.tls | list | `[]` |  |
-| lifetime | string | `""` | Lifetime in seconds (default: 43200) |
-| livenessProbe | object | {"periodSeconds":20,"tcpSocket":{"port":"http"}} | Liveness probe configuration |
-| livenessProbe.enabled | bool | `true` | Enable liveness probe |
-| logging.format | string | `""` | [text|json|pretty] Log format (default: text) |
-| logging.level | string | `""` | [trace|debug|info|warn|error|fatal|panic] Log level (default: warn) |
-| logoutRedirect | string | `""` | URL to redirect to following logout |
-| middleware.enabled | bool | `false` | Enable to deploy a preconfigured middleware |
-| middleware.name | string | `""` | Name for the middleware |
-| nameOverride | string | `""` |  |
-| nodeSelector | object | `{}` |  |
-| podAnnotations | object | `{}` |  |
-| podSecurityContext | object | `{}` |  |
-| providers.genericOauth.authUrl | string | `""` | Auth/Login URL |
-| providers.genericOauth.clientId | string | `""` | Client ID |
-| providers.genericOauth.clientSecret | string | `""` | Client Secret |
-| providers.genericOauth.enabled | bool | `false` | Enable the generic OAUTH2 provider |
-| providers.genericOauth.resource | string | `""` | Optional resource indicator |
-| providers.genericOauth.scope | string | `""` | Scopes (default: profile, email) |
-| providers.genericOauth.tokenStyle | string | `""` | How token is presented when querying the User URL |
-| providers.genericOauth.tokenUrl | string | `""` | Token URL |
-| providers.genericOauth.userUrl | string | `""` | URL used to retrieve user info |
-| providers.google.clientId | string | `""` | Client ID |
-| providers.google.clientSecret | string | `""` | Client Secret |
-| providers.google.enabled | bool | `false` | Enable the google provider |
-| providers.google.prompt | string | `""` | Space separated list of OpenID prompt options |
-| providers.oidc.clientId | string | `""` | Client ID |
-| providers.oidc.clientSecret | string | `""` | Client Secret |
-| providers.oidc.enabled | bool | `false` | Enable the generic OIDC provider |
-| providers.oidc.issuerUrl | string | `""` | Issuer URL |
-| providers.oidc.resource | string | `""` | Optional resource indicator |
-| readinessProbe | object | {"periodSeconds":10,"tcpSocket":{"port":"http"}} | Readiness probe configuration |
-| readinessProbe.enabled | bool | `true` | Enable readiness probe |
-| replicaCount | int | `1` |  |
-| resources | object | `{}` |  |
-| restrictions.domain | string | `""` | Only allow given email domains. (Comma delimited) |
-| restrictions.whitelist | string | `""` | Only allow given email addresses. (Comma delimited) |
-| secret | string | `""` | Secret used for signing. If empty, one will be generated. If specifying your own in env use "-" |
-| securityContext | object | `{}` |  |
-| service.additionalSpec | object | `{}` |  |
-| service.annotations | object | `{}` |  |
-| service.labels | object | `{}` |  |
-| service.port | int | `4181` |  |
-| service.type | string | `"ClusterIP"` |  |
-| serviceAccount.annotations | object | `{}` |  |
-| serviceAccount.create | bool | `true` |  |
-| serviceAccount.name | string | `""` |  |
-| tolerations | list | `[]` |  |
-| urlPath | string | `""` | Callback URL Path (default: /_oauth) |
+| env | object | See below | environment variables. See more environment variables in the [traefik-forward-auth documentation](https://github.com/thomseddon/traefik-forward-auth#configuration) |
+| image.pullPolicy | string | `"IfNotPresent"` | image pull policy |
+| image.repository | string | `"thomseddon/traefik-forward-auth"` | image repository |
+| image.tag | string | chart.appVersion | image tag |
+| middleware.enabled | bool | `true` | Enable a preconfigured middleware. |
+| middleware.nameOverride | string | `""` | Override the middleware name. |
+| service | object | See values.yaml | Configures service settings for the chart. |
+
+## Changelog
+
+### Version 2.1.2
+
+#### Added
+
+N/A
+
+#### Changed
+
+* Upgraded `common` chart dependency to version 4.4.2
+
+#### Fixed
+
+N/A
+
+### Older versions
+
+A historical overview of changes can be found on [ArtifactHUB](https://artifacthub.io/packages/helm/k8s-at-home/traefik-forward-auth?modal=changelog)
+
+## Support
+
+- See the [Docs](https://docs.k8s-at-home.com/our-helm-charts/getting-started/)
+- Open an [issue](https://github.com/k8s-at-home/charts/issues/new/choose)
+- Ask a [question](https://github.com/k8s-at-home/organization/discussions)
+- Join our [Discord](https://discord.gg/sTMX7Vh) community
+
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v0.1.1](https://github.com/k8s-at-home/helm-docs/releases/v0.1.1)

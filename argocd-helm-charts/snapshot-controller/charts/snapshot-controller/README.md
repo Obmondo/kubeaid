@@ -81,23 +81,24 @@ The upgrade procedure can be summarized by the following steps:
 
 The following options are available:
 
-| Option | Usage | Default |
-|--------|-------|---------|
-| `replicaCount` | Number of replicas to deploy. | `1` |
-| `image.repository` | Repository to pull the image from. | `k8s.gcr.io/sig-storage/snapshot-controller` |
-| `image.pullPolicy` | Pull policy to use. Possible values: `IfNotPresent`, `Always`, `Never` | `IfNotPresent` |
-| `image.tag` | Override the tag to pull. If not given, defaults to charts `AppVersion`. | `""` |
-| `imagePullSecrets` | Image pull secrets to add to the deployment. | `[]` |
-| `podAnnotations` | Annotations to add to every pod in the deployment. | `{}` |
-| `podSecurityContext` | Security context to set on the webhook pod. | `{}` |
-| `securityContext` | Configure container security context. Defaults to dropping all capabilties and running as user 1000. | `{capabilities: {drop: [ALL]}, readOnlyRootFilesystem: true, runAsNonRoot: true, runAsUser: 1000}`
-| `resources` | Resources to request and limit on the pod. | `{}` |
-| `nodeSelector` | Node selector to add to each webhook pod. | `{}` |
-| `tolerations` | Tolerations to add to each webhook pod. | `[]` |
-| `affinity` | Affinity to set on each webhook pod. | `{}` |
-| `rbac.create` | Create the necessary roles and bindings for the snapshot controller. | `true` |
-| `serviceAccount.create` | Create the service account resource | `true` |
-| `serviceAccount.name` | Sets the name of the service account. If left empty, will use the release name as default | `""` |
+| Option                  | Usage                                                                                                                  | Default                                                                                            |
+|-------------------------|------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| `args`                  | Arguments to pass to the snapshot controller. Note: Keys will be converted to kebab-case, i.e. `oneArg` -> `--one-arg` | `...`                                                                                              |
+| `replicaCount`          | Number of replicas to deploy.                                                                                          | `1`                                                                                                |
+| `image.repository`      | Repository to pull the image from.                                                                                     | `k8s.gcr.io/sig-storage/snapshot-controller`                                                       |
+| `image.pullPolicy`      | Pull policy to use. Possible values: `IfNotPresent`, `Always`, `Never`                                                 | `IfNotPresent`                                                                                     |
+| `image.tag`             | Override the tag to pull. If not given, defaults to charts `AppVersion`.                                               | `""`                                                                                               |
+| `imagePullSecrets`      | Image pull secrets to add to the deployment.                                                                           | `[]`                                                                                               |
+| `podAnnotations`        | Annotations to add to every pod in the deployment.                                                                     | `{}`                                                                                               |
+| `podSecurityContext`    | Security context to set on the webhook pod.                                                                            | `{}`                                                                                               |
+| `securityContext`       | Configure container security context. Defaults to dropping all capabilties and running as user 1000.                   | `{capabilities: {drop: [ALL]}, readOnlyRootFilesystem: true, runAsNonRoot: true, runAsUser: 1000}` |
+| `resources`             | Resources to request and limit on the pod.                                                                             | `{}`                                                                                               |
+| `nodeSelector`          | Node selector to add to each webhook pod.                                                                              | `{}`                                                                                               |
+| `tolerations`           | Tolerations to add to each webhook pod.                                                                                | `[]`                                                                                               |
+| `affinity`              | Affinity to set on each webhook pod.                                                                                   | `{}`                                                                                               |
+| `rbac.create`           | Create the necessary roles and bindings for the snapshot controller.                                                   | `true`                                                                                             |
+| `serviceAccount.create` | Create the service account resource                                                                                    | `true`                                                                                             |
+| `serviceAccount.name`   | Sets the name of the service account. If left empty, will use the release name as default                              | `""`                                                                                               |
 
 [`3.x.x` releases]: https://github.com/kubernetes-csi/external-snapshotter/releases
 [have to ensure non of your resources violate the requirements for `v1`]: https://github.com/kubernetes-csi/external-snapshotter#validating-webhook
