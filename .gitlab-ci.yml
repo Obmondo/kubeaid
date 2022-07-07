@@ -4,6 +4,7 @@ stages:
   - lint
   - build
   - deploy
+  - helm
 
 lint:markdown:
   stage: lint
@@ -58,3 +59,13 @@ git:push:
     - ./bin/gitlab-build-and-create-mr.sh
   only:
     - 'master'
+
+git:helm_update:
+  stage: helm
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+  image:
+    name: registry.obmondo.com/obmondo/dockerfiles/helm:latest
+    entrypoint: [""]
+  script:
+    - ./bin/helm-repo-update.sh argocd-helm-charts true
