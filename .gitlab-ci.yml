@@ -17,7 +17,7 @@ lint_sh:
   stage: lint
   image: registry.obmondo.com/obmondo/dockerfiles/shlint:latest
   script:
-    - 'find . -not -path ./build/kube-prometheus/libraries/\* -a -not -path ./build/vendor/\* -a -not -path ./argocd-helm-charts/\* -name \*.sh -o -name \*.bash | xargs shellcheck'
+    - 'find . -not -path ./argocd-helm-charts/\* -a -not -path ./build/kube-prometheus/libraries/\* -a -not -path ./build/vendor/\* -name \*.sh -o -name \*.bash | xargs shellcheck'
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
@@ -36,14 +36,6 @@ lint:jsonnetfmt:
     entrypoint: ['']
   script:
     - './bin/lint-jsonnetfmt.sh'
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "merge_request_event"'
-
-check_diff:
-  image: registry.obmondo.com/obmondo/dockerfiles/obmondo-build:latest
-  stage: diff
-  script:
-    - ./bin/script.sh
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "merge_request_event"'
 
