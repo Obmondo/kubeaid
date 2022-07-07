@@ -1,0 +1,32 @@
+{{- if and (eq (default 1.0 .Values.replicas) 1.0) .Values.sessionServer .Values.sessionServer.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "gitlab-runner.fullname" . }}-session-server
+  namespace: {{ default .Release.Namespace .Values.runners.namespace | quote }}
+  {{- if .Values.sessionServer.annotations }}
+  annotations:
+    {{- toYaml .Values.sessionServer.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    app: {{ include "gitlab-runner.fullname" . }}
+    chart: {{ include "gitlab-runner.chart" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  selector:
+    app: {{ include "gitlab-runner.fullname" . }}
+    release: "{{ .Release.Name }}"
+  type: LoadBalancer
+  {{- if .Values.sessionServer.publicIP }}
+  loadBalancerIP: {{ .Values.sessionServer.publicIP }}
+  {{- end }}
+  {{- if .Values.sessionServer.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml .Values.sessionServer.loadBalancerSourceRanges | nindent 4 }}
+  {{- end }}
+  ports:
+  - protocol: TCP
+    port: {{ include "gitlab-runner.server-session-external-port" . }}
+    targetPort: {{ include "gitlab-runner.server-session-internal-port" . }}
+{{- end }}

@@ -3,5 +3,5 @@ name: snapshot-validation-webhook
 version: 1.0.0
 dependencies:
   - name: snapshot-validation-webhook
-    version: 1.3.1
+    version: 1.5.0
     repository: https://piraeus.io/helm-charts

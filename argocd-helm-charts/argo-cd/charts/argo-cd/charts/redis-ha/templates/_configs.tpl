@@ -64,34 +64,14 @@
     {{- end }}
 {{- if .Values.auth }}
     sentinel auth-pass {{ template "redis-ha.masterGroupName" . }} replace-default-auth
+{{- end }}
 {{- if .Values.sentinel.auth }}
     requirepass replace-default-sentinel-auth
 {{- end }}
 {{- end }}
 {{- end }}
-{{- end }}
 
-{{- define "config-init.sh" }}
-    echo "$(date) Start..."
-    HOSTNAME="$(hostname)"
-    {{- if .Values.ro_replicas }}
-    RO_REPLICAS="{{ .Values.ro_replicas }}"
-    {{- end }}
-    INDEX="${HOSTNAME##*-}"
-    SENTINEL_PORT={{ .Values.sentinel.port }}
-    MASTER=''
-    MASTER_GROUP="{{ template "redis-ha.masterGroupName" . }}"
-    QUORUM="{{ .Values.sentinel.quorum }}"
-    REDIS_CONF=/data/conf/redis.conf
-    REDIS_PORT={{ .Values.redis.port }}
-    REDIS_TLS_PORT={{ .Values.redis.tlsPort }}
-    SENTINEL_CONF=/data/conf/sentinel.conf
-    SENTINEL_TLS_PORT={{ .Values.sentinel.tlsPort }}
-    SERVICE={{ template "redis-ha.fullname" . }}
-    SENTINEL_TLS_REPLICATION_ENABLED={{ default false .Values.sentinel.tlsReplication }}
-    REDIS_TLS_REPLICATION_ENABLED={{ default false .Values.redis.tlsReplication }}
-    set -eu
-
+{{- define "lib.sh" }}
     sentinel_get_master() {
     set +e
         if [ "$SENTINEL_PORT" -eq 0 ]; then
@@ -303,6 +283,43 @@
         echo "${host}"
     }
 
+    identify_announce_ip() {
+        echo "Identify announce ip for this pod.."
+        echo "  using (${SERVICE}-announce-${INDEX}) or (${SERVICE}-server-${INDEX})"
+        ANNOUNCE_IP=$(getent_hosts | awk '{ print $1 }')
+        echo "  identified announce (${ANNOUNCE_IP})"
+    }
+{{- end }}
+
+{{- define "vars.sh" }}
+    HOSTNAME="$(hostname)"
+    {{- if .Values.ro_replicas }}
+    RO_REPLICAS="{{ .Values.ro_replicas }}"
+    {{- end }}
+    INDEX="${HOSTNAME##*-}"
+    SENTINEL_PORT={{ .Values.sentinel.port }}
+    ANNOUNCE_IP=''
+    MASTER=''
+    MASTER_GROUP="{{ template "redis-ha.masterGroupName" . }}"
+    QUORUM="{{ .Values.sentinel.quorum }}"
+    REDIS_CONF=/data/conf/redis.conf
+    REDIS_PORT={{ .Values.redis.port }}
+    REDIS_TLS_PORT={{ .Values.redis.tlsPort }}
+    SENTINEL_CONF=/data/conf/sentinel.conf
+    SENTINEL_TLS_PORT={{ .Values.sentinel.tlsPort }}
+    SERVICE={{ template "redis-ha.fullname" . }}
+    SENTINEL_TLS_REPLICATION_ENABLED={{ default false .Values.sentinel.tlsReplication }}
+    REDIS_TLS_REPLICATION_ENABLED={{ default false .Values.redis.tlsReplication }}
+{{- end }}
+
+{{- define "config-init.sh" }}
+    echo "$(date) Start..."
+    {{- include "vars.sh" . }}
+
+    set -eu
+
+    {{- include "lib.sh" . }}
+
     mkdir -p /data/conf/
 
     echo "Initializing config.."
@@ -311,10 +328,8 @@
     # where is redis master
     identify_master
 
-    echo "Identify announce ip for this pod.."
-    echo "  using (${SERVICE}-announce-${INDEX}) or (${SERVICE}-server-${INDEX})"
-    ANNOUNCE_IP=$(getent_hosts | awk '{ print $1 }')
-    echo "  identified announce (${ANNOUNCE_IP})"
+    identify_announce_ip
+
     if [ -z "${ANNOUNCE_IP}" ]; then
         "Error: Could not resolve the announce ip for this pod."
         exit 1
@@ -348,6 +363,121 @@
     echo "$(date) Ready..."
 {{- end }}
 
+{{- define "trigger-failover-if-master.sh" }}
+    {{- if or (eq (int .Values.redis.port) 0) (eq (int .Values.sentinel.port) 0) }}
+    TLS_CLIENT_OPTION="--tls --cacert /tls-certs/{{ .Values.tls.caCertFile }} --cert /tls-certs/{{ .Values.tls.certFile }} --key /tls-certs/{{ .Values.tls.keyFile }}"
+    {{- end }}
+    get_redis_role() {
+      is_master=$(
+        redis-cli \
+        {{- if .Values.auth }}
+          -a "${AUTH}" --no-auth-warning \
+        {{- end }}
+          -h localhost \
+        {{- if (int .Values.redis.port) }}
+          -p {{ .Values.redis.port }} \
+        {{- else }}
+          -p {{ .Values.redis.tlsPort }} ${TLS_CLIENT_OPTION} \
+        {{- end}}
+          info | grep -c 'role:master' || true
+      )
+    }
+    get_redis_role
+    if [[ "$is_master" -eq 1 ]]; then
+      echo "This node is currently master, we trigger a failover."
+      {{- $masterGroupName := include "redis-ha.masterGroupName" . }}
+      response=$(
+        redis-cli \
+        {{- if .Values.sentinel.auth }}
+          -a "${SENTINELAUTH}" --no-auth-warning \
+        {{- end }}
+          -h localhost \
+        {{- if (int .Values.sentinel.port) }}
+          -p {{ .Values.sentinel.port }} \
+        {{- else }}
+          -p {{ .Values.sentinel.tlsPort }} ${TLS_CLIENT_OPTION} \
+        {{- end}}
+          SENTINEL failover {{ $masterGroupName }}
+      )
+      if [[ "$response" != "OK" ]] ; then
+        echo "$response"
+        exit 1
+      fi
+      timeout=30
+      while [[ "$is_master" -eq 1 && $timeout -gt 0 ]]; do
+        sleep 1
+        get_redis_role
+        timeout=$((timeout - 1))
+      done
+      echo "Failover successful"
+    fi
+{{- end }}
+
+{{- define "fix-split-brain.sh" }}
+    {{- include "vars.sh" . }}
+
+    ROLE=''
+    REDIS_MASTER=''
+
+    set -eu
+
+    {{- include "lib.sh" . }}
+
+    redis_role() {
+    set +e
+        if [ "$REDIS_PORT" -eq 0 ]; then
+            ROLE=$(redis-cli {{ if .Values.auth }} -a "${AUTH}"{{ end }} -p "${REDIS_TLS_PORT}" {{ if ne (default "yes" .Values.sentinel.authClients) "no"}} --tls --cacert /tls-certs/{{ .Values.tls.caCertFile }} --cert /tls-certs/{{ .Values.tls.certFile }} --key /tls-certs/{{ .Values.tls.keyFile }}{{ end }} info | grep role | sed 's/role://' | sed 's/\r//')
+        else
+            ROLE=$(redis-cli {{ if .Values.auth }} -a "${AUTH}"{{ end }} -p "${REDIS_PORT}" info | grep role | sed 's/role://' | sed 's/\r//')
+        fi
+    set -e
+    }
+
+    identify_redis_master() {
+    set +e
+        if [ "$REDIS_PORT" -eq 0 ]; then
+            REDIS_MASTER=$(redis-cli {{ if .Values.auth }} -a "${AUTH}"{{ end }} -p "${REDIS_TLS_PORT}" {{ if ne (default "yes" .Values.sentinel.authClients) "no"}} --tls --cacert /tls-certs/{{ .Values.tls.caCertFile }} --cert /tls-certs/{{ .Values.tls.certFile }} --key /tls-certs/{{ .Values.tls.keyFile }}{{ end }} info | grep master_host | sed 's/master_host://' | sed 's/\r//')
+        else
+            REDIS_MASTER=$(redis-cli {{ if .Values.auth }} -a "${AUTH}"{{ end }} -p "${REDIS_PORT}" info | grep master_host | sed 's/master_host://' | sed 's/\r//')
+        fi
+    set -e
+    }
+
+    reinit() {
+    set +e
+        sh /readonly-config/init.sh
+
+        if [ "$REDIS_PORT" -eq 0 ]; then
+            echo "shutdown" | redis-cli {{ if .Values.auth }} -a "${AUTH}"{{ end }} -p "${REDIS_TLS_PORT}" {{ if ne (default "yes" .Values.sentinel.authClients) "no"}} --tls --cacert /tls-certs/{{ .Values.tls.caCertFile }} --cert /tls-certs/{{ .Values.tls.certFile }} --key /tls-certs/{{ .Values.tls.keyFile }}{{ end }}
+        else
+            echo "shutdown" | redis-cli {{ if .Values.auth }} -a "${AUTH}"{{ end }} -p "${REDIS_PORT}"
+        fi
+    set -e
+    }
+
+    identify_announce_ip
+
+    while true; do
+        sleep {{ .Values.splitBrainDetection.interval }}
+
+        # where is redis master
+        identify_master
+
+        if [ "$MASTER" == "$ANNOUNCE_IP" ]; then
+            redis_role
+            if [ "$ROLE" != "master" ]; then
+                reinit
+            fi
+        else
+            identify_redis_master
+            if [ "$REDIS_MASTER" != "$MASTER" ]; then
+                reinit
+            fi
+        fi
+    done
+
+{{- end }}
+
 {{- define "config-haproxy.cfg" }}
 {{- if .Values.haproxy.customConfig }}
 {{ tpl .Values.haproxy.customConfig . | indent 4 }}
@@ -360,7 +490,7 @@
       timeout check {{ .Values.haproxy.timeout.check }}
 
     listen health_check_http_url
-      bind :8888
+      bind [::]:8888 v4v6
       mode http
       monitor-uri /healthz
       option      dontlognull
@@ -393,12 +523,16 @@
     # decide redis backend to use
     #master
     frontend ft_redis_master
-      bind *:{{ $root.Values.redis.port }}
+      {{- if .Values.haproxy.tls.enabled }}
+      bind [::]:{{ $root.Values.haproxy.containerPort }} ssl crt {{ .Values.haproxy.tls.certMountPath }}{{ .Values.haproxy.tls.keyName }} v4v6
+      {{ else }}
+      bind [::]:{{ $root.Values.redis.port }} v4v6
+      {{- end }}
       use_backend bk_redis_master
     {{- if .Values.haproxy.readOnly.enabled }}
     #slave
     frontend ft_redis_slave
-      bind *:{{ .Values.haproxy.readOnly.port }}
+      bind [::]:{{ .Values.haproxy.readOnly.port }} v4v6
       use_backend bk_redis_slave
     {{- end }}
     # Check all redis servers to see if they think they are master
@@ -422,7 +556,7 @@
       tcp-check expect string +OK
       {{- range $i := until $replicas }}
       use-server R{{ $i }} if { srv_is_up(R{{ $i }}) } { nbsrv(check_if_redis_is_master_{{ $i }}) ge 2 }
-      server R{{ $i }} {{ $fullName }}-announce-{{ $i }}:{{ $root.Values.redis.port }} check inter {{ $root.Values.haproxy.checkInterval }} fall 1 rise 1
+      server R{{ $i }} {{ $fullName }}-announce-{{ $i }}:{{ $root.Values.redis.port }} check inter {{ $root.Values.haproxy.checkInterval }} fall {{ $root.Values.haproxy.checkFall }} rise 1
       {{- end }}
     {{- if .Values.haproxy.readOnly.enabled }}
     backend bk_redis_slave
@@ -434,7 +568,7 @@
       option tcp-check
       tcp-check connect
       {{- if .Values.auth }}
-      tcp-check send AUTH\ REPLACE_AUTH_SECRET\r\n
+      tcp-check send "AUTH ${AUTH}"\r\n
       tcp-check expect string +OK
       {{- end }}
       tcp-check send PING\r\n
@@ -444,15 +578,17 @@
       tcp-check send QUIT\r\n
       tcp-check expect string +OK
       {{- range $i := until $replicas }}
-      server R{{ $i }} {{ $fullName }}-announce-{{ $i }}:{{ $root.Values.redis.port }} check inter {{ $root.Values.haproxy.checkInterval }} fall 1 rise 1
+      server R{{ $i }} {{ $fullName }}-announce-{{ $i }}:{{ $root.Values.redis.port }} check inter {{ $root.Values.haproxy.checkInterval }} fall {{ $root.Values.haproxy.checkFall }} rise 1
       {{- end }}
     {{- end }}
     {{- if .Values.haproxy.metrics.enabled }}
-    frontend metrics
+    frontend stats
       mode http
-      bind *:{{ .Values.haproxy.metrics.port }}
-      option http-use-htx
+      bind [::]:{{ .Values.haproxy.metrics.port }} v4v6
       http-request use-service prometheus-exporter if { path {{ .Values.haproxy.metrics.scrapePath }} }
+      stats enable
+      stats uri /stats
+      stats refresh 10s
     {{- end }}
 {{- if .Values.haproxy.extraConfig }}
     # Additional configuration
@@ -536,7 +672,7 @@
     {{- end }}
     response=$(
       redis-cli \
-      {{- if .Values.auth }}
+      {{- if .Values.sentinel.auth }}
         -a "${SENTINELAUTH}" --no-auth-warning \
       {{- end }}
         -h localhost \

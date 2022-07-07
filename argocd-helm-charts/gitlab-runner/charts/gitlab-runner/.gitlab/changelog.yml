@@ -33,15 +33,15 @@ label_matchers:
   scope: maintenance
 - labels:
   - feature::enhancement
+  scope: feature
+- labels:
+  - maintenance::refactor
   scope: maintenance
 - labels:
-  - technical debt
+  - maintenance::pipelines
   scope: maintenance
 - labels:
-  - tooling::pipelines
-  scope: maintenance
-- labels:
-  - tooling::workflow
+  - maintenance::workflow
   scope: maintenance
 - labels:
   - documentation

@@ -15,6 +15,10 @@ namespace: ""
 ## @param extraDeploy [array] Array of extra objects to deploy with the release
 ##
 extraDeploy: []
+## @param commonAnnotations [object] Annotations to add to all deployed resources
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+##
+commonAnnotations: {}
 
 ## @section Sealed Secrets Parameters
 
@@ -29,7 +33,7 @@ extraDeploy: []
 image:
   registry: docker.io
   repository: bitnami/sealed-secrets-controller
-  tag: v0.17.5
+  tag: v0.18.0
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images

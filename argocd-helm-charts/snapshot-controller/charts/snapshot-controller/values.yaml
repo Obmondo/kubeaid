@@ -1,5 +1,10 @@
 replicaCount: 1
 
+args:
+  leaderElection: true
+  leaderElectionNamespace: "$(NAMESPACE)"
+  httpEndpoint: ":8080"
+
 image:
   repository: k8s.gcr.io/sig-storage/snapshot-controller
   pullPolicy: IfNotPresent

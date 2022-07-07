@@ -1,9 +1,9 @@
 annotations:
   artifacthub.io/changes: |
     - kind: changed
-      description: "Update Metrics Server image to v0.5.2."
+      description: "Allow probes to be turned off completly (this is not advised unless you know what you're doing)."
 apiVersion: v2
-appVersion: 0.5.2
+appVersion: 0.6.1
 description: Metrics Server is a scalable, efficient source of container resource
   metrics for Kubernetes built-in autoscaling pipelines.
 home: https://github.com/kubernetes-sigs/metrics-server
@@ -23,4 +23,4 @@ name: metrics-server
 sources:
 - https://github.com/kubernetes-sigs/metrics-server
 type: application
-version: 3.7.0
+version: 3.8.2

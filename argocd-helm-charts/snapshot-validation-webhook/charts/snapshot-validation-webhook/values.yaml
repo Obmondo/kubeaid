@@ -1,5 +1,10 @@
 replicaCount: 1
 
+args:
+  tlsPrivateKeyFile: /etc/snapshot-validation/tls.key
+  tlsCertFile: /etc/snapshot-validation/tls.crt
+  port: 8443
+
 image:
   repository: k8s.gcr.io/sig-storage/snapshot-validation-webhook
   pullPolicy: IfNotPresent
@@ -41,3 +46,6 @@ affinity: {}
 serviceAccount:
   create: true
   name: ""
+
+rbac:
+  create: true

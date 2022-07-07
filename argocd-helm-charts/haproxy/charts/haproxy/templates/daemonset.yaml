@@ -122,10 +122,6 @@ spec:
             - {{ . }}
           {{- end }}
           {{- end }}
-          {{- if .Values.containerEnv }}
-          env:
-            {{- toYaml .Values.containerEnv | nindent 12 }}
-          {{- end }}
           ports:
           {{- range $key, $value := .Values.containerPorts }}
             - name: {{ $key }}
@@ -145,6 +141,10 @@ spec:
           {{- end }}
           {{- with .Values.startupProbe }}
           startupProbe:
+            {{- toYaml . | trim | nindent 12 }}
+          {{- end }}
+          {{- with .Values.extraEnvs }}
+          env:
             {{- toYaml . | trim | nindent 12 }}
           {{- end }}
           resources:

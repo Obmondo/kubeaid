@@ -4,25 +4,17 @@ Cerebro is an open source (MIT License) elasticsearch web admin tool built using
 
 ## Introduction
 
-This chart deploys Cerebro to your cluster via a Deployment and Service.
-Optionally you can also enable ingress.
+This chart deploys Cerebro to your cluster.
+
 Optionally you can use cerebro provided auth by uploading a Secret with the needed env vars (don't forget to set `AUTH_TYPE`).
 
-# Prerequisites
+## Prerequisites
 
 - Kubernetes 1.9+
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release`, run:
-
-```bash
-$ helm install --name my-release wiremind/cerebro
-```
-
-After a few seconds, you should see service statuses being written to the configured output.
-
-> **Tip**: List all releases using `helm list`
+Please refer to https://artifacthub.io/packages/helm/wiremind/cerebro?modal=install.
 
 ## Uninstalling the Chart
 
@@ -36,19 +28,12 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ## Configuration
 
-Please refer to values.yaml to see parameters and their default values.
+Please refer to values.yaml or [Artifact Hub UI](https://artifacthub.io/packages/helm/wiremind/cerebro?modal=values-schema) to see parameters and their default values.
 
-Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
-
-```bash
-$ helm install --name my-release \
-    stable/cerebro
-```
-
-Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
+A YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
 ```bash
-$ helm install --name my-release -f values.yaml stable/cerebro
+$ helm install --name my-release -f my-values.yaml stable/cerebro
 ```
 
 ## Backend connection with basic auth

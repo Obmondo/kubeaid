@@ -58,24 +58,11 @@ Craft url taking into account the TLS settings of the server
 {{- end -}}
 
 {{/*
-Craft Publicurl taking into account the TLS settings of the server
-*/}}
-{{- define "graylog.formatPublicUrl" -}}
-{{- $env := index . 0 }}
-{{- $url := index . 1 }}
-{{- if $env.Values.graylog.externalUriTLS }}
-{{- printf "https://%s" $url }}
-{{- else }}
-{{- printf "http://%s" $url }}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Print external URI
 */}}
 {{- define "graylog.url" -}}
 {{- if .Values.graylog.externalUri }}
-{{- include "graylog.formatPublicUrl" (list . .Values.graylog.externalUri) }}
+{{- printf .Values.graylog.externalUri }}
 {{- else if .Values.graylog.ingress.enabled }}
 {{- if .Values.graylog.ingress.tls }}
 {{- range .Values.graylog.ingress.tls }}{{ range .hosts }}https://{{ . }}{{ end }}{{ end }}
@@ -92,14 +79,14 @@ Or use chart dependencies with release name
 {{- define "graylog.elasticsearch.hosts" -}}
 {{- if .Values.graylog.elasticsearch.uriSecretKey }}
     {{- if .Values.graylog.elasticsearch.uriSSL }}
-        {{- printf "https://${GRAYLOG_ELASTICSEARCH_HOST}" -}}
+        {{- printf "https://${GRAYLOG_ELASTICSEARCH_HOSTS}" -}}
     {{- else }}
-        {{- printf "http://${GRAYLOG_ELASTICSEARCH_HOST}" -}}
+        {{- printf "http://${GRAYLOG_ELASTICSEARCH_HOSTS}" -}}
     {{- end }}
 {{- else if .Values.graylog.elasticsearch.hosts }}
     {{- .Values.graylog.elasticsearch.hosts -}}
 {{- else }}
-    {{- printf "http://%s-elasticsearch-client.%s.svc.cluster.local:9200" .Release.Name .Release.Namespace -}}
+    {{- printf "http://elasticsearch-master.%s.svc.cluster.local:9200" .Release.Namespace -}}
 {{- end -}}
 {{- end -}}
 
@@ -144,4 +131,19 @@ app.kubernetes.io/managed-by: "Tiller"
 {{- else }}
 app.kubernetes.io/managed-by: "{{ .Release.Service }}"
 {{- end -}}
+{{- end -}}
+
+{{/*
+Set's the affinity for pod placement when running in standalone and HA modes.
+*/}}
+{{- define "graylog.affinity" -}}
+  {{- if .Values.graylog.affinity }}
+      affinity:
+        {{ $tp := typeOf .Values.graylog.affinity }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.graylog.affinity . | nindent 8 | trim }}
+        {{- else }}
+          {{- toYaml .Values.graylog.affinity | nindent 8 }}
+        {{- end }}
+  {{ end }}
 {{- end -}}

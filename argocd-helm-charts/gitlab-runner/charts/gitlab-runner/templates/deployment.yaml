@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "gitlab-runner.fullname" . }}
+  namespace: {{ default .Release.Namespace .Values.runners.namespace | quote }}
   labels:
     app: {{ include "gitlab-runner.fullname" . }}
     chart: {{ include "gitlab-runner.chart" . }}
@@ -37,54 +38,18 @@ spec:
       {{- if .Values.schedulerName }}
       schedulerName: {{ .Values.schedulerName }}
       {{- end }}
-      securityContext:
-        runAsUser: {{ .Values.securityContext.runAsUser }}
-        {{- if .Values.securityContext.runAsGroup }}
-        runAsGroup: {{ .Values.securityContext.runAsGroup }}
-        {{- end}}
-        {{- if .Values.securityContext.fsGroup }}
-        fsGroup: {{ .Values.securityContext.fsGroup }}
-        {{- end}}
-        {{- if .Values.securityContext.supplementalGroups }}
-        supplementalGroups:
-        {{-   range .Values.securityContext.supplementalGroups }}
-          - {{ . }}
-        {{-   end}}
-        {{- end}}
+      securityContext: {{ toYaml .Values.podSecurityContext | nindent 8 }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
-      initContainers:
-      - name: configure
-        command: ['sh', '/configmaps/configure']
-        image: {{ include "gitlab-runner.image" . }}
-        imagePullPolicy: {{ default "" .Values.imagePullPolicy | quote }}
-        securityContext:
-          allowPrivilegeEscalation: false
-        env:
-        {{ include "gitlab-runner.runner-env-vars" . | indent 8 }}
-        volumeMounts:
-        - name: runner-secrets
-          mountPath: /secrets
-          readOnly: false
-        - name: configmaps
-          mountPath: /configmaps
-          readOnly: true
-        - name: init-runner-secrets
-          mountPath: /init-secrets
-          readOnly: true
-        {{- if .Values.certsSecretName }}
-        - name: custom-certs
-          readOnly: true
-          mountPath: /home/gitlab-runner/.gitlab-runner/certs/
-        {{- end }}
-        resources:
-{{ toYaml .Values.resources | indent 10 }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+      {{- end }}
       serviceAccountName: {{ if .Values.rbac.create }}{{ include "gitlab-runner.fullname" . }}{{ else }}"{{ .Values.rbac.serviceAccountName }}"{{ end }}
       containers:
       - name: {{ include "gitlab-runner.fullname" . }}
         image: {{ include "gitlab-runner.image" . }}
         imagePullPolicy: {{ default "" .Values.imagePullPolicy | quote }}
-        securityContext:
-          allowPrivilegeEscalation: false
+        securityContext: {{ toYaml .Values.securityContext | nindent 10 }}
+        {{- include "gitlab-runner.unregisterRunner" . | nindent 8 }}
         {{- include "gitlab-runner.unregisterRunners" . | nindent 8 }}
         command: ["/usr/bin/dumb-init", "--", "/bin/bash", "/configmaps/entrypoint"]
         env:
@@ -108,8 +73,13 @@ spec:
         ports:
         - name: {{ .Values.metrics.portName | quote }}
           containerPort: {{ .Values.metrics.port }}
+        {{- if and (eq (default 1.0 .Values.replicas) 1.0) .Values.sessionServer .Values.sessionServer.enabled }}
+        - name: session-server
+          containerPort: {{ include "gitlab-runner.server-session-internal-port" . }}
+          protocol: TCP
+        {{- end }}
         volumeMounts:
-        - name: runner-secrets
+        - name: projected-secrets
           mountPath: /secrets
         - name: etc-gitlab-runner
           mountPath: /home/gitlab-runner/.gitlab-runner
@@ -120,6 +90,9 @@ spec:
           readOnly: true
           mountPath: /home/gitlab-runner/.gitlab-runner/certs/
         {{- end }}
+        {{- if .Values.volumeMounts }}
+{{ toYaml .Values.volumeMounts | indent 8 }}
+        {{- end }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
       volumes:
@@ -129,7 +102,7 @@ spec:
       - name: etc-gitlab-runner
         emptyDir:
           medium: "Memory"
-      - name: init-runner-secrets
+      - name: projected-secrets
         projected:
           sources:
             {{- if .Values.runners.cache.cacheType }}
@@ -171,6 +144,9 @@ spec:
       - name: configmaps
         configMap:
           name: {{ include "gitlab-runner.fullname" . }}
+      {{- if .Values.volumes }}
+{{ toYaml .Values.volumes | indent 6 }}
+      {{- end }}
     {{- if .Values.imagePullSecrets }}
       imagePullSecrets:
 {{ toYaml .Values.imagePullSecrets | indent 8 }}

@@ -25,6 +25,13 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
+Allow the release namespace to be overridden for multi-namespace deployments in combined charts
+*/}}
+{{- define "k8s-prometheus-adapter.namespace" -}}
+{{- default .Release.Namespace .Values.namespaceOverride -}}
+{{- end -}}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "k8s-prometheus-adapter.chart" -}}
@@ -64,5 +71,14 @@ Create the name of the service account to use
     {{ default (include "k8s-prometheus-adapter.fullname" .) .Values.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/* Get Policy API Version */}}
+{{- define "k8s-prometheus-adapter.pdb.apiVersion" -}}
+{{- if and (.Capabilities.APIVersions.Has "policy/v1") (semverCompare ">= 1.21-0" .Capabilities.KubeVersion.Version) -}}
+    {{- print "policy/v1" -}}
+{{- else -}}
+    {{- print "policy/v1beta1" -}}
 {{- end -}}
 {{- end -}}

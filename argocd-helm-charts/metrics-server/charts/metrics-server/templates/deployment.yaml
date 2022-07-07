@@ -50,20 +50,27 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - {{ printf "--secure-port=%d" (int .Values.containerPort) }}
-            {{- range .Values.defaultArgs }}
+          {{- range .Values.defaultArgs }}
             - {{ . }}
-            {{- end }}
-            {{- range .Values.args }}
+          {{- end }}
+          {{- if .Values.metrics.enabled }}
+            - --authorization-always-allow-paths=/metrics
+          {{- end }}
+          {{- range .Values.args }}
             - {{ . }}
-            {{- end }}
+          {{- end }}
           ports:
           - name: https
             protocol: TCP
             containerPort: {{ .Values.containerPort }}
+          {{- with .Values.livenessProbe }}
           livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
           readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: tmp
               mountPath: /tmp
