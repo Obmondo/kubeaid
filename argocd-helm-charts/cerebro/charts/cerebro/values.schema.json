@@ -1,0 +1,223 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "affinity": {
+            "type": "object"
+        },
+        "config": {
+            "type": "object",
+            "properties": {
+                "basePath": {
+                    "type": "string"
+                },
+                "hosts": {
+                    "type": "array"
+                },
+                "restHistorySize": {
+                    "type": "integer"
+                },
+                "secret": {
+                    "type": "string"
+                },
+                "tlsVerify": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "deployment": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "type": "object"
+                },
+                "labels": {
+                    "type": "object"
+                },
+                "livenessProbe": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "podAnnotations": {
+                    "type": "object"
+                },
+                "podLabels": {
+                    "type": "object"
+                },
+                "readinessProbe": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "env": {
+            "type": "object"
+        },
+        "image": {
+            "type": "object",
+            "properties": {
+                "pullPolicy": {
+                    "type": "string"
+                },
+                "repository": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "ingress": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "type": "object"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "hosts": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "labels": {
+                    "type": "object"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "tls": {
+                    "type": "array"
+                }
+            }
+        },
+        "nodeSelector": {
+            "type": "object"
+        },
+        "priorityClassName": {
+            "type": "string"
+        },
+        "replicaCount": {
+            "type": "integer"
+        },
+        "resources": {
+            "type": "object",
+            "title": "Required Resources",
+            "description": "Configure resource requests",
+            "form": true,
+            "properties": {
+                "requests": {
+                    "type": "object",
+                    "properties": {
+                        "memory": {
+                            "type": "string",
+                            "form": true,
+                            "render": "slider",
+                            "title": "Memory Request",
+                            "sliderMin": 10,
+                            "sliderMax": 2048,
+                            "sliderUnit": "Mi"
+                        },
+                        "cpu": {
+                            "type": "string",
+                            "form": true,
+                            "render": "slider",
+                            "title": "CPU Request",
+                            "sliderMin": 10,
+                            "sliderMax": 2000,
+                            "sliderUnit": "m"
+                        }
+                    }
+                },
+                "limits": {
+                    "type": "object",
+                    "properties": {
+                        "memory": {
+                            "type": "string",
+                            "form": true,
+                            "render": "slider",
+                            "title": "Memory Limits",
+                            "sliderMin": 10,
+                            "sliderMax": 2048,
+                            "sliderUnit": "Mi"
+                        },
+                        "cpu": {
+                            "type": "string",
+                            "form": true,
+                            "render": "slider",
+                            "title": "CPU Limits",
+                            "sliderMin": 10,
+                            "sliderMax": 2000,
+                            "sliderUnit": "m"
+                        }
+                    }
+                }
+            }
+        },
+        "revisionHistoryLimit": {
+            "type": "integer"
+        },
+        "securityContext": {
+            "type": "object",
+            "properties": {
+                "runAsGroup": {
+                    "type": "integer"
+                },
+                "runAsNonRoot": {
+                    "type": "boolean"
+                },
+                "runAsUser": {
+                    "type": "integer"
+                }
+            }
+        },
+        "service": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "type": "object"
+                },
+                "labels": {
+                    "type": "object"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "serviceAccount": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "type": "object"
+                },
+                "create": {
+                    "type": "boolean"
+                },
+                "labels": {
+                    "type": "object"
+                },
+                "name": {
+                    "type": "string"
+                }
+
+            }
+        },
+        "tolerations": {
+            "type": "array"
+        }
+    }
+}

@@ -27,6 +27,7 @@ service:
 
 ingress:
   enabled: false
+  # ingressClassName: ""
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
@@ -54,16 +55,17 @@ tolerations: []
 
 affinity: {}
 
-env:
+env: {}
   # AUTH_TYPE: "basic"
   # BASIC_AUTH_USER: "admin"
 
 # Reference to a Secret object with environment variables
 # envFromSecretRef: 'my-secret-ref'
 
-# if config is coming from a k8s secret, give the secret name
-# configFromSecertRef: 'my-secret-config-name'
+# Allows you to add "application.conf" from a kubernetes secret
+# configFromSecretRef: '<secret-with-key-application.conf>'
 
+# "config" will be ignored if "configFromSecretRef" is set.
 config:
   basePath: '/'
   restHistorySize: 50
@@ -88,3 +90,14 @@ config:
 #       defaultMode: 420
 #       optional: false
 #       secretName: cerebro_ca_cert_secret
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # Labels to add to the service account
+  labels: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""

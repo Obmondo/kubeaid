@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tigera-operator
-  namespace: tigera-operator
+  namespace: {{.Release.Namespace}}
   labels:
     k8s-app: tigera-operator
 spec:
@@ -37,6 +37,10 @@ spec:
             - name: var-lib-calico
               readOnly: true
               mountPath: /var/lib/calico
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: WATCH_NAMESPACE
               value: ""
