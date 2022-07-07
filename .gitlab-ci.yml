@@ -39,14 +39,6 @@ lint:jsonnetfmt:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "merge_request_event"'
 
-check_diff:
-  image: registry.obmondo.com/obmondo/dockerfiles/obmondo-build:latest
-  stage: diff
-  script:
-    - ./bin/script.sh
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "merge_request_event"'
-
 git:push:
   stage: deploy
   image:
