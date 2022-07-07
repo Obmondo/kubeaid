@@ -93,28 +93,29 @@ following options:
 There are additional options that allow customization outside of HTTPS concerns. This is the full list of options
 available.
 
-| Option | Usage | Default |
-|--------|-------|---------|
-| `replicaCount` | Number of replicas to deploy. | `1` |
-| `image.repository` | Repository to pull the image from. | `k8s.gcr.io/sig-storage/snapshot-validation-webhook` |
-| `image.pullPolicy` | Pull policy to use. Possible values: `IfNotPresent`, `Always`, `Never` | `IfNotPresent` |
-| `image.tag` | Override the tag to pull. If not given, defaults to charts `AppVersion`. | `""` |
-| `webhook.timeoutSeconds` | Timeout to use when contacting webhook server. | `2` |
-| `webhook.failurePolicy` | Policy to apply when webhook is unavailable. Possible values: `Fail`, `Ignore`. | `Fail` |
-| `tls.certificateSecret` | Name of the static tls secret to use for serving the HTTPS endpoint. | `""` |
-| `tls.autogenerate` | Automatically generate the TLS secret for serving the HTTPS endpoint. | `true` |
-| `tls.renew` | Force renewal of certificate when auto-generating. | `false` |
-| `tls.certManagerIssuerRef` | Issuer to use for provisioning the TLS certificate. If this is used, `tls.certificateSecret` can be left empty. | `{}` |
-| `imagePullSecrets` | Image pull secrets to add to the deployment. | `[]` |
-| `podAnnotations` | Annotations to add to every pod in the deployment. | `{}` |
-| `podSecurityContext` | Security context to set on the webhook pod. | `{}` |
-| `securityContext` | Configure container security context. Defaults to dropping all capabilties and running as user 1000. | `{capabilities: {drop: [ALL]}, readOnlyRootFilesystem: true, runAsNonRoot: true, runAsUser: 1000}`
-| `resources` | Resources to request and limit on the pod. | `{}` |
-| `nodeSelector` | Node selector to add to each webhook pod. | `{}` |
-| `tolerations` | Tolerations to add to each webhook pod. | `[]` |
-| `affinity` | Affinity to set on each webhook pod. | `{}` |
-| `serviceAccount.create` | Create the service account resource | `true` |
-| `serviceAccount.name` | Sets the name of the service account. If left empty, will use the release name as default | `""` |
+| Option                     | Usage                                                                                                                  | Default                                                                                            |
+|----------------------------|------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| `args`                     | Arguments to pass to the snapshot controller. Note: Keys will be converted to kebab-case, i.e. `oneArg` -> `--one-arg` | `...`                                                                                              |
+| `replicaCount`             | Number of replicas to deploy.                                                                                          | `1`                                                                                                |
+| `image.repository`         | Repository to pull the image from.                                                                                     | `k8s.gcr.io/sig-storage/snapshot-validation-webhook`                                               |
+| `image.pullPolicy`         | Pull policy to use. Possible values: `IfNotPresent`, `Always`, `Never`                                                 | `IfNotPresent`                                                                                     |
+| `image.tag`                | Override the tag to pull. If not given, defaults to charts `AppVersion`.                                               | `""`                                                                                               |
+| `webhook.timeoutSeconds`   | Timeout to use when contacting webhook server.                                                                         | `2`                                                                                                |
+| `webhook.failurePolicy`    | Policy to apply when webhook is unavailable. Possible values: `Fail`, `Ignore`.                                        | `Fail`                                                                                             |
+| `tls.certificateSecret`    | Name of the static tls secret to use for serving the HTTPS endpoint.                                                   | `""`                                                                                               |
+| `tls.autogenerate`         | Automatically generate the TLS secret for serving the HTTPS endpoint.                                                  | `true`                                                                                             |
+| `tls.renew`                | Force renewal of certificate when auto-generating.                                                                     | `false`                                                                                            |
+| `tls.certManagerIssuerRef` | Issuer to use for provisioning the TLS certificate. If this is used, `tls.certificateSecret` can be left empty.        | `{}`                                                                                               |
+| `imagePullSecrets`         | Image pull secrets to add to the deployment.                                                                           | `[]`                                                                                               |
+| `podAnnotations`           | Annotations to add to every pod in the deployment.                                                                     | `{}`                                                                                               |
+| `podSecurityContext`       | Security context to set on the webhook pod.                                                                            | `{}`                                                                                               |
+| `securityContext`          | Configure container security context. Defaults to dropping all capabilties and running as user 1000.                   | `{capabilities: {drop: [ALL]}, readOnlyRootFilesystem: true, runAsNonRoot: true, runAsUser: 1000}` |
+| `resources`                | Resources to request and limit on the pod.                                                                             | `{}`                                                                                               |
+| `nodeSelector`             | Node selector to add to each webhook pod.                                                                              | `{}`                                                                                               |
+| `tolerations`              | Tolerations to add to each webhook pod.                                                                                | `[]`                                                                                               |
+| `affinity`                 | Affinity to set on each webhook pod.                                                                                   | `{}`                                                                                               |
+| `serviceAccount.create`    | Create the service account resource                                                                                    | `true`                                                                                             |
+| `serviceAccount.name`      | Sets the name of the service account. If left empty, will use the release name as default                              | `""`                                                                                               |
 
 [`kubernetes.io/tls`]: https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets
 [`3.x.x` releases]: https://github.com/kubernetes-csi/external-snapshotter/releases

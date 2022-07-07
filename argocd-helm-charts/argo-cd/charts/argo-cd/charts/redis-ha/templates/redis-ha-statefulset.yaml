@@ -8,6 +8,9 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels:
     {{ template "redis-ha.fullname" . }}: replica
+    {{- range $key, $value := .Values.extraLabels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
 {{ include "labels.standard" . | indent 4 }}
   annotations:
 {{ toYaml .Values.redis.annotations | indent 4 }}
@@ -18,13 +21,13 @@ spec:
       app: {{ template "redis-ha.name" . }}
   serviceName: {{ template "redis-ha.fullname" . }}
   replicas: {{ .Values.replicas }}
-  podManagementPolicy: OrderedReady
+  podManagementPolicy: {{ .Values.podManagementPolicy }}
   updateStrategy:
     type: {{ .Values.redis.updateStrategy.type }}
   template:
     metadata:
       annotations:
-        checksum/init-config: {{ print (include "config-redis.conf" .) (include "config-init.sh" .) (include "redis_liveness.sh" .) (include "redis_readiness.sh" .) (include "sentinel_liveness.sh" .) | sha256sum }}
+        checksum/init-config: {{ print (include "config-redis.conf" .) (include "config-sentinel.conf" .) (include "config-init.sh" .) (include "fix-split-brain.sh" .) (include "redis_liveness.sh" .) (include "redis_readiness.sh" .) (include "sentinel_liveness.sh" .) (include "trigger-failover-if-master.sh" .)| sha256sum }}
       {{- if .Values.podAnnotations }}
 {{ toYaml .Values.podAnnotations | indent 8 }}
       {{- end }}
@@ -39,6 +42,9 @@ spec:
         {{ template "redis-ha.fullname" . }}: replica
         {{- range $key, $value := .Values.labels }}
         {{ $key }}: {{ $value | toString }}
+        {{- end }}
+        {{- range $key, $value := .Values.extraLabels }}
+        {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
       {{- if .Values.redis.terminationGracePeriodSeconds }}
@@ -85,6 +91,17 @@ spec:
                 topologyKey: kubernetes.io/hostname
     {{- end }}
     {{- end }}
+    {{- if .Values.topologySpreadConstraints.enabled }}
+      topologySpreadConstraints:
+      - maxSkew: {{ .Values.topologySpreadConstraints.maxSkew | default 1 }}
+        topologyKey: {{ .Values.topologySpreadConstraints.topologyKey | default "topology.kubernetes.io/zone" }}
+        whenUnsatisfiable: {{ .Values.topologySpreadConstraints.whenUnsatisfiable | default "ScheduleAnyway" }}
+        labelSelector:
+          matchLabels:
+            app: {{ template "redis-ha.name" . }}
+            release: {{ .Release.Name }}
+            {{ template "redis-ha.fullname" . }}: replica
+      {{- end }}
       {{- if .Values.imagePullSecrets }}
       imagePullSecrets: {{ toYaml .Values.imagePullSecrets | nindent 8 }}
       {{- end }}
@@ -190,7 +207,11 @@ spec:
            && mv -v /data/dump.rdb_ /data/dump.rdb"
         envFrom:
         - secretRef:
+          {{- if .Values.restore.existingSecret }}
+            name: {{ .Values.existingSecret }}
+          {{- else }}
             name: {{ include "redis-ha.fullname" . }}-secret
+          {{- end }}
         volumeMounts:
         - name: data
           mountPath: /data
@@ -222,7 +243,11 @@ spec:
           runAsUser: 0
         envFrom:
         - secretRef:
+          {{- if .Values.restore.existingSecret }}
+            name: {{ .Values.existingSecret }}
+          {{- else }}
             name: {{ include "redis-ha.fullname" . }}-secret
+          {{- end }}
         volumeMounts:
         - name: data
           mountPath: /data
@@ -284,6 +309,9 @@ spec:
           containerPort: {{ .Values.redis.tlsPort }}
         {{- end }}
         volumeMounts:
+        - name: config
+          mountPath: /readonly-config
+          readOnly: true
         - mountPath: /data
           name: data
         {{- if .Values.redis.tlsPort }}
@@ -376,6 +404,55 @@ spec:
 {{- end }}
         lifecycle:
 {{ toYaml .Values.sentinel.lifecycle | indent 10 }}
+
+      - name: split-brain-fix
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+          - sh
+        args:
+          - /readonly-config/fix-split-brain.sh
+        env:
+{{- $replicas := int (toString .Values.replicas) -}}
+{{- range $i := until $replicas }}
+        - name: SENTINEL_ID_{{ $i }}
+          value: {{ printf "%s\n%s\nindex: %d" (include "redis-ha.name" $) ($.Release.Name) $i | sha256sum | trunc 40 }}
+{{- end }}
+{{- if .Values.auth }}
+        - name: AUTH
+          valueFrom:
+            secretKeyRef:
+            {{- if .Values.existingSecret }}
+              name: {{ .Values.existingSecret }}
+            {{- else }}
+              name: {{ template "redis-ha.fullname" . }}
+            {{- end }}
+              key: {{ .Values.authKey }}
+{{- end }}
+{{- if .Values.sentinel.auth }}
+        - name: SENTINELAUTH
+          valueFrom:
+            secretKeyRef:
+            {{- if .Values.sentinel.existingSecret }}
+              name: {{ .Values.sentinel.existingSecret }}
+            {{- else }}
+              name: {{ template "redis-ha.fullname" . }}-sentinel
+            {{- end }}
+              key: {{ .Values.sentinel.authKey }}
+{{- end }}
+        resources: 
+          {{- toYaml .Values.splitBrainDetection.resources | nindent 10 }}
+        volumeMounts:
+        - name: config
+          mountPath: /readonly-config
+          readOnly: true
+        - mountPath: /data
+          name: data
+        {{- if .Values.redis.tlsPort }}
+        - mountPath: /tls-certs
+          name: tls-certs
+        {{- end }}
+
 {{- if .Values.exporter.enabled }}
       - name: redis-exporter
         image: "{{ .Values.exporter.image }}:{{ .Values.exporter.tag }}"

@@ -1,3 +1,96 @@
+## v0.42.0 (2022-06-20)
+
+### New features
+
+- Update GitLab Runner version to 15.1.0
+- Add priority classname !350
+- Update namespaces to be consistent across manifests !343 (blacktide @blacktide)
+- Add freely configurable securityContext to deployment !354
+- Add possibility to overwrite default image registry !351 (Patrik Votoček @vrtak-cz)
+- Make session server service annotations configurable !336 (Matthias Baur @m.baur)
+
+### Maintenance
+
+- Add volume and volumeMount support to runner deployment !348
+- ci: Update Helm from 3.4.1 to 3.7.2 !347 (Takuya Noguchi @tnir)
+- Update Docker to 20.10 on integration test !346 (Takuya Noguchi @tnir)
+- Update default registry to GitLab Runner registry !345
+- Update casing of GitLab in values YAML file !344 (Ben Bodenmiller @bbodenmiller)
+- Remove unneeded rbac role !335 (Matthias Baur @m.baur)
+
+## v0.41.0 (2022-05-19)
+
+### New features
+
+- Update GitLab Runner version to 15.0.0
+- Add the ability to unregister only one runner !329 (LAKostis @LAKostis)
+- Remove init container and instead project secrets !312
+- Don't repeat chart name if release name starts with the chart name !232 (Ahmadali Shafiee @ahmadalli)
+
+### Maintenance
+
+- Use Helm 3 instead of 2.16.9 on lint/release jobs !342 (Takuya Noguchi @tnir)
+
+## v0.40.0 (2022-04-20)
+
+### New features
+
+- Update GitLab Runner version to 14.10.0
+- Add the possibility to configure maximum timeout that will be set for jobs when using the runner !341 (Adrien Gooris @adrien.gooris)
+
+### Maintenance
+
+- Add a post-release CI job to trigger a deps pipeline in Charts repo !339
+- Add helm install integration test !326
+- Make loadBalancerSourceRanges of Session Server configurable !334 (Matthias Baur @m.baur)
+
+## v0.39.0 (2022-03-21)
+
+### New Features
+
+- Update GitLab Runner version to 14.9.0
+
+### Bug fixes
+
+- Disable metrics endpoint by default !337
+
+### Maintenance
+
+- Update labels according to latest taxonomy !338
+
+## v0.38.1 (2022-03-02)
+
+### New Features
+
+- Update GitLab Runner version to 14.8.2
+
+## v0.38.0 (2022-02-21)
+
+### Maintenance
+
+- Fix urls with runners configuration information !314 (Dmitriy Stoyanov @DmitriyStoyanov)
+- k8s rbac: add more resources in comment. !307 (Chen Yufei @cyfdecyf)
+- Add dependency scanning to Runner Helm Chart project !331
+
+## v0.37.2 (2022-01-24)
+
+### Bug fixes
+
+- Fix appVersion to 14.7.0
+
+## v0.37.1 (2022-01-20)
+
+### Bug fixes
+
+- Set sessionServer to false by default !332
+
+## v0.37.0 (2022-01-19)
+
+### New Features
+
+- Update GitLab Runner version to 14.7.0
+- Add support for interactive web terminal !320
+
 ## v0.36.0 (2021-12-18)
 
 ### New features

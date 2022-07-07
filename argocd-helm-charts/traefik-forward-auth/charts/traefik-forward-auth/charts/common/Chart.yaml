@@ -1,0 +1,17 @@
+apiVersion: v2
+description: Function library for k8s-at-home charts
+home: https://github.com/k8s-at-home/library-charts/tree/main/stable/common
+keywords:
+- k8s-at-home
+- common
+kubeVersion: '>=1.16.0-0'
+maintainers:
+- email: me@bjw-s.dev
+  name: bjw-s
+- email: devin.kray@gmail.com
+  name: onedr0p
+- email: nick@cajun.pro
+  name: dirtycajunrice
+name: common
+type: library
+version: 4.4.2

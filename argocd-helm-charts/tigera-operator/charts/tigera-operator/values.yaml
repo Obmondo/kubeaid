@@ -18,11 +18,13 @@ certs:
     commonName:
     caBundle:
 
+resources: {}
+
 # Configuration for the tigera operator
 tigeraOperator:
   image: tigera/operator
-  version: v1.25.0
+  version: v1.27.7
   registry: quay.io
 calicoctl:
   image: docker.io/calico/ctl
-  tag: v3.22.0
+  tag: v3.23.2

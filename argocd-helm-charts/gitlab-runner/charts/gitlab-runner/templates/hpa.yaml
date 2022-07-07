@@ -3,7 +3,7 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "gitlab-runner.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ default .Release.Namespace .Values.runners.namespace | quote }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

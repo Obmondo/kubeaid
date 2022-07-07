@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "gitlab-runner.fullname" . }}
+  namespace: {{ default .Release.Namespace .Values.runners.namespace | quote }}
   labels:
     app: {{ include "gitlab-runner.fullname" . }}
     chart: {{ include "gitlab-runner.chart" . }}
@@ -11,8 +12,22 @@ data:
   entrypoint: |
     #!/bin/bash
     set -e
+
     mkdir -p /home/gitlab-runner/.gitlab-runner/
+
     cp /configmaps/config.toml /home/gitlab-runner/.gitlab-runner/
+
+    {{- if and (eq (default 1.0 .Values.replicas) 1.0) .Values.sessionServer .Values.sessionServer.enabled }}
+    quit() {
+      kill -TERM "$child"
+    }
+
+    trap quit QUIT TERM
+
+    sh /configmaps/set-session-server-address &
+    child=$!
+    wait "$child"
+    {{- end }}
 
     # Set up environment variables for cache
     if [[ -f /secrets/accesskey && -f /secrets/secretkey ]]; then
@@ -82,14 +97,17 @@ data:
     {{- if .Values.sentryDsn }}
     sentry_dsn = "{{ .Values.sentryDsn }}"
     {{- end }}
+    {{- if and (eq (default 1.0 .Values.replicas) 1.0) .Values.sessionServer .Values.sessionServer.enabled }}
+    [session_server]
+      session_timeout = {{ include "gitlab-runner.server-session-timeout" . }}
+      listen_address = "0.0.0.0:{{ include "gitlab-runner.server-session-internal-port" . }}"
+      advertise_address = "SESSION_SERVER_IP:{{ include "gitlab-runner.server-session-external-port" . }}"
+    {{- end }}
 
   {{ if .Values.runners.config }}
   config.template.toml: {{ tpl (toYaml .Values.runners.config) $ | indent 2 }}
   {{ end }}
 
-  configure: |
-    set -e
-    cp /init-secrets/* /secrets
   register-the-runner: |
     #!/bin/bash
     MAX_REGISTER_ATTEMPTS=30
@@ -118,6 +136,9 @@ data:
         {{- end }}
         {{- if and (hasKey .Values.runners "name") .Values.runners.name }}
         --name={{ .Values.runners.name | quote -}} \
+        {{- end }}
+        {{- if and (hasKey .Values.runners "maximumTimeout") .Values.runners.maximumTimeout }}
+        --maximum-timeout={{ .Values.runners.maximumTimeout | quote -}} \
         {{- end }}
         {{- range $key, $value := .Values.runners.env }}
         --env {{ $key | quote -}} = {{- $value | quote }} \
@@ -162,6 +183,52 @@ data:
     else
       exit 1
     fi
+
+  {{- if and (eq (default 1.0 .Values.replicas) 1.0) .Values.sessionServer .Values.sessionServer.enabled }}
+  set-session-server-address: |
+    #!/bin/bash
+
+    {{- if (not .Values.sessionServer.publicIP) }}
+    APISERVER=https://kubernetes.default.svc \
+      && SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount \
+      && NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace) \
+      && TOKEN=$(cat ${SERVICEACCOUNT}/token) \
+      && CACERT=${SERVICEACCOUNT}/ca.crt \
+      && header="Authorization: Bearer ${TOKEN}"
+
+    SERVICEURL=${APISERVER}/api/v1/namespaces/${NAMESPACE}/services/{{ include "gitlab-runner.fullname" . }}-session-server
+
+    has_address=false
+    while [ "${has_address}" = false ]; do
+      SERVICEIP=$(curl —-silent \
+        --cacert ${CACERT} \
+        --header "${header}" \
+        -X GET ${SERVICEURL} 2>/dev/null \
+        | grep '"ip":' | cut -d ":" -f2 | xargs)
+
+      # for aws, the hostname is available but not the external IP
+      SERVICEHOSTNAME=$(curl —-silent \
+        --cacert ${CACERT} \
+        --header "${header}" \
+        -X GET ${SERVICEURL} 2>/dev/null \
+        | grep '"hostname":' | cut -d ":" -f2 | xargs)
+
+      ADDRESS="${SERVICEHOSTNAME:-$SERVICEIP}"
+      
+      if [ -z "${ADDRESS}" ]
+      then
+        echo "Service LoadBalancer External Address not yet available"
+        has_address=false
+        sleep 5
+      else
+        has_address=true
+        sed -i -e "s/SESSION_SERVER_IP/${ADDRESS}/g" /home/gitlab-runner/.gitlab-runner/config.toml
+      fi
+    done
+    {{- else }}
+    sed -i -e "s/SESSION_SERVER_IP/{{ .Values.sessionServer.publicIP }}/g" /home/gitlab-runner/.gitlab-runner/config.toml
+    {{- end}}
+  {{ end }}
 
   pre-entrypoint-script: |
 {{ .Values.preEntrypointScript | default "" | indent 4 }}

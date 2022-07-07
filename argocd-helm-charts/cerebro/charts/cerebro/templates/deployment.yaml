@@ -35,6 +35,7 @@ spec:
         {{- toYaml .Values.deployment.podAnnotations | nindent 8 }}
         {{- end }}
     spec:
+      serviceAccountName: {{ include "cerebro.serviceAccountName" . }}
       {{- if .Values.securityContext }}
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}

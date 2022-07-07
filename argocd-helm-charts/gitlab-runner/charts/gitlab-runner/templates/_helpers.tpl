@@ -15,7 +15,11 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{-     .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{-   else -}}
 {{-     $name := default .Chart.Name .Values.nameOverride -}}
-{{-     printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{-     if hasPrefix $name .Release.Name -}}
+{{-       .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{-     else -}}
+{{-       printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{-     end -}}
 {{-   end -}}
 {{- end -}}
 
@@ -60,13 +64,51 @@ Template runners.cache.s3ServerAddress in order to allow overrides from external
 Define the image, using .Chart.AppVersion and GitLab Runner image as a default value
 */}}
 {{- define "gitlab-runner.image" }}
-{{-   $appVersion := ternary "bleeding" (print "v" .Chart.AppVersion) (eq .Chart.AppVersion "bleeding") -}}
-{{-   $image := printf "gitlab/gitlab-runner:alpine-%s" $appVersion -}}
-{{-   default $image .Values.image }}
+{{- if kindIs "string" .Values.image -}}
+{{- .Values.image }}
+{{- else -}}
+{{- $appVersion := ternary "bleeding" (print "v" .Chart.AppVersion) (eq .Chart.AppVersion "bleeding") -}}
+{{- $appVersionImageTag := printf "alpine-%s" $appVersion -}}
+{{- $imageTag := default $appVersionImageTag .Values.image.tag -}}
+{{- printf "%s/%s:%s" .Values.image.registry .Values.image.image $imageTag }}
+{{- end -}}
 {{- end -}}
 
 {{/*
-Unregister runners on pod stop
+Define the server session timeout, using 1800 as a default value
+*/}}
+{{- define "gitlab-runner.server-session-timeout" }}
+{{-   default 1800 .Values.sessionServer.timeout }}
+{{- end -}}
+
+{{/*
+Define the server session internal port, using 9000 as a default value
+*/}}
+{{- define "gitlab-runner.server-session-external-port" }}
+{{-   default 9000 .Values.sessionServer.externalPort }}
+{{- end -}}
+
+{{/*
+Define the server session external port, using 8093 as a default value
+*/}}
+{{- define "gitlab-runner.server-session-internal-port" }}
+{{-   default 8093 .Values.sessionServer.internalPort }}
+{{- end -}}
+
+{{/*
+Unregister runner on pod stop
+*/}}
+{{- define "gitlab-runner.unregisterRunner" -}}
+{{- if or (and (hasKey .Values "unregisterRunner") .Values.unregisterRunner) (and (not (hasKey .Values "unregisterRunner")) .Values.runnerRegistrationToken) -}}
+lifecycle:
+  preStop:
+    exec:
+      command: ["/entrypoint", "unregister", "--config=/home/gitlab-runner/.gitlab-runner/config.toml"]
+{{- end -}}
+{{- end -}}
+
+{{/*
+Unregister all runners on pod stop
 */}}
 {{- define "gitlab-runner.unregisterRunners" -}}
 {{- if or (and (hasKey .Values "unregisterRunners") .Values.unregisterRunners) (and (not (hasKey .Values "unregisterRunners")) .Values.runnerRegistrationToken) -}}

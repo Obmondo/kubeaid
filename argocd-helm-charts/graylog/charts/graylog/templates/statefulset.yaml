@@ -39,11 +39,7 @@ spec:
       nodeSelector:
 {{ toYaml .Values.graylog.nodeSelector | indent 8 }}
 {{- end }}
-{{- if .Values.graylog.affinity }}
-      affinity:
-{{ toYaml .Values.graylog.affinity | indent 8 }}
-
-{{- end }}
+{{ template "graylog.affinity" . }}
 {{- if .Values.graylog.tolerations }}
       tolerations:
 {{ toYaml .Values.graylog.tolerations | indent 8 }}
@@ -123,7 +119,7 @@ spec:
                   name: {{ .Values.graylog.existingRootSecret | default (include "graylog.fullname" .) }}
                   key: graylog-password-sha2
             {{- if .Values.graylog.elasticsearch.uriSecretKey }}
-            - name: GRAYLOG_ELASTICSEARCH_HOST
+            - name: GRAYLOG_ELASTICSEARCH_HOSTS
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.graylog.elasticsearch.uriSecretName | default (printf "%s-es" (include "graylog.fullname" .)) }}
@@ -173,6 +169,17 @@ spec:
           {{- end }}
           resources:
 {{ toYaml .Values.graylog.resources | indent 12 }}
+          startupProbe:
+            httpGet:
+              path: /api/system/lbstatus
+              port: 9000
+            {{- if .Values.graylog.tls.enabled }}
+              scheme: HTTPS
+            {{- end }}
+            periodSeconds: {{ .Values.graylog.startupProbe.periodSeconds }}
+            failureThreshold: {{ .Values.graylog.startupProbe.failureThreshold }}
+            successThreshold: {{ .Values.graylog.startupProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.graylog.startupProbe.timeoutSeconds }}
           livenessProbe:
             httpGet:
               path: /api/system/lbstatus
@@ -180,11 +187,11 @@ spec:
             {{- if .Values.graylog.tls.enabled }}
               scheme: HTTPS
             {{- end }}
-            initialDelaySeconds: 120
-            periodSeconds: 30
-            failureThreshold: 3
-            successThreshold: 1
-            timeoutSeconds: 5
+            initialDelaySeconds: {{ .Values.graylog.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.graylog.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.graylog.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.graylog.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.graylog.livenessProbe.timeoutSeconds }}
           readinessProbe:
             httpGet:
               path: /api/system/lbstatus
@@ -192,11 +199,11 @@ spec:
             {{- if .Values.graylog.tls.enabled }}
               scheme: HTTPS
             {{- end }}
-            initialDelaySeconds: 60
-            periodSeconds: 10
-            failureThreshold: 3
-            successThreshold: 1
-            timeoutSeconds: 5
+            initialDelaySeconds: {{ .Values.graylog.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.graylog.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.graylog.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.graylog.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.graylog.readinessProbe.timeoutSeconds }}
           volumeMounts:
             - name: journal
               mountPath: /usr/share/graylog/data/journal

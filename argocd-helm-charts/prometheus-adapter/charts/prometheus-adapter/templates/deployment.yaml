@@ -8,7 +8,7 @@ metadata:
   labels:
     {{- include "k8s-prometheus-adapter.labels" . | indent 4 }}
   name: {{ template "k8s-prometheus-adapter.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "k8s-prometheus-adapter.namespace" . }}
 spec:
   replicas: {{ .Values.replicas }}
   strategy: {{ toYaml .Values.strategy | nindent 4 }}
@@ -91,7 +91,9 @@ spec:
             drop: ["all"]
           readOnlyRootFilesystem: true
           runAsNonRoot: true
-          runAsUser: 10001
+          {{- if .Values.runAsUser }}
+          runAsUser: {{ .Values.runAsUser }}
+          {{- end }}
         volumeMounts:
         {{- if .Values.extraVolumeMounts }}
         {{ toYaml .Values.extraVolumeMounts | trim | nindent 8 }}
@@ -110,6 +112,8 @@ spec:
         {{- toYaml .Values.nodeSelector | nindent 8 }}
       affinity:
         {{- toYaml .Values.affinity | nindent 8 }}
+      topologySpreadConstraints:
+        {{- toYaml .Values.topologySpreadConstraints | nindent 8 }}
       priorityClassName: {{ .Values.priorityClassName }}
       {{- if .Values.podSecurityContext }}
       securityContext:
