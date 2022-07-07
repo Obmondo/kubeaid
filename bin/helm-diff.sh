@@ -10,7 +10,7 @@ git clone "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJEC
 
 cd "${TEMPDIR}"
 
-# SKIP if there is a lint commit message
+# SKIP diff check part IF MR conststs of ONLY commits with word 'lint' in them
 COMMIT_COUNT=$(git log --oneline --format=%s --abbrev-commit "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" | wc -l)
 
 LINT_COUNT=$(git log --oneline --format=%s --abbrev-commit "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" | grep lint -c)
