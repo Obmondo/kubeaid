@@ -1,5 +1,6 @@
 zfsNode:
-  nodeSelector: {}
+  nodeSelector:
+    disk: nvme
   tolerations: []
   securityContext: {}
   labels: {}
@@ -10,7 +11,8 @@ zfsNode:
 # zfsController contains the configurables for
 # the zfs controller statefulset
 zfsController:
-  nodeSelector: {}
+  nodeSelector:
+    disk: nvme
   tolerations: []
   securityContext: {}
   priorityClass:
