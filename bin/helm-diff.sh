@@ -11,20 +11,20 @@ git clone "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJEC
 cd "${TEMPDIR}"
 
 # SKIP diff check part IF MR conststs of ONLY commits with word 'lint' in them
-COMMIT_COUNT=$(git log --oneline --format=%s --abbrev-commit "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" | wc -l)
+COMMIT_COUNT=$(git log --oneline --abbrev-commit "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..origin/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" | wc -l)
 
-LINT_COUNT=$(git log --oneline --format=%s --abbrev-commit "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" | grep lint -c)
+LINT_COUNT=$(git log --oneline --abbrev-commit "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..origin/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" | { grep lint -c || true; } )
 
 function helm_diff() {
-  diff=$1
-  chart_name=$2
+  chart_path="argocd-helm-charts/${1}"
+  chart_name="$1"
 
-  helm template "$diff" -f "${diff}/values.yaml" > "/tmp/${chart_name}_master.yaml"
+  helm template "$chart_path" -f "${chart_path}/values.yaml" > "/tmp/${chart_name}_master.yaml"
 
   # Move to the local branch
-  git switch "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
+  git checkout "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
 
-  helm template "$diff" -f "${diff}/values.yaml" > "/tmp/${chart_name}_local.yaml"
+  helm template "$chart_path" -f "${chart_path}/values.yaml" > "/tmp/${chart_name}_local.yaml"
 
   any_diff=$(diff -u "/tmp/${chart_name}_master.yaml" "/tmp/${chart_name}_local.yaml")
 
@@ -37,27 +37,41 @@ function helm_diff() {
   fi
 }
 
-function helm_compile(){
-  diff=$1
-  chart_name=$2
+function helm_compile() {
+  chart_name="argocd-helm-charts/${1}"
 
-  if helm template "$diff" -f "${diff}/values.yaml"; then
+  git checkout "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
+
+  if helm template "$chart_name" -f "${chart_name}/values.yaml"; then
     echo "Nice, Helm template works with the given values files"
   else
     echo "Ouch!! Helm template fails, please run this command to verify locally first"
-    echo "helm template $diff -f ${diff}/values.yaml"
+    echo "helm template $chart_name -f ${chart_name}/values.yaml"
     exit 1
   fi
 }
 
 # Only get the directory name of the chart
-for diff in $(git diff "${CI_COMMIT_SHA}" --name-only | grep argocd-helm-charts | cut -d '/' -f 1,2 | sort | uniq); do
+git diff "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..origin/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" --name-only | grep argocd-helm-charts | cut -d '/' -f 1,2 | sort | uniq | while read -r diff; do
 
   chart_name=$(echo "$diff" | cut -d '/' -f2)
+
   if [ "$COMMIT_COUNT" -eq "$LINT_COUNT" ]; then
-    helm_compile "$diff" "$chart_name"
+    helm_compile "$chart_name"
   else
-    helm_diff "$diff" "$chart_name"
+    # Check if there is any changes are in chart.yaml/lock files for a particular helm chart
+    if git diff "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..origin/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" --name-only | grep -e "argocd-helm-charts/${chart_name}" | grep -v 'Chart'; then
+
+      # Check if we have a value file in master branch, incase its a new helm chart.
+      if test -f "${diff}/values.yaml"; then
+        helm_diff "$chart_name"
+      else
+        helm_compile "$chart_name"
+      fi
+    else
+      # Run the compile test, if there is changes only in the Chart.yaml or Chart.lock files
+      helm_compile "$chart_name"
+    fi
   fi
 done
 
