@@ -9,11 +9,26 @@ image:
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
+  env:
+    - name: DURATION
+      value: "30s"
+    - name: AGENT_CERT_PATH
+      value: "/mnt/obmondo-k8s-agent/tls.crt"
+    - name: AGENT_KEY_PATH
+      value: "/mnt/obmondo-k8s-agent/tls.key"
+  volumeMounts:
+    - mountPath: "/mnt/obmondo-k8s-agent"
+      name: k8s-agent-tls
 
 imagePullSecrets:
     - name: gitlab-registry
 nameOverride: ""
 fullnameOverride: ""
+
+volumes: 
+  - name: k8s-agent-tls
+    secret: 
+      secretName: k8s-agent-tls
 
 serviceAccount:
   # Specifies whether a service account should be created
