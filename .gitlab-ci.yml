@@ -45,6 +45,7 @@ helm:check_diff:
   image:
     name: registry.obmondo.com/obmondo/dockerfiles/kubernetes-build:helm
   script:
+    - helm version
     - "./bin/helm-diff.sh"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "merge_request_event"'
