@@ -25,9 +25,9 @@ imagePullSecrets:
 nameOverride: ""
 fullnameOverride: ""
 
-volumes: 
+volumes:
   - name: k8s-agent-tls
-    secret: 
+    secret:
       secretName: k8s-agent-tls
 
 serviceAccount:
