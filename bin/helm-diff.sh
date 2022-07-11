@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -x
 set -eou pipefail
 
 TEMPDIR=$(mktemp -d)
@@ -19,21 +20,25 @@ function helm_diff() {
   chart_path="argocd-helm-charts/${1}"
   chart_name="$1"
 
-  helm template "$chart_path" -f "${chart_path}/values.yaml" > "/tmp/${chart_name}_master.yaml"
+  # Move to the local branch
+  git checkout "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+
+  # if incase the target branch code has some bug
+  helm template "$chart_path" -f "${chart_path}/values.yaml" > "/tmp/${chart_name}_master.yaml" || true
 
   # Move to the local branch
   git checkout "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
 
   helm template "$chart_path" -f "${chart_path}/values.yaml" > "/tmp/${chart_name}_local.yaml"
 
-  any_diff=$(diff -u "/tmp/${chart_name}_master.yaml" "/tmp/${chart_name}_local.yaml")
+  any_diff=$(diff -u "/tmp/${chart_name}_master.yaml" "/tmp/${chart_name}_local.yaml" || true )
 
-  if [ -n "$any_diff" ]; then
-    echo "Nice, there is a diff between changes"
-    echo "$any_diff"
-  else
+  if diff -u "/tmp/${chart_name}_master.yaml" "/tmp/${chart_name}_local.yaml"; then
     echo "There is no changes based on the changes, not good"
     exit 1
+  else
+    echo "Nice, there is a diff between changes"
+    echo "$any_diff"
   fi
 }
 
@@ -74,5 +79,3 @@ git diff "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..origin/${CI_MERGE_REQUEST_SOUR
     fi
   fi
 done
-
-
