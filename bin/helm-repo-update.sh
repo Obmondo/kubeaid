@@ -150,21 +150,14 @@ function merge_request() {
   config_repo_path=$(pwd)
   deploy_target_branch="master"
 
-  git config --global user.email "${GITLAB_USER_EMAIL}"
-  git config --global user.name "${GITLAB_USER_NAME}"
-
-  # Set the remote url
-  git remote set-url origin "https://oauth2:${HELM_UPDATE_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
-
   # Check if we have modifications to commit
   CHANGES=$(git -C "${config_repo_path}" status --porcelain | wc -l)
 
   if (( CHANGES > 0)); then
     title="[CI] Helm Chart Update ${chart_name}"
 
-    git switch --create "${chart_name}" --track "origin/${deploy_target_branch}"
+    git add "argocd-helm-charts/${chart_name}"
 
-    git -C "${config_repo_path}" status
     git -C "${config_repo_path}" commit -m "${title}"
 
     # shellcheck disable=SC2094
@@ -186,22 +179,27 @@ function merge_request() {
 
 
 if [ -n "$UPDATE_HELM_CHART" ]; then
-  update_helm_chart "$HELM_APP"
+  update_helm_chart "$UPDATE_HELM_CHART"
 fi
 
 if "${GITLAB_CI}" ; then
   TEMPDIR=$(mktemp -d)
 
-  git clone --depth 1 "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}" "${TEMPDIR}"
+  git clone --depth 1 "https://oauth2:${HELM_UPDATE_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}" "${TEMPDIR}"
+
+  git config --global user.email "${GITLAB_USER_EMAIL}"
+  git config --global user.name "${GITLAB_USER_NAME}"
 
   cd "${TEMPDIR}"
 fi
 
 if "$UPDATE_ALL"; then
   find ./argocd-helm-charts -maxdepth 1 -mindepth 1 -type d | sort | while read -r path; do
-    update_helm_chart "$path"
-
     chart_name=$(basename "$path")
+
+    git switch --create "${chart_name}_${CI_JOB_ID}" --track "origin/master"
+
+    update_helm_chart "$path"
 
     # Raise MR for each individual helm chart
     if $MERGE_REQUEST; then
