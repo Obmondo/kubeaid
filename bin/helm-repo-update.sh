@@ -1,10 +1,6 @@
 #!/bin/bash
 
-set -x
 set -eou pipefail
-
-HELM_APP="${1:-argocd-helm-charts}"
-MERGE_REQUEST="${2:-false}"
 
 for program in helm tar; do
   if ! command -v "$program" >/dev/null; then
@@ -18,13 +14,60 @@ if ! helm version --template='Version: {{.Version}}' | grep 'v3.8' >/dev/null; t
   exit 1
 fi
 
-function usage {
-  echo -n "Usage:
-$0 argocd-helm-charts/kube-iptables-tailer
-or
-$0
+function ARGFAIL() {
+  echo -n "
+Usage $0 [OPTIONS]:
+  --update-helm-chart       Update specific helm chart  [Need path to specific helm chart]
+  --update-all              Update all the helm chart   [Default: false]
+  --merge-request           Raise Merge request         [Default: false] (Only in CI)
+  --gitlab-ci               Run inside a Gitlab CI      [Default: false] (Only in CI)
+  -h|--help
+
+Example:
+# $0 --update-helm-chart argocd-helm-charts/traefik
 "
 }
+
+declare UPDATE_ALL=false
+declare MERGE_REQUEST=false
+declare GITLAB_CI=false
+declare UPDATE_HELM_CHART=
+
+while [[ $# -gt 0 ]]; do
+  arg="$1"
+  shift
+
+  case "$arg" in
+    --update-all)
+      UPDATE_ALL=true
+      ;;
+    --update-helm-chart)
+      UPDATE_HELM_CHART=$1
+
+      if ! test -d "$UPDATE_HELM_CHART"; then
+        echo "${UPDATE_HELM_CHART} does not exist, please make sure directory exists."
+        exit 1
+      fi
+
+      shift
+      ;;
+    --merge-request)
+      MERGE_REQUEST=true
+      ;;
+    --gitlab-ci)
+      GITLAB_CI=true
+      ;;
+    -h|--help)
+      ARGFAIL
+      exit
+      ;;
+    *)
+      echo "Error: wrong argument given"
+      ARGFAIL
+      exit 1
+      ;;
+  esac
+done
 
 function update_helm_chart {
   HELM_CHART_PATH="$1"
@@ -146,30 +189,26 @@ function merge_request() {
   fi
 }
 
-if "${CI}" ; then
+
+if [ -n "$UPDATE_HELM_CHART" ]; then
+  update_helm_chart "$HELM_APP"
+fi
+
+if "${GITLAB_CI}" ; then
   TEMPDIR=$(mktemp -d)
 
-  # NOTE: git diff does not work, cause gitlab only checkout only one branch
-  # so there is nothing to compare.
-  git clone "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}" "${TEMPDIR}"
+  git clone --depth 1 "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}" "${TEMPDIR}"
 
   cd "${TEMPDIR}"
 fi
 
 
-if [ "$HELM_APP" != "argocd-helm-charts" ]; then
-  if test -d "$HELM_APP"; then
-    update_helm_chart "$HELM_APP"
-  else
-    echo "Error: $HELM_APP does not exists, please check the path"
-    usage
-    exit 1
-  fi
-else
-  find "$HELM_APP" -maxdepth 1 -mindepth 1 -type d | sort | while read -r path; do
+
+if "$UPDATE_ALL"; then
+  find ./argocd-helm-charts -maxdepth 1 -mindepth 1 -type d | sort | while read -r path; do
     update_helm_chart "$path"
 
-    chart_name=$(echo "$path" | cut -d '/' -f2)
+    chart_name=$(basename "$path")
 
     # Raise MR for each individual helm chart
     if $MERGE_REQUEST; then
@@ -178,4 +217,4 @@ else
   done
 fi
 
-find . -name '*tgz*' -delete
+find . -name '*.tgz' -delete
