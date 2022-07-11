@@ -147,11 +147,6 @@ function update_helm_chart {
 function merge_request() {
   chart_name=$1
 
-  # Don't run for merge requests that target a branch that is not master/main.
-  #if [[ "${CI_COMMIT_REF_NAME}" != master ]] && [[ "${CI_COMMIT_REF_NAME}" != main ]]; then
-   # exit
-  #fi
-
   config_repo_path=$(pwd)
   deploy_target_branch="master"
 
@@ -201,8 +196,6 @@ if "${GITLAB_CI}" ; then
 
   cd "${TEMPDIR}"
 fi
-
-
 
 if "$UPDATE_ALL"; then
   find ./argocd-helm-charts -maxdepth 1 -mindepth 1 -type d | sort | while read -r path; do
