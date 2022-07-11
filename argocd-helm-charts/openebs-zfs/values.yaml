@@ -9,8 +9,8 @@ zfs-localpv:
       create: true
       name: zfs-csi-node-critical
 
-# zfsController contains the configurables for
-# the zfs controller statefulset
+  # zfsController contains the configurables for
+  # the zfs controller statefulset
   zfsController:
     nodeSelector:
       disk: nvme
