@@ -1,8 +1,8 @@
 annotations:
   artifacthub.io/changes: |
-    - [Changed]: Update redis-ha dependency for better configuration options
+    - [Changed]: Update to app version 2.4.4"
 apiVersion: v2
-appVersion: v2.4.3
+appVersion: v2.4.4
 dependencies:
 - condition: redis-ha.enabled
   name: redis-ha
@@ -22,4 +22,4 @@ maintainers:
 - name: jessesuen
 - name: seanson
 name: argo-cd
-version: 4.9.11
+version: 4.9.12
