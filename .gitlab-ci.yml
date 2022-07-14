@@ -57,8 +57,10 @@ git:push:
     name: registry.obmondo.com/obmondo/dockerfiles/kubernetes-build:1644571507
   script:
     - ./bin/gitlab-build-and-create-mr.sh
-  only:
-    - 'master'
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        - "build/**/*"
 
 git:helm_update:
   stage: helm
