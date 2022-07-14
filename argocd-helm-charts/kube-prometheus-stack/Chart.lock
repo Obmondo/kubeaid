@@ -1,6 +1,6 @@
 dependencies:
 - name: kube-prometheus-stack
   repository: https://prometheus-community.github.io/helm-charts
-  version: 37.0.0
-digest: sha256:37e4701feef651372f9aff352c7851ff0ffac7528a661f65c5c46d1b3450f05a
-generated: "2022-07-13T08:43:25.550659452Z"
+  version: 37.2.0
+digest: sha256:9c8fa9a89621e5f1700d65927e6ae243dedbc23bca15b4a0b76e99bed43d3b0c
+generated: "2022-07-14T05:38:46.597485065Z"
