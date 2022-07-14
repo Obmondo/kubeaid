@@ -19,4 +19,4 @@ name: snapshot-validation-webhook
 sources:
 - https://github.com/kubernetes-csi/external-snapshotter/
 type: application
-version: 1.5.0
+version: 1.5.1
