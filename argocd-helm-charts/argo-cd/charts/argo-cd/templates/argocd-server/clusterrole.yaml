@@ -27,12 +27,4 @@ rules:
       - pods/log
     verbs:
       - get
-  {{- if eq (index .Values.server.config "exec.enabled") "true" }}
-  - apiGroups:
-    - ""
-    resources:
-    - pods/exec
-    verbs:
-    - create
-  {{- end }}
 {{- end }}
