@@ -3,7 +3,7 @@
 ##
 image:
   repository: redis
-  tag: 6.2.5-alpine
+  tag: 6.0.7-alpine
   pullPolicy: IfNotPresent
 
 ## Reference to one or more secrets to be used when pulling images
@@ -15,10 +15,6 @@ imagePullSecrets: []
 
 ## replicas number for each component
 replicas: 3
-
-## Customize the statefulset pod management policy:
-## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies
-podManagementPolicy: OrderedReady
 
 ## read-only replicas
 ## indexed slaves get never promoted to be master
@@ -32,9 +28,6 @@ ro_replicas: ""
 
 ## Custom labels for the redis pod
 labels: {}
-
-## Custom labels for redis service
-serviceLabels: {}
 
 configmap:
   ## Custom labels for the redis configmap
@@ -57,14 +50,6 @@ serviceAccount:
 ## Recommend for externally exposed Redis clusters.
 ## ref: https://cbonte.github.io/haproxy-dconv/1.9/intro.html
 haproxy:
-  servicePort: 6379
-  containerPort: 6379
-  ## Enable TLS termination on HAproxy, This will create a volume mount
-  tls:
-    enabled: false
-    secretName: ""
-    keyName:
-    certMountPath: /tmp/
   enabled: false
   # Enable if you want a dedicated port in haproxy for redis-slaves
   readOnly:
@@ -73,7 +58,7 @@ haproxy:
   replicas: 3
   image:
     repository: haproxy
-    tag: 2.5.7
+    tag: 2.0.4
     pullPolicy: IfNotPresent
 
   ## Custom labels for the haproxy pod
@@ -97,32 +82,19 @@ haproxy:
     ##
     create: false
 
-  ## Pod Disruption Budget
-  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
-  ##
-  podDisruptionBudget: {}
-    # Use only one of the two
-    # maxUnavailable: 1
-    # minAvailable: 1
-
-
   ## Enable sticky sessions to Redis nodes via HAProxy
   ## Very useful for long-living connections as in case of Sentry for example
   stickyBalancing: false
   ## Kubernetes priorityClass name for the haproxy pod
   # priorityClassName: ""
-
-  ## Service for HAProxy
+  ## Service type for HAProxy
+  ##
   service:
     type: ClusterIP
     loadBalancerIP:
-    labels: {}
-    annotations: null
-
     # List of CIDR's allowed to connect to LoadBalancer
     # loadBalancerSourceRanges: []
-
-  serviceAccountName: redis-sa
+    annotations: {}
   serviceAccount:
     create: true
   ## Official HAProxy embedded prometheus metrics settings.
@@ -156,7 +128,6 @@ haproxy:
     client: 330s
     check: 2s
   checkInterval: 1s
-  checkFall: 1
 
   securityContext:
     runAsUser: 1000
@@ -279,10 +250,7 @@ redis:
 
   ## Container lifecycle hooks
   ## Ref: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/
-  lifecycle:
-    preStop:
-      exec:
-        command: ["/bin/sh", "/readonly-config/trigger-failover-if-master.sh"]
+  lifecycle: {}
 
   ## annotations for the redis statefulset
   annotations: {}
@@ -436,18 +404,11 @@ additionalAffinities: {}
 ##
 affinity: |
 
-## https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
-topologySpreadConstraints:
-  enabled: false
-  maxSkew: ""
-  topologyKey: ""
-  whenUnsatisfiable: ""
-
 # Prometheus exporter specific configuration options
 exporter:
   enabled: false
   image: oliver006/redis_exporter
-  tag: v1.27.0
+  tag: v1.15.1
   pullPolicy: IfNotPresent
 
   # prometheus port & scrape path
@@ -522,7 +483,6 @@ exporter:
     successThreshold: 2
 
 podDisruptionBudget: {}
-  # Use only one of the two
   # maxUnavailable: 1
   # minAvailable: 1
 
@@ -531,7 +491,6 @@ auth: false
 # redisPassword:
 
 ## Use existing secret containing key `authKey` (ignores redisPassword)
-## Can also store AWS S3 or SSH secrets in this secret
 # existingSecret:
 
 ## Defines the key holding the redis password in existing secret.
@@ -587,51 +546,20 @@ tls:
 # restore init container creates /data/dump.rdb_ from original if exists
 # restore init container overrides /data/dump.rdb
 # secrets are stored into environment of init container - stored encoded on k8s
-# REQUIRED for s3 restore: AWS 'access_key' and 'secret_key' or stored in existingSecret
+# REQUIRED for s3 restore: AWS 'access_key' and 'secret_key'
 # EXAMPLE source for s3 restore: 's3://bucket/dump.rdb'
 # REQUIRED for ssh restore: 'key' should be in one line including CR i.e. '-----BEGIN RSA PRIVATE KEY-----\n...\n...\n...\n-----END RSA PRIVATE KEY-----'
 # EXAMPLE source for ssh restore: 'user@server:/path/dump.rdb'
 restore:
   timeout: 600
-  # Set existingSecret to true to use secret specified in existingSecret above
-  existingSecret: false
   s3:
     source: false
-    # If using existingSecret, that secret must contain:
-    # AWS_SECRET_ACCESS_KEY: <YOUR_ACCESS_KEY:>
-    # AWS_ACCESS_KEY_ID: <YOUR_KEY_ID>
-    # If not set the key and ID as strings below:
     access_key: ""
     secret_key: ""
     region: ""
   ssh:
     source: false
     key: ""
-
-## Custom PrometheusRule to be defined
-## The value is evaluated as a template, so, for example, the value can depend on .Release or .Chart
-## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
-prometheusRule:
-  # prometheusRule.enabled -- If true, creates a Prometheus Operator PrometheusRule.
-  enabled: false
-  # prometheusRule.additionalLabels -- Additional labels to be set in metadata.
-  additionalLabels: {}
-  # prometheusRule.namespace -- Namespace which Prometheus is running in.
-  namespace:
-  # prometheusRule.interval -- How often rules in the group are evaluated (falls back to `global.evaluation_interval` if not set).
-  interval: 10s
-  # prometheusRule.rules -- Rules spec template (see https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#rule).
-  rules: []
-    # Example:
-    # - alert: RedisPodDown
-    #   expr: |
-    #     redis_up{job="{{ include "redis-ha.fullname" . }}"} == 0
-    #   for: 5m
-    #   labels:
-    #     severity: critical
-    #   annotations:
-    #     description: Redis pod {{ "{{ $labels.pod }}" }} is down
-    #     summary: Redis pod {{ "{{ $labels.pod }}" }} is down
 
 extraInitContainers: []
 #  - name: extraInit
@@ -642,36 +570,3 @@ extraContainers: []
 extraVolumes: []
 #  - name: empty
 #    emptyDir: {}
-
-# Labels added here are applied to all created resources
-extraLabels: {}
-
-networkPolicy:
-  ## whether NetworkPolicy for Redis StatefulSets should be created
-  ## when enabled, inter-Redis connectivity is created
-  enabled: false
-  annotations: {}
-  labels: {}
-  ## user defines ingress rules that Redis should permit into
-  ## uses the format defined in https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
-  ingressRules: []
-    # - selectors:
-    #   - namespaceSelector:
-    #       matchLabels:
-    #         name: my-redis-client-namespace
-    #     podSelector:
-    #       matchLabels:
-    #         application: redis-client
-    ## if ports is not defined then it defaults to the ports defined for enabled services (redis, sentinel)
-    #   ports:
-    #     - port: 6379
-    #       protocol: TCP
-    #     - port: 26379
-    #       protocol: TCP
-
-  ## user can define egress rules too, uses the same structure as ingressRules
-  egressRules: []
-
-splitBrainDetection:
-  interval: 60
-  resources: {}

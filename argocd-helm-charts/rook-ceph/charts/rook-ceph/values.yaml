@@ -4,7 +4,7 @@
 
 image:
   repository: rook/ceph
-  tag: v1.9.6
+  tag: v1.9.7
   pullPolicy: IfNotPresent
 
 crds:

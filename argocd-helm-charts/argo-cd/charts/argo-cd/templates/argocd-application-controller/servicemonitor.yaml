@@ -16,7 +16,7 @@ metadata:
     {{- end }}
 spec:
   endpoints:
-    - port: {{ .Values.controller.metrics.service.portName }}
+    - port: metrics
       {{- with .Values.controller.metrics.serviceMonitor.interval }}
       interval: {{ . }}
       {{- end }}
@@ -27,13 +27,6 @@ spec:
       {{- end }}
       {{- with .Values.controller.metrics.serviceMonitor.metricRelabelings }}
       metricRelabelings:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.controller.metrics.serviceMonitor.scheme }}
-      scheme: {{ . }}
-      {{- end }}
-      {{- with .Values.controller.metrics.serviceMonitor.tlsConfig }}
-      tlsConfig:
         {{- toYaml . | nindent 8 }}
       {{- end }}
   namespaceSelector:

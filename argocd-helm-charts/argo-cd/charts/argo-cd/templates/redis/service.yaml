@@ -11,9 +11,7 @@ metadata:
     {{- end }}
   {{- with .Values.redis.service.annotations }}
   annotations:
-    {{- range $key, $value := . }}
-    {{ $key }}: {{ $value | quote }}
-    {{- end }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   ports:
