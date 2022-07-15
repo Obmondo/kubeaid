@@ -19,9 +19,7 @@ spec:
     metadata:
       {{- with (mergeOverwrite (deepCopy .Values.global.podAnnotations) .Values.controller.podAnnotations) }}
       annotations:
-        {{- range $key, $value := . }}
-        {{ $key }}: {{ $value | quote }}
-        {{- end }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "argo-cd.labels" (dict "context" . "component" .Values.controller.name "name" .Values.controller.name) | nindent 8 }}
@@ -30,7 +28,7 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with .Values.controller.imagePullSecrets | default .Values.global.imagePullSecrets }}
+      {{- with .Values.global.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -57,17 +55,14 @@ spec:
         - --loglevel
         - {{ .Values.controller.logLevel }}
         {{- if .Values.controller.metrics.applicationLabels.enabled }}
-        {{- range .Values.controller.metrics.applicationLabels.labels }}
         - --metrics-application-labels
-        - {{ . }}
+        {{- range .Values.controller.metrics.applicationLabels.labels }}
+        - {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- end }}
         {{- if or (and .Values.redis.enabled (not $redisHa.enabled)) (and $redisHa.enabled $redisHa.haproxy.enabled) }}
         - --redis
         - {{ template "argo-cd.redis.fullname" . }}:{{ .Values.redis.servicePort }}
-        {{- else if and .Values.externalRedis.host .Values.externalRedis.port }}
-        - --redis
-        - {{ .Values.externalRedis.host }}:{{ .Values.externalRedis.port }}
         {{- end }}
         {{- with .Values.controller.extraArgs }}
         {{- . | toYaml | nindent 8 }}
@@ -78,12 +73,9 @@ spec:
         {{- if .Values.controller.containerSecurityContext }}
         securityContext: {{- toYaml .Values.controller.containerSecurityContext | nindent 10 }}
         {{- end }}
-        {{- if or .Values.controller.env .Values.externalRedis.password .Values.externalRedis.existingSecret  }}
+        {{- if .Values.controller.env }}
         env:
-          {{- include "argo-cd.redisPasswordEnv" . | nindent 8 }}
-          {{- with .Values.controller.env }}
-          {{- toYaml . | nindent 8 }}
-          {{- end }}
+{{- toYaml .Values.controller.env | nindent 8 }}
         {{- end }}
         {{- with .Values.controller.envFrom }}
         envFrom: {{- toYaml . | nindent 8 }}

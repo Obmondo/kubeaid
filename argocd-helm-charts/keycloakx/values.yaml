@@ -1,21 +1,16 @@
-keycloak:
-  postgresql:
-    enabled: false
+keycloakx:
+  database:
+    vendor: postgres
+    hostname: keycloak-pgsql
+    port: 5432
+    database: keycloak
   extraEnv: |
-    - name: DB_VENDOR
-      value: postgres
-    - name: DB_ADDR
-      value: keycloak-pgsql
-    - name: DB_PORT
-      value: "5432"
-    - name: DB_DATABASE
-      value: keycloak
-    - name: DB_USER
+    - name: KC_DB_USERNAME
       valueFrom:
         secretKeyRef:
           name: keycloak.keycloak-pgsql.credentials.postgresql.acid.zalan.do
           key: username
-    - name: DB_PASSWORD
+    - name: KC_DB_PASSWORD
       valueFrom:
         secretKeyRef:
         name: keycloak.keycloak-pgsql.credentials.postgresql.acid.zalan.do

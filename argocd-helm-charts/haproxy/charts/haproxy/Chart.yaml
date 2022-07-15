@@ -1,10 +1,10 @@
 annotations:
   artifacthub.io/changes: |
-    - Update base image to 2.5.5 release
-    - Add PullSecret for default backend
-    - Add extraEnvs to the main container
+    - Update base image to 2.6.1 release
+    - Add HPA Keda support and improvements to ServiceMonitor
+    - Add PSP for sysctl and remove privileged containers use
 apiVersion: v2
-appVersion: 2.5.5
+appVersion: 2.6.1
 description: A Helm chart for HAProxy on Kubernetes
 home: https://github.com/haproxytech/helm-charts/tree/main/haproxy
 icon: https://raw.githubusercontent.com/haproxytech/helm-charts/main/haproxy/chart-icon.png
@@ -18,4 +18,4 @@ name: haproxy
 sources:
 - http://www.haproxy.org/
 type: application
-version: 1.14.0
+version: 1.15.0
