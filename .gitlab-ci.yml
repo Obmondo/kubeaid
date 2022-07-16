@@ -43,7 +43,7 @@ lint:jsonnetfmt:
 helm:check_diff:
   stage: diff
   image:
-    name: registry.obmondo.com/obmondo/dockerfiles/kubernetes-build:helm
+    name: registry.obmondo.com/obmondo/dockerfiles/kubernetes-build:latest
   script:
     - helm version
     - "./bin/helm-diff.sh"
@@ -55,7 +55,7 @@ helm:check_diff:
 git:push:
   stage: deploy
   image:
-    name: registry.obmondo.com/obmondo/dockerfiles/kubernetes-build:1644571507
+    name: registry.obmondo.com/obmondo/dockerfiles/kubernetes-build:latest
   script:
     - ./bin/gitlab-build-and-create-mr.sh
   rules:
