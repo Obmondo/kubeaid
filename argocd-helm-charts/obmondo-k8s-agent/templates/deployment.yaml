@@ -24,7 +24,6 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "obmondo-k8s-agent.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -41,10 +40,6 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12}}
           {{- end }}
-          ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
           livenessProbe:
             exec:
               command:
