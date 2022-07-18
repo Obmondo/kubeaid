@@ -1,17 +1,38 @@
 keycloakx:
+  command:
+    - "/opt/keycloak/bin/kc.sh"
+    - "--verbose"
+    - "start"
+    - "--auto-build"
+    - "--http-enabled=true"
+    - "--http-port=8080"
+    - "--hostname-strict=false"
+    - "--hostname-strict-https=false"
+    - "--spi-events-listener-jboss-logging-success-level=info"
+    - "--spi-events-listener-jboss-logging-error-level=warn"
   database:
     vendor: postgres
-    hostname: keycloak-pgsql
+    hostname: keycloakx-pgsql
     port: 5432
     database: keycloak
   extraEnv: |
     - name: KC_DB_USERNAME
       valueFrom:
         secretKeyRef:
-          name: keycloak.keycloak-pgsql.credentials.postgresql.acid.zalan.do
+          name: keycloak.keycloakx-pgsql.credentials.postgresql.acid.zalan.do
           key: username
     - name: KC_DB_PASSWORD
       valueFrom:
         secretKeyRef:
-        name: keycloak.keycloak-pgsql.credentials.postgresql.acid.zalan.do
-        key: password
+          name: keycloak.keycloakx-pgsql.credentials.postgresql.acid.zalan.do
+          key: password
+    - name: KEYCLOAK_ADMIN
+      value: admin
+    - name: KEYCLOAK_ADMIN_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: keycloak-admin
+          key: KEYCLOAK_PASSWORD
+    - name: JAVA_OPTS_APPEND
+      value: >-
+        -Djgroups.dns.query={{ include "keycloak.fullname" . }}-headless
