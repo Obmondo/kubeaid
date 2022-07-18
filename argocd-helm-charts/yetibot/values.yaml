@@ -15,7 +15,7 @@ yetibot:
       YB_DB_URL: "jdbc:postgresql://yetibot:yetibot@yetibot-postgresql:5432/yetibot"
 
       # Enable Mattermost adapter
-      # YETIBOT_ADAPTERS_MYMATTERMOST_TYPE: "mattermost-team-edition"
+      # YETIBOT_ADAPTERS_MYMATTERMOST_TYPE: "mattermost"
       # YETIBOT_ADAPTERS_MYMATTERMOST_HOST: "chat.obmondo.com"
       # This is delivered by sealed-secrets
       # YETIBOT_ADAPTERS_MYMATTERMOST_TOKEN: ""
