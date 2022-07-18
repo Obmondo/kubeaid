@@ -9,8 +9,8 @@ for program in helm tar; do
   fi
 done
 
-if ! helm version --template='Version: {{.Version}}' | grep 'v3.9' >/dev/null; then
-  echo "I'm expecting helm version be v3.9.x"
+if ! helm version --template='Version: {{.Version}}' | grep 'v3.8' >/dev/null; then
+  echo "I'm expecting helm version be v3.8.x"
   exit 1
 fi
 
