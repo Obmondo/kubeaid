@@ -1,0 +1,130 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mattermost-team-edition.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "mattermost-team-edition.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ include "mattermost-team-edition.chart" . }}
+spec:
+  replicas: 1
+  strategy: {{ toYaml .Values.deploymentStrategy | nindent 4 }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "mattermost-team-edition.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/managed-by: {{ .Release.Service }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/secret-config.yaml") . | sha256sum }}
+        {{- if .Values.extraPodAnnotations }}
+        {{- .Values.extraPodAnnotations | toYaml | nindent 8 }}
+        {{- end }}
+      labels:
+        app.kubernetes.io/name: {{ include "mattermost-team-edition.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
+        helm.sh/chart: {{ include "mattermost-team-edition.chart" . }}
+    spec:
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+      {{- toYaml .Values.tolerations | nindent 6 }}
+      {{- end }}
+      {{- if .Values.securityContext }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+      {{- end }}
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      {{- end }}
+      initContainers:
+      {{- if not .Values.externalDB.enabled }}
+      - name: "init-mysql"
+        image: "{{ .Values.initContainerImage.repository }}:{{ .Values.initContainerImage.tag }}"
+        imagePullPolicy: {{ .Values.initContainerImage.imagePullPolicy }}
+        command: ["sh", "-c", "until curl --max-time 10 http://{{ .Release.Name }}-mysql:3306; do echo waiting for {{ .Release.Name }}-mysql; sleep 5; done;"]
+      {{- end }}
+      {{- if .Values.extraInitContainers }}
+      {{- .Values.extraInitContainers | toYaml | nindent 6 }}
+      {{- end }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        env:
+        - name: MM_CONFIG
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "mattermost-team-edition.fullname" . }}-mattermost-dbsecret
+              key: mattermost.dbsecret
+        {{- if .Values.extraEnvVars }}
+          {{- .Values.extraEnvVars | toYaml | nindent 8 }}
+        {{- end }}
+        envFrom:
+        - secretRef:
+            name:  {{ include "mattermost-team-edition.fullname" . }}-config
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.internalPort }}
+          protocol: TCP
+        livenessProbe:
+          initialDelaySeconds: 90
+          timeoutSeconds: 5
+          periodSeconds: 15
+          httpGet:
+            path: /api/v4/system/ping
+            port: http
+        readinessProbe:
+          initialDelaySeconds: 15
+          timeoutSeconds: 5
+          periodSeconds: 15
+          httpGet:
+            path: /api/v4/system/ping
+            port: http
+        volumeMounts:
+        - mountPath: /mattermost/config
+          name: mattermost-config
+        - mountPath: /mattermost/data
+          name: mattermost-data
+        - mountPath: /mattermost/{{ trimPrefix "./" .Values.config.MM_PLUGINSETTINGS_CLIENTDIRECTORY }}
+          name: mattermost-plugins
+        {{- if .Values.extraVolumeMounts -}}
+        {{ .Values.extraVolumeMounts | toYaml | nindent 8 }}
+        {{- end }}
+        resources:
+          {{- .Values.resources | toYaml | nindent 12 }}
+      volumes:
+      {{- if .Values.extraVolumes -}}
+      {{ .Values.extraVolumes | toYaml | nindent 6 }}
+      {{- end }}
+      - name: mattermost-config
+        emptyDir: {}
+      - name: mattermost-data
+      {{ if .Values.persistence.data.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.data.existingClaim | default (include "mattermost-team-edition.fullname" .) }}
+      {{ else }}
+        emptyDir: {}
+      {{ end }}
+      - name: mattermost-plugins
+      {{ if .Values.persistence.plugins.enabled }}
+        persistentVolumeClaim:
+          {{ if .Values.persistence.plugins.existingClaim }}
+          claimName: {{.Values.persistence.plugins.existingClaim }}
+          {{ else }}
+          claimName: {{ default (include "mattermost-team-edition.fullname" .) }}-plugins
+          {{ end }}
+      {{ else }}
+        emptyDir: {}
+      {{ end }}

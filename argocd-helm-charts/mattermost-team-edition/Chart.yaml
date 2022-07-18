@@ -1,0 +1,7 @@
+apiVersion: v1
+name: mattermost-team-edition
+version: 6.6.6
+dependencies:
+  - name: mattermost-team-edition
+    version: 6.6.6
+    repository: https://helm.mattermost.com
