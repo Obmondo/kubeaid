@@ -46,6 +46,9 @@ spec:
       securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "sealed-secrets.serviceAccountName" . }}
+      {{- if .Values.automountServiceAccountToken }}
+      automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
+      {{- end }}
       containers:
         - name: controller
           command:
@@ -64,6 +67,14 @@ spec:
             {{- if .Values.keyrenewperiod }}
             - --key-renew-period
             - {{ .Values.keyrenewperiod | quote }}
+            {{- end }}
+            {{- if .Values.rateLimit }}
+            - --rate-limit
+            - {{ .Values.rateLimit | quote }}
+            {{- end }}
+            {{- if .Values.rateLimitBurst }}
+            - --rate-limit-burst
+            - {{ .Values.rateLimitBurst | quote }}
             {{- end }}
             - --key-prefix
             - {{ .Values.secretName | quote }}
