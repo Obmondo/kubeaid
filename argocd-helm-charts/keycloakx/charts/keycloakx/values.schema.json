@@ -250,6 +250,14 @@
           }
         }
       },
+      "health": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
       "database": {
         "type": "object",
         "properties": {
@@ -269,6 +277,9 @@
             "type": "string"
           },
           "database": {
+            "type": "string"
+          },
+          "existingSecret": {
             "type": "string"
           }
         }
@@ -411,6 +422,9 @@
           },
           "name": {
             "type": "string"
+          },
+          "automountServiceAccountToken": {
+            "type": "boolean"
           }
         }
       },
