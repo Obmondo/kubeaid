@@ -32,7 +32,7 @@ volumes:
 
 serviceAccount:
   # Specifies whether a service account should be created
-  create: true
+  create: false
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
@@ -52,10 +52,7 @@ securityContext: {}
 # runAsNonRoot: true
 # runAsUser: 1000
 
-service:
-  type: ClusterIP
-  port: 80
-  internalPort: 80
+service: {}
 
 ingress:
   enabled: false
