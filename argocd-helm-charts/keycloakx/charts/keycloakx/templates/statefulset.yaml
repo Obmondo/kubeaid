@@ -72,10 +72,14 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.command }}
           command:
             {{- toYaml .Values.command | nindent 12 }}
+          {{- end }}
+          {{- if .Values.args }}
           args:
             {{- toYaml .Values.args | nindent 12 }}
+          {{- end }}
           {{- with .Values.lifecycleHooks }}
           lifecycle:
           {{- tpl . $ | nindent 12 }}
@@ -83,7 +87,7 @@ spec:
           env:
             {{- if .Values.http.relativePath }}
             - name: KC_HTTP_RELATIVE_PATH
-              value: {{ .Values.http.relativePath }}
+              value: {{ tpl .Values.http.relativePath $ | trimSuffix "/" }}
             {{- end }}
             {{- if eq .Values.cache.stack "default" }}
             - name: KC_CACHE
@@ -115,15 +119,15 @@ spec:
             - name: KC_DB_USERNAME
               value: {{ .Values.database.username }}
             {{- end }}
-            {{- if .Values.database.password }}
-            - name: KC_DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "keycloak.fullname" $ }}-database
-                  key: password
+            {{- if or .Values.database.password .Values.database.existingSecret -}}
+            {{- include "keycloak.databasePasswordEnv" . | nindent 12 }}
             {{- end }}
             {{- if .Values.metrics.enabled }}
             - name: KC_METRICS_ENABLED
+              value: "true"
+            {{- end }}
+            {{- if .Values.metrics.enabled }}
+            - name: KC_HEALTH_ENABLED
               value: "true"
             {{- end }}
             {{- with .Values.extraEnv }}
