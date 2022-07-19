@@ -100,10 +100,9 @@ resource "azurerm_linux_virtual_machine" "myterraformvm" {
   custom_data = base64encode(templatefile(
     "cloud_init.yml.tftpl",
     {
-      wg_client_pubkey = var.wg_client_pubkey,
       wg_port          = var.wg_port,
       wg_address       = var.wg_address,
-      wg_peer_address  = var.wg_peer_address,
+      wg_peers         = var.wg_peers,
       public_iface     = var.public_iface,
   }))
 
