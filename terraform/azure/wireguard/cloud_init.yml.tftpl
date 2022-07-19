@@ -17,35 +17,17 @@ write_files:
       Address = ${wg_address}
       ListenPort = ${wg_port}
       PrivateKey = WG_SRV_PRI
-      PostUp = /etc/wireguard/postup.sh
-      PreDown = /etc/wireguard/predown.sh
-      SaveConfig = true
+      PostUp = sysctl -w -q net.ipv4.ip_forward=1
+      PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+      PostDown = sysctl -w -q net.ipv4.ip_forward=0
+      PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
 
+      %{ for peer in wg_peers }
       [Peer]
-      PublicKey = ${wg_client_pubkey}
-      AllowedIPs = ${wg_peer_address}
-
-  # Add WireGuard postup and predown scripts
-  - path: /etc/wireguard/postup.sh
-    owner: root:root
-    permissions: "0700"
-    append: true
-    content: |
-      iptables -t nat -I POSTROUTING 1 -s ${wg_peer_address} -o ${public_iface} -j MASQUERADE
-      iptables -I INPUT 1 -i wg0 -j ACCEPT
-      iptables -I FORWARD 1 -i ${public_iface} -o wg0 -j ACCEPT
-      iptables -I FORWARD 1 -i wg0 -o ${public_iface} -j ACCEPT
-      iptables -I INPUT 1 -i ${public_iface} -p udp --dport ${wg_port} -j ACCEPT
-  - path: /etc/wireguard/predown.sh
-    owner: root:root
-    permissions: "0700"
-    append: true
-    content: |
-      iptables -t nat -D POSTROUTING -s ${wg_peer_address} -o ${public_iface} -j MASQUERADE
-      iptables -D INPUT -i wg0 -j ACCEPT
-      iptables -D FORWARD -i ${public_iface} -o wg0 -j ACCEPT
-      iptables -D FORWARD -i wg0 -o ${public_iface} -j ACCEPT
-      iptables -D INPUT -i ${public_iface} -p udp --dport ${wg_port} -j ACCEPT
+      # ${peer["name"]}
+      PublicKey = ${peer["public_key"]}
+      AllowedIPs = ${peer["allowed_ips"]}
+      %{ endfor ~}
 
   # Add script that allows a remote user to read pubkey
   - path: /opt/get_wireguard_status
