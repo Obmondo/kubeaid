@@ -56,16 +56,17 @@ variable "wg_port" {
   default = 51820
 }
 
-variable "wg_client_pubkey" {
-  type = string
-}
-
 variable "wg_address" {
   type = string
 }
 
-variable "wg_peer_address" {
-  type = string
+variable "wg_peers" {
+  type        = list(object({
+    name        = string,
+    public_key  = string,
+    allowed_ips = string
+  }))
+  description = "List of client objects with IP and public key."
 }
 
 variable "public_iface" {
