@@ -113,18 +113,26 @@ if [[ -z "${kube_prometheus_release}" ]]; then
 fi
 
 jsonnet_lib_path="${basedir}/libraries/${kube_prometheus_release}/vendor"
-if ! [ -e "${jsonnet_lib_path}" ]; then
-  if [[ -d "${basedir}/libraries/${kube_prometheus_release}" ]]; then
-    echo 'Release dir exists; exiting'
-    exit 73
-  fi
 
+function jb_install() {
+  package_name=$1
+  package_url=$2
+
+  if ! [[ -d "${jsonnet_lib_path}/${package_name}" ]]; then
+    jb install "$package_url"
+  fi
+}
+
+if ! [ -e "${jsonnet_lib_path}" ]; then
   echo "INFO: '${jsonnet_lib_path}' doesn't exist; executing jsonnet-bundler"
   jb init
-  jb install "github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@${kube_prometheus_release}"
-  jb install "github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin@main"
-  jb install "github.com/ceph/ceph-mixins@master"
-  mkdir "${basedir}/libraries/${kube_prometheus_release}"
+
+  jb_install kube-prometheus "github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@${kube_prometheus_release}"
+  jb_install prometheus-mixin github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin@main
+  jb_install ceph-mixins "github.com/ceph/ceph-mixins@master"
+  jb_install cert-manager-mixin "gitlab.com/uneeq-oss/cert-manager-mixin@master"
+
+  mkdir -p "${basedir}/libraries/${kube_prometheus_release}"
   mv vendor "${basedir}/libraries/${kube_prometheus_release}/"
   mv jsonnetfile.json jsonnetfile.lock.json "${basedir}/libraries/${kube_prometheus_release}/"
 fi
