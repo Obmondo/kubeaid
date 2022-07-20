@@ -1,4 +1,4 @@
-local utils = import 'utils.libsonnet';
+local utils = import 'lib/utils.libsonnet';
 local addMixin = (import 'lib/addmixin.libsonnet');
 
 local remove_nulls = (
@@ -42,6 +42,7 @@ local default_vars = {
     sealedsecrets: true,
     etcd: true,
     velero: false,
+    certmanager: true,
   },
   mixin_configs: {
     // Example:
@@ -73,6 +74,11 @@ local mixins = remove_nulls([
   addMixin(
     'velero',
     (import 'mixins/velero/mixin.libsonnet'),
+    vars,
+  ),
+  addMixin(
+    'certmanager',
+    (import 'gitlab.com/uneeq-oss/cert-manager-mixin/mixin.libsonnet'),
     vars,
   ),
 ]);
