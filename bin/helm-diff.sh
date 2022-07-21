@@ -14,6 +14,7 @@ cd "${TEMPDIR}"
 COMMIT_COUNT=$(git log --oneline --abbrev-commit "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..origin/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" | wc -l)
 
 LINT_COUNT=$(git log --oneline --abbrev-commit "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..origin/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" | { grep lint -c || true; } )
+DOC_COUNT=$(git log --oneline --abbrev-commit "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..origin/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" | { grep doc -c || true; } )
 
 function helm_diff() {
   chart_path="argocd-helm-charts/${1}"
@@ -61,6 +62,8 @@ git diff "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..origin/${CI_MERGE_REQUEST_SOUR
   chart_name=$(echo "$diff" | cut -d '/' -f2)
 
   if [ "$COMMIT_COUNT" -eq "$LINT_COUNT" ]; then
+    helm_compile "$chart_name"
+  elif [ "$COMMIT_COUNT" -eq "$DOC_COUNT" ]; then
     helm_compile "$chart_name"
   else
     # Check if there is any changes are in chart.yaml/lock files for a particular helm chart
