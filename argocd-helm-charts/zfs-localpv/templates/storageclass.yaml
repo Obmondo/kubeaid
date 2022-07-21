@@ -1,18 +1,4 @@
 {{- if .Values.storageClass.enabled -}}
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: openebs-zfspv-retain
-parameters:
-  recordsize: "4k"
-  compression: "off"
-  dedup: "off"
-  fstype: "zfs"
-  poolname: "mypool"
-provisioner: zfs.csi.openebs.io
-reclaimPolicy: Retain
-
----
 
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
@@ -25,3 +11,5 @@ parameters:
   fstype: "zfs"
   poolname: "mypool"
 provisioner: zfs.csi.openebs.io
+
+{{- end -}}
