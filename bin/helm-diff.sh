@@ -15,7 +15,7 @@ COMMIT_MSG=$(git log --oneline --pretty=format:'%s' --abbrev-commit "${CI_MERGE_
 
 COMMIT_COUNT=$(echo "$COMMIT_MSG" | wc -l)
 LINT_COUNT=$(echo "$COMMIT_MSG" | { grep '^lint' -c || true; } )
-LINT_COUNT=$(echo "$COMMIT_MSG" | { grep '^doc' -c || true; } )
+DOC_COUNT=$(echo "$COMMIT_MSG" | { grep '^doc' -c || true; } )
 
 function helm_diff() {
   chart_path="argocd-helm-charts/${1}"
