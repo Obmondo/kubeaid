@@ -40,5 +40,5 @@ source: https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management
   -> Users
   -> Select User
   -> Under `groups` tab
-  -> Select the required group (which you have created from the above doc)
+  -> Select the required group (See values for argocd https://<k8id-config-repo-url>/-/blob/main/k8s/<clustername>/argocd-apps/values-argo-cd.yaml under policy.csv)
   -> done
