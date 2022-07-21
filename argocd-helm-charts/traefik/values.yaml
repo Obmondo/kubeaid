@@ -25,9 +25,10 @@ traefik:
     kubernetesIngress:
       publishedService:
         enabled: true
-  ingressRoute:
-    dashboard:
-      enabled: true
-      annotations:
-        traefik.ingress.kubernetes.io/router.tls: "true"
-        cert-manager.io/cluster-issuer: letsencrypt
+# defines an ingressroute (public url - custom traefik CRD that replaces generic ingress type) for traefik dashboard. Not advised to enable - and below needs addition of a specific url to be accessible.
+#  ingressRoute:
+#    dashboard:
+#      enabled: true
+#      annotations:
+#        traefik.ingress.kubernetes.io/router.tls: "true"
+#        cert-manager.io/cluster-issuer: letsencrypt
