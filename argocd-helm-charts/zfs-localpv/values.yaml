@@ -20,5 +20,5 @@ zfs-localpv:
       create: true
       name: zfs-csi-controller-critical
   
-  storageClass:
-    enabled: true
+storageClass:
+  enabled: true
