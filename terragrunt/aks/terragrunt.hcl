@@ -12,17 +12,6 @@ remote_state {
   }
 }
 
-# Indicate what region to deploy the resources into
-generate "provider" {
-  path = "provider.tf"
-  if_exists = "overwrite_terragrunt"
-  contents = <<EOF
-provider "aws" {
-  region = "${local.region}"
-}
-EOF
-}
-
 locals {
   tags = {
     terraform = true
@@ -37,7 +26,7 @@ locals {
 }
 
 terraform {
-  source = "${get_parent_terragrunt_dir()}/../../../terraform//azure/aks"
+  source = "${get_parent_terragrunt_dir()}/../../terraform//azure/aks"
 
   after_hook "after_hook" {
     commands     = ["apply", "plan"]
