@@ -5,13 +5,14 @@
 Run our script to do this:
 Source: https://github.com/argoproj/argo-cd/blob/master/docs/faq.md#i-forgot-the-admin-password-how-do-i-reset-it
 
-generate new becrypt string by:
-NB. SPACE in front of 'python' command IS IMPORTANT - as it ensures its NOT stored in your bash history
+NB. SPACE in front of 'bcrypt-tool' command IS IMPORTANT - as it ensures its NOT stored in your bash history
 
 ```sh
-sudo apt install python-bcrypt
- python -c 'import bcrypt; print(bcrypt.hashpw(b"PASSWORD", bcrypt.gensalt(rounds=15)).decode("ascii"))'
-kubectl -n argocd patch secret argocd-secret -p '{"stringData": { "admin.password": "<insert-bcrypt-hash>", "admin.passwordMtime": "'$(date +%FT%T%Z)'" }}'
+# sudo snap install bcrypt-tool
+
+# <need-space> bcrypt-tool hash "lolyourpassword123" 10
+
+# kubectl -n argocd patch secret argocd-secret -p '{"stringData": { "admin.password": "<insert-bcrypt-hash>", "admin.passwordMtime": "'$(date +%FT%T%Z)'" }}'
 ```
 
 and KILL the pod(s) called `argo-cd-argocd-server-*`
@@ -29,3 +30,15 @@ The `status.loadBalancer` field is empty for the argocd ingress, and it seems to
 ```sh
 kubectl -n argocd get ing argo-cd-argocd-server -o jsonpath={.status}
 ```
+
+## Configure argocd with keycloak
+
+source: https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/keycloak/
+
+* To add any new user into argocd as an admin
+  login to keycloak
+  -> Users
+  -> Select User
+  -> Under `groups` tab
+  -> Select the required group (which you have created from the above doc)
+  -> done
