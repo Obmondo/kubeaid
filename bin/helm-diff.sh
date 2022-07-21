@@ -11,10 +11,11 @@ git clone "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJEC
 cd "${TEMPDIR}"
 
 # SKIP diff check part IF MR conststs of ONLY commits with word 'lint' in them
-COMMIT_COUNT=$(git log --oneline --abbrev-commit "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..origin/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" | wc -l)
+COMMIT_MSG=$(git log --oneline --pretty=format:'%s' --abbrev-commit "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..origin/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" argocd-helm-charts)
 
-LINT_COUNT=$(git log --oneline --abbrev-commit "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..origin/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" | { grep lint -c || true; } )
-DOC_COUNT=$(git log --oneline --abbrev-commit "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}..origin/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}" | { grep doc -c || true; } )
+COMMIT_COUNT=$(echo "$COMMIT_MSG" | wc -l)
+LINT_COUNT=$(echo "$COMMIT_MSG" | { grep '^lint' -c || true; } )
+LINT_COUNT=$(echo "$COMMIT_MSG" | { grep '^doc' -c || true; } )
 
 function helm_diff() {
   chart_path="argocd-helm-charts/${1}"
