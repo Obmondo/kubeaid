@@ -19,6 +19,6 @@ zfs-localpv:
     priorityClass:
       create: true
       name: zfs-csi-controller-critical
-  
+
 storageClass:
   enabled: true
