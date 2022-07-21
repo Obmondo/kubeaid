@@ -23,7 +23,7 @@ image:
       name: k8s-agent-tls
 
 imagePullSecrets:
-    - name: gitlab-registry
+    - name: obmondo-k8s-agent-gitlab.enableit.dk-registry
 nameOverride: ""
 fullnameOverride: ""
 
