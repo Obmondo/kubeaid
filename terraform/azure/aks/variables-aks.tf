@@ -9,11 +9,6 @@ variable "resource_group" {
   description = "Resource Group Name under which k8s cluster needs to be created"
 }
 
-variable "storage_account" {
-  type = string
-  description = "Storage account to store the terraform state file"
-}
-
 variable "agent_count" {
   default = 3
   description = "The initial number of nodes which should exist in the Node Pool."
