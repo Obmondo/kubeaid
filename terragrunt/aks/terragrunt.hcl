@@ -7,20 +7,9 @@ remote_state {
   config = {
     resource_group_name  = local.resource_group
     storage_account_name = local.storage_account
-    container_name       = "${local.cluster_name}-terraform"
+    container_name       = local.container
     key                  = "${path_relative_to_include()}/aks/terraform.tfstate"
   }
-}
-
-# Indicate what region to deploy the resources into
-generate "provider" {
-  path = "provider.tf"
-  if_exists = "overwrite_terragrunt"
-  contents = <<EOF
-provider "aws" {
-  region = "${local.region}"
-}
-EOF
 }
 
 locals {
@@ -28,16 +17,16 @@ locals {
     terraform = true
   }
 
-  customer_vars = yamldecode(file(get_env("OBMONDO_VARS_FILE")))
+  customer_vars   = yamldecode(file(get_env("OBMONDO_VARS_FILE")))
 
-  cluster_name = local.customer_vars.cluster_name
-
+  cluster_name    = local.customer_vars.cluster_name
+  container       = local.customer_vars.container
   resource_group  = local.customer_vars.resource_group
   storage_account = local.customer_vars.storage_account
 }
 
 terraform {
-  source = "${get_parent_terragrunt_dir()}/../../../terraform//azure/aks"
+  source = "${get_parent_terragrunt_dir()}/../../terraform//azure/aks"
 
   after_hook "after_hook" {
     commands     = ["apply", "plan"]
