@@ -1,0 +1,13 @@
+{{- if .Values.storageClass.enabled -}}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: zfs-localpv
+parameters:
+  recordsize: "4k"
+  compression: "off"
+  dedup: "off"
+  fstype: "zfs"
+  poolname: "mypool"
+provisioner: zfs.csi.openebs.io
+{{- end -}}

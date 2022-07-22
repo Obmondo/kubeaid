@@ -1,0 +1,7 @@
+apiVersion: v2
+name: zfs-localpv
+version: 1.0.0
+dependencies:
+  - name: zfs-localpv
+    version: 2.1.0
+    repository: https://openebs.github.io/zfs-localpv
