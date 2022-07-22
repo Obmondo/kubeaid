@@ -24,11 +24,59 @@
       terraform
       bcrypt
       wireguard
+      yq (https://github.com/mikefarah/yq)
      ```
 
   2. Git repository
      a. clone the k8id git repo from obmondo
      b. Create a fresh git repo (for better naming, we usually call it k8id-config)
+
+### Setup AKS cluster on Azure
+
+1. export your variables yaml file
+
+    ```sh
+     export OBMONDO_VARS_FILE=/path/to/yaml/values/file
+    ```
+
+    A sample variable yaml file looks like
+
+    ```yaml
+    location: "northeurope"
+    resource_group: "obmondo"
+    agent_count: 3
+    dns_prefix: "k8s-qa"
+    cluster_name: "abc"
+    vm_size: "Standard_DS2_v2"
+    kubernetes_version: "1.22.6"
+    enable_auto_scaling: true
+    min_node_count: 1
+    max_node_count: 3
+    storage_account: "abc"
+    container: "abcd"
+    ```
+
+2. Change your directory structure to the respective folder.
+   For eg if you want to create the AKS cluster then you must be sitting at `terragrunt/aks` folder
+   and run all the following commands from that folder  
+
+3. For Azure terragrunt wants the storage account to be created before hand, so you will have run
+
+   ```sh
+   ./create-rg-sc-con.sh
+   ```
+
+4. Now plan your terragrunt so that you can sure everything looks good to you
+
+   ```sh
+   terragrunt run-all plan
+   ```
+
+5. Once you are happy with the above plan - go ahead and apply those
+
+   ```sh
+   terragrunt run-all apply
+   ```
 
 ### Setup Kubernetes cluster on AWS with Kops
 
