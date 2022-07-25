@@ -1,6 +1,5 @@
 data "azurerm_resource_group" "resource" {
   name     = var.resource_group
-  location = var.location
 }
 
 resource "azurerm_kubernetes_cluster" "k8s" {
