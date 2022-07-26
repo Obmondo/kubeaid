@@ -54,6 +54,17 @@
     max_node_count: 3
     storage_account: "abc"
     container: "abcd"
+    argocd_admin_password: "Testing@123"
+    argocd_admin_bcrypt_password: $2a$10$KdHplv8yqG3pwtC3L.McZuzY3EJ74d0GB6lDs7dt9w8shrEQkhcQ.
+    domain_name: "your-domain.com"
+    environment: "test"
+    argocd_repos:
+    k8id:
+      url: "git@github.com:<org>/k8id.git"
+      ssh_private_key: "/home/k8id"
+    k8id-config:
+      url: "git@github.com:<org>/k8id-config.git"
+      ssh_private_key: "/home/k8id-config"
     ```
 
 2. Change your directory structure to the respective folder.
