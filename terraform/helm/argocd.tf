@@ -36,7 +36,6 @@ resource "helm_release" "argocd" {
   ]
   depends_on       = [
     sealedsecret_local.argocd_repos,
-    kubectl_manifest.argocd_secret
   ]
 }
 
