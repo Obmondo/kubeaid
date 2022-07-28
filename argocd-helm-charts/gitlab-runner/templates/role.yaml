@@ -38,4 +38,12 @@ rules:
     - postgresqls
   verbs:
     - '*'
+- apiGroups:
+    - traefik.containo.us
+  resources:
+    - middlewares
+  verbs:
+    - get
+    - create
+    - delete
 {{- end -}}

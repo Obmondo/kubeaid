@@ -48,9 +48,10 @@ helm:check_diff:
     - helm version
     - "./bin/helm-diff.sh"
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+    # MRs and started through UI, except if last commit starts with ":no-diff"
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_MESSAGE !~ /^:no-diff/ || $CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_MESSAGE !~ /^:no-diff/'
       changes:
-        - "argocd-helm-charts/**/*"
+       - "argocd-helm-charts/**/*"
 
 git:push:
   stage: deploy
@@ -61,7 +62,7 @@ git:push:
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       changes:
-        - "build/**/*"
+       - "build/**/*"
 
 git:helm_update:
   stage: helm
