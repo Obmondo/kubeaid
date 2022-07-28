@@ -7,3 +7,5 @@ defaults
 *.tfstate.backup
 .terraform*
 .terragrunt*
+*.~undo-tree~
+
