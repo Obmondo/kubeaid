@@ -49,3 +49,9 @@ variable "max_node_count" {
   default = 3
   description = "The maximum number of nodes which should exist in the Node Pool. Valid only when auto scaling is enabled"
 }
+
+variable "private_cluster_enabled" {
+  type = bool
+  default = false
+  description = "Whether the cluster will be private or public"
+}

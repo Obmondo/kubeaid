@@ -52,6 +52,7 @@
     enable_auto_scaling: true
     min_node_count: 1
     max_node_count: 3
+    private_cluster_enabled: true
     storage_account: "abc"
     container: "abcd"
     argocd_admin_password: "Testing@123"
@@ -59,12 +60,12 @@
     domain_name: "your-domain.com"
     environment: "test"
     argocd_repos:
-    k8id:
-      url: "git@github.com:<org>/k8id.git"
-      ssh_private_key: "/home/k8id"
-    k8id-config:
-      url: "git@github.com:<org>/k8id-config.git"
-      ssh_private_key: "/home/k8id-config"
+      k8id:
+        url: "git@github.com:<org>/k8id.git"
+        ssh_private_key: "/home/k8id"
+      k8id-config:
+        url: "git@github.com:<org>/k8id-config.git"
+        ssh_private_key: "/home/k8id-config"
     ```
 
 2. Change your directory structure to the respective folder.
