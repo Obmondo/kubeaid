@@ -90,6 +90,13 @@
    terragrunt run-all apply
    ```
 
+6. After your kube cluster is created - you will need to deploy the root application
+   Assuming you have already created the `k8s/<clustername>/argocd-apps` in your kube config repo
+
+   ```sh
+   helm template k8s/<clustername>/argocd-apps --show-only templates/root.yaml | kubectl apply -f
+   ```
+
 ### Setup Kubernetes cluster on AWS with Kops
 
   1. Generate argocd password
