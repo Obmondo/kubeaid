@@ -3,11 +3,12 @@ data "azurerm_resource_group" "resource" {
 }
 
 resource "azurerm_kubernetes_cluster" "k8s" {
-    name                = var.cluster_name
-    location            = var.location
-    resource_group_name = var.resource_group
-    dns_prefix          = var.dns_prefix
-    kubernetes_version  = var.kubernetes_version
+    name                    = var.cluster_name
+    location                = var.location
+    resource_group_name     = var.resource_group
+    dns_prefix              = var.dns_prefix
+    kubernetes_version      = var.kubernetes_version
+    private_cluster_enabled = var.private_cluster_enabled
 
     default_node_pool {
         name                = "agentpool"
