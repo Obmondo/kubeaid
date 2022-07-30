@@ -1,5 +1,8 @@
-Example config
-```
+# Opensearch Cluster
+
+## Example config
+
+```yaml
 opensearch:
   opensearchJavaOpts: "-Xms4g -Xmx4g"
   replicas: 3
@@ -153,3 +156,57 @@ Create a secret with template functionality
           logfile:
           loglevel: INFO
 ```
+
+## Down sizing the cluster.
+
+### Down sizing might take hours, so its not a 30 min job. so relax and enjoy :)
+
+1. Stop routing any shards to the node you want.
+  NOTE: Always take the last node in the cluster. if you are downsizing.
+  f.exp, if you cluster has 12 pods and start with 12th pod and put the IP in the curl command given below.
+
+```sh
+# curl -v -H 'Content-type: application/json' -XPUT 'http://admin:lolpassword@opensearch-cluster-master:9200/_cluster/settings' -d '{
+  "transient" :{
+     "cluster.routing.allocation.exclude._ip" : "<last-pod-in-the-cluster-ip>"
+   }
+}'
+```
+
+2. Verify if all the shards are moved
+
+```
+# curl -s http://admin:lolpassword@opensearch-cluster-master:9200/_cat/shards | grep <last-pod-name-in-the-cluster>
+
+# `relocating_shards` should be **0**
+
+# curl -s http://admin:lolpassworl@opensearch-cluster-master:9200/_cluster/health | jq
+{
+  "cluster_name": "opensearch-cluster",
+  "status": "green",
+  "timed_out": false,
+  "number_of_nodes": 12,
+  "number_of_data_nodes": 12,
+  "discovered_master": true,
+  "active_primary_shards": 3963,
+  "active_shards": 3979,
+  "relocating_shards": 0,
+  "initializing_shards": 0,
+  "unassigned_shards": 0,
+  "delayed_unassigned_shards": 0,
+  "number_of_pending_tasks": 0,
+  "number_of_in_flight_fetch": 0,
+  "task_max_waiting_in_queue_millis": 0,
+  "active_shards_percent_as_number": 100
+}
+```
+
+3. Set the replicas count to n - 1 (12 pods in the cluster - 1 == 11)
+  NOTE: Do this only when cluster is green
+
+```yaml
+opensearch:
+  replicas: 11
+```
+
+4. Sync it on the argocd and it will restart the whole cluster and remove the last pod in the cluster.
