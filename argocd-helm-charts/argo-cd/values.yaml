@@ -18,3 +18,53 @@ argo-cd:
     replicas: 1
     autoscaling:
       enabled: true
+  server:
+    additionalProjects:
+    - name: argocd
+      namespace: argocd
+      sourceRepos:
+        - "*"
+      destinations:
+        - namespace: argocd
+          server: "*"
+      clusterResourceWhitelist:
+        - group: "*"
+          kind: "*"
+      orphanedResources:
+        warn: true
+    - name: obmondo
+      namespace: argocd
+      sourceRepos:
+        - "*"
+      destinations:
+        - namespace: obmondo
+          server: "*"
+      clusterResourceWhitelist:
+        - group: "*"
+          kind: "*"
+      orphanedResources:
+        warn: true
+    - name: system
+      namespace: argocd
+      sourceRepos:
+        - "*"
+      destinations:
+        - namespace: "*"
+          server: "*"
+      clusterResourceWhitelist:
+        - group: "*"
+          kind: "*"
+      orphanedResources:
+        warn: true
+    - name: custom
+      namespace: argocd
+      sourceRepos:
+        - "*"
+      destinations:
+        - namespace: "*"
+          server: "*"
+      clusterResourceWhitelist:
+        - group: "*"
+          kind: "*"
+      orphanedResources:
+        warn: true
