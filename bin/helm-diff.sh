@@ -30,16 +30,21 @@ function helm_diff() {
   # Move to the local branch
   git checkout "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
 
-  helm template "$chart_path" -f "${chart_path}/values.yaml" > "/tmp/${chart_name}_local.yaml"
+  # Check if the helm chart exists in the feature branch
+  if test -d "$chart_path"; then
+    helm template "$chart_path" -f "${chart_path}/values.yaml" > "/tmp/${chart_name}_local.yaml"
 
-  any_diff=$(diff -u "/tmp/${chart_name}_master.yaml" "/tmp/${chart_name}_local.yaml" || true )
+    any_diff=$(diff -u "/tmp/${chart_name}_master.yaml" "/tmp/${chart_name}_local.yaml" || true )
 
-  if diff -u "/tmp/${chart_name}_master.yaml" "/tmp/${chart_name}_local.yaml"; then
-    echo "There is no changes based on the changes, not good"
-    exit 1
+    if diff -u "/tmp/${chart_name}_master.yaml" "/tmp/${chart_name}_local.yaml"; then
+      echo "There is no changes based on the changes, not good"
+      exit 1
+    else
+      echo "Nice, there is a diff between changes"
+      echo "$any_diff"
+    fi
   else
-    echo "Nice, there is a diff between changes"
-    echo "$any_diff"
+    echo "Helm chart removed"
   fi
 }
 
