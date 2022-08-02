@@ -1,0 +1,5 @@
+sonarqube:
+  nginx:
+    enabled: false
+  postgres:
+    enabled: false
