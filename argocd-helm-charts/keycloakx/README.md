@@ -1,10 +1,10 @@
 # Keycloak Server Setup
 
-### NOTE: Do not give admin password from the webUI, add the password via an ENV variable. 'KEYCLOAK_PASSWORD'
+NOTE: Do not give admin password from the webUI, add the password via an ENV variable. 'KEYCLOAK_PASSWORD'
 
 * There are bunch of ways to do this, I have did it in this way.
 
-```
+```bash
 # Regular way
 kubectl create secret generic keycloak-admin --from-file=KEYCLOAK_PASSWORD=./keycloak_password -n keycloak
 
@@ -13,14 +13,14 @@ kubectl create secret generic keycloak-admin -n keycloak --dry-run=client --from
 kubeseal --controller-name sealed-secrets --controller-namespace system <mysecret.json >keycloak-admin.json
 ```
 
-# Keycloak Client Setup
+## Keycloak Client Setup
 
-## Install krew plugin manager
+### Install krew plugin manager
 
-https://krew.sigs.k8s.io/docs/user-guide/setup/install/
+<https://krew.sigs.k8s.io/docs/user-guide/setup/install/>
 
 In case you are interested.
-https://krew.sigs.k8s.io/docs/user-guide/quickstart
+<https://krew.sigs.k8s.io/docs/user-guide/quickstart>
 
 ```sh
 (
@@ -48,11 +48,11 @@ kubectl krew install oidc-login
 
 Details about setup if you are interested:
 
-* https://github.com/int128/kubelogin/blob/master/docs/setup.md
+* <https://github.com/int128/kubelogin/blob/master/docs/setup.md>
 
 ## Basic Keycloak setup
 
-* Log into the keycloak server as admin: https://keycloak.ops.bw7.io/auth/admin/
+* Log into the keycloak server as admin: <https://keycloak.ops.bw7.io/auth/admin/>
   * The password can be extracted from the `keycloak-admin` secret.
 * Make sure that you are in the `Master` realm
 * Create a personal admin user account
@@ -78,7 +78,7 @@ Details about setup if you are interested:
 * Log into the keycloak server, using your personal admin account
 * Switch to the `<customer_name>` realm
 * Follow this description:
-  * https://access.redhat.com/documentation/en-us/red_hat_single_sign-on/7.3/html/server_administration_guide/identity_broker#google
+  * <https://access.redhat.com/documentation/en-us/red_hat_single_sign-on/7.3/html/server_administration_guide/identity_broker#google>
     * There is a backup of the documentation [here](static/GoogleSetup.pdf).
   * Google project name: `Keycloak`
   * Hint: Enable `Trust Email`
@@ -97,7 +97,7 @@ Details about setup if you are interested:
 * Log into the keycloak server using your personal admin user
 * Go to the `<customer_name>` realm
 * Go to clients and click on `Create`.
-* Provide the `Client ID` as `kubernetes`, leave `Client Protocol ` as
+* Provide the `Client ID` as `kubernetes`, leave `Client Protocol` as
   `openid-connect`, `Root URL` as blank, and click on save.
 * In the "Kubernetes" client details find "Valid redirect URLs" and add
   `http://localhost` and click "Save.
@@ -108,7 +108,8 @@ Details about setup if you are interested:
 
 ## Make logins easier for the user
 
-Since we only allow users to login to the <customer_name> using Google oauth, we can make the login flow faster, by setting it as default:
+Since we only allow users to login to the `<customer_name>` using Google oauth,
+we can make the login flow faster, by setting it as default:
 
 * Log into the keycloak server using your personal admin user
 * Go to the `<customer_name>` realm
@@ -118,7 +119,7 @@ Since we only allow users to login to the <customer_name> using Google oauth, we
 
 ## Add normal users to the Keycloak setup
 
-* Have the user access https://keycloak.ops.bw7.io/auth/realms/<customer_name>/account/
+* Have the user access <https://keycloak.ops.bw7.io/auth/realms/<customer_name>/account/>
   * Click `Personal Info` link
   * The user is now done, and the basic user account has been created
 * Add the user to the group, that that describe their access needs
@@ -135,7 +136,12 @@ Since we only allow users to login to the <customer_name> using Google oauth, we
   * The account has been created by terraform, as part of the cluster install procedure
   * Go to the directory, where you have checked out the `iac_iam` repository
   * Execute: ```terraform refresh```
-  * Execute: ```terraform show -json | jq -e '.values.root_module.child_modules[].resources[] | select(.name=="keycloak-smtp") | select(.type=="aws_iam_access_key")|{cluster:.index,smtp_user:.values.id,smtp_pass:.values.ses_smtp_password_v4}'```
+  * Execute:
+
+    ```sh
+    terraform show -json | jq -e '.values.root_module.child_modules[].resources[] | select(.name=="keycloak-smtp") | select(.type=="aws_iam_access_key")|{cluster:.index,smtp_user:.values.id,smtp_pass:.values.ses_smtp_password_v4}'
+    ```
+
 * Log into the keycloak server using your personal admin user
 * Go to the `<customer_name>` realm
 * Configure -> "Realm Settings" -> Email
@@ -165,23 +171,28 @@ Since we only allow users to login to the <customer_name> using Google oauth, we
     ```
 
 * Bind a cluster role
-  1. After you ran the above command, you would be getting a output which will include the below command, just correct the clusterrolebinding `name` here.
+  1. After you ran the above command, you would be getting a output which will include the below command,
+     just correct the clusterrolebinding `name` here.
   2. The url should be exactly same from the output of the above command.
-        ```
+
+        ```sh
         kubectl create clusterrolebinding <your-username>-oidc-cluster-admin --clusterrole=cluster-admin --user='$KEYCLOAK_URL#<your-keycloak-userID>'
         ```
 
 * Set up the Kubernetes API server. Add the following options to the kube-apiserver:
-    ```
+
+    ```raw
     --oidc-issuer-url=$KEYCLOAK_URL
     --oidc-client-id=$CLIENT_ID
     ```
+
     > k8s admin should have already done it via puppet/kops (get it confirmed by the k8s admin)
 
 * Set up the kubeconfig
 
   1. Run the following command to add the oidc user in your `kubeconfig` file.
-      ```
+
+      ```bash
       kubectl config set-credentials oidc \
         --exec-api-version=client.authentication.k8s.io/v1beta1 \
         --exec-command=kubectl \
@@ -192,8 +203,9 @@ Since we only allow users to login to the <customer_name> using Google oauth, we
         --exec-arg=--oidc-client-secret=$CLIENT_SECRET
       ```
 
-  2.  Or directly copy below in your `kubeconfig` file.
-      ```
+  2. Or directly copy below in your `kubeconfig` file.
+
+      ```yaml
       users:
       - name: oidc
         user:
@@ -211,14 +223,17 @@ Since we only allow users to login to the <customer_name> using Google oauth, we
       ```
 
   3. Once done set the `oidc` user for current context.
-      ```
+
+      ```bash
       kubectl config set-context --user oidc $(kubectl config get-contexts -o name)
       ```
 
 * Verify cluster access
-  ```
+
+  ```bash
   kubectl get nodes
   ```
+
 ## Create Keycloak Group based Cluster RBAC autherization
 
 * Login to keycloak as admin
@@ -232,17 +247,21 @@ Since we only allow users to login to the <customer_name> using Google oauth, we
   ![new mapper](static/mapper.png)
 
 * Once done, you can go ahead create all the respective groups you want in keycloak.
-  1. From [Keycloak homepage](https://keycloak.your.domain.com/auth/admin/master/console/) go to [groups](https://keycloak.your.domain.com/auth/admin/master/console/#/realms/master/groups) and click on `new`
+  1. From [Keycloak homepage](https://keycloak.your.domain.com/auth/admin/master/console/)
+     go to [groups](https://keycloak.your.domain.com/auth/admin/master/console/#/realms/master/groups) and click on `new`
   2. Provide the new group's name and click save.
 
 * Add the users to the group
-  1. From [Keycloak homepage](https://keycloak.your.domain.com/auth/admin/master/console/) go to [users](https://keycloak.your.domain.com/auth/admin/master/console/#/realms/master/users) and click on `View all users`
+  1. From [Keycloak homepage](https://keycloak.your.domain.com/auth/admin/master/console/)
+     go to [users](https://keycloak.your.domain.com/auth/admin/master/console/#/realms/master/users)
+     and click on `View all users`
   2. Go `Groups`
   3. Select the group you want to add the user to from the `Available Groups` table
   4. Click on `Join`
 
 * Create the respective RBAC policy in kubernetes cluster
-    ```
+
+    ```yaml
     apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRoleBinding
     metadata:
@@ -256,6 +275,7 @@ Since we only allow users to login to the <customer_name> using Google oauth, we
       name: <clusterRole name that you want to map the group to>
       apiGroup: rbac.authorization.k8s.io
     ```
+
 * Refresh your `id-token` retrived from keycloak and you are good to go.
 
 ---
@@ -264,20 +284,26 @@ Since we only allow users to login to the <customer_name> using Google oauth, we
 
 * Select realm 'master'
 
-    NOTE: `master` realm is sacred, so add user wisely in this realm and for other purpose just use another realm (most of the cases there will be `devops` realm)
-* From [Keycloak homepage](https://keycloak.your.domain.com/auth/admin/master/console/) go to [users](https://keycloak.your.domain.com/auth/admin/master/console/#/realms/master/users) and click on `View all users`
+    NOTE: `master` realm is sacred, so add user wisely in this realm and
+    for other purpose just use another realm (most of the cases there will be `devops` realm)
+* From [Keycloak homepage](https://keycloak.your.domain.com/auth/admin/master/console/)
+  go to [users](https://keycloak.your.domain.com/auth/admin/master/console/#/realms/master/users) i
+  and click on `View all users`
 * Click on `Add User`
 * Add the relevant details and under `Required User Actions` add `Update Password` (so user can change password on login)
 * Click on `Save`
 * Click on `Credentials` and give the random password and share it with the end user, make sure `Temporary` is **ON**
-* Click on `Role Mappings` and under `Available Roles` select `admin` and click on `Add Selected` (it automatically saves and you should see green colour popup alert toolbox)
+* Click on `Role Mappings` and under `Available Roles` select `admin` and
+  click on `Add Selected` (it automatically saves and you should see green colour popup alert toolbox)
 
-    NOTE: `admin` role is quite powerful, so be cautious about this when assigning this role and its only available in `master` realm
+  NOTE: `admin` role is quite powerful, so be cautious about this when assigning this role and
+  its only available in `master` realm
 
 ## Troubleshooting
 
 * Remove all cache session and run all the steps in the Setup the client.
-  ```
+
+  ```bash
   # rm -fr ~/.kube/cache/oidc-login
 
   # kubectl delete clusterrolebinding <your-username>-oidc-cluster-admin
@@ -293,12 +319,16 @@ The keycloak recovery/reconfiguration can also be done by exporting the realm an
 * `clients` -> ON
 * Click on `Export`
 
-This will download the real and the respective settings as a `.json` file which can later be used to import the settings from `https://<keycloack-url>/auth/admin/master/console/#/realms/master/partial-import`.
+This will download the real and the respective settings as a `.json` file which can later be used to import the
+settings from `https://<keycloack-url>/auth/admin/master/console/#/realms/master/partial-import`.
 
-The same can also be done through the argocd UI. You can go ahead and delete the app from the argocd UI which doesn't seem to delete the PVC/PV, therefore when you sync the root app and the keycloak app next it will use the same PVC/PV.
+The same can also be done through the argocd UI. You can go ahead and delete the app from the argocd UI,
+which doesn't seem to delete the PVC/PV, therefore when you sync the root app and i
+the keycloak app next it will use the same PVC/PV.
+
 Restoring itself to the point previously setup and configured to.
 
 ## Good "Reads"
 
-* https://medium.com/keycloak/github-as-identity-provider-in-keyclaok-dca95a9d80ca
-* https://www.youtube.com/watch?v=duawSV69LDI
+* <https://medium.com/keycloak/github-as-identity-provider-in-keyclaok-dca95a9d80ca>
+* <https://www.youtube.com/watch?v=duawSV69LDI>
