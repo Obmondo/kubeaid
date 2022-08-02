@@ -1,1 +1,49 @@
-
+mattermost-team-edition:
+  image:
+    repository: mattermost/mattermost-team-edition
+    tag: 6.7.0@sha256:cf0c182aeff6553d93e33485858c3dd9de1c8dd73d140dda18d926721f8ff7a0
+  ingress:
+    enabled: true
+    path: /
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      kubernetes.io/ingress.class: traefik-cert-manager
+  mysql:
+    enabled: false
+  externalDB:
+    enabled: true
+  extraEnvVars:
+  - name: MM_DB_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: mattermost.mattermost-pgsql.credentials.postgresql.acid.zalan.do
+        key: username
+  - name: MM_DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: mattermost.mattermost-pgsql.credentials.postgresql.acid.zalan.do
+        key: password
+  - name: MM_SQLSETTINGS_DATASOURCE
+    value: postgres://$(MM_DB_USERNAME):$(MM_DB_PASSWORD)@mattermost-pgsql:5432/mattermost?sslmode=require&connect_timeout=10
+  - name: MM_GITLABSETTINGS_ID
+    valueFrom:
+      secretKeyRef:
+        name: mattermost-team-config
+        key: gitlabsettings-id
+  - name: MM_GITLABSETTINGS_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: mattermost-team-config
+        key: gitlabsettings-secret
+  config:
+    MM_SQLSETTINGS_DRIVERNAME: "postgres"
+    POSTGRES_DB_NAME_MATTERMOST: "mattermost"
+    MM_TEAMSETTINGS_ENABLEUSERCREATION: "true"
+    MM_GITLABSETTINGS_ENABLE: "true"
+    MM_FILESETTINGS_DIRECTORY: "/mattermost/data/"
+    MM_PLUGINSETTINGS_ENABLEUPLOADS: "true"
+  # For fixing the permissions of the mattermost directory
+  securityContext:
+    runAsUser: 2000
+    runAsGroup: 2000
+    fsGroup: 2000
