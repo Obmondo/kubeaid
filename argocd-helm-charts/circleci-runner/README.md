@@ -1,17 +1,18 @@
-## CircleCI Runner
+# CircleCI Runner
 
 NOTE: there is no helm package given by the upstream guys, so have build it by forking it under Obmondo org
 so you can download the chart under main branch and a PR is also raised https://github.com/CircleCI-Public/circleci-runner-k8s/pull/11/files
 this is just a workaround, if you need to change anything in the helm chart, just push it to the main branch of
 Obmondo fork.
 
-#### CircleCI CLI Setup
+## CircleCI CLI Setup
 
 * Install cli https://circleci.com/docs/2.0/local-cli/index.html#installation
-* Need github organisation admin, you can create here (API Personal Token)[https://circleci.com/docs/2.0/managing-api-tokens/#creating-a-personal-api-token]
-  NOTE: The project api token didn't worked and end up authentication issue when creating a namespace in circleci, so watchout for that
+* Need github organisation admin, you can create here [API Personal Token](https://circleci.com/docs/2.0/managing-api-tokens/#creating-a-personal-api-token)
+  NOTE: The project api token didn't worked and end up authentication issue when creating a namespace in circleci,
+        so watchout for that
 
-```
+```sh
 # sudo snap install circleci
 
 # circleci setup
@@ -41,47 +42,48 @@ api:
 +----------------------------------------+---------------------+
 ```
 
-#### Create Secret
+### Create Secret
 
-```
+```sh
 kubectl create secret generic circleci-runner-token -n circleci --dry-run=client --from-literal=resourceClass=ci-feature-branch-deployment/testing01 --from-literal=runnerToken=xxxx -o yaml | kubeseal --controller-name sealed-secrets --controller-namespace system --cert /tmp/staging.pem -o yaml - > /tmp/circleci-runner-token.yaml
 ```
 
-#### Create KUBECONFIG
+### Create KUBECONFIG
 
-NOTE: This is using **circleci-runner** serviceaccount and namespace, so if you change the default values, make sure you change the command line thereupon.
+NOTE: This is using **circleci-runner** serviceaccount and namespace, so if you change the default values,
+      make sure you change the command line thereupon.
 
-```
+```sh
 # Save the CA cert
 # kubectl get secret $(kubectl get serviceaccount circleci-runner -n circleci-runner -o yaml | yq eval '.secrets.[].name' -) -n circleci-runner -o yaml | yq eval '.data."ca.crt"' - | base64 --decode > /tmp/staging.ca.crt
 ```
 
-```
+```sh
 # Add the cluster in the config file
 # kubectl config --kubeconfig /tmp/kube.config set-cluster your-clustername --embed-certs=true --server="https://kubernetes.default.svc" --certificate-authority=/tmp/staging.ca.crt
 ```
 
-```
+```sh
 # Add the credentials for the circleci-runner serviceaccount
 # kubectl config --kubeconfig /tmp/kube.config set-credentials circleci-runner --token=$(kubectl get secret $(kubectl get serviceaccount circleci-runner -n circleci-runner -o yaml | yq eval '.secrets.[].name' -) -n circleci-runner -o yaml | yq eval '.data."token"' - | base64 --decode)
 ```
 
-```
+```sh
 # Add the context
 # kubectl config --kubeconfig /tmp/kube.config set-context your-clustername --cluster=your-clustername --user=circleci-runner
 ```
 
-```
+```sh
 # Set the current context
 # kubectl config --kubeconfig /tmp/kube.config use-context your-clustername
 ```
 
-```
+```sh
 # Create the KUBECONFIG encoded
 # cat /tmp/kube.config | base64 --wrap=0
 ```
 
-#### Add Environment variable in CircleCI Project or Organization (You have to take a call here)
+### Add Environment variable in CircleCI Project or Organization (You have to take a call here)
 
 * Goto CircleCI dashboard
 * Select **Project**
@@ -89,9 +91,10 @@ NOTE: This is using **circleci-runner** serviceaccount and namespace, so if you 
 * Select **Environment Variables**
 * Select **Add Environment Variable**
 * Name: KUBECONFIG_DATA
-* Value: <your base64 encoded of kube.config>
+* Value: your base64 encoded of kube.config
 
-#### Blogs
+### Blogs
+
 * https://medium.com/devopstricks/ci-cd-with-gitlab-kubernetes-399f81ac91ae
 * https://blog.lwolf.org/post/how-to-create-ci-cd-pipeline-with-autodeploy-k8s-gitlab-helm/
 * https://www.vadosware.io/post/level-one-automated-k8s-deployments-with-gitlab-ci/#step-0-have-a-kubernetes-cluster
