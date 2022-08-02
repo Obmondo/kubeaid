@@ -1,0 +1,42 @@
+annotations:
+  artifacthub.io/changes: |
+    - kind: added
+      description: "adding tolerations and affinity to change password hooks"
+    - kind: added
+      description: "Add documentation to setup web context via environment variable"
+    - kind: added
+      description: "Add automount service account token flag"
+    - kind: fixed
+      description: "Fix issue with additional network policy"
+    - kind: changed
+      description: "updated SonarQube to 9.5.0"
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/images: |
+    - name: sonarqube
+      image: sonarqube:9.5.0-community
+  artifacthub.io/links: |
+    - name: support
+      url: https://community.sonarsource.com/
+    - name: Chart Source
+      url: https://github.com/SonarSource/helm-chart-sonarqube/tree/master/charts/sonarqube
+apiVersion: v1
+appVersion: 9.5.0
+description: SonarQube offers Code Quality and Code Security analysis for up to 27
+  languages. Find Bugs, Vulnerabilities, Security Hotspots and Code Smells throughout
+  your workflow.
+home: https://www.sonarqube.org/
+icon: https://www.sonarqube.org/assets/logo-31ad3115b1b4b120f3d1efd63e6b13ac9f1f89437f0cf6881cc4d8b5603a52b4.svg
+keywords:
+- coverage
+- security
+- code
+- quality
+kubeVersion: '>= 1.19.0-0'
+maintainers:
+- email: leo.geoffroy+helm@sonarsource.com
+  name: leo-geoffroy-sonarsource
+name: sonarqube
+sources:
+- https://github.com/SonarSource/docker-sonarqube
+- https://github.com/SonarSource/sonarqube
+version: 4.0.2+325
