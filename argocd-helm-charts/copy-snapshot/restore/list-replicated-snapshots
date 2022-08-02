@@ -1,7 +1,0 @@
-#!/usr/local/bin/bash
-
-SOURCE_REGION=eu-west-1
-DESTINATION_REGION=eu-west-3
-
-aws ec2 describe-snapshots --region ${DESTINATION_REGION} --filters Name="tag-key",Values="velero.io/schedule-name" | jq -re '.Snapshots[] | .Tags + [{Key: "VolumeSize", Value: .VolumeSize}] | from_entries | "Velero backup: "+ ."velero.io/backup" +"  Namespace: "+ ."kubernetes.io/created-for/pvc/namespace" +"  PVC: "+ ."kubernetes.io/created-for/pvc/name"+"  Size: "+ (.VolumeSize|tostring)+" GiB"' | sort
-
