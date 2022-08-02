@@ -1,4 +1,4 @@
-# Traefik Setup.
+# Traefik Setup
 
 ## Internal
 
@@ -25,7 +25,7 @@ service:
 * We setup an internal service which will have an internet-facing loadbalance IP.
   you will have to add these service annotation in your yaml file
 
-### AWS
+### AWS Public
 
 ```yaml
 service:
@@ -33,7 +33,7 @@ service:
     service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
 ```
 
-### AKS
+### AKS Public
 
 ```yaml
 service:

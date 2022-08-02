@@ -35,6 +35,7 @@ kubectl -n argocd get ing argo-cd-argocd-server -o jsonpath={.status}
 
 source: https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/keycloak/
 
+```raw
 * To add any new user into argocd as an admin
   login to keycloak
   -> Users
@@ -42,3 +43,4 @@ source: https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management
   -> Under `groups` tab
   -> Select the required group (See values for argocd https://<k8id-config-repo-url>/-/blob/main/k8s/<clustername>/argocd-apps/values-argo-cd.yaml under policy.csv)
   -> done
+```
