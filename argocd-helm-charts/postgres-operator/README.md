@@ -2,7 +2,8 @@
 
 ## Summary
 
-Postgres-operator is used to manage Postgres instances, including high-availability setups with master and multiple slaves, and automatic failover and backups of data to offsite location.
+Postgres-operator is used to manage Postgres instances, including high-availability setups with master and
+multiple slaves, and automatic failover and backups of data to offsite location.
 
 Here is an example of how to setup a postgresql instance, using this operator:
 
@@ -29,10 +30,12 @@ spec:
   enableMasterLoadBalancer: false
 ```
 
-NB. The Postgres-operator is instatlled in the ```system``` namespace as it is to be used for MANY postgresql instances - preferrably ALL in the cluster - so backup and high-availability works the same for all.
+NB. The Postgres-operator is instatlled in the ```system``` namespace as it is to be used for
+MANY postgresql instances - preferrably ALL in the cluster - so backup and high-availability works the same for all.
 
 Example per-cluster values for AWS cluster:
-```
+
+```yaml
 postgres-operator:
   configAwsOrGcp:
     aws_region: 'eu-west-1'

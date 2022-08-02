@@ -1,6 +1,6 @@
-This repository is only for public apps, supported by Obmondo. Private apps go in users k8id-config repo, under k8s/argocd-helm-charts/<chartname>
-
 # Updating argocd-helm-charts applications
+
+This repository is only for public apps, supported by Obmondo. Private apps go in users k8id-config repo, under `k8s/argocd-helm-charts/<chartname>`
 
 ## Test update - with current values files
 
@@ -9,7 +9,6 @@ This repository is only for public apps, supported by Obmondo. Private apps go i
 ```bash
   helm dep up ./<application-folder-name>
   helm template ./<application-folder-name> --values ./<application-folder-name>/values.yaml --values /path/to/cluster-specific-values.yaml > before.yaml
-
 ```
 
 - Update the umbrella and Upstream chart versions in `Chart.yaml`
@@ -58,32 +57,40 @@ This repository is only for public apps, supported by Obmondo. Private apps go i
 
 Locally add the repo of the chart first.
 
-```
+```bash
 helm repo add repo url
 ```
 
 using ```bitnami``` f. ex:
 
-```
+```bash
 helm repo add bitnami https://charts.bitnami.com/bitnami
 ```
 
-You should then pull the chart locally with the ```--untar``` option to unpack it under folder in ```argocd-helm-charts/``` manually with:
+You should then pull the chart locally with the ```--untar``` option to unpack it under folder
+in ```argocd-helm-charts/``` manually with:
 
-```
+```bash
 helm pull --untar repo/chart
 ```
 
 Working with ```dokuwiki``` for example:
 
-```
+```bash
 helm pull --untar bitnami/dokuwiki
 ```
 
-You should put the unpacked folder under a ```charts``` folder - ```argocd-helm-charts/dokuwiki/charts/dokuwiki``` then add ```templates``` folder, ```Chart.yaml``` and ```values.yaml``` to setup our umbrella chart. Kindly check other charts to correctly define the ```Chart.yaml```.
+You should put the unpacked folder under a
+
+- `charts` folder
+- `argocd-helm-charts/dokuwiki/charts/dokuwiki`
+- add `templates` folder
+- `Chart.yaml`
+- `values.yaml` to setup our umbrella chart.
+- Kindly check other charts to correctly define the `Chart.yaml`.
 
 Then locally run the dependency update to get the charts updated from the upstream repo:
 
-```
+```bash
 helm dep up dokuwiki
 ```

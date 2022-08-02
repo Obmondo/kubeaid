@@ -5,7 +5,6 @@ only be read by the controller, so we can safely store them in repo.
 
 ## How to add a sealed secret
 
-
 ### Create a json/yaml-encoded secret somehow
 
 You can turn any kubernetes secret into a sealed secret, so it doesnt matter how the normal secret was created, but here
@@ -31,7 +30,6 @@ kubectl create secret --namespace system --dry-run=client docker-registry myDock
 ```
 
 Using kubeseal, the secret can then be converted to a sealed secret.
-
 
 ```sh
 # for using local public cert

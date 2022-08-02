@@ -21,7 +21,8 @@ Let argocd do the rest
 
 ## CI User setup
 
-Copy the files from the gitlab-runner/templates to the desired helm chart and raise the MR to get it merged. Once merged, create the kubeconfig with the script below and it should then be set as variables on the CI.
+Copy the files from the gitlab-runner/templates to the desired helm chart and raise the MR to get it merged.
+Once merged, create the kubeconfig with the script below and it should then be set as variables on the CI.
 
 ```bash
 #!/bin/bash
