@@ -1,10 +1,55 @@
 # SonarQube Chart Changelog
 All changes to this chart will be documented in this file.
 
+## [4.0.2]
+* Fix issue with Openshift route name to use use fullname instead of name
+
+## [4.0.1]
+* Add documentation for ingress annotations
+
+## [4.0.0]
+* updated SonarQube to 9.5.0
+
+## [3.0.4]
+* Fix issue with additional network policy
+
+## [3.0.3]
+* Add automount service account token flag
+
+## [3.0.2]
+* Add documentation to setup web context via environment variable
+
+## [3.0.1]
+* Fix for issue (#215)[https://github.com/SonarSource/helm-chart-sonarqube/issues/215], adding tolerations and affinity to change password hooks
+
+## [3.0.0]
+* updated SonarQube to 9.4.0
+
+## [2.0.7]
+* Specify location of .netrc file when downloading plugins that require auth
+
+## [2.0.6]
+* Specify service account name in change admin password hook
+
+## [2.0.5]
+* secure admin password in k8s secret
+
+## [2.0.4]
+* no longer automount service account token
+
+## [2.0.3]
+* changed description of dependency postgresql chart
+
+## [2.0.2]
+* changed links to get a better overview of sources
+
+## [2.0.1]
+* Updated all instances of the caCerts enabled check
+
 ## [2.0.0]
 * updated SonarQube to 9.3.0
 
-## [1.6.5]
+## [1.6.5]
 * add securitycontext to wait-for-db and change-password hook
 
 ## [1.6.4]

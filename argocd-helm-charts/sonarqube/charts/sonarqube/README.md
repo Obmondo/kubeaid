@@ -129,11 +129,12 @@ The following table lists the configurable parameters of the Sonarqube chart and
 | `podLabels` | Map of labels to add to the pods | `{}` |
 | `env` | Environment variables to attach to the pods | `{}`|
 | `annotations` | Sonarqube Pod annotations | `{}` |
-| `edition` | SonarQube Edition to use | `community` |
+| `edition` | SonarQube Edition to use (e.g. `community`, `developer` or `enterprise`) | `community` |
 
 ### NetworkPolicies
 
 | Parameter | Description | Default |
+| --------- | ----------- | ------- |
 | `networkPolicy.enabled` | Create NetworkPolicies | `false` |
 | `networkPolicy.prometheusNamespace` | Allow incoming traffic to monitoring ports from this namespace | `nil` |
 | `networkPolicy.additionalNetworkPolicys` | User defined NetworkPolicies (usefull for external database) | `nil` |
@@ -194,6 +195,7 @@ The following table lists the configurable parameters of the Sonarqube chart and
 | `ingress.hosts[0].servicePort` | Optional field to override the default servicePort of a path | `None` |
 | `ingress.tls` | Ingress secrets for TLS certificates | `[]` |
 | `ingress.ingressClassName` | Optional field to configure ingress class name | `None` |
+| `ingress.annotations` | Optional field to add extra annotations to the ingress | `None` |
 
 ### Route
 
@@ -328,9 +330,8 @@ The following table lists the configurable parameters of the Sonarqube chart and
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
 | `postgresql.enabled` | Set to `false` to use external server  | `true` |
-| `postgresql.existingSecret` | (DEPRECATED) Secret containing the password of the external Postgresql server | `null` |
-| `postgresql.existingSecretPasswordKey` | (DEPRECATED) Secret Key containing the password of the external Postgresql server | `postgresql-password` |
-| `postgresql.postgresqlServer` | (DEPRECATED) Hostname of the external Postgresql server | `null` |
+| `postgresql.existingSecret` |  existingSecret Name of existing secret to use for PostgreSQL passwords | `nil` |
+| `postgresql.postgresqlServer` | (DEPRECATED) Hostname of the external Postgresql server | `nil` |
 | `postgresql.postgresqlUsername` | Postgresql database user | `sonarUser` |
 | `postgresql.postgresqlPassword` | Postgresql database password | `sonarPass` |
 | `postgresql.postgresqlDatabase` | Postgresql database name | `sonarDB` |
@@ -361,11 +362,12 @@ The following table lists the configurable parameters of the Sonarqube chart and
 
 ### ServiceAccount
 
-| Parameter | Description | Default |
-| --------- | ----------- | ------- |
-| `serviceAccount.create` | If set to true, create a serviceAccount | `false` |
-| `serviceAccount.name` | Name of the serviceAccount to create/use | `sonarqube-sonarqube` |
-| `serviceAccount.annotations` | Additional serviceAccount annotations | `{}` |
+| Parameter                       | Description                                                                          | Default               |
+|---------------------------------|--------------------------------------------------------------------------------------|-----------------------|
+| `serviceAccount.create`         | If set to true, create a serviceAccount                                              | `false`               |
+| `serviceAccount.name`           | Name of the serviceAccount to create/use                                             | `sonarqube-sonarqube` |
+| `serviceAccount.automountToken` | Manage `automountServiceAccountToken` field for mounting service account credentials | `false`               |
+| `serviceAccount.annotations`    | Additional serviceAccount annotations                                                | `{}`                  |
 
 ### ExtraConfig
 
