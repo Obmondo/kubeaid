@@ -8,4 +8,5 @@ defaults
 .terraform*
 .terragrunt*
 *.~undo-tree~
-
+argocd-helm-charts/sonarqube/charts/sonarqube/charts/ingress-nginx/
+argocd-helm-charts/sonarqube/charts/sonarqube/charts/postgres/
