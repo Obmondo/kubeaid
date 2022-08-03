@@ -8,6 +8,10 @@ terraform {
     kubernetes = {
       version = ">= 1.22.6"
     }
+
+    external = {
+      version = ">=1.1.0"
+    }
   }
 }
 
