@@ -53,11 +53,14 @@
     min_node_count: 1
     max_node_count: 3
     private_cluster_enabled: true
+    private_cluster_public_fqdn_enabled: true
+    wg_resource_group: "obmondo-aks"
+    wg_vnet_name: "obmondo-vnet"
+    wg_vnet_id: "abcd"
     storage_account: "abc"
     container: "abcd"
     argocd_admin_password: "Testing@123"
     argocd_admin_bcrypt_password: $2a$10$KdHplv8yqG3pwtC3L.McZuzY3EJ74d0GB6lDs7dt9w8shrEQkhcQ.
-    domain_name: "your-domain.com"
     environment: "test"
     argocd_repos:
       k8id:
