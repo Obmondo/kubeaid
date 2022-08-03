@@ -23,3 +23,17 @@ resource "azurerm_kubernetes_cluster" "k8s" {
      type = "SystemAssigned"
     }
 }
+
+;; This can be bit intimidating. We are using the bash since terraform right now doesn't support mixed type in json values
+;; https://github.com/hashicorp/terraform/issues/13991 https://github.com/hashicorp/terraform/issues/12256
+
+data "external" "cluster_vnet_name" {
+  program    = ["bash", "${path.module}/get_vnet_name.sh", "MC_${var.resource_group}_${var.cluster_name}_${var.location}"]
+  depends_on = [azurerm_kubernetes_cluster.k8s]
+}
+
+data "external" "cluster_vnet_id" {
+  program    = ["bash", "${path.module}/get_vnet_id.sh", "MC_${var.resource_group}_${var.cluster_name}_${var.location}"]
+  depends_on = [azurerm_kubernetes_cluster.k8s]
+}
+
