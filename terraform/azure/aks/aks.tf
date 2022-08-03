@@ -9,7 +9,7 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     dns_prefix              = var.dns_prefix
     kubernetes_version      = var.kubernetes_version
     private_cluster_enabled = var.private_cluster_enabled
-
+    private_cluster_public_fqdn_enabled = true
     default_node_pool {
         name                = "agentpool"
         node_count          = var.agent_count
@@ -24,16 +24,16 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     }
 }
 
-;; This can be bit intimidating. We are using the bash since terraform right now doesn't support mixed type in json values
-;; https://github.com/hashicorp/terraform/issues/13991 https://github.com/hashicorp/terraform/issues/12256
+# This can be bit intimidating. We are using the bash since terraform right now doesn't support mixed type in json values
+# https://github.com/hashicorp/terraform/issues/13991 https://github.com/hashicorp/terraform/issues/12256
 
 data "external" "cluster_vnet_name" {
-  program    = ["bash", "${path.module}/get_vnet_name.sh", "MC_${var.resource_group}_${var.cluster_name}_${var.location}"]
+  program    = ["bash", "${path.module}/get_vnet_details.sh", "MC_${var.resource_group}_${var.cluster_name}_${var.location}", "name"]
   depends_on = [azurerm_kubernetes_cluster.k8s]
 }
 
 data "external" "cluster_vnet_id" {
-  program    = ["bash", "${path.module}/get_vnet_id.sh", "MC_${var.resource_group}_${var.cluster_name}_${var.location}"]
+  program    = ["bash", "${path.module}/get_vnet_details.sh", "MC_${var.resource_group}_${var.cluster_name}_${var.location}", "id"]
   depends_on = [azurerm_kubernetes_cluster.k8s]
 }
 
