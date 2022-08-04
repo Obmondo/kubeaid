@@ -1,3 +1,50 @@
+{{- if kindIs "slice" .Values.issuer -}}
+{{- range $k, $v := .Values.issuer -}}
+apiVersion: cert-manager.io/vashish
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt
+spec:
+  acme:
+    email: {{ $v.issuerEmail }}
+    preferredChain: ""
+    privateKeySecretRef:
+      name: {{ $v.secret }}
+    {{- if $v.production }}
+    server: https://acme-v02.api.letsencrypt.org/directory
+    {{- else }}
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    {{- end }}
+    {{- if eq (toString $v.cloudProvider) "cloudflare" }}
+    solvers:
+    - dns01:
+        {{ $v.cloudProvider }}:
+          email: {{ $v.issuerEmail }}
+          apiTokenSecretRef:
+            name: {{ $v.cloudProviderSecret }}
+            key: api-token
+    {{- else if eq (toString $v.cloudProvider) "route53" }}
+    solvers:
+    - dns01:
+        {{ $v.cloudProvider }}:
+          region: {{ $v.region }}
+          {{- if $v.hostedZoneID }}
+          hostedZoneID: {{ $v.hostedZoneID }}
+          {{- end }}
+      selector:
+        dnsZones:
+          {{- range $v.dnsZones }}
+          - {{ . | quote }}
+          {{- end }}
+    {{- else }}
+    solvers:
+    - http01:
+        ingress:
+          class: traefik-cert-manager
+    {{- end }}
+---
+{{- end }}
+{{ else -}}
 {{- if .Values.issuer.enabled -}}
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -41,4 +88,5 @@ spec:
         ingress:
           class: traefik-cert-manager
     {{- end }}
+{{- end }}
 {{- end }}
