@@ -7,6 +7,6 @@ cert-manager:
     leaderElection:
       namespace: cert-manager
 issuer:
-  enabled: true
+  enabled: false
   production: false
 networkpolicies: false
