@@ -9,6 +9,14 @@ local remove_nulls = (
 local ext_vars = std.extVar('vars');
 
 local default_vars = {
+  //TODO: add these namespace automatically based on the mixins is enabled
+  prometheus_scrape_namespaces: [
+    'argocd',
+    'velero',
+    'sealedsecrets',
+    'cert-manager',
+    'etcd',
+  ],
   prometheus_operator_resources: {
     limits: { cpu: '100m', memory: '80Mi' },
     requests: { cpu: '10m', memory: '30Mi' },
@@ -114,6 +122,9 @@ local kp =
 
       common+: {
         namespace: 'monitoring',
+      },
+      prometheus+: {
+        namespaces+: vars.prometheus_scrape_namespaces,
       },
       prometheusOperator+: {
         resources: vars.prometheus_operator_resources,
