@@ -97,7 +97,7 @@
    Assuming you have already created the `k8s/<clustername>/argocd-apps` in your kube config repo
 
    ```sh
-   helm template k8s/<clustername>/argocd-apps --show-only templates/root.yaml | kubectl apply -f
+   helm template k8s/<clustername>/argocd-apps --show-only templates/root.yaml | kubectl apply -f -
    ```
 
 ### Setup Kubernetes cluster on AWS with Kops
