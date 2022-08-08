@@ -18,6 +18,10 @@ argo-cd:
     replicas: 1
     autoscaling:
       enabled: true
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
   server:
     additionalProjects:
     - name: argocd
@@ -68,3 +72,19 @@ argo-cd:
           kind: "*"
       orphanedResources:
         warn: true
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+  controller:
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+  redis:
+    metrics:
+      enabled: true
+      image:
+        repository: bitnami/redis-exporter
+      serviceMonitor:
+        enabled: true
