@@ -19,9 +19,11 @@ resource "sealedsecret_local" "argocd_repos" {
   ]
 }
 
-resource "local_file" "argocd-secret" {
-  filename = "argocd-secret.yaml"
-  content  = sealedsecret_local.argocd_repos.yaml_content
+resource "kubectl_manifest" "argocd_secret" {
+  yaml_body         = sealedsecret_local.argocd_repos.yaml_content
+  force_new         = true
+  server_side_apply = true
+  wait              = true
 }
 
 resource "helm_release" "argocd" {
@@ -35,21 +37,15 @@ resource "helm_release" "argocd" {
     file("argocd.yaml")
   ]
   depends_on       = [
-    sealedsecret_local.argocd_repos,
+    kubectl_manifest.argocd_secret
   ]
-}
-
-resource "kubectl_manifest" "argocd_secret" {
-  yaml_body         = sealedsecret_local.argocd_repos.yaml_content
-  force_new         = true
-  server_side_apply = true
-  wait              = true
 }
 
 resource "argocd_repository" "argocd_repos" {
   for_each        = var.argocd_repos
   ssh_private_key = file(each.value.ssh_private_key)
   repo            = each.value.url
+  type            = "git"
   depends_on      = [
     helm_release.argocd
   ]
