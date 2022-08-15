@@ -19,18 +19,30 @@ resource "sealedsecret_local" "argocd_repos" {
   ]
 }
 
+resource "kubernetes_namespace" "argocd" {
+  metadata {
+    name = "argocd"
+  }
+  depends_on = [
+    sealedsecret_local.argocd_repos,
+  ]
+}
+
 resource "kubectl_manifest" "argocd_secret" {
   yaml_body         = sealedsecret_local.argocd_repos.yaml_content
   force_new         = true
   server_side_apply = true
   wait              = true
+  depends_on        = [
+    kubernetes_namespace.argocd
+  ]
 }
 
 resource "helm_release" "argocd" {
   name             = "argo-cd"
   chart            = "argo-cd"
   repository       = "https://argoproj.github.io/argo-helm"
-  create_namespace = true
+  create_namespace = false
   namespace        = "argocd"
   version          = "3.29.5"
   values           = [

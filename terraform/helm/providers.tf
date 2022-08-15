@@ -14,6 +14,11 @@ terraform {
       source  = "gavinbunney/kubectl"
       version = ">= 1.7.0"
     }
+
+    kubernetes = {
+      source = "hashicorp/kubernetes"
+      version = "2.12.1"
+    }
   }
 }
 
@@ -59,6 +64,13 @@ provider "argocd" {
 }
 
 provider "kubectl" {
+  host                   = var.k8s_host
+  cluster_ca_certificate = base64decode(var.k8s_cluster_ca_certificate)
+  client_certificate     = base64decode(var.k8s_client_certificate)
+  client_key             = base64decode(var.k8s_client_key)
+}
+
+provider "kubernetes" {
   host                   = var.k8s_host
   cluster_ca_certificate = base64decode(var.k8s_cluster_ca_certificate)
   client_certificate     = base64decode(var.k8s_client_certificate)
