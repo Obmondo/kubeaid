@@ -19,7 +19,7 @@ output "cluster_ca_certificate" {
 }
 
 output "k8s_fqdn" {
-  value = azurerm_kubernetes_cluster.k8s.fqdn
+  value = "https://${azurerm_kubernetes_cluster.k8s.fqdn}"
 }
 
 output "private_fqdn" {
