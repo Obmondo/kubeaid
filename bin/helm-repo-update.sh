@@ -176,7 +176,7 @@ function merge_request() {
                   -o merge_request.remove_source_branch \
                   -o merge_request.label="helm_chart_update" \
                   -o merge_request.label="ci_bot" \
-                  -o merge_request.merge_when_pipeline_succeed \
+                  -o merge_request.merge_when_pipeline_succeeds \
                   -o merge_request.description="Auto-generated merge request from Obmondo K8id CI, created from changes by ${GITLAB_USER_NAME} (${GITLAB_USER_EMAIL})." \
                   origin HEAD)
     echo "${output}"
@@ -207,7 +207,7 @@ if "$UPDATE_ALL"; then
   find ./"$ARGOCD_CHART_PATH" -maxdepth 1 -mindepth 1 -type d | sort | while read -r path; do
     chart_name=$(basename "$path")
 
-    git switch --create "${chart_name}_${CI_PIPELINE_IID}" --track "origin/master"
+    git switch --create "${chart_name}_${CI_JOB_ID}" --track "origin/master"
 
     update_helm_chart "$path" "$CHART_VERSION"
 
