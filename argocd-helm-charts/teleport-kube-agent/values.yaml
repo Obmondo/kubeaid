@@ -1,0 +1,4 @@
+teleport-kube-agent:
+  roles: kube
+  kubeClusterName: staging.example.com
+  proxyAddr: teleport.obmondo.com:443
