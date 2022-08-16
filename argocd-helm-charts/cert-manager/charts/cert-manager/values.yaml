@@ -74,6 +74,11 @@ image:
 # used. This namespace will not be automatically created by the Helm chart.
 clusterResourceNamespace: ""
 
+# This namespace allows you to define where the services will be installed into
+# if not set then they will use the namespace of the release
+# This is helpful when installing cert manager as a chart dependency (sub chart)
+namespace: ""
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -86,6 +91,9 @@ serviceAccount:
   # Optional additional labels to add to the controller's ServiceAccount
   # labels: {}
   automountServiceAccountToken: true
+
+# Automounting API credentials for a particular pod
+# automountServiceAccountToken: true
 
 # Additional command line flags to pass to cert-manager controller binary.
 # To see all available flags run docker run quay.io/jetstack/cert-manager-controller:<version> --help
@@ -108,17 +116,6 @@ resources: {}
 # ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 securityContext:
   runAsNonRoot: true
-# legacy securityContext parameter format: if enabled is set to true, only fsGroup and runAsUser are supported
-# securityContext:
-#   enabled: false
-#   fsGroup: 1001
-#   runAsUser: 1001
-# to support additional securityContext parameters, omit the `enabled` parameter and simply specify the parameters
-# you want to set, e.g.
-# securityContext:
-#   fsGroup: 1000
-#   runAsUser: 1000
-#   runAsNonRoot: true
 
 # Container Security Context to be set on the controller component container
 # ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
@@ -332,6 +329,9 @@ webhook:
     # Automount API credentials for a Service Account.
     automountServiceAccountToken: true
 
+  # Automounting API credentials for a particular pod
+  # automountServiceAccountToken: true
+
   # The port that the webhook should listen on for requests.
   # In GKE private clusters, by default kubernetes apiservers are allowed to
   # talk to the cluster nodes only on 443 and 10250. so configuring
@@ -442,6 +442,9 @@ cainjector:
     # labels: {}
     automountServiceAccountToken: true
 
+  # Automounting API credentials for a particular pod
+  # automountServiceAccountToken: true
+
 # This startupapicheck is a Helm post-install hook that waits for the webhook
 # endpoints to become available.
 # The check is implemented using a Kubernetes Job- if you are injecting mesh
@@ -491,7 +494,8 @@ startupapicheck:
     #   cpu: 10m
     #   memory: 32Mi
 
-  nodeSelector: {}
+  nodeSelector:
+    kubernetes.io/os: linux
 
   affinity: {}
 
