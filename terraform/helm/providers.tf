@@ -52,6 +52,11 @@ provider "argocd" {
   username    = "admin"
   password    = var.argocd_admin_password
 
+  # NOTE: this is a wierd bug, have reported it here
+  # https://github.com/oboukili/terraform-provider-argocd/issues/196
+  # If the connection is failing, then just remove the comment and try again.
+  # plain_text  = true
+
   port_forward                = true
   port_forward_with_namespace = "argocd"
 
