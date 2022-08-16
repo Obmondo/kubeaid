@@ -1,6 +1,6 @@
 dependencies:
 - name: dokuwiki
   repository: https://charts.bitnami.com/bitnami
-  version: 12.5.8
-digest: sha256:2ab5f583bb748cc1ca7800971f9f21d3598ea358ca73f21713c80115589c36c0
-generated: "2022-07-11T09:48:29.739314996Z"
+  version: 13.0.0
+digest: sha256:7677b49f73b852aa06949364dadff78f440597212a5f30e508a8bedd0588b366
+generated: "2022-08-16T06:13:21.752490483Z"
