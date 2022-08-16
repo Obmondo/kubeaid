@@ -9,14 +9,15 @@ local remove_nulls = (
 local ext_vars = std.extVar('vars');
 
 local default_vars = {
-  //TODO: add these namespace automatically based on the mixins is enabled
-  prometheus_scrape_namespaces: [
+  prometheus_scrape_default_namespaces+: [
     'argocd',
+    'external-dns',
     'velero',
-    'sealedsecrets',
+    'system',
     'cert-manager',
-    'etcd',
+    'obmondo',
   ],
+
   prometheus_operator_resources: {
     limits: { cpu: '100m', memory: '80Mi' },
     requests: { cpu: '10m', memory: '30Mi' },
@@ -50,7 +51,7 @@ local default_vars = {
     sealedsecrets: true,
     etcd: true,
     velero: false,
-    certmanager: true,
+    'cert-manager': true,
   },
   mixin_configs: {
     // Example:
@@ -85,11 +86,18 @@ local mixins = remove_nulls([
     vars,
   ),
   addMixin(
-    'certmanager',
+    'cert-manager',
     (import 'gitlab.com/uneeq-oss/cert-manager-mixin/mixin.libsonnet'),
     vars,
   ),
 ]);
+
+local scrape_namespaces = std.uniq(std.sort(std.flattenArrays(
+  [
+    vars.prometheus_scrape_namespaces +
+    vars.prometheus_scrape_default_namespaces,
+  ]
+)));
 
 local kp =
   (import 'kube-prometheus/main.libsonnet') +
@@ -124,7 +132,8 @@ local kp =
         namespace: 'monitoring',
       },
       prometheus+: {
-        namespaces+: vars.prometheus_scrape_namespaces,
+        // [ i for i in scrape_namespaces if std.get(defaults.mixins, i) == true ],
+        namespaces+: scrape_namespaces,
       },
       prometheusOperator+: {
         resources: vars.prometheus_operator_resources,
