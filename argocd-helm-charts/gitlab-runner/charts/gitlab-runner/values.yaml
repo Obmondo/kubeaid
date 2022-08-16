@@ -46,13 +46,13 @@ imagePullPolicy: IfNotPresent
 # revisionHistoryLimit: 10
 
 ## The GitLab Server URL (with protocol) that want to register the runner against
-## ref: https://docs.gitlab.com/runner/commands/README.html#gitlab-runner-register
+## ref: https://docs.gitlab.com/runner/commands/index.html#gitlab-runner-register
 ##
 # gitlabUrl: http://gitlab.your-domain.com/
 
 ## The Registration Token for adding new Runners to the GitLab Server. This must
 ## be retrieved from your GitLab Instance.
-## ref: https://docs.gitlab.com/ce/ci/runners/README.html
+## ref: https://docs.gitlab.com/ce/ci/runners/index.html
 ##
 # runnerRegistrationToken: ""
 
@@ -68,7 +68,7 @@ imagePullPolicy: IfNotPresent
 ## Updating the runner's chart version or configuration will cause the runner container
 ## to be terminated and created again. This may cause your GitLab instance to reference
 ## non-existant runners. Un-registering the runner before termination mitigates this issue.
-## ref: https://docs.gitlab.com/runner/commands/README.html#gitlab-runner-unregister
+## ref: https://docs.gitlab.com/runner/commands/index.html#gitlab-runner-unregister
 ##
 ## Please set unregisterRunners to false if you set unregisterRunner to true as only
 ## one preStop action is supported.
@@ -80,7 +80,7 @@ imagePullPolicy: IfNotPresent
 ## Updating the runner's chart version or configuration will cause the runner container
 ## to be terminated and created again. This may cause your Gitlab instance to reference
 ## non-existant runners. Un-registering the runner before termination mitigates this issue.
-## ref: https://docs.gitlab.com/runner/commands/README.html#gitlab-runner-unregister
+## ref: https://docs.gitlab.com/runner/commands/index.html#gitlab-runner-unregister
 ##
 # unregisterRunners: true
 
@@ -95,7 +95,7 @@ terminationGracePeriodSeconds: 3600
 ## Set the certsSecretName in order to pass custom certficates for GitLab Runner to use
 ## Provide resource name for a Kubernetes Secret Object in the same namespace,
 ## this is used to populate the /home/gitlab-runner/.gitlab-runner/certs/ directory
-## ref: https://docs.gitlab.com/runner/configuration/tls-self-signed.html#supported-options-for-self-signed-certificates
+## ref: https://docs.gitlab.com/runner/configuration/tls-self-signed.html#supported-options-for-self-signed-certificates-targeting-the-gitlab-server
 ##
 # certsSecretName:
 
