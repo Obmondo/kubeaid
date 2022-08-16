@@ -9,6 +9,7 @@ local remove_nulls = (
 local ext_vars = std.extVar('vars');
 
 local default_vars = {
+  prometheus_scrape_namespaces: [],
   prometheus_scrape_default_namespaces+: [
     'argocd',
     'external-dns',
