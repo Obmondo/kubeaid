@@ -51,6 +51,15 @@ local default_vars = {
     name: 'kube-prometheus-stack-grafana',
     key: 'grafana-keycloak-secret',
   },
+  prometheus: {
+    storage: {
+      size: '10Gi',
+      classname: 'rook-ceph-block',
+    },
+  },
+  grafana_ingress_annotations: {
+    'cert-manager.io/cluster-issuer': 'letsencrypt',
+  },
   addMixins: {
     ceph: true,
     sealedsecrets: true,
@@ -67,7 +76,7 @@ local default_vars = {
   },
 };
 
-local vars = default_vars + ext_vars;
+local vars = std.mergePatch(default_vars, ext_vars);
 
 local mixins = remove_nulls([
   addMixin(
@@ -218,8 +227,8 @@ local kp =
                   kind: 'PersistentVolumeClaim',
                   spec: {
                     accessModes: ['ReadWriteOnce'],
-                    resources: { requests: { storage: '10Gi' } },
-                    storageClassName: 'rook-ceph-block',
+                    resources: { requests: { storage: vars.prometheus.storage.size } },
+                    storageClassName: vars.prometheus.storage.classname,
                   },
                 },
               },
@@ -238,7 +247,10 @@ local kp =
               replicas: 1,
               resources: vars.alertmanager_resources,
               logLevel: 'debug',  // So firing alerts show up in log
-              secrets: ['obmondo-clientcert'],
+              secrets: [
+                'obmondo-clientcert',
+                'alertmanager-main',
+              ],
             },
           },
         },
@@ -274,7 +286,8 @@ local kp =
               hosts: [
                 vars.grafana_ingress_host,
               ],
-            }]
+            }],
+            vars.grafana_ingress_annotations,
           ),
         },
       } else {}
