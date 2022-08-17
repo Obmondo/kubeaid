@@ -47,6 +47,10 @@ local default_vars = {
   },
 
   grafana_keycloak_enable: false,
+  grafana_keycloak_secretref: {
+    name: 'kube-prometheus-stack-grafana',
+    key: 'grafana-keycloak-secret',
+  },
   addMixins: {
     ceph: true,
     sealedsecrets: true,
@@ -148,6 +152,24 @@ local kp =
       {
         values+:: {
           grafana+: {
+            analytics+: {
+              check_for_updates: false,
+            },
+            env: [
+              {
+                name: 'GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION',
+                value: true,
+              },
+              {
+                name: 'GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET',
+                valueFrom+: {
+                  secretKeyRef+: {
+                    name: vars.grafana_keycloak_secretref.name,
+                    key: vars.grafana_keycloak_secretref.key,
+                  },
+                },
+              },
+            ],
             config+: {
               sections: {
                 date_formats: { default_timezone: 'UTC' },
