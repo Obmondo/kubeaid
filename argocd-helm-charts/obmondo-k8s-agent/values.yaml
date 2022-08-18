@@ -23,7 +23,7 @@ image:
       name: k8s-agent-tls
 
 imagePullSecrets:
-    - name: obmondo-k8s-agent-gitlab.enableit.dk-registry
+    - name: accesstoken-4obmondoagentregistry-customer-enableit
 nameOverride: ""
 fullnameOverride: ""
 
@@ -54,7 +54,17 @@ securityContext: {}
 # runAsNonRoot: true
 # runAsUser: 1000
 
-service: {}
+service:
+  type: ClusterIP
+  port: 80
+
+metrics:
+  serviceMonitor:
+    interval: 30s
+    relabelings: []
+    metricRelabelings: []
+
+networkPolicy: true
 
 ingress:
   enabled: false
