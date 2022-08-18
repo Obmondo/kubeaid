@@ -12,8 +12,6 @@ local default_vars = {
   prometheus_scrape_namespaces: [],
   prometheus_scrape_default_namespaces+: [
     'argocd',
-    'external-dns',
-    'velero',
     'system',
     'cert-manager',
     'obmondo',
