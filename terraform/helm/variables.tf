@@ -44,3 +44,8 @@ variable "k8s_host" {
   type      = string
   sensitive = true
 }
+
+variable "restore_secrets" {
+  type = bool
+  default = false
+}
