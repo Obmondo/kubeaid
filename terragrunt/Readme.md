@@ -14,22 +14,22 @@
 
 ## Prerequisite
 
-  1. Need this package to be installed on your local machine
+1. Need this package to be installed on your local machine
 
-     ```text
-      kops
-      kubectl
-      jq
-      terragrunt
-      terraform
-      bcrypt
-      wireguard
-      yq (https://github.com/mikefarah/yq)
-     ```
+   ```text
+   kops
+   kubectl
+   jq
+   terragrunt
+   terraform
+   bcrypt
+   wireguard
+   yq (https://github.com/mikefarah/yq)
+   ```
 
-  2. Git repository
-     a. clone the k8id git repo from obmondo
-     b. Create a fresh git repo (for better naming, we usually call it k8id-config)
+2. Git repository
+   a. clone the k8id git repo from obmondo
+   b. Create a fresh git repo (for better naming, we usually call it k8id-config)
 
 ### Setup AKS cluster on Azure
 
@@ -59,6 +59,7 @@
     wg_vnet_id: "abcd"
     storage_account: "abc"
     container: "abcd"
+    restore_secrets: false
     argocd_admin_password: "Testing@123"
     argocd_admin_bcrypt_password: $2a$10$KdHplv8yqG3pwtC3L.McZuzY3EJ74d0GB6lDs7dt9w8shrEQkhcQ.
     environment: "test"
@@ -73,7 +74,7 @@
 
 2. Change your directory structure to the respective folder.
    For eg if you want to create the AKS cluster then you must be sitting at `terragrunt/aks` folder
-   and run all the following commands from that folder  
+   and run all the following commands from that folder
 
 3. For Azure terragrunt wants the storage account to be created before hand, so you will have run
 
@@ -154,7 +155,13 @@
      export OBMONDO_VARS_FILE=/path/to/yaml/values/file
      ```
 
-  6. Setup wireguard instance
+  6. Export the certs and keys of sealed secrets in case you want to apply/use the secrets of an existing cluster
+
+     ```sh
+     kubectl -n system get secret -l sealedsecrets.bitnami.com/sealed-secrets-key=active -o yaml | kubectl neat > ../../terraform/helm/allsealkeys.yml
+     ```
+
+  7. Setup wireguard instance
 
      ```sh
      # cd terragrunt/wireguard/aws
@@ -164,35 +171,35 @@
      Remote state S3 bucket <some-name>-terraform does not exist or you don't have permissions to access it. Would you like Terragrunt to create it? (y/n) y
      ```
 
-  7. Generate wireguard public and private key
+  8. Generate wireguard public and private key
 
      ```sh
      wg genkey | sudo tee client-private_key | wg pubkey | sudo tee client-public_key
      ```
 
-  8. Setup your wireguard client and make sure it works
+  9. Setup your wireguard client and make sure it works
 
-  9. Deploy the cluster
+  10. Deploy the cluster
 
-     ```sh
-     cd terragrunt/kops
+      ```sh
+      cd terragrunt/kops
 
-     terragrunt run-all apply
-     INFO[0000] The stack at /home/ashish/k8id-all/k8id/terragrunt/kops will be processed in the following order for command apply:
-     Group 1
-     - Module /home/ashish/k8id-all/k8id/terragrunt/kops/vpc
+      terragrunt run-all apply
+      INFO[0000] The stack at /home/ashish/k8id-all/k8id/terragrunt/kops will be processed in the following order for command apply:
+      Group 1
+      - Module /home/ashish/k8id-all/k8id/terragrunt/kops/vpc
 
-     Group 2
-     - Module /home/ashish/k8id-all/k8id/terragrunt/kops/peering
+      Group 2
+      - Module /home/ashish/k8id-all/k8id/terragrunt/kops/peering
 
-     Group 3
-     - Module /home/ashish/k8id-all/k8id/terragrunt/kops/kops
+      Group 3
+      - Module /home/ashish/k8id-all/k8id/terragrunt/kops/kops
 
-     Group 4
-     - Module /home/ashish/k8id-all/k8id/terragrunt/kops/iam
+      Group 4
+      - Module /home/ashish/k8id-all/k8id/terragrunt/kops/iam
 
-     Group 5
-     - Module /home/ashish/k8id-all/k8id/terragrunt/kops/helm
+      Group 5
+      - Module /home/ashish/k8id-all/k8id/terragrunt/kops/helm
 
-     Are you sure you want to run 'terragrunt apply' in each folder of the stack described above? (y/n) y
-     ```
+      Are you sure you want to run 'terragrunt apply' in each folder of the stack described above? (y/n) y
+      ```
