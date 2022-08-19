@@ -1,0 +1,26 @@
+# USE THIS CONFIG TO CONFIGURE multiple issuers (e.g. cloudflare and route53
+# and HTTP01 challenge solver)
+issuer:
+  enabled: true
+  issuerEmail: <email>  # this is required
+  production: true
+  # secret is privateKeySecretRef. This private key is used to store the
+  # ACME/Let's-Encrypt account private key.
+  secret: <secret-name>  # BACKUP THIS SECRET FOR FUTURE USE & SECURITY.
+  solvers:
+    - type: dns
+      cloudProvider: cloudflare
+      cloudProviderSecret: <dns-provider-secret-name>
+      dnsNames:
+        - foo.example.com
+        - bar.example.com
+    - type: dns
+      cloudprovider: route53
+      region: <region>
+      zone: <zone>
+      hostedZoneID: <hosted-zone-id>
+      dnsNames:
+        - foo.com
+        - bar.com
+    # this will setup HTTP01 challenge solver
+    - type: http
