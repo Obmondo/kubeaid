@@ -1,0 +1,8 @@
+# USE THIS CONFIG TO CONFIGURE THE HTTP01 CHALLENGE SOLVER
+issuer:
+  enable: true
+  issuerEmail: <email>  # this is required
+  production: true
+  # secret is privateKeySecretRef. This private key is used to store the
+  # ACME/Let's-Encrypt account private key.
+  secret: <secret-name>  # BACKUP THIS SECRET FOR FUTURE USE & SECURITY.
