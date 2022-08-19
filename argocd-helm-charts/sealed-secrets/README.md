@@ -39,6 +39,10 @@ kubeseal --cert secret-certificate.pem <mysecret.json >mysealedsecret.json
 kubeseal --controller-namespace system --controller-name sealed-secrets < mysecret.json > mysealedsecret.json
 ```
 
+**mysecret.json** is your target secret file, which will generated to sealedsecret one (can be yaml format too)
+
+**sealedsecret.json** is a new generated sealedsecret file (name can be changed also)
+
 This can then be imported manually using kubectl apply for confirming.
 
 ### Important - verify
