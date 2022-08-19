@@ -1,17 +1,12 @@
----
-kind: SealedSecret
 apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
 metadata:
   name: alertmanager-main
   namespace: monitoring
-  creationTimestamp:
 spec:
   encryptedData:
-    slack-url: AgCSodaIgeT2ZHJq4TqQ4IDfWXKSZhd6zIXgK8JxyXl82h1k1QoDHKvKxzo+z7aWFUIHqRsvhOR8ayWeFneHrWb1qhxbCFN4rGVvROFurJaWS9uM02Xsto1KWgfDMIGJSEQQ1g7FBcJkNW8tLKGQDhcVOsubQzeWqKYoPS7XyP7ubj4E+LmF4+YBbiCu2zdyl3AEd/UE5lkCUORFD1uDkBIwHH+Ds7Vdc9y94IHjnlNMPsbNl4reyq5UwMiZBi4StcvVvbyMXcMdI/2ECWUL2kudMzXSDmujXEojUjlsq8fyJBX61GacJTHfKVPqH2u/9HmVVqRLoiHbhRS6XMrGFWfW7ONN2rE27b4iiJR4/tX9DxphRFAFkmCufZKDxhwM0J42YjyclYzqpvtEh5B8OqaiUCSrKYBlHTx149tV0qKIqL7J43a7vmNcBp0SFAzpJk9ugrckWR/S0LE9Z+DNcFYDxW+n8fCJ7m9KFmPxnbvX+TL0EnbYCNOEKetx2LF7RDpzNbScHmxHh4Bm2RiRdAsOOPaGIle1w+fZptNxJnMMF2Kq4EmHRCoR/48D2Vn9NgEEp0ce0+Zm0UVO6qNlFPH9kIUf4fq6RXWYqR23cazCdZMOOuSEsUGqxXPBJIGoLEmpVIqmyrCwXlZ+CII6fQHlzguU2SMZ5uPuont/URD8fC3JH11XMVXyww0x3AHRE7216iV4hJIzIUVnG8sZPhwO1pQUOPHJpZQ1oqRnr6zx3QuLba83KcBj3qStE7DYXay9rUMdO68oiYiNRzKKW30Szueqd61sD/6GhFzqPepp
+    slack-url: gibberish-encrypted-data
   template:
-    metadata:
-      creationTimestamp: null
-      name: abc
     data:
       alertmanager.yaml: |
         global:
