@@ -1,4 +1,5 @@
 #Variables
+
 argocd_admin_password: Plain text password for argocd
 
 argocd_admin_bcrypt_password: bcrypted version of the above
