@@ -122,6 +122,32 @@ local kp =
   // (import 'kube-prometheus/addons/external-metrics.libsonnet') +
 
   {
+    grafana+: {
+      networkPolicy+: {
+        spec+: {
+          ingress+: [{
+            from: [{
+              podSelector: {
+                matchLabels: {
+                  'app.kubernetes.io/name': 'traefik',
+                },
+              },
+              namespaceSelector: {
+                matchLabels: {
+                  'kubernetes.io/metadata.name': 'traefik',
+                },
+              },
+            }],
+            ports: [{
+              port: 'http',
+              protocol: 'TCP',
+            }],
+          }],
+        },
+      },
+    },
+  } +
+  {
     values+:: {
       common+: {
         platform: vars.platform,
@@ -158,7 +184,7 @@ local kp =
     if vars.extra_configs then
       {
         values+:: {
-          grafana+: {
+          grafana+:: {
             analytics+: {
               check_for_updates: false,
             },
