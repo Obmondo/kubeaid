@@ -165,7 +165,7 @@ local kp =
             env: [
               {
                 name: 'GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION',
-                value: true,
+                value: 'true',
               },
               {
                 name: 'GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET',
