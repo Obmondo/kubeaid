@@ -1,0 +1,11 @@
+# USE THIS CONFIG TO CONFIGURE `cloudflare` DNS01 CHALLENGE SOLVER
+issuer:
+  enabled: true
+  issuerEmail: <email>  # this is required
+  production: true
+  # secret is privateKeySecretRef. This private key is used to store the
+  # ACME/Let's-Encrypt account private key.
+  secret: <secret-name>  # BACKUP THIS SECRET FOR FUTURE USE & SECURITY.
+  cloudProvider: cloudflare
+  # this secret name will be used to store cloudflare account credentials
+  cloudProviderSecret: cloudflare-api-secret
