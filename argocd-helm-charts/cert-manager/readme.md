@@ -27,6 +27,5 @@ This will help with future rate limiting problems.
 [secrets](https://kubernetes.io/docs/tasks/configmap-secret/managing-secret-using-kubectl/)
 (in case of cloudflare DNS challenge solvers),
 please make sure you backup them.
-Check how to [backup Cert-Manager resources](https://cert-manager.io/docs/tutorials/backup/).
-(Backup may help in case of reinstalling, transferring to another cluster or deleting the cert-manager).
+Check how to [complete backup Cert-Manager resources](https://cert-manager.io/docs/tutorials/backup/).
 - For multiple DNS solvers you must provide `dnsNames` field. That will hold dns names cloud provider is handling.
