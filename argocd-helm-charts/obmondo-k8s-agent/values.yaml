@@ -11,7 +11,7 @@ image:
   tag: "latest"
   env:
     - name: DURATION
-      value: "30s"
+      value: "8h"
     - name: AGENT_CERT_PATH
       value: "/mnt/obmondo-k8s-agent/tls.crt"
     - name: AGENT_KEY_PATH
