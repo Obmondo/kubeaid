@@ -21,8 +21,7 @@ dependency "aks" {
 dependency "peering" {
   config_path  = "../peering"
   mock_outputs = {
-    virtual_network_name = "aks-vnet-41315820"
-    remote_virtual_network_id = "/subscriptions/bd59662e-a78e-4d7c-84f6-9d9ad1883726/resourceGroups/MC_k8s-qa-az1_qa_az1_abc_eu_northeurope/providers/Microsoft.Network/virtualNetworks/aks-vnet-41315820"
+    cluster_vnet_id = "/subscriptions/bd59662e-a78e-4d7c-84f6-9d9ad1883726/resourceGroups/MC_k8s-qa-az1_qa_az1_abc_eu_northeurope/providers/Microsoft.Network/virtualNetworks/aks-vnet-41315820"
    private_dns_zone_name = "863397e9-10d3-4075-b3ea-116f8fe4612d.privatelink.northeurope.azmk8s.io"}
 }
 
@@ -37,8 +36,7 @@ inputs = merge(
     k8s_client_key             = dependency.aks.outputs.client_key,
     k8s_cluster_ca_certificate = dependency.aks.outputs.cluster_ca_certificate,
     k8s_client_certificate     = dependency.aks.outputs.client_certificate,
-    virtual_network_name       = dependency.peering.outputs.virtual_network_name,
-    remote_virtual_network_id  = dependency.peering.outputs.remote_virtual_network_id,
+    cluster_vnet_id            = dependency.peering.outputs.cluster_vnet_id,
     private_dns_zone_name      = dependency.peering.outputs.private_dns_zone_name,
   }
 )

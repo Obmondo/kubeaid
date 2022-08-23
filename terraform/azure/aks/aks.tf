@@ -2,6 +2,23 @@ data "azurerm_resource_group" "resource" {
   name     = var.resource_group
 }
 
+# Create Virtual Network
+resource "azurerm_virtual_network" "aksvnet" {
+  name                = var.vnet_name
+  location            = var.location
+  resource_group_name = var.resource_group
+  address_space       = [var.vnet_address_space]
+}
+
+# Create a Subnet for AKS
+resource "azurerm_subnet" "aks-default" {
+  name                 = var.subnet_name
+  virtual_network_name = var.vnet_name
+  resource_group_name  = var.resource_group
+  address_prefixes     = [var.subnet_prefixes]
+}
+
+# Create AKS cluster
 resource "azurerm_kubernetes_cluster" "k8s" {
     name                    = var.cluster_name
     location                = var.location
@@ -14,6 +31,7 @@ resource "azurerm_kubernetes_cluster" "k8s" {
         name                = "agentpool"
         node_count          = var.agent_count
         vm_size             = var.vm_size
+        vnet_subnet_id      = azurerm_subnet.aks-default.id
         enable_auto_scaling = var.enable_auto_scaling
         min_count           = var.min_node_count 
         max_count           = var.max_node_count
@@ -23,17 +41,3 @@ resource "azurerm_kubernetes_cluster" "k8s" {
      type = "SystemAssigned"
     }
 }
-
-# This can be bit intimidating. We are using the bash since terraform right now doesn't support mixed type in json values
-# https://github.com/hashicorp/terraform/issues/13991 https://github.com/hashicorp/terraform/issues/12256
-
-data "external" "cluster_vnet_name" {
-  program    = ["bash", "${path.module}/get_vnet_details.sh", "MC_${var.resource_group}_${var.cluster_name}_${var.location}", "name"]
-  depends_on = [azurerm_kubernetes_cluster.k8s]
-}
-
-data "external" "cluster_vnet_id" {
-  program    = ["bash", "${path.module}/get_vnet_details.sh", "MC_${var.resource_group}_${var.cluster_name}_${var.location}", "id"]
-  depends_on = [azurerm_kubernetes_cluster.k8s]
-}
-

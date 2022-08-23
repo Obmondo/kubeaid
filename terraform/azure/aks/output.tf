@@ -27,14 +27,11 @@ output "private_fqdn" {
   sensitive = true
 }
 
-output "remote_virtual_network_id" {
-  value = jsondecode(base64decode(data.external.cluster_vnet_id.result["base64_encoded"]))
-}
-
-output "virtual_network_name" {
-  value = jsondecode(base64decode(data.external.cluster_vnet_name.result["base64_encoded"]))
-}
-
 output "private_dns_zone_name" {
   value = join(".", slice(split(".", azurerm_kubernetes_cluster.k8s.private_fqdn), 1, length(split(".", azurerm_kubernetes_cluster.k8s.private_fqdn))))
+}
+
+output "cluster_vnet_id" {
+  value = azurerm_virtual_network.aksvnet.id
+  sensitive = true
 }
