@@ -56,3 +56,48 @@ sealedsecrets.bitnami.com/managed: "true"
 ```
 
 and then restart sealed-secrets pod in kube-system to make it do its job (it has already given up at this point).
+
+## How to backup and restore sealed secrets
+
+### Manual way
+
+We are basically backing up all the tls.crt & tls.key files of the cluster locally, so we can restore them later.
+
+```sh
+# This would get all the tls secrets in the cluster from all the name spaces.
+kubectl get secrets -n system -l sealedsecrets.bitnami.com/sealed-secrets-key=active -o yaml > backup_key.yml
+```
+
+This would backup the ``tls.crt`` & ``tls.key`` in a yaml file locally.
+
+For restoring the secrets, in a cluster use .
+
+```sh
+# This would restore the tls secrets in the cluster from the backup file.
+kubectl apply -f backup_key.yml
+```
+
+### Automated way (velero)
+
+Run the commands from the velero pod in the cluster .
+
+We are backing up the system namespace which contains the sealed secrets if there is no shedule backup already present.
+If there is sheduled backup already present skip this command.
+
+```sh
+# This would create backup of the sealesecret pod in system namespace.
+velero backup create <backup-name> --include-namespaces system --include-resources pods --selector sealedsecrets.bitnami.com/sealed-secrets-key=active
+```
+
+Assuming we already have scheduled backup .
+Check the backup status using the following command.
+
+```sh
+velero get backups
+```
+
+Restore the backup with the name that is created/exists.
+
+```sh
+velero restore create <restore-name> --include-namespaces system --include-resources pods --selector sealedsecrets.bitnami.com/sealed-secrets-key=active --from-backup <backup-name>
+```
