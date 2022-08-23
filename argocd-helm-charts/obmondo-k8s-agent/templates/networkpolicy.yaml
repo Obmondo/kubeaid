@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "obmondo-k8s-agent.labels" . | nindent 4 }}
   name: {{ include "obmondo-k8s-agent.fullname" . }}
-  namespace: monitoring
+  namespace: obmondo
 spec:
   ingress:
   - from:
