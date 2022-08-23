@@ -52,6 +52,11 @@
     enable_auto_scaling: true
     min_node_count: 1
     max_node_count: 3
+    vnet_name: "cluster_vnet"
+    subnet_name: "cluster_subnet"
+    vnet_address_space: "10.226.0.0/16"
+    subnet_prefixes: "10.226.0.0/16"
+    peer_name: "cluster-name_wg"
     private_cluster_enabled: true
     private_cluster_public_fqdn_enabled: true
     wg_resource_group: "obmondo-aks"
