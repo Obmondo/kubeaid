@@ -1,15 +1,15 @@
 apiVersion: "acid.zalan.do/v1"
 kind: postgresql
 metadata:
-  name: obmondo-postgresql
+  name: sonarqube-pgsql
   namespace: sonarqube
 spec:
-  teamId: obmondo
+  teamId: sonarqube
   volume:
     size: 2Gi
-  numberOfInstances: 1
+  numberOfInstances: 2
   users:
-    sonarqube_admin: # database owner
+    sonarqube_admin:
       - superuser
       - createdb
     sonarqube_test: []
