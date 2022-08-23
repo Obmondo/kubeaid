@@ -44,3 +44,11 @@ source: https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management
   -> Select the required group (See values for argocd https://<k8id-config-repo-url>/-/blob/main/k8s/<clustername>/argocd-apps/values-argo-cd.yaml under policy.csv)
   -> done
 ```
+
+## Troubleshooting ArgoCD and Keycloak
+
+* Check whether there is a secret called `argocd-secret` in the `argocd` namespace in the k8s cluster.
+* The `argocd-secret` should have a key `oidc.keycloak.clientSecret`.
+* Verify your keycloak user roles and group memberships for your username by logging into the keycloak server from UI.
+* The URL for keycloak server would be https://keycloak.your.domain.com. Refer [Keycloak readme](../keycloak/README.md).
+* Check the `values-argo-cd.yaml` in the k8id-config repo for the k8s cluster. Match policy.csv with the roles in Keycloak
