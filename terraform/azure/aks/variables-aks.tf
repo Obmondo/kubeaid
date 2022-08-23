@@ -24,9 +24,31 @@ variable "cluster_name" {
   description = "Clsuter name"
 }
 
+variable "vnet_name" {
+  default = "aks-default-vnet"
+  type = string
+  description = "Virtual network name"
+}
+
+variable "subnet_name" {
+  default = "aks-default-subnet"
+  type = string
+  description = "Subnet name"
+}
+
 variable "vm_size" {
   type = string
   description = "Size of the VM"
+}
+
+variable "vnet_address_space" {
+  type = string
+  description = "The address space that is used for the virtual network"
+}
+
+variable "subnet_prefixes" {
+  type = string
+  description = "The address prefix to use for the subnet."
 }
 
 variable "kubernetes_version" {

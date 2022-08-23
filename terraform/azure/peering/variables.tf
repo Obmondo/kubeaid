@@ -10,6 +10,11 @@ variable "cluster_name" {
   type = string
 }
 
+variable "peer_name" {
+  type = string
+  description = "Name of the peer between WG Vnet and AKS cluster Vnet"
+}
+
 variable "wg_vnet_name" {
   type = string
 }
@@ -22,12 +27,13 @@ variable "wg_vnet_id" {
   type = string
 }
 
-variable "remote_virtual_network_id" {
+variable "cluster_vnet_id" {
   type = string
 }
 
-variable "virtual_network_name" {
-  type = string
+variable "vnet_name" {
+  default = "aks-default-vnet"
+  description = "Virtual network name"
 }
 
 variable "private_dns_zone_name" {
