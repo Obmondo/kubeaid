@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager  # Name of the application
+  namespace: argocd
+spec:
+  destination:
+    namespace: cert-manager  # Namespace where the application will be deployed
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    # for e.g. argocd-helm-charts/cert-manager
+    path: <relative path to cert-manager helm chart>
+    # for e.g. https://gitlab.enableit.dk/kubernetes/k8id.git
+    repoURL: <repo url>
+    targetRevision: HEAD  # repo branch or commit SHA or HEAD
+    helm:
+      valueFiles:
+      - values.yaml  # name of values file in helm chart
+      # you can add list of values files here
+      # which may present in different repositories.
+      - /tmp/https___<repo>_<path-to-values-file>
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
