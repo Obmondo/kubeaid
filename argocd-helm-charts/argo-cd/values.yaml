@@ -17,7 +17,7 @@ argo-cd:
   repoServer:
     replicas: 1
     autoscaling:
-      enabled: true
+      enabled: false
     metrics:
       enabled: true
       serviceMonitor:
