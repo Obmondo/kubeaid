@@ -34,7 +34,7 @@ Check how to [complete backup Cert-Manager resources](https://cert-manager.io/do
 
 - Cert-manager setup involves creation of secrets, i.e. ACME server account credentials, cloud provider creds, etc.
 <!-- markdownlint-disable -->
-- We highly suggest you backup these secrets:
+- We suggest you backup the ACME server account secret, f.ex. by enabling Velero application (see below) - as this secret is created by cert-manager and is needed to cancel an issued certificate ahead of time.
 [read](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/sealed-secrets/README.md#how-to-backup-and-restore-sealed-secrets)
 this guide.
 <!-- markdownlint-enable -->
