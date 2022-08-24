@@ -37,3 +37,4 @@ Check how to [complete backup Cert-Manager resources](https://cert-manager.io/do
 - We highly suggest you backup these secrets:
 [read](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/sealed-secrets/README.md#how-to-backup-and-restore-sealed-secrets)
 this guide.
+<!-- markdownlint-enable -->
