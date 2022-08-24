@@ -29,3 +29,11 @@ This will help with future rate limiting problems.
 please make sure you backup them.
 Check how to [complete backup Cert-Manager resources](https://cert-manager.io/docs/tutorials/backup/).
 - For multiple DNS solvers you must provide `dnsNames` field. That will hold dns names cloud provider is handling.
+
+## Backup and recovery
+
+- Cert-manager setup involves creation of secrets, i.e. ACME server account credentials, cloud provider creds, etc.
+<!-- markdownlint-disable -->
+- We highly suggest you backup these secrets:
+[read](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/sealed-secrets/README.md#how-to-backup-and-restore-sealed-secrets)
+this guide.
