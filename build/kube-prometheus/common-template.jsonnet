@@ -18,30 +18,28 @@ local default_vars = {
   ],
 
   prometheus_operator_resources: {
-    limits: { cpu: '100m', memory: '80Mi' },
-    requests: { cpu: '10m', memory: '30Mi' },
+    limits: { memory: '80Mi' },
+    requests: { cpu: '20m', memory: '80Mi' },
   },
   alertmanager_resources: {
-    limits: { cpu: '100m', memory: '50Mi' },
-    requests: { cpu: '20m', memory: '30Mi' },
+    limits: { memory: '50Mi' },
+    requests: { cpu: '20m', memory: '50Mi' },
   },
   prometheus_resources: {
-    limits: { memory: '3Gi' },
-    requests: { cpu: '200m', memory: '1500Mi' },
+    limits: { memory: '1Gi' },
+    requests: { cpu: '500m', memory: '1500Mi' },
   },
   node_exporter_resources: {
-    limits: { cpu: '500m', memory: '180Mi' },
-    requests: { cpu: '102m', memory: '180Mi' },
+    limits: { memory: '180Mi' },
+    requests: { cpu: '500m', memory: '180Mi' },
   },
-
   kube_state_metrics_kubeRbacProxyMain_resources: {
-    limits: { cpu: '320m', memory: '40Mi' },
-    requests: { cpu: '20m', memory: '20Mi' },
+    limits: { memory: '40Mi' },
+    requests: { cpu: '20m', memory: '40Mi' },
   },
-
   kube_state_metrics_kubeRbacProxySelf_resources: {
-    limits: { cpu: '80m', memory: '40Mi' },
-    requests: { cpu: '10m', memory: '20Mi' },
+    limits: { memory: '40Mi' },
+    requests: { cpu: '20m', memory: '40Mi' },
   },
 
   grafana_keycloak_enable: false,
