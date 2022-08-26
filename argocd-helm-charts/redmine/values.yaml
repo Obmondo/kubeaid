@@ -1,0 +1,9 @@
+redmine:
+  databaseType: postgresql
+  externalDatabase:
+    host: redmine-pgsql
+    port: 5432
+    user: redmine
+    database: redmine
+    existingSecret: redmine.redmine-pgsql.credentials.postgresql.acid.zalan.do
+    existingSecretPasswordKey: "password"
