@@ -1,0 +1,17 @@
+apiVersion: acid.zalan.do/v1
+kind: postgresql
+metadata:
+  name: redmine-pgsql
+spec:
+  databases:
+    redmine: redmine
+  enableMasterLoadBalancer: false
+  numberOfInstances: 2
+  postgresql:
+    version: "12"
+  teamId: redmine
+  users:
+    redmine:
+      - superuser
+  volume:
+    size: 8Gi
