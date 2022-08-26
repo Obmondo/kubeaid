@@ -146,6 +146,27 @@ local kp =
     },
   } +
   {
+    prometheus+: {
+      networkPolicy+: {
+        spec+: {
+          ingress+: [{
+            from: [{
+              podSelector: {
+                matchLabels: {
+                  'app.kubernetes.io/name': 'prometheus-adapter',
+                },
+              },
+            }],
+            ports: [{
+              port: 9090,
+              protocol: 'TCP',
+            }],
+          }],
+        },
+      },
+    },
+  } +
+  {
     values+:: {
       common+: {
         platform: vars.platform,
