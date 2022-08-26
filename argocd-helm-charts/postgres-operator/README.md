@@ -52,3 +52,21 @@ postgres-operator:
   configLogicalBackup:
     logical_backup_s3_bucket: "postgres-backup"
 ```
+
+Note:
+
+- Depending on the chart please check what database env variables are getting used.
+And provide those values through
+[values.yaml](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/keycloak/values.yaml).
+<!-- markdownlint-disable -->
+- Create the `postgresql.yaml` file in `templates` directory of umbrella chart.
+So that postgres-operator will use that to manage the instance
+- Also check this
+[example](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/keycloak/templates/postgresql.yaml)
+for postgresql.yaml file
+- Also check example of mattermost setup for
+[postgresql](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/mattermost-team-edition/templates/postgresql.yaml)
+and the corresponding
+[values.yaml](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/mattermost-team-edition/values.yaml)
+file
+<!-- markdownlint-enable -->
