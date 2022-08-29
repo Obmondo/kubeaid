@@ -1,0 +1,34 @@
+networkpolicies: "true"
+LoadCustomCRDs: true
+velero:
+  configuration:
+    extraEnvVars:
+      AWS_CLUSTER_NAME: abc.com
+    backupStorageLocation:
+      bucket: velero-staging
+      config:
+        region: "eu-west-1"
+    provider: aws
+    volumeSnapshotLocation:
+      name: default
+      config:
+        region: "eu-west-1"
+    logLevel: debug
+  credentials:
+    userSecret: false
+  initContainers:
+  - name: velero-plugin-for-csi
+    image: velero/velero-plugin-for-csi:v0.2.0
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - mountPath: /target
+      name: plugins
+  - name: velero-velero-plugin-for-aws
+    image: 'velero/velero-plugin-for-aws:v1.4.1'
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - mountPath: /target
+      name: plugins
+  podAnnotations:
+    iam.amazonaws.com/role: arn:aws:iam::43842424424:role/velero-staging
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
