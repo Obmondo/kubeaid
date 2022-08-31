@@ -1,0 +1,10 @@
+# Applying nodeselector for zfs-controller and node, apply according to node label.
+# i.e if node label is "filesystem=zfs" then nodeselector would be applied as shown below
+
+zfsController:
+    nodeSelector:
+      filesystem: zfs
+
+zfsNode:
+    nodeSelector:
+      filesystem: zfs

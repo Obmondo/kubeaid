@@ -8,6 +8,9 @@ parameters:
   compression: "off"
   dedup: "off"
   fstype: "zfs"
-  poolname: "mypool"
+  poolname: "{{ .Values.storageClass.poolName }}"
 provisioner: zfs.csi.openebs.io
+{{- if .Values.storageClass.reclaimPolicy }}
+reclaimPolicy: {{ toYaml .Values.storageClass.reclaimPolicy }}
+{{- end }}
 {{- end -}}
