@@ -5,27 +5,53 @@ metadata:
   namespace: monitoring
 spec:
   encryptedData:
-    slack-url: gibberish-encrypted-data
+    slack-url: lolsecert_encrypted_with_kubeseal
   template:
     data:
       alertmanager.yaml: |
         global:
           resolve_timeout: 5m
 
+        inhibit_rules:
+        - "equal":
+          - "namespace"
+          - "alertname"
+          "source_matchers":
+          - "severity = critical"
+          "target_matchers":
+          - "severity =~ warning|info"
+        - "equal":
+          - "namespace"
+          - "alertname"
+          "source_matchers":
+          - "severity = warning"
+          "target_matchers":
+          - "severity = info"
+        - "equal":
+          - "namespace"
+          "source_matchers":
+          - "alertname = InfoInhibitor"
+          "target_matchers":
+          - "severity = info"
+
         route:
-          receiver: 'obmondo'
-          group_by: ['alertname']
+          group_by:
+            - 'namespace'
           group_wait: 10s
           group_interval: 10s
-          repeat_interval: 15m
+          repeat_interval: 1h
+          receiver: 'obmondo'
           routes:
-            - receiver: obmondo
-              match:
-                alertname: Watchdog
-            - receiver: slack
-              continue: true
-            - receiver: obmondo
-              continue: true
+          - receiver: 'obmondo'
+            matchers:
+            - "alertname = Watchdog"
+          - receiver: 'null'
+            matchers:
+            - "alertname = InfoInhibitor"
+          - receiver: slack
+            continue: true
+          - receiver: obmondo
+            continue: true
 
         receivers:
           - name: "null"
