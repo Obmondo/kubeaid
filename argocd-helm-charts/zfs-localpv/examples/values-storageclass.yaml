@@ -1,0 +1,7 @@
+# If enabled, will create a storageclass object.
+# Poolname could be exactly same as the zfs pool created.
+
+storageClass:
+  enabled: true
+  poolName: nvmelocal
+  reclaimPolicy: {}
