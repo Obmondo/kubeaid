@@ -33,6 +33,10 @@ local default_vars = {
     limits: { memory: '180Mi' },
     requests: { cpu: '500m', memory: '180Mi' },
   },
+  node_exporter_kubeRbacProxyMain_resources: {
+    limits: { memory: '40Mi' },
+    requests: { cpu: '40m', memory: '40Mi' },
+  },
   kube_state_metrics_kubeRbacProxyMain_resources: {
     limits: { memory: '40Mi' },
     requests: { cpu: '20m', memory: '40Mi' },
@@ -168,13 +172,6 @@ local kp =
   } +
   {
     values+:: {
-      common+: {
-        platform: vars.platform,
-      },
-    },
-  } +
-  {
-    values+:: {
       // This is ONLY supported in release-0.11+ and main
       kubeStateMetrics+: {
         kubeRbacProxyMain+: {
@@ -186,7 +183,10 @@ local kp =
       },
 
       common+: {
+        platform: vars.platform,
         namespace: 'monitoring',
+        ruleLabels+: {
+        },
       },
       prometheus+: {
         // [ i for i in scrape_namespaces if std.get(defaults.mixins, i) == true ],
@@ -197,6 +197,10 @@ local kp =
       },
       nodeExporter+: {
         resources: vars.node_exporter_resources,
+        kubeRbacProxyMain+: {
+          resources+: vars.node_exporter_kubeRbacProxyMain_resources,
+        },
+
       },
     },
   } + (
