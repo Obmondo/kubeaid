@@ -21,6 +21,10 @@ local default_vars = {
     limits: { memory: '80Mi' },
     requests: { cpu: '20m', memory: '80Mi' },
   },
+  prometheus_operator_kubeRbacProxyMain_resources: {
+    limits: { memory: '40Mi' },
+    requests: { cpu: '40m', memory: '40Mi' },
+  },
   alertmanager_resources: {
     limits: { memory: '50Mi' },
     requests: { cpu: '20m', memory: '50Mi' },
@@ -194,6 +198,9 @@ local kp =
       },
       prometheusOperator+: {
         resources: vars.prometheus_operator_resources,
+        kubeRbacProxyMain+: {
+          resources+: vars.prometheus_operator_kubeRbacProxyMain_resources,
+        },
       },
       nodeExporter+: {
         resources: vars.node_exporter_resources,
