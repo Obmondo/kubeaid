@@ -6,7 +6,7 @@ metadata:
 spec:
   teamId: sonarqube
   volume:
-    size: 2Gi
+    size: 4Gi
   numberOfInstances: 2
   users:
     sonarqube_admin:
