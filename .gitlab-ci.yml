@@ -2,6 +2,7 @@
 stages:
   - diff
   - lint
+  - test
   - build
   - deploy
   - helm
@@ -52,6 +53,16 @@ helm:check_diff:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_COMMIT_MESSAGE !~ /^:no-diff/ || $CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_MESSAGE !~ /^:no-diff/'
       changes:
        - "argocd-helm-charts/**/*"
+
+opa:gatekeeper:test_policy:
+  stage: test
+  image: alpine
+  script:
+    - wget https://github.com/open-policy-agent/opa/releases/download/v0.43.0/opa_linux_amd64_static -O /usr/local/bin/opa
+    - chmod +x /usr/local/bin/opa
+    - opa test ./argocd-helm-charts/gatekeeper/policies -v
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 git:push:
   stage: deploy
