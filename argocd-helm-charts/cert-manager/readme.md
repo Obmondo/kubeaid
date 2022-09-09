@@ -30,6 +30,14 @@ please make sure you backup them.
 Check how to [complete backup Cert-Manager resources](https://cert-manager.io/docs/tutorials/backup/).
 - For multiple DNS solvers you must provide `dnsNames` field. That will hold dns names cloud provider is handling.
 
+## Secrets
+
+- Create cloudflare api token secret
+
+```sh
+kubectl create secret generic cloudflare-api-token-secret -n cert-manager --dry-run=client --from-literal=api-token=1234567890123 -o yaml | kubeseal --controller-name sealed-secrets --controller-namespace system -o yaml - > cloudflare-api-token-secret.yaml
+```
+
 ## Backup and recovery
 
 - Cert-manager setup involves creation of secrets, i.e. ACME server account credentials, cloud provider creds, etc.
