@@ -1,0 +1,3 @@
+apiVersion: v2
+name: k8id-custom-azure
+version: 0.0.1
