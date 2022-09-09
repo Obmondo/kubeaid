@@ -398,7 +398,14 @@ local kp =
 } } +
 { ['node-exporter-' + name]: kp.nodeExporter[name] for name in std.objectFields(kp.nodeExporter) } +
 { ['prometheus-' + name]: kp.prometheus[name] for name in std.objectFields(kp.prometheus) } +
-{ ['prometheus-adapter-' + name]: kp.prometheusAdapter[name] for name in std.objectFields(kp.prometheusAdapter) } +
+(
+  // Need to figure out elseif
+  // if vars != 'gke' || vars != 'azure' didnt worked
+  if vars.platform != 'gke' then {
+    ['prometheus-adapter-' + name]: kp.prometheusAdapter[name]
+    for name in std.objectFields(kp.prometheusAdapter)
+  } else {}
+) +
 (if std.objectHas(vars, 'grafana_ingress_host') then { [name + '-ingress']: kp.ingress[name] for name in std.objectFields(kp.ingress) } else {})
 // Rendering prometheusRules object. This is an object compatible with prometheus-operator CRD definition for prometheusRule
 + { [o._config.name + '-prometheus-rules']: o.prometheusRules for o in std.filter((function(o) o.prometheusRules != null), mixins) }
