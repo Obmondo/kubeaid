@@ -1,0 +1,8 @@
+apiVersion: v2
+description: A Helm chart for Redis Operator
+name: redis-operator
+version: 1.0.0
+dependencies:
+  - name: redis-operator
+    version: 3.1.6
+    repository: https://spotahome.github.io/redis-operator
