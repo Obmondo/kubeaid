@@ -1,5 +1,5 @@
+local addMixin = import 'lib/addmixin.libsonnet';
 local utils = import 'lib/utils.libsonnet';
-local addMixin = (import 'lib/addmixin.libsonnet');
 
 local remove_nulls = (
   function(arr)
@@ -9,12 +9,11 @@ local remove_nulls = (
 local ext_vars = std.extVar('vars');
 
 local default_vars = {
-  prometheus_scrape_namespaces: [],
+  prometheus_scrape_namespaces+: [],
   prometheus_scrape_default_namespaces+: [
     'argocd',
     'system',
     'cert-manager',
-    'obmondo',
   ],
 
   prometheus_operator_resources: {
@@ -112,9 +111,15 @@ local mixins = remove_nulls([
 
 local scrape_namespaces = std.uniq(std.sort(std.flattenArrays(
   [
-    vars.prometheus_scrape_namespaces +
+    vars.prometheus_scrape_namespaces,
     vars.prometheus_scrape_default_namespaces,
-  ]
+  ] + (
+    if std.objectHas(vars, 'connect_obmondo') && vars.connect_obmondo then
+      [
+        ['obmondo'],
+      ]
+    else []
+  )
 )));
 
 local kp =
@@ -155,6 +160,23 @@ local kp =
   } +
   {
     prometheus+: {
+      prometheus+: {
+        spec+: {
+          replicas: 1,
+          resources: vars.prometheus_resources,
+          storage: {
+            volumeClaimTemplate: {
+              apiVersion: 'v1',
+              kind: 'PersistentVolumeClaim',
+              spec: {
+                accessModes: ['ReadWriteOnce'],
+                resources: { requests: { storage: vars.prometheus.storage.size } },
+                storageClassName: vars.prometheus.storage.classname,
+              },
+            },
+          },
+        },
+      },
       networkPolicy+: {
         spec+: {
           ingress+: [{
@@ -176,6 +198,22 @@ local kp =
   } +
   {
     values+:: {
+      common+: {
+        platform: vars.platform,
+        namespace: 'monitoring',
+      },
+
+      prometheus+: {
+        // [ i for i in scrape_namespaces if std.get(defaults.mixins, i) == true ],
+        namespaces+: scrape_namespaces,
+      },
+
+      prometheusOperator+: {
+        resources: vars.prometheus_operator_resources,
+        kubeRbacProxyMain+: {
+          resources+: vars.prometheus_operator_kubeRbacProxyMain_resources,
+        },
+      },
       // This is ONLY supported in release-0.11+ and main
       kubeStateMetrics+: {
         kubeRbacProxyMain+: {
@@ -186,132 +224,87 @@ local kp =
         },
       },
 
-      common+: {
-        platform: vars.platform,
-        namespace: 'monitoring',
-        ruleLabels+: {
-        },
-      },
-      prometheus+: {
-        // [ i for i in scrape_namespaces if std.get(defaults.mixins, i) == true ],
-        namespaces+: scrape_namespaces,
-      },
-      prometheusOperator+: {
-        resources: vars.prometheus_operator_resources,
-        kubeRbacProxyMain+: {
-          resources+: vars.prometheus_operator_kubeRbacProxyMain_resources,
-        },
-      },
       nodeExporter+: {
         resources: vars.node_exporter_resources,
         kubeRbacProxyMain+: {
           resources+: vars.node_exporter_kubeRbacProxyMain_resources,
         },
-
       },
-    },
-  } + (
-    if vars.extra_configs then
-      {
-        values+:: {
-          grafana+:: {
-            analytics+: {
+
+      grafana+: {
+        analytics+: {
+          check_for_updates: false,
+        },
+        env: [
+          {
+            name: 'GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION',
+            value: 'true',
+          },
+          {
+            name: 'GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET',
+            valueFrom+: {
+              secretKeyRef+: {
+                name: vars.grafana_keycloak_secretref.name,
+                key: vars.grafana_keycloak_secretref.key,
+              },
+            },
+          },
+        ],
+        config+: {
+          sections: {
+            date_formats: { default_timezone: 'UTC' },
+            auth: {
+              disable_login_form: false,
+              // oauth_auto_login: true,
+              disable_signout_menu: false,
+              signout_redirect_url: vars.grafana_signout_redirect_url,
+            },
+            analytics: {
               check_for_updates: false,
             },
-            env: [
-              {
-                name: 'GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION',
-                value: 'true',
-              },
-              {
-                name: 'GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET',
-                valueFrom+: {
-                  secretKeyRef+: {
-                    name: vars.grafana_keycloak_secretref.name,
-                    key: vars.grafana_keycloak_secretref.key,
-                  },
-                },
-              },
-            ],
-            config+: {
-              sections: {
-                date_formats: { default_timezone: 'UTC' },
-                auth: {
-                  disable_login_form: false,
-                  // oauth_auto_login: true,
-                  disable_signout_menu: false,
-                  signout_redirect_url: vars.grafana_signout_redirect_url,
-                },
-                analytics: {
-                  check_for_updates: false,
-                },
-                server: {
-                  root_url: vars.grafana_root_url,
-                },
-              } + (
-                if vars.grafana_keycloak_enable then
-                  {
-                    'auth.generic_oauth': {
-                      enabled: true,
-                      allow_sign_up: true,
-                      scopes: 'openid profile email',
-                      name: 'Keycloak',
-                      auth_url: vars.grafana_auth_url,
-                      token_url: vars.grafana_token_url,
-                      api_url: vars.grafana_api_url,
-                      client_id: 'grafana',
-                      role_attribute_path: "contains(not_null(roles[*],''), 'Admin') && 'Admin' || contains(not_null(roles[*],''), 'Editor') && 'Editor' || contains(not_null(roles[*],''), 'Viewer') && 'Viewer'|| ''",
-
-                    },
-                  }
-                else {}
-              ),
+            server: {
+              root_url: vars.grafana_root_url,
             },
-          },
-        },
+          } + (
+            if vars.grafana_keycloak_enable then
+              {
+                'auth.generic_oauth': {
+                  enabled: true,
+                  allow_sign_up: true,
+                  scopes: 'openid profile email',
+                  name: 'Keycloak',
+                  auth_url: vars.grafana_auth_url,
+                  token_url: vars.grafana_token_url,
+                  api_url: vars.grafana_api_url,
+                  client_id: 'grafana',
+                  role_attribute_path: "contains(not_null(roles[*],''), 'Admin') && 'Admin' || contains(not_null(roles[*],''), 'Editor') && 'Editor' || contains(not_null(roles[*],''), 'Viewer') && 'Viewer'|| ''",
 
-        prometheus+:: {
-          prometheus+: {
-            spec+: {
-              replicas: 1,
-              resources: vars.prometheus_resources,
-              storage: {
-                volumeClaimTemplate: {
-                  apiVersion: 'v1',
-                  kind: 'PersistentVolumeClaim',
-                  spec: {
-                    accessModes: ['ReadWriteOnce'],
-                    resources: { requests: { storage: vars.prometheus.storage.size } },
-                    storageClassName: vars.prometheus.storage.classname,
-                  },
                 },
-              },
-            },
-          },
+              }
+            else {}
+          ),
         },
+      },
+    },
+    alertmanager+: {
+      alertmanager+: {
+        spec+: {
+          replicas: 1,
+          resources: vars.alertmanager_resources,
+          secrets: (
+            if std.objectHas(vars, 'connect_obmondo') && vars.connect_obmondo then [
+              'obmondo-clientcert',
+              'alertmanager-main',
+            ] else []
+          ),
+        },
+      },
+    } + (
+      if std.objectHas(vars, 'connect_obmondo') && vars.connect_obmondo then {
+        secret:: {},
       } else {}
-  )
-  + (
-    if std.objectHas(vars, 'connect_obmondo') && vars.connect_obmondo then
-      {
-        alertmanager+: {
-          secret:: {},
-          alertmanager+: {
-            spec+: {
-              replicas: 1,
-              resources: vars.alertmanager_resources,
-              logLevel: 'debug',  // So firing alerts show up in log
-              secrets: [
-                'obmondo-clientcert',
-                'alertmanager-main',
-              ],
-            },
-          },
-        },
-      }
-    else {}
-  )
-  + (
+    ),
+  } + (
     if std.objectHas(vars, 'grafana_ingress_host') then
       {
         ingress+:: {
@@ -346,6 +339,7 @@ local kp =
         },
       } else {}
   );
+
 
 {
   'setup/0namespace-namespace': kp.kubePrometheus.namespace +

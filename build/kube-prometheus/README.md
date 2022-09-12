@@ -1,4 +1,4 @@
-# kube-prometheus build
+# k8id kube-prometheus build
 
 Use `build.sh` to build prometheus manifests for a kubernetes cluster.
 See the comment at the top of `build.sh` for how to use it.
@@ -27,6 +27,11 @@ go install -a github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest
 go install github.com/brancz/gojsontoyaml@latest
 go install github.com/google/go-jsonnet/cmd/jsonnet@latest
 ```
+
+Setup the jsonnet file as per the requirement
+
+* Look into [examples folder](./examples)
+
 
 ### Run the build script
 
