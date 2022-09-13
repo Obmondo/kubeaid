@@ -14,4 +14,7 @@ spec:
     keycloak:
       - superuser
   volume:
-    size: 8Gi
+    size: {{ .Values.postgresql.size }}
+    {{- if .Values.postgresql.storageClass }}
+    storageClass: {{ .Values.postgresql.storageClass }}
+    {{- end }}

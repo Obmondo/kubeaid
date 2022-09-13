@@ -36,3 +36,8 @@ keycloakx:
     - name: JAVA_OPTS_APPEND
       value: >-
         -Djgroups.dns.query={{ include "keycloak.fullname" . }}-headless
+  dbchecker:
+    enabled: true
+
+postgresql:
+  size: 4Gi
