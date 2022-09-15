@@ -53,6 +53,14 @@ This repository is only for public apps, supported by Obmondo. Private apps go i
 
 - update the versions to delete outdated charts
 
+### Note
+
+- Be careful about what values you are using, some values can cause the chart to fail to deploy in some scenarios.
+E.g. if you are running copy of a chart,
+make sure you are not using hardcoded ip and port values which can cause conflicts.
+- While deleting an application from ArgoCD, make sure you don't have `finalizers` config in values file.
+Which will cause the application to fail to delete.
+
 ## Adding new charts to argocd-helm-charts
 
 Locally add the repo of the chart first.
