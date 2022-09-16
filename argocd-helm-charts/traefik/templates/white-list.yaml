@@ -1,0 +1,13 @@
+{{- range $k, $v := .Values.ipwhitelists }}
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ $k }}
+spec:
+  ipWhiteList:
+    sourceRange:
+    {{- range $v }}
+      - {{ . }}
+    {{- end }}
+---
+{{- end }}
