@@ -1,0 +1,7 @@
+ipwhitelists:
+  whitelist1:
+    - 127.0.0.1
+    - 192.178.2.2
+  whitelist2:
+    - 123.24.234
+    - 192.1.1.2
