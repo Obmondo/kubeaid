@@ -13,7 +13,7 @@
           {
             alert: 'VeleroBackupPartialFailures',
             expr: |||
-              velero_backup_partial_failure_total{schedule!="", %(selector)s} / velero_backup_attempt_total{schedule!="", %(selector)s} > 0.25
+              sum_over_time(velero_backup_partial_failure_total{schedule!="", %(selector)s}[7d]) / sum_over_time(velero_backup_attempt_total{schedule!="", %(selector)s}[7d]) > 0.25
             ||| % $._config,
             'for': '15m',
             labels: {
@@ -27,7 +27,7 @@
           {
             alert: 'VeleroBackupFailures',
             expr: |||
-              velero_backup_failure_total{schedule!="", %(selector)s} / velero_backup_attempt_total{schedule!="", %(selector)s} > 0.25
+              sum_over_time(velero_backup_failure_total{schedule!="", %(selector)s}[7d]) / sum_over_time(velero_backup_attempt_total{schedule!="", %(selector)s}[7d]) > 0.25
             ||| % $._config,
             'for': '15m',
             labels: {
