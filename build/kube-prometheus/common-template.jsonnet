@@ -257,8 +257,11 @@ local kp =
               disable_login_form: false,
               // oauth_auto_login: true,
               disable_signout_menu: false,
-              signout_redirect_url: vars.grafana_signout_redirect_url,
-            },
+            } + (
+              if vars.grafana_keycloak_enable then {
+                signout_redirect_url: vars.grafana_signout_redirect_url,
+              } else {}
+            ),
             analytics: {
               check_for_updates: false,
             },
