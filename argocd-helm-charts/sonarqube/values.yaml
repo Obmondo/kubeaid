@@ -15,3 +15,5 @@ sonarqube:
 
 postgresql:
   size: 4Gi
+
+networkpolicies: false
