@@ -35,6 +35,16 @@ kubectl -n argocd get ing argo-cd-argocd-server -o jsonpath={.status}
 
 source: https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/keycloak/
 
+```sh
+bcrypt-tool hash "lolpassword" 10
+
+# When creating a new argocd-secret
+kubectl create secret generic argocd-secret --namespace argocd --dry-run=client --from-literal=admin.password='crypt-output-from-above-command' --from-literal=admin.passwordMtime="$(date +%FT%T%Z)" --from-literal=oidc.keycloak.clientSecret='you-get-from-keycloak' --from-literal=server.secretkey='any-random-string-which-is-long-enough' --output=yaml | kubeseal --controller-name sealed-secrets --controller-namespace system -o yaml - > argocd-secret.yaml
+
+# When updating the existing argocd-secret
+kubectl create secret generic argocd-secret --namespace argocd --dry-run=client --from-literal=oidc.keycloak.clientSecret="you-get-from-keycloak" -o yaml| kubeseal --controller-namespace system --controller-name sealed-secrets --format yaml --merge-into argocd-secret.yaml
+```
+
 ```raw
 * To add any new user into argocd as an admin
   login to keycloak
