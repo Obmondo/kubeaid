@@ -10,6 +10,7 @@ resource "aws_s3_bucket" "kops_state" {
 
 resource "aws_s3_bucket_versioning" "kops_state_bucket_versioning" {
   bucket = aws_s3_bucket.kops_state.id
+
   versioning_configuration {
     status = "Enabled"
   }

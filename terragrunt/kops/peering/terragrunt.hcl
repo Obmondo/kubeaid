@@ -2,6 +2,7 @@ include "root" {
   path = find_in_parent_folders()
 }
 
+skip = local.vars.locals.customer_vars.skip_peering
 terraform {
   source = "${get_parent_terragrunt_dir()}/../../terraform//aws/peering"
 }
