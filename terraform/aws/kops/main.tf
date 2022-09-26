@@ -2,7 +2,10 @@ resource "kops_cluster" "cluster" {
   name               = var.cluster_name
   cloud_provider     = "aws"
   kubernetes_version = var.kubernetes_version
-  dns_zone           = "${var.environment}.${var.domain_name}"
+
+  # User sometime have diff TLD in their cluster name
+  # If not given, use the subdomain
+  dns_zone           = var.api_dns_zone != "" ? var.api_dns_zone : "${var.environment}.${var.domain_name}"
   network_id         = var.vpc_id
   network_cidr       = var.cidr
 
@@ -91,27 +94,33 @@ resource "kops_cluster" "cluster" {
 
   # etcd clusters
   etcd_cluster {
-    name = "main"
+    name           = "main"
+    memory_request = "100Mi"
+    cpu_request    = "200m"
 
     dynamic "member" {
       for_each = [0, 1, 2]
 
       content {
-        name           = "master-${member.key}"
-        instance_group = "master-${member.key}"
+        name             = "master-${member.key}"
+        instance_group   = "master-${member.key}"
+        encrypted_volume = true
       }
     }
   }
 
   etcd_cluster {
-    name = "events"
+    name           = "events"
+    memory_request = "100Mi"
+    cpu_request    = "100m"
 
     dynamic "member" {
       for_each = [0, 1, 2]
 
       content {
-        name           = "master-${member.key}"
-        instance_group = "master-${member.key}"
+        name             = "master-${member.key}"
+        instance_group   = "master-${member.key}"
+        encrypted_volume = true
       }
     }
   }
@@ -131,7 +140,7 @@ resource "kops_instance_group" "master-0" {
   additional_user_data {
     name    = "addPublicKey.sh"
     type    = "text/x-shellscript"
-    content = join(" ", data.template_file.admin_ssh_keys.*.rendered)
+    content = join(" ", flatten([["#!/bin/sh"], data.template_file.admin_ssh_keys.*.rendered]))
   }
 }
 
@@ -149,7 +158,7 @@ resource "kops_instance_group" "master-1" {
   additional_user_data {
     name    = "addPublicKey.sh"
     type    = "text/x-shellscript"
-    content = join(" ", data.template_file.admin_ssh_keys.*.rendered)
+    content = join(" ", flatten([["#!/bin/sh"], data.template_file.admin_ssh_keys.*.rendered]))
   }
 }
 
@@ -167,7 +176,7 @@ resource "kops_instance_group" "master-2" {
   additional_user_data {
     name    = "addPublicKey.sh"
     type    = "text/x-shellscript"
-    content = join(" ", data.template_file.admin_ssh_keys.*.rendered)
+    content = join(" ", flatten([["#!/bin/sh"], data.template_file.admin_ssh_keys.*.rendered]))
   }
 }
 
@@ -184,7 +193,7 @@ resource "kops_instance_group" "node-0" {
   additional_user_data {
     name    = "addPublicKey.sh"
     type    = "text/x-shellscript"
-    content = join(" ", data.template_file.admin_ssh_keys.*.rendered)
+    content = join(" ", flatten([["#!/bin/sh"], data.template_file.admin_ssh_keys.*.rendered]))
   }
 }
 

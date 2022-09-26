@@ -102,6 +102,11 @@ variable "subdomain" {
   description = "subdomain of the k8s cluster"
 }
 
+variable "api_dns_zone" {
+  type        = string
+  description = "DNS zone for the k8s api"
+}
+
 variable "admin_ssh_keys" {
   type        = list
   description = "Only one ssh key is supported as of now"
