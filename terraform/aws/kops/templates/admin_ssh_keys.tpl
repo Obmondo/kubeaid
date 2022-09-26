@@ -1,1 +1,2 @@
-echo "${key}" >> /home/admin/.ssh/authorized_keys
+
+echo "${key}" >> /home/ubuntu/.ssh/authorized_keys

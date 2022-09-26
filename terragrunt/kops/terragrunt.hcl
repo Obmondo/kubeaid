@@ -5,10 +5,10 @@ remote_state {
     if_exists = "overwrite_terragrunt"
   }
   config = {
-    bucket  = "${local.cluster_name}-terraform"
+    bucket  = "${local.bucket}"
     region  = "${local.region}"
     encrypt = true
-    key     = "${path_relative_to_include()}/terraform.tfstate"
+    key     = "${local.cluster_name}/${path_relative_to_include()}/terraform.tfstate"
   }
 }
 
@@ -35,4 +35,5 @@ locals {
   cluster_name = local.customer_vars.cluster_name
   subdomain    = "${local.customer_vars.environment}.${local.customer_vars.domain_name}"
   region       = local.customer_vars.region
+  bucket       = local.customer_vars.terraform_bucket
 }
