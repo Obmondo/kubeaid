@@ -58,8 +58,11 @@ they need it.
 Mirror this repo and the `kubernetes-config` repo into a Git platform of your choice, and follow the `README` file in
 the `kubernetes-config` repository on how to write the config for your Kubernetes cluster.
 
-You must NEVER alter your copy of this mirror as we use this to deliver updates to you. This means that your cluster can
-be updated simply by running `git pull` on your copy of this repository.
+You must NEVER make any changes on the master/main branch of you mirror of the k8id repository, as we use this to
+deliver updates to you. This means that your cluster can be updated simply by running `git pull` on your copy of
+this repository.
+
+**TODO:** Add description of the proper way to make changes, in the form of a pull request
 
 All customizations happens in your `kubernetes-config` repo.
 
@@ -72,7 +75,7 @@ help you with developing new features or other tasks on clusters, setup using th
 There are ZERO vendor lockin - so any subscription you sign - can be cancelled at any time - you only pay for 1 month at
 a time.
 
-With a subscription we will be there, to ensure your smooth operations, in timeso f sickness and employee shortages -
+With a subscription we will be there, to ensure your smooth operations, in times of sickness and employee shortages -
 and able to scale your development efforts on k8id if needed.
 
 ## Secrets
@@ -123,6 +126,7 @@ TODO: Get autoscaling working for AKS and GCP.
 
 We use upstream Helm charts preferrably - and use the Helm Umbrella pattern in ArgoCD - so the 'root' application,
 manages the rest of the applications in a cluster.
+**TODO:** Link to documentation describing the "Helm Umbrella patters"
 
 ### Build advanced, customized Prometheus monitoring, using just a per-cluster config file
 
@@ -131,6 +135,8 @@ your 'kubernetes-config' repo - when changes are made (by doing git pull on repo
 
 You can also adjust your settings for Prometheus per-cluster - in your `kubernetes-config` repo, and trigger a CI
 rebuild in this repo, to get an updated build PR generated - which can then be sync'ed to production.
+
+**TODO:** Link to documentation describing how to configure this
 
 We currently have CI support for Gitlab and Github actions.
 
@@ -190,6 +196,8 @@ TODO: Add vulnerability scanning of docker images used
 
 ## Create a VM with gitlab server setup and running
 
+**TODO:** Add an introduction, describing what you are going to do here
+
 Start with initializing your terraform providers
 
 ```sh
@@ -213,6 +221,7 @@ Look at the `variables.tf` file to see what all variables your config file must 
 ### Example
 
 Sample config file `example.tfvars`
+**TODO:** Describe what the configuration keys mean
 
 ```text
 gitlab_vm_name = "kilroy-gitlab"
@@ -252,6 +261,7 @@ terraform -chdir=cluster-setup-files/terraform/aks init
 ```
 
 Sample config file
+**TODO:** Describe what the configuration keys mean, or link to documentation that does
 
 ```text
 cluster_name = "k8s-prod"
@@ -280,6 +290,8 @@ terraform -chdir=cluster-setup-files/terraform/aks apply -var-file=../k8id-confi
 
 ## CI build and automatic pull requests
 
+**TODO:** Add documentation describing what is actually going on here
+
 To automatically build K8id in CI and create a pull request against your own config repository additional configuration
 may be required.
 
@@ -288,13 +300,15 @@ may be required.
 The `kube-prometheus` needs two secrets thats needs to be present
 
 1. alertmanager-main - It is the secret that contains the alertmanager config file.
-   An example template for the alertmanager config can be found here
-   https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/build/kube-prometheus/example-alertmanager-config/alertmanager-main.yaml
-
+   An example template for the alertmanager config can be found [here](build/kube-prometheus/examples/alertmanager-config/alertmanager-main.yaml)
+   
 2. obmondo-clientcert - This secret contains the `tls.crt` which is the certificate and `tls.key` which is the private key.
    This cert and key must be generated from the puppetserver. And then copied over to the secret
+   **Comment:** Which puppetserver is that, and how is that used?
 
 ### GitHub
+
+**TODO:** Start by documenting what these pull requests are actually all about....
 
 K8id implements a GitHub Action that is used to automatically create pull requests. For this to work the following
 variables should be set:
@@ -314,6 +328,8 @@ repository. This can be done by in repository settings under the heading "Pull R
 result in the CI job not creating new PRs as long as a branch named `obmondo-deploy` exists.
 
 ### GitLab
+
+**TODO:** Start by documenting what these pull requests are actually all about....
 
 K8id requires two CI/CD secrets to be configured in order for GitLab CI to be able to create merge requests against a
 config repository:
