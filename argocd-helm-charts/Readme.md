@@ -24,8 +24,8 @@ dependencies:
 Use [this script](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/bin/helm-repo-update.sh)
 to get the upstream chart and dependencies
 
-```bash
-./helm-repo-update.sh --update-helm-chart <name-of-chart>
+```sh
+./bin/helm-repo-update.sh --update-helm-chart <name-of-chart>
 ```
 
 Note:
