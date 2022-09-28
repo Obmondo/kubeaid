@@ -122,6 +122,8 @@ local scrape_namespaces = std.uniq(std.sort(std.flattenArrays(
   )
 )));
 
+local relabelings = import 'kube-prometheus/addons/dropping-deprecated-metrics-relabelings.libsonnet';
+
 local kp =
   (import 'kube-prometheus/main.libsonnet') +
   // Uncomment the following imports to enable its patches
@@ -195,7 +197,49 @@ local kp =
         },
       },
     },
-  } +
+  } + (
+    if vars.platform == 'kubeadm' then {
+      kubernetesControlPlane+: {
+        serviceMonitorKubeScheduler+: {
+          spec+: {
+            endpoints: [{
+              port: 'https-metrics',
+              interval: '30s',
+              scheme: 'http',
+              bearerTokenFile: '/var/run/secrets/kubernetes.io/serviceaccount/token',
+              tlsConfig: { insecureSkipVerify: true },
+            }],
+          },
+        },
+        serviceMonitorKubeControllerManager+: {
+          spec+: {
+            endpoints: [{
+              port: 'https-metrics',
+              interval: '30s',
+              scheme: 'http',
+              bearerTokenFile: '/var/run/secrets/kubernetes.io/serviceaccount/token',
+              tlsConfig: {
+                insecureSkipVerify: true,
+              },
+              metricRelabelings: relabelings + [
+                {
+                  sourceLabels: ['__name__'],
+                  regex: 'etcd_(debugging|disk|request|server).*',
+                  action: 'drop',
+                },
+              ],
+            }],
+            selector: {
+              matchLabels: { 'app.kubernetes.io/name': 'kube-controller-manager' },
+            },
+            namespaceSelector: {
+              matchNames: ['kube-system'],
+            },
+          },
+        },
+      },
+    } else {}
+  ) +
   {
     values+:: {
       common+: {
