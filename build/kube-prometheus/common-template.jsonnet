@@ -216,7 +216,7 @@ local kp =
             endpoints: [{
               port: 'https-metrics',
               interval: '30s',
-              scheme: 'https',
+              scheme: 'http',
               bearerTokenFile: '/var/run/secrets/kubernetes.io/serviceaccount/token',
               tlsConfig: {
                 insecureSkipVerify: true,
