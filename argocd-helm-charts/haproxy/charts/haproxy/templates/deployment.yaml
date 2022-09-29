@@ -19,6 +19,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "haproxy.fullname" . }}
+  namespace: {{ template "haproxy.namespace" . }}
   labels:
     {{- include "haproxy.labels" . | nindent 4 }}
   {{- if .Values.podAnnotations }}
@@ -26,6 +27,7 @@ metadata:
 {{ toYaml .Values.podAnnotations | indent 4 }}
   {{- end }}
 spec:
+  minReadySeconds: {{ .Values.minReadySeconds }}
   {{- if and (not .Values.autoscaling.enabled) (not .Values.keda.enabled) }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
