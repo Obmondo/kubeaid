@@ -1,10 +1,9 @@
 annotations:
   artifacthub.io/changes: |
-    - Update base image to 2.6.1 release
-    - Add HPA Keda support and improvements to ServiceMonitor
-    - Add PSP for sysctl and remove privileged containers use
+    - Update base image to 2.6.5 release
+    - Fix for namespaceOverride not used for configMap
 apiVersion: v2
-appVersion: 2.6.1
+appVersion: 2.6.5
 description: A Helm chart for HAProxy on Kubernetes
 home: https://github.com/haproxytech/helm-charts/tree/main/haproxy
 icon: https://raw.githubusercontent.com/haproxytech/helm-charts/main/haproxy/chart-icon.png
@@ -18,4 +17,4 @@ name: haproxy
 sources:
 - http://www.haproxy.org/
 type: application
-version: 1.15.0
+version: 1.17.0
