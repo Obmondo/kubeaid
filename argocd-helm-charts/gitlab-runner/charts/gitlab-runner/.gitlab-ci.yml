@@ -115,6 +115,7 @@ release development:
     paths:
     - gitlab-runner*.tgz
     expire_in: 7d
+  allow_failure: true
 
 release beta:
   extends:

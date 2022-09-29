@@ -63,18 +63,6 @@ imagePullPolicy: IfNotPresent
 # runnerToken: ""
 #
 
-## Unregister runner before termination
-##
-## Updating the runner's chart version or configuration will cause the runner container
-## to be terminated and created again. This may cause your GitLab instance to reference
-## non-existant runners. Un-registering the runner before termination mitigates this issue.
-## ref: https://docs.gitlab.com/runner/commands/index.html#gitlab-runner-unregister
-##
-## Please set unregisterRunners to false if you set unregisterRunner to true as only
-## one preStop action is supported.
-##
-# unregisterRunner: true
-
 ## Unregister all runners before termination
 ##
 ## Updating the runner's chart version or configuration will cause the runner container
@@ -162,9 +150,14 @@ rbac:
   ## - apiGroups: default "" (indicates the core API group) if missing or empty.
   ## - resources: default "*" if missing or empty.
   ## - verbs: default "*" if missing or empty.
+  ##
+  ## Read more about the recommended rules on the following link
+  ##
+  ## ref: https://docs.gitlab.com/runner/executors/kubernetes.html#configuring-executor-service-account
+  ##
   rules: []
   # - resources: ["configmaps", "pods", "pods/attach", "secrets", "services"]
-  #   verbs: ["get", "list", "watch", "create", "patch", "delete"]
+  #   verbs: ["get", "list", "watch", "create", "patch", "update", "delete"]
   # - apiGroups: [""]
   #   resources: ["pods/exec"]
   #   verbs: ["create", "patch", "delete"]

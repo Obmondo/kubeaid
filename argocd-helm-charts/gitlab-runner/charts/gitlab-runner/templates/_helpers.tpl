@@ -96,19 +96,7 @@ Define the server session external port, using 8093 as a default value
 {{- end -}}
 
 {{/*
-Unregister runner on pod stop
-*/}}
-{{- define "gitlab-runner.unregisterRunner" -}}
-{{- if or (and (hasKey .Values "unregisterRunner") .Values.unregisterRunner) (and (not (hasKey .Values "unregisterRunner")) .Values.runnerRegistrationToken) -}}
-lifecycle:
-  preStop:
-    exec:
-      command: ["/entrypoint", "unregister", "--config=/home/gitlab-runner/.gitlab-runner/config.toml"]
-{{- end -}}
-{{- end -}}
-
-{{/*
-Unregister all runners on pod stop
+Unregister runners on pod stop
 */}}
 {{- define "gitlab-runner.unregisterRunners" -}}
 {{- if or (and (hasKey .Values "unregisterRunners") .Values.unregisterRunners) (and (not (hasKey .Values "unregisterRunners")) .Values.runnerRegistrationToken) -}}
