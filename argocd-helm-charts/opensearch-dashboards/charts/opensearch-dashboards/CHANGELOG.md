@@ -13,6 +13,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Security
 ---
+## [2.5.2]
+### Added
+- Template configmap content by tpl function
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.5.1]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- ingress helm validation error fix by removing additional hyphen
+### Security
+---
+## [2.5.0]
+### Added
+### Changed
+- Updated version to 2.5.0 and appVersion to "2.3.0".
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.4.2]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- OpenSearch Dashboards fixed failure when ingress service port is a string (named port)
+### Security
+---
+## [2.4.1]
+### Added
+- Helm chart-releaser parallel release issue, updated version to 2.4.1.
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.4.0]
+### Added
+- Updated version to 2.4.0 and appVersion to "2.2.1".
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
 ## [2.3.0]
 ### Added
 - Updated version to 2.3.0 and appVersion to "2.2.0".
@@ -95,7 +149,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Security
 
-[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.3.0...HEAD
+[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.5.2...HEAD
+[2.5.2]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.5.1...opensearch-dashboards-2.5.2
+[2.5.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.5.0...opensearch-dashboards-2.5.1
+[2.5.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.4.1...opensearch-dashboards-2.5.0
+[2.4.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.4.0...opensearch-dashboards-2.4.1
+[2.4.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.3.0...opensearch-dashboards-2.4.0
 [2.3.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.2.4...opensearch-dashboards-2.3.0
 [2.2.4]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.2.3...opensearch-dashboards-2.2.4
 [2.2.3]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.2.2...opensearch-dashboards-2.2.3
