@@ -125,7 +125,7 @@ clusterAPICloudConfigPath: /etc/kubernetes/mgmt-kubeconfig
 clusterAPIConfigMapsNamespace: ""
 
 # cloudConfigPath -- Configuration file for cloud provider.
-cloudConfigPath: /etc/gce.conf
+cloudConfigPath: ""
 
 # cloudProvider -- The cloud provider where the autoscaler runs.
 # Currently only `gce`, `aws`, `azure`, `magnum` and `clusterapi` are supported.
@@ -342,6 +342,11 @@ serviceMonitor:
     release: prometheus-operator
   # serviceMonitor.path -- The path to scrape for metrics; autoscaler exposes `/metrics` (this is standard)
   path: /metrics
+  # serviceMonitor.annotations -- Annotations to add to service monitor
+  annotations: {}
+  ## [RelabelConfig](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.RelabelConfig)
+  # serviceMonitor.metricRelabelings -- MetricRelabelConfigs to apply to samples before ingestion.
+  metricRelabelings: {}
 
 ## Custom PrometheusRule to be defined
 ## The value is evaluated as a template, so, for example, the value can depend on .Release or .Chart
