@@ -30,7 +30,7 @@ spec:
         {{- toYaml .Values.deployment.podLabels | nindent 8 }}
         {{- end }}
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
         {{- if .Values.deployment.podAnnotations }}
         {{- toYaml .Values.deployment.podAnnotations | nindent 8 }}
         {{- end }}
@@ -114,8 +114,8 @@ spec:
             secretName: {{ .Values.configFromSecretRef }}
     {{- else }}
         - name: config
-          configMap:
-            name: {{ template "cerebro.fullname" . }}
+          secret:
+            secretName: {{ template "cerebro.fullname" . }}
     {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
