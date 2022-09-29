@@ -7,9 +7,12 @@ fullnameOverride: ""
 
 replicaCount: 2
 
+useFIPS: false
+podIAMAuthorization: false
+
 image:
   repository: amazon/aws-efs-csi-driver
-  tag: "v1.4.0"
+  tag: "v1.4.1"
   pullPolicy: IfNotPresent
 
 sidecars:
