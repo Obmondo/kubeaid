@@ -305,7 +305,7 @@ Though enough for the majority of installations, the default PodSecurityPolicy _
 | azureTenantID | string | `""` | Azure tenant where the resources are located. Required if `cloudProvider=azure` |
 | azureUseManagedIdentityExtension | bool | `false` | Whether to use Azure's managed identity extension for credentials. If using MSI, ensure subscription ID, resource group, and azure AKS cluster name are set. |
 | azureVMType | string | `"AKS"` | Azure VM type. |
-| cloudConfigPath | string | `"/etc/gce.conf"` | Configuration file for cloud provider. |
+| cloudConfigPath | string | `""` | Configuration file for cloud provider. |
 | cloudProvider | string | `"aws"` | The cloud provider where the autoscaler runs. Currently only `gce`, `aws`, `azure`, `magnum` and `clusterapi` are supported. `aws` supported for AWS. `gce` for GCE. `azure` for Azure AKS. `magnum` for OpenStack Magnum, `clusterapi` for Cluster API. |
 | clusterAPICloudConfigPath | string | `"/etc/kubernetes/mgmt-kubeconfig"` | Path to kubeconfig for connecting to Cluster API Management Cluster, only used if `clusterAPIMode=kubeconfig-kubeconfig or incluster-kubeconfig` |
 | clusterAPIConfigMapsNamespace | string | `""` | Namespace on the workload cluster to store Leader election and status configmaps |
@@ -364,8 +364,10 @@ Though enough for the majority of installations, the default PodSecurityPolicy _
 | service.portName | string | `"http"` | Name for service port. |
 | service.servicePort | int | `8085` | Service port to expose. |
 | service.type | string | `"ClusterIP"` | Type of service to create. |
+| serviceMonitor.annotations | object | `{}` | Annotations to add to service monitor |
 | serviceMonitor.enabled | bool | `false` | If true, creates a Prometheus Operator ServiceMonitor. |
 | serviceMonitor.interval | string | `"10s"` | Interval that Prometheus scrapes Cluster Autoscaler metrics. |
+| serviceMonitor.metricRelabelings | object | `{}` | MetricRelabelConfigs to apply to samples before ingestion. |
 | serviceMonitor.namespace | string | `"monitoring"` | Namespace which Prometheus is running in. |
 | serviceMonitor.path | string | `"/metrics"` | The path to scrape for metrics; autoscaler exposes `/metrics` (this is standard) |
 | serviceMonitor.selector | object | `{"release":"prometheus-operator"}` | Default to kube-prometheus install (CoreOS recommended), but should be set according to Prometheus install. |
