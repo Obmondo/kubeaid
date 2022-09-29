@@ -86,13 +86,18 @@ The command removes all the Kubernetes components associated with the chart and 
 | ------------------------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------- |
 | `image.registry`                                  | Sealed Secrets image registry                                                        | `docker.io`                         |
 | `image.repository`                                | Sealed Secrets image repository                                                      | `bitnami/sealed-secrets-controller` |
-| `image.tag`                                       | Sealed Secrets image tag (immutable tags are recommended)                            | `v0.18.1`                           |
+| `image.tag`                                       | Sealed Secrets image tag (immutable tags are recommended)                            | `v0.18.5`                           |
 | `image.pullPolicy`                                | Sealed Secrets image pull policy                                                     | `IfNotPresent`                      |
 | `image.pullSecrets`                               | Sealed Secrets image pull secrets                                                    | `[]`                                |
 | `createController`                                | Specifies whether the Sealed Secrets controller should be created                    | `true`                              |
 | `secretName`                                      | The name of an existing TLS secret containing the key used to encrypt secrets        | `sealed-secrets-key`                |
 | `updateStatus`                                    | Specifies whether the Sealed Secrets controller should update the status subresource | `true`                              |
 | `keyrenewperiod`                                  | Specifies key renewal period. Default 30 days                                        | `""`                                |
+| `rateLimit`                                       | Number of allowed sustained request per second for verify endpoint                   | `""`                                |
+| `rateLimitBurst`                                  | Number of requests allowed to exceed the rate limit per second for verify endpoint   | `""`                                |
+| `additionalNamespaces`                            | List of namespaces used to manage the Sealed Secrets                                 | `[]`                                |
+| `additionalVolumes`                               | Extra volumes to be added to the controller deployment                               | `[]`                                |
+| `additionalVolumeMounts`                          | Extra volumeMounts to be added to the controller deployment's container              | `[]`                                |
 | `command`                                         | Override default container command                                                   | `[]`                                |
 | `args`                                            | Override default container args                                                      | `[]`                                |
 | `livenessProbe.enabled`                           | Enable livenessProbe on Sealed Secret containers                                     | `true`                              |
@@ -132,6 +137,8 @@ The command removes all the Kubernetes components associated with the chart and 
 | `affinity`                                        | Affinity for Sealed Secret pods assignment                                           | `{}`                                |
 | `nodeSelector`                                    | Node labels for Sealed Secret pods assignment                                        | `{}`                                |
 | `tolerations`                                     | Tolerations for Sealed Secret pods assignment                                        | `[]`                                |
+| `hostNetwork`                                     | Run Sealed Secret pods in the host network of the node where the pod is deployed     | `false`                             |
+| `dnsPolicy`                                       | Sealed Secret pods' dnsPolicy                                                        | `""`                                |
 
 
 ### Traffic Exposure Parameters
@@ -160,15 +167,17 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Other Parameters
 
-| Name                                          | Description                                               | Value   |
-| --------------------------------------------- | --------------------------------------------------------- | ------- |
-| `serviceAccount.create`                       | Specifies whether a ServiceAccount should be created      | `true`  |
-| `serviceAccount.labels`                       | Extra labels to be added to the ServiceAccount            | `{}`    |
-| `serviceAccount.name`                         | The name of the ServiceAccount to use.                    | `""`    |
-| `serviceAccount.automountServiceAccountToken` | Specifies, whether to mount the service account API-token | `""`    |
-| `rbac.create`                                 | Specifies whether RBAC resources should be created        | `true`  |
-| `rbac.labels`                                 | Extra labels to be added to RBAC resources                | `{}`    |
-| `rbac.pspEnabled`                             | PodSecurityPolicy                                         | `false` |
+| Name                                          | Description                                                   | Value   |
+| --------------------------------------------- | ------------------------------------------------------------- | ------- |
+| `serviceAccount.annotations`                  | Extra labels to be added to the ServiceAccount                | `{}`    |
+| `serviceAccount.create`                       | Specifies whether a ServiceAccount should be created          | `true`  |
+| `serviceAccount.labels`                       | Extra labels to be added to the ServiceAccount                | `{}`    |
+| `serviceAccount.name`                         | The name of the ServiceAccount to use.                        | `""`    |
+| `serviceAccount.automountServiceAccountToken` | Specifies, whether to mount the service account API-token     | `""`    |
+| `rbac.create`                                 | Specifies whether RBAC resources should be created            | `true`  |
+| `rbac.clusterRole`                            | Specifies whether the Cluster Role resource should be created | `true`  |
+| `rbac.labels`                                 | Extra labels to be added to RBAC resources                    | `{}`    |
+| `rbac.pspEnabled`                             | PodSecurityPolicy                                             | `false` |
 
 
 ### Metrics parameters
@@ -180,6 +189,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `metrics.serviceMonitor.labels`            | Extra labels for the ServiceMonitor                                                    | `{}`    |
 | `metrics.serviceMonitor.annotations`       | Extra annotations for the ServiceMonitor                                               | `{}`    |
 | `metrics.serviceMonitor.interval`          | How frequently to scrape metrics                                                       | `""`    |
+| `metrics.serviceMonitor.honorLabels`       | Specify if ServiceMonitor endPoints will honor labels                                  | `true`  |
 | `metrics.serviceMonitor.scrapeTimeout`     | Timeout after which the scrape is ended                                                | `""`    |
 | `metrics.serviceMonitor.metricRelabelings` | Specify additional relabeling of metrics                                               | `[]`    |
 | `metrics.serviceMonitor.relabelings`       | Specify general relabeling                                                             | `[]`    |
@@ -250,7 +260,7 @@ Find more information about how to deal with common errors related to Bitnami's 
 
 ### To 2.0.0
 
-A major refactoring of the chart has been performed to adopt several common practices for Helm charts. Upgrades from previous chart versions should work, however, the values structure suffered several changes and you'll have to adapt your custom values/parameters so they're aligned with the new structure. For instance, these are a couple of examples:
+A major refactoring of the chart has been performed to adopt several common practices for Helm charts. Upgrades from previous chart versions should work, however, the values structure experienced several changes and you'll have to adapt your custom values/parameters so they're aligned with the new structure. For instance, these are a couple of examples:
 
 - `controller.create` renamed as `createController`.
 - `securityContext.*` parameters are deprecated in favor of `podSecurityContext.*`, and `containerSecurityContext.*` ones.
