@@ -21,6 +21,12 @@ serviceAccount:
   create: true
   name:
 
+## Override namespace for for the whole chart
+## If namespaceOverride is set, helm will use it's value instead of .Release.Namespace for all chart components.
+## It is useful in case Haproxy is used as a dependency for another helm chart. Value can be overridden in parent chart values.yaml
+## Example values.yaml of parent chart:
+# namespaceOverride: haproxytech
+
 ## Default values for image
 image:
   repository: haproxytech/haproxy-alpine    # can be changed to use CE or EE images
@@ -76,6 +82,10 @@ sidecarContainers: []
 ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/
 kind: Deployment    # can be 'Deployment' or 'DaemonSet'
 replicaCount: 1   # used only for Deployment mode
+
+## minReadySeconds setting of Deployment or DaemonSet
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#min-ready-seconds
+minReadySeconds: 0
 
 ## Command line arguments to pass to HAProxy
 args:
@@ -355,6 +365,15 @@ securityContext:
   enabled: false
   runAsUser: 1000
   runAsGroup: 1000
+  allowPrivilegeEscalation: true
+  runAsNonRoot: true
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - NET_BIND_SERVICE
+  seccompProfile:
+    type: RuntimeDefault
 
 ## Compute Resources
 ## ref: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
