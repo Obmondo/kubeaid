@@ -49,7 +49,6 @@ spec:
         image: {{ include "gitlab-runner.image" . }}
         imagePullPolicy: {{ default "" .Values.imagePullPolicy | quote }}
         securityContext: {{ toYaml .Values.securityContext | nindent 10 }}
-        {{- include "gitlab-runner.unregisterRunner" . | nindent 8 }}
         {{- include "gitlab-runner.unregisterRunners" . | nindent 8 }}
         command: ["/usr/bin/dumb-init", "--", "/bin/bash", "/configmaps/entrypoint"]
         env:
