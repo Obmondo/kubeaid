@@ -49,6 +49,12 @@ spec:
       {{- if .Values.automountServiceAccountToken }}
       automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
       {{- end }}
+      {{- if .Values.hostNetwork }}
+      hostNetwork: true
+      {{- end }}
+      {{- if .Values.dnsPolicy }}
+      dnsPolicy: {{ .Values.dnsPolicy }}
+      {{- end }}
       containers:
         - name: controller
           command:
@@ -78,6 +84,10 @@ spec:
             {{- end }}
             - --key-prefix
             - {{ .Values.secretName | quote }}
+            {{- if .Values.additionalNamespaces }}
+            - --additional-namespaces
+            - {{ join "," .Values.additionalNamespaces | quote }}
+            {{- end }}
           {{- end }}
           image: {{ printf "%s/%s:%s" .Values.image.registry .Values.image.repository .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -114,9 +124,15 @@ spec:
           securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 12 }}
           {{- end }}
           volumeMounts:
+            {{- if .Values.additionalVolumeMounts }}
+              {{- toYaml .Values.additionalVolumeMounts | nindent 12 }} 
+            {{- end }}
             - mountPath: /tmp
               name: tmp
-      volumes:
+      volumes: 
+      {{- if .Values.additionalVolumes }}
+        {{- toYaml .Values.additionalVolumes | nindent 8 }} 
+      {{- end }}
         - name: tmp
           emptyDir: {}
 {{- end }}
