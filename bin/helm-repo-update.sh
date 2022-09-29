@@ -207,7 +207,8 @@ if "$UPDATE_ALL"; then
   find ./"$ARGOCD_CHART_PATH" -maxdepth 1 -mindepth 1 -type d | sort | while read -r path; do
     chart_name=$(basename "$path")
 
-    git switch --create "${chart_name}_${CI_JOB_ID}" --track "origin/master"
+    unique_branch_id=$(echo $RANDOM | base64)
+    git switch --create "${chart_name}_${unique_branch_id}" --track "origin/master"
 
     update_helm_chart "$path" "$CHART_VERSION"
 
