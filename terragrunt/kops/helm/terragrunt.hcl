@@ -12,8 +12,8 @@ dependency "iam" {
   skip_outputs = true
 }
 
-dependency "kops" {
-  config_path = "../kops"
+dependency "cluster" {
+  config_path = "../cluster"
 
   mock_outputs = {
     kube_config = {
@@ -32,10 +32,10 @@ locals {
 inputs = merge(
   local.vars.locals.customer_vars,
   {
-    k8s_host                   = dependency.kops.outputs.kube_config.server,
-    k8s_client_key             = base64encode(dependency.kops.outputs.kube_config.client_key),
-    k8s_cluster_ca_certificate = base64encode(dependency.kops.outputs.kube_config.ca_certs),
-    k8s_client_certificate     = base64encode(dependency.kops.outputs.kube_config.client_cert),
+    k8s_host                   = dependency.cluster.outputs.kube_config.server,
+    k8s_client_key             = base64encode(dependency.cluster.outputs.kube_config.client_key),
+    k8s_cluster_ca_certificate = base64encode(dependency.cluster.outputs.kube_config.ca_certs),
+    k8s_client_certificate     = base64encode(dependency.cluster.outputs.kube_config.client_cert),
     subdomain                  = local.vars.locals.subdomain
   }
 )
