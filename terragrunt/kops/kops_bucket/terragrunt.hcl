@@ -8,9 +8,10 @@ remote_state {
     bucket  = "${local.bucket}"
     region  = "${local.region}"
     encrypt = true
-    key     = "${local.cluster_name}/${path_relative_to_include()}/terraform.tfstate"
+    key     = "kops_bucket/terraform.tfstate"
   }
 }
+
 
 # Indicate what region to deploy the resources into
 generate "provider" {
@@ -23,10 +24,15 @@ provider "aws" {
 EOF
 }
 
+skip = local.customer_vars.setup_kops_bucket == false ? true : false
+
+terraform {
+  source = "${get_parent_terragrunt_dir()}/../../../terraform//aws/kops_bucket"
+}
+
 locals {
    tags = {
-    name      = local.customer_vars.cluster_name
-    env       = local.customer_vars.environment
+    kops      = true
     terraform = true
   }
 
@@ -36,4 +42,10 @@ locals {
   subdomain    = "${local.customer_vars.environment}.${local.customer_vars.domain_name}"
   region       = local.customer_vars.region
   bucket       = local.customer_vars.terraform_bucket
+}
+
+inputs = {
+  kops_state_bucket_name = local.customer_vars.kops_state_bucket_name,
+  cluster_name           = local.cluster_name,
+  environment            = local.customer_vars.environment,
 }
