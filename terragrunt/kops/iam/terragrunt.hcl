@@ -20,7 +20,7 @@ dependency "vpc" {
 }
 
 dependencies {
-  paths = ["../vpc", "../kops"]
+  paths = ["../vpc", "../cluster"]
 }
 
 inputs = merge(
