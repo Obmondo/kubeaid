@@ -3,7 +3,7 @@ include "root" {
 }
 
 terraform {
-  source = "${get_parent_terragrunt_dir()}/../../terraform//aws/kops"
+  source = "${get_parent_terragrunt_dir()}/../../terraform//aws/cluster"
 }
 
 dependency "peering" {
