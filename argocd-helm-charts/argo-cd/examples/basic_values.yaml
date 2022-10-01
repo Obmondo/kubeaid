@@ -1,0 +1,53 @@
+---
+argo-cd:
+  dex:
+    enabled: false
+  repoServer:
+    replicas: 2
+    autoscaling:
+      enabled: false
+  configs:
+    secret:
+      # managed by sealed-secrets now
+      createSecret: false
+  server:
+    rbacConfig:
+      policy.csv: |
+        g, SRE, role:admin
+    extraArgs:
+      - --insecure
+    config:
+      url: https://argocd.example.com
+      oidc.config: |
+        name: Keycloak
+        issuer: https://keycloakx.example.com/auth/realms/Obmondo
+        clientID: argocd
+        clientSecret: $oidc.keycloak.clientSecret
+        requestedScopes: ["openid", "profile", "email", "groups"]
+      repositories:
+        - type: git
+          url: https://gitlab.com/kubernetes/k8id.git
+          usernameSecret:
+            name: k8id-argocd
+            key: username
+          passwordSecret:
+            name: k8id-argocd
+            key: password
+        - type: git
+          url: https://gitlab.com/kubernetes/kubernetes-config-enableit.git
+          usernameSecret:
+            name: k8id-config-argocd
+            key: username
+          passwordSecret:
+            name: k8id-config-argocd
+            key: password
+    ingress:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt
+      hosts:
+      - argocd.example.com
+      tls:
+      - secretName: argocd-ssl
+        hosts:
+        - argocd.example.com

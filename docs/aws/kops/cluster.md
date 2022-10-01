@@ -1,44 +1,56 @@
 # Setup Kubernetes cluster on AWS with Kops
 
-  1. Configure your AWS profile
+## Prerequisite
 
-     ```sh
-     export AWS_PROFILE=default
-     ```
+  ```text
+  kops
+  awscli
+  ```
 
-  2. Create a [value.yaml](./samples/values.yaml)
+## Setup
 
-  3. Export the values.yaml file
+* Configure your AWS profile
 
-     ```sh
-     export OBMONDO_VARS_FILE=/path/to/yaml/values/file
-     ```
+   ```sh
+   export AWS_PROFILE=default
+   ```
 
-  4. [Setup wireguard instance for vpn setup](./wireguard.md)
+* Create a [values.yaml](./samples/values.yaml) and export the values.yaml file
 
-  5. Deploy the cluster
+   ```sh
+   export OBMONDO_VARS_FILE=/path/to/yaml/values/file
+   ```
 
-      ```sh
-      cd terragrunt/kops
+* Setup wireguard instance for [vpn setup](./wireguard.md) if you want one. This is optional
 
-      terragrunt run-all plan
-      terragrunt run-all apply
-      INFO[0000] The stack at /home/ashish/k8id-all/k8id/terragrunt/kops will be processed in the following order for command apply:
-      Group 1
-      - Module /home/ashish/k8id-all/k8id/terragrunt/kops/kops_bucket
-      - Module /home/ashish/k8id-all/k8id/terragrunt/kops/vpc
+* Deploy the cluster
 
-      Group 2
-      - Module /home/ashish/k8id-all/k8id/terragrunt/kops/peering
+    ```sh
+    cd terragrunt/kops
 
-      Group 3
-      - Module /home/ashish/k8id-all/k8id/terragrunt/kops/cluster
+    terragrunt run-all plan
+    terragrunt run-all apply
+    INFO[0000] The stack at /home/ashish/k8id-all/k8id/terragrunt/kops will be processed in the following order for command apply:
+    Group 1
+    - Module /home/ashish/k8id-all/k8id/terragrunt/kops/kops_bucket
+    - Module /home/ashish/k8id-all/k8id/terragrunt/kops/vpc
 
-      Group 4
-      - Module /home/ashish/k8id-all/k8id/terragrunt/kops/iam
+    Group 2
+    - Module /home/ashish/k8id-all/k8id/terragrunt/kops/peering
 
-      Group 5
-      - Module /home/ashish/k8id-all/k8id/terragrunt/kops/helm
+    Group 3
+    - Module /home/ashish/k8id-all/k8id/terragrunt/kops/cluster
 
-      Are you sure you want to run 'terragrunt apply' in each folder of the stack described above? (y/n) y
-      ```
+    Group 4
+    - Module /home/ashish/k8id-all/k8id/terragrunt/kops/iam
+
+    Group 5
+    - Module /home/ashish/k8id-all/k8id/terragrunt/kops/helm
+
+    Are you sure you want to run 'terragrunt apply' in each folder of the stack described above? (y/n) y
+    ```
+
+* Argocd Setup
+
+  * Arogcd `root` app Setup [docs](../../../argocd-helm-charts/argo-cd/Readme.md/#setup-root-argocd-application)
+  * Arogcd repo Setup [docs](../../../argocd-helm-charts/argo-cd/Readme.md/#add-argocd-repos)
