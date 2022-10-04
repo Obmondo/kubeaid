@@ -3,6 +3,9 @@ sonarqube:
     enabled: false
   postgresql:
     enabled: false
+  resources:
+    limits:
+      cpu: null
   jdbcOverwrite:
     enable: true
     jdbcSecretName: sonarqube-admin.sonarqube-pgsql.credentials.postgresql.acid.zalan.do
