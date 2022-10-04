@@ -1,0 +1,3 @@
+deviceFilter: '^sd[ab]4$'
+storageclass:
+  default: true
