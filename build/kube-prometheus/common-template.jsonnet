@@ -278,25 +278,22 @@ local kp =
       grafana+: {
         analytics+: {
           check_for_updates: false,
-        } + (
-          if vars.grafana_keycloak_enable then {
-            env: [
-              {
-                name: 'GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION',
-                value: 'true',
+        },
+        env: if vars.grafana_keycloak_enable then [
+          {
+            name: 'GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION',
+            value: 'true',
+          },
+          {
+            name: 'GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET',
+            valueFrom+: {
+              secretKeyRef+: {
+                name: vars.grafana_keycloak_secretref.name,
+                key: vars.grafana_keycloak_secretref.key,
               },
-              {
-                name: 'GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET',
-                valueFrom+: {
-                  secretKeyRef+: {
-                    name: vars.grafana_keycloak_secretref.name,
-                    key: vars.grafana_keycloak_secretref.key,
-                  },
-                },
-              },
-            ],
-          } else []
-        ),
+            },
+          },
+        ] else [],
         config+: {
           sections: {
             date_formats: { default_timezone: 'UTC' },
