@@ -1,17 +1,16 @@
+---
 apiVersion: "acid.zalan.do/v1"
 kind: postgresql
 metadata:
-  name: sonarqube-pgsql
+  name: teamname-postgresql
   namespace: sonarqube
 spec:
-  teamId: sonarqube
+  teamId: teamname
   volume:
-    size: {{ .Values.postgresql.size }}
-    {{- if .Values.postgresql.storageClass }}
-    storageClass: {{ .Values.postgresql.storageClass }}
-  numberOfInstances: 2
+    size: 2Gi
+  numberOfInstances: 1
   users:
-    sonarqube_admin:
+    sonarqube_admin:             # database owner
       - superuser
       - createdb
     sonarqube_test: []

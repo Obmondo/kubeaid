@@ -5,30 +5,7 @@
 Postgres-operator is used to manage Postgres instances, including high-availability setups with master and
 multiple slaves, and automatic failover and backups of data to offsite location.
 
-Here is an example of how to setup a postgresql instance, using this operator:
-
-```bash
-apiVersion: "acid.zalan.do/v1"
-kind: postgresql
-metadata:
-  name: teamname-postgresql
-  namespace: sonarqube
-spec:
-  teamId: teamname
-  volume:
-    size: 2Gi
-  numberOfInstances: 1
-  users:
-    sonarqube_admin: # database owner
-      - superuser
-      - createdb
-    sonarqube_test: []
-  databases:
-    sonarqube: sonarqube_admin
-  postgresql:
-    version: "13"
-  enableMasterLoadBalancer: false
-```
+Here is an example of how to setup a postgresql instance, [using this operator](./examples/sample.yaml)
 
 NB. The Postgres-operator is instatlled in the ```system``` namespace as it is to be used for
 MANY postgresql instances - preferrably ALL in the cluster - so backup and high-availability works the same for all.
@@ -53,20 +30,29 @@ postgres-operator:
     logical_backup_s3_bucket: "postgres-backup"
 ```
 
-Note:
+## Troubleshooting
 
-- Depending on the chart please check what database env variables are getting used.
+* `PersistentVolume is filling up`
+  or
+  `FATAL:  could not write lock file "postmaster.pid": No space left on device`
+
+  * Increase the [volume size](https://postgres-operator.readthedocs.io/en/latest/user/#increase-volume-size)
+
+## Notes
+
+* Depending on the chart please check what database env variables are getting used.
 And provide those values through
 [values.yaml](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/keycloak/values.yaml).
-<!-- markdownlint-disable -->
-- Create the `postgresql.yaml` file in `templates` directory of umbrella chart.
+
+* Create the `postgresql.yaml` file in `templates` directory of umbrella chart.
 So that postgres-operator will use that to manage the instance
-- Also check this
+
+* Also check this
 [example](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/keycloak/templates/postgresql.yaml)
 for postgresql.yaml file
-- Also check example of mattermost setup for
+
+* Also check example of mattermost setup for
 [postgresql](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/mattermost-team-edition/templates/postgresql.yaml)
 and the corresponding
 [values.yaml](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/mattermost-team-edition/values.yaml)
 file
-<!-- markdownlint-enable -->
