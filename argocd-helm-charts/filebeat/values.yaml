@@ -2,14 +2,13 @@ networkpolicies: false
 filebeat:
   daemonset:
     tolerations:
-    - effect: NoSchedule
-      operator: Exists
-    - effect: NoExecute
-      operator: Exists
+      - effect: NoSchedule
+        operator: Exists
+      - effect: NoExecute
+        operator: Exists
     resources:
       requests:
         cpu: "200m"
-        memory: "130Mi"
+        memory: "200Mi"
       limits:
-        cpu: "2000m"
-        memory: "250Mi"
+        memory: "200Mi"
