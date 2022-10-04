@@ -9,3 +9,6 @@ sonarqube:
     jdbcSecretPasswordKey: password
     jdbcUrl: "jdbc:postgresql://sonarqube-pgsql/sonarqube?socketTimeout=1500"
     jdbcUsername: sonarqube_admin
+
+postgresql:
+  size: 4Gi
