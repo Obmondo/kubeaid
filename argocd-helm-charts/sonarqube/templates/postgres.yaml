@@ -9,6 +9,7 @@ spec:
     size: {{ .Values.postgresql.size }}
     {{- if .Values.postgresql.storageClass }}
     storageClass: {{ .Values.postgresql.storageClass }}
+    {{- end }}
   numberOfInstances: 2
   users:
     sonarqube_admin:
