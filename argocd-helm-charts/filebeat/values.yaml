@@ -11,4 +11,5 @@ filebeat:
         cpu: "200m"
         memory: "200Mi"
       limits:
+        cpu: null
         memory: "200Mi"
