@@ -132,7 +132,7 @@ cd plugins/opensearch-security/tools
 chmod +x hash.sh
 ./hash.sh NEWPASSWORD
 # use the generate hash from above - when modifying internal_users.yml to suit your needs
-vi /usr/share/opensearch/plugins/opensearch-security/securityconfig/internal_users.yml
+vi /usr/share/opensearch/config/opensearch-security/internal_users.yml
 ../securityadmin.sh -cd ../securityconfig/ -icl -nhnv -cacert ../../../config/root-ca.pem -cert ../../../config/kirk.pem -key ../../../config/kirk-key.pem
 ```
 
