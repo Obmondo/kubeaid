@@ -10,6 +10,11 @@ spec:
   ports:
     - name: graylog
       port: 9000
+{{- if .Values.graylog.metrics.enabled }}
+    - name: metrics
+      port: 9833
+      targetPort: 9833
+{{- end }}
   type: ClusterIP
   clusterIP: None
   publishNotReadyAddresses: true
