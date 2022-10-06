@@ -132,6 +132,9 @@ data:
     transport_email_auth_password = {{ default .Values.graylog.transportEmail.authPassword }}
     transport_email_subject_prefix = {{ default .Values.graylog.transportEmail.subjectPrefix }}
     transport_email_from_email = {{ default .Values.graylog.transportEmail.fromEmail }}
+  {{- if .Values.graylog.options.gc_warning_threshold }}
+    gc_warning_threshold = {{ .Values.graylog.options.gc_warning_threshold }}
+  {{- end }}
   {{- if $externalUri }}
     transport_email_web_interface_url = {{ $externalUri }}
   {{- end }}

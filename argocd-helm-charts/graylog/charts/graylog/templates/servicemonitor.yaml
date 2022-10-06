@@ -1,0 +1,28 @@
+{{- if (and .Values.graylog.metrics.enabled .Values.graylog.metrics.serviceMonitor.enabled) }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "graylog.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app: {{ template "graylog.fullname" . }}-coredns
+    {{- if .Values.graylog.metrics.serviceMonitor.additionalLabels }}
+{{ toYaml .Values.graylog.metrics.serviceMonitor.additionalLabels | indent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+    - port: metrics
+      path: /metrics
+      {{- if .Values.graylog.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.graylog.metrics.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.graylog.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.graylog.metrics.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+{{ include "graylog.selectorLabels" . | indent 6 }}
+{{- end }}

@@ -59,3 +59,23 @@ curl -XPOST http://127.0.0.1:9000/api/system/deflector/cycle -H 'X-Requested-By:
 ```
 
 login (user+password) can be found in secret called graylog - field `data.graylog-password-secret`
+
+## Connecting MongoDB
+
+Graylog needs to connect to MongoDB to store configs. This chart uses the MongoDB operator to
+add a database by creating an object of `kind: MongoDBCommunity`.
+
+The object also tells the operator to create a separate `graylog` database
+and a `graylog-user` with `readWrite` permissions. It expects a secret `graylog-user-password`
+containing the password which will be used by graylog client later.
+
+The connection string for the graylog client is generated and kept in a secret
+called `mongodb-replica-set-graylog-graylog-user`. The string is of the form :
+
+```bash
+mongodb://graylog-user:<password>@mongodb-replica-set-0.mongodb-replica-set-svc.graylog.svc.cluster.local:27017/graylog?replicaSet=mongodb-replica-set&ssl=false
+```
+
+This username and password combination allows the Graylog client to authenticate itself to the MongoDB instance.
+
+**NOTE: Do not use `userAdminAnyDatabase` role of MongoDB as it does not have permissions to create index.**

@@ -314,6 +314,26 @@ graylog:
     ## An URL path
     path: /
 
+  istio:
+    ## If true, Graylog server Istio Ingress Gateway will be created
+    ##
+    enabled: false
+
+    ## Change if you use custom ingressgateway controller
+    gatewaySelector:
+      istio: ingressgateway
+
+    ## Graylog server Istio Ingress Gateway hostnames with optional path
+    ## Must be provided if Ingress is enabled
+    ## Note: Graylog does not support two URL. You can specify only single URL
+    ##
+    host: graylog.yourdomain.com
+
+    ## Please note that tls secret should reside in istio-system namespace
+    ## leave blanc for disabling TLS
+    tlsSecretName: ""
+
+
   ## Configure resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
@@ -342,6 +362,11 @@ graylog:
     ## If true, prometheus annotations will be attached
     ##
     enabled: false
+    serviceMonitor:
+      enabled: false
+      additionalLabels: {}
+      scrapeTimeout: 10s
+      interval: 10s
 
   geoip:
     ## If true, Maxmind GeoLite2 will be installed to ${GRAYLOG_HOME}/geoip location
@@ -523,6 +548,10 @@ graylog:
     ringSize: ""
     inputBufferRingSize: ""
 
+    ## The threshold of the garbage collection runs. If GC runs take longer than this
+    ## threshold, a system notification will be generated to warn the administrator
+    ## about possible problems with the system. Default is 1 second.
+    gc_warning_threshold: 1s
 
 ## Specify Elasticsearch version from requirement dependencies. Ignore this seection if you install Elasticsearch manually.
 ##
