@@ -146,6 +146,10 @@ spec:
           ports:
             - containerPort: 9000
               name: graylog
+          {{- if .Values.graylog.metrics.enabled }}
+            - containerPort: 9833
+              name: metrics
+          {{- end }}
           {{- range .Values.graylog.service.ports }}
             - containerPort: {{ .port }}
               name: {{ .name}}

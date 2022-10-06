@@ -1,0 +1,49 @@
+{{- if .Values.graylog.istio.enabled }}
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: {{ template "graylog.fullname" . }}-gateway
+spec:
+  selector:
+{{- with .Values.graylog.istio.gatewaySelector }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+  servers:
+    - hosts:
+        - {{ .Values.graylog.istio.host }}
+      port:
+        number: 80
+        name: http
+        protocol: HTTP
+{{- if .Values.graylog.istio.tlsSecretName }}
+      tls:
+        httpsRedirect: true
+    - hosts:
+        - {{ .Values.graylog.istio.host }}
+      port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      tls:
+        mode: SIMPLE
+        credentialName: {{ .Values.graylog.istio.tlsSecretName }}
+{{- end }}
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ template "graylog.fullname" . }}-vs
+spec:
+  gateways:
+    - {{ template "graylog.fullname" . }}-gateway
+  hosts:
+    - {{ .Values.graylog.istio.host }}
+  http:
+    - route:
+        - destination:
+            host: {{ template "graylog.fullname" $ }}-web
+            port:
+              number: {{ default 9000 .Values.graylog.service.port }}
+{{- end }}
+

@@ -1,0 +1,8 @@
+apiVersion: v1
+description: A Helm chart for MongoDB operator
+name: mongodb-operator
+version: 0.7.6
+dependencies:
+  - name: community-operator
+    version: 0.7.6
+    repository: https://mongodb.github.io/helm-charts
