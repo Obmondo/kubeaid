@@ -1,0 +1,18 @@
+{{- if and .Values.middleware.jwt.enabled .Values.middleware.jwt.public_key }}
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: jwt
+  namespace: traefik
+spec:
+  plugin:
+    jwt:
+      PayloadFields:
+        - exp
+      Required: true
+      Keys:
+        - |
+          {{ .Values.middleware.jwt.public_key }}
+      JwtHeaders:
+        Subject: sub
+{{- end }}
