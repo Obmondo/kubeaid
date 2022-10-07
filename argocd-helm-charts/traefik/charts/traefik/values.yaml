@@ -59,6 +59,17 @@ deployment:
   # Additional imagePullSecrets
   imagePullSecrets: []
     # - name: myRegistryKeySecretName
+  # Pod lifecycle actions
+  lifecycle: {}
+    # preStop:
+    #   exec:
+    #     command: ["/bin/sh", "-c", "sleep 40"]
+    # postStart:
+    #   httpGet:
+    #     path: /ping
+    #     port: 9000
+    #     host: localhost
+    #     scheme: HTTP
 
 # Pod disruption budget
 podDisruptionBudget:
@@ -91,6 +102,8 @@ experimental:
     enabled: false
   kubernetesGateway:
     enabled: false
+    gateway:
+      enabled: true
     # certificate:
     #   group: "core"
     #   kind: "Secret"
@@ -107,22 +120,26 @@ ingressRoute:
     annotations: {}
     # Additional ingressRoute labels (e.g. for filtering IngressRoute by custom labels)
     labels: {}
+    # Specify the allowed entrypoints to use for the dashboard ingress route, (e.g. traefik, web, websecure).
+    # By default, it's using traefik entrypoint, which is not exposed.
+    # /!\ Do not expose your dashboard without any protection over the internet /!\
+    entryPoints: ["traefik"]
 
 rollingUpdate:
-  maxUnavailable: 1
+  maxUnavailable: 0
   maxSurge: 1
 
 # Customize liveness and readiness probe values.
 readinessProbe:
   failureThreshold: 1
-  initialDelaySeconds: 10
+  initialDelaySeconds: 2
   periodSeconds: 10
   successThreshold: 1
   timeoutSeconds: 2
 
 livenessProbe:
   failureThreshold: 3
-  initialDelaySeconds: 10
+  initialDelaySeconds: 2
   periodSeconds: 10
   successThreshold: 1
   timeoutSeconds: 2
@@ -234,12 +251,45 @@ metrics:
 
 tracing: {}
   # instana:
-  #   enabled: true
+  #   localAgentHost: 127.0.0.1
+  #   localAgentPort: 42699
+  #   logLevel: info
+  #   enableAutoProfile: true
   # datadog:
   #   localAgentHostPort: 127.0.0.1:8126
   #   debug: false
   #   globalTag: ""
   #   prioritySampling: false
+  # jaeger:
+  #   samplingServerURL: http://localhost:5778/sampling
+  #   samplingType: const
+  #   samplingParam: 1.0
+  #   localAgentHostPort: 127.0.0.1:6831
+  #   gen128Bit: false
+  #   propagation: jaeger
+  #   traceContextHeaderName: uber-trace-id
+  #   disableAttemptReconnecting: true
+  #   collector:
+  #      endpoint: ""
+  #      user: ""
+  #      password: ""
+  # zipkin:
+  #   httpEndpoint: http://localhost:9411/api/v2/spans
+  #   sameSpan: false
+  #   id128Bit: true
+  #   sampleRate: 1.0
+  # haystack:
+  #   localAgentHost: 127.0.0.1
+  #   localAgentPort: 35000
+  #   globalTag: ""
+  #   traceIDHeaderName: ""
+  #   parentIDHeaderName: ""
+  #   spanIDHeaderName: ""
+  #   baggagePrefixHeaderName: ""
+  # elastic:
+  #   serverURL: http://localhost:8200
+  #   secretToken: ""
+  #   serviceEnvironment: ""
 
 globalArguments:
   - "--global.checknewversion"
@@ -294,6 +344,10 @@ ports:
     # with an external Load Balancer that performs healthchecks.
     # healthchecksPort: 9000
 
+    # Override the liveness/readiness scheme. Useful for getting ping to
+    # respond on websecure entryPoint.
+    # healthchecksScheme: HTTPS
+
     # Defines whether the port is exposed if service.type is LoadBalancer or
     # NodePort.
     #
@@ -343,7 +397,19 @@ ports:
       #   sans:
       #     - foo.example.com
       #     - bar.example.com
+    #
+    # One can apply Middlewares on an entrypoint
+    # https://doc.traefik.io/traefik/middlewares/overview/
+    # https://doc.traefik.io/traefik/routing/entrypoints/#middlewares
+    # /!\ It introduces here a link between your static configuration and your dynamic configuration /!\
+    # It follows the provider naming convention: https://doc.traefik.io/traefik/providers/overview/#provider-namespace
+    # middlewares:
+    #   - namespace-name1@kubernetescrd
+    #   - namespace-name2@kubernetescrd
+    middlewares: []
   metrics:
+    # When using hostNetwork, use another port to avoid conflict with node exporter:
+    # https://github.com/prometheus/prometheus/wiki/Default-port-allocations
     port: 9100
     # hostPort: 9100
     # Defines whether the port is exposed if service.type is LoadBalancer or
@@ -370,6 +436,15 @@ ports:
 #       - CurveP521
 #       - CurveP384
 tlsOptions: {}
+
+# TLS Store are created as TLSStore CRDs. This is useful if you want to set a default certificate
+# https://doc.traefik.io/traefik/https/tls/#default-certificate
+# Example:
+# tlsStore:
+#   default:
+#     defaultCertificate:
+#       secretName: tls-cert
+tlsStore: {}
 
 # Options for the main traefik service, where the entrypoints traffic comes
 # from.
@@ -413,11 +488,22 @@ autoscaling:
 #   - type: Resource
 #     resource:
 #       name: cpu
-#       targetAverageUtilization: 60
+#       target:
+#         type: Utilization
+#         averageUtilization: 60
 #   - type: Resource
 #     resource:
 #       name: memory
-#       targetAverageUtilization: 60
+#       target:
+#         type: Utilization
+#         averageUtilization: 60
+#   behavior:
+#     scaleDown:
+#       stabilizationWindowSeconds: 300
+#       policies:
+#       - type: Pods
+#         value: 1
+#         periodSeconds: 60
 
 # Enable persistence using Persistent Volume Claims
 # ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
@@ -523,3 +609,10 @@ securityContext:
 
 podSecurityContext:
   fsGroup: 65532
+
+#
+# Extra objects to deploy (value evaluated as a template)
+#
+# In some cases, it can avoid the need for additional, extended or adhoc deployments.
+# See #595 for more details and traefik/tests/extra.yaml for example.
+extraObjects: []
