@@ -1,3 +1,9 @@
+# Added features outside upstream chart
+middleware:
+  jwt:
+    enabled: false
+    # public_key: <add your pubkey here>
+
 traefik:
   podDisruptionBudget:
     enabled: true
@@ -15,11 +21,16 @@ traefik:
         enabled: true
     web:
       redirectTo: websecure
+  experimental:
+    plugins:
+      enabled: true
   additionalArguments:
     - "--entrypoints.web.proxyprotocol=true"
     - "--entrypoints.web.proxyprotocol.insecure=true"
     - "--entrypoints.websecure.proxyprotocol=true"
     - "--entrypoints.websecure.proxyprotocol.insecure=true"
+    - "--experimental.plugins.jwt.moduleName=github.com/team-carepay/traefik-jwt-plugin"
+    - "--experimental.plugins.jwt.version=v0.0.13"
   # https://github.com/argoproj/argo-cd/issues/1704#issuecomment-904741817
   providers:
     kubernetesIngress:
