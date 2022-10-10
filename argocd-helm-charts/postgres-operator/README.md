@@ -43,11 +43,11 @@ postgres-operator:
 * Depending on the chart please check what database env variables are getting used. And provide those values through
 [values.yaml](../keycloak/values.yaml).
 
-- Create the `postgresql.yaml` file in `templates` directory of umbrella chart.
+* Create the `postgresql.yaml` file in `templates` directory of umbrella chart.
 So that postgres-operator will use that to manage the instance
 
-- Also check this [example](../keycloak/templates/postgresql.yaml) for postgresql.yaml file
+* Also check this [example](../keycloak/templates/postgresql.yaml) for postgresql.yaml file
 
-- Also check example of mattermost setup for [postgresql](../mattermost-team-edition/templates/postgresql.yaml) and the corresponding
+* Also check example of mattermost setup for [postgresql](../mattermost-team-edition/templates/postgresql.yaml) and the corresponding
 
-- [values.yaml](../mattermost-team-edition/values.yaml) file
+* [values.yaml](../mattermost-team-edition/values.yaml) file
