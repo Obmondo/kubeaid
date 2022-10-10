@@ -28,12 +28,12 @@ To check if nodes are labelled:
 ## Node-selector
 
 Now to run zfs-controller and zfs-node on specific k8s node, use nodeselector field in values file available
-see values in [examples/](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/zfs-localpv/examples/values-nodeselector.yaml).
+see values in [examples/](examples/values-nodeselector.yaml).
 
 ## Storageclass
 
 Now, once the chart is deployed with custom values next step would be to create a storageclass in order to use the zfs storage.
-See [examples/](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/zfs-localpv/examples/storageclass.yaml)
+See [examples/](examples/values-storageclass.yaml)
 
 For more details on available parameters for zfs-localpv. Check this [doc](https://github.com/openebs/zfs-localpv/blob/develop/docs/storageclasses.md).
 
@@ -52,4 +52,4 @@ storageClass:
 
 ```
 
-> if enabled in `values.yaml` will apply this [manifest](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/zfs-localpv/templates/storageclass.yaml).
+> if enabled in `values.yaml` will apply this [manifest](templates/storageclass.yaml).
