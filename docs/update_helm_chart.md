@@ -21,7 +21,7 @@ dependencies:
     repository: https://argoproj.github.io/argo-helm
 ```
 
-Use [this script](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/bin/helm-repo-update.sh)
+Use [this script](../bin/helm-repo-update.sh)
 to get the upstream chart and dependencies
 
 ```sh
@@ -35,5 +35,5 @@ Note:
 For example `postgres-operator` for postgres for postgresql database and so on.
 <!-- markdownlint-disable -->
 - Check
-[doc](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/postgres-operator/README.md) about postgres operator and how that works.
+[doc](postgres-operator/README.md) about postgres operator and how that works.
 <!-- markdownlint-enable -->
