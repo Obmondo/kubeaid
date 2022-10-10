@@ -35,6 +35,11 @@ resource "azurerm_kubernetes_cluster" "k8s" {
         enable_auto_scaling = var.enable_auto_scaling
         min_count           = var.min_node_count 
         max_count           = var.max_node_count
+        linux_os_config {
+          sysctl_config {
+            vm_max_map_count = var.max_map_count
+          }
+        }
     }
 
     identity {

@@ -77,3 +77,9 @@ variable "private_cluster_enabled" {
   default = false
   description = "Whether the cluster will be private or public"
 }
+
+variable "max_map_count" {
+  type    = number
+  default = 262144
+  description = "The sysctl setting.Must be between 65530 and 262144."
+}
