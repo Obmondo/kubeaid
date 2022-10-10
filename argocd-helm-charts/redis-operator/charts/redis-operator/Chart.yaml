@@ -1,7 +1,7 @@
 annotations:
   category: Redis Operator
 apiVersion: v1
-appVersion: 1.1.1
+appVersion: 1.2.1
 description: A Helm chart for the Spotahome Redis Operator
 home: https://github.com/spotahome/redis-operator
 keywords:
@@ -11,4 +11,4 @@ keywords:
 name: redis-operator
 sources:
 - https://github.com/spotahome/redis-operator
-version: 3.1.6
+version: 3.2.3
