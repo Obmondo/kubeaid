@@ -1,6 +1,6 @@
 # Whoami
 
-[Whoami](https://github.com/containous/whoami) is a tiny Go webserver that prints os information and HTTP request to output.
+[Whoami](https://github.com/traefik/whoami) is a tiny Go webserver that prints os information and HTTP request to output.
 
 **DISCLAIMER**: This is an unofficial chart not supported by Whoami authors.
 
@@ -17,7 +17,7 @@ This chart bootstraps a Whoami deployment on a [Kubernetes](http://kubernetes.io
 
 ## Prerequisites
 
-- Kubernetes >= 1.16
+- Kubernetes >= 1.19
 - Helm >= 3.1
 
 ## Installing
@@ -75,14 +75,15 @@ The following tables lists all the configurable parameters expose by the chart a
 | `fullnameOverride`  | Fully override `whoami.fullname` template with a string                                     | `nil`   |
 | `commonAnnotations` | Annotations to add to all deployed objects                                                  | `{}`    |
 | `commonLabels`      | Labels to add to all deployed objects                                                       | `{}`    |
+| `extraDeploy`       | Array of extra objects to deploy with the release                                           | `[]`    |
 
 ### Parameters
 
 | Name                                 | Description                                                                                           | Default                                        |
 |--------------------------------------|-------------------------------------------------------------------------------------------------------|------------------------------------------------|
 | `replicaCount`                       | Number of replicas                                                                                    | `1`                                            |
-| `image.repository`                   | Image name                                                                                            | `containous/whoami`                            |
-| `image.tag`                          | Image tag                                                                                             | `v1.5.0`                                       |
+| `image.repository`                   | Image name                                                                                            | `traefik/whoami`                               |
+| `image.tag`                          | Image tag                                                                                             | `v1.8.6`                                       |
 | `image.pullPolicy`                   | Image pull policy                                                                                     | `IfNotPresent`                                 |
 | `pdb.create`                         | Specifies whether a pod disruption budget should be created                                           | `false`                                        |
 | `pdb.minAvailable`                   | Minimum number/percentage of pods that should remain scheduled                                        | `1`                                            |
