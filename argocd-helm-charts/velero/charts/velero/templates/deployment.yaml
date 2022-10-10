@@ -109,8 +109,14 @@ spec:
             {{- with .clientBurst }}
             - --client-burst={{ . }}
             {{- end }}
+            {{- with .clientPageSize }}
+            - --client-page-size={{ . }}
+            {{- end }}
             {{- with .disableControllers }}
             - --disable-controllers={{ . }}
+            {{- end }}
+            {{- with .storeValidationFrequency }}
+            - --store-validation-frequency={{ . }}
             {{- end }}
           {{- end }}
           {{- with .Values.resources }}
@@ -182,6 +188,9 @@ spec:
                   key: {{ default "none" $key }}
           {{- end }}
           {{- end }}
+          {{- if .Values.lifecycle }}
+          lifecycle: {{ toYaml .Values.lifecycle | nindent 12 }}
+          {{- end }}
       dnsPolicy: {{ .Values.dnsPolicy }}
 {{- if .Values.initContainers }}
       initContainers:
@@ -214,6 +223,10 @@ spec:
     {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.dnsConfig }}
+      dnsConfig:
         {{- toYaml . | nindent 8 }}
     {{- end }}
     {{- with .Values.tolerations }}
