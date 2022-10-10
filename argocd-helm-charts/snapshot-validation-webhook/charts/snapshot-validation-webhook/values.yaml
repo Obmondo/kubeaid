@@ -6,7 +6,7 @@ args:
   port: 8443
 
 image:
-  repository: k8s.gcr.io/sig-storage/snapshot-validation-webhook
+  repository: registry.k8s.io/sig-storage/snapshot-validation-webhook
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
