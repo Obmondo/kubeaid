@@ -73,7 +73,7 @@ diagnosticMode:
 image:
   registry: docker.io
   repository: bitnami/redmine
-  tag: 5.0.2-debian-11-r23
+  tag: 5.0.3-debian-11-r0
   digest: ""
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -634,7 +634,7 @@ autoscaling:
 ## @param databaseType Redmine database type. Allowed values: `mariadb` and `postgresql`
 ## ref: https://github.com/bitnami/containers/tree/main/bitnami/redmine/#environment-variables
 ##
-databaseType: postgresql
+databaseType: mariadb
 ## MariaDB chart configuration
 ## ref: https://github.com/bitnami/charts/blob/master/bitnami/mariadb/values.yaml
 ## @param mariadb.enabled Switch to enable or disable the MariaDB helm chart
@@ -645,7 +645,7 @@ databaseType: postgresql
 ## @param mariadb.architecture MariaDB architecture. Allowed values: `standalone` or `replication`
 ##
 mariadb:
-  enabled: false
+  enabled: true
   auth:
     rootPassword: ""
     username: bn_redmine
@@ -662,7 +662,7 @@ mariadb:
 ## @param postgresql.architecture PostgreSQL architecture (`standalone` or `replication`)
 ##
 postgresql:
-  enabled: false
+  enabled: true
   auth:
     username: bn_redmine
     password: ""
@@ -942,7 +942,7 @@ certificates:
   image:
     registry: docker.io
     repository: bitnami/bitnami-shell
-    tag: 11-debian-11-r28
+    tag: 11-debian-11-r37
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
