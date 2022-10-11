@@ -59,6 +59,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "nodepool" {
   }
 
   tags = {
-    Environment = "each.value.tags"
+    Environment = each.value.tags
   }
 }
