@@ -7,8 +7,10 @@
         "roles",
         "kubeClusterName",
         "apps",
+        "appResources",
         "awsDatabases",
         "databases",
+        "databaseResources",
         "teleportVersionOverride",
         "insecureSkipProxyTLSVerify",
         "existingDataVolume",
@@ -73,6 +75,21 @@
                 "additionalProperties": true
             }
         },
+        "appResources": {
+            "$id": "#/properties/appResources",
+            "type": "array",
+            "default": [],
+            "required": [
+                "labels"
+            ],
+            "properties": {
+                "labels": {
+                    "$id": "#/properties/appResources/labels",
+                    "type": "object"
+                },
+                "additionalProperties": false
+            }
+        },
         "awsDatabases": {
             "$id": "#/properties/awsDatabases",
             "type": "array",
@@ -106,15 +123,52 @@
             "type": "array",
             "default": []
         },
+        "databaseResources": {
+            "$id": "#/properties/databaseResources",
+            "type": "array",
+            "default": [],
+            "required": [
+                "labels"
+            ],
+            "properties": {
+                "labels": {
+                    "$id": "#/properties/databaseResources/labels",
+                    "type": "object"
+                },
+                "additionalProperties": false
+            }
+        },
         "teleportVersionOverride": {
             "$id": "#/properties/teleportVersionOverride",
             "type": "string",
             "default": ""
         },
+        "caPin": {
+            "$id": "#/properties/caPin",
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "default": []
+        },
         "insecureSkipProxyTLSVerify": {
             "$id": "#/properties/insecureSkipProxyTLSVerify",
             "type": "boolean",
             "default": false
+        },
+        "tls": {
+            "$id": "#/properties/tls",
+            "type": "object",
+            "required": [
+                "existingCASecretName"
+            ],
+            "properties": {
+                "existingCASecretName": {
+                    "$id": "#/properties/tls/properties/existingCASecretName",
+                    "type": "string",
+                    "default": ""
+                }
+            }
         },
         "existingDataVolume": {
             "$id": "#/properties/existingDataVolume",
