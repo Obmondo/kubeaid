@@ -35,14 +35,30 @@ resource "azurerm_kubernetes_cluster" "k8s" {
         enable_auto_scaling = var.enable_auto_scaling
         min_count           = var.min_node_count 
         max_count           = var.max_node_count
-        linux_os_config {
-          sysctl_config {
-            vm_max_map_count = var.max_map_count
-          }
-        }
     }
 
     identity {
      type = "SystemAssigned"
     }
+}
+
+resource "azurerm_kubernetes_cluster_node_pool" "nodepool" {
+  for_each              = var.nodepools
+  name                  = each.key
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.k8s.id
+  vm_size               = each.value.vm_size
+  node_count            = each.value.agent_count
+  vnet_subnet_id        = azurerm_subnet.aks-default.id
+  enable_auto_scaling   = each.value.enable_auto_scaling
+  min_count             = each.value.min_node_count
+  max_count             = each.value.max_node_count
+  linux_os_config {
+    sysctl_config {
+      vm_max_map_count = each.value.max_map_count
+    }
+  }
+
+  tags = {
+    Environment = "each.value.tags"
+  }
 }
