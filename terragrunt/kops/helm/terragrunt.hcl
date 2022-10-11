@@ -14,6 +14,7 @@ dependency "iam" {
 
 dependency "cluster" {
   config_path = "../cluster"
+  mock_outputs_merge_strategy_with_state = "shallow"
 
   mock_outputs = {
     kube_config = {
