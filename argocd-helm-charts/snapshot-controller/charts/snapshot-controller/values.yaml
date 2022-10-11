@@ -6,7 +6,7 @@ args:
   httpEndpoint: ":8080"
 
 image:
-  repository: k8s.gcr.io/sig-storage/snapshot-controller
+  repository: registry.k8s.io/sig-storage/snapshot-controller
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
