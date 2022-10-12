@@ -181,19 +181,39 @@ local kp =
       },
       networkPolicy+: {
         spec+: {
-          ingress+: [{
-            from: [{
-              podSelector: {
-                matchLabels: {
-                  'app.kubernetes.io/name': 'prometheus-adapter',
+          ingress+: [
+            {
+              from: [{
+                podSelector: {
+                  matchLabels: {
+                    'app.kubernetes.io/name': 'prometheus-adapter',
+                  },
                 },
-              },
-            }],
-            ports: [{
-              port: 9090,
-              protocol: 'TCP',
-            }],
-          }],
+              }],
+              ports: [{
+                port: 9090,
+                protocol: 'TCP',
+              }],
+            },
+            {
+              from: [{
+                namespaceSelector: {
+                  matchLabels: {
+                    'kubernetes.io/metadata.name': 'obmondo',
+                  },
+                },
+                podSelector: {
+                  matchLabels: {
+                    'app.kubernetes.io/name': 'obmondo-k8s-agent',
+                  },
+                },
+              }],
+              ports: [{
+                port: 9090,
+                protocol: 'TCP',
+              }],
+            },
+          ],
         },
       },
     },
