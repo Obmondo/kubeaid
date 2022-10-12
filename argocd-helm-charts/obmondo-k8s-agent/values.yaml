@@ -64,8 +64,6 @@ metrics:
     relabelings: []
     metricRelabelings: []
 
-networkPolicy: true
-
 ingress:
   enabled: false
   className: ""
