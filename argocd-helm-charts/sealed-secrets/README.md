@@ -57,6 +57,55 @@ sealedsecrets.bitnami.com/managed: "true"
 
 and then restart sealed-secrets pod in kube-system to make it do its job (it has already given up at this point).
 
+## Templating Sealed Secrets
+
+Sealed secrets have an interesting feature which can use config files
+where only a part of the file needs to be encrypted. To use templates in sealed secrets,
+create a secret using the examples provided above, and add the `template:` part as
+given in the example below:
+
+```yaml
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: example
+spec:
+  encryptedData:
+    password: AgC2==
+    access-token: AgDE==
+  template:
+    data:
+      k8id-pushupdate.yaml: |
+        repo-url: https://gitlab.com/example/repo.git
+        username: smart_user
+        password: "{{ index . "password" }}"
+        repo-token: "{{ index . "access-token" }}"
+    metadata:
+      creationTimestamp: null
+      namespace: test
+```
+
+The `encryptedData` field can store some random data for the start. All the referenced
+fields in the `data` section, need to be present in the `encryptedData` before you attempt to seal the secret.
+Then seal and merge the secret using the below command:
+
+```sh
+kubectl create secret generic example\
+ --dry-run=client \
+ --namespace test \
+ --from-literal=password="super_secret_pass" \
+ --from-literal=access-token="0123abcDEF" -o yaml | \
+ kubeseal \
+ --controller-namespace system \
+ --controller-name sealed-secrets \
+ --namespace test -o yaml \
+ --merge-into sealedSecret.yaml
+```
+
+The `--merge-into` option only changes the encrypted data without changing the whole SealedSecret.
+[Original Example](https://github.com/bitnami-labs/sealed-secrets/tree/main/docs/examples/config-template)
+
 ## How to backup and restore sealed secrets
 
 ### Manual way
