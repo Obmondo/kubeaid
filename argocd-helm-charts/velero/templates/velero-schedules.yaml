@@ -5,7 +5,7 @@ metadata:
   name: daily-backup
   namespace: velero
 spec:
-  schedule: '0 0 * * 1-6'
+  schedule: '0 0 * * *'
   template:
     hooks: {}
     includedNamespaces:
