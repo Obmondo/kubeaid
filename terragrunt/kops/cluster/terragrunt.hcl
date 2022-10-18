@@ -6,6 +6,38 @@ terraform {
   source = "${get_parent_terragrunt_dir()}/../../terraform//aws/cluster"
 }
 
+# Indicate what region to deploy the resources into
+generate "provider" {
+  path = "kops.tf"
+  if_exists = "overwrite_terragrunt"
+  contents = <<EOF
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.16"
+    }
+    kops = {
+      source = "eddycharly/kops"
+      version = "1.23.5"
+    }
+  }
+
+  required_version = ">= 1.2.2"
+}
+
+provider "aws" {
+  region = "${local.vars.locals.region}"
+}
+provider "kops" {
+  state_store = "s3://${local.vars.locals.customer_vars.kops_state_bucket_name}"
+  aws {
+    region = var.region
+  }
+}
+EOF
+}
+
 dependency "peering" {
   config_path = "../peering"
 
