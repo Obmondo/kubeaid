@@ -111,3 +111,39 @@ variable "admin_ssh_keys" {
   type        = list
   description = "Only one ssh key is supported as of now"
 }
+
+variable "kube_api_server" {
+  type      = object({
+    feature_gates      = optional(map(string))
+    oidc_issuer_url    = optional(string)
+    oidc_client_id     = optional(string)
+    oidc_groups_claim  = optional(string)
+    oidc_groups_prefix = optional(string)
+  })
+  description = "List of option suppored for kube_api_server"
+  default     = {}
+}
+
+variable "kube_controller_manager" {
+  type      = object({
+    feature_gates = optional(map(string))
+  })
+  description = "List of option suppored for kube_controller_manager"
+  default     = {}
+}
+
+variable "kube_scheduler" {
+  type      = object({
+    feature_gates = optional(map(string))
+  })
+  description = "List of option suppored for kube_scheduler"
+  default     = {}
+}
+
+variable "kubelet" {
+  type      = object({
+    feature_gates = optional(map(string))
+  })
+  description = "List of option suppored for kube_scheduler"
+  default     = {}
+}
