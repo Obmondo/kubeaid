@@ -45,10 +45,31 @@ resource "kops_cluster" "cluster" {
     proxy_mode           = "ipvs"
   }
 
+  # https://registry.terraform.io/providers/eddycharly/kops/latest/docs/resources/cluster#kubelet_config_spec
   kubelet {
     anonymous_auth {
       value = false
     }
+    feature_gates = var.kubelet.feature_gates
+  }
+
+  # https://registry.terraform.io/providers/eddycharly/kops/latest/docs/resources/cluster#kube_scheduler_config
+  kube_scheduler {
+    feature_gates = var.kube_scheduler.feature_gates
+  }
+
+  # https://registry.terraform.io/providers/eddycharly/kops/latest/docs/resources/cluster#kube_controller_manager_config
+  kube_controller_manager {
+    feature_gates = var.kube_controller_manager.feature_gates
+  }
+
+  # https://registry.terraform.io/providers/eddycharly/kops/latest/docs/resources/cluster#kube_api_server_config
+  kube_api_server {
+    feature_gates = var.kube_api_server.feature_gates
+    oidc_issuer_url = var.kube_api_server.oidc_issuer_url
+    oidc_client_id = var.kube_api_server.oidc_client_id
+    oidc_groups_claim = var.kube_api_server.oidc_groups_claim
+    oidc_groups_prefix = var.kube_api_server.oidc_groups_prefix
   }
 
   iam {
