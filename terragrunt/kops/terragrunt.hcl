@@ -1,3 +1,6 @@
+terraform_version_constraint = ">= 1.2.2"
+terragrunt_version_constraint = ">= 0.37.4"
+
 remote_state {
   backend = "s3"
   generate = {
@@ -17,6 +20,17 @@ generate "provider" {
   path = "provider.tf"
   if_exists = "overwrite_terragrunt"
   contents = <<EOF
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.16"
+    }
+  }
+
+  required_version = ">= 1.2.2"
+}
+
 provider "aws" {
   region = "${local.region}"
 }
