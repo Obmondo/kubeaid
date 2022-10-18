@@ -155,6 +155,8 @@ resource "kops_instance_group" "master-0" {
   min_size     = var.master.min_size
   max_size     = var.master.max_size
   machine_type = var.master.machine_type
+  node_labels  = var.master.node_labels
+  cloud_labels = var.master.cloud_labels
   subnets      = ["k8s-${var.environment}-private-0"]
   depends_on   = [kops_cluster.cluster]
 
@@ -173,6 +175,8 @@ resource "kops_instance_group" "master-1" {
   min_size     = var.master.min_size
   max_size     = var.master.max_size
   machine_type = var.master.machine_type
+  node_labels  = var.master.node_labels
+  cloud_labels = var.master.cloud_labels
   subnets      = ["k8s-${var.environment}-private-1"]
   depends_on   = [kops_cluster.cluster]
 
@@ -191,6 +195,8 @@ resource "kops_instance_group" "master-2" {
   min_size     = var.master.min_size
   max_size     = var.master.max_size
   machine_type = var.master.machine_type
+  node_labels  = var.master.node_labels
+  cloud_labels = var.master.cloud_labels
   subnets      = ["k8s-${var.environment}-private-2"]
   depends_on   = [kops_cluster.cluster]
 
@@ -202,14 +208,46 @@ resource "kops_instance_group" "master-2" {
 }
 
 resource "kops_instance_group" "node-0" {
-  cluster_name = kops_cluster.cluster.id
-  name         = "node-0"
-  role         = "Node"
-  image        = var.worker.image_id
-  min_size     = var.worker.min_size
-  max_size     = var.worker.max_size
-  machine_type = var.worker.machine_type
-  subnets      = ["k8s-${var.environment}-private-0", "k8s-${var.environment}-private-1", "k8s-${var.environment}-private-2"]
+  cluster_name      = kops_cluster.cluster.id
+  name              = "node-0"
+  role              = "Node"
+  image             = var.worker.image_id
+  min_size          = var.worker.min_size
+  max_size          = var.worker.max_size
+  machine_type      = var.worker.machine_type
+  node_labels       = var.worker.node_labels
+  cloud_labels      = var.worker.cloud_labels
+  suspend_processes = var.worker.suspend_processes
+  subnets           = [
+    "k8s-${var.environment}-private-0",
+    "k8s-${var.environment}-private-1",
+    "k8s-${var.environment}-private-2"
+  ]
+
+  additional_user_data {
+    name    = "addPublicKey.sh"
+    type    = "text/x-shellscript"
+    content = join(" ", flatten([["#!/bin/sh"], data.template_file.admin_ssh_keys.*.rendered]))
+  }
+}
+
+resource "kops_instance_group" "instance_group" {
+  for_each          = var.instance_groups
+  cluster_name      = kops_cluster.cluster.id
+  name              = each.key
+  role              = "Node"
+  image             = each.value.image_id
+  min_size          = each.value.min_size
+  max_size          = each.value.max_size
+  machine_type      = each.value.machine_type
+  node_labels       = each.value.node_labels
+  cloud_labels      = each.value.cloud_labels
+  suspend_processes = each.value.suspend_processes
+  taints            = each.value.taints
+  max_price         = each.value.max_price
+  zones             = each.value.zones
+  subnets           = ["k8s-${var.environment}-private-0"]
+  depends_on        = [kops_cluster.cluster]
 
   additional_user_data {
     name    = "addPublicKey.sh"

@@ -1,33 +1,47 @@
+variable "instance_groups" {
+  type = map(
+    object({
+      image_id          = string
+      max_size          = number
+      min_size          = number
+      machine_type      = string
+      cloud_labels      = optional(map(string))
+      node_labels       = optional(map(string))
+      suspend_processes = optional(list(string))
+      taints            = optional(list(string))
+      max_price         = optional(string)
+      zones             = optional(list(string))
+    })
+  )
+  description = "Instance Group"
+  default     = {}
+}
+
 variable "master" {
   type = object({
-    image_id     = string
-    max_size     = number
-    min_size     = number
-    machine_type = string
+    image_id     = optional(string, "099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-arm64-server-20220404")
+    max_size     = optional(number, 1)
+    min_size     = optional(number, 1)
+    machine_type = optional(string, "t4g.medium")
+    cloud_labels = optional(map(string))
+    node_labels  = optional(map(string))
   })
   description = "K8s master node spec"
-  default = {
-    image_id     = "099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-arm64-server-20220404"
-    max_size     = 1
-    min_size     = 1
-    machine_type = "t4g.medium"
-  }
+  default = {}
 }
 
 variable "worker" {
   type = object({
-    image_id     = string
-    max_size     = number
-    min_size     = number
-    machine_type = string
+    image_id          = optional(string, "099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20220404")
+    max_size          = optional(number, 2)
+    min_size          = optional(number, 1)
+    machine_type      = optional(string, "t3.medium")
+    cloud_labels      = optional(map(string))
+    node_labels       = optional(map(string))
+    suspend_processes = optional(list(string))
   })
   description = "K8s worker nodes spec"
-  default = {
-    image_id     = "099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20220404"
-    max_size     = 2
-    min_size     = 1
-    machine_type = "t3.medium"
-  }
+  default = {}
 }
 
 variable "region" {
