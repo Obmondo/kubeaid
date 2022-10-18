@@ -48,3 +48,13 @@
 
   * Arogcd `root` app Setup [docs](../../../argocd-helm-charts/argo-cd/Readme.md/#setup-root-argocd-application)
   * Arogcd repo Setup [docs](../../../argocd-helm-charts/argo-cd/Readme.md/#add-argocd-repos)
+
+### Connect to Kubernetes Cluster on Azure
+
+```sh
+# Setup account
+az account set --subscription <subscription_id>
+
+# Connect to cluster and merge the KUBECONFIG
+az aks get-credentials --resource-group <resource_group> --name <cluster_name> --public-fqdn
+```
