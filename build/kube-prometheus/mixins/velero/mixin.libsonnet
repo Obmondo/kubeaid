@@ -13,7 +13,7 @@
           {
             alert: 'VeleroUnsuccessfulBackup',
             expr: |||
-              ((time() - velero_backup_last_successful_timestamp{schedule=~".*6hrly.*"}) > (60 * 60 * 6)) or ((time() - velero_backup_last_successful_timestamp{schedule=~".*daily.*"}) > (60 * 60 * 24)) or ((time() - velero_backup_last_successful_timestamp{schedule=~".*weekly.*"}) > (60 * 60 * 24 * 7))
+              ((time() - velero_backup_last_successful_timestamp{schedule=~".*6hrly.*"}) > (60 * 60 * 6) and ON() hour() >= 6.30 <= 18.30) or ((time() - velero_backup_last_successful_timestamp{schedule=~".*daily.*"}) > (60 * 60 * 24) and ON() day_of_week() != 0) or ((time() - velero_backup_last_successful_timestamp{schedule=~".*weekly.*"}) > (60 * 60 * 24 * 7))
             ||| % $._config,
             'for': '15m',
             labels: {
