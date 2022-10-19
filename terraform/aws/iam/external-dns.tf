@@ -1,3 +1,13 @@
+data "aws_route53_zone" "external_dns_zones" {
+  for_each = toset(var.external_dns_zones)
+  name     = each.value
+}
+
+locals {
+  zone_ids = concat(values(data.aws_route53_zone.external_dns_zones)[*].id, [var.subzone_id])
+  zone_arns = [for id in local.zone_ids : "arn:aws:route53:::hostedzone/${id}"]
+}
+
 resource "aws_iam_role" "external-dns" {
   name               = "${var.environment}-external-dns"
   path               = "/"
@@ -32,7 +42,7 @@ resource "aws_iam_policy" "external-dns" {
   name        = "${var.environment}-external-dns"
   path        = "/"
   description = "External DNS for ${var.cluster_name}"
-  policy      = <<EOF
+  policy      = jsonencode(
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -54,13 +64,10 @@ resource "aws_iam_policy" "external-dns" {
     {
       "Effect": "Allow",
       "Action": "route53:ChangeResourceRecordSets",
-      "Resource": [
-        "arn:aws:route53:::hostedzone/${var.subzone_id}"
-      ]
+      "Resource": "${local.zone_arns}"
     }
   ]
-}
-EOF
+})
 }
 
 resource "aws_iam_role_policy_attachment" "external-dns-attachment" {
