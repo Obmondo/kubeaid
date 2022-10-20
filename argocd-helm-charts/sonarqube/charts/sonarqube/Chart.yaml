@@ -1,26 +1,49 @@
 annotations:
   artifacthub.io/changes: |
-    - kind: added
-      description: "adding tolerations and affinity to change password hooks"
-    - kind: added
-      description: "Add documentation to setup web context via environment variable"
-    - kind: added
-      description: "Add automount service account token flag"
-    - kind: fixed
-      description: "Fix issue with additional network policy"
     - kind: changed
-      description: "updated SonarQube to 9.5.0"
+      description: "Updated SonarQube to 9.7.0"
+    - kind: fixed
+      description: "Fix the right-dash curly brace issue with the additional network policy parameter"
+    - kind: added
+      description: "Allow `tests.image` to be configured and update README accordingly"
+    - kind: added
+      description: "Allow `tests.initContainers.image` to be configured and update README accordingly"
+    - kind: changed
+      description: "Use the networkPolicy.prometheusNamespace value for the network policy namespace selector"
+    - kind: changed
+      description: "Uncomment default value in values.yaml for backwards compatibility"
+    - kind: added
+      description: "Add support for monitoringPasscode passed as a secret and removal of livenessprobe httpheader defined in clear text"
+    - kind: changed
+      description: "Bump apiVersion to v2"
+    - kind: changed
+      description: "Set the number of allowed replicas to 0 and 1"
+    - kind: added
+      description: "Add documentation for ingress tls"
+    - kind: added
+      description: "Add documentation for sonarProperties and sonarSecretProperties"
+    - kind: added
+      description: "Add the possibility of using a secret for customizing the admin password"
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/images: |
     - name: sonarqube
-      image: sonarqube:9.5.0-community
+      image: sonarqube:9.7.0-community
   artifacthub.io/links: |
     - name: support
       url: https://community.sonarsource.com/
     - name: Chart Source
       url: https://github.com/SonarSource/helm-chart-sonarqube/tree/master/charts/sonarqube
-apiVersion: v1
-appVersion: 9.5.0
+apiVersion: v2
+appVersion: 9.7.0
+dependencies:
+- condition: postgresql.enabled
+  name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 10.15.0
+- condition: nginx.enabled
+  name: ingress-nginx
+  repository: https://kubernetes.github.io/ingress-nginx
+  version: 4.0.13
 description: SonarQube offers Code Quality and Code Security analysis for up to 27
   languages. Find Bugs, Vulnerabilities, Security Hotspots and Code Smells throughout
   your workflow.
@@ -39,4 +62,5 @@ name: sonarqube
 sources:
 - https://github.com/SonarSource/docker-sonarqube
 - https://github.com/SonarSource/sonarqube
-version: 4.0.2+325
+type: application
+version: 6.0.0+403
