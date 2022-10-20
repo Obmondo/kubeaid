@@ -22,6 +22,8 @@ metadata:
     {{- end }}
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app.kubernetes.io/instance: {{ .Release.Name }}
@@ -58,6 +60,7 @@ spec:
       {{- if .Values.priorityClassName }}
       priorityClassName: {{ include "velero.priorityClassName" . }}
       {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       containers:
         - name: velero
       {{- if .Values.image.digest }}
@@ -117,6 +120,9 @@ spec:
             {{- end }}
             {{- with .storeValidationFrequency }}
             - --store-validation-frequency={{ . }}
+            {{- end }}
+            {{- with .garbageCollectionFrequency }}
+            - --garbage-collection-frequency={{ . }}
             {{- end }}
           {{- end }}
           {{- with .Values.resources }}
