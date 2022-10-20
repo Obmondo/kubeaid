@@ -118,7 +118,7 @@ The following table lists the configurable parameters of the Sonarqube chart and
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
 | `deploymentType` | Deployment Type (supported values are `StatefulSet` or `Deployment`) | `StatefulSet` |
-| `replicaCount`   | Number of replicas deployed  | `1` |
+| `replicaCount`   | Number of replicas deployed (supported values are 0 and 1)  | `1` |
 | `deploymentStrategy` | Deployment strategy | `{}` |
 | `priorityClassName` | Schedule pods on priority (e.g. `high-priority`) | `None` |
 | `schedulerName` | Kubernetes scheduler name | `None` |
@@ -204,6 +204,8 @@ The following table lists the configurable parameters of the Sonarqube chart and
 | `route.enabled` | Flag to enable OpenShift Route | `false` |
 | `route.host` | Host of the route | `""` |
 | `route.tls.termination` | TLS termination type. Currently supported values are `edge` and `passthrough` | `edge` |
+| `route.annotations` | Optional field to add extra annotations to the route | `None` |
+| `route.labels` | Route additional labels | `{}` |
 
 ### Probes
 
@@ -285,10 +287,12 @@ The following table lists the configurable parameters of the Sonarqube chart and
 | `jvmOpts` | Values to add to SONARQUBE_WEB_JVM_OPTS | `""` |
 | `jvmCeOpts` | Values to add to SONAR_CE_JAVAOPTS | `""` |
 | `sonarqubeFolder` | Directory name of Sonarqube | `/opt/sonarqube` |
-| `sonarProperties` | Custom `sonar.properties` file | `None` |
-| `sonarSecretProperties` | Additional `sonar.properties` file to load from a secret | `None` |
+| `sonarProperties` | Custom `sonar.properties` key-value pairs (e.g., "sonarProperties.sonar.forceAuthentication=true") | `None` |
+| `sonarSecretProperties` | Additional `sonar.properties` key-value pairs to load from a secret | `None` |
 | `sonarSecretKey` | Name of existing secret used for settings encryption | `None` |
-| `monitoringPasscode` | Value for sonar.web.systemPasscode. needed for LivenessProbes | `define_it` |
+| `monitoringPasscode` | Value for sonar.web.systemPasscode needed for LivenessProbes (encoded to Base64 format) | `define_it` |
+| `monitoringPasscodeSecretName` | Name of the secret where to load `monitoringPasscode` | `None` |
+| `monitoringPasscodeSecretKey` | Key of an existing secret containing `monitoringPasscode` | `None` |
 | `extraContainers` | Array of extra containers to run alongside the `sonarqube` container (aka. Sidecars) | `[]` |
 
 ### Resources
@@ -355,10 +359,11 @@ The following table lists the configurable parameters of the Sonarqube chart and
 
 ### Tests
 
-| Parameter | Description | Default |
-| --------- | ----------- | ------- |
-| `tests.enabled` | Flag that allows tests to be excluded from generated yaml | `true` |
-| `tests.image` | Change init test container image | `dduportal/bats:0.4.0` |
+| Parameter                    | Description                                                   | Default |
+|------------------------------|---------------------------------------------------------------| ------- |
+| `tests.enabled`              | Flag that allows tests to be excluded from the generated yaml | `true` |
+| `tests.image`                | Change test container image                                   | `bitnami/minideb-extras` |
+| `tests.initContainers.image` | Change test init container image                              | `bats/bats:1.2.1` |
 
 ### ServiceAccount
 
@@ -382,6 +387,7 @@ The following table lists the configurable parameters of the Sonarqube chart and
 | --------- | ----------- | ------- |
 | `account.adminPassword` | Custom admin password | `admin` |
 | `account.currentAdminPassword` | Current admin password | `admin` |
+| `account.adminPasswordSecretName` | Secret containing `password` (custom password) and `currentPassword` (current password) keys for admin | `None` |
 | `account.resources.requests.memory` | Memory request for Admin hook | `128Mi` |
 | `account.resources.requests.cpu` | CPU request for Admin hook | `100m` |
 | `account.resources.limits.memory` | Memory limit for Admin hook | `128Mi` |
