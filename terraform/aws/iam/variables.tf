@@ -12,3 +12,9 @@ variable "subzone_id" {
   type        = string
   description = "Zone ID for subdomain"
 }
+
+variable "external_dns_zones" {
+  type        = list(string)
+  description = "Zone ID for subdomain"
+  default     = []
+}
