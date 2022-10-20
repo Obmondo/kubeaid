@@ -11,6 +11,17 @@ Any ideas/suggestions are welcomed...
 
 ## Running
 
+### Mac OS
+
+Pay attention to all prerequisites. 
+
+Additionally do following two installations to run the build.sh :
+
+```
+brew install bash
+brew install jsonnet
+```
+
 ### Install prerequisites
 
 This installs go

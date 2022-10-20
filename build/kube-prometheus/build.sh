@@ -21,7 +21,7 @@ basedir="$(dirname "$(readlink -f "${0}")")"
 
 function _exit() {
   if ! (( debug )); then
-    if [[ -v tmpdir ]] && [[ -d "${tmpdir}" ]]; then
+    if [ -v tmpdir ] && [ -d "${tmpdir}" ]; then
       rm -rf "${tmpdir}"
     fi
   fi
@@ -64,7 +64,7 @@ while (( $# > 0 )); do
       exit 0
       ;;
     *)
-      if ! [[ -d "${1}" ]]; then
+      if ! [ -d "${1}" ]; then
         echo "Invalid argument ${1}"
         exit 2
       fi
