@@ -86,6 +86,9 @@ lifecycle: {}
 # Pod priority class name to use for the Velero deployment. Optional.
 priorityClassName: ""
 
+# The number of seconds to allow for graceful termination of the pod. Optional.
+terminationGracePeriodSeconds: 3600
+
 # Tolerations to use for the Velero deployment. Optional.
 tolerations: []
 
@@ -299,6 +302,8 @@ configuration:
   disableControllers:
   # `velero server` default: 1m
   storeValidationFrequency:
+  # `velero server` default: 1h
+  garbageCollectionFrequency:
   #
 
   # additional key/value pairs to be used as environment variables such as "AWS_CLUSTER_NAME: 'yourcluster.domain.tld'"
