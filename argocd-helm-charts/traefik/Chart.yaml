@@ -3,6 +3,6 @@ name: traefik
 version: 1.0.0
 dependencies:
   - name: traefik
-    version: 12.0.6
+    version: 16.2.0
     repository: https://helm.traefik.io/traefik
     #repository: "oci://ghcr.io/Obmondo"

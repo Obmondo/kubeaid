@@ -45,10 +45,10 @@ deployment:
   # Additional initContainers (e.g. for setting file permission as shown below)
   initContainers: []
     # The "volume-permissions" init container is required if you run into permission issues.
-    # Related issue: https://github.com/traefik/traefik/issues/6972
+    # Related issue: https://github.com/traefik/traefik/issues/6825
     # - name: volume-permissions
-    #   image: busybox:1.31.1
-    #   command: ["sh", "-c", "chmod -Rv 600 /data/*"]
+    #   image: busybox:1.35
+    #   command: ["sh", "-c", "touch /data/acme.json && chmod -Rv 600 /data/* && chown 65532:65532 /data/acme.json"]
     #   volumeMounts:
     #     - name: data
     #       mountPath: /data
@@ -84,15 +84,6 @@ ingressClass:
   # true is not unit-testable yet, pending https://github.com/rancher/helm-unittest/pull/12
   enabled: false
   isDefaultClass: false
-  # Use to force a networking.k8s.io API Version for certain CI/CD applications. E.g. "v1beta1"
-  fallbackApiVersion: ""
-
-# Activate Pilot integration
-pilot:
-  enabled: false
-  token: ""
-  # Toggle Pilot Dashboard
-  # dashboard: false
 
 # Enable experimental features
 experimental:
@@ -246,8 +237,46 @@ metrics:
   prometheus:
     entryPoint: metrics
   #  addRoutersLabels: true
-  # statsd:
-  #   address: localhost:8125
+  #  statsd:
+  #    address: localhost:8125
+##
+##  enable optional CRDs for Prometheus Operator
+##
+  #  serviceMonitor:
+  #    additionalLabels:
+  #      foo: bar
+  #    namespace: "another-namespace"
+  #    namespaceSelector: {}
+  #    metricRelabelings: []
+  #      - sourceLabels: [__name__]
+  #        separator: ;
+  #        regex: ^fluentd_output_status_buffer_(oldest|newest)_.+
+  #        replacement: $1
+  #        action: drop
+  #    relabelings: []
+  #      - sourceLabels: [__meta_kubernetes_pod_node_name]
+  #        separator: ;
+  #        regex: ^(.*)$
+  #        targetLabel: nodename
+  #        replacement: $1
+  #        action: replace
+  #    jobLabel: traefik
+  #    scrapeInterval: 30s
+  #    scrapeTimeout: 5s
+  #    honorLabels: true
+  #  prometheusRule:
+  #    additionalLabels: {}
+  #    namespace: "another-namespace"
+  #    rules:
+  #      - alert: TraefikDown
+  #        expr: up{job="traefik"} == 0
+  #        for: 5m
+  #        labels:
+  #          context: traefik
+  #          severity: warning
+  #        annotations:
+  #          summary: "Traefik Down"
+  #          description: "{{ $labels.pod }} on {{ $labels.nodename }} is down"
 
 tracing: {}
   # instana:
@@ -374,6 +403,16 @@ ports:
     # Added in 2.2, you can make permanent redirects via entrypoints.
     # https://docs.traefik.io/routing/entrypoints/#redirection
     # redirectTo: websecure
+    #
+    # Trust forwarded  headers information (X-Forwarded-*).
+    # forwardedHeaders:
+    #   trustedIPs: []
+    #   insecure: false
+    #
+    # Enable the Proxy Protocol header parsing for the entry point
+    # proxyProtocol:
+    #   trustedIPs: []
+    #   insecure: false
   websecure:
     port: 8443
     # hostPort: 8443
@@ -389,7 +428,7 @@ ports:
     # Set TLS at the entrypoint
     # https://doc.traefik.io/traefik/routing/entrypoints/#tls
     tls:
-      enabled: false
+      enabled: true
       # this is the name of a TLSOption definition
       options: ""
       certResolver: ""
@@ -398,6 +437,16 @@ ports:
       #   sans:
       #     - foo.example.com
       #     - bar.example.com
+    #
+    # Trust forwarded  headers information (X-Forwarded-*).
+    # forwardedHeaders:
+    #   trustedIPs: []
+    #   insecure: false
+    #
+    # Enable the Proxy Protocol header parsing for the entry point
+    # proxyProtocol:
+    #   trustedIPs: []
+    #   insecure: false
     #
     # One can apply Middlewares on an entrypoint
     # https://doc.traefik.io/traefik/middlewares/overview/
@@ -553,10 +602,12 @@ hostNetwork: false
 # Whether Role Based Access Control objects like roles and rolebindings should be created
 rbac:
   enabled: true
-
   # If set to false, installs ClusterRole and ClusterRoleBinding so Traefik can be used across namespaces.
-  # If set to true, installs namespace-specific Role and RoleBinding and requires provider configuration be set to that same namespace
+  # If set to true, installs Role and RoleBinding. Providers will only watch target namespace.
   namespaced: false
+  # Enable user-facing roles
+  # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles
+  # aggregateTo: [ "admin" ]
 
 # Enable to create a PodSecurityPolicy and assign it to the Service Account via RoleBinding or ClusterRoleBinding
 podSecurityPolicy:
@@ -578,21 +629,30 @@ resources: {}
   # limits:
   #   cpu: "300m"
   #   memory: "150Mi"
+
+# This example pod anti-affinity forces the scheduler to put traefik pods
+# on nodes where no other traefik pods are scheduled.
+# It should be used when hostNetwork: true to prevent port conflicts
 affinity: {}
-# # This example pod anti-affinity forces the scheduler to put traefik pods
-# # on nodes where no other traefik pods are scheduled.
-# # It should be used when hostNetwork: true to prevent port conflicts
-#   podAntiAffinity:
-#     requiredDuringSchedulingIgnoredDuringExecution:
-#       - labelSelector:
-#           matchExpressions:
-#             - key: app.kubernetes.io/name
-#               operator: In
-#               values:
-#                 - {{ template "traefik.name" . }}
-#         topologyKey: kubernetes.io/hostname
+#  podAntiAffinity:
+#    requiredDuringSchedulingIgnoredDuringExecution:
+#      - labelSelector:
+#          matchLabels:
+#            app.kubernetes.io/name: '{{ template "traefik.name" . }}'
+#            app.kubernetes.io/instance: '{{ .Release.Name }}'
+#        topologyKey: kubernetes.io/hostname
+
 nodeSelector: {}
 tolerations: []
+topologySpreadConstraints: []
+# # This example topologySpreadConstraints forces the scheduler to put traefik pods
+# # on nodes where no other traefik pods are scheduled.
+#  - labelSelector:
+#      matchLabels:
+#        app: '{{ template "traefik.name" . }}'
+#    maxSkew: 1
+#    topologyKey: kubernetes.io/hostname
+#    whenUnsatisfiable: DoNotSchedule
 
 # Pods can have priority.
 # Priority indicates the importance of a Pod relative to other Pods.
