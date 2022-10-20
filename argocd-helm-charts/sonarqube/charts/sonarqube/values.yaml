@@ -2,13 +2,13 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# If the deployment Type is set to Deployment sonarqube is deployed as a replica set.
 deploymentType: "StatefulSet"
 
-# If the deployment Type is set to Deployment sonarqube is deployed as a replica set
-# There should not be more than 1 sonarqube instance connected to the same database
+# There should not be more than 1 sonarqube instance connected to the same database. Please set this value to 1 or 0 (in case you need to scale down programmatically).
 replicaCount: 1
 
- # This will use the default deployment strategy unless it is overriden
+# This will use the default deployment strategy unless it is overriden
 deploymentStrategy: {}
 # Uncomment this to scheduler pods on priority
 # priorityClassName: "high-priority"
@@ -27,7 +27,7 @@ edition: "community"
 
 image:
   repository: sonarqube
-  tag: 9.5.0-{{ .Values.edition }}
+  tag: 9.7.0-{{ .Values.edition }}
   pullPolicy: IfNotPresent
   # If using a private repository, the imagePullSecrets to use
   # pullSecrets:
@@ -65,7 +65,7 @@ networkPolicy:
   enabled: false
 
   # If you plan on using the jmx exporter, you need to define where the traffic is coming from
-  # prometheusNamespace: "monitoring"
+  prometheusNamespace: "monitoring"
 
   # If you are using a external database and enable network Policies to be created
   # you will need to explicitly allow egress traffic to your database
@@ -103,7 +103,7 @@ ingress:
   #  traffic-type: external
   #  traffic-type: internal
   tls: []
-  # Secrets must be manually created in the namespace.
+  # Secrets must be manually created in the namespace. To generate a self-signed certificate (and private key) and then create the secret in the cluster please refer to official documentation available at https://kubernetes.github.io/ingress-nginx/user-guide/tls/#tls-secrets
   # - secretName: chart-example-tls
   #   hosts:
   #     - chart-example.local
@@ -115,6 +115,15 @@ route:
   # Comment this out if you want plain http route created.
   tls:
     termination: edge
+
+  annotations: {}
+  # See Openshift/OKD route annotation
+  # https://docs.openshift.com/container-platform/4.10/networking/routes/route-configuration.html#nw-route-specific-annotations_route-configuration
+  # haproxy.router.openshift.io/timeout: 1m
+
+  # Additional labels for Route manifest file
+  # labels:
+  #  external: 'true'
 
 # Affinity for pod assignment
 # Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
@@ -288,6 +297,9 @@ jvmCeOpts: ""
 ## a monitoring passcode needs to be defined in order to get reasonable probe results
 # not setting the monitoring passcode will result in a deployment that will never be ready
 monitoringPasscode: "define_it"
+# Alternatively, you can define the passcode loading it from an existing secret specifying the right key
+# monitoringPasscodeSecretName: "pass-secret-name"
+# monitoringPasscodeSecretKey: "pass-key"
 
 ## Environment variables to attach to the pods
 ##
@@ -451,11 +463,12 @@ podLabels: {}
 sonarqubeFolder: /opt/sonarqube
 
 tests:
+  image: bitnami/minideb-extras
   enabled: true
   resources: {}
   initContainers:
+    image: bats/bats:1.2.1
     resources: {}
-  # image: bitnami/minideb-extras
 
 # For OpenShift set create=true to ensure service account is created.
 serviceAccount:
@@ -489,8 +502,12 @@ extraConfig:
   configmaps: []
 
 # account:
+# The values can be set to define the current and the (new) custom admin passwords at the startup (the username will remain "admin")
 #   adminPassword: admin
 #   currentAdminPassword: admin
+# The above values can be also provided by a secret that contains "password" and "currentPassword" as keys. You can generate such a secret in your cluster
+# using "kubectl create secret generic admin-password-secret-name --from-literal=password=admin --from-literal=currentPassword=admin"
+#   adminPasswordSecretName: ""
 #   securityContext: {}
 #   resources:
 #     limits:

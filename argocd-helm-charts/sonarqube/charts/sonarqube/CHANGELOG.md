@@ -1,6 +1,39 @@
 # SonarQube Chart Changelog
 All changes to this chart will be documented in this file.
 
+## [6.0.0]
+* Updated SonarQube to 9.7.0
+
+## [5.4.1]
+* Fix the right-dash curly brace issue with the additional network policy parameter
+
+## [5.4.0]
+* Allow `tests.image` to be configured and update README accordingly.
+* Allow `tests.initContainers.image` to be configured and update README accordingly.
+
+## [5.3.0]
+* Use the networkPolicy.prometheusNamespace value for the network policy namespace selector
+* Uncomment default value in values.yaml for backwards compatibility
+
+## [5.2.0]
+* Add support for monitoringPasscode passed as a secret and removal of livenessprobe httpheader defined in clear text
+
+## [5.1.0]
+* Bump apiVersion to v2
+* Set the number of allowed replicas to 0 and 1
+* Add documentation for ingress tls
+* Add documentation for sonarProperties and sonarSecretProperties
+* Add the possibility of using a secret for customizing the admin password
+
+## [5.0.6]
+* Updated SonarQube to 9.6.1
+
+## [5.0.0]
+* Updated SonarQube to 9.6.0
+
+## [4.0.3]
+* Add support for Openshift Route labels and annotations
+
 ## [4.0.2]
 * Fix issue with Openshift route name to use use fullname instead of name
 
@@ -111,7 +144,7 @@ All changes to this chart will be documented in this file.
 * Use liveness endpoint instead of helth endpoint for liveness probe
 
 ## [1.1.9]
-* fixed wrong scc user reference if name was explicitly set 
+* fixed wrong scc user reference if name was explicitly set
 
 ## [1.1.8]
 * fixed serviceaccount logic

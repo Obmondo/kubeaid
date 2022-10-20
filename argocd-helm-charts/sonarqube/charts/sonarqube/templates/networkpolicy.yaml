@@ -28,7 +28,7 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              networking/namespace: monitoring
+              networking/namespace: {{ .Values.networkPolicy.prometheusNamespace }}
       ports:
         - port: {{ .Values.prometheusExporter.ceBeanPort }}
           protocol: TCP
@@ -96,7 +96,7 @@ spec:
           protocol: UDP
 {{- end }}
 
-{{- if and .Values.networkPolicy.enabled .Values.networkPolicy.additionalNetworkPolicys -}}
+{{- if and .Values.networkPolicy.enabled .Values.networkPolicy.additionalNetworkPolicys }}
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
