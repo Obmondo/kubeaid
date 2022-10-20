@@ -1,7 +1,6 @@
 annotations:
   artifacthub.io/changes: |
-    - Update base image to 2.6.6 release
-    - Fully open securityContext for user configuration
+    - Fixes securityContext rendering
 apiVersion: v2
 appVersion: 2.6.6
 description: A Helm chart for HAProxy on Kubernetes
@@ -17,4 +16,4 @@ name: haproxy
 sources:
 - http://www.haproxy.org/
 type: application
-version: 1.17.1
+version: 1.17.3
