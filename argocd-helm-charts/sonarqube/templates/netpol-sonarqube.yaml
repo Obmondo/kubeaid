@@ -15,14 +15,26 @@ spec:
   - action: Allow
     protocol: TCP
     destination:
-      selector: app.kubernetes.io/name == 'postgresql'
+      selector: application == 'spilo'
       ports:
       - 5432
+  # 199.232.24.209 is pointed to repo1.maven.org
+  # Make sure you change when maven guys move their IP :)
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+        - 443
+      destination:
+        - 199.232.24.209
   ingress:
   - action: Allow
     protocol: TCP
     source:
-      selector: app.kubernetes.io/name == 'nginx'
+      selector: app.kubernetes.io/name=traefik
+      namespaceSelector: projectcalico.org/name ='traefik'
+      nets:
+        - 199.232.24.209
     destination:
       ports:
       - 9000
