@@ -31,8 +31,8 @@ spec:
   - action: Allow
     protocol: TCP
     source:
-      selector: app.kubernetes.io/name=traefik
-      namespaceSelector: projectcalico.org/name ='traefik'
+      selector: app.kubernetes.io/name == 'traefik'
+      namespaceSelector: projectcalico.org/name == 'traefik'
       nets:
         - 199.232.24.209
     destination:
