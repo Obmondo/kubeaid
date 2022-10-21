@@ -25,7 +25,7 @@ spec:
     destination:
       ports:
         - 443
-      destination:
+      nets:
         - 199.232.24.209
   ingress:
   - action: Allow
