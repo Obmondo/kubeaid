@@ -31,6 +31,20 @@ velero backup describe <backup_name>
 velero backup logs <backup_name>
 ```
 
+## Create SealedSecret for Velero
+
+Depending on the cloud provider, run the script located inside `/bin/<cloud>` directory. (Currently only `Azure` is supported)
+
+```sh
+# help
+./azure --help
+
+# running the script
+./azure --client-secret xxxx --cluster-name cluster.company.com
+```
+
+Script will generate `credentials-velero.json` in same directory. User has to apply that file to the desired cluster.
+
 ## References
 
 * [How Velero Works](https://velero.io/docs/v1.9/how-velero-works/)
