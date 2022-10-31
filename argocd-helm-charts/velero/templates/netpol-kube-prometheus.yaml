@@ -16,7 +16,7 @@ spec:
     protocol: TCP
     source:
       selector: app.kubernetes.io/name == 'prometheus'
-      namespaceSelector: monitoring == 'kube-prometheus-stack'
+      namespaceSelector: projectcalico.org/name == 'monitoring'
     destination:
       ports:
       - 8085
