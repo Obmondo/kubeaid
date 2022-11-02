@@ -17,7 +17,7 @@ image:
     - name: AGENT_KEY_PATH
       value: "/mnt/obmondo-k8s-agent/tls.key"
     - name: API_URL
-      value: "https://obmondo.com/api/clusters/node-count/"
+      value: "https://api.obmondo.com/api/clusters/node-count/"
   volumeMounts:
     - mountPath: "/mnt/obmondo-k8s-agent"
       name: k8s-agent-tls
