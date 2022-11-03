@@ -1,0 +1,45 @@
+{{- if .Values.networkPolicy }}
+---
+kind: NetworkPolicy
+apiVersion: crd.projectcalico.org/v1
+metadata:
+  name: obmondo-k8s-agent-monitoring-netpol
+  namespace: obmondo
+spec:
+  order: 100
+  selector: app.kubernetes.io/name == 'obmondo-k8s-agent'
+  types:
+  - Ingress
+  - Egress
+  ingress:
+  - action: Allow
+    protocol: TCP
+    source:
+      selector: app.kubernetes.io/name == 'prometheus'
+      namespaceSelector: projectcalico.org/name == 'monitoring'
+    destination:
+      ports:
+      - 8080
+  egress:
+    - action: Allow
+      protocol: UDP
+      source: {}
+      destination:
+        namespaceSelector: kubernetes.io/metadata.name == 'kube-system'
+        ports:
+          - 53
+    - action: Allow
+      protocol: TCP
+      destination:
+        selector: app.kubernetes.io/name == 'prometheus'
+        namespaceSelector: projectcalico.org/name == 'monitoring'
+        ports:
+          - 9090
+    - action: Allow
+      destination:
+        ports:
+          - 443
+      protocol: TCP
+      source: {}
+---
+{{ end }}
