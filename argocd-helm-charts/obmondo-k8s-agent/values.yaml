@@ -16,6 +16,8 @@ image:
       value: "/mnt/obmondo-k8s-agent/tls.crt"
     - name: AGENT_KEY_PATH
       value: "/mnt/obmondo-k8s-agent/tls.key"
+    - name: PROMETHEUS_URL
+      value: "http://prometheus-k8s.monitoring:9090"
     - name: API_URL
       value: "https://api.obmondo.com/api/clusters/node-count/"
   volumeMounts:
