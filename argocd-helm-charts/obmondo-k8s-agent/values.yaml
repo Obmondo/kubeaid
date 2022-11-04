@@ -9,23 +9,13 @@ image:
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
-  env:
-    - name: DURATION
-      value: "8h"
-    - name: AGENT_CERT_PATH
-      value: "/mnt/obmondo-k8s-agent/tls.crt"
-    - name: AGENT_KEY_PATH
-      value: "/mnt/obmondo-k8s-agent/tls.key"
-    - name: PROMETHEUS_URL
-      value: "http://prometheus-k8s.monitoring:9090"
-    - name: API_URL
-      value: "https://api.obmondo.com/api/clusters/node-count/"
   volumeMounts:
     - mountPath: "/mnt/obmondo-k8s-agent"
       name: k8s-agent-tls
 
 imagePullSecrets:
     - name: accesstoken-4obmondoagentregistry-customer-enableit
+
 nameOverride: ""
 fullnameOverride: ""
 
