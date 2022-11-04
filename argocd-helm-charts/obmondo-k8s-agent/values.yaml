@@ -16,6 +16,8 @@ image:
 imagePullSecrets:
     - name: accesstoken-4obmondoagentregistry-customer-enableit
 
+envVars: {}
+
 nameOverride: ""
 fullnameOverride: ""
 
