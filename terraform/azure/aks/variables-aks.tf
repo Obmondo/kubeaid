@@ -82,3 +82,9 @@ variable "nodepools" {
   type = map
   default = {}
 }
+
+variable "mode" {
+  type = string
+  default = "System"
+  description = "Should the added Node Pool be used for System or User resources?"
+}
