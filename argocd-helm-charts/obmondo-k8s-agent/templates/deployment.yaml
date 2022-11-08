@@ -57,10 +57,11 @@ spec:
               - ps
               - p1
           readinessProbe:
-            exec:
-              command:
-              - ps
-              - p1
+            httpGet:
+              path: /readyz
+              port: 8080
+            periodSeconds: 300
+            initialDelaySeconds: 1
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.volumes }}
