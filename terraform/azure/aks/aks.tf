@@ -45,6 +45,7 @@ resource "azurerm_kubernetes_cluster" "k8s" {
 resource "azurerm_kubernetes_cluster_node_pool" "nodepool" {
   for_each              = var.nodepools
   name                  = each.key
+  mode                  = var.mode
   kubernetes_cluster_id = azurerm_kubernetes_cluster.k8s.id
   vm_size               = each.value.vm_size
   node_count            = each.value.agent_count
