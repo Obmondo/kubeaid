@@ -28,3 +28,14 @@ variable "cluster_name" {
   type        = string
   description = "K8s cluster name"
 }
+
+variable "peerings" {
+  type        = map(
+    object({
+      requestor_tag = string
+      acceptor_tag  = string
+    })
+  )
+  default     = {}
+  description = "Peerings between any two vpc of your choice"
+}
