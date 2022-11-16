@@ -26,8 +26,10 @@ data:
     kubernetes_service:
       enabled: true
       kube_cluster_name: teleport.obmondo.com
+      listen_addr: 0.0.0.0:3027
     proxy_service:
       public_addr: 'teleport.obmondo.com:443'
+      kube_listen_addr: 0.0.0.0:3026
       enabled: true
       acme:
         enabled: true
