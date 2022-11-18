@@ -82,3 +82,8 @@ mongodb://graylog-user:<password>@mongodb-replica-set-0.mongodb-replica-set-svc.
 This username and password combination allows the Graylog client to authenticate itself to the MongoDB instance.
 
 **NOTE: Do not use `userAdminAnyDatabase` role of MongoDB as it does not have permissions to create index.**
+
+Create the mongodb graylog-user password
+```bash
+kubectl create secret generic graylog-user-password -n default --dry-run=client --from-literal=password=lolpassword -o yaml
+```
