@@ -2,28 +2,9 @@ backup:
   enable: false
 
 opensearch:
-  extraInitContainers:
-    ## Image that performs the sysctl operation to modify Kernel settings (needed sometimes to avoid boot errors)
-    - name: sysctl
-      image: docker.io/bitnami/bitnami-shell:10-debian-10-r199
-      imagePullPolicy: "IfNotPresent"
-      command:
-        - /bin/bash
-        - -ec
-        - |
-          CURRENT=`sysctl -n vm.max_map_count`;
-          DESIRED="262144";
-          if [ "$DESIRED" -gt "$CURRENT" ]; then
-              sysctl -w vm.max_map_count=262144;
-          fi;
-          CURRENT=`sysctl -n fs.file-max`;
-          DESIRED="65536";
-          if [ "$DESIRED" -gt "$CURRENT" ]; then
-              sysctl -w fs.file-max=65536;
-          fi;
-      securityContext:
-        #runAsUser: 0
-        privileged: true
+  # Helm chart points to 1.3.2, we want to use latest as of now which is 1.3.6
+  image:
+    tag: 1.3.6
   extraEnvs:
   - name: DISABLE_INSTALL_DEMO_CONFIG
     value: "false"
