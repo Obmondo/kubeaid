@@ -95,7 +95,7 @@ data:
     http_tls_key_file = {{ .Values.graylog.tls.keyFile }}
     {{- end }}
     {{- if $externalUri }}
-    http_external_uri = {{ $externalUri }}/
+    http_external_uri = https://{{ $externalUri }}/
     {{- end }}
   {{- end }}
     elasticsearch_hosts = {{ template "graylog.elasticsearch.hosts" . }}
