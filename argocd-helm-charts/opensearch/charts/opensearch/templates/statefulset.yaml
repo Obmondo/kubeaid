@@ -12,11 +12,7 @@ spec:
   selector:
     matchLabels:
       {{- include "opensearch.selectorLabels" . | nindent 6 }}
-  {{- if .Values.singleNode }}
-  replicas: 1
-  {{- else }}
   replicas: {{ .Values.replicas }}
-  {{- end }}
   podManagementPolicy: {{ .Values.podManagementPolicy }}
   updateStrategy:
     type: {{ .Values.updateStrategy }}
@@ -303,19 +299,8 @@ spec:
 
           bash opensearch-docker-entrypoint.sh
       {{- end }}
-  
         image: "{{ template "opensearch.dockerRegistry" . }}{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: "{{ .Values.image.pullPolicy }}"
-        readinessProbe:
-{{ toYaml .Values.readinessProbe | indent 10 }}
-        {{- if .Values.livenessProbe }}
-        livenessProbe:
-{{ toYaml .Values.livenessProbe | indent 10 }}
-        {{- end }}
-      {{- if semverCompare ">=1.16-0" .Capabilities.KubeVersion.Version }}
-        startupProbe:
-{{ toYaml .Values.startupProbe | indent 10 }}
-      {{- end }}
         ports:
         - name: http
           containerPort: {{ .Values.httpPort }}
@@ -328,7 +313,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        {{- if (and (has "master" .Values.roles) (not .Values.singleNode)) }}
+        {{- if has "master" .Values.roles }}
         - name: cluster.initial_master_nodes
           value: "{{ template "opensearch.endpoints" . }}"
         {{- end }}
@@ -342,10 +327,6 @@ spec:
           value: "{{ .Values.opensearchJavaOpts }}"
         - name: node.roles
           value: "{{ template "opensearch.roles" . }}"
-        {{- if .Values.singleNode }}
-        - name: discovery.type
-          value: "single-node"
-        {{- end }}
 {{- if .Values.extraEnvs }}
 {{ toYaml .Values.extraEnvs | indent 8 }}
 {{- end }}
@@ -449,7 +430,7 @@ spec:
               local path="${1}"
               if [ -n "${USERNAME}" ] && [ -n "${PASSWORD}" ]; then
                 BASIC_AUTH="-u ${USERNAME}:${PASSWORD}"
-              else
+              elses
                 BASIC_AUTH=''
               fi
               curl -XGET -s -k --fail ${BASIC_AUTH} {{ .Values.protocol }}://{{ template "opensearch.masterService" . }}:{{ .Values.httpPort }}${path}
