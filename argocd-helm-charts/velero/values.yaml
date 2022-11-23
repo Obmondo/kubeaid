@@ -6,6 +6,7 @@ schedule:
 velero:
   configuration:
     logLevel: debug
+    features: EnableCSI
   metrics:
     enabled: true
     serviceMonitor:
