@@ -35,6 +35,4 @@ data:
         enabled: true
         email: ops@enableit.dk
     ssh_service:
-      enabled: true
-      labels:
-        environment: ssh-nodes
+      enabled: false
