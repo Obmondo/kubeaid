@@ -30,7 +30,7 @@ spec:
           containers:
           - name: es-curator
             # 5.8.4 was not working, so sticking it to 5.8.3
-            image: bitnami/elasticsearch-curator:5.8.3
+            image: {{ .Values.backup.image | default "bitnami/elasticsearch-curator:5.8.3" }}
             imagePullPolicy: IfNotPresent
             command:
             - /bin/sh
