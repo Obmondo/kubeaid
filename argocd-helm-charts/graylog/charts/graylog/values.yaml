@@ -55,7 +55,7 @@ graylog:
   ##
   image:
     repository: "graylog/graylog"
-    tag: "4.3.9"
+    tag: "4.2.3-1"
     pullPolicy: "IfNotPresent"
 
   ## Graylog default Java option
@@ -552,6 +552,12 @@ graylog:
     ## threshold, a system notification will be generated to warn the administrator
     ## about possible problems with the system. Default is 1 second.
     gc_warning_threshold: 1s
+
+    ## Buffer processor settings.
+    ## A good rule of thumb is to never go over the number of cores available
+    outputbufferProcessors: 3
+    inputbufferProcessors: 2
+    processbufferProcessors: 5
 
 ## Specify Elasticsearch version from requirement dependencies. Ignore this seection if you install Elasticsearch manually.
 ##
