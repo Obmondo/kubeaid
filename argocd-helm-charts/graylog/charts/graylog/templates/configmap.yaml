@@ -105,12 +105,12 @@ data:
     output_flush_interval = 1
     output_fault_count_threshold = 5
     output_fault_penalty_seconds = 30
-    processbuffer_processors = 5
-    outputbuffer_processors = 3
+    processbuffer_processors = {{ .Values.graylog.options.processbufferProcessors | default 5 }}
+    outputbuffer_processors = {{ .Values.graylog.options.outputbufferProcessors | default 3 }}
     processor_wait_strategy = blocking
     ring_size = {{ .Values.graylog.options.ringSize | default 65536 }}
     inputbuffer_ring_size = {{ .Values.graylog.options.inputBufferRingSize | default 65536 }}
-    inputbuffer_processors = 2
+    inputbuffer_processors = {{ .Values.graylog.options.inputbufferProcessors | default 2 }}
     inputbuffer_wait_strategy = blocking
     message_journal_enabled = true
     # Do not change `message_journal_dir` location
@@ -174,16 +174,19 @@ data:
     if [[ -z "$MASTER_IP" ]]; then
       echo "Launching $HOSTNAME as master"
       export GRAYLOG_IS_MASTER="true"
+      export GRAYLOG_IS_LEADER="true"
       /k8s/kubectl --namespace {{ .Release.Namespace }} label --overwrite pod $HOSTNAME graylog-role="master"
     else
       # When container was recreated or restart, MASTER_IP == SELF_IP, running as master and no need to change label graylog-role="master"
       if [ "$SELF_IP" == "$MASTER_IP" ];then
         echo "Launching $HOSTNAME as master"
         export GRAYLOG_IS_MASTER="true"
+        export GRAYLOG_IS_LEADER="true"
       else
         # MASTER_IP != SELF_IP, running as coordinating
         echo "Launching $HOSTNAME as coordinating"
         export GRAYLOG_IS_MASTER="false"
+        export GRAYLOG_IS_LEADER="false"
         /k8s/kubectl --namespace {{ .Release.Namespace }} label --overwrite pod $HOSTNAME graylog-role="coordinating"
       fi
     fi

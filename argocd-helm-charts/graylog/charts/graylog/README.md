@@ -227,6 +227,9 @@ The following table lists the configurable parameters of the Graylog chart and t
 | `graylog.options.allowLeadingWildcardSearches` | if true, allow searches with leading wildcards. This can be extremely resource hungry and should only be enabled with care.                           | `false`                           |
 | `graylog.options.gc_warning_threshold`         | The threshold of the garbage collection runs                                                                                                          | `1s`                              |
 | `graylog.options.ringSize`                    | Size of internal ring buffers.       |          `65536`                    |
+| `graylog.options.processbufferProcessors`     | Number of processors assigned to the process buffer                                                                                                    | `5`                               |
+| `graylog.options.inputbufferProcessors`       | Number of processors assigned to the input buffer                                                                                                      | `2`                               |
+| `graylog.options.outputbufferProcessors`      | Number of processors assigned to the output buffer                                                                                                     | `3`                               |
 | `graylog.options.inputBufferRingSize`         | Size of input internal ring buffers. |          `65536`                    |
 
 
