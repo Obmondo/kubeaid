@@ -1,11 +1,11 @@
 apiVersion: v2
-appVersion: 4.2.7
+appVersion: 4.3.8
 dependencies:
 - name: elasticsearch
   repository: https://helm.elastic.co
   tags:
   - install-elasticsearch
-  version: 7.10.2
+  version: 7.16.2
 - name: mongodb
   repository: https://charts.bitnami.com/bitnami
   tags:
@@ -27,4 +27,4 @@ maintainers:
 name: graylog
 sources:
 - https://github.com/KongZ/charts
-version: 2.1.7
+version: 2.2.0
