@@ -78,7 +78,11 @@ Or use chart dependencies with release name
 */}}
 {{- define "graylog.elasticsearch.hosts" -}}
 {{- if .Values.graylog.elasticsearch.uriSecretKey }}
-    {{- printf "${GRAYLOG_ELASTICSEARCH_HOSTS}" -}}
+    {{- if .Values.graylog.elasticsearch.uriSSL }}
+        {{- printf "https://${GRAYLOG_ELASTICSEARCH_HOSTS}" -}}
+    {{- else }}
+        {{- printf "http://${GRAYLOG_ELASTICSEARCH_HOSTS}" -}}
+    {{- end }}
 {{- else if .Values.graylog.elasticsearch.hosts }}
     {{- .Values.graylog.elasticsearch.hosts -}}
 {{- else }}
