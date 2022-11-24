@@ -1,8 +1,0 @@
-    {
-      "snapshot" : "opensearch-ops-202211160526",
-      "uuid" : "m_6I4nkWQOOkBcinhsjgsA",
-      "version_id" : 135237927,
-      "version" : "1.2.1",
-      "indices" : [
-        "graylog_265",
-

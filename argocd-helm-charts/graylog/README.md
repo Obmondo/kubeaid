@@ -108,10 +108,7 @@ kubectl create secret generic graylog-es-svc -n graylog --from-literal=url='http
   (there is a link on their website, cant find one now)
 * few things to look for, for now I have fixed locally on k8id repo
   a. [issue#104](https://github.com/KongZ/charts/issues/104)
-  b. [issue#34](https://github.com/KongZ/charts/issues/34)
 * With graylog 4.3.x and opensearch 1.x we can disable the emulation(ES 7.x - set in opensearch values)
-* Graylog does not work with cluster setup, so MAKE SURE it has only one replica (helm chart needs to be fixed upstream)
-  a. Need to raise a MR to patch with `is_leader = 1` [This is not supported in helm, have did it manually for now]
 * external url `externalUri` in graylog values should include `https://your-domain.com`
 
 ## Restore Instruction
