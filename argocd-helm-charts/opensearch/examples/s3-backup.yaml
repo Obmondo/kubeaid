@@ -1,0 +1,23 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: s3-backup
+  namespace: graylog
+spec:
+  encryptedData:
+    username: admin
+    password: lolpassword
+  template:
+    data:
+      config.yml: |
+        client:
+          hosts: opensearch-cluster-master
+          username: {{ index . "username" }}
+          password: {{ index . "password" }}
+          port: 9200
+          timeout: 10
+        logging:
+          blacklist: ["elasticsearch", "urllib3"]
+          logformat: default
+          logfile:
+          loglevel: DEBUG
