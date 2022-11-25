@@ -21,9 +21,7 @@ kubectl port-forward -n graylog svc/graylog 9091:9000
 
 ## set admin password (in standalone setup)
 
-Helm chart takes care of converting the password into `sha256` hash.
-
-https://docs.graylog.org/en/4.0/pages/getting_started/configure.html
+Helm chart takes care of converting the password into `sha256` hash. [configure](https://docs.graylog.org/en/4.0/pages/getting_started/configure.html)
 
 ```sh
 echo -n "Enter Password: " && head -1 </dev/stdin | tr -d '\n' | sha256sum | cut -d" " -f1
@@ -82,3 +80,68 @@ mongodb://graylog-user:<password>@mongodb-replica-set-0.mongodb-replica-set-svc.
 This username and password combination allows the Graylog client to authenticate itself to the MongoDB instance.
 
 **NOTE: Do not use `userAdminAnyDatabase` role of MongoDB as it does not have permissions to create index.**
+
+Create the mongodb graylog-user password
+
+```bash
+kubectl create secret generic graylog-user-password -n default --dry-run=client --from-literal=password=lolpassword -o yaml
+```
+
+## Opensearch (elasticsearch fork with open source license)
+
+```bash
+kubectl create secret generic graylog-es-svc -n graylog --from-literal=url='http://admin:admin@opensearch-cluster-master:9200' -o yaml
+```
+
+## Upgrade Instruction
+
+* Take backup of mongodb
+  a. Login on mongodb-replica-set pods shell
+  b. and run these commands
+
+  ```bash
+  cd /tmp
+  mongo dump
+  ```
+
+* Check the version of opensearch and mongodb which are supported by graylog
+  (there is a link on their website, cant find one now)
+* few things to look for, for now I have fixed locally on k8id repo
+  a. [issue#104](https://github.com/KongZ/charts/issues/104)
+* With graylog 4.3.x and opensearch 1.x we can disable the emulation(ES 7.x - set in opensearch values)
+* external url `externalUri` in graylog values should include `https://your-domain.com`
+
+## Restore Instruction
+
+* Mongodb graylog db restore
+
+  a. Delete the graylog statefulset
+
+  ```bash
+  kubectl delete sts graylog -n graylog --cascade=orphan
+  ```
+
+  b. Delete the graylog pod
+
+  c. Restore the graylog DB
+
+  ```bash
+  kubectl cp . graylog/mongodb-replica-set-0:/tmp
+  mongorestore  --username graylog-user --password lolpass --authenticationDatabase graylog -d graylog ./tmp
+  ```
+
+  d. Sync the graylog pod from argocd
+
+* After upgrade you might now see the old data, to fix this
+  a. System
+       -> Indices
+       -> `click on any indices` or `the one which is missing old data`
+       -> Maintenance
+       -> 'Recalculate Index Range'`
+  b. If you are doing the above for multiple indices, just wait for 1 indices to finish (look at graylog to see)
+     and do another one (not compulsory, but hold the horses)
+
+## Troubleshooting
+
+* if you have upgraded mongodb to 5.x and downgraded to mongodb 4.x you would end up with
+  [this error](https://github.com/Graylog2/graylog2-server/issues/13999)

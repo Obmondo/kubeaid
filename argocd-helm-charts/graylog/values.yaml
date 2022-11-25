@@ -4,7 +4,6 @@ graylog:
     tags:
       install-elasticsearch: false
       install-mongodb: false
-
     resources:
       limits:
       # NO memory or CPU limit - this peaks >4GB memory usage and CPU is based on processing needs. Memory usage really should be fixed - no upstream bug reported though.
