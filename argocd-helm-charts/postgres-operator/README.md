@@ -5,30 +5,20 @@
 Postgres-operator is used to manage Postgres instances, including high-availability setups with master and
 multiple slaves, and automatic failover and backups of data to offsite location.
 
-Here is an example of how to setup a postgresql instance, [using this operator](./examples/sample.yaml)
+Example [postgres-cluster](./examples/postgres-cluster.yaml)
 
-NB. The Postgres-operator is instatlled in the ```system``` namespace as it is to be used for
-MANY postgresql instances - preferrably ALL in the cluster - so backup and high-availability works the same for all.
+### how to setup a postgresql cluster instance on diff providers
 
-Example per-cluster values for AWS cluster:
-
-```yaml
-postgres-operator:
-  configAwsOrGcp:
-    aws_region: 'eu-west-1'
-    kube_iam_role: "arn:aws:iam::438423213058:role/k8s-zalando-operator-dmz"
-    wal_s3_bucket: "postgres-backup"
-  # setup AWS loadbalancer - so postgres instances can be reachable from other clusters
-  configLoadBalancer:
-    db_hosted_zone: 'example.tld'
-    master_dns_name_format: '{cluster}.{hostedzone}'
-    replica_dns_name_format: '{cluster}-repl.{hostedzone}'
-    custom_service_annotations:
-      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
-      service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
-  configLogicalBackup:
-    logical_backup_s3_bucket: "postgres-backup"
-```
+* [AWS](./examples/aws.yaml)
+* Setup the values files for baremetal server
+  NOTE: currently its not possible to setup the secret directly in postgres operator which will pass
+  the env variable to backup pods. [More info](https://github.com/zalando/postgres-operator/pull/2097)
+  a. [Physical](./examples/baremetal.yaml)
+  b. Create the secret for accessing self-hosted s3
+  ```sh
+  kubectl create secret generic $postgres-cluster-name-postgres-pod-env -n $namspace-where-is-your-postgres-cluster-deployed --dry-run=client --from-literal=AWS_SECRET_ACCESS_KEY=boolol -o yaml | kubeseal --controller-namespace system --controller-name sealed-secrets -o yaml > /path/to/sealed-secret/dir/$postgres-cluster-postgres-pod-env.yaml
+  ```
+  c. https://github.com/zalando/postgres-operator/pull/2097
 
 ## Troubleshooting
 
