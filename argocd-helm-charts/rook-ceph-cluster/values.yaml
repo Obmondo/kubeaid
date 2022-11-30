@@ -1,0 +1,31 @@
+storageclass:
+  default: false
+
+rook-ceph-cluster:
+
+  cephClusterSpec:
+    monitoring:
+      enabled: false
+    resources:
+      mgr:
+        limits: null
+      mon:
+        limits: null
+      osd:
+        limits: null
+      mgr-sidecar:
+        limits: null
+      crashcollector:
+        limits: null
+      logcollector:
+        limits: null
+      cleanup:
+        limits: null
+
+    logCollector:
+
+    disruptionManagement:
+      # If true, the operator will create and manage PodDisruptionBudgets for OSD, Mon, RGW, and MDS daemons. OSD PDBs are managed dynamically
+      # via the strategy outlined in the [design](https://github.com/rook/rook/blob/master/design/ceph/ceph-managed-disruptionbudgets.md). The operator will
+      # block eviction of OSDs by default and unblock them safely when drains are detected.
+      managePodBudgets: false
