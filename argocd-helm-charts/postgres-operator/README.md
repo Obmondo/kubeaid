@@ -15,10 +15,19 @@ Example [postgres-cluster](./examples/postgres-cluster.yaml)
   the env variable to backup pods. [More info](https://github.com/zalando/postgres-operator/pull/2097)
   a. [Physical](./examples/baremetal.yaml)
   b. Create the secret for accessing self-hosted s3
+
   ```sh
   kubectl create secret generic $postgres-cluster-name-postgres-pod-env -n $namspace-where-is-your-postgres-cluster-deployed --dry-run=client --from-literal=AWS_SECRET_ACCESS_KEY=boolol -o yaml | kubeseal --controller-namespace system --controller-name sealed-secrets -o yaml > /path/to/sealed-secret/dir/$postgres-cluster-postgres-pod-env.yaml
   ```
-  c. https://github.com/zalando/postgres-operator/pull/2097
+
+  c. Create the bucket manually
+
+  ```sh
+  # aws s3api create-bucket --bucket kbm-postgres-buckets --region eu-west-1 --endpoint-url=https://s3.obmondo.com
+  {
+    "Location": "/kbm-postgres-buckets"
+  }
+  ```
 
 ## Troubleshooting
 
