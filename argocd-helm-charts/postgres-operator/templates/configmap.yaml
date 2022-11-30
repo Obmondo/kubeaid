@@ -1,0 +1,20 @@
+{{- if .Values.s3 }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-pod-env
+data:
+  WAL_BUCKET_SCOPE_PREFIX: ""
+  WAL_BUCKET_SCOPE_SUFFIX: ""
+  USE_WALG_BACKUP: "true"
+  USE_WALG_RESTORE: "true"
+  AWS_S3_FORCE_PATH_STYLE: "true"
+  AWS_ENDPOINT: {{ .Values.s3.endpoint }}
+  WALG_DISABLE_S3_SSE: "true"
+  CLONE_USE_WALG_RESTORE: "true"
+  WAL_S3_BUCKET: {{ .Values.s3.bucket }}
+  BACKUP_SCHEDULE: '02 10 * * *'
+  AWS_ACCESS_KEY_ID: {{ .Values.s3.access_key_id }}
+  AWS_REGION: eu-west-1
+  BACKUP_NUM_TO_RETAIN: "5"
+{{- end }}
