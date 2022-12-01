@@ -1,5 +1,2 @@
 teleport-cluster:
   clusterName: teleport.obmondo.com
-  acme: true
-  acmeEmail: "ops@enableit.dk"
-  useExistingConfigMap: true
