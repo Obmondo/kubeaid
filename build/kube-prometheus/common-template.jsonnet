@@ -103,6 +103,11 @@ local mixins = remove_nulls([
     vars,
   ),
   addMixin(
+    'kubernetes-eol',
+    (import 'mixins/eol/mixin.libsonnet'),
+    vars,
+  ),
+  addMixin(
     'cert-manager',
     (import 'gitlab.com/uneeq-oss/cert-manager-mixin/mixin.libsonnet'),
     vars,
