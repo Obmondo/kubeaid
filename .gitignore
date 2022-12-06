@@ -9,3 +9,9 @@ defaults
 .terraform*
 .terragrunt*
 *.~undo-tree~
+
+# These files are ignored as make build creates them but they are
+# are already there in build/kube-prometheus/libraries/main
+build/vendor/
+build/jsonnetfile.json
+build/jsonnetfile.lock.json
