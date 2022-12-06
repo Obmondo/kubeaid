@@ -122,7 +122,7 @@ available in https://github.com/prometheus/alertmanager/blob/main/doc/alertmanag
 
   Note that the search path contains the full path of the file from the top of the `vendor` folder.
 
-  Checkout how the 'velero' mixin has been added in `common-template.json`. You may need to import the local path depending on your mixin. You should also set the value that decides whether this mixin should be used as true. See this snippet from `common-template.json`.
+  Checkout how the 'velero' mixin has been added in `common-template.json`. You may need to import the local path of the mixin depending on your mixin. You should also set the value that decides whether this mixin should be used as true/false. See this snippet from `common-template.json`.
 
   ```
   addMixins: {
