@@ -69,6 +69,7 @@ local default_vars = {
     etcd: true,
     velero: false,
     'cert-manager': true,
+    'kubernetes-eol':true,
   },
   mixin_configs: {
     // Example:
