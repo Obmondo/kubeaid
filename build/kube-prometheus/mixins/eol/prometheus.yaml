@@ -1,17 +1,18 @@
+---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: kubernetes-eol
 spec:
   groups:
-  - name: kubernetes-eol
-    rules:
-    - alert: KubernetesVersionInfoAlert
-      annotations:
-        description: 'The Kubernetes version has reached very close to its end of life for the cluster '
-        summary: The Kubernetes version info metric has a value 1
-      expr: kubernetes_version_info==1
-      for: 15m
-      labels:
-        severity: warning
-
+    - name: kubernetes-eol
+      rules:
+        - alert: KubernetesVersionInfoAlert
+          annotations:
+            description: "The Kubernetes version has reached very close to its end of life
+              for the cluster "
+            summary: The Kubernetes version info metric has a value 1
+          expr: kubernetes_version_info==1
+          for: 15m
+          labels:
+            severity: warning
