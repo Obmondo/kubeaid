@@ -46,7 +46,7 @@ Setup the jsonnet file as per the requirement
 
 ### Run the build script
 
-Run this in the root of the argocd-apps repo, with the k8s config repo cloned next to it
+Run this in the root of this repo, with the k8s config repo cloned next to it
 
 ```sh
 ./build/kube-prometheus/build.sh ../kubernetes-config-enableit/k8s/kam.obmondo.com
@@ -121,6 +121,34 @@ available in https://github.com/prometheus/alertmanager/blob/main/doc/alertmanag
    ```
 
   Note that the search path contains the full path of the file from the top of the `vendor` folder.
+
+  Checkout how the 'velero' mixin has been added in `common-template.json`. You may need to import the local path depending on your mixin. You should also set the value that decides whether this mixin should be used as true. See this snippet from `common-template.json`.
+
+  ```
+  addMixins: {
+    ceph: true,
+    sealedsecrets: true,
+    etcd: true,
+    velero: false,
+    'cert-manager': true,
+    'kubernetes-eol':true,
+  }
+  ```
+
++ To add a custom prometheus rule as a mixin, create a mixin.libsonnet file in the relevant folder under the `mixins` folder and generate the `prometheus.yaml`  for it. One way to do generate a YAML file from a .libsonnet file is using a jsonnet command similar to this:
+
+```
+jsonnet -e '(import "mixin.libsonnet").prometheusAlerts' | gojsontoyaml > prometheus.yaml
+```
+
++ In the case when your mixin is supposed to trigger a Prometheus alert and <b>all you want is to test</b> whether it works, do this:
+
+* Run the build script as described in the 'Run the build script' section above.
+* Apply the newly generated YAML file in the test cluster's monitoring namespace where you want to test if the alert is triggered.
+
+```
+kubectl apply -f <path to alert rules file>.yaml -n monitoring
+```
 
 ## Jsonnet debugging
 
