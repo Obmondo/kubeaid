@@ -27,18 +27,43 @@ rook-ceph-cluster:
     resources:
       mgr:
         limits: null
+        requests:
+          cpu: "250m"
+          memory: "512Mi"
       mon:
         limits: null
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
       osd:
         limits: null
+        requests:
+          cpu: "500m"
+          memory: "4Gi"
+      prepareosd:
+        requests:
+          cpu: "250m"
+          memory: "50Mi"
       mgr-sidecar:
         limits: null
+        requests:
+          cpu: "50m"
+          memory: "40Mi"
       crashcollector:
         limits: null
+        requests:
+          cpu: "50m"
+          memory: "60Mi"
       logcollector:
         limits: null
+        requests:
+          cpu: "50m"
+          memory: "100Mi"
       cleanup:
         limits: null
+        requests:
+          cpu: "250m"
+          memory: "100Mi"
 
     logCollector:
 
