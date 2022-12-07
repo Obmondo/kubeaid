@@ -1,7 +1,0 @@
-storageclass:
-  default: true
-
-rook-ceph-cluster:
-  cephClusterSpec:
-    storage:
-      deviceFilter: '^sd[ab]4$'
