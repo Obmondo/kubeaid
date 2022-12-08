@@ -1,7 +1,12 @@
+rook-ceph:
+  monitoring:
+    enabled: true
+
 rook-ceph-cluster:
+  monitoring:
+    enabled: true
+
   cephClusterSpec:
-    monitoring:
-      enabled: false
     resources:
       mgr:
         limits: null
