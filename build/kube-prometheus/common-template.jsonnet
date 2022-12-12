@@ -69,7 +69,7 @@ local default_vars = {
     etcd: true,
     velero: false,
     'cert-manager': true,
-    'kubernetes-eol': true,
+    'kubernetes-version-info': true,
   },
   mixin_configs: {
     // Example:
@@ -104,8 +104,8 @@ local mixins = remove_nulls([
     vars,
   ),
   addMixin(
-    'kubernetes-eol',
-    (import 'mixins/eol/mixin.libsonnet'),
+    'kubernetes-version-info',
+    (import 'mixins/kube-version/mixin.libsonnet'),
     vars,
   ),
   addMixin(
