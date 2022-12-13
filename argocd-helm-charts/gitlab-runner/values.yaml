@@ -8,6 +8,7 @@ gitlab-runner:
   runners:
     locked: false
     secret: gitlab-runner
+    privileged: true
     runUntagged: true
     config: |
       [[runners]]
