@@ -1,2 +1,14 @@
 rabbitmq-cluster-operator:
   useCertManager: "true"
+  clusterOperator:
+    resources:
+      limits: null
+      requests:
+        cpu: 100m
+        memory: 250Mi
+  msgTopologyOperator:
+    resources:
+      limits: null
+      requests:
+        cpu: 100m
+        memory: 250Mi
