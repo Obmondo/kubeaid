@@ -1,2 +1,12 @@
 teleport-cluster:
   clusterName: teleport.obmondo.com
+  acme: true
+  acmeEmail: "ops@enableit.dk"
+  useExistingConfigMap: true
+  resources:
+    limits:
+      cpu: null
+      memory: '400Mi'
+    requests:
+      cpu: '180m'
+      memory: '250Mi'
