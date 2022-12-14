@@ -1,51 +1,85 @@
 rook-ceph:
   monitoring:
     enabled: true
+  resources:
+    limits:
+      cpu: null
+      memory: 400Mi
+    requests:
+      cpu: 100m
+      memory: 200Mi
 
 rook-ceph-cluster:
   monitoring:
     enabled: true
 
+  toolbox:
+    enabled: true
+    resources:
+      limits:
+        cpu: null
+        memory: "100Mi"
+      requests:
+        cpu: "100m"
+        memory: "100Mi"
+
   cephClusterSpec:
     resources:
       mgr:
-        limits: null
+        limits:
+          cpu: null
+          memory: "800Mi"
         requests:
-          cpu: "250m"
+          cpu: "150m"
           memory: "512Mi"
       mon:
-        limits: null
+        limits:
+          cpu: null
+          memory: "512Mi"
         requests:
-          cpu: "500m"
-          memory: "1Gi"
+          cpu: "100m"
+          memory: "200Mi"
       osd:
-        limits: null
+        limits:
+          cpu: null
+          memory: "1500Mi"
         requests:
           cpu: "500m"
-          memory: "4Gi"
-      prepareosd:
+          memory: "1500Mi"
+      prepareosod:
+        limits:
+          cpu: null
+          memory: "50Mi"
         requests:
-          cpu: "250m"
+          cpu: "100m"
           memory: "50Mi"
       mgr-sidecar:
-        limits: null
+        limits:
+          cpu: null
+          memory: "40Mi"
         requests:
           cpu: "50m"
           memory: "40Mi"
       crashcollector:
-        limits: null
+        limits:
+          cpu: null
+          memory: "60Mi"
         requests:
           cpu: "50m"
           memory: "60Mi"
       logcollector:
-        limits: null
+        limits:
+          cpu: null
+          memory: "100Mi"
         requests:
           cpu: "50m"
           memory: "100Mi"
       cleanup:
-        limits: null
+        limits:
+          cpu: null
+          memory: "100Mi"
         requests:
-          cpu: "250m"
+          cpu: "100m"
           memory: "100Mi"
 
     logCollector:
@@ -55,3 +89,93 @@ rook-ceph-cluster:
       # via the strategy outlined in the [design](https://github.com/rook/rook/blob/master/design/ceph/ceph-managed-disruptionbudgets.md). The operator will
       # block eviction of OSDs by default and unblock them safely when drains are detected.
       managePodBudgets: false
+
+  # NOTE copied from rook-ceph-cluster/values.yaml file
+  # Since we cannot really overwrite the resource usage
+  cephFileSystems:
+    - name: ceph-filesystem
+      # see https://github.com/rook/rook/blob/master/Documentation/CRDs/Shared-Filesystem/ceph-filesystem-crd.md#filesystem-settings for available configuration
+      spec:
+        metadataPool:
+          replicated:
+            size: 3
+        dataPools:
+          - failureDomain: host
+            replicated:
+              size: 3
+            # Optional and highly recommended, 'data0' by default, see https://github.com/rook/rook/blob/master/Documentation/CRDs/Shared-Filesystem/ceph-filesystem-crd.md#pools
+            name: data0
+        metadataServer:
+          activeCount: 1
+          activeStandby: true
+          resources:
+            limits:
+              cpu: null
+              memory: "100Mi"
+            requests:
+              cpu: "100m"
+              memory: "100Mi"
+          priorityClassName: system-cluster-critical
+      storageClass:
+        enabled: true
+        isDefault: false
+        name: ceph-filesystem
+        # (Optional) specify a data pool to use, must be the name of one of the data pools above, 'data0' by default
+        pool: data0
+        reclaimPolicy: Delete
+        allowVolumeExpansion: true
+        mountOptions: []
+        # see https://github.com/rook/rook/blob/master/Documentation/ceph-filesystem.md#provision-storage for available configuration
+        parameters:
+          # The secrets contain Ceph admin credentials.
+          csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
+          csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+          csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
+          csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+          csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
+          csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+          # Specify the filesystem type of the volume. If not specified, csi-provisioner
+          # will set default as `ext4`. Note that `xfs` is not recommended due to potential deadlock
+          # in hyperconverged settings where the volume is mounted on the same node as the osds.
+          csi.storage.k8s.io/fstype: ext4
+
+  # NOTE copied from rook-ceph-cluster/values.yaml file
+  # Since we cannot really overwrite the resource usage
+  cephObjectStores:
+    - name: ceph-objectstore
+      # see https://github.com/rook/rook/blob/master/Documentation/CRDs/Object-Storage/ceph-object-store-crd.md#object-store-settings for available configuration
+      spec:
+        metadataPool:
+          failureDomain: host
+          replicated:
+            size: 3
+        dataPool:
+          failureDomain: host
+          erasureCoded:
+            dataChunks: 2
+            codingChunks: 1
+        preservePoolsOnDelete: true
+        gateway:
+          port: 80
+          resources:
+            limits:
+              cpu: null
+              memory: "200Mi"
+            requests:
+              cpu: "200m"
+              memory: "200Mi"
+          # securePort: 443
+          # sslCertificateRef:
+          instances: 1
+          priorityClassName: system-cluster-critical
+        healthCheck:
+          bucket:
+            interval: 60s
+      storageClass:
+        enabled: true
+        name: ceph-bucket
+        reclaimPolicy: Delete
+        # see https://github.com/rook/rook/blob/master/Documentation/ceph-object-bucket-claim.md#storageclass for available configuration
+        parameters:
+          # note: objectStoreNamespace and objectStoreName are configured by the chart
+          region: us-east-1
