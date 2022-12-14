@@ -2,3 +2,10 @@ teleport-kube-agent:
   roles: kube
   kubeClusterName: staging.example.com
   proxyAddr: teleport.obmondo.com:443
+  resources:
+    limits:
+      cpu: 100m
+      memory: 200Mi
+    requests:
+      cpu: 100m
+      memory: 150Mi
