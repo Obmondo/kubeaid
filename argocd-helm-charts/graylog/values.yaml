@@ -80,4 +80,7 @@ graylog:
 # https://github.com/mongodb/mongodb-kubernetes-operator
 # Please ensure that MongoDB operator is installed in your cluster
 # and it is set to watch the graylog namespace before enabling this setting.
-installMongoDB: true
+mongodb:
+  installMongodb: true
+  # Set the MongoDB database version, if unset it defaults to 4.4.1
+  # version: 5.0.0
