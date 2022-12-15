@@ -1,4 +1,4 @@
-{{ if .Values.installMongoDB }}
+{{ if .Values.mongodb.installMongodb }}
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -48,7 +48,7 @@ metadata:
 spec:
   members: 2
   type: ReplicaSet
-  version: "4.4.1"
+  version: {{ .Values.mongodb.version | default "4.4.1" }}
   security:
     authentication:
       modes: ["SCRAM"]
