@@ -295,7 +295,7 @@ securityContext:
 
 securityConfig:
   enabled: true
-  path: "/usr/share/opensearch/config/opensearch-security"
+  path: "/usr/share/opensearch/plugins/opensearch-security/securityconfig"
   actionGroupsSecret:
   configSecret:
   internalUsersSecret:
