@@ -2,11 +2,6 @@
 clusterName: "opensearch-cluster"
 nodeGroup: "master"
 
-# If discovery.type in the opensearch configuration is set to "single-node",
-# this should be set to "true"
-# If "true", replicas will be forced to 1
-singleNode: false
-
 # The service that non master groups will try to connect to when joining the cluster
 # This should be set to clusterName + "-" + nodeGroup for your master group
 masterService: "opensearch-cluster-master"
@@ -52,7 +47,6 @@ config:
     network.host: 0.0.0.0
 
     # Setting network.host to a non-loopback address enables the annoying bootstrap checks. "Single-node" mode disables them again.
-    # Implicitly done if ".singleNode" is set to "true".
     # discovery.type: single-node
 
     # Start OpenSearch Security Demo Configuration
@@ -336,16 +330,6 @@ startupProbe:
   periodSeconds: 10
   timeoutSeconds: 3
   failureThreshold: 30
-
-livenessProbe: {}
-  # periodSeconds: 20
-  # timeoutSeconds: 5
-  # failureThreshold: 10
-  # successThreshold: 1
-  # initialDelaySeconds: 10
-  # tcpSocket:
-  #   port: 9200
-
 readinessProbe:
   tcpSocket:
     port: 9200
@@ -427,19 +411,11 @@ networkPolicy:
 # please use the above podSecurityContext.fsGroup instead
 fsGroup: ""
 
-## Set optimal sysctl's through securityContext. This requires privilege. Can be disabled if
+## Set optimal sysctl's. This requires privilege. Can be disabled if
 ## the system has already been preconfigured. (Ex: https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html)
 ## Also see: https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
 sysctl:
   enabled: false
-
-## Set optimal sysctl's through privileged initContainer.
-sysctlInit:
-  enabled: false
-  # override image, which is busybox by default
-  # image: busybox
-  # override image tag, which is latest by default
-  # imageTag:
 
 ## Enable to add 3rd Party / Custom plugins not offered in the default OpenSearch image.
 plugins:

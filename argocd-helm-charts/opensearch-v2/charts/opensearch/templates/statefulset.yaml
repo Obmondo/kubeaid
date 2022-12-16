@@ -12,11 +12,7 @@ spec:
   selector:
     matchLabels:
       {{- include "opensearch.selectorLabels" . | nindent 6 }}
-  {{- if .Values.singleNode }}
-  replicas: 1
-  {{- else }}
   replicas: {{ .Values.replicas }}
-  {{- end }}
   podManagementPolicy: {{ .Values.podManagementPolicy }}
   updateStrategy:
     type: {{ .Values.updateStrategy }}
@@ -220,7 +216,7 @@ spec:
       {{- if .Values.hostAliases }}
       hostAliases: {{ toYaml .Values.hostAliases | nindent 8 }}
       {{- end }}
-      {{- if or (.Values.extraInitContainers) (.Values.keystore) (.Values.persistence.enabled) (.Values.sysctlInit.enabled)  }}
+      {{- if or (.Values.extraInitContainers) (.Values.keystore) (.Values.persistence.enabled) }}
       initContainers:
 {{- if and .Values.persistence.enabled .Values.persistence.enableInitChown }}
       - name: fsgroup-volume
@@ -235,26 +231,6 @@ spec:
         volumeMounts:
           - name: "{{ template "opensearch.uname" . }}"
             mountPath: {{ .Values.opensearchHome }}/data
-{{- end }}
-{{- if .Values.sysctlInit.enabled }}
-      - name: sysctl
-        image: "{{ template "opensearch.dockerRegistry" . }}{{ .Values.sysctlInit.image | default "busybox" }}:{{ .Values.sysctlInit.imageTag | default "latest" }}"
-        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
-        command:
-        - sh
-        - -c
-        - |
-          set -xe
-          DESIRED="{{ .Values.sysctlVmMaxMapCount }}"
-          CURRENT=$(sysctl -n vm.max_map_count)
-          if [ "$DESIRED" -gt "$CURRENT" ]; then
-            sysctl -w vm.max_map_count=$DESIRED
-          fi
-        securityContext:
-          runAsUser: 0
-          privileged: true
-        resources:
-           {{ toYaml .Values.initResources | nindent 10 }}
 {{- end }}
 {{ if .Values.keystore }}
       - name: keystore
@@ -328,10 +304,6 @@ spec:
         imagePullPolicy: "{{ .Values.image.pullPolicy }}"
         readinessProbe:
 {{ toYaml .Values.readinessProbe | indent 10 }}
-        {{- if .Values.livenessProbe }}
-        livenessProbe:
-{{ toYaml .Values.livenessProbe | indent 10 }}
-        {{- end }}
       {{- if semverCompare ">=1.16-0" .Capabilities.KubeVersion.Version }}
         startupProbe:
 {{ toYaml .Values.startupProbe | indent 10 }}
@@ -348,7 +320,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        {{- if (and (has "master" .Values.roles) (not .Values.singleNode)) }}
+        {{- if has "master" .Values.roles }}
         - name: cluster.initial_master_nodes
           value: "{{ template "opensearch.endpoints" . }}"
         {{- end }}
@@ -362,10 +334,6 @@ spec:
           value: "{{ .Values.opensearchJavaOpts }}"
         - name: node.roles
           value: "{{ template "opensearch.roles" . }}"
-        {{- if .Values.singleNode }}
-        - name: discovery.type
-          value: "single-node"
-        {{- end }}
 {{- if .Values.extraEnvs }}
 {{ toYaml .Values.extraEnvs | indent 8 }}
 {{- end }}
