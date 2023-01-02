@@ -1,0 +1,17 @@
+{{- if .Values.clusterStorage.enabled }}
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: {{ .Values.clusterStorage.namespace }}
+  labels:
+{{ include "traefik-forward-auth.labels" . | indent 4 }}
+  name: {{ include "traefik-forward-auth.fullname" . }}-clusterstorage
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "traefik-forward-auth.fullname" . }}-clusterstorage
+subjects:
+- kind: ServiceAccount
+  name: {{ include "traefik-forward-auth.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+{{- end }}

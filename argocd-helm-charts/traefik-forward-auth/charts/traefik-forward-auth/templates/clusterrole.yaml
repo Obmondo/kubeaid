@@ -1,0 +1,51 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  labels:
+{{ include "traefik-forward-auth.labels" . | indent 4 }}
+  name: {{ include "traefik-forward-auth.fullname" . }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - "users"
+  - "groups"
+  - "serviceaccounts"
+  verbs:
+  - "impersonate"
+- apiGroups:
+  - ""
+  resources:
+  - "secrets"
+  - "configmaps"
+  verbs:
+  - "get"
+  - "list"
+  - "watch"
+  - "update"
+  - "create"
+- apiGroups:
+  - "authentication.k8s.io"
+  resources:
+  - "userextras/scopes"
+  verbs:
+  - "impersonate"
+# kube-oidc-proxy init container requires to list services in order to get
+# load balancer hostname
+- apiGroups:
+  - ""
+  resources:
+  - "services"
+  verbs:
+  - "get"
+  - "list"
+  - "watch"
+- apiGroups:
+  - "rbac.authorization.k8s.io"
+  resources:
+  - "clusterrolebindings"
+  - "clusterroles"
+  verbs:
+  - "get"
+  - "watch"
+  - "list"
