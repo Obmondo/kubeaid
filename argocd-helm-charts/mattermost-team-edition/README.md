@@ -5,13 +5,19 @@
 
 ## Configure Mattermost config values**
 
+- From Mattermost v7.5, environment configuration parsing supports JSON for `MM_PLUGINSETTINGS_PLUGINSTATES`
+    and `MM_PLUGINSETTINGS_PLUGINSTATES`.
+
+- For `MM_PLUGINSETTINGS_PLUGINSTATES` and `MM_PLUGINSETTINGS_PLUGINS` write a simple json following this format
+    [config.json](https://github.com/mattermost/mattermost-server/blob/master/tests/test-config.json#L379) and escape
+        the json strings. This website can be used to escape json easily refer [codebeauty.org](https://codebeautify.org/json-escape-unescape).
+
 ```text
 MM_GITLABSETTINGS_ENABLE: "true"
 MM_GITLABSETTINGS_USERAPIENDPOINT: "https://<keycloak-domain>/auth/realms/<realm-name>/protocol/openid-connect/userinfo"
 MM_GITLABSETTINGS_AUTHENDPOINT: "https://<keycloak-domain>/auth/realms/<realm-name>/protocol/openid-connect/auth"
 MM_GITLABSETTINGS_TOKENENDPOINT: "https://<keycloak-domain>/auth/realms/<realm-name>/protocol/openid-connect/token"
-MM_GITLABSETTINGS_ID: ""
-MM_GITLABSETTINGS_SECRET: ""
+MM_PLUGINSETTINGS_PLUGINSTATES: "{\n\"com.github.matterpoll.matterpoll\":{\n\"Enable\":true\n}\n}"
 ```
 
 **Create Client on Keycloak**
