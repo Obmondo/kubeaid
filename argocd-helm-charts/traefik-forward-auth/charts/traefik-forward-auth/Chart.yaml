@@ -1,28 +1,14 @@
-annotations:
-  artifacthub.io/changes: |-
-    - kind: changed
-      description: Upgraded `common` chart dependency to version 4.4.2
-apiVersion: v2
-appVersion: 2.2.0
-dependencies:
-- name: common
-  repository: https://library-charts.k8s-at-home.com
-  version: 4.4.2
-description: A minimal forward authentication service that provides OAuth/SSO login
-  and authentication for the traefik reverse proxy/load balancer
-home: https://github.com/k8s-at-home/charts/tree/master/charts/stable/traefik-forward-auth
+apiVersion: v1
+appVersion: 3.1.0
+description: Minimal forward authentication service that provides OIDC based login
+  and authentication for the traefik reverse proxy
+home: https://github.com/mesosphere/traefik-forward-auth
 keywords:
-- traefik
 - traefik-forward-auth
+- traefik
 - oauth
-- oauth2
-- oidc
-kubeVersion: '>=1.16.0-0'
 maintainers:
-- email: nick@cajun.pro
-  name: DirtyCajunRice
+- email: mhrabovcin.c@d2iq.com
+  name: mhrabovcin
 name: traefik-forward-auth
-sources:
-- https://github.com/thomseddon/traefik-forward-auth
-- https://hub.docker.com/r/thomseddon/traefik-forward-auth
-version: 2.1.2
+version: 0.3.8

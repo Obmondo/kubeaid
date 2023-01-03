@@ -1,0 +1,16 @@
+{{- if .Values.clusterStorage.enabled }}
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: {{ .Values.clusterStorage.namespace }}
+  labels:
+{{ include "traefik-forward-auth.labels" . | indent 4 }}
+  name: {{ include "traefik-forward-auth.fullname" . }}-clusterstorage
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - "secrets"
+  verbs:
+  - "delete"
+{{- end }}
