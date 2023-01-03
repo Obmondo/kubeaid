@@ -3,11 +3,10 @@ kind: Service
 metadata:
   name: {{ include "traefik-forward-auth.fullname" . }}
   labels:
-    {{- include "traefik-forward-auth.labels" . | nindent 4 }}
-  {{- with .Values.service.annotations }}
-  annotations:
-  {{- toYaml . | nindent 4 }}
-  {{- end }}
+    app.kubernetes.io/name: {{ include "traefik-forward-auth.name" . }}
+    helm.sh/chart: {{ include "traefik-forward-auth.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -15,8 +14,6 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-  {{- with .Values.service.additionalSpec }}
-  {{- toYaml . | nindent 2 }}
-  {{- end }}
   selector:
-    {{- include "traefik-forward-auth.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "traefik-forward-auth.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
