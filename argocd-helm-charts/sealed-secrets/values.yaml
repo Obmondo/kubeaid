@@ -7,4 +7,10 @@ sealed-secrets:
   #should be default from v1.17 - fixes "progressing" hanging in argocd 'secrets' applications
   commandArgs:
   - --update-status
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+    seccompProfile:
+      type: RuntimeDefault
 networkpolicies: false
