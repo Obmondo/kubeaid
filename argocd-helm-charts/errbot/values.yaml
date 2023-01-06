@@ -5,8 +5,8 @@
 appName: errbot
 
 image:
-  repository: code.abifog.com/icewreck/errbot
-  pullPolicy: IfNotPresent
+  repository: registry.obmondo.com/obmondo/dockerfiles/errbot
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
@@ -43,7 +43,7 @@ resources:
   #   cpu: 100m
   #   memory: 128Mi
 
-containerEnvVars:
+env:
   - name: BOT_TOKEN
     value: "XXXXXXXXX"
   - name: BOT_SERVER
@@ -55,4 +55,9 @@ containerEnvVars:
   - name: BOT_TEAM
     value: "test-team"
   - name: BOT_ADMINS
-    value: "@anchit,"
+    value: "@admin,@anotheradmin"
+# - name: SOME_SECRET
+#   valueFrom:
+#     secretKeyRef:
+#       name: abc
+#       key: xyz
