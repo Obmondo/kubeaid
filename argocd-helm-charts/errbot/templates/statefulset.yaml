@@ -32,10 +32,7 @@ spec:
             - name: {{ .Values.appName }}
               mountPath: /home/errbot/data
           env:
-            {{- range .Values.containerEnvVars }}
-            - name: {{ .name }}
-              value: {{ .value | quote }}
-            {{- end }}
+            {{- toYaml .Values.env | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
 
