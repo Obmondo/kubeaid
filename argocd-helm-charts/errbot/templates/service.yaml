@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.appName }}
+  labels:
+    app: {{ .Values.appName }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3141
+      name: webhook1
+      targetPort: 3141
+    - port: 3142
+      name: webhook2
+      targetPort: 3142
+  selector:
+    app: {{ .Values.appName }}
