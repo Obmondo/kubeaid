@@ -29,4 +29,10 @@ env:
 
 If you want to run plugins that require webhooks, then you can add an ingress in `values.yaml`.
 
+If you want to execute a command in an initcontainer, ex: to change volume mount permissions then set:
+
+```yaml
+initContainerCmd: "chown -R 1000:1000 /home/errbot/data"
+```
+
 Look at `values.yaml` for other configurable options like resources, image, etc.
