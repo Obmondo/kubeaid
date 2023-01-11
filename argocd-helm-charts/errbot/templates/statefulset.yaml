@@ -19,6 +19,15 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      initContainers:
+      - name: "{{ .Values.appName }}-initcontainer"
+        image: docker.io/alpine:3
+        command: ["/bin/sh", "-c"]
+        args:
+          - {{ .Values.initContainerCmd }}
+        volumeMounts:
+          - name: {{ .Values.appName }}
+            mountPath: /home/errbot/data
       containers:
         - name: {{ .Values.appName }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
