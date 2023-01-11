@@ -12,6 +12,8 @@ image:
 
 imagePullSecrets: []
 
+initContainerCmd: "exit 0"
+
 ingress:
   enabled: false
   annotations:
