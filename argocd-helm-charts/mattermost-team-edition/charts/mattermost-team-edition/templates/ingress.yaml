@@ -41,6 +41,26 @@ spec:
           servicePort: {{ $servicePort }}
         {{- end }}
   {{ end }}
+
+  {{- range .Values.ingress.extraHosts }}
+  - host: {{ .host | quote }}
+    http:
+      paths:
+        - path: /
+          {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+          backend:
+            service:
+              name: {{ $serviceName }}
+              port:
+                number: {{ .servicePort }}
+          pathType: Prefix
+          {{- else }}
+          backend:
+            serviceName: {{ $serviceName }}
+            servicePort: {{ .servicePort }}
+          {{- end }}
+  {{- end }}
+
   {{ if $ingress.tls }}
   tls:
     {{- $ingress.tls | toYaml | nindent 4 }}
