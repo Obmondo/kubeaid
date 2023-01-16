@@ -1,5 +1,10 @@
 
-# Migrate mattermost-team-edition to k8S  
+# Migrate mattermost-team-edition to k8S
+
+## Updating upstream chart
+
+Update it the regular way then reapply git patch from the MR that adds support for plugins with their own webservers.
+If upstream changes have changed something that breaks that patch, then fix it.
 
 ## Follow to Enable Keycloak SSO (OAuth) for Mattermost Teams Edition
 

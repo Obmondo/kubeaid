@@ -75,6 +75,9 @@ ingress:
     ####     proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=mattermost_cache:10m max_size=3g inactive=120m use_temp_path=off;
   hosts:
     - mattermost.example.com
+  extraHosts: []
+    # - host: matternelle.example.com
+    #   servicePort: 8585  # should match a port added in extraPorts
   tls:
     # - secretName: mattermost.example.com-tls
     #   hosts:
@@ -187,6 +190,12 @@ extraVolumeMounts: []
   # - name: varlog
   #   mountPath: /host/var/log
   #   readOnly: true
+
+# Add additional ports to be exposed in the mattermost container (for plugins that start their own webservers)
+extraPorts: []
+  # - name: matternelle
+  #   port: 8585
+  #   protocol: TCP
 
 ## Node selector
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
