@@ -107,6 +107,21 @@ make test
 
 - Verify whether the template is correctly populated using the `helm template` command.
 
+## Troubleshooting
+
+- While syncing Gatekeeper via ArgoCD, make sure that the Constraint Template is synced
+before the CRD (policy). This is because Gatekeeper creates the CRDs for each policy
+and it needs the Constraint Templates to create the CRD.
+ArgoCD does not know this as it uses `helm template` to generate all the YAML definitions
+in one go. This might be possible to solve via Helm hooks.
+
+- If you have enabled network policy in the _values.yaml_ file, you might experience
+the Gatekeeper pods restarting and ending up in `CrashloopBackOff` state due to
+Readiness and Liveness probes failing continuously. To correct this, disable the
+`gatekeeper-netpol` network policy from the _values.yaml_ file by specifying `networkPolicy: false`.
+This has been observed in bare metal clusters and after removing the network policy, the
+pods come back to healthy state after a restart.
+
 ## References
 
 - [OPA](https://www.openpolicyagent.org/docs/latest/)
