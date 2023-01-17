@@ -1,29 +1,29 @@
 # Why Sealed Secrets?
 
-As we know Secrets are used to store sensitive data like password, keys, certificates and token. 
-In Secrets these values are encoded by base64. 
-But the actual problem is these encoded values can be easily decoded, 
-which means if hacker or normal guy get access to your Secrets then 
+As we know Secrets are used to store sensitive data like password, keys, certificates and token
+In Secrets these values are encoded by base64.
+But the actual problem is these encoded values can be easily decoded,
+which means if hacker or normal guy get access to your Secrets then
 can easily get access to your sensitive data like passwords, token, etc.
 To know [more](https://docs.bitnami.com/tutorials/sealed-secrets)
 
 ## What is the Solution?
 
-Concept of `private-public` keys. The Secret(or any data) will be encrypted 
-using Public keys and those encrypted values can only be decrypted using 
-private key only. So, neither hacker(or normal guy) is having those prvate keys. 
+Concept of `private-public` keys. The Secret(or any data) will be encrypted
+using Public keys and those encrypted values can only be decrypted using
+private key only. So, neither hacker(or normal guy) is having those prvate keys.
 Therefore, it can't be decoded. So, it is safely secured.
 
 ## Sealed secrets
 
-Sealed Secrets is a solution to encrypt your Kubernetes Secret into a SealedSecret, 
-which is safe to store – even to a public repository. 
-The SealedSecret can be decrypted only by the controller running in 
+Sealed Secrets is a solution to encrypt your Kubernetes Secret into a SealedSecret,
+which is safe to store – even to a public repository.
+The SealedSecret can be decrypted only by the controller running in
 the target cluster and nobody else.
-Sealed secrets are build on the top of kubernetes secrets where the 
-data is encrypted using the cluster controllers `public key`, so it can 
-only be read by the controller. Because the target cluster controller 
-keeps the `private key` with itself. So no one else other than target 
+Sealed secrets are build on the top of kubernetes secrets where the
+data is encrypted using the cluster controllers `public key`, so it can
+only be read by the controller. Because the target cluster controller
+keeps the `private key` with itself. So no one else other than target
 cluster controller could have access to Secrets sesitive data.
 To know more, [refer](https://blog.knoldus.com/how-to-encrypt-kubernetes-secrets-with-sealed-secrets/#:~:text=Sealed%20Secrets%20is%20a%20solution,target%20cluster%20and%20nobody%20else)
 
