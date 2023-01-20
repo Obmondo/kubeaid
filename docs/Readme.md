@@ -38,3 +38,18 @@
 * Helm
 
   * [Update Helm chart](./helm/update_helm_chart.md)
+
+## Feature and Security Updates
+
+We regularly update our Helm charts from upstream repositories and ensure that you don't miss out on
+important security updates. To simplify updates, you can grant write access to your `k8id` and `k8id-config` repo
+created in step 2 above - to the github user `obmondo-pushupdate-user`.
+
+This will enable us to automatically push the latest updates to your repo and allow us to adjust your
+cluster and app configuration, which we need to be able to do - if you're a subscriber with us.
+
+Alternatively, you can pull the updates from our repo after cloning it on your systems using:
+
+```sh
+git pull origin master
+```
