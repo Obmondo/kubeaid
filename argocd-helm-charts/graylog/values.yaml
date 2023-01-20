@@ -75,6 +75,11 @@ graylog:
       uriSecretKey: url
       uriSSL: false
 
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+
 
 # This installs MongoDB Community Edition from the MongoDB operator for Kubernetes.
 # https://github.com/mongodb/mongodb-kubernetes-operator
