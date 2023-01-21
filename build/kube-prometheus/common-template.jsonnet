@@ -29,7 +29,7 @@ local default_vars = {
     requests: { cpu: '20m', memory: '50Mi' },
   },
   prometheus_resources: {
-    limits: { memory: '1Gi' },
+    limits: { memory: '3Gi' },
     requests: { cpu: '500m', memory: '1500Mi' },
   },
   node_exporter_resources: {
