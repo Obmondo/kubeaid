@@ -32,6 +32,10 @@ local default_vars = {
     limits: { memory: '3Gi' },
     requests: { cpu: '500m', memory: '1500Mi' },
   },
+  grafana_resources: {
+    limits: { memory: '200Mi' },
+    requests: { cpu: '100m', memory: '100Mi' },
+  },
   node_exporter_resources: {
     limits: { memory: '180Mi' },
     requests: { cpu: '500m', memory: '180Mi' },
@@ -302,6 +306,7 @@ local kp =
       },
 
       grafana+: {
+        resources: vars.grafana_resources,
         analytics+: {
           check_for_updates: false,
         },
