@@ -87,11 +87,11 @@ the developer who knows them) and committed to your K8id config repo under the p
 
 ## License
 
-**K8id** is licensed under the GPLv3 license, as we believe this is the best way to protect against the patent
+**K8id** is licensed under the Affero GPLv3 license, as we believe this is the best way to protect against the patent
 attacks we see hurting the industry; where companies submit code that uses technology they have patented, and then turn
 and litigate companies that use the software.
 
-The GNU Public License has always been focused on ensuring everyone gets the same privileges, protecting against methods
+The Affero GNU Public License has always been focused on ensuring everyone gets the same privileges, protecting against methods
 like [TiVoization](https://en.wikipedia.org/wiki/Tivoization), which means it's very much aligned with the goals of this
 project, namely to allow everyone to work on a level playing ground.
 
