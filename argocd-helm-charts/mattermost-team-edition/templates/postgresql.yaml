@@ -18,7 +18,7 @@ spec:
   databases:
     mattermost: mattermost
   enableMasterLoadBalancer: false
-  numberOfInstances: 2
+  numberOfInstances: {{ .Values.postgresql.instance | default 2 }}
   postgresql:
     version: "12"
   teamId: mattermost
