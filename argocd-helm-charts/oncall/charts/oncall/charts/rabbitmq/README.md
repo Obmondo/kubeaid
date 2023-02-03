@@ -11,15 +11,15 @@ Trademarks: This software listing is packaged by Bitnami. The respective tradema
 ## TL;DR
 
 ```bash
-$ helm repo add bitnami https://charts.bitnami.com/bitnami
-$ helm install my-release bitnami/rabbitmq
+$ helm repo add my-repo https://charts.bitnami.com/bitnami
+$ helm install my-release my-repo/rabbitmq
 ```
 
 ## Introduction
 
-This chart bootstraps a [RabbitMQ](https://github.com/bitnami/bitnami-docker-rabbitmq) deployment on a [Kubernetes](https://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+This chart bootstraps a [RabbitMQ](https://github.com/bitnami/containers/tree/main/bitnami/rabbitmq) deployment on a [Kubernetes](https://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
-Bitnami charts can be used with [Kubeapps](https://kubeapps.com/) for deployment and management of Helm Charts in clusters. This chart has been tested to work with NGINX Ingress, cert-manager, fluentd and Prometheus on top of the [BKPR](https://kubeprod.io/).
+Bitnami charts can be used with [Kubeapps](https://kubeapps.dev/) for deployment and management of Helm Charts in clusters.
 
 ## Prerequisites
 
@@ -32,7 +32,8 @@ Bitnami charts can be used with [Kubeapps](https://kubeapps.com/) for deployment
 To install the chart with the release name `my-release`:
 
 ```bash
-$ helm install my-release bitnami/rabbitmq
+$ helm repo add my-repo https://charts.bitnami.com/bitnami
+$ helm install my-release my-repo/rabbitmq
 ```
 
 The command deploys RabbitMQ on the Kubernetes cluster in the default configuration. The [Parameters](#parameters) section lists the parameters that can be configured during installation.
@@ -62,14 +63,15 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### RabbitMQ Image parameters
 
-| Name                | Description                                                    | Value                 |
-| ------------------- | -------------------------------------------------------------- | --------------------- |
-| `image.registry`    | RabbitMQ image registry                                        | `docker.io`           |
-| `image.repository`  | RabbitMQ image repository                                      | `bitnami/rabbitmq`    |
-| `image.tag`         | RabbitMQ image tag (immutable tags are recommended)            | `3.10.2-debian-10-r7` |
-| `image.pullPolicy`  | RabbitMQ image pull policy                                     | `IfNotPresent`        |
-| `image.pullSecrets` | Specify docker-registry secret names as an array               | `[]`                  |
-| `image.debug`       | Set to true if you would like to see extra information on logs | `false`               |
+| Name                | Description                                                                                              | Value                 |
+| ------------------- | -------------------------------------------------------------------------------------------------------- | --------------------- |
+| `image.registry`    | RabbitMQ image registry                                                                                  | `docker.io`           |
+| `image.repository`  | RabbitMQ image repository                                                                                | `bitnami/rabbitmq`    |
+| `image.tag`         | RabbitMQ image tag (immutable tags are recommended)                                                      | `3.10.8-debian-11-r4` |
+| `image.digest`      | RabbitMQ image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag | `""`                  |
+| `image.pullPolicy`  | RabbitMQ image pull policy                                                                               | `IfNotPresent`        |
+| `image.pullSecrets` | Specify docker-registry secret names as an array                                                         | `[]`                  |
+| `image.debug`       | Set to true if you would like to see extra information on logs                                           | `false`               |
 
 
 ### Common parameters
@@ -135,6 +137,9 @@ The command removes all the Kubernetes components associated with the chart and 
 | `containerPorts.manager`           |                                                                                                                                                      | `15672`                                           |
 | `containerPorts.epmd`              |                                                                                                                                                      | `4369`                                            |
 | `containerPorts.metrics`           |                                                                                                                                                      | `9419`                                            |
+| `initScripts`                      | Dictionary of init scripts. Evaluated as a template.                                                                                                 | `{}`                                              |
+| `initScriptsCM`                    | ConfigMap with the init scripts. Evaluated as a template.                                                                                            | `""`                                              |
+| `initScriptsSecret`                | Secret containing `/docker-entrypoint-initdb.d` scripts to be executed at initialization time that contain sensitive data. Evaluated as a template.  | `""`                                              |
 | `extraContainerPorts`              | Extra ports to be included in container spec, primarily informational                                                                                | `[]`                                              |
 | `configuration`                    | RabbitMQ Configuration file content: required cluster configuration                                                                                  | `""`                                              |
 | `extraConfiguration`               | Configuration file content: extra configuration to be appended to RabbitMQ configuration                                                             | `""`                                              |
@@ -332,26 +337,28 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Init Container Parameters
 
-| Name                                   | Description                                                                                                          | Value                   |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ----------------------- |
-| `volumePermissions.enabled`            | Enable init container that changes the owner and group of the persistent volume(s) mountpoint to `runAsUser:fsGroup` | `false`                 |
-| `volumePermissions.image.registry`     | Init container volume-permissions image registry                                                                     | `docker.io`             |
-| `volumePermissions.image.repository`   | Init container volume-permissions image repository                                                                   | `bitnami/bitnami-shell` |
-| `volumePermissions.image.tag`          | Init container volume-permissions image tag                                                                          | `10-debian-10-r436`     |
-| `volumePermissions.image.pullPolicy`   | Init container volume-permissions image pull policy                                                                  | `IfNotPresent`          |
-| `volumePermissions.image.pullSecrets`  | Specify docker-registry secret names as an array                                                                     | `[]`                    |
-| `volumePermissions.resources.limits`   | Init container volume-permissions resource limits                                                                    | `{}`                    |
-| `volumePermissions.resources.requests` | Init container volume-permissions resource requests                                                                  | `{}`                    |
+| Name                                                   | Description                                                                                                                       | Value                   |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `volumePermissions.enabled`                            | Enable init container that changes the owner and group of the persistent volume(s) mountpoint to `runAsUser:fsGroup`              | `false`                 |
+| `volumePermissions.image.registry`                     | Init container volume-permissions image registry                                                                                  | `docker.io`             |
+| `volumePermissions.image.repository`                   | Init container volume-permissions image repository                                                                                | `bitnami/bitnami-shell` |
+| `volumePermissions.image.tag`                          | Init container volume-permissions image tag                                                                                       | `11-debian-11-r38`      |
+| `volumePermissions.image.digest`                       | Init container volume-permissions image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag | `""`                    |
+| `volumePermissions.image.pullPolicy`                   | Init container volume-permissions image pull policy                                                                               | `IfNotPresent`          |
+| `volumePermissions.image.pullSecrets`                  | Specify docker-registry secret names as an array                                                                                  | `[]`                    |
+| `volumePermissions.resources.limits`                   | Init container volume-permissions resource limits                                                                                 | `{}`                    |
+| `volumePermissions.resources.requests`                 | Init container volume-permissions resource requests                                                                               | `{}`                    |
+| `volumePermissions.containerSecurityContext.runAsUser` | User ID for the init container                                                                                                    | `0`                     |
 
 
-The above parameters map to the env variables defined in [bitnami/rabbitmq](https://github.com/bitnami/bitnami-docker-rabbitmq). For more information please refer to the [bitnami/rabbitmq](https://github.com/bitnami/bitnami-docker-rabbitmq) image documentation.
+The above parameters map to the env variables defined in [bitnami/rabbitmq](https://github.com/bitnami/containers/tree/main/bitnami/rabbitmq). For more information please refer to the [bitnami/rabbitmq](https://github.com/bitnami/containers/tree/main/bitnami/rabbitmq) image documentation.
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
 
 ```bash
 $ helm install my-release \
   --set auth.username=admin,auth.password=secretpassword,auth.erlangCookie=secretcookie \
-    bitnami/rabbitmq
+    my-repo/rabbitmq
 ```
 
 The above command sets the RabbitMQ admin username and password to `admin` and `secretpassword` respectively. Additionally the secure erlang cookie is set to `secretcookie`.
@@ -361,7 +368,7 @@ The above command sets the RabbitMQ admin username and password to `admin` and `
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
 ```bash
-$ helm install my-release -f values.yaml bitnami/rabbitmq
+$ helm install my-release -f values.yaml my-repo/rabbitmq
 ```
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
@@ -467,6 +474,22 @@ To enable extra plugins, set the `extraPlugins` parameter with the list of plugi
 
 Refer to the chart documentation for [more information on using RabbitMQ plugins](https://docs.bitnami.com/kubernetes/infrastructure/rabbitmq/configuration/use-plugins/).
 
+### Advanced logging
+
+In case you want to configure RabbitMQ logging set `logs` value to false and set the log config in extraConfiguration following the [official documentation](https://www.rabbitmq.com/logging.html#log-file-location).
+
+An example:
+
+```yaml
+logs: false # custom logging
+extraConfiguration: |
+  log.default.level = warning
+  log.file = false
+  log.console = true
+  log.console.level = warning
+  log.console.formatter = json
+```
+
 ### Recover the cluster from complete shutdown
 
 > IMPORTANT: Some of these procedures can lead to data loss. Always make a backup beforehand.
@@ -477,7 +500,7 @@ This happens if the pod management policy of the statefulset is not `Parallel` a
 
 ```console
 $ kubectl delete statefulset STATEFULSET_NAME --cascade=false
-$ helm upgrade RELEASE_NAME bitnami/rabbitmq \
+$ helm upgrade RELEASE_NAME my-repo/rabbitmq \
     --set podManagementPolicy=Parallel \
     --set replicaCount=NUMBER_OF_REPLICAS \
     --set auth.password=PASSWORD \
@@ -489,7 +512,7 @@ For a faster resyncronization of the nodes, you can temporarily disable the read
 If the steps above don't bring the cluster to a healthy state, it could be possible that none of the RabbitMQ nodes think they were the last node to be up during the shutdown. In those cases, you can force the boot of the nodes by specifying the `clustering.forceBoot=true` parameter (which will execute [`rabbitmqctl force_boot`](https://www.rabbitmq.com/rabbitmqctl.8.html#force_boot) in each pod):
 
 ```console
-$ helm upgrade RELEASE_NAME bitnami/rabbitmq \
+$ helm upgrade RELEASE_NAME my-repo/rabbitmq \
     --set podManagementPolicy=Parallel \
     --set clustering.forceBoot=true \
     --set replicaCount=NUMBER_OF_REPLICAS \
@@ -505,7 +528,7 @@ More information: [Clustering Guide: Restarting](https://www.rabbitmq.com/cluste
 
 ## Persistence
 
-The [Bitnami RabbitMQ](https://github.com/bitnami/bitnami-docker-rabbitmq) image stores the RabbitMQ data and configurations at the `/opt/bitnami/rabbitmq/var/lib/rabbitmq/` path of the container.
+The [Bitnami RabbitMQ](https://github.com/bitnami/containers/tree/main/bitnami/rabbitmq) image stores the RabbitMQ data and configurations at the `/opt/bitnami/rabbitmq/var/lib/rabbitmq/` path of the container.
 
 The chart mounts a [Persistent Volume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) at this location. By default, the volume is created using dynamic volume provisioning. An existing PersistentVolumeClaim can also be defined.
 
@@ -516,7 +539,7 @@ The chart mounts a [Persistent Volume](https://kubernetes.io/docs/concepts/stora
 1. Install the chart
 
 ```bash
-$ helm install my-release --set persistence.existingClaim=PVC_NAME bitnami/rabbitmq
+$ helm install my-release --set persistence.existingClaim=PVC_NAME my-repo/rabbitmq
 ```
 
 ### Adjust permissions of the persistence volume mountpoint
@@ -551,7 +574,7 @@ Find more information about how to deal with common errors related to Bitnami's 
 It's necessary to set the `auth.password` and `auth.erlangCookie` parameters when upgrading for readiness/liveness probes to work properly. When you install this chart for the first time, some notes will be displayed providing the credentials you must use under the 'Credentials' section. Please note down the password and the cookie, and run the command below to upgrade your chart:
 
 ```bash
-$ helm upgrade my-release bitnami/rabbitmq --set auth.password=[PASSWORD] --set auth.erlangCookie=[RABBITMQ_ERLANG_COOKIE]
+$ helm upgrade my-release my-repo/rabbitmq --set auth.password=[PASSWORD] --set auth.erlangCookie=[RABBITMQ_ERLANG_COOKIE]
 ```
 
 | Note: you need to substitute the placeholders [PASSWORD] and [RABBITMQ_ERLANG_COOKIE] with the values obtained in the installation notes.
@@ -630,6 +653,12 @@ See the [Upgrading guide](https://www.rabbitmq.com/upgrade.html) and the [Rabbit
 - Chart labels and Ingress configuration were adapted to follow the Helm charts best practices.
 - Initialization logic now relies on the container.
 - This version introduces `bitnami/common`, a [library chart](https://helm.sh/docs/topics/library_charts/#helm) as a dependency. More documentation about this new utility could be found [here](https://github.com/bitnami/charts/tree/master/bitnami/common#bitnami-common-library-chart). Please, make sure that you have updated the chart dependencies before executing any upgrade.
+- The layout of the persistent volumes has changed (if using persistence). Action is required if preserving data through the upgrade is desired:
+  - The data has moved from `mnesia/` within the persistent volume to the root of the persistent volume
+  - The `config/` and `schema/` directories within the persistent volume are no longer used
+  - An init container can be used to move and clean up the peristent volumes. An example can be found [here](https://github.com/bitnami/charts/issues/10913#issuecomment-1169619513).
+  - Alternately the value `persistence.subPath` can be overridden to be `mnesia` so that the directory layout is consistent with what it was previously.
+    - Note however that this will leave the unused `config/` and `schema/` directories within the peristent volume forever.
 
 Consequences:
 
@@ -638,7 +667,7 @@ Consequences:
 
 ### To 6.0.0
 
-This new version updates the RabbitMQ image to a [new version based on bash instead of node.js](https://github.com/bitnami/bitnami-docker-rabbitmq#3715-r18-3715-ol-7-r19). However, since this Chart overwrites the container's command, the changes to the container shouldn't affect the Chart. To upgrade, it may be needed to enable the `fastBoot` option, as it is already the case from upgrading from 5.X to 5.Y.
+This new version updates the RabbitMQ image to a [new version based on bash instead of node.js](https://github.com/bitnami/containers/tree/main/bitnami/rabbitmq#3715-r18-3715-ol-7-r19). However, since this Chart overwrites the container's command, the changes to the container shouldn't affect the Chart. To upgrade, it may be needed to enable the `fastBoot` option, as it is already the case from upgrading from 5.X to 5.Y.
 
 ### To 5.0.0
 
