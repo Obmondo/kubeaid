@@ -1,6 +1,6 @@
 annotations:
   artifacthub.io/changes: |
-    - Fixes securityContext rendering
+    - Fix HPA spec
 apiVersion: v2
 appVersion: 2.6.6
 description: A Helm chart for HAProxy on Kubernetes
@@ -16,4 +16,4 @@ name: haproxy
 sources:
 - http://www.haproxy.org/
 type: application
-version: 1.17.3
+version: 1.17.5
