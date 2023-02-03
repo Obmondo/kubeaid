@@ -1,7 +1,7 @@
 annotations:
   artifacthub.io/changes: |
-    - kind: changed
-      description: "Update fluent-bit image to 2.0.8"
+    - kind: added
+      description: "Service monitor additional endpoints support"
 apiVersion: v1
 appVersion: 2.0.8
 description: Fast and lightweight log processor and forwarder or Linux, OSX and BSD
@@ -24,4 +24,4 @@ maintainers:
 name: fluent-bit
 sources:
 - https://github.com/fluent/fluent-bit/
-version: 0.21.7
+version: 0.23.0
