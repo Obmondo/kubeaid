@@ -3,7 +3,7 @@
 affinity: {}
 
 autoDiscovery:
-  # cloudProviders `aws`, `gce`, `azure`, `magnum` and `clusterapi` are supported by auto-discovery at this time
+  # cloudProviders `aws`, `gce`, `azure`, `magnum` and `clusterapi` `oci-oke` are supported by auto-discovery at this time
   # AWS: Set tags as described in https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#auto-discovery-setup
 
   # autoDiscovery.clusterName -- Enable autodiscovery for `cloudProvider=aws`, for groups matching `autoDiscovery.tags`.
@@ -95,7 +95,10 @@ azureClusterName: ""
 # Required if `cloudProvider=azure`
 azureNodeResourceGroup: ""
 
-# azureUseManagedIdentityExtension -- Whether to use Azure's managed identity extension for credentials. If using MSI, ensure subscription ID, resource group, and azure AKS cluster name are set.
+# azureUseWorkloadIdentityExtension -- Whether to use Azure's workload identity extension for credentials. See the project here: https://github.com/Azure/azure-workload-identity for more details. You can only use one authentication method at a time, either azureUseWorkloadIdentityExtension or azureUseManagedIdentityExtension should be set.
+azureUseWorkloadIdentityExtension: false
+
+# azureUseManagedIdentityExtension -- Whether to use Azure's managed identity extension for credentials. If using MSI, ensure subscription ID, resource group, and azure AKS cluster name are set. You can only use one authentication method at a time, either azureUseWorkloadIdentityExtension or azureUseManagedIdentityExtension should be set.
 azureUseManagedIdentityExtension: false
 
 # magnumClusterName -- Cluster name or ID in Magnum.
