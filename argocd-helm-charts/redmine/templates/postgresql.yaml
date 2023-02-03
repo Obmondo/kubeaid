@@ -3,10 +3,11 @@ kind: postgresql
 metadata:
   name: redmine-pgsql
 spec:
+  enableLogicalBackup: true
   databases:
     redmine: redmine
   enableMasterLoadBalancer: false
-  numberOfInstances: 2
+  numberOfInstances: {{ ((.Values.postgresql).instance) | default 1 }}
   postgresql:
     version: "12"
   teamId: redmine
