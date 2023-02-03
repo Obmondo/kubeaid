@@ -4,5 +4,5 @@ name: mongodb-operator
 version: 0.7.6
 dependencies:
   - name: community-operator
-    version: 0.7.6
+    version: 0.7.8
     repository: https://mongodb.github.io/helm-charts
