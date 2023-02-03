@@ -1,5 +1,7 @@
 annotations:
   category: Infrastructure
+  licenses: |
+    - Apache-2.0
 apiVersion: v2
 appVersion: 0.13.7
 dependencies:
@@ -20,6 +22,7 @@ keywords:
 - arp
 - vrrp
 - vip
+kubeVersion: '>= 1.19.0-0'
 maintainers:
 - name: Bitnami
   url: https://github.com/bitnami/charts
@@ -28,4 +31,4 @@ sources:
 - https://github.com/metallb/metallb
 - https://github.com/bitnami/containers/tree/main/bitnami/metallb
 - https://metallb.universe.tf
-version: 4.1.8
+version: 4.1.14
