@@ -30,7 +30,8 @@ Bitnami charts can be used with [Kubeapps](https://kubeapps.dev/) for deployment
 
 To install the chart with the release name `my-release`:
 
-```bash
+```console
+$ helm repo add my-repo https://charts.bitnami.com/bitnami
 $ helm install my-release my-repo/external-dns
 ```
 
@@ -70,6 +71,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `extraDeploy`           | Array of extra objects to deploy with the release (evaluated as a template).                 | `[]`            |
 | `kubeVersion`           | Force target Kubernetes version (using Helm capabilities if not set)                         | `""`            |
 | `watchReleaseNamespace` | Watch only namepsace used for the release                                                    | `false`         |
+| `useDaemonset`          | Use ExternalDNS in Daemonset mode                                                            | `false`         |
 
 
 ### external-dns parameters
@@ -78,7 +80,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
 | `image.registry`                              | ExternalDNS image registry                                                                                                                                                   | `docker.io`               |
 | `image.repository`                            | ExternalDNS image repository                                                                                                                                                 | `bitnami/external-dns`    |
-| `image.tag`                                   | ExternalDNS Image tag (immutable tags are recommended)                                                                                                                       | `0.12.2-debian-11-r22`    |
+| `image.tag`                                   | ExternalDNS Image tag (immutable tags are recommended)                                                                                                                       | `0.13.2-debian-11-r0`     |
 | `image.digest`                                | ExternalDNS image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag                                                                  | `""`                      |
 | `image.pullPolicy`                            | ExternalDNS image pull policy                                                                                                                                                | `IfNotPresent`            |
 | `image.pullSecrets`                           | ExternalDNS image pull secrets                                                                                                                                               | `[]`                      |
@@ -162,6 +164,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `digitalocean.apiToken`                       | When using the DigitalOcean provider, `DO_TOKEN` to set (optional)                                                                                                           | `""`                      |
 | `digitalocean.secretName`                     | Use an existing secret with key "digitalocean_api_token" defined.                                                                                                            | `""`                      |
 | `google.project`                              | When using the Google provider, specify the Google project (required when provider=google)                                                                                   | `""`                      |
+| `google.batchChangeSize`                      | When using the google provider, set the maximum number of changes that will be applied in each batch                                                                         | `1000`                    |
 | `google.serviceAccountSecret`                 | When using the Google provider, specify the existing secret which contains credentials.json (optional)                                                                       | `""`                      |
 | `google.serviceAccountSecretKey`              | When using the Google provider with an existing secret, specify the key name (optional)                                                                                      | `credentials.json`        |
 | `google.serviceAccountKey`                    | When using the Google provider, specify the service account key JSON file. In this case a new secret will be created holding this service account (optional)                 | `""`                      |
@@ -200,7 +203,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | `ovh.secretName`                              | When using the OVH provider, it's the name of the secret containing `ovh_consumer_key`, `ovh_application_key` and `ovh_application_secret`. Disables usage of other `ovh`.   | `""`                      |
 | `scaleway.scwAccessKey`                       | When using the Scaleway provider, specify an existing access key. (required when provider=scaleway)                                                                          | `""`                      |
 | `scaleway.scwSecretKey`                       | When using the Scaleway provider, specify an existing secret key. (required when provider=scaleway)                                                                          | `""`                      |
-| `scaleway.scwDefaultOrganizationId`           | When using the Scaleway provider, specify the existing organization id. (required when provider=scaleway)                                                                    | `""`                      |
 | `rfc2136.host`                                | When using the rfc2136 provider, specify the RFC2136 host (required when provider=rfc2136)                                                                                   | `""`                      |
 | `rfc2136.port`                                | When using the rfc2136 provider, specify the RFC2136 port (optional)                                                                                                         | `53`                      |
 | `rfc2136.zone`                                | When using the rfc2136 provider, specify the zone (required when provider=rfc2136)                                                                                           | `""`                      |
@@ -346,7 +348,7 @@ $ helm install my-release \
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
-```bash
+```console
 $ helm install my-release -f values.yaml my-repo/external-dns
 ```
 
@@ -385,7 +387,7 @@ For instance, to install ExternalDNS on AWS, you need to:
 - Install ExternalDNS chart using the command below:
 
 > Note: replace the placeholder HOSTED_ZONE_IDENTIFIER and HOSTED_ZONE_NAME, with your hosted zoned identifier and name, respectively.
-```bash
+```console
 $ helm install my-release \
   --set provider=aws \
   --set aws.zoneType=public \
@@ -413,8 +415,8 @@ No issues should be expected when upgrading.
 The CRD was updated according to the latest changes in the upstream project. As a consequence, the CRD API version was moved from `apiextensions.k8s.io/v1beta1` to `apiextensions.k8s.io/v1`. If you deployed the Helm Chart using `crd.create=true` you need to manually delete the old CRD before upgrading the release.
 
 ```console
-kubectl delete crd dnsendpoints.externaldns.k8s.io
-helm upgrade my-release -f my-values.yaml
+$ kubectl delete crd dnsendpoints.externaldns.k8s.io
+$ helm upgrade my-release -f my-values.yaml
 ```
 
 ### To 4.3.0
