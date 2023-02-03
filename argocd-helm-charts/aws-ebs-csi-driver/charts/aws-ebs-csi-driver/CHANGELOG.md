@@ -1,5 +1,44 @@
 # Helm chart
 
+## v2.16.0
+* Bump driver version to `v1.15.0`
+* Change default sidecars to EKS-D ([#1475](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/1475), [@ConnorJC3](https://github.com/ConnorJC3), [@torredil](https://github.com/torredil))
+* The sidecars have been updated. The new versions are:
+    - csi-provisioner: `v3.3.0`
+    - csi-attacher: `v4.0.0`
+    - csi-snapshotter: `v6.1.0`
+    - livenessprobe: `v2.8.0`
+    - csi-resizer: `v1.6.0`
+    - node-driver-registrar: `v2.6.2`
+
+## v2.15.1
+* Bugfix: Prevent deployment of testing resources during normal installation by adding `helm.sh/hook: test` annotation.
+
+## v2.15.0
+* Set sensible default resource requests/limits
+* Add sensible default update strategy
+* Add podAntiAffinity so controller pods prefer scheduling on separate nodes if possible
+* Add container registry parameter
+
+## v2.14.2
+* Bump driver version to `v1.14.1`
+
+## v2.14.1
+* Add `controller.sdkDebugLog` parameter
+
+## v2.14.0
+* Bump driver version to `v1.14.0`
+
+## v2.13.0
+* Bump app/driver to version `v1.13.0`
+* Expose volumes and volumeMounts for the ebs-csi-controller deployment ([#1400](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/1436), [@cnmcavoy](https://github.com/cnmcavoy))
+* refactor: Move the default controller tolerations in the helm chart values ([#1427](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/1427), [@cnmcavoy](https://github.com/Linutux42))
+* Add serviceMonitor.labels parameter ([#1419](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/1419), [@torredil](https://github.com/torredil))
+* Add parameter to force enable snapshotter sidecar ([#1418](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/1418), [@ConnorJC3](https://github.com/ConnorJC3))
+
+## v2.12.1
+* Bump app/driver to version `v1.12.1`
+
 ## v2.12.0
 * Bump app/driver to version `v1.12.0`
 * Move default toleration to values.yaml so it can be overriden if desired by users ([#1400](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/1400), [@cnmcavoy](https://github.com/cnmcavoy))
