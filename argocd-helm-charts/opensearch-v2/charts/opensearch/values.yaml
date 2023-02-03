@@ -259,6 +259,8 @@ enableServiceLinks: true
 protocol: https
 httpPort: 9200
 transportPort: 9300
+httpHostPort: ""
+transportHostPort: ""
 
 service:
   labels: {}
@@ -295,7 +297,7 @@ securityContext:
 
 securityConfig:
   enabled: true
-  path: "/usr/share/opensearch/plugins/opensearch-security/securityconfig"
+  path: "/usr/share/opensearch/config/opensearch-security"
   actionGroupsSecret:
   configSecret:
   internalUsersSecret:
