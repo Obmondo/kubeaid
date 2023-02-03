@@ -4,5 +4,5 @@ name: redis-operator
 version: 1.0.0
 dependencies:
   - name: redis-operator
-    version: 3.2.3
+    version: 3.2.7
     repository: https://spotahome.github.io/redis-operator

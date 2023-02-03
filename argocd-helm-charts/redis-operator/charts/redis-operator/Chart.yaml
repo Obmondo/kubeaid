@@ -1,14 +1,15 @@
 annotations:
   category: Redis Operator
 apiVersion: v1
-appVersion: 1.2.1
+appVersion: 1.2.4
 description: A Helm chart for the Spotahome Redis Operator
 home: https://github.com/spotahome/redis-operator
 keywords:
 - golang
 - operator
 - cluster
+kubeVersion: '>=1.21.0-0'
 name: redis-operator
 sources:
 - https://github.com/spotahome/redis-operator
-version: 3.2.3
+version: 3.2.7

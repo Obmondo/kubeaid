@@ -6,7 +6,7 @@
 image:
   repository: quay.io/spotahome/redis-operator
   pullPolicy: IfNotPresent
-  tag: v1.2.1
+  tag: v1.2.4
 
 imageCredentials:
   create: false
@@ -16,10 +16,12 @@ imageCredentials:
   email: someone@example.com
   # Use exists secrets in namespace
   existsSecrets:
-  - registrysecret
+    - registrysecret
 
 updateStrategy:
   type: RollingUpdate
+
+replicas: 1
 
 # A name in place of the chart name for `app:` labels.
 nameOverride: ""
@@ -53,13 +55,13 @@ securityContext:
 # Container resource [requests and limits](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/).
 # See the [API reference](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources) for details.
 # @default -- No requests or limits.
-resources: {}
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
 
 ### Monitoring
 ###############
