@@ -11,18 +11,25 @@ daemonset:
   envFrom: []
   # - configMapRef:
   #     name: config-secret
-  extraEnvs: []
-  #  - name: MY_ENVIRONMENT_VAR
-  #    value: the_value_goes_here
-  extraVolumes:
-    []
-    # - name: extras
-    #   emptyDir: {}
-  extraVolumeMounts:
-    []
-    # - name: extras
-    #   mountPath: /usr/share/extras
-    #   readOnly: true
+  extraEnvs:
+    - name: "ELASTICSEARCH_USERNAME"
+      valueFrom:
+        secretKeyRef:
+          name: elasticsearch-master-credentials
+          key: username
+    - name: "ELASTICSEARCH_PASSWORD"
+      valueFrom:
+        secretKeyRef:
+          name: elasticsearch-master-credentials
+          key: password
+  # Allows you to add any config files in /usr/share/filebeat
+  extraVolumes: []
+  # - name: extras
+  #   emptyDir: {}
+  extraVolumeMounts: []
+  # - name: extras
+  #   mountPath: /usr/share/extras
+  #   readOnly: true
   hostNetworking: false
   # Allows you to add any config files in /usr/share/filebeat
   # such as filebeat.yml for daemonset
@@ -41,13 +48,20 @@ daemonset:
 
       output.elasticsearch:
         host: '${NODE_NAME}'
-        hosts: '${ELASTICSEARCH_HOSTS:elasticsearch-master:9200}'
+        hosts: '["https://${ELASTICSEARCH_HOSTS:elasticsearch-master:9200}"]'
+        username: '${ELASTICSEARCH_USERNAME}'
+        password: '${ELASTICSEARCH_PASSWORD}'
+        protocol: https
+        ssl.certificate_authorities: ["/usr/share/filebeat/certs/ca.crt"]
   # Only used when updateStrategy is set to "RollingUpdate"
   maxUnavailable: 1
   nodeSelector: {}
   # A list of secrets and their paths to mount inside the pod
   # This is useful for mounting certificates for security other sensitive values
-  secretMounts: []
+  secretMounts:
+    - name: elasticsearch-master-certs
+      secretName: elasticsearch-master-certs
+      path: /usr/share/filebeat/certs/
   #  - name: filebeat-certificates
   #    secretName: filebeat-certificates
   #    path: /usr/share/filebeat/certs
@@ -79,9 +93,17 @@ deployment:
   envFrom: []
   # - configMapRef:
   #     name: config-secret
-  extraEnvs: []
-  #  - name: MY_ENVIRONMENT_VAR
-  #    value: the_value_goes_here
+  extraEnvs:
+    - name: "ELASTICSEARCH_USERNAME"
+      valueFrom:
+        secretKeyRef:
+          name: elasticsearch-master-credentials
+          key: username
+    - name: "ELASTICSEARCH_PASSWORD"
+      valueFrom:
+        secretKeyRef:
+          name: elasticsearch-master-credentials
+          key: password
   # Allows you to add any config files in /usr/share/filebeat
   extraVolumes: []
   # - name: extras
@@ -94,17 +116,24 @@ deployment:
   filebeatConfig:
     filebeat.yml: |
       filebeat.inputs:
-      - type: tcp
-        max_message_size: 10MiB
-        host: "localhost:9000"
+        - type: log
+          paths:
+            - /usr/share/filebeat/logs/filebeat
 
       output.elasticsearch:
-        host: '${NODE_NAME}'
-        hosts: '${ELASTICSEARCH_HOSTS:elasticsearch-master:9200}'
+        host: "${NODE_NAME}"
+        hosts: '["https://${ELASTICSEARCH_HOSTS:elasticsearch-master:9200}"]'
+        username: "${ELASTICSEARCH_USERNAME}"
+        password: "${ELASTICSEARCH_PASSWORD}"
+        protocol: https
+        ssl.certificate_authorities: ["/usr/share/filebeat/certs/ca.crt"]
   nodeSelector: {}
   # A list of secrets and their paths to mount inside the pod
   # This is useful for mounting certificates for security other sensitive values
-  secretMounts: []
+  secretMounts:
+    - name: elasticsearch-master-certs
+      secretName: elasticsearch-master-certs
+      path: /usr/share/filebeat/certs/
   #  - name: filebeat-certificates
   #    secretName: filebeat-certificates
   #    path: /usr/share/filebeat/certs
@@ -148,7 +177,7 @@ hostAliases: []
 #  - "foo.local"
 #  - "bar.local"
 image: "docker.elastic.co/beats/filebeat"
-imageTag: "7.17.3"
+imageTag: "8.5.1"
 imagePullPolicy: "IfNotPresent"
 imagePullSecrets: []
 
@@ -201,17 +230,15 @@ clusterRoleRules:
       - list
       - watch
 
-podAnnotations:
-  {}
-  # iam.amazonaws.com/role: es-cluster
+podAnnotations: {}
+# iam.amazonaws.com/role: es-cluster
 
 # Custom service account override that the pod will use
 serviceAccount: ""
 
 # Annotations to add to the ServiceAccount that is created if the serviceAccount value isn't set.
-serviceAccountAnnotations:
-  {}
-  # eks.amazonaws.com/role-arn: arn:aws:iam::111111111111:role/k8s.clustername.namespace.serviceaccount
+serviceAccountAnnotations: {}
+# eks.amazonaws.com/role-arn: arn:aws:iam::111111111111:role/k8s.clustername.namespace.serviceaccount
 
 # How long to wait for Filebeat pods to stop gracefully
 terminationGracePeriod: 30
@@ -225,19 +252,3 @@ updateStrategy: RollingUpdate
 # Only edit these if you know what you're doing
 nameOverride: ""
 fullnameOverride: ""
-
-# DEPRECATED
-affinity: {}
-envFrom: []
-extraEnvs: []
-extraVolumes: []
-extraVolumeMounts: []
-# Allows you to add any config files in /usr/share/filebeat
-# such as filebeat.yml for both daemonset and deployment
-filebeatConfig: {}
-nodeSelector: {}
-podSecurityContext: {}
-resources: {}
-secretMounts: []
-tolerations: []
-labels: {}

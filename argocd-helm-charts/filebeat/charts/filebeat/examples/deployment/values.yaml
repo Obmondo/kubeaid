@@ -1,16 +1,9 @@
 deployment:
   enabled: true
+  resources:
+    limits:
+      # Should avoid OOM (Error 137) when running goss tests into the pod
+      memory: "300Mi"
 
 daemonset:
   enabled: false
-
-filebeatConfig:
-  filebeat.yml: |
-    filebeat.inputs:
-      - type: log 
-        paths:
-        - /usr/share/filebeat/logs/filebeat
-
-    output.elasticsearch:
-      host: '${NODE_NAME}'
-      hosts: '${ELASTICSEARCH_HOSTS:elasticsearch-master:9200}'
