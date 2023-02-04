@@ -7,12 +7,12 @@ The RabbitMQ Cluster Kubernetes Operator automates provisioning, management, and
 [Overview of RabbitMQ Cluster Operator](https://github.com/rabbitmq/cluster-operator)
 
 Trademarks: This software listing is packaged by Bitnami. The respective trademarks mentioned in the offering are owned by the respective companies, and use of them does not imply any affiliation or endorsement.
-                           
+
 ## TL;DR
 
 ```console
-$ helm repo add bitnami https://charts.bitnami.com/bitnami
-$ helm install my-release bitnami/rabbitmq-cluster-operator
+$ helm repo add my-repo https://charts.bitnami.com/bitnami
+$ helm install my-release my-repo/rabbitmq-cluster-operator
 ```
 
 ## Introduction
@@ -34,7 +34,8 @@ Bitnami charts can be used with [Kubeapps](https://kubeapps.dev/) for deployment
 To install the chart with the release name `my-release`:
 
 ```console
-helm install my-release bitnami/rabbitmq-cluster-operators
+$ helm repo add my-repo https://charts.bitnami.com/bitnami
+$ helm install my-release my-repo/rabbitmq-cluster-operators
 ```
 
 The command deploy the RabbitMQ Cluster Kubernetes Operator on the Kubernetes cluster in the default configuration. The [Parameters](#parameters) section lists the parameters that can be configured during installation.
@@ -46,7 +47,7 @@ The command deploy the RabbitMQ Cluster Kubernetes Operator on the Kubernetes cl
 To uninstall/delete the `my-release` deployment:
 
 ```console
-helm delete my-release
+$ helm delete my-release
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
@@ -139,6 +140,7 @@ This solution allows to easily deploy multiple RabbitMQ instances compared to th
 | `global.imagePullSecrets` | Global Docker registry secret names as an array | `[]`  |
 | `global.storageClass`     | Global StorageClass for Persistent Volume(s)    | `""`  |
 
+
 ### Common parameters
 
 | Name                     | Description                                          | Value           |
@@ -152,23 +154,24 @@ This solution allows to easily deploy multiple RabbitMQ instances compared to th
 | `extraDeploy`            | Array of extra objects to deploy with the release    | `[]`            |
 | `diagnosticMode.enabled` | Enable diagnostic mode (all probes will be disabled) | `false`         |
 
+
 ### RabbitMQ Cluster Operator Parameters
 
 | Name                                                              | Description                                                                                                                              | Value                                    |
 | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
 | `rabbitmqImage.registry`                                          | RabbitMQ Image registry                                                                                                                  | `docker.io`                              |
 | `rabbitmqImage.repository`                                        | RabbitMQ Image repository                                                                                                                | `bitnami/rabbitmq`                       |
-| `rabbitmqImage.tag`                                               | RabbitMQ Image tag (immutable tags are recommended)                                                                                      | `3.10.7-debian-11-r3`                    |
+| `rabbitmqImage.tag`                                               | RabbitMQ Image tag (immutable tags are recommended)                                                                                      | `3.10.13-debian-11-r8`                   |
 | `rabbitmqImage.digest`                                            | RabbitMQ image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag                                 | `""`                                     |
 | `rabbitmqImage.pullSecrets`                                       | RabbitMQ Image pull secrets                                                                                                              | `[]`                                     |
 | `credentialUpdaterImage.registry`                                 | RabbitMQ Default User Credential Updater image registry                                                                                  | `docker.io`                              |
 | `credentialUpdaterImage.repository`                               | RabbitMQ Default User Credential Updater image repository                                                                                | `bitnami/rmq-default-credential-updater` |
-| `credentialUpdaterImage.tag`                                      | RabbitMQ Default User Credential Updater image tag (immutable tags are recommended)                                                      | `1.0.2-scratch-r6`                       |
+| `credentialUpdaterImage.tag`                                      | RabbitMQ Default User Credential Updater image tag (immutable tags are recommended)                                                      | `1.0.2-scratch-r12`                      |
 | `credentialUpdaterImage.digest`                                   | RabbitMQ Default User Credential Updater image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag | `""`                                     |
 | `credentialUpdaterImage.pullSecrets`                              | RabbitMQ Default User Credential Updater image pull secrets                                                                              | `[]`                                     |
 | `clusterOperator.image.registry`                                  | RabbitMQ Cluster Operator image registry                                                                                                 | `docker.io`                              |
 | `clusterOperator.image.repository`                                | RabbitMQ Cluster Operator image repository                                                                                               | `bitnami/rabbitmq-cluster-operator`      |
-| `clusterOperator.image.tag`                                       | RabbitMQ Cluster Operator image tag (immutable tags are recommended)                                                                     | `1.14.0-scratch-r5`                      |
+| `clusterOperator.image.tag`                                       | RabbitMQ Cluster Operator image tag (immutable tags are recommended)                                                                     | `2.1.0-scratch-r0`                       |
 | `clusterOperator.image.digest`                                    | RabbitMQ Cluster Operator image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag                | `""`                                     |
 | `clusterOperator.image.pullPolicy`                                | RabbitMQ Cluster Operator image pull policy                                                                                              | `IfNotPresent`                           |
 | `clusterOperator.image.pullSecrets`                               | RabbitMQ Cluster Operator image pull secrets                                                                                             | `[]`                                     |
@@ -235,6 +238,7 @@ This solution allows to easily deploy multiple RabbitMQ instances compared to th
 | `clusterOperator.serviceAccount.annotations`                      | Add annotations                                                                                                                          | `{}`                                     |
 | `clusterOperator.serviceAccount.automountServiceAccountToken`     | Automount API credentials for a service account.                                                                                         | `true`                                   |
 
+
 ### RabbitMQ Cluster Operator Metrics parameters
 
 | Name                                                       | Description                                                                 | Value                    |
@@ -262,13 +266,14 @@ This solution allows to easily deploy multiple RabbitMQ instances compared to th
 | `clusterOperator.metrics.serviceMonitor.relabelings`       | Specify general relabeling                                                  | `[]`                     |
 | `clusterOperator.metrics.serviceMonitor.labels`            | Extra labels for the ServiceMonitor                                         | `{}`                     |
 
+
 ### RabbitMQ Messaging Topology Operator Parameters
 
 | Name                                                                  | Description                                                                                                                          | Value                                     |
 | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- |
 | `msgTopologyOperator.image.registry`                                  | RabbitMQ Messaging Topology Operator image registry                                                                                  | `docker.io`                               |
 | `msgTopologyOperator.image.repository`                                | RabbitMQ Messaging Topology Operator image repository                                                                                | `bitnami/rmq-messaging-topology-operator` |
-| `msgTopologyOperator.image.tag`                                       | RabbitMQ Messaging Topology Operator image tag (immutable tags are recommended)                                                      | `1.7.1-scratch-r3`                        |
+| `msgTopologyOperator.image.tag`                                       | RabbitMQ Messaging Topology Operator image tag (immutable tags are recommended)                                                      | `1.10.0-scratch-r0`                       |
 | `msgTopologyOperator.image.digest`                                    | RabbitMQ Messaging Topology Operator image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag | `""`                                      |
 | `msgTopologyOperator.image.pullPolicy`                                | RabbitMQ Messaging Topology Operator image pull policy                                                                               | `IfNotPresent`                            |
 | `msgTopologyOperator.image.pullSecrets`                               | RabbitMQ Messaging Topology Operator image pull secrets                                                                              | `[]`                                      |
@@ -276,6 +281,8 @@ This solution allows to easily deploy multiple RabbitMQ instances compared to th
 | `msgTopologyOperator.topologySpreadConstraints`                       | Topology Spread Constraints for pod assignment                                                                                       | `[]`                                      |
 | `msgTopologyOperator.schedulerName`                                   | Alternative scheduler                                                                                                                | `""`                                      |
 | `msgTopologyOperator.terminationGracePeriodSeconds`                   | In seconds, time the given to the %%MAIN_CONTAINER_NAME%% pod needs to terminate gracefully                                          | `""`                                      |
+| `msgTopologyOperator.hostNetwork`                                     | Boolean                                                                                                                              | `false`                                   |
+| `msgTopologyOperator.dnsPolicy`                                       | Alternative DNS policy                                                                                                               | `ClusterFirst`                            |
 | `msgTopologyOperator.livenessProbe.enabled`                           | Enable livenessProbe on RabbitMQ Messaging Topology Operator nodes                                                                   | `true`                                    |
 | `msgTopologyOperator.livenessProbe.initialDelaySeconds`               | Initial delay seconds for livenessProbe                                                                                              | `5`                                       |
 | `msgTopologyOperator.livenessProbe.periodSeconds`                     | Period seconds for livenessProbe                                                                                                     | `30`                                      |
@@ -349,6 +356,7 @@ This solution allows to easily deploy multiple RabbitMQ instances compared to th
 | `msgTopologyOperator.serviceAccount.annotations`                      | Add annotations                                                                                                                      | `{}`                                      |
 | `msgTopologyOperator.serviceAccount.automountServiceAccountToken`     | Automount API credentials for a service account.                                                                                     | `true`                                    |
 
+
 ### RabbitMQ Messaging Topology Operator parameters
 
 | Name                                                           | Description                                                                 | Value                    |
@@ -376,22 +384,23 @@ This solution allows to easily deploy multiple RabbitMQ instances compared to th
 | `msgTopologyOperator.metrics.serviceMonitor.relabelings`       | Specify general relabeling                                                  | `[]`                     |
 | `msgTopologyOperator.metrics.serviceMonitor.labels`            | Extra labels for the ServiceMonitor                                         | `{}`                     |
 
+
 ### cert-manager parameters
 
 | Name             | Description                                                       | Value   |
 | ---------------- | ----------------------------------------------------------------- | ------- |
 | `useCertManager` | Deploy cert-manager objects (Issuer and Certificate) for webhooks | `false` |
 
-See [readme-generator-for-helm](https://github.com/bitnami-labs/readme-generator-for-helm) to create the table.
+
 
 The above parameters map to the env variables defined in [bitnami/rabbitmq-cluster-operator](https://github.com/bitnami/containers/tree/main/bitnami/rabbitmq-cluster-operator). For more information please refer to the [bitnami/rabbitmq-cluster-operator](https://github.com/bitnami/containers/tree/main/bitnami/rabbitmq-cluster-operator) image documentation.
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
 
 ```console
-helm install my-release \
+$ helm install my-release \
   --set livenessProbe.enabled=false \
-    bitnami/rabbitmq-cluster-operator
+    my-repo/rabbitmq-cluster-operator
 ```
 
 The above command disables the Operator liveness probes.
@@ -399,7 +408,7 @@ The above command disables the Operator liveness probes.
 Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the chart. For example,
 
 ```console
-helm install my-release -f values.yaml bitnami/rabbitmq-cluster-operator
+$ helm install my-release -f values.yaml my-repo/rabbitmq-cluster-operator
 ```
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
@@ -433,7 +442,7 @@ If additional containers are needed in the same pod as rabbitmq-cluster-operator
 
 This chart allows you to set your custom affinity using the `affinity` parameter. Find more information about Pod affinity in the [kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity).
 
-As an alternative, use one of the preset configurations for pod affinity, pod anti-affinity, and node affinity available at the [bitnami/common](https://github.com/bitnami/charts/tree/master/bitnami/common#affinities) chart. To do so, set the `podAffinityPreset`, `podAntiAffinityPreset`, or `nodeAffinityPreset` parameters.
+As an alternative, use one of the preset configurations for pod affinity, pod anti-affinity, and node affinity available at the [bitnami/common](https://github.com/bitnami/charts/tree/main/bitnami/common#affinities) chart. To do so, set the `podAffinityPreset`, `podAntiAffinityPreset`, or `nodeAffinityPreset` parameters.
 ### Deploying extra resources
 
 There are cases where you may want to deploy extra objects, such your custom *RabbitmqCluster* objects. For covering this case, the chart allows adding the full specification of other objects using the `extraDeploy` parameter.
@@ -470,9 +479,9 @@ In order to upgrade the CRD objects, perform the following steps:
 - Execute the following commands (replace the VERSION placeholder):
 
 ```console
-helm fetch bitnami/rabbitmq-cluster-operator --version VERSION
-tar xf rabbitmq-cluster-operator-VERSION.tar.gz
-kubectl apply -f rabbitmq-cluster-operator/crds
+$ helm fetch bitnami/rabbitmq-cluster-operator --version VERSION
+$ tar xf rabbitmq-cluster-operator-VERSION.tar.gz
+$ kubectl apply -f rabbitmq-cluster-operator/crds
 ```
 
 ### To 2.0.0
@@ -494,8 +503,8 @@ The CRD was updated according to the latest changes in the upstream project. Tha
 You need to manually delete the old CRD before upgrading the release.
 
 ```console
-kubectl delete crd rabbitmqclusters.rabbitmq.com
-helm upgrade my-release bitnami/rabbitmq-cluster-operator
+$ kubectl delete crd rabbitmqclusters.rabbitmq.com
+$ helm upgrade my-release my-repo/rabbitmq-cluster-operator
 ```
 
 ## License
