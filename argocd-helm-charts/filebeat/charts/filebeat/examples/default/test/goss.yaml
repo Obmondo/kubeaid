@@ -25,11 +25,14 @@ user:
     gid: 1000
 
 http:
-  http://elasticsearch-master:9200/_cat/indices:
+  https://elasticsearch-master:9200/_cat/indices:
     status: 200
     timeout: 2000
+    allow-insecure: true
+    username: "{{ .Env.ELASTICSEARCH_USERNAME }}"
+    password: "{{ .Env.ELASTICSEARCH_PASSWORD }}"
     body:
-      - "filebeat-7.17.3"
+      - "filebeat-8.5.1"
 
 file:
   /usr/share/filebeat/filebeat.yml:
@@ -38,10 +41,3 @@ file:
       - "add_kubernetes_metadata"
       - "output.elasticsearch"
       - "elasticsearch-master:9200"
-
-command:
-  cd /usr/share/filebeat && filebeat test output:
-    exit-status: 0
-    stdout:
-      - "elasticsearch: http://elasticsearch-master:9200"
-      - "version: 7.17.3"
