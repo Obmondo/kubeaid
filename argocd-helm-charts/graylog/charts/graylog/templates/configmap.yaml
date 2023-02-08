@@ -98,7 +98,9 @@ data:
     http_external_uri = {{ $externalUri }}/
     {{- end }}
   {{- end }}
-    elasticsearch_hosts = {{ template "graylog.elasticsearch.hosts" . }}
+    elasticsearch_hosts = {{ template "graylog.opensearch.hosts" . }}
+    elasticsearch_discovery_enabled = false
+    # elasticsearch_disable_version_check = true
     allow_leading_wildcard_searches = {{ .Values.graylog.options.allowLeadingWildcardSearches }}
     allow_highlighting = {{ .Values.graylog.options.allowHighlighting }}
     output_batch_size = 500
@@ -228,12 +230,12 @@ data:
     echo "Starting graylog"
     # Original docker-entrypoint.sh in Graylog Docker will error while executing since you can't chown readonly files in `config`
     # exec /docker-entrypoint.sh graylog
-  {{- if or (.Values.graylog.elasticsearch.uriSecretKey) (.Values.graylog.mongodb.uriSecretKey) }}
+  {{- if or (.Values.graylog.opensearch.uriSecretKey) (.Values.graylog.mongodb.uriSecretKey) }}
     # Interpolate
     sed 's/"/\\\"/g;s/.*/echo "&"/e' ${GRAYLOG_HOME}/config/graylog.conf > ${GRAYLOG_HOME}/graylog.conf.subst
   {{- end }}
-  {{- if .Values.graylog.elasticsearch.version }}
-    export GRAYLOG_ELASTICSEARCH_VERSION={{ .Values.graylog.elasticsearch.version }}
+  {{- if .Values.graylog.opensearch.version }}
+    export GRAYLOG_ELASTICSEARCH_VERSION={{ .Values.graylog.opensearch.version }}
   {{- end }}
     echo "Graylog Home ${GRAYLOG_HOME}"
     echo "Graylog Plugin Dir ${GRAYLOG_PLUGIN_DIR}"
@@ -246,7 +248,7 @@ data:
       -Dgraylog2.installation_source=docker \
       ${GRAYLOG_HOME}/graylog.jar \
       server \
-    {{- if or (.Values.graylog.elasticsearch.uriSecretKey) (.Values.graylog.mongodb.uriSecretKey) }}
+    {{- if or (.Values.graylog.opensearch.uriSecretKey) (.Values.graylog.mongodb.uriSecretKey) }}
       -f ${GRAYLOG_HOME}/graylog.conf.subst
     {{- else }}
       -f ${GRAYLOG_HOME}/config/graylog.conf

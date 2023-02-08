@@ -25,8 +25,8 @@ serviceAccount:
   annotations: {}
 
 tags:
-  # If true, this chart will install Elasticsearch from requirement dependencies
-  install-elasticsearch: true
+  # If true, this chart will install opensearch from requirement dependencies
+  install-opensearch: true
   # If true, this chart will install MongoDB replicaset from requirement dependencies
   install-mongodb: true
 
@@ -55,11 +55,12 @@ graylog:
   ##
   image:
     repository: "graylog/graylog"
-    tag: "4.2.3-1"
+    tag: "5.0.2"
     pullPolicy: "IfNotPresent"
 
   ## Graylog default Java option
-  javaOpts: "-Dlog4j2.formatMsgNoLookups=true -Djdk.tls.acknowledgeCloseNotify=true -XX:+UnlockExperimentalVMOptions -XX:NewRatio=1 -XX:MaxMetaspaceSize=256m -server -XX:+ResizeTLAB -XX:-OmitStackTraceInFastThrow"
+  # javaOpts: "-Dlog4j2.formatMsgNoLookups=true -Djdk.tls.acknowledgeCloseNotify=true -XX:+UnlockExperimentalVMOptions -XX:-OmitStackTraceInFastThrow -XX:+UseG1GC -server"
+  javaOpts: "-Dlog4j2.formatMsgNoLookups=true -Djdk.tls.acknowledgeCloseNotify=true -XX:+UnlockExperimentalVMOptions -XX:-OmitStackTraceInFastThrow -XX:+UseG1GC -server"
 
   ## Number of Graylog instance
   ##
@@ -90,7 +91,8 @@ graylog:
   ## Node tolerations for node-exporter scheduling to nodes with taints
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   ##
-  tolerations: []
+  tolerations:
+    []
     # - key: "key"
     #   operator: "Equal|Exists"
     #   value: "value"
@@ -112,7 +114,8 @@ graylog:
   ## Set security context for defining privilege and accessing control settings entire Pod
   ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   ##
-  podSecurityContext: {}
+  podSecurityContext:
+    {}
     # runAsUser: 10001
     # fsGroup: 65534
 
@@ -237,7 +240,8 @@ graylog:
   ## Note: Name must be in IANA_SVC_NAME (at most 15 characters, matching regex [a-z0-9]([a-z0-9-]*[a-z0-9])* and it must contains at least one letter [a-z], hyphens cannot be adjacent to other hyphens)
   ## Note: Array must be sorted by port order
   ##
-  input: {}
+  input:
+    {}
     # tcp:
     #   service:
     #     name: your-tcp-service-name
@@ -333,7 +337,6 @@ graylog:
     ## leave blanc for disabling TLS
     tlsSecretName: ""
 
-
   ## Configure resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
@@ -341,13 +344,13 @@ graylog:
     limits:
       cpu: "1"
     requests:
-      cpu: "500m"
-      memory: "1024Mi"
+      cpu: "200m"
+      memory: "512Mi"
 
   ## Set Graylog Java heapsize. If this value empty, chart will allocate heapsize using `-XX:+UseCGroupMemoryLimitForHeap`
   ## ref: https://blogs.oracle.com/java-platform-group/java-se-support-for-docker-cpu-and-memory-limits
   ##
-  # heapSize: "1024g"
+  heapSize: "16g"
 
   ## RollingUpdate update strategy
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
@@ -397,16 +400,17 @@ graylog:
   ##
   existingRootSecret: ""
 
-  elasticsearch:
+  opensearch:
     ## Major version of the Elasticsearch version used.
     ## It is required by Graylog 4. See https://docs.graylog.org/en/4.0/pages/configuration/elasticsearch.html#available-elasticsearch-configuration-tunables
-    version: "7"
+    # version: "7"
+
     ## List of Elasticsearch hosts Graylog should connect to.
     ## Need to be specified as a comma-separated list of valid URIs for the http ports of your elasticsearch nodes.
     ## If one or more of your elasticsearch hosts require authentication, include the credentials in each node URI that
     ## requires authentication.
     ##
-    # hosts: http://elasticsearch-client.graylog.svc.cluster.local:9200
+    # hosts: http://opensearch-cluster-master-headless.graylog.svc.cluster.local:9200
     hosts: ""
     # Allow elasticsearch hosts to be fetched from a k8s secret
     # {{ graylog.fullname }}-es will be used as uriSecretName if left empty
@@ -488,7 +492,8 @@ graylog:
   ## Additional server files will be deployed to /etc/graylog/server
   ## For example, you can put server certificates or authorized clients certificates here
   ##
-  serverFiles: {}
+  serverFiles:
+    {}
     # server.key: |
     # server.cert: |
 
@@ -559,29 +564,32 @@ graylog:
     inputbufferProcessors: 2
     processbufferProcessors: 5
 
-## Specify Elasticsearch version from requirement dependencies. Ignore this seection if you install Elasticsearch manually.
-##
-## Note: the official elasticsearch chart will install master, coordinate, data, and ingest in single node.
-## It is strongly recommend to install Elasticsearch manually without using the dependency.
-## To install Elasticsearch on production, please follow the official guide https://github.com/elastic/helm-charts/tree/main/elasticsearch#how-to-deploy-dedicated-nodes-types
-elasticsearch:
-  replicas: 1
-  minimumMasterNodes: 1
-  antiAffinity: "soft"
-  # Shrink default JVM heap.
-  esJavaOpts: "-Xmx128m -Xms128m"
-  # Allocate smaller chunks of memory per pod.
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "512M"
-    limits:
-      cpu: "1000m"
-      memory: "512M"
-  volumeClaimTemplate:
-    resources:
-      requests:
-        storage: 8Gi  # default 30Gi
+opensearch:
+  enabled: true
+  extraEnvs:
+    - name: plugins.security.ssl.http.enabled
+      value: "false"
+    - name: plugins.security.disabled
+      value: "true"
+  # - name: OPENSEARCH_JAVA_OPTS
+  #   value: "-Xms512m -Xmx512m"
+
+  # - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+  # - "discovery.seed_hosts=opensearch2,opensearch3"
+  # - "cluster.initial_master_nodes=opensearch1,opensearch2,opensearch3"
+  # - "bootstrap.memory_lock=true"
+  # - "action.auto_create_index=false"
+  # resources:
+  #   requests:
+  #     cpu: "100m"
+  #     memory: "512M"
+  #   limits:
+  #     cpu: "1000m"
+  #     memory: "512M"
+  # volumeClaimTemplate:
+  #   resources:
+  #     requests:
+  #       storage: 30Gi # default 30Gi
 
 # Specify Mongodb settings. Ignore this section if you install MongoDB manually.
 mongodb:

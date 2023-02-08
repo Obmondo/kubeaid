@@ -118,12 +118,12 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.graylog.existingRootSecret | default (include "graylog.fullname" .) }}
                   key: graylog-password-sha2
-            {{- if .Values.graylog.elasticsearch.uriSecretKey }}
+            {{- if .Values.graylog.opensearch.uriSecretKey }}
             - name: GRAYLOG_ELASTICSEARCH_HOSTS
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.graylog.elasticsearch.uriSecretName | default (printf "%s-es" (include "graylog.fullname" .)) }}
-                  key: {{ .Values.graylog.elasticsearch.uriSecretKey }}
+                  name: {{ .Values.graylog.opensearch.uriSecretName | default (printf "%s-es" (include "graylog.fullname" .)) }}
+                  key: {{ .Values.graylog.opensearch.uriSecretKey }}
             {{- end }}
             {{- if .Values.graylog.mongodb.uriSecretKey }}
             - name: GRAYLOG_MONGODB_URI

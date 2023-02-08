@@ -73,20 +73,20 @@ Print external URI
 {{- end -}}
 
 {{/*
-Create a default fully qualified elasticsearch name or use the `graylog.elasticsearch.hosts` value if defined.
+Create a default fully qualified opensearch name or use the `graylog.opensearch.hosts` value if defined.
 Or use chart dependencies with release name
 */}}
-{{- define "graylog.elasticsearch.hosts" -}}
-{{- if .Values.graylog.elasticsearch.uriSecretKey }}
-    {{- if .Values.graylog.elasticsearch.uriSSL }}
+{{- define "graylog.opensearch.hosts" -}}
+{{- if .Values.graylog.opensearch.uriSecretKey }}
+    {{- if .Values.graylog.opensearch.uriSSL }}
         {{- printf "https://${GRAYLOG_ELASTICSEARCH_HOSTS}" -}}
     {{- else }}
         {{- printf "http://${GRAYLOG_ELASTICSEARCH_HOSTS}" -}}
     {{- end }}
-{{- else if .Values.graylog.elasticsearch.hosts }}
-    {{- .Values.graylog.elasticsearch.hosts -}}
+{{- else if .Values.graylog.opensearch.hosts }}
+    {{- .Values.graylog.opensearch.hosts -}}
 {{- else }}
-    {{- printf "http://elasticsearch-master.%s.svc.cluster.local:9200" .Release.Namespace -}}
+    {{- printf "http://opensearch-cluster-master-headless.%s.svc.cluster.local:9200" .Release.Namespace -}}
 {{- end -}}
 {{- end -}}
 
