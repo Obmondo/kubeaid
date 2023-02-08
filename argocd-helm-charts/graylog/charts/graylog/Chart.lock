@@ -1,9 +1,9 @@
 dependencies:
-- name: elasticsearch
-  repository: https://helm.elastic.co
-  version: 7.16.2
 - name: mongodb
   repository: https://charts.bitnami.com/bitnami
-  version: 10.31.2
-digest: sha256:3b158d3dea43aa83556165df55c2bfe096a80910652a58da6eff4cce07fceea4
-generated: "2022-11-21T15:00:16.369102262Z"
+  version: 13.6.6
+- name: opensearch
+  repository: https://opensearch-project.github.io/helm-charts
+  version: 2.8.0
+digest: sha256:9fd00100847a133502f909c00d381d17dd2802c3c724a5e55a95b2266e950f25
+generated: "2023-02-07T18:10:17.066411419Z"
