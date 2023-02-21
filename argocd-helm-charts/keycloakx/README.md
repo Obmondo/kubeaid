@@ -92,6 +92,35 @@ Details about setup if you are interested:
   * Create `Developer` group, with role mappings to `kube_developer`
   * *ToDo*: Add more user groups
 
+## Setup Keycloak as Identity Provider on a Keycloak
+
+* Log into the keycloak server, using your personal admin account
+* Switch to the `<customer_name>` realm
+* Click on Identity Provider -> Add provider -> Keycloak OIDC
+* Set the alias and displayname
+* Set the `Authorization Url` as `https://keycloakx.kam.obmondo.com/auth/realms/Obmondo/protocol/openid-account/auth`
+* Set the `Token Url` as `https://keycloakx.kam.obmondo.com/auth/realms/Obmondo/protocol/openid-account/token`
+* Set the `Client Authentication` as `Client secret sent as basic auth`
+* Set the `Client ID` as `k8id-employee`
+* Set the `Client Secret` as `secret-from-obmondo`
+* Toggle the `pass login hint`
+* Save
+
+## Allow Group from external Identity provider to mapper with local keycloak
+
+* Select the relevant realm
+* Select the external Identity Provider (You want groups from this ID to map with local groups)
+* Select Mappers from the tabs
+* Click on "Add mapper" [here](static/identity_provider_mapper.png)
+* Add a [local group](static/create_local_group.png), Make sure the group name is same with the external ID.
+* Add a mapper on the client.
+  * Select the relevant client, for example (argocd)
+  * Click on Client Scope
+  * Click on 'argocd-dedicated' (this is created by keycloak for you automatically)
+  * Click on 'Add mapper' and 'By configuration'
+  * Fill in the name and 'Token Claim Name' [here](static/mapper.png)
+* Save
+
 ## Setup the Kubernetes client
 
 * Log into the keycloak server using your personal admin user
@@ -332,3 +361,4 @@ Restoring itself to the point previously setup and configured to.
 
 * <https://medium.com/keycloak/github-as-identity-provider-in-keyclaok-dca95a9d80ca>
 * <https://www.youtube.com/watch?v=duawSV69LDI>
+* <https://medium.com/keycloak/keycloak-as-an-identity-broker-an-identity-provider-af1b150ea94>
