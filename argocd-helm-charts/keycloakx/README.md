@@ -106,6 +106,21 @@ Details about setup if you are interested:
 * Toggle the `pass login hint`
 * Save
 
+## Allow Group from external Identity provider to mapper with local keycloak
+
+* Select the relevant realm
+* Select the external Identity Provider (You want groups from this ID to map with local groups)
+* Select Mappers from the tabs
+* Click on "Add mapper" [here](static/identity_provider_mapper.png)
+* Add a [local group](static/create_local_group.png), Make sure the group name is same with the external ID.
+* Add a mapper on the client.
+  * Select the relevant client, for example (argocd)
+  * Click on Client Scope
+  * Click on 'argocd-dedicated' (this is created by keycloak for you automatically)
+  * Click on 'Add mapper' and 'By configuration'
+  * Fill in the name and 'Token Claim Name' [here](static/mapper.png)
+* Save
+
 ## Setup the Kubernetes client
 
 * Log into the keycloak server using your personal admin user
