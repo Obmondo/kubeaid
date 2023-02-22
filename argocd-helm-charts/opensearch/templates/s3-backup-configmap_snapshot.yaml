@@ -32,6 +32,7 @@ data:
           repository: {{ .Values.backup.repository | quote }}
           disable_action: False
           ignore_empty_list: True
+          timeout_override: {{ .Values.backup.timeout_delete_snapshots | default 600 }}
         filters:
           - filtertype: age
             source: creation_date
