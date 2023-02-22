@@ -84,4 +84,4 @@ git:helm_update:
     entrypoint: [""]
   script:
     # Keycloak and argocd are pinned to specific version on purpose
-    - ./bin/helm-repo-update.sh --update-all --merge-request --gitlab-ci --skip-chart argo-cd,keycloak
+    - ./bin/helm-repo-update.sh --update-all --merge-request --gitlab-ci --skip-charts argo-cd,keycloak
