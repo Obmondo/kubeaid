@@ -12,9 +12,6 @@ metadata:
 spec:
   policyTypes:
     - Ingress
-  {{- if .Values.networkPolicy.egress }}
-    - Egress
-  {{- end}}
   podSelector:
     matchLabels:
       {{- include "keycloak.selectorLabels" . | nindent 6 }}
@@ -45,8 +42,4 @@ spec:
         - protocol: {{ default "TCP" .protocol }}
           port: {{ .containerPort }}
         {{- end }}
-  {{- if .Values.networkPolicy.egress }}
-  egress:
-    {{- .Values.networkPolicy.egress | toYaml | nindent 4 }}
-  {{- end }}
 {{- end }}

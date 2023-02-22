@@ -24,7 +24,7 @@ spec:
   serviceName: {{ include "keycloak.fullname" . }}-headless
   podManagementPolicy: {{ .Values.podManagementPolicy }}
   updateStrategy:
-    type: {{ .Values.updateStrategy }}
+    type: RollingUpdate
   template:
     metadata:
       annotations:
@@ -145,11 +145,9 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-            {{- if .Values.service.httpsPort }}
             - name: https
               containerPort: 8443
               protocol: TCP
-            {{- end }}
             {{- with .Values.extraPorts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
