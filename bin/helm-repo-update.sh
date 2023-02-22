@@ -34,7 +34,7 @@ declare UPDATE_ALL=false
 declare MERGE_REQUEST=false
 declare GITLAB_CI=false
 declare UPDATE_HELM_CHART=
-declare SKIP_CHART=
+declare SKIP_CHARTS=
 declare ARGOCD_CHART_PATH="argocd-helm-charts"
 declare CHART_VERSION=
 
