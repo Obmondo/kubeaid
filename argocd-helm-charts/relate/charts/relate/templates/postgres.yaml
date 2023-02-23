@@ -4,6 +4,7 @@ metadata:
   name: obmondo-postgresql
   namespace: relate
 spec:
+  enableLogicalBackup: true
   teamId: obmondo
   volume:
     size: 2Gi

@@ -4,6 +4,7 @@ metadata:
   name: sonarqube-pgsql
   namespace: sonarqube
 spec:
+  enableLogicalBackup: true
   teamId: sonarqube
   volume:
     size: {{ .Values.postgresql.size }}
