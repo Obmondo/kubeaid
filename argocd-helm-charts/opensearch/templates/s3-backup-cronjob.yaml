@@ -5,7 +5,7 @@ metadata:
   namespace: graylog
   name: backup-s3
 spec:
-  schedule: "0 03 * * *"
+  schedule: "0 05 * * *"
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 1
   successfulJobsHistoryLimit: 1
