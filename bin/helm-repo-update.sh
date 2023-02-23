@@ -2,15 +2,17 @@
 
 set -eou pipefail
 
-for program in helm tar; do
+for program in helm tar yq git; do
   if ! command -v "$program" >/dev/null; then
     echo "Missing $program"
     exit 1
   fi
 done
 
-if ! helm version --template='Version: {{.Version}}' | grep 'v3.8' >/dev/null; then
-  echo "I'm expecting helm version be v3.8.x"
+helm_version=$(helm version --template="{{.Version}}" | sed 's/[^[:alnum:]]\+//g; s/v//')
+
+if [ ! "$helm_version" -ge "380" ] ; then
+  echo "I'm expecting helm version to be greater than 3.8.0"
   exit 1
 fi
 
@@ -140,8 +142,13 @@ function update_helm_chart {
         # Go to helm chart, 1st layer
         helm dependencies update "$HELM_CHART_PATH"
 
+        # Deleting old helm before untar
+        echo "Deleing old $HELM_CHART_NAME before untar"
+        rm -rf "${HELM_CHART_DEP_PATH:?}/${HELM_CHART_NAME}"
+
         # Untar the tgz file
         tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_UPSTREAM_CHART_VERSION.tgz"
+
       else
         echo "Helm chart $HELM_REPO_NAME is already on latest version $HELM_CHART_VERSION"
       fi
@@ -149,6 +156,10 @@ function update_helm_chart {
       echo "HELMING $HELM_CHART_NAME"
       # Go to helm chart, 1st layer
       helm dependencies update "$HELM_CHART_PATH"
+
+      # Deleting old helm before untar
+      echo "Deleting old $HELM_CHART_NAME before untar"
+      rm -rf "${HELM_CHART_DEP_PATH:?}/${HELM_CHART_NAME}"
 
       # Untar the tgz file
       tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz"
