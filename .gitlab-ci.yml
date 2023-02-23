@@ -83,4 +83,5 @@ git:helm_update:
     name: registry.obmondo.com/obmondo/dockerfiles/helm:latest
     entrypoint: [""]
   script:
-    - ./bin/helm-repo-update.sh --update-all --merge-request --gitlab-ci --skip-chart argo-cd
+    # argocd is pinned to specific version on purpose
+    - ./bin/helm-repo-update.sh --update-all --merge-request --gitlab-ci --skip-charts argo-cd

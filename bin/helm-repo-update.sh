@@ -34,7 +34,7 @@ declare UPDATE_ALL=false
 declare MERGE_REQUEST=false
 declare GITLAB_CI=false
 declare UPDATE_HELM_CHART=
-declare SKIP_CHART=
+declare SKIP_CHARTS=
 declare ARGOCD_CHART_PATH="argocd-helm-charts"
 declare CHART_VERSION=
 
@@ -62,8 +62,8 @@ while [[ $# -gt 0 ]]; do
     --gitlab-ci)
       GITLAB_CI=true
       ;;
-    --skip-chart)
-      SKIP_CHART=$1
+    --skip-charts)
+      SKIP_CHARTS=$1
 
       shift
       ;;
@@ -84,6 +84,9 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# Build an array based on the input
+IFS=',' read -ra SKIP_HELM_CHARTS <<< "$SKIP_CHARTS"
+
 function update_helm_chart {
   HELM_CHART_PATH="$1"
   HELM_CHART_YAML="$1/Chart.yaml"
@@ -102,10 +105,12 @@ function update_helm_chart {
   HELM_REPOSITORY_URL=$(yq eval '.dependencies[].repository' "$HELM_CHART_YAML")
   HELM_CHART_DEP_PATH="$HELM_CHART_PATH/charts"
 
-  if [ "$HELM_REPO_NAME" == "$SKIP_CHART" ]; then
-    echo "Skipping $SKIP_CHART"
-    return
-  fi
+  for SKIP_HELM_CHART in "${SKIP_HELM_CHARTS[@]}"; do
+    if [ "$HELM_REPO_NAME" == "$SKIP_HELM_CHART" ]; then
+      echo "Skipping $SKIP_HELM_CHART"
+      return
+    fi
+  done
 
   # This chart does not have any dependencies, so lets not do helm dep up
   if [ "$HELM_CHART_DEP_PRESENT" -ne 0 ]; then
