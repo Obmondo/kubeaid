@@ -6,6 +6,9 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels:
 {{ include "labels.standard" . | indent 4 }}
+    {{- range $key, $value := .Values.extraLabels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
 spec:
   strategy:
     type: RollingUpdate
@@ -25,6 +28,9 @@ spec:
         {{- range $key, $value := .Values.haproxy.labels }}
         {{ $key }}: {{ $value | toString }}
         {{- end }}
+        {{- range $key, $value := .Values.extraLabels }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
       annotations:
       {{- if and (.Values.haproxy.metrics.enabled) (not .Values.haproxy.metrics.serviceMonitor.enabled)  }}
         prometheus.io/port: "{{ .Values.haproxy.metrics.port }}"
@@ -39,7 +45,10 @@ spec:
       # Needed when using unmodified rbac-setup.yml
       {{ if .Values.haproxy.serviceAccount.create }}
       serviceAccountName: {{ template "redis-ha.serviceAccountName" . }}-haproxy
-      {{ end }}
+      {{- else }}
+      serviceAccountName: {{ .Values.haproxy.serviceAccountName }}
+      {{- end }}
+      securityContext: {{ toYaml .Values.haproxy.securityContext | nindent 8 }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
       tolerations:
@@ -74,6 +83,17 @@ spec:
                 topologyKey: kubernetes.io/hostname
     {{- end }}
     {{- end }}
+    {{- if .Values.topologySpreadConstraints.enabled }}
+      topologySpreadConstraints:
+      - maxSkew: {{ .Values.topologySpreadConstraints.maxSkew | default 1 }}
+        topologyKey: {{ .Values.topologySpreadConstraints.topologyKey | default "topology.kubernetes.io/zone" }}
+        whenUnsatisfiable: {{ .Values.topologySpreadConstraints.whenUnsatisfiable | default "ScheduleAnyway" }}
+        labelSelector:
+          matchLabels:
+            app: {{ template "redis-ha.name" . }}-haproxy
+            release: {{ .Release.Name }}
+            revision: "{{ .Release.Revision }}"
+      {{- end }}
       initContainers:
       - name: config-init
         image: {{ .Values.haproxy.image.repository }}:{{ .Values.haproxy.image.tag }}
@@ -84,6 +104,7 @@ spec:
         - sh
         args:
         - /readonly/haproxy_init.sh
+        securityContext: {{ toYaml .Values.haproxy.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - name: config-volume
           mountPath: /readonly
@@ -93,12 +114,11 @@ spec:
       {{- if .Values.haproxy.imagePullSecrets }}
       imagePullSecrets: {{ toYaml .Values.haproxy.imagePullSecrets | nindent 8 }}
       {{- end }}
-      securityContext:
-{{ toYaml .Values.haproxy.securityContext | indent 8 }}
       containers:
       - name: haproxy
         image: {{ .Values.haproxy.image.repository }}:{{ .Values.haproxy.image.tag }}
         imagePullPolicy: {{ .Values.haproxy.image.pullPolicy }}
+        securityContext: {{ toYaml .Values.haproxy.containerSecurityContext | nindent 10 }}
     {{- if or .Values.auth .Values.sentinel.auth}}
         env:
       {{- if .Values.auth }}
@@ -138,7 +158,7 @@ spec:
           periodSeconds: 3
         ports:
         - name: redis
-          containerPort: {{ default "6379" .Values.redis.port }}
+          containerPort: {{ default "6379" .Values.haproxy.containerPort }}
         {{- if .Values.haproxy.readOnly.enabled }}
         - name: readonlyport
           containerPort: {{ default "6380" .Values.haproxy.readOnly.port }}
@@ -154,12 +174,21 @@ spec:
           mountPath: /usr/local/etc/haproxy
         - name: shared-socket
           mountPath: /run/haproxy
+{{- if .Values.haproxy.tls.enabled }}
+        - name: pemfile
+          mountPath: {{ .Values.haproxy.tls.certMountPath }}
+{{- end }}
         lifecycle:
 {{ toYaml .Values.haproxy.lifecycle | indent 10 }}
 {{- if .Values.haproxy.priorityClassName }}
       priorityClassName: {{ .Values.haproxy.priorityClassName }}
 {{- end }}
       volumes:
+{{- if .Values.haproxy.tls.enabled }}
+      - name: pemfile
+        secret:
+          secretName: {{ .Values.haproxy.tls.secretName }}
+{{- end }}
       - name: config-volume
         configMap:
           name: {{ template "redis-ha.fullname" . }}-configmap
