@@ -1,7 +1,10 @@
 resource "kops_cluster" "cluster" {
   name               = var.cluster_name
-  cloud_provider     = "aws"
   kubernetes_version = var.kubernetes_version
+
+  cloud_provider {
+    aws {}
+  }
 
   # User sometime have diff TLD in their cluster name
   # If not given, use the subdomain
