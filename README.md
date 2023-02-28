@@ -55,16 +55,14 @@ they need it.
 
 ## Setup of Kubernetes clusters
 
-Mirror this repo and the `kubernetes-config` repo into a Git platform of your choice, and follow the `README` file in
-the `kubernetes-config` repository on how to write the config for your Kubernetes cluster.
+Mirror this repo and the [k8id-config](https://github.com/Obmondo/k8id-config) repo into a Git platform of your choice,
+and follow the `README` file in the `k8id-config` repository on how to write the config for your Kubernetes cluster.
 
 You must NEVER make any changes on the master/main branch of you mirror of the k8id repository, as we use this to
 deliver updates to you. This means that your cluster can be updated simply by running `git pull` on your copy of
 this repository.
 
-**TODO:** Add description of the proper way to make changes, in the form of a pull request
-
-All customizations happens in your `kubernetes-config` repo.
+All customizations happens in your `k8id-config` repo.
 
 ## support
 
