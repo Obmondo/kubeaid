@@ -3,8 +3,9 @@ data "aws_route53_zone" "parent_zone" {
 }
 
 resource "aws_route53_zone" "zone" {
-  name    = var.subdomain
-  comment = "Created on behalf of the ${var.cluster_name} Kubernetes cluster"
+  name          = var.subdomain
+  force_destroy = true
+  comment       = "Created on behalf of the ${var.cluster_name} Kubernetes cluster"
 }
 
 resource "aws_route53_record" "subzone-ns-records" {
