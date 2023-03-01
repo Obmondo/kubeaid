@@ -1,0 +1,8 @@
+haproxy:
+  # This is necessary to clear the default ports. Even if you set other
+  # containPorts they will just be merged with the default ports if you dont set
+  # these to null.
+  containerPorts:
+    http: null
+    https: null
+    stat: null
