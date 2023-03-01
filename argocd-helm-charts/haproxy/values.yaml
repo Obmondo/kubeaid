@@ -1,5 +1,0 @@
-haproxy:
-  containerPorts:
-    http: null
-    https: null
-    stat: null

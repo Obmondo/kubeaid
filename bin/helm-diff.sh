@@ -58,7 +58,7 @@ function helm_diff() {
   # Check there is a diff
   if [ -z "$any_diff" ]; then
     echo "There are no changes to the helm template resulting from these code changes"
-    echo "Please test with 'helm template $1 $chart_path ${chart_path}/values.yaml' that your changes appear, before making an MR"
+    echo "Please test with 'helm template $1 $chart_path -f ${chart_path}/values.yaml' that your changes appear, before making an MR"
     exit 1
   else
     echo "Nice, there is a diff between changes"
