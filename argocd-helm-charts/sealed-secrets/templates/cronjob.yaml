@@ -1,0 +1,60 @@
+{{ if .Values.backup }}
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: backup-sealed-secrets
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 20
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+        {{- if .Values.backup.annotations }}
+          annotations: {{ toYaml .Values.backup.annotations | nindent 12 }}
+        {{- end }}
+          labels:
+            app: backup-sealed-secrets
+        spec:
+          containers:
+          - name: backup-sealed-secrets
+            command:
+            - /bin/bash
+            - /mnt/script
+            image: {{ .Values.backup.image }}
+            imagePullPolicy: IfNotPresent
+            env:
+            - name: AWS_ACCESS_KEY_ID
+              value: {{ .Values.backup.access_key_id }}
+          {{- if .Values.backup.access_secret }}
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backup.access_secret | default "backup-sealed-secrets-pod-env" }}
+                  key: AWS_SECRET_ACCESS_KEY
+          {{- end }}
+            volumeMounts:
+            - mountPath: /mnt
+              name: scripts
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: true
+              runAsUser: 1000
+              capabilities:
+                drop: ["ALL"]
+              seccompProfile:
+                type: RuntimeDefault
+          restartPolicy: OnFailure
+          serviceAccount: sealed-secrets
+          serviceAccountName: sealed-secrets
+          volumes:
+          - configMap:
+              defaultMode: 420
+              name: backup-sealed-secrets
+            name: scripts
+  schedule: {{ .Values.backup.schedule | quote }}
+  startingDeadlineSeconds: 180
+  successfulJobsHistoryLimit: 3
+---
+{{ end }}

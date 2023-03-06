@@ -174,3 +174,11 @@ Restore the backup with the name that is created/exists.
 ```sh
 velero restore create <restore-name> --include-namespaces system --include-resources pods --selector sealedsecrets.bitnami.com/sealed-secrets-key=active --from-backup <backup-name>
 ```
+
+### Backup Setup on aws
+
+Create the s3 bucket
+
+```sh
+aws s3api create-bucket --bucket kbm-sealed-secrets-backups --region eu-west-1 --endpoint-url=https://s3.obmondo.com
+```
