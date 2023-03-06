@@ -1,0 +1,21 @@
+{{ if .Values.backup }}
+apiVersion: v1
+data:
+  script: |-
+    #!/usr/bin/bash
+    TEMP=$(mktemp)
+    DATE=$(date +%Y%m%d)
+
+    echo "Getting secret from the default serviceaccount"
+    kubectl get secret -n {{ .Values.backup.namespace }} -o json | jq -ce '.items[] | select( .metadata.name | match ( "^sealed-secrets-key" ) )' | gzip -c > $TEMP.gz
+
+    if [ ! -z "{{ .Values.backup.s3endpoint }}" ]; then
+    ENDPOINT="--endpoint-url={{ .Values.backup.s3endpoint }}"
+    fi
+
+    echo "Copying the sealed-secret  backup to aws s3"
+    aws $ENDPOINT s3 cp "$TEMP.gz" s3://{{ .Values.backup.backupBucket }}/$(date +%Y%m%d).gz
+kind: ConfigMap
+metadata:
+  name: backup-sealed-secrets
+{{ end }}
