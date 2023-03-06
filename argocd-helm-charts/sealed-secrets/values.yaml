@@ -1,12 +1,6 @@
+---
 sealed-secrets:
-  image:
-    registry: docker.io
-    repository: bitnami/sealed-secrets-controller
-    tag: v0.17.5
   namespace: system
-  #should be default from v1.17 - fixes "progressing" hanging in argocd 'secrets' applications
-  commandArgs:
-  - --update-status
   containerSecurityContext:
     allowPrivilegeEscalation: false
     capabilities:
@@ -14,3 +8,7 @@ sealed-secrets:
     seccompProfile:
       type: RuntimeDefault
 networkpolicies: false
+backup:
+  schedule: "5 4 * * *"
+  image: ghcr.io/obmondo/backup-sealed-secrets-keys@sha256:6cc8952dbaaf4d29f60b6e5ab3f61d6dabeadcfd79cc72ca8620047857133bfd
+  namespace: system
