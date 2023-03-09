@@ -328,6 +328,83 @@ the keycloak app next it will use the same PVC/PV.
 
 Restoring itself to the point previously setup and configured to.
 
+## Keycloak update
+
+* Here we are updating the keycloak to keycloakx.
+* Install the keycloakx application from argocd.
+* Take a dump from keycloak postgres database i.e from keycloak-pgsql-0 pod.
+
+```sh
+# Take the shell access to keycloak-pgsql-0 pod
+
+kubectl -n keycloak exec -i -t keycloak-pgsql-0 -- /bin/bash
+
+# Take a dump for keycloak database
+pg_dump -U postgres keycloak > keycloak.psql
+
+ls -l keycloak.psql 
+-rw-r--r-- 1 root root 235633 Mar  6 12:28 keycloak.psql
+```
+
+* Download the dump file to keycloakx new application under the keycloakx-pgsql-0 pod.
+
+```sh
+1. Download to local machine
+kubectl -n keycloak cp keycloak-pgsql-0:keycloak.psql keycloak.psql
+
+2. Download to keycloakx-pgsql-0 pod
+kubectl -n keycloakx cp keycloak.psql keycloakx-pgsql-0:keycloak.psql
+```
+
+* After the database is copied, stop the keycloakx application and delete the keycloak database.
+* To stop the keycloak application you can delete the statefulsets for that application so the keycloakx pod will be deleted.
+
+```sh
+# Deleting stastefulsets from kubectl
+kubectl delete statefulsets keycloakx -n keycloakx
+
+# you can also delete statefulsets from argocd application.
+```
+
+* Once the pod is deleted no data will be passed to the keycloakx-pgsql-0 pod.
+* which will not add any new data while we import the dump database.
+* Create a new database keycloak and import the copied database.
+
+```sh
+# Take the shell access to keycloakx-pgsql-0 pod
+ kubectl -n keycloakx exec -i -t keycloakx-pgsql-0 -- /bin/bash
+
+#Login to database
+psql -U postgres
+
+psql (15.1 (Ubuntu 15.1-1.pgdg22.04+1), server 12.13 (Ubuntu 12.13-1.pgdg22.04+1))
+Type "help" for help.
+postgres=# \l
+                                                 List of databases
+   Name    |  Owner   | Encoding |   Collate   |    Ctype    | ICU Locale | Locale Provider |   Access privileges   
+-----------+----------+----------+-------------+-------------+------------+-----------------+-----------------------
+ keycloak  | keycloak | UTF8     | en_US.utf-8 | en_US.utf-8 |            | libc            | 
+ postgres  | postgres | UTF8     | en_US.utf-8 | en_US.utf-8 |            | libc            | 
+
+postgres=# Drop database keycloak;
+DROPPED DATABASE
+
+postgres=# Create database keycloak;
+CREATE DATABASE
+
+#Update the ownership of keycloak database to keycloak user.
+postgres=# ALTER DATABASE keycloak OWNER TO keycloak;
+
+postgres=# exit
+
+# Import the dump to keycloak database 
+psql -U postgres keycloak < keyclaok.psql
+```
+
+* After importing the database sync the statefulsets from argocd panel.The keycloakx pod will be created.
+* Once the pod is created, check the admin login and check all data, users and clients are added successfully.
+* Test your keycloakx application by trying logging with other user's.
+
 ## Good "Reads"
 
 * <https://medium.com/keycloak/github-as-identity-provider-in-keyclaok-dca95a9d80ca>
