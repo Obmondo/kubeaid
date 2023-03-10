@@ -63,6 +63,7 @@ local default_vars = {
       size: '10Gi',
       classname: 'rook-ceph-block',
     },
+    retention: '30d',
   },
   grafana_ingress_annotations: {
     'cert-manager.io/cluster-issuer': 'letsencrypt',
@@ -176,6 +177,7 @@ local kp =
         spec+: {
           replicas: 1,
           resources: vars.prometheus_resources,
+          retention: vars.prometheus.retention,
           storage: {
             volumeClaimTemplate: {
               apiVersion: 'v1',
