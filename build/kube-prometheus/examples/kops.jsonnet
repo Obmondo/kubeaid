@@ -39,6 +39,7 @@
       size: '10Gi',
       classname: 'gp2',
     },
+    retention: '30d',
   },
   prometheus_scrape_namespaces: [
     'velero',
