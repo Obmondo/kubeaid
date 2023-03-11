@@ -53,7 +53,7 @@ git -C "${config_repo_path}" checkout -b "argocd-deploy" --track "origin/${deplo
 
 # Loop over all clusters that are defined in config repo and copy
 # corresponding compiled files into cloned repo.
-find "${config_repo_path}/k8s/" -mindepth 1 -maxdepth 1 -type d -not -name .\* | while read -r cluster_dir; do
+find "${config_repo_path}/k8s/" -mindepth 2 -maxdepth 2 -type f -name '*.jsonnet' -exec dirname {} \; | while read -r cluster_dir; do
   ./build/kube-prometheus/build.sh "$cluster_dir"
   git -C "${config_repo_path}" add -f "${cluster_dir}"
 done
