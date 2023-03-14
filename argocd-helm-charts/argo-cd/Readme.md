@@ -48,6 +48,33 @@
   kubectl -n argocd get ing argo-cd-argocd-server -o jsonpath={.status}
   ```
 
+## Upgrading Argocd
+
+* For updating the Argocd application through helm check the document for [Updating helm repository](../../bin/README.md)
+* In latest version of Argocd You can provide multiple sources using the sources field.
+* You can use `sources` parameters for adding Helm value files from an external Git repository [Ref Link](https://argo-cd.readthedocs.io/en/stable/user-guide/multiple_sources/#helm-value-files-from-external-git-repository)
+* To test the updated changes on argocd you can change the targetRevision from HEAD your updated branch and test it.
+* Try checking the AppDiff if the changes seem to be fine then you can sync the application.
+* The application would require hard refresh to get the application up.
+* Once the Changes seem fine you can sync the application.
+* After syncing the application check on k9s your pod will be recreated.
+* Try logging to the argocd panel in the new browser and check the version it will be updated.
+
+## Error shown while updating argocd
+
+`1.` **spec.source.repoURL and spec.source.path either spec.source.chart are required**
+
+* Check the crd changes have applied to the new version.
+* You can manually apply the changes for application crd by `kubectl apply -f application-crd.yaml`
+* If that doesn't work you can apply on server-side `kubectl apply -f application-crd.yaml --server-side`
+* Don't try to delete the crd assuming that the argocd will generate the new updated one.
+* It led to delete most of the running applications on argocd and the argocd will be broken.
+
+`2.` **ComparisonError: groupVersion shouldn't be empty**
+
+* This Error shows for using incorrect ApiVersion. This can be identified by checking the apiversion in the template files.
+* In Argocd the first application in root will be showing this error. so that application has the wrong ApiVersion.
+
 ## Configure argocd with keycloak
 
 * Doc: https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/keycloak/
