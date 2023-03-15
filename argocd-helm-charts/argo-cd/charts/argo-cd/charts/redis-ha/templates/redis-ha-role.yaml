@@ -6,6 +6,9 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels:
 {{ include "labels.standard" . | indent 4 }}
+    {{- range $key, $value := .Values.extraLabels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
 rules:
 - apiGroups:
     - ""
@@ -13,14 +16,4 @@ rules:
     - endpoints
   verbs:
     - get
-{{- if .Values.podSecurityPolicy.create }}
-- apiGroups:
-    - 'policy'
-  resources:
-    - 'podsecuritypolicies'
-  verbs:
-    - 'use'
-  resourceNames:
-    - {{ template "redis-ha.fullname" . }}
-{{- end }}
 {{- end }}
