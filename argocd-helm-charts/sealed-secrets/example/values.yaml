@@ -3,7 +3,16 @@ backup:
   schedule: "25 1 * * *"
   image: ghcr.io/obmondo/backup-sealed-secrets-keys@sha256:6cc8952dbaaf4d29f60b6e5ab3f61d6dabeadcfd79cc72ca8620047857133bfd
   namespace: system
+
+  # aws
+  provider: aws
   backupBucket: sealed-secrets-keys
   s3endpoint: https://s3.example.com
   access_key_id: sealedsecret-backup
   access_secret: backup-sealed-secrets-pod-env
+
+  # azure
+  # provider: azure
+  # destinationContainer: qasealedsecrets
+  # azureStorageAccount: testingsealedsecret
+  # access_secret: backup-sealed-secrets-pod-env
