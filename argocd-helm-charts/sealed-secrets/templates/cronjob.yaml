@@ -25,14 +25,23 @@ spec:
             image: {{ .Values.backup.image }}
             imagePullPolicy: IfNotPresent
             env:
+          {{- if eq .Values.backup.provider "aws" }}
             - name: AWS_ACCESS_KEY_ID
               value: {{ .Values.backup.access_key_id }}
-          {{- if .Values.backup.access_secret }}
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.backup.access_secret | default "backup-sealed-secrets-pod-env" }}
                   key: AWS_SECRET_ACCESS_KEY
+          {{- end }}
+          {{- if eq .Values.backup.provider "azure" }}
+            - name: AZURE_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backup.access_secret | default "backup-sealed-secrets-pod-env" }}
+                  key: AZURE_ACCESS_KEY
+            - name: AZURE_STORAGE_ACCOUNT
+              value: {{ .Values.backup.azureStorageAccount }}
           {{- end }}
             volumeMounts:
             - mountPath: /mnt
