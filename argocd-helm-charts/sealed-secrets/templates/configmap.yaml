@@ -3,18 +3,31 @@ apiVersion: v1
 data:
   script: |-
     #!/usr/bin/bash
+    set -eou pipefail
     TEMP=$(mktemp)
     DATE=$(date +%Y%m%d)
+    PROVIDER="{{ .Values.backup.provider }}"
 
     echo "Getting secret from the default serviceaccount"
     kubectl get secret -n {{ .Values.backup.namespace }} -o json | jq -ce '.items[] | select( .metadata.name | match ( "^sealed-secrets-key" ) )' | gzip -c > $TEMP.gz
 
-    if [ ! -z "{{ .Values.backup.s3endpoint }}" ]; then
-    ENDPOINT="--endpoint-url={{ .Values.backup.s3endpoint }}"
+    # Check the provider and upload the file
+    if [ $PROVIDER == "aws" ]; then
+      destination_bucket="s3://{{ .Values.backup.backupBucket }}/$(date +%Y%m%d).gz"
+      ENDPOINT="--endpoint-url={{ .Values.backup.s3endpoint }}"
+      echo "Copying the sealed-secret backup to aws s3"
+      aws $ENDPOINT s3 cp "$TEMP.gz" $destination_bucket
+    
+    elif [ $PROVIDER == "azure" ]; then
+      destination_container="{{ .Values.backup.destinationContainer }}"
+      connection_string="DefaultEndpointsProtocol=https;AccountName={{ .Values.backup.azureStorageAccount }};AccountKey=$AZURE_ACCESS_KEY;EndpointSuffix=core.windows.net"
+      echo "Copying the sealed-secret backup to azure blob"
+      az storage blob upload -f "$TEMP.gz" -c $destination_container -n $(date +%Y%m%d).gz --overwrite --connection-string=$connection_string
+    else
+      echo "Invalid provider passed"
+      exit 1
     fi
 
-    echo "Copying the sealed-secret  backup to aws s3"
-    aws $ENDPOINT s3 cp "$TEMP.gz" s3://{{ .Values.backup.backupBucket }}/$(date +%Y%m%d).gz
 kind: ConfigMap
 metadata:
   name: backup-sealed-secrets
