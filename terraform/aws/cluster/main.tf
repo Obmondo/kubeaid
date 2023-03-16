@@ -249,7 +249,7 @@ resource "kops_instance_group" "instance_group" {
   taints            = each.value.taints
   max_price         = each.value.max_price
   zones             = each.value.zones
-  subnets           = ["k8s-${var.environment}-private-0"]
+  subnets           = [ for subnet in each.value.subnets: "k8s-${var.environment}-private-${subnet}" ]
   depends_on        = [kops_cluster.cluster]
 
   additional_user_data {
@@ -271,13 +271,15 @@ data "template_file" "admin_ssh_keys" {
 resource "kops_cluster_updater" "updater" {
   cluster_name = kops_cluster.cluster.id
 
-  keepers = {
+  keepers = merge( {
     cluster  = kops_cluster.cluster.revision
     master-0 = kops_instance_group.master-0.revision
     master-1 = kops_instance_group.master-1.revision
     master-2 = kops_instance_group.master-2.revision
     node-0   = kops_instance_group.node-0.revision
-  }
+  }, {
+    for ig in kops_instance_group.instance_group : "ig_${ig.name}" => ig.revision
+  } )
 
   rolling_update {
     skip                = false
