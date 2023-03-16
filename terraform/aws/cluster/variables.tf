@@ -11,6 +11,7 @@ variable "instance_groups" {
       taints            = optional(list(string))
       max_price         = optional(string)
       zones             = optional(list(string))
+      subnets           = optional(list(string), [ "0", "1", "2" ])
     })
   )
   description = "Instance Group"
