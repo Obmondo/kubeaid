@@ -1,9 +1,9 @@
 annotations:
   artifacthub.io/changes: |
     - kind: changed
-      description: Grouped component templates together
+      description: Upgrade Argo CD to v2.6.6
 apiVersion: v2
-appVersion: v2.6.2
+appVersion: v2.6.6
 dependencies:
 - condition: redis-ha.enabled
   name: redis-ha
@@ -25,4 +25,4 @@ name: argo-cd
 sources:
 - https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
 - https://github.com/argoproj/argo-cd
-version: 5.22.1
+version: 5.27.1

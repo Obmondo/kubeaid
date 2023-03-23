@@ -40,11 +40,18 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      automountServiceAccountToken: {{ .Values.repoServer.serviceAccount.automountServiceAccountToken }}
+      {{- with .Values.global.hostAliases }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.global.securityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.repoServer.priorityClassName | default .Values.global.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
+      serviceAccountName: {{ include "argo-cd.repoServerServiceAccountName" . }}
       containers:
       - name: {{ .Values.repoServer.name }}
         image: {{ default .Values.global.image.repository .Values.repoServer.image.repository }}:{{ default (include "argo-cd.defaultTag" .) .Values.repoServer.image.tag }}
@@ -291,17 +298,19 @@ spec:
       {{- with .Values.repoServer.initContainers }}
         {{- tpl (toYaml .) $ | nindent 6 }}
       {{- end }}
+      {{- with include "argo-cd.affinity" (dict "context" . "component" .Values.repoServer) }}
       affinity:
-        {{- include "argo-cd.affinity" (dict "context" . "component" .Values.repoServer) | nindent 8 }}
-      {{- with .Values.repoServer.nodeSelector }}
+        {{- trim . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.repoServer.nodeSelector | default .Values.global.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.repoServer.tolerations }}
+      {{- with .Values.repoServer.tolerations | default .Values.global.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.repoServer.topologySpreadConstraints }}
+      {{- with .Values.repoServer.topologySpreadConstraints | default .Values.global.topologySpreadConstraints }}
       topologySpreadConstraints:
         {{- range $constraint := . }}
       - {{ toYaml $constraint | nindent 8 | trim }}
@@ -311,11 +320,6 @@ spec:
             {{- include "argo-cd.selectorLabels" (dict "context" $ "name" $.Values.repoServer.name) | nindent 12 }}
         {{- end }}
         {{- end }}
-      {{- end }}
-      serviceAccountName: {{ template "argo-cd.repoServerServiceAccountName" . }}
-      {{- with .Values.global.hostAliases }}
-      hostAliases:
-        {{- toYaml . | nindent 6 }}
       {{- end }}
       volumes:
       {{- with .Values.repoServer.volumes }}
@@ -351,9 +355,6 @@ spec:
             path: tls.key
           - key: ca.crt
             path: ca.crt
-      {{- with .Values.repoServer.priorityClassName }}
-      priorityClassName: {{ . }}
-      {{- end }}
       hostNetwork: {{ .Values.repoServer.hostNetwork }}
       {{- with .Values.repoServer.dnsConfig }}
       dnsConfig:
