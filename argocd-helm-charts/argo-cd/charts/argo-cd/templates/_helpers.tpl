@@ -159,17 +159,6 @@ Create the name of the notifications service account to use
 {{- end -}}
 
 {{/*
-Create the name of the notifications bots slack service account to use
-*/}}
-{{- define "argo-cd.notificationsBotsSlackServiceAccountName" -}}
-{{- if .Values.notifications.bots.slack.serviceAccount.create -}}
-    {{ default (include "argo-cd.notifications.fullname" .) .Values.notifications.bots.slack.serviceAccount.name }}
-{{- else -}}
-    {{ default "default" .Values.notifications.bots.slack.serviceAccount.name }}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Argo Configuration Preset Values (Incluenced by Values configuration)
 */}}
 {{- define "argo-cd.config.cm.presets" -}}
@@ -185,7 +174,10 @@ Merge Argo Configuration with Preset Configuration
 {{- $config := (mergeOverwrite (deepCopy (omit .Values.configs.cm "create" "annotations")) (.Values.server.config | default dict))  -}}
 {{- $preset := include "argo-cd.config.cm.presets" . | fromYaml | default dict -}}
 {{- range $key, $value := mergeOverwrite $preset $config }}
-{{ $key }}: {{ toString $value | toYaml }}
+{{- $fmted := $value | toString }}
+{{- if not (eq $fmted "") }}
+{{ $key }}: {{ $fmted | toYaml }}
+{{- end }}
 {{- end }}
 {{- end -}}
 
