@@ -99,13 +99,22 @@ global:
     # -- Default deny all ingress traffic
     defaultDenyIngress: false
 
+  # -- Default priority class for all components
+  priorityClassName: ""
+
+  # -- Default node selector for all components
+  nodeSelector: {}
+
+  # -- Default tolerations for all components
+  tolerations: {}
+
   # Default affinity preset for all components
   affinity:
-    # -- Default pod anti-affinity rules. Either: `soft` or `hard`
+    # -- Default pod anti-affinity rules. Either: `none`, `soft` or `hard`
     podAntiAffinity: soft
     # Node affinity rules
     nodeAffinity:
-      # -- Default node affinity rules. Either: `soft` or `hard`
+      # -- Default node affinity rules. Either: `none`, `soft` or `hard`
       type: hard
       # -- Default match expressions for node affinity
       matchExpressions: []
@@ -114,6 +123,15 @@ global:
         #   values:
         #    - antarctica-east1
         #    - antarctica-west1
+
+  # -- Default [TopologySpreadConstraints] rules for all components
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  ## If labelSelector is left out, it will default to the labelSelector of the component
+  topologySpreadConstraints: []
+    # - maxSkew: 1
+    #   topologyKey: topology.kubernetes.io/zone
+    #   whenUnsatisfiable: DoNotSchedule
+
 
 ## Argo Configs
 configs:
@@ -289,7 +307,7 @@ configs:
       bitbucket.org ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAubiN81eDcafrgMeLzaFPsw2kNvEcqTKl/VqLat/MaB33pZy0y3rJZtnqwR2qOOvbwKZYKiEO1O6VqNEBxKvJJelCq0dTXWT5pbO2gDXC6h6QDXCaHo6pOHGPUy+YBaGQRGuSusMEASYiWunYN0vCAI8QaXnWMXNMdFP3jHAJH0eDsoiGnLPBlBp4TNm6rYI74nMzgz3B9IikW4WVK+dc8KZJZWYjAuORU3jc1c/NPskD2ASinf8v3xnfXeukU0sJ5N6m5E8VLjObPEO+mN2t/FZTMZLiFqPWc/ALSqnMnnhwrNi2rbfg/rd/IpL8Le3pSBne8+seeFVBoGqzHM9yXw==
       github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=
       github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
-      github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+      github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
       gitlab.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFSMqzJeV9rUzU4kWitGjeR4PWSa29SPqJ1fVkhtj3Hw9xjLVXVYrU9QlYWrOLXBpQ6KWjbjTDTdDkoohFzgbEY=
       gitlab.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAfuCHKVTjquxvt6CM6tdG4SLp1Btn/nOeHHE5UOzRdf
       gitlab.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsj2bNKTBSpIYDEGk9KxsGh3mySTRgMtXL583qmBpzeQ+jqCMRgBqB98u3z++J1sKlXHWfM9dyhSevkMwSbhoR8XIq/U0tCNyokEi/ueaBMCvbcTHhO7FcwzY92WK4Yt0aGROY5qX2UKSeOvuP4D6TPqKF1onrSzH9bx9XUf2lEdWT/ia1NEKjunUqu1xOB/StKDHMoX4/OKyIzuS0q/T1zOATthvasJFoPrAjkohTyaDUz2LN5JoH839hViyEG82yB+MjcFV5MU3N1l1QL3cVUCh93xSaua1N85qivl+siMkPGbO5xR/En4iEY6K2XPASUEMaieWVNTRCtJ4S8H+9
@@ -313,11 +331,55 @@ configs:
       #   ...
       #   -----END CERTIFICATE-----
 
+  # ConfigMap for Config Management Plugins
+  # Ref: https://argo-cd.readthedocs.io/en/stable/operator-manual/config-management-plugins/
+  cmp:
+    # -- Create the argocd-cmp-cm configmap
+    create: false
+
+    # -- Annotations to be added to argocd-cmp-cm configmap
+    annotations: {}
+
+    # -- Plugin yaml files to be added to argocd-cmp-cm
+    plugins: {}
+      # --- First plugin
+      # my-plugin:
+      #   init:
+      #     command: [sh]
+      #     args: [-c, 'echo "Initializing..."']
+      #   generate:
+      #     command: [sh, -c]
+      #     args:
+      #       - |
+      #         echo "{\"kind\": \"ConfigMap\", \"apiVersion\": \"v1\", \"metadata\": { \"name\": \"$ARGOCD_APP_NAME\", \"namespace\": \"$ARGOCD_APP_NAMESPACE\", \"annotations\": {\"Foo\": \"$ARGOCD_ENV_FOO\", \"KubeVersion\": \"$KUBE_VERSION\", \"KubeApiVersion\": \"$KUBE_API_VERSIONS\",\"Bar\": \"baz\"}}}"
+      #   discover:
+      #     fileName: "./subdir/s*.yaml"
+      #     find:
+      #       glob: "**/Chart.yaml"
+      #       command: [sh, -c, find . -name env.yaml]
+
+      # --- Second plugin
+      # my-plugin2:
+      #   init:
+      #     command: [sh]
+      #     args: [-c, 'echo "Initializing..."']
+      #   generate:
+      #     command: [sh, -c]
+      #     args:
+      #       - |
+      #         echo "{\"kind\": \"ConfigMap\", \"apiVersion\": \"v1\", \"metadata\": { \"name\": \"$ARGOCD_APP_NAME\", \"namespace\": \"$ARGOCD_APP_NAMESPACE\", \"annotations\": {\"Foo\": \"$ARGOCD_ENV_FOO\", \"KubeVersion\": \"$KUBE_VERSION\", \"KubeApiVersion\": \"$KUBE_API_VERSIONS\",\"Bar\": \"baz\"}}}"
+      #   discover:
+      #     fileName: "./subdir/s*.yaml"
+      #     find:
+      #       glob: "**/Chart.yaml"
+      #       command: [sh, -c, find . -name env.yaml]
+
   # -- Provide one or multiple [external cluster credentials]
   # @default -- `[]` (See [values.yaml])
   ## Ref:
   ## - https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#clusters
   ## - https://argo-cd.readthedocs.io/en/stable/operator-manual/security/#external-cluster-credentials
+  ## - https://argo-cd.readthedocs.io/en/stable/user-guide/projects/#project-scoped-repositories-and-clusters
   clusterCredentials: []
     # - name: mycluster
     #   server: https://mycluster.com
@@ -334,6 +396,16 @@ configs:
     #   annotations: {}
     #   namespaces: namespace1,namespace2
     #   clusterResources: true
+    #   config:
+    #     bearerToken: "<authentication token>"
+    #     tlsClientConfig:
+    #       insecure: false
+    #       caData: "<base64 encoded certificate>"
+    # - name: mycluster3-project-scoped
+    #   server: https://mycluster3.com
+    #   labels: {}
+    #   annotations: {}
+    #   project: my-project1
     #   config:
     #     bearerToken: "<authentication token>"
     #     tlsClientConfig:
@@ -499,7 +571,7 @@ controller:
     # -- Number of pods that are available after eviction as number or percentage (eg.: 50%)
     # @default -- `""` (defaults to 0 if not specified)
     minAvailable: ""
-    # -- Number of pods that are unavailble after eviction as number or percentage (eg.: 50%).
+    # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%).
     ## Has higher precedence over `controller.pdb.minAvailable`
     maxUnavailable: ""
 
@@ -623,7 +695,7 @@ controller:
       drop:
       - ALL
 
-  # Rediness probe for application controller
+  # Readiness probe for application controller
   ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
   readinessProbe:
     # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
@@ -637,10 +709,16 @@ controller:
     # -- Number of seconds after which the [probe] times out
     timeoutSeconds: 1
 
+  # -- Priority class for the application controller pods
+  # @default -- `""` (defaults to global.priorityClassName)
+  priorityClassName: ""
+
   # -- [Node selector]
+  # @default -- `{}` (defaults to global.nodeSelector)
   nodeSelector: {}
 
   # -- [Tolerations] for use with node taints
+  # @default -- `[]` (defaults to global.tolerations)
   tolerations: []
 
   # -- Assign custom [affinity] rules to the deployment
@@ -648,15 +726,13 @@ controller:
   affinity: {}
 
   # -- Assign custom [TopologySpreadConstraints] rules to the application controller
+  # @default -- `[]` (defaults to global.topologySpreadConstraints)
   ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
   ## If labelSelector is left out, it will default to the labelSelector configuration of the deployment
   topologySpreadConstraints: []
-  # - maxSkew: 1
-  #   topologyKey: topology.kubernetes.io/zone
-  #   whenUnsatisfiable: DoNotSchedule
-
-  # -- Priority class for the application controller pods
-  priorityClassName: ""
+    # - maxSkew: 1
+    #   topologyKey: topology.kubernetes.io/zone
+    #   whenUnsatisfiable: DoNotSchedule
 
   serviceAccount:
     # -- Create a service account for the application controller
@@ -714,6 +790,17 @@ controller:
     rules:
       # -- Deploy a PrometheusRule for the application controller
       enabled: false
+      # -- PrometheusRule namespace
+      namespace: "" # "monitoring"
+      # -- PrometheusRule selector
+      selector: {}
+        # prometheus: kube-prometheus
+
+      # -- PrometheusRule labels
+      additionalLabels: {}
+      # -- PrometheusRule annotations
+      annotations: {}
+
       # -- PrometheusRule.Spec for the application controller
       spec: []
       # - alert: ArgoAppMissing
@@ -740,11 +827,6 @@ controller:
       #       The application [{{`{{$labels.name}}`}} has not been synchronized for over
       #       12 hours which means that the state of this cloud has drifted away from the
       #       state inside Git.
-    #   selector:
-    #     prometheus: kube-prometheus
-    #   namespace: monitoring
-    #   additionalLabels: {}
-    #   annotations: {}
 
   ## Enable this and set the rules: to whatever custom rules you want for the Cluster Role resource.
   ## Defaults to off
@@ -978,24 +1060,30 @@ dex:
   # -- Service port for metrics access
   servicePortMetrics: 5558
 
+  # -- Priority class for the dex pods
+  # @default -- `""` (defaults to global.priorityClassName)
+  priorityClassName: ""
+
   # -- [Node selector]
+  # @default -- `{}` (defaults to global.nodeSelector)
   nodeSelector: {}
+
   # -- [Tolerations] for use with node taints
+  # @default -- `[]` (defaults to global.tolerations)
   tolerations: []
+
   # -- Assign custom [affinity] rules to the deployment
   # @default -- `{}` (defaults to global.affinity preset)
   affinity: {}
 
   # -- Assign custom [TopologySpreadConstraints] rules to dex
+  # @default -- `[]` (defaults to global.topologySpreadConstraints)
   ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
   ## If labelSelector is left out, it will default to the labelSelector configuration of the deployment
   topologySpreadConstraints: []
-  # - maxSkew: 1
-  #   topologyKey: topology.kubernetes.io/zone
-  #   whenUnsatisfiable: DoNotSchedule
-
-  # -- Priority class for dex
-  priorityClassName: ""
+    # - maxSkew: 1
+    #   topologyKey: topology.kubernetes.io/zone
+    #   whenUnsatisfiable: DoNotSchedule
 
 ## Redis
 redis:
@@ -1034,6 +1122,8 @@ redis:
   exporter:
     # -- Enable Prometheus redis-exporter sidecar
     enabled: false
+    # -- Environment variables to pass to the Redis exporter
+    env: []
     ## Prometheus redis-exporter image
     image:
       # -- Repository to use for the redis-exporter
@@ -1148,10 +1238,16 @@ redis:
   # -- Redis service port
   servicePort: 6379
 
+  # -- Priority class for redis pods
+  # @default -- `""` (defaults to global.priorityClassName)
+  priorityClassName: ""
+
   # -- [Node selector]
+  # @default -- `{}` (defaults to global.nodeSelector)
   nodeSelector: {}
 
   # -- [Tolerations] for use with node taints
+  # @default -- `[]` (defaults to global.tolerations)
   tolerations: []
 
   # -- Assign custom [affinity] rules to the deployment
@@ -1159,15 +1255,13 @@ redis:
   affinity: {}
 
   # -- Assign custom [TopologySpreadConstraints] rules to redis
+  # @default -- `[]` (defaults to global.topologySpreadConstraints)
   ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
   ## If labelSelector is left out, it will default to the labelSelector configuration of the deployment
   topologySpreadConstraints: []
-  # - maxSkew: 1
-  #   topologyKey: topology.kubernetes.io/zone
-  #   whenUnsatisfiable: DoNotSchedule
-
-  # -- Priority class for redis
-  priorityClassName: ""
+    # - maxSkew: 1
+    #   topologyKey: topology.kubernetes.io/zone
+    #   whenUnsatisfiable: DoNotSchedule
 
   serviceAccount:
     # -- Create a service account for the redis pod
@@ -1243,7 +1337,7 @@ redis-ha:
     # -- Tag to use for the redis-exporter
     tag: 1.45.0
   persistentVolume:
-    # -- Configures persistency on Redis nodes
+    # -- Configures persistence on Redis nodes
     enabled: false
   redis:
     # -- Redis convention for naming the cluster group: must match `^[\\w-\\.]+$` and can be templated
@@ -1342,7 +1436,7 @@ server:
     # -- Number of pods that are available after eviction as number or percentage (eg.: 50%)
     # @default -- `""` (defaults to 0 if not specified)
     minAvailable: ""
-    # -- Number of pods that are unavailble after eviction as number or percentage (eg.: 50%).
+    # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%).
     ## Has higher precedence over `server.pdb.minAvailable`
     maxUnavailable: ""
 
@@ -1380,7 +1474,7 @@ server:
   lifecycle: {}
 
   ## Argo UI extensions
-  ## This function in tech preview stage, do expect unstability or breaking changes in newer versions.
+  ## This function in tech preview stage, do expect instability or breaking changes in newer versions.
   ## Ref: https://github.com/argoproj-labs/argocd-extensions
   extensions:
     # -- Enable support for Argo UI extensions
@@ -1490,7 +1584,7 @@ server:
     # -- Server container port
     server: 8080
     # -- Metrics container port
-    metrics: 8082
+    metrics: 8083
 
   # -- Host Network for Server pods
   hostNetwork: false
@@ -1538,24 +1632,30 @@ server:
     # -- Number of seconds after which the [probe] times out
     timeoutSeconds: 1
 
+  # -- Priority class for the Argo CD server pods
+  # @default -- `""` (defaults to global.priorityClassName)
+  priorityClassName: ""
+
   # -- [Node selector]
+  # @default -- `{}` (defaults to global.nodeSelector)
   nodeSelector: {}
+
   # -- [Tolerations] for use with node taints
+  # @default -- `[]` (defaults to global.tolerations)
   tolerations: []
+
   # -- Assign custom [affinity] rules to the deployment
   # @default -- `{}` (defaults to global.affinity preset)
   affinity: {}
 
   # -- Assign custom [TopologySpreadConstraints] rules to the Argo CD server
+  # @default -- `[]` (defaults to global.topologySpreadConstraints)
   ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
   ## If labelSelector is left out, it will default to the labelSelector configuration of the deployment
   topologySpreadConstraints: []
-  # - maxSkew: 1
-  #   topologyKey: topology.kubernetes.io/zone
-  #   whenUnsatisfiable: DoNotSchedule
-
-  # -- Priority class for the Argo CD server
-  priorityClassName: ""
+    # - maxSkew: 1
+    #   topologyKey: topology.kubernetes.io/zone
+    #   whenUnsatisfiable: DoNotSchedule
 
   # TLS certificate configuration via cert-manager
   ## Ref: https://argo-cd.readthedocs.io/en/stable/operator-manual/tls/#tls-certificates-used-by-argocd-server
@@ -1583,7 +1683,7 @@ server:
       group: ""
       # -- Certificate issuer kind. Either `Issuer` or `ClusterIssuer`
       kind: ""
-      # -- Certificate isser name. Eg. `letsencrypt`
+      # -- Certificate issuer name. Eg. `letsencrypt`
       name: ""
     # Private key of the certificate
     privateKey:
@@ -1885,7 +1985,7 @@ repoServer:
     # -- Number of pods that are available after eviction as number or percentage (eg.: 50%)
     # @default -- `""` (defaults to 0 if not specified)
     minAvailable: ""
-    # -- Number of pods that are unavailble after eviction as number or percentage (eg.: 50%).
+    # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%).
     ## Has higher precedence over `repoServer.pdb.minAvailable`
     maxUnavailable: ""
 
@@ -1923,27 +2023,46 @@ repoServer:
   ## Ref: https://argo-cd.readthedocs.io/en/stable/user-guide/config-management-plugins/
   ## Note: Supports use of custom Helm templates
   extraContainers: []
-  # - name: cmp
-  #   # Entrypoint should be Argo CD lightweight CMP server i.e. argocd-cmp-server
-  #   command: [/var/run/argocd/argocd-cmp-server]
-  #   # This can be off-the-shelf or custom-built image
-  #   image: busybox
-  #   securityContext:
-  #     runAsNonRoot: true
-  #     runAsUser: 999
-  #   volumeMounts:
-  #     - mountPath: /var/run/argocd
-  #       name: var-files
-  #     - mountPath: /home/argocd/cmp-server/plugins
-  #       name: plugins
-  #     # Remove this volumeMount if you've chosen to bake the config file into the sidecar image.
-  #     - mountPath: /home/argocd/cmp-server/config/plugin.yaml
-  #       subPath: plugin.yaml
-  #       name: cmp-plugin
-  #     # Starting with v2.4, do NOT mount the same tmp volume as the repo-server container. The filesystem separation helps
-  #     # mitigate path traversal attacks.
-  #     - mountPath: /tmp
-  #       name: cmp-tmp
+    # - name: cmp-my-plugin
+    #   command:
+    #     - "/var/run/argocd/argocd-cmp-server"
+    #   image: busybox
+    #   securityContext:
+    #     runAsNonRoot: true
+    #     runAsUser: 999
+    #   volumeMounts:
+    #     - mountPath: /var/run/argocd
+    #       name: var-files
+    #     - mountPath: /home/argocd/cmp-server/plugins
+    #       name: plugins
+    #     # Remove this volumeMount if you've chosen to bake the config file into the sidecar image.
+    #     - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+    #       subPath: my-plugin.yaml
+    #       name: argocd-cmp-cm
+    #     # Starting with v2.4, do NOT mount the same tmp volume as the repo-server container. The filesystem separation helps
+    #     # mitigate path traversal attacks.
+    #     - mountPath: /tmp
+    #       name: cmp-tmp
+    # - name: cmp-my-plugin2
+    #   command:
+    #     - "/var/run/argocd/argocd-cmp-server"
+    #   image: busybox
+    #   securityContext:
+    #     runAsNonRoot: true
+    #     runAsUser: 999
+    #   volumeMounts:
+    #     - mountPath: /var/run/argocd
+    #       name: var-files
+    #     # Remove this volumeMount if you've chosen to bake the config file into the sidecar image.
+    #     - mountPath: /home/argocd/cmp-server/plugins
+    #       name: plugins
+    #     - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+    #       subPath: my-plugin2.yaml
+    #       name: argocd-cmp-cm
+    #     # Starting with v2.4, do NOT mount the same tmp volume as the repo-server container. The filesystem separation helps
+    #     # mitigate path traversal attacks.
+    #     - mountPath: /tmp
+    #       name: cmp-tmp
 
   # -- Init containers to add to the repo server pods
   initContainers: []
@@ -1953,9 +2072,9 @@ repoServer:
 
   # -- Additional volumes to the repo server pod
   volumes: []
-  #  - name: cmp-plugin
+  #  - name: argocd-cmp-cm
   #    configMap:
-  #      name: cmp-plugin
+  #      name: argocd-cmp-cm
   #  - name: cmp-tmp
   #    emptyDir: {}
 
@@ -2031,22 +2150,28 @@ repoServer:
     timeoutSeconds: 1
 
   # -- [Node selector]
+  # @default -- `{}` (defaults to global.nodeSelector)
   nodeSelector: {}
+
   # -- [Tolerations] for use with node taints
+  # @default -- `[]` (defaults to global.tolerations)
   tolerations: []
+
   # -- Assign custom [affinity] rules to the deployment
   # @default -- `{}` (defaults to global.affinity preset)
   affinity: {}
 
   # -- Assign custom [TopologySpreadConstraints] rules to the repo server
+  # @default -- `[]` (defaults to global.topologySpreadConstraints)
   ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
   ## If labelSelector is left out, it will default to the labelSelector configuration of the deployment
   topologySpreadConstraints: []
-  # - maxSkew: 1
-  #   topologyKey: topology.kubernetes.io/zone
-  #   whenUnsatisfiable: DoNotSchedule
+    # - maxSkew: 1
+    #   topologyKey: topology.kubernetes.io/zone
+    #   whenUnsatisfiable: DoNotSchedule
 
-  # -- Priority class for the repo server
+  # -- Priority class for the repo server pods
+  # @default -- `""` (defaults to global.priorityClassName)
   priorityClassName: ""
 
   # TLS certificate configuration via Secret
@@ -2171,7 +2296,7 @@ applicationSet:
     # -- Number of pods that are available after eviction as number or percentage (eg.: 50%)
     # @default -- `""` (defaults to 0 if not specified)
     minAvailable: ""
-    # -- Number of pods that are unavailble after eviction as number or percentage (eg.: 50%).
+    # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%).
     ## Has higher precedence over `applicationSet.pdb.minAvailable`
     maxUnavailable: ""
 
@@ -2365,16 +2490,28 @@ applicationSet:
     failureThreshold: 3
 
   # -- [Node selector]
+  # @default -- `{}` (defaults to global.nodeSelector)
   nodeSelector: {}
 
   # -- [Tolerations] for use with node taints
+  # @default -- `[]` (defaults to global.tolerations)
   tolerations: []
 
   # -- Assign custom [affinity] rules
   # @default -- `{}` (defaults to global.affinity preset)
   affinity: {}
 
-  # -- If specified, indicates the pod's priority. If not specified, the pod priority will be default or zero if there is no default.
+  # -- Assign custom [TopologySpreadConstraints] rules to the ApplicationSet controller
+  # @default -- `[]` (defaults to global.topologySpreadConstraints)
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  ## If labelSelector is left out, it will default to the labelSelector configuration of the deployment
+  topologySpreadConstraints: []
+    # - maxSkew: 1
+    #   topologyKey: topology.kubernetes.io/zone
+    #   whenUnsatisfiable: DoNotSchedule
+
+  # -- Priority class for the ApplicationSet controller pods
+  # @default -- `""` (defaults to global.priorityClassName)
   priorityClassName: ""
 
   ## Webhook for the Git Generator
@@ -2445,7 +2582,7 @@ notifications:
     # -- Number of pods that are available after eviction as number or percentage (eg.: 50%)
     # @default -- `""` (defaults to 0 if not specified)
     minAvailable: ""
-    # -- Number of pods that are unavailble after eviction as number or percentage (eg.: 50%).
+    # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%).
     ## Has higher precedence over `notifications.pdb.minAvailable`
     maxUnavailable: ""
 
@@ -2611,16 +2748,28 @@ notifications:
       - ALL
 
   # -- [Node selector]
+  # @default -- `{}` (defaults to global.nodeSelector)
   nodeSelector: {}
 
   # -- [Tolerations] for use with node taints
+  # @default -- `[]` (defaults to global.tolerations)
   tolerations: []
 
   # -- Assign custom [affinity] rules
   # @default -- `{}` (defaults to global.affinity preset)
   affinity: {}
 
+  # -- Assign custom [TopologySpreadConstraints] rules to the application controller
+  # @default -- `[]` (defaults to global.topologySpreadConstraints)
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  ## If labelSelector is left out, it will default to the labelSelector configuration of the deployment
+  topologySpreadConstraints: []
+    # - maxSkew: 1
+    #   topologyKey: topology.kubernetes.io/zone
+    #   whenUnsatisfiable: DoNotSchedule
+
   # -- Priority class for the notifications controller pods
+  # @default -- `""` (defaults to global.priorityClassName)
   priorityClassName: ""
 
   serviceAccount:
@@ -2910,108 +3059,3 @@ notifications:
     # For more information: https://argocd-notifications.readthedocs.io/en/stable/triggers/#default-triggers
     # defaultTriggers: |
     #   - on-sync-status-unknown
-
-  ## The optional bot component simplifies managing subscriptions
-  ## For more information: https://argocd-notifications.readthedocs.io/en/stable/bots/overview/
-  bots:
-    slack:
-      # -- Enable slack bot
-      ## You have to set secret.notifiers.slack.signingSecret
-      enabled: false
-
-      ## Slack bot Pod Disruption Budget
-      ## Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
-      pdb:
-        # -- Deploy a [PodDisruptionBudget] for the Slack bot
-        enabled: false
-        # -- Labels to be added to Slack bot pdb
-        labels: {}
-        # -- Annotations to be added to Slack bot pdb
-        annotations: {}
-        # -- Number of pods that are available after eviction as number or percentage (eg.: 50%)
-        # @default -- `""` (defaults to 0 if not specified)
-        minAvailable: ""
-        # -- Number of pods that are unavailble after eviction as number or percentage (eg.: 50%).
-        ## Has higher precedence over `notifications.bots.slack.pdb.minAvailable`
-        maxUnavailable: ""
-
-      ## Slack bot image
-      image:
-        # -- Repository to use for the Slack bot
-        # @default -- `""` (defaults to global.image.repository)
-        repository: ""
-        # -- Tag to use for the Slack bot
-        # @default -- `""` (defaults to global.image.tag)
-        tag: ""
-        # -- Image pull policy for the Slack bot
-        # @default -- `""` (defaults to global.image.imagePullPolicy)
-        imagePullPolicy: ""
-
-      # -- Secrets with credentials to pull images from a private registry
-      # @default -- `[]` (defaults to global.imagePullSecrets)
-      imagePullSecrets: []
-
-      # -- Slack bot log format. Either `text` or `json`
-      # @default -- `""` (defaults to global.logging.format)
-      logFormat: ""
-      # -- Slack bot log level. One of: `debug`, `info`, `warn`, `error`
-      # @default -- `""` (defaults to global.logging.level)
-      logLevel: ""
-
-      # -- List of extra cli args to add for Slack bot
-      extraArgs: []
-
-      service:
-        # -- Service annotations for Slack bot
-        annotations: {}
-        # -- Service port for Slack bot
-        port: 80
-        # -- Service type for Slack bot
-        type: LoadBalancer
-
-      serviceAccount:
-        # -- Specifies whether a service account should be created
-        create: true
-
-        # -- The name of the service account to use.
-        ## If not set and create is true, a name is generated using the fullname template
-        name: argocd-notifications-bot
-
-        # -- Annotations applied to created service account
-        annotations: {}
-
-      # -- [DNS configuration]
-      dnsConfig: {}
-      # -- Alternative DNS policy for Slack bot pods
-      dnsPolicy: "ClusterFirst"
-
-      # -- Slack bot container-level security Context
-      # @default -- See [values.yaml]
-      containerSecurityContext:
-        runAsNonRoot: true
-        readOnlyRootFilesystem: true
-        allowPrivilegeEscalation: false
-        seccompProfile:
-          type: RuntimeDefault
-        capabilities:
-          drop:
-          - ALL
-
-      # -- Resource limits and requests for the Slack bot
-      resources: {}
-      # limits:
-      #   cpu: 100m
-      #   memory: 128Mi
-      # requests:
-      #   cpu: 100m
-      #   memory: 128Mi
-
-      # -- Assign custom [affinity] rules
-      # @default -- `{}` (defaults to global.affinity preset)
-      affinity: {}
-
-      # -- [Tolerations] for use with node taints
-      tolerations: []
-
-      # -- [Node selector]
-      nodeSelector: {}
