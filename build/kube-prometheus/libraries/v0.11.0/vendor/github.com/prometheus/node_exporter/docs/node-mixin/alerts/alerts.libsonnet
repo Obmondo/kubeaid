@@ -167,7 +167,7 @@
               severity: 'warning',
             },
             annotations: {
-              summary: 'Average nodes memory utilization is greater than 80%'.,
+              summary: 'Average nodes memory utilization is greater than 80%.',
               description: 'Average nodes memory utilization is {{ printf "%.2f" $value }}% and is filling up.',
             },
           },
@@ -182,7 +182,7 @@
               severity: '%(nodeCriticalSeverity)s' % $._config,
             },
             annotations: {
-              summary: 'Average nodes memory utilization is greater than 90%'.,
+              summary: 'Average nodes memory utilization is greater than 90%.',
               description: 'Average nodes memory utilization is {{ printf "%.2f" $value }}% and is filling up.',
             },
           },
