@@ -130,3 +130,49 @@ For more info refer to - <https://devopstales.github.io/sso/mattermost-keycloak-
 
 10. If all goes well now we have to restart the mattermost-team-edition pod from the argo CD ui to sync the
     mattermost-team-edition with the changes.
+
+### Moving mattermost to a new cluster
+
+1. Backup existing mattermost Database by running the following command on the old cluster's postgres pod.
+
+    ```shell
+    pg_dump -c -U mattermost | gzip > mattermost_dbdump_$(date --rfc-3339=date).sql.gz
+    
+   # Copy the data to local machine
+    kubectl cp mattermost/mattermost-pgsql-0:/mattermost_dbdump_....gz .
+    ```
+
+2. Backup the data directory .
+
+    ```shell
+    sudo tar -zcvf mattermost_data_$(date --rfc-3339=date).gz data
+
+    # Copy the data to local machine
+    kubectl cp mattermost/mattermost-team-edition-...:/mattermost_data_2022-08-02.gz .
+    ```
+
+3. Delete the postgres and mattermost deployment from the new cluster via argocd and sync only the
+    postgres deployment so we don't have any old tables.
+
+4. Copy the databse backup file to the new cluster's postgres pod and append the sql files to database.
+
+    ```shell
+    kubectl cp mattermost_dbdump_2022-08-02.sql.gz mattermost/mattermost-pgsql-0:/tmp
+    kubectl exec -it mattermost-pgsql-0 sh -n mattermost
+    cd /tmp
+    gzip -d mattermost_dbdump_2022-08-02.sql.gz
+
+    # Get the password for the postgresql DB
+    kubectl get secret postgres.mattermost-pgsql.credentials.postgresql.acid.zalan.do -n mattermost -o jsonpath='{.data.password}' | base64 --decode
+
+    # Run the command to copy files to the DB.
+    psql -h 127.0.0.1 -p 5432 -d mattermost -U postgres < mattermost_dbdump_2022-08-02.sql
+    ```
+
+5. Sync the mattermost deployment from the argocd UI, that will create mattermost pod and copy the data to
+    the mattermost pod and sync it.
+
+    ```shell
+    kubectl cp mattermost_data_....gz mattermost/mattermost-team-edition-...:/tmp
+    tar -xvf mattermost_data_....tar -C /mattermost/
+    ```
