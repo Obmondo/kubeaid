@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "snapshot-validation-webhook.fullname" . }}-test-valid-body"
+  labels:
+  {{- include "snapshot-validation-webhook.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: curl
+      image: curlimages/curl
+      args:
+        - sh
+        - -exc
+        - |
+          curl -kfsS -X POST -H 'Content-Type: application/json' -d '{{ .Files.Get "tests/valid-admission.json" | trim }}' https://{{ include "snapshot-validation-webhook.fullname" . }}/volumesnapshot | grep -c '"allowed":true'
+  restartPolicy: Never
