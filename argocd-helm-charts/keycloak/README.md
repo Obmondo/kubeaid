@@ -331,7 +331,7 @@ Restoring itself to the point previously setup and configured to.
 ## Keycloak update
 
 * Here we are updating the keycloak to keycloakx.
-* Install the keycloakx application from argocd.
+* Before Installing the keycloakx application first Only sync the postgress i.e keycloakx-psql-0 pod in argocd.
 * Take a dump from keycloak postgres database i.e from keycloak-pgsql-0 pod.
 
 ```sh
@@ -346,6 +346,13 @@ ls -l keycloak.psql
 -rw-r--r-- 1 root root 235633 Mar  6 12:28 keycloak.psql
 ```
 
+* Sometimes the postgres login will not work. You can login with a keycloak user and take the dump
+* For keycloak user password you can extract that from the secret.
+
+```sh
+# kubectl get secret --namespace keycloak keycloak-postgresql -o jsonpath="{.data.postgresql-password}" | base64 --decode
+```
+
 * Download the dump file to keycloakx new application under the keycloakx-pgsql-0 pod.
 
 ```sh
@@ -356,18 +363,7 @@ kubectl -n keycloak cp keycloak-pgsql-0:keycloak.psql keycloak.psql
 kubectl -n keycloakx cp keycloak.psql keycloakx-pgsql-0:keycloak.psql
 ```
 
-* After the database is copied, stop the keycloakx application and delete the keycloak database.
-* To stop the keycloak application you can delete the statefulsets for that application so the keycloakx pod will be deleted.
-
-```sh
-# Deleting stastefulsets from kubectl
-kubectl delete statefulsets keycloakx -n keycloakx
-
-# you can also delete statefulsets from argocd application.
-```
-
-* Once the pod is deleted no data will be passed to the keycloakx-pgsql-0 pod.
-* which will not add any new data while we import the dump database.
+* After the database is copied, take the shell access to keycloakx-psql-0 pod and delete the keycloak database.
 * Create a new database keycloak and import the copied database.
 
 ```sh
@@ -392,7 +388,7 @@ DROPPED DATABASE
 postgres=# Create database keycloak;
 CREATE DATABASE
 
-#Update the ownership of keycloak database to keycloak user.
+# Update the ownership of keycloak database to keycloak user.
 postgres=# ALTER DATABASE keycloak OWNER TO keycloak;
 
 postgres=# exit
@@ -401,9 +397,13 @@ postgres=# exit
 psql -U postgres keycloak < keyclaok.psql
 ```
 
-* After importing the database sync the statefulsets from argocd panel.The keycloakx pod will be created.
-* Once the pod is created, check the admin login and check all data, users and clients are added successfully.
+* After importing the database sync the keycloakx application from argocd panel.The keycloakx pod will be created.
+* To get the login access you need to sync the secret app so that your secret get added.
+* Once the secret is added, check the admin login and check all data, users and clients are added successfully.
 * Test your keycloakx application by trying logging with other user's.
+* Once the data is tested update the host to the customer values file and sync the application.
+* Before syncing the application, delete the ingress for the keycloak application so that it doesn't clash.
+* for logical backups you need to sync the k8s-configs so that your Iam role get added to keycloakx.
 
 ## Good "Reads"
 
