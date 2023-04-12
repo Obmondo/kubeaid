@@ -88,7 +88,8 @@ The default values.yaml should be suitable for most basic deployments.
 
 ```
 # Image pull secrets to provision for pulling images from private registries.
-# If provided, references to the secrets must also be provided in the installation section.
+# This field is a map of desired Secret name to .dockerconfigjson formatted data to use for the secret.
+# Populates the `imagePullSecrets` property for all Pods controlled by the `Installation` resource.
 imagePullSecrets: {}
 
 # Configures general installation parameters for Calico. Schema is based
@@ -120,6 +121,24 @@ certs:
 # Resources for the tigera/operator pod itself.
 # By default, no resource requests or limits are specified.
 resources: {}
+
+# Tolerations for the tigera/operator pod itself.
+# By default, will schedule on all possible place.
+tolerations:
+- effect: NoExecute
+  operator: Exists
+- effect: NoSchedule
+  operator: Exists
+
+# NodeSelector for the tigera/operator pod itself.
+nodeSelector:
+  kubernetes.io/os: linux
+
+# Custom annotations for the tigera/operator pod itself
+podAnnotations: {}
+
+# Custom labels for the tigera/operator pod itself
+podLabels: {}
 
 # Configuration for the tigera operator images to deploy.
 tigeraOperator:
