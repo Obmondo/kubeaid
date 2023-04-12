@@ -176,3 +176,17 @@ For more info refer to - <https://devopstales.github.io/sso/mattermost-keycloak-
     kubectl cp mattermost_data_....gz mattermost/mattermost-team-edition-...:/tmp
     tar -xvf mattermost_data_....tar -C /mattermost/
     ```
+
+### Issues that might occur during upgrade
+
+1. DB lock issue
+
+    ```text
+    If you get the following error after syncing the changes for new version of mattermost.
+
+    psql: cannot acquire lock on db
+    ```
+
+    ```text
+    Solution - Delete the old mattermost-team-edition deployment resource from the argocd UI .
+    ```
