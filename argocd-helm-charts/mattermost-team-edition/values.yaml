@@ -44,3 +44,4 @@ mattermost-team-edition:
 
 postgresql:
   size: 8Gi
+  logicalBackup: true
