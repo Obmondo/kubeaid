@@ -14,9 +14,11 @@ data:
     # Check the provider and upload the file
     if [ $PROVIDER == "aws" ]; then
       destination_bucket="s3://{{ .Values.backup.backupBucket }}/$(date +%Y%m%d).gz"
+      {{- if .Values.backup.s3endpoint }}
       ENDPOINT="--endpoint-url={{ .Values.backup.s3endpoint }}"
+      {{ end }}
       echo "Copying the sealed-secret backup to aws s3"
-      aws $ENDPOINT s3 cp "$TEMP.gz" $destination_bucket
+      aws {{- if .Values.backup.s3endpoint }}$ENDPOINT{{- end }} s3 cp "$TEMP.gz" $destination_bucket
     
     elif [ $PROVIDER == "azure" ]; then
       destination_container="{{ .Values.backup.destinationContainer }}"
