@@ -4,7 +4,7 @@ metadata:
   name: obmondo-postgresql
   namespace: relate
 spec:
-  enableLogicalBackup: true
+  enableLogicalBackup: {{ .Values.postgresql.logicalBackup | default "true" }}
   teamId: obmondo
   volume:
     size: 2Gi
