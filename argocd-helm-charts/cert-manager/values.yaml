@@ -10,6 +10,26 @@ cert-manager:
     enabled: true
     servicemonitor:
       enabled: true
+  resources:
+    limits:
+      memory: 256Mi
+    requests:
+      cpu: 4m
+      memory: 64Mi
+  cainjector:
+    resources:
+      limits:
+        memory: 128Mi
+      requests:
+        cpu: 1m
+        memory: 64Mi
+  webhook:
+    resources:
+      limits:
+        memory: 32Mi
+      requests:
+        cpu: 1m
+        memory: 16Mi
 issuer:
   enabled: false
   production: false
