@@ -11,3 +11,9 @@ velero:
     enabled: true
     serviceMonitor:
       enabled: true
+  resources:
+    limits:
+      memory: 512Mi
+    requests:
+      cpu: 3m
+      memory: 128Mi
