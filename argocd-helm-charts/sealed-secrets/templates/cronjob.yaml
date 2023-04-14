@@ -11,9 +11,13 @@ spec:
     spec:
       template:
         metadata:
-        {{- if .Values.backup.annotations }}
-          annotations: {{ toYaml .Values.backup.annotations | nindent 12 }}
-        {{- end }}
+          annotations:
+          {{- if .Values.backup.kube2iamRole }}
+            iam.amazonaws.com/role: {{ .Values.backup.kube2iamRole | quote }}
+          {{- end }}
+          {{- if .Values.backup.annotations }}
+            {{- toYaml .Values.backup.annotations | nindent 12 }}
+          {{- end }}
           labels:
             app: backup-sealed-secrets
         spec:
@@ -26,6 +30,7 @@ spec:
             imagePullPolicy: IfNotPresent
             env:
           {{- if eq .Values.backup.provider "aws" }}
+          {{- if not .Values.backup.kube2iamRole }}
             - name: AWS_ACCESS_KEY_ID
               value: {{ .Values.backup.access_key_id }}
             - name: AWS_SECRET_ACCESS_KEY
@@ -33,6 +38,7 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.backup.access_secret | default "backup-sealed-secrets-pod-env" }}
                   key: AWS_SECRET_ACCESS_KEY
+          {{- end }}
           {{- end }}
           {{- if eq .Values.backup.provider "azure" }}
             - name: AZURE_ACCESS_KEY
