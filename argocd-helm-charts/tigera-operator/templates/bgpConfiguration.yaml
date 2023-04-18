@@ -1,0 +1,10 @@
+{{ if eq .Values.netbird.enabled "true" }}
+apiVersion: crd.projectcalico.org/v1
+kind: BGPConfiguration
+metadata:
+  name: default
+spec:
+  logSeverityScreen: Error
+  nodeToNodeMeshEnabled: false
+  asNumber: 64512
+{{- end }}
