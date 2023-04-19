@@ -2,6 +2,13 @@ fluent-bit:
   image:
     pullPolicy: IfNotPresent
 
+  resources:
+    limits:
+      memory: 64Mi
+    requests:
+      cpu: 12m
+      memory: 32Mi
+
   serviceMonitor:
     enabled: true
     namespace: logging

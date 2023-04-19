@@ -8,7 +8,7 @@ image:
   repository: registry.obmondo.com/obmondo/obmondo-k8s-agent
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.0.0"
+  tag: "1.0.2"
   volumeMounts:
     - mountPath: "/mnt/obmondo-k8s-agent"
       name: k8s-agent-tls
@@ -78,10 +78,10 @@ ingress:
 
 resources:
   limits:
-    memory: 30Mi
+    memory: 32Mi
   requests:
-    cpu: 30m
-    memory: 30Mi
+    cpu: 1m
+    memory: 16Mi
 
 autoscaling:
   enabled: false

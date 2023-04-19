@@ -1,6 +1,12 @@
 ---
 sealed-secrets:
   namespace: system
+  resources:
+    limits:
+      memory: 32Mi
+    requests:
+      cpu: 1m
+      memory: 8Mi
   containerSecurityContext:
     allowPrivilegeEscalation: false
     capabilities:

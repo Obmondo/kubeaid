@@ -22,35 +22,35 @@ local default_vars = {
   },
   prometheus_operator_kubeRbacProxyMain_resources: {
     limits: { memory: '40Mi' },
-    requests: { cpu: '40m', memory: '40Mi' },
+    requests: { cpu: '1m', memory: '40Mi' },
   },
   alertmanager_resources: {
     limits: { memory: '50Mi' },
-    requests: { cpu: '20m', memory: '50Mi' },
+    requests: { cpu: '1m', memory: '50Mi' },
   },
   prometheus_resources: {
     limits: { memory: '3Gi' },
-    requests: { cpu: '500m', memory: '1500Mi' },
+    requests: { cpu: '80m', memory: '1500Mi' },
   },
   grafana_resources: {
     limits: { memory: '200Mi' },
-    requests: { cpu: '100m', memory: '100Mi' },
+    requests: { cpu: '6m', memory: '100Mi' },
   },
   node_exporter_resources: {
     limits: { memory: '180Mi' },
-    requests: { cpu: '500m', memory: '180Mi' },
+    requests: { cpu: '3m', memory: '180Mi' },
   },
   node_exporter_kubeRbacProxyMain_resources: {
     limits: { memory: '40Mi' },
-    requests: { cpu: '40m', memory: '40Mi' },
+    requests: { cpu: '1m', memory: '40Mi' },
   },
   kube_state_metrics_kubeRbacProxyMain_resources: {
     limits: { memory: '40Mi' },
-    requests: { cpu: '20m', memory: '40Mi' },
+    requests: { cpu: '1m', memory: '40Mi' },
   },
   kube_state_metrics_kubeRbacProxySelf_resources: {
     limits: { memory: '40Mi' },
-    requests: { cpu: '20m', memory: '40Mi' },
+    requests: { cpu: '1m', memory: '40Mi' },
   },
 
   grafana_keycloak_enable: false,
@@ -60,7 +60,7 @@ local default_vars = {
   },
   prometheus: {
     storage: {
-      size: '10Gi',
+      size: '20Gi',
       classname: 'rook-ceph-block',
     },
     retention: '30d',
@@ -450,7 +450,7 @@ local kp =
   spec+: {
     groups: std.filter((
               function(o)
-                std.objectHas(o, 'rules') && o.name != 'kubernetes-system-apiserver'
+                std.objectHas(o, 'rules') && o.name != 'kubernetes-system-apiserver' && o.name != 'kubernetes-resources'
             ), kp.kubernetesControlPlane.prometheusRule.spec.groups)
             +
             [{
@@ -465,6 +465,23 @@ local kp =
                   std.filter((
                     function(o)
                       std.objectHas(o, 'rules') && o.name == 'kubernetes-system-apiserver'
+                  ), kp.kubernetesControlPlane.prometheusRule.spec.groups)[0].rules
+                ),
+            }]
+            +
+            [{
+              name: 'kubernetes-resources',
+              rules:
+                std.filter(
+                  (
+                    function(o)
+                      std.objectHas(o, 'alert') &&
+                      !std.member(o.alert, 'KubeCPUOvercommit') &&
+                      !std.member(o.alert, 'KubeMemoryOvercommit')
+                  ),
+                  std.filter((
+                    function(o)
+                      std.objectHas(o, 'rules') && o.name == 'kubernetes-resources'
                   ), kp.kubernetesControlPlane.prometheusRule.spec.groups)[0].rules
                 ),
             }],

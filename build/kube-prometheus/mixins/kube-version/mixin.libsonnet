@@ -17,7 +17,7 @@
               alert_id: 'KubernetesVersionInfoEOS',
             },
             annotations: {
-              description: 'The Kubernetes version on the cluster **{{ .Labels.certname }}** (that is version **{{ .Labels.current_version }}**) is **{{ .Labels.days_until_end_of_support }}** days away from its end of support date which is **{{ .Labels.end_of_support_date }}**. You really should upgrade to ensure you will still get security updates. Please visit https://kubernetes.io/releases/patch-releases/ for more version related information.',
+              description: 'The Kubernetes version on the cluster **{{ .Labels.certname }}** (that is version **{{ .Labels.current_version }}**) is **{{ .Values }}** days away from its end of support date which is **{{ .Labels.end_of_support_date }}**. You really should upgrade to ensure you will still get security updates. Please visit https://kubernetes.io/releases/patch-releases/ for more version related information.',
               summary: 'The cluster Kubernetes version is getting close to the end of support window',
             },
           },
@@ -43,7 +43,7 @@
               alert_id: 'KubernetesVersionInfoEOL',
             },
             annotations: {
-              description: 'The Kubernetes version on the cluster **{{ .Labels.certname }}** (that is version **{{ .Labels.current_version }}**) is **{{ .Labels.days_until_end_of_life }}** days away from its end of life date which is **{{ .Labels.end_of_life_date }}**. You really should upgrade soon. Please visit https://kubernetes.io/releases/patch-releases/ for more version related information.',
+              description: 'The Kubernetes version on the cluster **{{ .Labels.certname }}** (that is version **{{ .Labels.current_version }}**) is **{{ .Values }}** days away from its end of life date which is **{{ .Labels.end_of_life_date }}**. You really should upgrade soon. Please visit https://kubernetes.io/releases/patch-releases/ for more version related information.',
               summary: 'The cluster Kubernetes version is getting close to the end of life window',
             },
           },

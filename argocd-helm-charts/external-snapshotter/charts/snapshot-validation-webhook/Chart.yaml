@@ -1,0 +1,22 @@
+annotations:
+  artifacthub.io/recommendations: |
+    - url: https://artifacthub.io/packages/helm/piraeus-charts/snapshot-controller
+apiVersion: v2
+appVersion: v6.2.1
+description: 'Deploys the snapshot-validation-webhook and configures your cluster
+  to validate every `VolumeSnapshot` and `VolumeSnapshotContent` resource by sending
+  it to the webhook. '
+home: https://github.com/piraeusdatastore/helm-charts
+icon: https://raw.githubusercontent.com/piraeusdatastore/piraeus/master/artwork/sandbox-artwork/icon/color.svg
+keywords:
+- storage
+- snapshot
+- validation
+maintainers:
+- name: The Piraeus Maintainers
+  url: https://github.com/piraeusdatastore/
+name: snapshot-validation-webhook
+sources:
+- https://github.com/kubernetes-csi/external-snapshotter/
+type: application
+version: 1.7.1

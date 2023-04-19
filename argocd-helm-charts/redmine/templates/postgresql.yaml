@@ -3,7 +3,7 @@ kind: postgresql
 metadata:
   name: redmine-pgsql
 spec:
-  enableLogicalBackup: true
+  enableLogicalBackup: {{ .Values.postgresql.logicalBackup | default "true" }}
   databases:
     redmine: redmine
   enableMasterLoadBalancer: false
