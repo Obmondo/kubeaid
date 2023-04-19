@@ -217,3 +217,5 @@ rbac:
   ##
   pspEnabled: false
 
+postgresql:
+  logicalBackup: "true"

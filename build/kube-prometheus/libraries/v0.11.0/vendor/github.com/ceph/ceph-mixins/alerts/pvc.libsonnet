@@ -18,6 +18,7 @@
               description: 'PVC {{ $labels.persistentvolumeclaim }} utilization has crossed 75%. Free up some space or expand the PVC.',
               storage_type: $._config.storageType,
               severity_level: 'warning',
+              summary: 'Persisent Volume is nearly full.',
             },
           },
           {
@@ -34,6 +35,7 @@
               description: 'PVC {{ $labels.persistentvolumeclaim }} utilization has crossed 85%. Free up some space or expand the PVC immediately.',
               storage_type: $._config.storageType,
               severity_level: 'error',
+              summary: 'Persistent Volume is critically full.',
             },
           },
         ],

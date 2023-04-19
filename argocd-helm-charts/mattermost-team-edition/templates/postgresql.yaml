@@ -3,7 +3,7 @@ kind: postgresql
 metadata:
   name: mattermost-pgsql
 spec:
-  enableLogicalBackup: true
+  enableLogicalBackup: {{ .Values.postgresql.logicalBackup | default "true" }}
   env:
 {{- if .Values.postgresql.access_key_id }}
   - name: AWS_ACCESS_KEY_ID

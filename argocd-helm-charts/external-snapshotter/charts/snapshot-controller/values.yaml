@@ -1,0 +1,56 @@
+replicaCount: 1
+
+args:
+  leaderElection: true
+  leaderElectionNamespace: "$(NAMESPACE)"
+  httpEndpoint: ":8080"
+
+image:
+  repository: registry.k8s.io/sig-storage/snapshot-controller
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+rbac:
+  # Specifies whether RBAC resources should be created
+  create: true
+
+serviceAccount:
+  # Specifies whether a ServiceAccount should be created
+  create: true
+  name: ""
+
+serviceMonitor:
+  # Specifies whether a ServiceMonitor should be created
+  create: false
+
+volumeSnapshotClasses: []
+#  - name: linstor-csi-delete
+#    annotations:
+#      snapshot.storage.kubernetes.io/is-default-class: "true"
+#    labels:
+#      velero.io/csi-volumesnapshot-class: "true"
+#    driver: linstor.csi.linbit.com
+#    deletionPolicy: Delete

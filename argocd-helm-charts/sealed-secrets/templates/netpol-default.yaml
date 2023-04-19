@@ -3,7 +3,6 @@ apiVersion: crd.projectcalico.org/v1
 kind: NetworkPolicy
 metadata:
   name: default.default
-  namespace: {{ .Values.backup.namespace }}
 spec:
   order: 1000
   types:
