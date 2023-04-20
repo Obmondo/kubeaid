@@ -5,6 +5,9 @@ metadata:
   name: default
 spec:
   logSeverityScreen: Error
-  nodeToNodeMeshEnabled: false
+  nodeToNodeMeshEnabled: true
+  # Ignore netbird interfaces, which conflict with calico
+  ignoredInterfaces:
+    - wt0
   asNumber: 64512
 {{- end }}
