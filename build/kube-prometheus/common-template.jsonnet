@@ -60,7 +60,7 @@ local default_vars = {
   },
   prometheus: {
     storage: {
-      size: '20Gi',
+      size: '30Gi',
       classname: 'rook-ceph-block',
     },
     retention: '30d',
