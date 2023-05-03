@@ -30,7 +30,7 @@ local default_vars = {
   },
   prometheus_resources: {
     limits: { memory: '3Gi' },
-    requests: { cpu: '80m', memory: '1500Mi' },
+    requests: { cpu: '200m', memory: '2500Mi' },
   },
   grafana_resources: {
     limits: { memory: '200Mi' },
@@ -60,7 +60,7 @@ local default_vars = {
   },
   prometheus: {
     storage: {
-      size: '20Gi',
+      size: '30Gi',
       classname: 'rook-ceph-block',
     },
     retention: '30d',
