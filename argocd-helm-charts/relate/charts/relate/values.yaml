@@ -219,3 +219,4 @@ rbac:
 
 postgresql:
   logicalBackup: "true"
+  size: 4Gi
