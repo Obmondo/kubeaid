@@ -31,7 +31,7 @@ graylog:
       uriSecretKey: "connectionString.standard"
 
     opensearch:
-      version: "7"
+      # version: "7"
       uriSecretName: graylog-es-svc
       uriSecretKey: url
       uriSSL: false
