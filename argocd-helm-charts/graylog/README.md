@@ -110,6 +110,7 @@ kubectl create secret generic graylog-es-svc -n graylog --from-literal=url='http
   a. [issue#104](https://github.com/KongZ/charts/issues/104)
 * With graylog 4.3.x and opensearch 1.x we can disable the emulation(ES 7.x - set in opensearch values)
 * external url `externalUri` in graylog values should include `https://your-domain.com`
+* After the upgrade check the graylog pod and UI for any errors .
 
 ## Restore Instruction
 
