@@ -1,0 +1,32 @@
+---
+sudo: true
+
+addons:
+  apt:
+    packages:
+      - python
+      - realpath
+
+language: go
+
+go:
+  # Kubernetes minimum_go_version can be found in this file:
+  # https://github.com/kubernetes/kubernetes/blob/master/hack/lib/golang.sh
+  - stable
+
+install:
+  - go get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb
+  - go get github.com/prometheus/prometheus/cmd/promtool
+  - git clone https://github.com/google/jsonnet ${TRAVIS_HOME}/jsonnet
+  - make -C ${TRAVIS_HOME}/jsonnet CC=clang CXX=clang++
+  - cp ${TRAVIS_HOME}/jsonnet/jsonnet ${TRAVIS_HOME}/gopath/bin
+  - cp ${TRAVIS_HOME}/jsonnet/jsonnetfmt ${TRAVIS_HOME}/gopath/bin
+  - jb install
+script:
+  - set -o pipefail &&
+    find . -name 'vendor' -prune -o -name '*.libsonnet' -print -o -name '*.jsonnet' -print |
+    while read f; do
+        jsonnetfmt -n 2 --max-blank-lines 2 --string-style s --comment-style s "$f" | diff -u "$f" -;
+    done
+
+  - make all
