@@ -32,6 +32,10 @@ local default_vars = {
     limits: { memory: '3Gi' },
     requests: { cpu: '200m', memory: '2500Mi' },
   },
+  prometheus_adapter_resources: {
+    limits: { memory: '2Gi' },
+    requests: { cpu: '200m', memory: '1500Mi' },
+  },
   grafana_resources: {
     limits: { memory: '200Mi' },
     requests: { cpu: '6m', memory: '100Mi' },
@@ -142,7 +146,7 @@ local kp =
   // (import 'kube-prometheus/addons/managed-cluster.libsonnet') +
   // (import 'kube-prometheus/addons/node-ports.libsonnet') +
   // (import 'kube-prometheus/addons/static-etcd.libsonnet') +
-  (import 'kube-prometheus/addons/external-metrics.libsonnet') +
+  // (import 'kube-prometheus/addons/external-metrics.libsonnet') +
   // NOTE: we need this condition because custom-metrics.libsonnet is broken prior to v0.13.0
   (
     if std.objectHas(vars, 'enable_custom_metrics_apiservice') && vars.enable_custom_metrics_apiservice then (
@@ -294,6 +298,9 @@ local kp =
         kubeRbacProxyMain+: {
           resources+: vars.prometheus_operator_kubeRbacProxyMain_resources,
         },
+      },
+      prometheusAdapter+: {
+        resources: vars.prometheus_adapter_resources,
       },
       // This is ONLY supported in release-0.11+ and main
       kubeStateMetrics+: {
