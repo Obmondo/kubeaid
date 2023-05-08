@@ -13,7 +13,7 @@ Any ideas/suggestions are welcomed...
 
 ### Mac OS
 
-Pay attention to all prerequisites. 
+Pay attention to all prerequisites.
 
 Additionally do following two installations to run the build.sh :
 
@@ -41,8 +41,7 @@ go install github.com/google/go-jsonnet/cmd/jsonnet@latest
 
 Setup the jsonnet file as per the requirement
 
-* Look into [examples folder](./examples)
-
+- Look into [examples folder](./examples)
 
 ### Run the build script
 
@@ -78,9 +77,23 @@ INFO: compiling jsonnet files into '../kubernetes-config-enableit/k8s/kam.obmond
 
 ## Upgrading
 
+For upgrading vendor directories of existing versions (for example main),
+
 ```sh
-make update
+./build/kube-prometheus/update.sh
 ```
+
+For upgrading to a new version of kube-prometheus, for example to `v0.12.0` - change the
+`kube_prometheus_version` variable in the jsonnet vars file of your kubernetes cluster config
+(example: `k8s/kbm.obmondo.com/kbm.obmondo.com-vars.jsonnet`) and run the build script again.
+
+```sh
+./build/kube-prometheus/build.sh ../kubernetes-config-enableit/k8s/kbm.obmondo.com
+```
+
+Note that you have to clone kubernetes-config-enableit (or your equivalent repository) seperately.
+
+If a version is broken or its vendor dirs are messed up you can just delete the entire version folder and follow this process to add it again.
 
 ## Cleaning up
 
@@ -99,26 +112,26 @@ available in https://github.com/prometheus/alertmanager/blob/main/doc/alertmanag
 
 ## Adding new mixins
 
-+ Install mixin into `kube-prometheus` release directories (currently manual). In the below we install it only into
+- Install mixin into `kube-prometheus` release directories (currently manual). In the below we install it only into
   `main`, but this should be repeated for all the versions in use.
 
-   ```sh
-   cd build/kube-prometheus/libraries/main
-   jb install github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin@main
-   ```
+  ```sh
+  cd build/kube-prometheus/libraries/main
+  jb install github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin@main
+  ```
 
-+ Add the mixin to `common-template.json`. For adding the Bitnami `sealed-secrets` mixin this diff was required:
+- Add the mixin to `common-template.json`. For adding the Bitnami `sealed-secrets` mixin this diff was required:
 
-   ```diff
-   @@ -46,6 +46,7 @@ local kp =
-      // (import 'kube-prometheus/addons/static-etcd.libsonnet') +
-      // (import 'kube-prometheus/addons/custom-metrics.libsonnet') +
-      // (import 'kube-prometheus/addons/external-metrics.libsonnet') +
-   +  (import 'github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin/mixin.libsonnet') +
+  ```diff
+  @@ -46,6 +46,7 @@ local kp =
+     // (import 'kube-prometheus/addons/static-etcd.libsonnet') +
+     // (import 'kube-prometheus/addons/custom-metrics.libsonnet') +
+     // (import 'kube-prometheus/addons/external-metrics.libsonnet') +
+  +  (import 'github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin/mixin.libsonnet') +
 
-      {
-        values+:: {
-   ```
+     {
+       values+:: {
+  ```
 
   Note that the search path contains the full path of the file from the top of the `vendor` folder.
 
@@ -135,13 +148,13 @@ available in https://github.com/prometheus/alertmanager/blob/main/doc/alertmanag
   }
   ```
 
-+ To add a custom prometheus rule as a mixin, create a mixin.libsonnet file in the relevant folder under the `mixins` folder and generate the `prometheus.yaml`  for it. One way to do generate a YAML file from a .libsonnet file is using a jsonnet command similar to this:
+- To add a custom prometheus rule as a mixin, create a mixin.libsonnet file in the relevant folder under the `mixins` folder and generate the `prometheus.yaml` for it. One way to do generate a YAML file from a .libsonnet file is using a jsonnet command similar to this:
 
 ```
 jsonnet -e '(import "mixin.libsonnet").prometheusAlerts' | gojsontoyaml > prometheus.yaml
 ```
 
-+ In the case when your mixin is supposed to trigger a Prometheus alert and <b>all you want is to test</b> whether it works, do this:
+- In the case when your mixin is supposed to trigger a Prometheus alert and <b>all you want is to test</b> whether it works, do this:
 
 * Run the build script as described in the 'Run the build script' section above.
 * Apply the newly generated YAML file in the test cluster's monitoring namespace where you want to test if the alert is triggered.
