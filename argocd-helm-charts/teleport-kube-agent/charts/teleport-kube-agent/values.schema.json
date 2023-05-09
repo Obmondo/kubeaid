@@ -9,16 +9,20 @@
         "apps",
         "appResources",
         "awsDatabases",
+        "azureDatabases",
         "databases",
         "databaseResources",
         "teleportVersionOverride",
         "insecureSkipProxyTLSVerify",
+        "teleportConfig",
         "existingDataVolume",
         "podSecurityPolicy",
         "labels",
         "image",
         "clusterRoleName",
         "clusterRoleBindingName",
+        "roleName",
+        "roleBindingName",
         "serviceAccountName",
         "secretName",
         "log",
@@ -136,6 +140,72 @@
                 "additionalProperties": false
             }
         },
+        "azureDatabases": {
+            "$id": "#/properties/azureDatabases",
+            "type": "array",
+            "default": [],
+            "items": {
+                "type": "object",
+                "default": {},
+                "required": [
+                    "types",
+                    "tags"
+                ],
+                "properties": {
+                    "types": {
+                        "$id": "#/properties/azureDatabases/types",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": []
+                    },
+                    "tags": {
+                        "$id": "#/properties/azureDatabases/tags",
+                        "type": "object",
+                        "default": {},
+                        "additionalProperties": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "subscriptions": {
+                        "$id": "#/properties/azureDatabases/subscriptions",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": []
+                    },
+                    "regions": {
+                        "$id": "#/properties/azureDatabases/regions",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": []
+                    },
+                    "resource_groups": {
+                        "$id": "#/properties/azureDatabases/resource_groups",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": []
+                    },
+                    "additionalProperties": false
+                }
+            }
+        },
         "databases": {
             "$id": "#/properties/databases",
             "type": "array",
@@ -173,6 +243,11 @@
             "$id": "#/properties/insecureSkipProxyTLSVerify",
             "type": "boolean",
             "default": false
+        },
+        "teleportConfig": {
+            "$id": "#/properties/teleportConfig",
+            "type": "object",
+            "default": {}
         },
         "tls": {
             "$id": "#/properties/tls",
@@ -215,7 +290,12 @@
         "image": {
             "$id": "#/properties/image",
             "type": "string",
-            "default": "quay.io/gravitational/teleport"
+            "default": "public.ecr.aws/gravitational/teleport-distroless"
+        },
+        "enterpriseImage": {
+            "$id": "#/properties/enterpriseImage",
+            "type": "string",
+            "default": "public.ecr.aws/gravitational/teleport-ent-distroless"
         },
         "imagePullSecrets": {
             "$id": "#/properties/imagePullSecrets",
@@ -234,6 +314,16 @@
         },
         "clusterRoleBindingName": {
             "$id": "#/properties/clusterRoleBindingName",
+            "type": "string",
+            "default": ""
+        },
+        "roleName": {
+            "$id": "#/properties/roleName",
+            "type": "string",
+            "default": ""
+        },
+        "roleBindingName": {
+            "$id": "#/properties/roleBindingName",
             "type": "string",
             "default": ""
         },
@@ -336,6 +426,16 @@
             "type": "object",
             "default": {}
         },
+        "dnsConfig": {
+            "$id": "#/properties/dnsConfig",
+            "type": "object",
+            "default": {}
+        },
+        "dnsPolicy": {
+            "$id": "#/properties/dnsPolicy",
+            "type": "string",
+            "default": ""
+        },
         "extraLabels": {
             "$id": "#/properties/extraLabels",
             "type": "object",
@@ -347,6 +447,16 @@
                 },
                 "clusterRoleBinding": {
                     "$id": "#/properties/extraLabels/properties/clusterRoleBinding",
+                    "type": "object",
+                    "default": {}
+                },
+                "role": {
+                    "$id": "#/properties/extraLabels/properties/role",
+                    "type": "object",
+                    "default": {}
+                },
+                "roleBinding": {
+                    "$id": "#/properties/extraLabels/properties/roleBinding",
                     "type": "object",
                     "default": {}
                 },
@@ -416,6 +526,35 @@
                     "$id": "#/properties/annotations/properties/serviceAccount",
                     "type": "object",
                     "default": {}
+                }
+            }
+        },
+        "serviceAccount": {
+            "$id": "#/properties/serviceAccount",
+            "type": "object",
+            "required": [],
+            "properties": {
+                "name": {
+                    "$id": "#properties/serviceAccount/name",
+                    "type": "string",
+                    "default": ""
+                },
+                "create": {
+                    "$id": "#properties/serviceAccount/create",
+                    "type": "boolean",
+                    "default": true
+                }
+            }
+        },
+        "rbac": {
+            "$id": "#/properties/rbac",
+            "type": "object",
+            "required": [],
+            "properties": {
+                "create": {
+                    "$id": "#properties/rbac/create",
+                    "type": "boolean",
+                    "default": true
                 }
             }
         },
