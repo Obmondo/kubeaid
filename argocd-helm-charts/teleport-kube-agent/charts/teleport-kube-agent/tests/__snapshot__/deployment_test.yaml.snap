@@ -1,4 +1,4 @@
-sets Deployment annotations when specified:
+sets Deployment annotations when specified if action is Upgrade:
   1: |
     apiVersion: apps/v1
     kind: Deployment
@@ -18,7 +18,7 @@ sets Deployment annotations when specified:
       template:
         metadata:
           annotations:
-            checksum/config: d6a8c6262121d39959d11174681133b8a8b7eded1d420957ff2ee7f20e1a25cf
+            checksum/config: 80088923d2d7ce4344db0f2174d29d7cfb2d599424adfabf6f6818a9434794ca
             kubernetes.io/pod: test-annotation
             kubernetes.io/pod-different: 4
           labels:
@@ -27,7 +27,10 @@ sets Deployment annotations when specified:
           containers:
           - args:
             - --diag-addr=0.0.0.0:3000
-            image: quay.io/gravitational/teleport:10.3.3
+            env:
+            - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+              value: "true"
+            image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
             imagePullPolicy: IfNotPresent
             livenessProbe:
               failureThreshold: 6
@@ -77,7 +80,7 @@ sets Deployment annotations when specified:
               secretName: teleport-kube-agent-join-token
           - emptyDir: {}
             name: data
-sets Deployment labels when specified:
+sets Deployment labels when specified if action is Upgrade:
   1: |
     replicas: 1
     selector:
@@ -86,7 +89,7 @@ sets Deployment labels when specified:
     template:
       metadata:
         annotations:
-          checksum/config: e40e91c502b3883cd280381b59705cb433efc9a0920ea3de309d39358673eaad
+          checksum/config: db49feab9b174f73188febc30d2b01d27b16e5a76b586c6e87e6e62eb43620a2
         labels:
           app: RELEASE-NAME
           app.kubernetes.io/name: teleport-kube-agent
@@ -95,7 +98,10 @@ sets Deployment labels when specified:
         containers:
         - args:
           - --diag-addr=0.0.0.0:3000
-          image: quay.io/gravitational/teleport:10.3.3
+          env:
+          - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+            value: "true"
+          image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 6
@@ -145,12 +151,15 @@ sets Deployment labels when specified:
             secretName: teleport-kube-agent-join-token
         - emptyDir: {}
           name: data
-sets Pod annotations when specified:
+sets Pod annotations when specified if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -200,12 +209,15 @@ sets Pod annotations when specified:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-sets Pod labels when specified:
+sets Pod labels when specified if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -255,12 +267,32 @@ sets Pod labels when specified:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should add emptyDir for data when existingDataVolume is not set:
+sets by default a container security context if action is Upgrade:
+  1: |
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - all
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 9807
+  2: |
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - all
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 9807
+should add emptyDir for data when existingDataVolume is not set if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -310,13 +342,16 @@ should add emptyDir for data when existingDataVolume is not set:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should add insecureSkipProxyTLSVerify to args when set in values:
+should add insecureSkipProxyTLSVerify to args when set in values if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
       - --insecure
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -366,12 +401,15 @@ should add insecureSkipProxyTLSVerify to args when set in values:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should correctly configure existingDataVolume when set:
+should correctly configure existingDataVolume when set if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -419,12 +457,15 @@ should correctly configure existingDataVolume when set:
     - name: auth-token
       secret:
         secretName: teleport-kube-agent-join-token
-should expose diag port:
+should expose diag port if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -474,7 +515,7 @@ should expose diag port:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should have multiple replicas when replicaCount is set (using .replicaCount, deprecated):
+should have multiple replicas when replicaCount is set (using .replicaCount, deprecated) if action is Upgrade:
   1: |
     affinity:
       podAntiAffinity:
@@ -491,7 +532,10 @@ should have multiple replicas when replicaCount is set (using .replicaCount, dep
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -541,7 +585,7 @@ should have multiple replicas when replicaCount is set (using .replicaCount, dep
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should have multiple replicas when replicaCount is set (using highAvailability.replicaCount):
+should have multiple replicas when replicaCount is set (using highAvailability.replicaCount) if action is Upgrade:
   1: |
     affinity:
       podAntiAffinity:
@@ -558,7 +602,10 @@ should have multiple replicas when replicaCount is set (using highAvailability.r
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -608,12 +655,15 @@ should have multiple replicas when replicaCount is set (using highAvailability.r
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should have one replica when replicaCount is not set:
+should have one replica when replicaCount is not set if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -663,12 +713,15 @@ should have one replica when replicaCount is not set:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should mount extraVolumes and extraVolumeMounts:
+should mount extraVolumes and extraVolumeMounts if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -723,15 +776,17 @@ should mount extraVolumes and extraVolumeMounts:
     - name: my-mount
       secret:
         secretName: mySecret
-should mount tls.existingCASecretName and set environment when set in values:
+should mount tls.existingCASecretName and set environment when set in values if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
       env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
       - name: SSL_CERT_FILE
         value: /etc/teleport-tls-ca/ca.pem
-      image: quay.io/gravitational/teleport:10.3.3
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -787,17 +842,19 @@ should mount tls.existingCASecretName and set environment when set in values:
     - name: teleport-tls-ca
       secret:
         secretName: helm-lint-existing-tls-secret-ca
-should mount tls.existingCASecretName and set extra environment when set in values:
+should mount tls.existingCASecretName and set extra environment when set in values if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
       env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
       - name: HTTPS_PROXY
         value: http://username:password@my.proxy.host:3128
       - name: SSL_CERT_FILE
         value: /etc/teleport-tls-ca/ca.pem
-      image: quay.io/gravitational/teleport:10.3.3
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -853,12 +910,15 @@ should mount tls.existingCASecretName and set extra environment when set in valu
     - name: teleport-tls-ca
       secret:
         secretName: helm-lint-existing-tls-secret-ca
-should provision initContainer correctly when set in values:
+should provision initContainer correctly when set in values if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -944,12 +1004,15 @@ should provision initContainer correctly when set in values:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should set SecurityContext:
+should set SecurityContext if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -999,7 +1062,7 @@ should set SecurityContext:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should set affinity when set in values:
+should set affinity when set in values if action is Upgrade:
   1: |
     affinity:
       nodeAffinity:
@@ -1024,7 +1087,10 @@ should set affinity when set in values:
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -1074,70 +1140,86 @@ should set affinity when set in values:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should set default serviceAccountName when not set in values:
-  1: |
-    containers:
-    - args:
-      - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
-      imagePullPolicy: IfNotPresent
-      livenessProbe:
-        failureThreshold: 6
-        httpGet:
-          path: /healthz
-          port: diag
-        initialDelaySeconds: 5
-        periodSeconds: 5
-        timeoutSeconds: 1
-      name: teleport
-      ports:
-      - containerPort: 3000
-        name: diag
-        protocol: TCP
-      readinessProbe:
-        failureThreshold: 12
-        httpGet:
-          path: /readyz
-          port: diag
-        initialDelaySeconds: 5
-        periodSeconds: 5
-        timeoutSeconds: 1
-      securityContext:
-        allowPrivilegeEscalation: false
-        capabilities:
-          drop:
-          - all
-        readOnlyRootFilesystem: true
-        runAsNonRoot: true
-        runAsUser: 9807
-      volumeMounts:
-      - mountPath: /etc/teleport
-        name: config
-        readOnly: true
-      - mountPath: /etc/teleport-secrets
-        name: auth-token
-        readOnly: true
-      - mountPath: /var/lib/teleport
-        name: data
-    serviceAccountName: RELEASE-NAME
-    volumes:
-    - configMap:
-        name: RELEASE-NAME
-      name: config
-    - name: auth-token
-      secret:
-        secretName: teleport-kube-agent-join-token
-    - emptyDir: {}
-      name: data
-should set environment when extraEnv set in values:
+should set default serviceAccountName when not set in values if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
       env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 6
+        httpGet:
+          path: /healthz
+          port: diag
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        timeoutSeconds: 1
+      name: teleport
+      ports:
+      - containerPort: 3000
+        name: diag
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 12
+        httpGet:
+          path: /readyz
+          port: diag
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        timeoutSeconds: 1
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - all
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 9807
+      volumeMounts:
+      - mountPath: /etc/teleport
+        name: config
+        readOnly: true
+      - mountPath: /etc/teleport-secrets
+        name: auth-token
+        readOnly: true
+      - mountPath: /var/lib/teleport
+        name: data
+    serviceAccountName: RELEASE-NAME
+    volumes:
+    - configMap:
+        name: RELEASE-NAME
+      name: config
+    - name: auth-token
+      secret:
+        secretName: teleport-kube-agent-join-token
+    - emptyDir: {}
+      name: data
+should set dnsConfig when set in values if action is Upgrade:
+  1: |
+    nameservers:
+    - 1.2.3.4
+    options:
+    - name: ndots
+      value: "2"
+    - name: edns0
+    searches:
+    - ns1.svc.cluster-domain.example
+    - my.dns.search.suffix
+should set environment when extraEnv set in values if action is Upgrade:
+  1: |
+    containers:
+    - args:
+      - --diag-addr=0.0.0.0:3000
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
       - name: HTTPS_PROXY
         value: http://username:password@my.proxy.host:3128
-      image: quay.io/gravitational/teleport:10.3.3
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -1187,12 +1269,15 @@ should set environment when extraEnv set in values:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should set image and tag correctly:
+should set image and tag correctly if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:8.3.4
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:12.2.1
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -1242,12 +1327,15 @@ should set image and tag correctly:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should set imagePullPolicy when set in values:
+should set imagePullPolicy when set in values if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: Always
       livenessProbe:
         failureThreshold: 6
@@ -1297,12 +1385,15 @@ should set imagePullPolicy when set in values:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should set nodeSelector if set in values:
+should set nodeSelector if set in values if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -1354,12 +1445,15 @@ should set nodeSelector if set in values:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should set not set priorityClassName when not set in values:
+should set not set priorityClassName when not set in values if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -1409,7 +1503,7 @@ should set not set priorityClassName when not set in values:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should set preferred affinity when more than one replica is used:
+should set preferred affinity when more than one replica is used if action is Upgrade:
   1: |
     affinity:
       podAntiAffinity:
@@ -1426,7 +1520,10 @@ should set preferred affinity when more than one replica is used:
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -1476,12 +1573,15 @@ should set preferred affinity when more than one replica is used:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should set priorityClassName when set in values:
+should set priorityClassName when set in values if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -1532,12 +1632,15 @@ should set priorityClassName when set in values:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should set probeTimeoutSeconds when set in values:
+should set probeTimeoutSeconds when set in values if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -1587,7 +1690,7 @@ should set probeTimeoutSeconds when set in values:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should set required affinity when highAvailability.requireAntiAffinity is set:
+should set required affinity when highAvailability.requireAntiAffinity is set if action is Upgrade:
   1: |
     affinity:
       podAntiAffinity:
@@ -1602,7 +1705,10 @@ should set required affinity when highAvailability.requireAntiAffinity is set:
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -1652,12 +1758,15 @@ should set required affinity when highAvailability.requireAntiAffinity is set:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should set resources when set in values:
+should set resources when set in values if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -1714,12 +1823,15 @@ should set resources when set in values:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should set serviceAccountName when set in values:
+should set serviceAccountName when set in values if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
@@ -1769,12 +1881,15 @@ should set serviceAccountName when set in values:
         secretName: teleport-kube-agent-join-token
     - emptyDir: {}
       name: data
-should set tolerations when set in values:
+should set tolerations when set in values if action is Upgrade:
   1: |
     containers:
     - args:
       - --diag-addr=0.0.0.0:3000
-      image: quay.io/gravitational/teleport:10.3.3
+      env:
+      - name: TELEPORT_INSTALL_METHOD_HELM_KUBE_AGENT
+        value: "true"
+      image: public.ecr.aws/gravitational/teleport-distroless:13.0.0
       imagePullPolicy: IfNotPresent
       livenessProbe:
         failureThreshold: 6
