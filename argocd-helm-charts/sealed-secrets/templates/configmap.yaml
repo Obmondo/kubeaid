@@ -18,7 +18,7 @@ data:
       ENDPOINT="--endpoint-url={{ .Values.backup.s3endpoint }}"
       {{ end }}
       echo "Copying the sealed-secret backup to aws s3"
-      aws {{- if .Values.backup.s3endpoint }}$ENDPOINT{{- end }} s3 cp "$TEMP.gz" $destination_bucket
+      aws {{- if .Values.backup.s3endpoint }} $ENDPOINT{{- end }} s3 cp "$TEMP.gz" $destination_bucket
     
     elif [ $PROVIDER == "azure" ]; then
       destination_container="{{ .Values.backup.destinationContainer }}"
