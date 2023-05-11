@@ -106,7 +106,7 @@ spec:
               {{- if .Values.graylog.heapSize }}
               value: "{{ $javaOpts }} {{ printf "-Xms%s -Xmx%s" .Values.graylog.heapSize .Values.graylog.heapSize}}"
               {{- else }}
-              value: "{{ $javaOpts }} -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+              value: "{{ $javaOpts }} -XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport"
               {{- end }}
             - name: GRAYLOG_PASSWORD_SECRET
               valueFrom:
