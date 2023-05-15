@@ -3,16 +3,15 @@ rook-ceph:
     enabled: true
   resources:
     limits:
-      cpu: 100m
+      cpu: 2000m
       memory: 400Mi
     requests:
-      cpu: 100m
+      cpu: 500m
       memory: 200Mi
 
 rook-ceph-cluster:
   monitoring:
     enabled: true
-    createPrometheusRules: true
 
   toolbox:
     enabled: true
@@ -28,10 +27,10 @@ rook-ceph-cluster:
     resources:
       mgr:
         limits:
-          cpu: null
+          cpu: "1000m"
           memory: "800Mi"
         requests:
-          cpu: "150m"
+          cpu: "1000m"
           memory: "512Mi"
       mon:
         limits:
@@ -56,10 +55,10 @@ rook-ceph-cluster:
           memory: "50Mi"
       mgr-sidecar:
         limits:
-          cpu: "50m"
+          cpu: "500m"
           memory: "40Mi"
         requests:
-          cpu: "50m"
+          cpu: "250m"
           memory: "40Mi"
       crashcollector:
         limits:
@@ -161,10 +160,10 @@ rook-ceph-cluster:
           resources:
             limits:
               cpu: null
-              memory: "200Mi"
+              memory: "300Mi"
             requests:
               cpu: "200m"
-              memory: "200Mi"
+              memory: "300Mi"
           # securePort: 443
           # sslCertificateRef:
           instances: 1
