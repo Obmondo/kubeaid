@@ -46,7 +46,7 @@ metadata:
   name: mongodb-replica-set
   namespace: {{ .Release.Namespace }}
 spec:
-  members: 2
+  members: {{ .Values.mongodb.replicas | default 2 }}
   type: ReplicaSet
   version: {{ .Values.mongodb.version | default "4.4.1" }}
   security:
