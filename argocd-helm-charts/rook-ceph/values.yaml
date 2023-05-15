@@ -3,7 +3,7 @@ rook-ceph:
     enabled: true
   resources:
     limits:
-      cpu: null
+      cpu: 100m
       memory: 400Mi
     requests:
       cpu: 100m
@@ -12,6 +12,7 @@ rook-ceph:
 rook-ceph-cluster:
   monitoring:
     enabled: true
+    createPrometheusRules: true
 
   toolbox:
     enabled: true
@@ -34,7 +35,7 @@ rook-ceph-cluster:
           memory: "512Mi"
       mon:
         limits:
-          cpu: null
+          cpu: "100m"
           memory: "512Mi"
         requests:
           cpu: "100m"
@@ -55,7 +56,7 @@ rook-ceph-cluster:
           memory: "50Mi"
       mgr-sidecar:
         limits:
-          cpu: null
+          cpu: "50m"
           memory: "40Mi"
         requests:
           cpu: "50m"
