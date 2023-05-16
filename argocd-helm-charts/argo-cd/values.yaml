@@ -26,7 +26,7 @@ argo-cd:
         memory: 256Mi
       requests:
         cpu: 10m
-        memory: 128i
+        memory: 128Mi
     replicas: 1
     autoscaling:
       enabled: false
@@ -37,10 +37,10 @@ argo-cd:
   server:
     resources:
       limits:
-        memory: 128Mi
+        memory: 256Mi
       requests:
         cpu: 5m
-        memory: 64Mi
+        memory: 128Mi
     metrics:
       enabled: true
       serviceMonitor:

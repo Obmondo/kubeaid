@@ -1,11 +1,6 @@
 # leaving mongodb without resource definitions per recommendation in mongodb values - it uses so little so it should be okay for it to run on "available resources"
 graylog:
   graylog:
-    tags:
-      install-elasticsearch: false
-      install-mongodb: false
-    image:
-      tag: "4.3.9"
     resources:
       limits:
       # NO memory or CPU limit - this peaks >4GB memory usage and CPU is based on processing needs. Memory usage really should be fixed - no upstream bug reported though.
@@ -19,42 +14,6 @@ graylog:
       size: "50Gi"
       #storageClass: "gp2"
     plugins: {}
-    #- name: graylog-plugin-slack-notification-4.0.1.jar
-    #  url: https://github.com/KongZ/graylog-plugin-slack-notification/releases/download/v4.0.1/graylog-plugin-slack-notification-4.0.1.jar
-    #- name: graylog-plugin-function-check-diff-1.0.1.jar
-    #  url: https://github.com/KongZ/graylog-plugin-function-check-diff/releases/download/v1.0.1/graylog-plugin-function-check-diff-1.0.1.jar
-    # - name: graylog-plugin-google-cloud-pubsub-1.0.4.jar
-    #   url: https://github.com/KongZ/graylog-plugin-google-cloud-pubsub/releases/download/v1.0.4/graylog-plugin-google-cloud-pubsub-1.0.4.jar
-    #- name: graylog-plugin-auth-sso-3.3.0.jar
-    #  url: https://github.com/Graylog2/graylog-plugin-auth-sso/releases/download/3.3.0/graylog-plugin-auth-sso-3.3.0.jar
-    #externalUri: address-used-in-browser
-    # ingress:
-    #   enabled: true
-    #   annotations:
-    #     cert-manager.io/cluster-issuer: letsencrypt
-    #     traefik.ingress.kubernetes.io/router.middlewares: traefik-traefik-forward-auth@kubernetescrd
-    #   hosts:
-    #   - graylog.example.cluster.tld
-    #   tls:
-    #   - secretName: argocd-helm-chart-tls
-    #     hosts:
-    #     - graylog.example.cluster.tld
-    # metrics:
-    #   enabled: true
-    # input:
-    #   tcp:
-    #     service:
-    #       type: LoadBalancer
-    #       annotations:
-    #         service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
-    #         service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
-    #         service.beta.kubernetes.io/aws-load-balancer-type: nlb
-    #         external-dns.alpha.kubernetes.io/internal-hostname: graylog-gelf.<cluster-domain>.
-    #     ports:
-    #     - name: beats
-    #       port: 5044
-    #     - name: gelf
-    #       port: 12222
     journal:
       ## Sometime Graylog journal continually grow up or corrupt and cause Graylog unable to start.
       ## You need to clean up all journal files in order to run the Graylog.
@@ -69,8 +28,8 @@ graylog:
       uriSecretName: "mongodb-replica-set-graylog-graylog-user"
       uriSecretKey: "connectionString.standard"
 
-    elasticsearch:
-      version: "7"
+    opensearch:
+      # version: "7"
       uriSecretName: graylog-es-svc
       uriSecretKey: url
       uriSSL: false
@@ -80,6 +39,12 @@ graylog:
       serviceMonitor:
         enabled: true
 
+  tags:
+    install-opensearch: false
+    install-mongodb: false
+
+  opensearch:
+    enabled: false
 
 # This installs MongoDB Community Edition from the MongoDB operator for Kubernetes.
 # https://github.com/mongodb/mongodb-kubernetes-operator
