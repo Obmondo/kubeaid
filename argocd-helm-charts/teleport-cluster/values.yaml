@@ -5,7 +5,7 @@ teleport-cluster:
   useExistingConfigMap: true
   resources:
     limits:
-      cpu: null
+      cpu: '180m'
       memory: '400Mi'
     requests:
       cpu: '180m'
