@@ -36,6 +36,7 @@ local default_vars = {
     limits: { memory: '2Gi' },
     requests: { cpu: '200m', memory: '1500Mi' },
   },
+  prometheus_adapter_additional_rules: [],
   grafana_resources: {
     limits: { memory: '200Mi' },
     requests: { cpu: '6m', memory: '100Mi' },
@@ -301,6 +302,9 @@ local kp =
       },
       prometheusAdapter+: {
         resources: vars.prometheus_adapter_resources,
+        config+:: {
+          rules+: vars.prometheus_adapter_additional_rules,
+        },
       },
       // This is ONLY supported in release-0.11+ and main
       kubeStateMetrics+: {
