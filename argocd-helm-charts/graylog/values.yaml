@@ -54,3 +54,4 @@ mongodb:
   installMongodb: true
   # Set the MongoDB database version, if unset it defaults to 4.4.1
   # version: 5.0.0
+  size: 2G

@@ -52,6 +52,12 @@ spec:
   security:
     authentication:
       modes: ["SCRAM"]
+  statefulSet:
+    spec:
+      volumeClaimTemplates:
+          resources:
+            requests:
+              storage: {{ .Values.mongodb.size}}
   users:
     - db: graylog
       name: graylog-user
