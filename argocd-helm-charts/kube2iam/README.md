@@ -36,5 +36,5 @@ annotations:
 
 ## Conclusion
 
-kube2iam will provide the credentials if both namespace as well as pods contains the 
+kube2iam will provide the credentials if both namespace as well as pods contains the
 annotation.
