@@ -5,4 +5,9 @@ resource "helm_release" "argocd" {
   create_namespace = true
   namespace        = "argocd"
   version          = "5.27.1"
+
+  set {
+    name = "dex.enabled"
+    value = "false"
+  }
 }
