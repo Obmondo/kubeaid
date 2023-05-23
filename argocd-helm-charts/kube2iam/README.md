@@ -21,7 +21,7 @@ service. Before providing credentials it looks for an annotation such as:
 
 ```yaml
    annotations:
-    iam.amazonaws.com/allowed-roles: ["arn:aws:iam::438423213058:role/k8s-zalando-operator-staging"]
+    iam.amazonaws.com/allowed-roles: ["arn:aws:iam::190493893020:role/k8s-zalando-operator-staging"]
 ```
 
 In our case, namespace restrictions is there, for more refer[here](<https://github.com/>
@@ -31,7 +31,7 @@ if the namespace in which pod exist also contains the annotation such as:
 ```yaml
 annotations:
     iam.amazonaws.com/allowed-roles: |
-      ["arn:aws:iam::438423213058:role/k8s-zalando-operator-staging"]
+      ["arn:aws:iam::190493893020:role/k8s-zalando-operator-staging"]
 ```
 
 ## Conclusion
