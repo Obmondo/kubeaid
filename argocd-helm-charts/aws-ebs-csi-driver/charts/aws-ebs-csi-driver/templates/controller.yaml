@@ -87,7 +87,12 @@ spec:
             {{- if .Values.controller.sdkDebugLog }}
             - --aws-sdk-debug-log=true
             {{- end}}
-            - --logtostderr
+            {{- with .Values.controller.loggingFormat }}
+            - --logging-format={{ . }}
+            {{- end }}
+            {{- with .Values.controller.userAgentExtra }}
+            - --user-agent-extra={{ . }}
+            {{- end }}
             - --v={{ .Values.controller.logLevel }}
             {{- range .Values.controller.additionalArgs }}
             - {{ . }}
@@ -266,6 +271,9 @@ spec:
           args:
             - --csi-address=$(ADDRESS)
             - --leader-election=true
+            {{- if .Values.controller.extraCreateMetadata }}
+            - --extra-create-metadata
+            {{- end}}
           env:
             - name: ADDRESS
               value: /var/lib/csi/sockets/pluginproxy/csi.sock
@@ -287,6 +295,50 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.sidecars.snapshotter.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- end }}
+        {{- if (.Values.controller.volumeModificationFeature).enabled }}
+        - name: volumemodifier
+          image: {{ printf "%s%s:%s" (default "" .Values.image.containerRegistry) .Values.sidecars.volumemodifier.image.repository .Values.sidecars.volumemodifier.image.tag }}
+          imagePullPolicy: {{ default .Values.image.pullPolicy .Values.sidecars.volumemodifier.image.pullPolicy }}
+          args:
+            - --csi-address=$(ADDRESS)
+            - --v={{ .Values.sidecars.volumemodifier.logLevel }}
+            - --leader-election={{ .Values.sidecars.volumemodifier.leaderElection.enabled | required "leader election state for csi-volumemodifier is required, must be set to true || false." }}
+            {{- if .Values.sidecars.volumemodifier.leaderElection.enabled }}
+            {{- if .Values.sidecars.volumemodifier.leaderElection.leaseDuration }}
+            - --leader-election-lease-duration={{ .Values.sidecars.volumemodifier.leaderElection.leaseDuration }}
+            {{- end }}
+            {{- if .Values.sidecars.volumemodifier.leaderElection.renewDeadline}}
+            - --leader-election-renew-deadline={{ .Values.sidecars.volumemodifier.leaderElection.renewDeadline }}
+            {{- end }}
+            {{- if .Values.sidecars.volumemodifier.leaderElection.retryPeriod }}
+            - --leader-election-retry-period={{ .Values.sidecars.volumemodifier.leaderElection.retryPeriod }}
+            {{- end }}
+            {{- end }}
+          env:
+            - name: ADDRESS
+              value: /var/lib/csi/sockets/pluginproxy/csi.sock
+            {{- if .Values.proxy.http_proxy }}
+            {{- include "aws-ebs-csi-driver.http-proxy" . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.sidecars.volumemodifier.env }}
+            {{- . | toYaml | nindent 12 }}
+            {{- end }}
+          envFrom:
+            {{- with .Values.controller.envFrom }}
+            {{- . | toYaml | nindent 12 }}
+            {{- end }}
+          volumeMounts:
+            - name: socket-dir
+              mountPath: /var/lib/csi/sockets/pluginproxy/
+          {{- with default .Values.controller.resources .Values.sidecars.volumemodifier.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.sidecars.volumemodifier.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
