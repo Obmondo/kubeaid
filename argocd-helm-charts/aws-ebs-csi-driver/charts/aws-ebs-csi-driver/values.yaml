@@ -19,7 +19,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
-      tag: "v3.3.0-eks-1-25-latest"
+      tag: "v3.5.0-eks-1-27-3"
     logLevel: 2
     resources: {}
     # Tune leader lease election for csi-provisioner.
@@ -40,7 +40,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/external-attacher
-      tag: "v4.0.0-eks-1-25-latest"
+      tag: "v4.3.0-eks-1-27-3"
     # Tune leader lease election for csi-attacher.
     # Leader election is on by default.
     leaderElection:
@@ -63,7 +63,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/external-snapshotter/csi-snapshotter
-      tag: "v6.1.0-eks-1-25-latest"
+      tag: "v6.2.1-eks-1-27-3"
     logLevel: 2
     resources: {}
     securityContext:
@@ -73,7 +73,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/livenessprobe
-      tag: "v2.8.0-eks-1-25-latest"
+      tag: "v2.10.0-eks-1-27-3"
     resources: {}
     securityContext:
       readOnlyRootFilesystem: true
@@ -83,7 +83,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/external-resizer
-      tag: "v1.6.0-eks-1-25-latest"
+      tag: "v1.8.0-eks-1-27-3"
     logLevel: 2
     resources: {}
     securityContext:
@@ -94,7 +94,26 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar
-      tag: "v2.6.2-eks-1-25-latest"
+      tag: "v2.8.0-eks-1-27-3"
+    logLevel: 2
+    resources: {}
+    securityContext:
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+  volumemodifier:
+    env: []
+    image:
+      pullPolicy: IfNotPresent
+      repository: public.ecr.aws/ebs-csi-driver/volume-modifier-for-k8s
+      tag: "v0.1.0"
+    leaderElection:
+      enabled: true
+      # Optional values to tune lease behavior.
+      # The arguments provided must be in an acceptable time.ParseDuration format.
+      # Ref: https://pkg.go.dev/flag#Duration
+      # leaseDuration: "15s"
+      # renewDeadline: "10s"
+      # retryPeriod: "5s"
     logLevel: 2
     resources: {}
     securityContext:
@@ -110,8 +129,11 @@ nameOverride:
 fullnameOverride:
 
 controller:
+  volumeModificationFeature:
+    enabled: false
   additionalArgs: []
   sdkDebugLog: false
+  loggingFormat: text
   affinity:
     nodeAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
@@ -165,6 +187,7 @@ controller:
   # ID of the Kubernetes cluster used for tagging provisioned EBS volumes (optional).
   k8sTagClusterId:
   logLevel: 2
+  userAgentExtra: "helm"
   nodeSelector: {}
   podAnnotations: {}
   podLabels: {}
@@ -188,7 +211,6 @@ controller:
       cpu: 10m
       memory: 40Mi
     limits:
-      cpu: 100m
       memory: 256Mi
   serviceAccount:
   # A service account will be created for you if set to true. Set to false if you want to use your own.
@@ -238,6 +260,7 @@ node:
   env: []
   envFrom: []
   kubeletPath: /var/lib/kubelet
+  loggingFormat: text
   logLevel: 2
   priorityClassName:
   affinity:
@@ -262,7 +285,6 @@ node:
       cpu: 10m
       memory: 40Mi
     limits:
-      cpu: 100m
       memory: 256Mi
   serviceAccount:
     create: true
@@ -302,6 +324,16 @@ storageClasses: []
 #   reclaimPolicy: Retain
 #   parameters:
 #     encrypted: "true"
+
+volumeSnapshotClasses: []
+# Add VolumeSnapshotClass resources like:
+# - name: ebs-vsc
+#   # annotation metadata
+#   annotations:
+#     snapshot.storage.kubernetes.io/is-default-class: "true"
+#   # deletionPolicy must be specified
+#   deletionPolicy: Delete
+#   parameters:
 
 # Use old CSIDriver without an fsGroupPolicy set
 # Intended for use with older clusters that cannot easily replace the CSIDriver object
