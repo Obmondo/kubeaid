@@ -10,7 +10,7 @@
         rules: [
           {
             alert: 'KubernetesVersionInfoEOS',
-            expr: 'kubernetes_version_info_eos<=30',
+            expr: 'kubernetes_version_info_eos <= 30 and kubernetes_version_info_eos > 0',
             'for': '15m',
             labels: {
               severity: 'warning',
@@ -36,7 +36,7 @@
           },
           {
             alert: 'KubernetesVersionInfoEOL',
-            expr: 'kubernetes_version_info_eol<=60',
+            expr: 'kubernetes_version_info_eol <= 60 and kubernetes_version_info_eol > 0',
             'for': '15m',
             labels: {
               severity: 'warning',
