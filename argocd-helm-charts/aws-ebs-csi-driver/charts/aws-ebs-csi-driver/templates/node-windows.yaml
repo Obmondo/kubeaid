@@ -54,7 +54,9 @@ spec:
             {{- with .Values.node.volumeAttachLimit }}
             - --volume-attach-limit={{ . }}
             {{- end }}
-            - --logtostderr
+            {{- with .Values.node.loggingFormat }}
+            - --logging-format={{ . }}
+            {{- end }}
             - --v={{ .Values.node.logLevel }}
           env:
             - name: CSI_ENDPOINT
@@ -97,6 +99,9 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          securityContext:
+            windowsOptions:
+              runAsUserName: "ContainerAdministrator"
         - name: node-driver-registrar
           image: {{ printf "%s%s:%s" (default "" .Values.image.containerRegistry) .Values.sidecars.nodeDriverRegistrar.image.repository .Values.sidecars.nodeDriverRegistrar.image.tag }}
           imagePullPolicy: {{ default .Values.image.pullPolicy .Values.sidecars.nodeDriverRegistrar.image.pullPolicy }}
@@ -115,11 +120,22 @@ spec:
             {{- with .Values.sidecars.nodeDriverRegistrar.env }}
             {{- . | toYaml | nindent 12 }}
             {{- end }}
+          livenessProbe:
+            exec:
+              command:
+                - /csi-node-driver-registrar.exe
+                - --kubelet-registration-path=$(DRIVER_REG_SOCK_PATH)
+                - --mode=kubelet-registration-probe
+            initialDelaySeconds: 30
+            timeoutSeconds: 15
+            periodSeconds: 90
           volumeMounts:
             - name: plugin-dir
               mountPath: C:\csi
             - name: registration-dir
               mountPath: C:\registration
+            - name: probe-dir
+              mountPath: C:\var\lib\kubelet\plugins\ebs.csi.aws.com
           {{- with default .Values.node.resources .Values.sidecars.nodeDriverRegistrar.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
@@ -167,4 +183,6 @@ spec:
           hostPath:
             path: \\.\pipe\csi-proxy-filesystem-v1
             type: ""
+        - name: probe-dir
+          emptyDir: {}
 {{- end }}
