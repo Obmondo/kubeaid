@@ -124,6 +124,11 @@ local mixins = remove_nulls([
     (import 'gitlab.com/uneeq-oss/cert-manager-mixin/mixin.libsonnet'),
     vars,
   ),
+  addMixin(
+    'NodesMemoryFillingUp',
+    (import 'mixins/memory/mixin.libsonnet'),
+    vars,
+  ),
 ]);
 
 local scrape_namespaces = std.uniq(std.sort(std.flattenArrays(
