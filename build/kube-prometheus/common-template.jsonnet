@@ -88,6 +88,7 @@ local default_vars = {
     //   selector: 'schedule=~"^ops.+"',
     // },
   },
+  connect_keda: false,
 };
 
 local vars = std.mergePatch(default_vars, ext_vars);
@@ -218,24 +219,42 @@ local kp =
               }],
             },
             {
-              from: [{
-                namespaceSelector: {
-                  matchLabels: {
-                    'kubernetes.io/metadata.name': 'obmondo',
+              from: [
+                {
+                  namespaceSelector: {
+                    matchLabels: {
+                      'kubernetes.io/metadata.name': 'obmondo',
+                    },
+                  },
+                  podSelector: {
+                    matchLabels: {
+                      'app.kubernetes.io/name': 'obmondo-k8s-agent',
+                    },
                   },
                 },
-                podSelector: {
-                  matchLabels: {
-                    'app.kubernetes.io/name': 'obmondo-k8s-agent',
-                  },
-                },
-              }],
+              ],
               ports: [{
                 port: 9090,
                 protocol: 'TCP',
               }],
             },
-          ],
+          ] + (
+            if vars.connect_keda then [{
+              from: [
+                {
+                  podSelector: {
+                    matchLabels: {
+                      'app.kubernetes.io/part-of': 'keda-operator',
+                    },
+                  },
+                },
+              ],
+              ports: [{
+                port: 9090,
+                protocol: 'TCP',
+              }],
+            }] else []
+          ),
         },
       },
     },
