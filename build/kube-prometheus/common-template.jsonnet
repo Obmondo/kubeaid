@@ -80,6 +80,7 @@ local default_vars = {
     velero: false,
     'cert-manager': true,
     'kubernetes-version-info': true,
+    'node-memory': true,
   },
   mixin_configs: {
     // Example:
@@ -125,7 +126,7 @@ local mixins = remove_nulls([
     vars,
   ),
   addMixin(
-    'NodesMemoryFillingUp',
+    'node-memory',
     (import 'mixins/memory/mixin.libsonnet'),
     vars,
   ),
