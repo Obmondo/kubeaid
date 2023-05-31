@@ -11,7 +11,7 @@
           {
             alert: 'NodesMemoryFillingUp',
             expr: |||
-              ((Sum(node_memory_MemTotal_bytes) - Sum(node_memory_MemAvailable_bytes)) / Sum(node_memory_MemAvailable_bytes) * 100) > 80
+              ((sum(node_memory_MemTotal_bytes) - sum(node_memory_MemAvailable_bytes)) / sum(node_memory_MemTotal_bytes) * 100) > 80 && ((sum(node_memory_MemTotal_bytes) - sum(node_memory_MemAvailable_bytes)) / sum(node_memory_MemTotal_bytes) * 100) < 90
             ||| % $._config,
             'for': '15m',
             labels: {
@@ -25,7 +25,7 @@
           {
             alert: 'NodesMemoryFillingUp',
             expr: |||
-              ((Sum(node_memory_MemTotal_bytes) - Sum(node_memory_MemAvailable_bytes)) / Sum(node_memory_MemAvailable_bytes) * 100) > 90
+              ((sum(node_memory_MemTotal_bytes) - sum(node_memory_MemAvailable_bytes)) / sum(node_memory_MemTotal_bytes) * 100) > 90
             ||| % $._config,
             'for': '15m',
             labels: {
