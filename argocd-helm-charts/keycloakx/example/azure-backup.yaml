@@ -1,0 +1,18 @@
+logicalbackup:
+  enabled: true
+  provider: az
+  pgOperatorClusterName: keycloakx-pgsql
+  pgdatabase: keycloakx
+  s3bucket: prodpsqllogicalbackup
+  azurecontainer: k8sprodaz1
+  extraEnvVars:
+    - name: PGPASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: password
+          name: keycloak.keycloakx-pgsql.credentials.postgresql.acid.zalan.do
+    - name: LOGICAL_BACKUP_AZURE_STORAGE_ACCOUNT_KEY
+      valueFrom:
+        secretKeyRef:
+          key: LOGICAL_BACKUP_AZURE_STORAGE_ACCOUNT_KEY
+          name: keycloakx-pgsql-postgres-pod-env
