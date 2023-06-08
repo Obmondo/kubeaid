@@ -1,4 +1,6 @@
 keycloakx:
+  image:
+    tag: "21.1.0"
   command:
     - "/opt/keycloak/bin/kc.sh"
     - "--verbose"
