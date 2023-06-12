@@ -4,7 +4,7 @@ fluent-bit:
 
   resources:
     limits:
-      memory: 64Mi
+      memory: 256Mi
     requests:
       cpu: 12m
       memory: 32Mi
@@ -41,7 +41,7 @@ fluent-bit:
           DB                        /var/log/fluentbit.db
           DB.Sync                   Normal
           Rotate_Wait               30
-          Mem_Buf_Limit             30MB
+          Mem_Buf_Limit             100MB
           Skip_Empty_Lines          On
           Refresh_Interval          10
 
