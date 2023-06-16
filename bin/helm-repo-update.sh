@@ -40,6 +40,8 @@ declare SKIP_CHARTS=
 declare ARGOCD_CHART_PATH="argocd-helm-charts"
 declare CHART_VERSION=
 
+[ $# -eq 0 ] && { ARGFAIL; exit 1; }
+
 while [[ $# -gt 0 ]]; do
   arg="$1"
   shift
