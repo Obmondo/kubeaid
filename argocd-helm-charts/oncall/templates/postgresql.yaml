@@ -1,0 +1,22 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: oncall-pgsql
+spec:
+  instances: {{ ((.Values.postgresql).instance) | default 1 }}
+  bootstrap:
+    initdb:
+      database: oncall
+      owner: oncall
+  resources:
+    limits:
+      memory: {{ .Values.postgresql.resources.limits.memory | default "800Mi" }}
+      cpu: {{ .Values.postgresql.resources.limits.cpu | default "100m" }}
+    requests:
+      memory: {{ .Values.postgresql.resources.requests.memory | default "500Mi" }}
+      cpu: {{ .Values.postgresql.resources.requests.cpu | default "100m" }}
+  storage:
+    size: {{ .Values.postgresql.size }}
+    {{- if .Values.postgresql.storageClass }}
+    storageClass: {{ .Values.postgresql.storageClass }}
+    {{- end }}

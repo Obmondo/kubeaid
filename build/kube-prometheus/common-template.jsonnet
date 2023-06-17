@@ -91,6 +91,7 @@ local default_vars = {
     // },
   },
   connect_keda: false,
+  grafana_plugins+: [],
 };
 
 local vars = std.mergePatch(default_vars, ext_vars);
@@ -355,6 +356,7 @@ local kp =
       },
 
       grafana+: {
+        plugins: vars.grafana_plugins,
         resources: vars.grafana_resources,
         analytics+: {
           check_for_updates: false,
