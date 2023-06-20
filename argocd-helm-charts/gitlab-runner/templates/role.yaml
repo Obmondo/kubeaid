@@ -46,4 +46,12 @@ rules:
     - get
     - create
     - delete
+- apiGroups:
+    - monitoring.coreos.com
+  resources:
+    - servicemonitors
+  verbs:
+    - get
+    - list
+    - watch
 {{- end -}}

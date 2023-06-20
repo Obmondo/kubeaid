@@ -80,6 +80,7 @@ local default_vars = {
     velero: false,
     'cert-manager': true,
     'kubernetes-version-info': true,
+    'node-count-monthly-status': true,
     'node-memory': true,
   },
   mixin_configs: {
@@ -118,6 +119,11 @@ local mixins = remove_nulls([
   addMixin(
     'kubernetes-version-info',
     (import 'mixins/kube-version/mixin.libsonnet'),
+    vars,
+  ),
+  addMixin(
+    'node-count-monthly-status',
+    (import 'mixins/node-count/mixin.libsonnet'),
     vars,
   ),
   addMixin(
