@@ -6,7 +6,7 @@
 # enabling node-agent). Required.
 image:
   repository: velero/velero
-  tag: v1.10.0
+  tag: v1.11.0
   # Digest value example: sha256:d238835e151cec91c6a811fe3a89a66d3231d9f64d09e5f3c49552672d271f38.
   # If used, it will take precedence over the image.tag.
   # digest:
@@ -53,13 +53,13 @@ dnsPolicy: ClusterFirst
 # If the value is a string then it is evaluated as a template.
 initContainers:
   # - name: velero-plugin-for-csi
-  #   image: velero/velero-plugin-for-csi:v0.3.2
+  #   image: velero/velero-plugin-for-csi:v0.5.0
   #   imagePullPolicy: IfNotPresent
   #   volumeMounts:
   #     - mountPath: /target
   #       name: plugins
   # - name: velero-plugin-for-aws
-  #   image: velero/velero-plugin-for-aws:v1.5.2
+  #   image: velero/velero-plugin-for-aws:v1.7.0
   #   imagePullPolicy: IfNotPresent
   #   volumeMounts:
   #     - mountPath: /target
@@ -151,6 +151,18 @@ metrics:
     prometheus.io/path: "/metrics"
 
   serviceMonitor:
+    autodetect: true
+    enabled: false
+    annotations: {}
+    additionalLabels: {}
+    # ServiceMonitor namespace. Default to Velero namespace.
+    # namespace:
+    # ServiceMonitor connection scheme. Defaults to HTTP.
+    # scheme: ""
+    # ServiceMonitor connection tlsConfig. Defaults to {}.
+    # tlsConfig: {}
+  nodeAgentPodMonitor:
+    autodetect: true
     enabled: false
     annotations: {}
     additionalLabels: {}
@@ -221,17 +233,13 @@ cleanUpCRDs: false
 ## and additional server settings.
 ##
 configuration:
-  # Cloud provider being used (e.g. aws, azure, gcp).
-  provider:
-
-  # Parameters for the `default` BackupStorageLocation. See
-  # https://velero.io/docs/v1.6/api-types/backupstoragelocation/
+  # Parameters for the BackupStorageLocation(s). Configure multiple by adding other element(s) to the backupStorageLocation slice.
+  # See https://velero.io/docs/v1.6/api-types/backupstoragelocation/
   backupStorageLocation:
     # name is the name of the backup storage location where backups should be stored. If a name is not provided,
     # a backup storage location will be created with the name "default". Optional.
-    name:
-    # provider is the name for the backup storage location provider. If omitted
-    # `configuration.provider` will be used instead.
+  - name:
+    # provider is the name for the backup storage location provider.
     provider:
     # bucket is the name of the bucket to store backups in. Required.
     bucket:
@@ -244,6 +252,11 @@ configuration:
     # accessMode determines if velero can write to this backup storage location. Optional.
     # default to ReadWrite, ReadOnly is used during migrations and restores.
     accessMode: ReadWrite
+    credential:
+      # name of the secret used by this backupStorageLocation.
+      name:
+      # name of key that contains the secret data to be used.
+      key:
     # Additional provider-specific configuration. See link above
     # for details of required/optional fields for your provider.
     config: {}
@@ -259,14 +272,16 @@ configuration:
     #  Name of the GCP service account to use for this backup storage location. Specify the
     #  service account here if you want to use workload identity instead of providing the key file.(GCP only)
     #  serviceAccount:
+    #  Option to skip certificate validation or not if insecureSkipTLSVerify is set to be true, the client side should set the
+    #  flag. For Velero client Command like velero backup describe, velero backup logs needs to add the flag --insecure-skip-tls-verify
+    #  insecureSkipTLSVerify:
 
-  # Parameters for the `default` VolumeSnapshotLocation. See
-  # https://velero.io/docs/v1.6/api-types/volumesnapshotlocation/
+  # Parameters for the VolumeSnapshotLocation(s). Configure multiple by adding other element(s) to the volumeSnapshotLocation slice.
+  # See https://velero.io/docs/v1.6/api-types/volumesnapshotlocation/
   volumeSnapshotLocation:
     # name is the name of the volume snapshot location where snapshots are being taken. Required.
-    name:
-    # provider is the name for the volume snapshot provider. If omitted
-    # `configuration.provider` will be used instead.
+  - name:
+    # provider is the name for the volume snapshot provider.
     provider:
     # Additional provider-specific configuration. See link above
     # for details of required/optional fields for your provider.
@@ -484,6 +499,7 @@ nodeAgent:
 #     useOwnerReferencesInBackup: false
 #     template:
 #       ttl: "240h"
+#       storageLocation: default
 #       includedNamespaces:
 #       - foo
 schedules: {}
@@ -496,7 +512,7 @@ schedules: {}
 #       velero.io/plugin-config: ""
 #       velero.io/pod-volume-restore: RestoreItemAction
 #     data:
-#       image: velero/velero-restore-helper:v1.10.0
+#       image: velero/velero-restore-helper:v1.10.2
 configMaps: {}
 
 ##
