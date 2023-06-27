@@ -6,7 +6,7 @@ Velero has two main components: a CLI, and a server-side Kubernetes deployment.
 
 ## Installing the Velero CLI
 
-See the different options for installing the [Velero CLI](https://velero.io/docs/v1.10/basic-install/#install-the-cli).
+See the different options for installing the [Velero CLI](https://velero.io/docs/v1.11/basic-install/#install-the-cli).
 
 ## Installing the Velero server
 
@@ -16,7 +16,7 @@ Kubernetes v1.16+, because this helm chart uses CustomResourceDefinition `apiext
 
 ### Velero version
 
-This helm chart installs Velero version v1.10 https://velero.io/docs/v1.10/. See the [#Upgrading](#upgrading) section for information on how to upgrade from other versions.
+This helm chart installs Velero version v1.11 https://velero.io/docs/v1.11/. See the [#Upgrading](#upgrading) section for information on how to upgrade from other versions.
 
 ### Provider credentials
 
@@ -26,7 +26,7 @@ When installing using the Helm chart, the provider's credential information will
 
 The default configuration values for this chart are listed in values.yaml.
 
-See Velero's full [official documentation](https://velero.io/docs/v1.10/basic-install/). More specifically, find your provider in the Velero list of [supported providers](https://velero.io/docs/v1.10/supported-providers/) for specific configuration information and examples.
+See Velero's full [official documentation](https://velero.io/docs/v1.11/basic-install/). More specifically, find your provider in the Velero list of [supported providers](https://velero.io/docs/v1.11/supported-providers/) for specific configuration information and examples.
 
 #### Set up Helm
 
@@ -46,12 +46,13 @@ helm install velero vmware-tanzu/velero \
 --namespace <YOUR NAMESPACE> \
 --create-namespace \
 --set-file credentials.secretContents.cloud=<FULL PATH TO FILE> \
---set configuration.provider=<PROVIDER NAME> \
---set configuration.backupStorageLocation.name=<BACKUP STORAGE LOCATION NAME> \
---set configuration.backupStorageLocation.bucket=<BUCKET NAME> \
---set configuration.backupStorageLocation.config.region=<REGION> \
---set configuration.volumeSnapshotLocation.name=<VOLUME SNAPSHOT LOCATION NAME> \
---set configuration.volumeSnapshotLocation.config.region=<REGION> \
+--set configuration.backupStorageLocation[0].name=<BACKUP STORAGE LOCATION NAME> \
+--set configuration.backupStorageLocation[0].provider=<PROVIDER NAME> \
+--set configuration.backupStorageLocation[0].bucket=<BUCKET NAME> \
+--set configuration.backupStorageLocation[0].config.region=<REGION> \
+--set configuration.volumeSnapshotLocation[0].name=<VOLUME SNAPSHOT LOCATION NAME> \
+--set configuration.volumeSnapshotLocation[0].provider=<PROVIDER NAME> \
+--set configuration.volumeSnapshotLocation[0].config.region=<REGION> \
 --set initContainers[0].name=velero-plugin-for-<PROVIDER NAME> \
 --set initContainers[0].image=velero/velero-plugin-for-<PROVIDER NAME>:<PROVIDER PLUGIN TAG> \
 --set initContainers[0].volumeMounts[0].mountPath=/target \
@@ -72,22 +73,26 @@ helm install vmware-tanzu/velero --namespace <YOUR NAMESPACE> -f values.yaml --g
 If a value needs to be added or changed, you may do so with the `upgrade` command. An example:
 
 ```bash
-helm upgrade <RELEASE NAME> vmware-tanzu/velero --namespace <YOUR NAMESPACE> --reuse-values --set configuration.provider=<NEW PROVIDER>
+helm upgrade <RELEASE NAME> vmware-tanzu/velero --namespace <YOUR NAMESPACE> --reuse-values --set configuration.backupStorageLocation[0].provider=<NEW PROVIDER>
 ```
 
 #### Using Helm 2
 
-We're no longer support Helm v2 since it's deprecated in November 2020.
+We're no longer supporting Helm v2 since it was deprecated in November 2020.
 
 ##### Upgrade the configuration
 
 If a value needs to be added or changed, you may do so with the `upgrade` command. An example:
 
 ```bash
-helm upgrade vmware-tanzu/velero <RELEASE NAME> --reuse-values --set configuration.provider=<NEW PROVIDER> 
+helm upgrade vmware-tanzu/velero <RELEASE NAME> --reuse-values --set configuration.backupStorageLocation[0].provider=<NEW PROVIDER>
 ```
 
 ## Upgrading
+
+### Upgrading to v1.11
+
+The [instructions found here](https://velero.io/docs/v1.11/upgrade-to-1.11/) will assist you in upgrading from version v1.10.x to v1.11.
 
 ### Upgrading to v1.10
 
