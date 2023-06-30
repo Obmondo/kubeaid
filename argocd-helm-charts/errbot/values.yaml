@@ -4,7 +4,8 @@
 
 appName: errbot
 
-additionalLabels: {}
+additionalLabels:
+  {}
   # l1: val1
   # l2: val2
 
