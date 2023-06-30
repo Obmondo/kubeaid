@@ -104,8 +104,11 @@ function update_helm_chart {
   HELM_CHART_NAME=$(yq eval '.dependencies[].name' "$HELM_CHART_YAML")
   HELM_CHART_VERSION=$(yq eval '.dependencies[].version' "$HELM_CHART_YAML")
   HELM_CHART_DEP_PRESENT=$(yq eval '.dependencies | length' "$HELM_CHART_YAML")
+  echo "HELM_CHART_DEP_PRESENT: ${HELM_CHART_DEP_PRESENT}"
+  echo "HELM_CHART_YAML: ${HELM_CHART_YAML}"
   HELM_REPOSITORY_URL=$(yq eval '.dependencies[].repository' "$HELM_CHART_YAML")
   HELM_CHART_DEP_PATH="$HELM_CHART_PATH/charts"
+  echo "1. HELM_REPOSITORY_URL: ${HELM_REPOSITORY_URL}"
 
   for SKIP_HELM_CHART in "${SKIP_HELM_CHARTS[@]}"; do
     if [ "$HELM_REPO_NAME" == "$SKIP_HELM_CHART" ]; then
@@ -118,8 +121,15 @@ function update_helm_chart {
   if [ "$HELM_CHART_DEP_PRESENT" -ne 0 ]; then
 
     # Add the repo
+    echo "BEFORE ADD HELM CHARTS"
+    echo "HELM_REPO_NAME: ${HELM_REPO_NAME}"
+    echo "2. HELM_REPOSITORY_URL: ${HELM_REPOSITORY_URL}"
     if ! helm repo list -o yaml | yq eval -e ".[].name == \"$HELM_REPO_NAME\"" >/dev/null 2>/dev/null; then
-      helm repo add "$HELM_REPO_NAME" "$HELM_REPOSITORY_URL" >/dev/null
+      echo "ADD HELM CHARTS"
+      for helm_repo_url in $HELM_REPOSITORY_URL; do
+        helm repo add "$HELM_REPO_NAME" "$helm_repo_url" >/dev/null
+      done
+      # helm repo add "$HELM_REPO_NAME" "$HELM_REPOSITORY_URL" >/dev/null
     fi
 
     # Check if we have an upstream chart already present or not
@@ -147,6 +157,7 @@ function update_helm_chart {
         rm -rf "${HELM_CHART_DEP_PATH:?}/${HELM_CHART_NAME}"
 
         # Untar the tgz file
+        echo "HELM_CHART_DEP_PATH: ${HELM_CHART_DEP_PATH}"
         tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_UPSTREAM_CHART_VERSION.tgz"
 
       else
@@ -161,6 +172,7 @@ function update_helm_chart {
       echo "Deleting old $HELM_CHART_NAME before untar"
       rm -rf "${HELM_CHART_DEP_PATH:?}/${HELM_CHART_NAME}"
 
+      echo "HELM_CHART_DEP_PATH: ${HELM_CHART_DEP_PATH}"
       # Untar the tgz file
       tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz"
     fi
