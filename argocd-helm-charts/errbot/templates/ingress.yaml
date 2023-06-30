@@ -1,15 +1,22 @@
 {{- if .Values.ingress.enabled -}}
+{{- $appName := .Values.appName -}}
 
-{{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
-apiVersion: networking.k8s.io/v1beta1
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" -}}
+apiVersion: "networking.k8s.io/v1"
+{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" -}}
+apiVersion: "networking.k8s.io/v1beta1"
 {{- else -}}
-apiVersion: extensions/v1beta1
+apiVersion: "extensions/v1beta1"
 {{- end }}
+
 kind: Ingress
 metadata:
   name: {{ .Values.appName }}
   labels:
     app: {{ .Values.appName }}
+    {{- range $key, $val := .Values.additionalLabels }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -32,9 +39,18 @@ spec:
         paths:
           {{- range .paths }}
           - path: {{ .path }}
+            {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
             backend:
-              serviceName: {{ .Values.appName }}
+              service:
+                name: {{ $appName }}
+                port:
+                  number: 3141
+            pathType: Prefix
+            {{- else }}
+            backend:
+              serviceName: {{ $appName }}
               servicePort: 3141
+            {{- end }}
           {{- end }}
     {{- end }}
 

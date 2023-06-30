@@ -4,6 +4,11 @@
 
 appName: errbot
 
+additionalLabels:
+  {}
+  # l1: val1
+  # l2: val2
+
 image:
   repository: registry.obmondo.com/obmondo/dockerfiles/errbot
   pullPolicy: Always
