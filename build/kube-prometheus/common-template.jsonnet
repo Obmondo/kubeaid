@@ -232,6 +232,11 @@ local kp =
             },
             {
               from: [{
+                namespaceSelector: {
+                  matchLabels: {
+                    'kubernetes.io/metadata.name': 'mattermost',
+                  },
+                },
                 podSelector: {
                   matchLabels: {
                     'k8id.io/permissions': 'allow-prometheus',
