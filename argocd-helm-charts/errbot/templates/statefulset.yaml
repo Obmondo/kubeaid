@@ -13,6 +13,9 @@ spec:
     metadata:
       labels:
         app: {{ .Values.appName }}
+        {{- range $key, $val := .Values.additionalLabels }}
+        {{ $key }}: {{ $val | quote }}
+        {{- end }}
     spec:
       terminationGracePeriodSeconds: 10
       {{- with .Values.imagePullSecrets }}
@@ -55,4 +58,4 @@ spec:
         accessModes: ["ReadWriteOnce"]
         resources:
           requests:
-            storage: 5Gi
+            storage: 1Gi
