@@ -117,6 +117,8 @@ function update_helm_chart {
     fi
   done
 
+  dependencies=$(yq eval '.dependencies[] | .name + "," + .repository' "$HELM_CHART_YAML")
+
   # This chart does not have any dependencies, so lets not do helm dep up
   if [ "$HELM_CHART_DEP_PRESENT" -ne 0 ]; then
 
@@ -126,8 +128,12 @@ function update_helm_chart {
     echo "2. HELM_REPOSITORY_URL: ${HELM_REPOSITORY_URL}"
     if ! helm repo list -o yaml | yq eval -e ".[].name == \"$HELM_REPO_NAME\"" >/dev/null 2>/dev/null; then
       echo "ADD HELM CHARTS"
-      for helm_repo_url in $HELM_REPOSITORY_URL; do
-        helm repo add "$HELM_REPO_NAME" "$helm_repo_url" >/dev/null
+      for dep in $dependencies; do
+        helm_chart_name=$(echo "$dep" | cut -d ',' -f 1)
+        echo "HELM_CHART_NAME: ${helm_chart_name}"
+        helm_repo_url=$(echo "$dep" | cut -d ',' -f 2)
+        echo "1. HELM_REPOSITORY_URL: ${helm_repo_url}"
+        helm repo add "${helm_chart_name}" "${helm_repo_url}"
       done
       # helm repo add "$HELM_REPO_NAME" "$HELM_REPOSITORY_URL" >/dev/null
     fi
