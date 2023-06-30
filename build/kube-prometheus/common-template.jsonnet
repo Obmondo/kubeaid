@@ -231,6 +231,19 @@ local kp =
               }],
             },
             {
+              from: [{
+                podSelector: {
+                  matchLabels: {
+                    'k8id.io/permissions': 'allow-prometheus',
+                  },
+                },
+              }],
+              ports: [{
+                port: 9090,
+                protocol: 'TCP',
+              }],
+            },
+            {
               from: [
                 {
                   namespaceSelector: {

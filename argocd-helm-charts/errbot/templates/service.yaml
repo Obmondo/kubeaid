@@ -4,6 +4,9 @@ metadata:
   name: {{ .Values.appName }}
   labels:
     app: {{ .Values.appName }}
+    {{- range $key, $val := .Values.additionalLabels }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
 spec:
   type: ClusterIP
   ports:
