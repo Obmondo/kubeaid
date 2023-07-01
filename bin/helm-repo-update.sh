@@ -110,6 +110,8 @@ function update_helm_chart {
   HELM_CHART_DEP_PATH="$HELM_CHART_PATH/charts"
   echo "1. HELM_REPOSITORY_URL: ${HELM_REPOSITORY_URL}"
 
+  echo "000. HELM_CHART_VERSION: ${HELM_CHART_VERSION}"
+
   for SKIP_HELM_CHART in "${SKIP_HELM_CHARTS[@]}"; do
     if [ "$HELM_REPO_NAME" == "$SKIP_HELM_CHART" ]; then
       echo "Skipping $SKIP_HELM_CHART"
@@ -117,7 +119,7 @@ function update_helm_chart {
     fi
   done
 
-  dependencies=$(yq eval '.dependencies[] | .name + "," + .repository' "$HELM_CHART_YAML")
+  dependencies=$(yq eval '.dependencies[] | .name + "," + .repository + "," + .version' "$HELM_CHART_YAML")
 
   # This chart does not have any dependencies, so lets not do helm dep up
   if [ "$HELM_CHART_DEP_PRESENT" -ne 0 ]; then
@@ -130,9 +132,7 @@ function update_helm_chart {
       echo "ADD HELM CHARTS"
       for dep in $dependencies; do
         helm_chart_name=$(echo "$dep" | cut -d ',' -f 1)
-        echo "HELM_CHART_NAME: ${helm_chart_name}"
         helm_repo_url=$(echo "$dep" | cut -d ',' -f 2)
-        echo "1. HELM_REPOSITORY_URL: ${helm_repo_url}"
         helm repo add "${helm_chart_name}" "${helm_repo_url}"
       done
       # helm repo add "$HELM_REPO_NAME" "$HELM_REPOSITORY_URL" >/dev/null
@@ -151,21 +151,39 @@ function update_helm_chart {
       # if there is difference, run helm dep up or else skip
       if [ "$HELM_UPSTREAM_CHART_VERSION" != "$HELM_CHART_VERSION" ]; then
         echo "HELMING $HELM_CHART_NAME"
-
+        for dep in $dependencies; do
+          helm_chart_version=$(echo "$dep" | cut -d ',' -f 3)
+          echo "1000. helm_chart_version: ${helm_chart_version}"
+          echo "HELM_CHART_VERSION: ${HELM_CHART_VERSION}"
+          helm_chart_version=$(echo "$dep" | cut -d ',' -f 3 | sed "s/.*/$HELM_UPSTREAM_CHART_VERSION/")
+          # yq eval -i ".dependencies[].version = \"$HELM_UPSTREAM_CHART_VERSION\"" "${helm_chart_version}"
+          echo "1001. helm_chart_version: ${helm_chart_version}"
+          echo "INSIDE"
+        done
+        echo "OUTSIDE"
         # Update the chart.yaml file
-        yq eval -i ".dependencies[].version = \"$HELM_UPSTREAM_CHART_VERSION\"" "$HELM_CHART_YAML"
-
+        # yq eval -i ".dependencies[].version = \"$HELM_UPSTREAM_CHART_VERSION\"" "$HELM_CHART_YAML"
+        # echo "OUTPUT: $(yq eval -i '.dependencies[].version')"
+        echo "304 DEPENDENCIES: ${dependencies}"
+        echo "1."
         # Go to helm chart, 1st layer
         helm dependencies update "$HELM_CHART_PATH"
-
+        echo "2."
         # Deleting old helm before untar
         echo "Deleing old $HELM_CHART_NAME before untar"
         rm -rf "${HELM_CHART_DEP_PATH:?}/${HELM_CHART_NAME}"
-
+        echo "3."
         # Untar the tgz file
-        echo "HELM_CHART_DEP_PATH: ${HELM_CHART_DEP_PATH}"
-        tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_UPSTREAM_CHART_VERSION.tgz"
+        for dep in $dependencies; do
+          echo "4."
 
+          helm_chart_version=$(echo "$dep" | cut -d ',' -f 3)
+          echo "1000. helm_chart_version: ${helm_chart_version}"
+          helm_chart_name=$(echo "$dep" | cut -d ',' -f 1)
+          echo "10001. helm_chart_name: ${helm_chart_name}"
+          tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$helm_chart_name-$helm_chart_version.tgz"
+        done
+        echo "5."
       else
         echo "Helm chart $HELM_REPO_NAME is already on latest version $HELM_CHART_VERSION"
       fi
@@ -177,10 +195,12 @@ function update_helm_chart {
       # Deleting old helm before untar
       echo "Deleting old $HELM_CHART_NAME before untar"
       rm -rf "${HELM_CHART_DEP_PATH:?}/${HELM_CHART_NAME}"
-
-      echo "HELM_CHART_DEP_PATH: ${HELM_CHART_DEP_PATH}"
-      # Untar the tgz file
-      tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz"
+      echo "000000. HELM_CHART_VERSION: ${HELM_CHART_VERSION}"
+      for dep in $dependencies; do
+        helm_chart_version=$(echo "$dep" | cut -d ',' -f 3)
+        helm_chart_name=$(echo "$dep" | cut -d ',' -f 1)
+        tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$helm_chart_name-$helm_chart_version.tgz"
+      done
     fi
   fi
 }
