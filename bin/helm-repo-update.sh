@@ -111,21 +111,24 @@ function update_helm_chart {
     fi
   done
 
+  # Extract dependencies array from YAML file
   dependencies=$(yq eval '.dependencies' "$HELM_CHART_YAML")
 
   # This chart does not have any dependencies, so lets not do helm dep up
   if [ "$HELM_CHART_DEP_PRESENT" -ne 0 ]; then
     
+    # It support helm chart updation for multiple dependencies
+    # Iterate over each dependency and extract the desired values
     while IFS='' read -r line; do
       if [[ $line == *"name"* ]]; then
-        name=$(echo "$line" | awk '{print $2}')
-        HELM_CHART_NAME=$name
+      # Get dependency chart name
+        HELM_CHART_NAME=$(echo "$line" | awk '{print $2}')
       elif [[ $line == *"version"* ]]; then
-        version=$(echo "$line" | awk '{print $2}')
-        HELM_CHART_VERSION=$version
+      # Get dependency chart version
+        HELM_CHART_VERSION=$(echo "$line" | awk '{print $2}')
       elif [[ $line == *"repository"* ]]; then
-        repository=$(echo "$line" | awk '{print $2}')
-        HELM_REPOSITORY_URL=$repository
+      # Get dependency repository url
+        HELM_REPOSITORY_URL=$(echo "$line" | awk '{print $2}')
         echo "HELM_CHART_NAME: $name"
         echo "HELM_CHART_VERSION: $version"
         echo "HELM_REPOSITORY_URL: $repository"
@@ -150,7 +153,7 @@ function update_helm_chart {
           # if there is difference, run helm dep up or else skip
           if [ "$HELM_UPSTREAM_CHART_VERSION" != "$HELM_CHART_VERSION" ]; then
             echo "HELMING $HELM_CHART_NAME"
-            
+
             # Update the chart.yaml file
             yq eval -i ".dependencies[].version = \"$HELM_UPSTREAM_CHART_VERSION\"" "$HELM_CHART_YAML"
 
