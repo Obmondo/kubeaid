@@ -4,15 +4,19 @@ Code better in up to 27 languages. Improve Code Quality and Code Security throug
 
 ## Introduction
 
-This chart bootstraps an instance of the latest SonarQube version with a PostgreSQL database. A helm chart is also available for the [LTS version](../sonarqube-lts).
+This chart bootstraps an instance of the latest SonarQube version with a PostgreSQL database.
 
-Please note that this chart only supports SonarQube Community, Developer, and Enterprise Editions.
+The latest version of the chart installs the latest SonarQube version.
+
+To install the version of the chart for SonarQube 9.9 LTS, please read the section [below](#installing-the-sonarqube-99-lts-chart). Deciding between LTS and Latest? [This may help](https://www.sonarsource.com/products/sonarqube/downloads/lts/)
+
+Please note that this chart only supports SonarQube Community, Developer, and Enterprise editions.
 
 ## Compatibility
 
-| SonarQube Version | Kubernetes Version | Helm Chart Version |
-|-------------------|--------------------|--------------------|
-| latest            | 1.19, 1.20, 1.21   | 2.0                |
+Compatible SonarQube Version: `10.1.0`
+
+Supported Kubernetes Versions: From `1.24` to `1.27`
 
 ## Installing the chart
 
@@ -25,9 +29,22 @@ kubectl create namespace sonarqube
 helm upgrade --install -n sonarqube sonarqube sonarqube/sonarqube
 ```
 
-The above command deploys Sonarqube on the Kubernetes cluster in the default configuration in the sonarqube namespace. The [configuration](#configuration) section lists the parameters that can be configured during installation.
+The above command deploys SonarQube on the Kubernetes cluster in the default configuration in the sonarqube namespace. The [configuration](#configuration) section lists the parameters that can be configured during installation.
 
 The default login is admin/admin.
+
+## Installing the SonarQube 9.9 LTS chart
+
+The version of the chart for the SonarQube 9.9 LTS is being distributed as the `8.x.x` version of this chart.
+
+In order to use it, please set the version constraint `~8`, which is equivalent to `>=8.0.0 && <= 9.0.0`. That version parameter **must** be used in every helm related command including `install`, `upgrade`, `template`, and `diff` (don't treat this as an exhaustive list).
+
+Example:
+```
+helm upgrade --install -n sonarqube --version ~8 sonarqube sonarqube/sonarqube
+```
+
+To upgrade from the old and unmaintained [sonarqube-lts chart](https://artifacthub.io/packages/helm/sonarqube/sonarqube-lts), please follow the steps described [in this section](#upgrade-from-the-old-sonarqube-lts-to-this-chart).
 
 ## How to use it
 
@@ -45,6 +62,36 @@ kindly-newt 1           Mon Oct  2 15:05:44 2017    DEPLOYED    sonarqube-0.1.0 
 $ helm delete kindly-newt
 ```
 
+## Prerequisites and suggested settings for production
+
+Please read the official documentation prerequisites [here](https://docs.sonarqube.org/latest/requirements/prerequisites-and-overview/).
+
+### Elasticsearch prerequisites
+
+SonarQube runs Elasticsearch under the hood.
+
+Elasticsearch is rolling out (strict) prerequisites that cannot be disabled when running in production context (see [this](https://www.elastic.co/blog/bootstrap_checks_annoying_instead_of_devastating) blog post regarding bootstrap checks, and the [official guide](https://www.elastic.co/guide/en/elasticsearch/reference/5.0/bootstrap-checks.html)).
+
+Because of such constraints, even when running in Docker containers, SonarQube requires some settings at the host/kernel level.
+
+Please carefully read the following and make sure these configurations are set up at the host level:
+
+- [vm.max_map_count](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html#vm-max-map-count)
+- [seccomp filter should be available](https://github.com/SonarSource/docker-sonarqube/issues/614)
+
+In general, please carefully read the Elasticsearch's [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/system-config.html).
+
+### Production use case
+
+The SonarQube helm chart is packed with multiple features enabling users to install and test SonarQube on Kubernetes easily.
+
+Nonetheless, if you intend to run a production-grade SonarQube please follow these recommendations.
+
+- Set `nginx.enabled` to **false**. This parameter would run the nginx chart. This is useful for testing purposes only. Ingress controllers are critical Kubernetes components, we advise users to install their own.
+- Set `postgresql.enabled` to **false**. This parameter would run the postgresql pre-2022 bitnami chart. That is useful for testing purposes, however, given that the database is at the hearth of SonarQube, we advise users to be careful with it and use a well-maintained database as a service or deploy their own database on top of Kubernetes.
+- Set `initSysctl.enabled` to **false**. This parameter would run **root** `sysctl` commands, while those sysctl-related values should be set by the Kubernetes administrator at the node level (see [here](#elasticsearch-prerequisites))
+- Set `initFs.enabled` to **false**. This parameter would run **root** `chown` commands. The parameter exists to fix non-posix, CSI, or deprecated drivers.
+
 ## Upgrade
 
 1. Read through the [SonarQube Upgrade Guide](https://docs.sonarqube.org/latest/setup/upgrading/) to familiarize yourself with the general upgrade process (most importantly, back up your database)
@@ -52,6 +99,10 @@ $ helm delete kindly-newt
 3. Redeploy SonarQube with the same helm chart (see [Install instructions](#installing-the-chart))
 4. Browse to http://yourSonarQubeServerURL/setup and follow the setup instructions
 5. Reanalyze your projects to get fresh data
+
+### Upgrade from the old sonarqube-lts to this chart
+
+Please refer to the Helm upgrade section accessible [here](https://docs.sonarqube.org/latest/setup-and-upgrade/upgrade-the-server/upgrade-guide/)
 
 ## Ingress
 
@@ -79,39 +130,21 @@ ingress:
 
 ## Monitoring
 
-This Helm chart offers the possibilitie to monitor SonarQube with Prometheus. Per default the jmx metrics for the Web Bean and the CE Bean are exposed on port 8000 and 8001. These Values can be configures with `prometheusExporter.webBeanPort` and `prometheusExporter.ceBeanPort`.
+This Helm chart offers the possibility to monitor SonarQube with Prometheus.
+
+### Export JMX metrics
+
+The prometheus exporter (`prometheusExporter.enabled=true`) converts the JMX metrics into a format that Prometheus can understand. After the metrics are exported, you can connect your Prometheus instance and scrape them.
+
+Per default the JMX metrics for the Web Bean and the CE Bean are exposed on port 8000 and 8001. These values can be configured with `prometheusExporter.webBeanPort` and `prometheusExporter.ceBeanPort`.
 
 ### PodMonitor
 
-if you are using the Prometheus Operator, you can configure a PodMonitor like this to let the scrape configuration automatically be generated by the Operator:
-
-``` yaml
-apiVersion: monitoring.coreos.com/v1
-kind: PodMonitor
-metadata:
-  name: sonarqube
-  namespace: monitoring
-spec:
-  namespaceSelector:
-    matchNames:
-    - sonarqube
-  podMetricsEndpoints:
-  - interval: 30s
-    path: /
-    scheme: http
-    targetPort: monitoring-ce
-  - interval: 30s
-    path: /
-    scheme: http
-    targetPort: monitoring-web
-  selector:
-    matchLabels:
-      app: sonarqube
-```
+If a Prometheus Operator is deployed in your cluster, you can enable a PodMonitor resource with `prometheusMonitoring.podMonitor.enabled`. It scrapes the Prometheus endpoint `/api/monitoring/metrics` exposed by the SonarQube application.
 
 ## Configuration
 
-The following table lists the configurable parameters of the Sonarqube chart and their default values.
+The following table lists the configurable parameters of the SonarQube chart and their default values.
 
 ### Global
 
@@ -128,7 +161,7 @@ The following table lists the configurable parameters of the Sonarqube chart and
 | `hostAliases` | Aliases for IPs in /etc/hosts | `[]` |
 | `podLabels` | Map of labels to add to the pods | `{}` |
 | `env` | Environment variables to attach to the pods | `{}`|
-| `annotations` | Sonarqube Pod annotations | `{}` |
+| `annotations` | SonarQube Pod annotations | `{}` |
 | `edition` | SonarQube Edition to use (e.g. `community`, `developer` or `enterprise`) | `community` |
 
 ### NetworkPolicies
@@ -148,13 +181,13 @@ The following table lists the configurable parameters of the Sonarqube chart and
 
 ### Image
 
-| Parameter | Description | Default |
-| --------- | ----------- | ------- |
-| `image.repository` | image repository | `sonarqube` |
-| `image.tag` | `sonarqube` image tag. | `9.2.4-{{ .Values.edition }}` |
-| `image.pullPolicy` | Image pull policy  | `IfNotPresent` |
-| `image.pullSecret` | (DEPRECATED) imagePullSecret to use for private repository | `None` |
-| `image.pullSecrets` | imagePullSecrets to use for private repository | `None` |
+| Parameter | Description | Default                        |
+| --------- | ----------- |--------------------------------|
+| `image.repository` | image repository | `sonarqube`                    |
+| `image.tag` | `sonarqube` image tag. | `10.1.0-{{ .Values.edition }}` |
+| `image.pullPolicy` | Image pull policy  | `IfNotPresent`                 |
+| `image.pullSecret` | (DEPRECATED) imagePullSecret to use for private repository | `None`                         |
+| `image.pullSecrets` | imagePullSecrets to use for private repository | `None`                         |
 
 ### Security
 
@@ -195,7 +228,8 @@ The following table lists the configurable parameters of the Sonarqube chart and
 | `ingress.hosts[0].servicePort` | Optional field to override the default servicePort of a path | `None` |
 | `ingress.tls` | Ingress secrets for TLS certificates | `[]` |
 | `ingress.ingressClassName` | Optional field to configure ingress class name | `None` |
-| `ingress.annotations` | Optional field to add extra annotations to the ingress | `None` |
+| `ingress.annotations` | Field to add extra annotations to the ingress | {`nginx.ingress.kubernetes.io/proxy-body-size=64m`} |
+| `ingress.annotations.nginx.ingress.kubernetes.io/proxy-body-size` | Field to set the maximum allowed size of the client request body  | `64m` |
 
 ### Route
 
@@ -214,15 +248,18 @@ The following table lists the configurable parameters of the Sonarqube chart and
 | `readinessProbe.initialDelaySeconds` | ReadinessProbe initial delay for SonarQube checking | `60` |
 | `readinessProbe.periodSeconds` | ReadinessProbe period between checking SonarQube | `30` |
 | `readinessProbe.failureThreshold` | ReadinessProbe threshold for marking as failed | `6` |
+| `readinessProbe.timeoutSeconds`| ReadinessProbe timeout delay | `1` |
 | `readinessProbe.sonarWebContext` | SonarQube web context for readinessProbe | `/` |
 | `livenessProbe.initialDelaySeconds` | LivenessProbe initial delay for SonarQube checking | `60` |
 | `livenessProbe.periodSeconds` | LivenessProbe period between checking SonarQube | `30` |
 | `livenessProbe.sonarWebContext` | SonarQube web context for LivenessProbe | `/` |
 | `livenessProbe.failureThreshold` | LivenessProbe threshold for marking as dead | `6` |
+| `livenessProbe.timeoutSeconds`| LivenessProbe timeout delay | `1` |
 | `startupProbe.initialDelaySeconds` | StartupProbe initial delay for SonarQube checking | `30` |
 | `startupProbe.periodSeconds` | StartupProbe period between checking SonarQube | `10` |
 | `startupProbe.sonarWebContext` | SonarQube web context for StartupProbe | `/` |
 | `startupProbe.failureThreshold` | StartupProbe threshold for marking as failed | `24` |
+| `startupProbe.timeoutSeconds`| StartupProbe timeout delay | `1` |
 
 ### InitContainers
 
@@ -251,8 +288,8 @@ The following table lists the configurable parameters of the Sonarqube chart and
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
-| `prometheusExporter.enabled` | Use the Prometheus JMX exporter | `true` |
-| `prometheusExporter.version` | jmx_prometheus_javaagent version to download from Maven Central | `0.16.0` |
+| `prometheusExporter.enabled` | Use the Prometheus JMX exporter | `false` |
+| `prometheusExporter.version` | jmx_prometheus_javaagent version to download from Maven Central | `0.17.2` |
 | `prometheusExporter.noCheckCertificate` | Flag to not check server's certificate when downloading jmx_prometheus_javaagent | `false` |
 | `prometheusExporter.webBeanPort` | Port where the jmx_prometheus_javaagent exposes the metrics for the webBean | `8000` |
 | `prometheusExporter.ceBeanPort` | Port where the jmx_prometheus_javaagent exposes the metrics for the ceBean | `8001` |
@@ -264,12 +301,20 @@ The following table lists the configurable parameters of the Sonarqube chart and
 | `prometheusExporter.noProxy` | No proxy for downloading JMX agent | `""` |
 | `prometheusExporter.securityContext` | Security context for downloading the jmx agent | see `values.yaml` |
 
+### Monitoring (Prometheus PodMonitor)
+
+| `prometheusMonitoring.podMonitor.enabled` | Enable Prometheus PodMonitor | `false` |
+| `prometheusMonitoring.podMonitor.namespace` | Specify a custom namespace where the PodMonitor will be created | `default` |
+| `prometheusMonitoring.podMonitor.interval` | Specify the interval how often metrics should be scraped | `30s` |
+| `prometheusMonitoring.podMonitor.scrapeTimeout` | Specify the timeout after a scrape is ended | `None` |
+| `prometheusMonitoring.podMonitor.jobLabel` |  Name of the label on target services that prometheus uses as job name | `None` |
+
+
 ### Plugins
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
-| `plugins.install` | List of plugin JARs to download and install | `[]` |
-| `plugins.lib` | Plugins libraries to download and install | `[]` |
+| `plugins.install` | Link(s) to the plugin JARs to download and install | `[]` |
 | `plugins.resources` | Plugin Pod resource requests & limits | `{}` |
 | `plugins.httpProxy` | For use behind a corporate proxy when downloading plugins | `""` |
 | `plugins.httpsProxy` | For use behind a corporate proxy when downloading plugins | `""` |
@@ -280,13 +325,13 @@ The following table lists the configurable parameters of the Sonarqube chart and
 | `plugins.noCheckCertificate` | Flag to not check server's certificate when downloading plugins | `false` |
 | `plugins.securityContext` | Security context for the container to download plugins | see `values.yaml` |
 
-### Sonarqube Specific
+### SonarQube Specific
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
-| `jvmOpts` | Values to add to SONARQUBE_WEB_JVM_OPTS | `""` |
-| `jvmCeOpts` | Values to add to SONAR_CE_JAVAOPTS | `""` |
-| `sonarqubeFolder` | Directory name of Sonarqube | `/opt/sonarqube` |
+| `jvmOpts` | (DEPRECATED) Values to add to SONARQUBE_WEB_JVM_OPTS | `""` |
+| `jvmCeOpts` | (DEPRECATED) Values to add to SONAR_CE_JAVAOPTS | `""` |
+| `sonarqubeFolder` | Directory name of SonarQube | `/opt/sonarqube` |
 | `sonarProperties` | Custom `sonar.properties` key-value pairs (e.g., "sonarProperties.sonar.forceAuthentication=true") | `None` |
 | `sonarSecretProperties` | Additional `sonar.properties` key-value pairs to load from a secret | `None` |
 | `sonarSecretKey` | Name of existing secret used for settings encryption | `None` |
@@ -294,15 +339,17 @@ The following table lists the configurable parameters of the Sonarqube chart and
 | `monitoringPasscodeSecretName` | Name of the secret where to load `monitoringPasscode` | `None` |
 | `monitoringPasscodeSecretKey` | Key of an existing secret containing `monitoringPasscode` | `None` |
 | `extraContainers` | Array of extra containers to run alongside the `sonarqube` container (aka. Sidecars) | `[]` |
+| `extraVolumes` | Array of extra volumes to add to the SonarQube deployment | `[]` |
+| `extraVolumeMounts` | Array of extra volume mounts to add to the SonarQube deployment | `[]` |
 
 ### Resources
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
-| `resources.requests.memory` | Sonarqube memory request | `2Gi` |
-| `resources.requests.cpu` | Sonarqube cpu request | `400m` |
-| `resources.limits.memory` | Sonarqube memory limit | `4Gi` |
-| `resources.limits.cpu` | Sonarqube cpu limit | `800m` |
+| `resources.requests.memory` | SonarQube memory request | `2Gi` |
+| `resources.requests.cpu` | SonarQube cpu request | `400m` |
+| `resources.limits.memory` | SonarQube memory limit | `4Gi` |
+| `resources.limits.cpu` | SonarQube cpu limit | `800m` |
 
 ### Persistence
 
@@ -362,8 +409,7 @@ The following table lists the configurable parameters of the Sonarqube chart and
 | Parameter                    | Description                                                   | Default |
 |------------------------------|---------------------------------------------------------------| ------- |
 | `tests.enabled`              | Flag that allows tests to be excluded from the generated yaml | `true` |
-| `tests.image`                | Change test container image                                   | `bitnami/minideb-extras` |
-| `tests.initContainers.image` | Change test init container image                              | `bats/bats:1.2.1` |
+| `tests.image`                | Change test container image                                   | `` |
 
 ### ServiceAccount
 
@@ -413,12 +459,12 @@ In environments with air-gapped setup, especially with internal tooling (repos) 
    kind: Secret
    metadata:
      name: my-cacerts
-   data:
+   stringData:
      cert-1.crt: |
        xxxxxxxxxxxxxxxxxxxxxxx
    ```
 
-2. Upload your `cacerts.yaml` to a secret in the cluster you are installing Sonarqube to.
+2. Upload your `cacerts.yaml` to a secret in the cluster you are installing SonarQube to.
 
    ```shell
    kubectl apply -f cacerts.yaml
@@ -450,7 +496,7 @@ For environments where another tool, such as terraform or ansible, is used to pr
 
 In such environments, configuration may be read, via environment variables, from Secrets and ConfigMaps.
 
-1. Create a `ConfigMap` (or `Secret`) containing key/value pairs, as expected by Sonarqube
+1. Create a `ConfigMap` (or `Secret`) containing key/value pairs, as expected by SonarQube.
 
    ```yaml
    apiVersion: v1
