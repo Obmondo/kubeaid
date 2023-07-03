@@ -45,6 +45,9 @@ spec:
       {{- end }}
 {{- end }}
     spec:
+    {{- if .Values.schedulerName }}
+      schedulerName: {{ .Values.schedulerName }}
+    {{- end }}      
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}
       {{- if or .Values.image.pullSecrets .Values.image.pullSecret }}
@@ -117,11 +120,11 @@ spec:
           {{- end }}
       {{- end }}
 
-      {{- if or .Values.sonarProperties .Values.sonarSecretProperties }}
+      {{- if or .Values.sonarProperties .Values.sonarSecretProperties .Values.sonarSecretKey (not .Values.elasticsearch.bootstrapChecks) }}
         - name: concat-properties
           image: {{ default "busybox:1.32" .Values.initContainers.image }}
           imagePullPolicy: {{ .Values.image.pullPolicy  }}
-          command: 
+          command:
           - sh
           - -c
           - |
@@ -136,7 +139,7 @@ spec:
               awk 1 /tmp/props/sonar.properties /tmp/props/secret.properties > /tmp/result/sonar.properties
             fi
           volumeMounts:
-          {{- if .Values.sonarProperties }}
+          {{- if or .Values.sonarProperties .Values.sonarSecretKey (not .Values.elasticsearch.bootstrapChecks) }}
             - mountPath: /tmp/props/sonar.properties
               name: config
               subPath: sonar.properties
@@ -219,16 +222,9 @@ spec:
               name: sonarqube
               subPath: extensions
             {{- else if .Values.plugins.install }}
-            - mountPath: {{ .Values.sonarqubeFolder }}/extensions/downloads
+            - mountPath: {{ .Values.sonarqubeFolder }}/extensions/plugins
               name: sonarqube
-              subPath: extensions/downloads
-            {{- end }}
-            {{- if .Values.plugins.lib }}
-            {{- range $index, $val := .Values.plugins.lib }}
-            - mountPath: {{ $.Values.sonarqubeFolder }}/lib/common/{{ $val }}
-              name: sonarqube
-              subPath: lib/common/{{ $val }}
-            {{- end }}
+              subPath: extensions/plugins
             {{- end }}
             - mountPath: {{ .Values.sonarqubeFolder }}/temp
               name: sonarqube
@@ -247,12 +243,9 @@ spec:
             "-e",
             "/tmp/scripts/install_plugins.sh"]
           volumeMounts:
-            - mountPath: {{ .Values.sonarqubeFolder }}/extensions/downloads
+            - mountPath: {{ .Values.sonarqubeFolder }}/extensions/plugins
               name: sonarqube
-              subPath: extensions/downloads
-            - mountPath: {{ .Values.sonarqubeFolder }}/lib/common
-              name: sonarqube
-              subPath: lib/common
+              subPath: extensions/plugins
             - name: install-plugins
               mountPath: /tmp/scripts/
             {{- if .Values.plugins.netrcCreds }}
@@ -298,6 +291,11 @@ spec:
           resources:
 {{ toYaml (default .Values.resources .Values.resource) | indent 12 }}
           env:
+            {{- with .Values.env }}
+            {{- . | toYaml | trim | nindent 12 }}
+            {{- end }}
+            - name: SONAR_HELM_CHART_VERSION
+              value: {{ .Chart.Version | replace "+" "_" }}
             - name: SONAR_WEB_JAVAOPTS
               value: {{ template "sonarqube.jvmOpts" . }}
             - name: SONAR_CE_JAVAOPTS
@@ -317,9 +315,6 @@ spec:
                   name: {{ template "sonarqube.fullname" . }}-monitoring-passcode
                   key: SONAR_WEB_SYSTEMPASSCODE
                 {{- end }}
-            {{- with .Values.env }}
-            {{- . | toYaml | trim | nindent 12 }}
-            {{- end }}
           envFrom:
             - configMapRef:
                 name: {{ template "sonarqube.fullname" . }}-jdbc-config
@@ -338,11 +333,11 @@ spec:
               - -c
               - |
                 host="$(hostname -i || echo '127.0.0.1')"
-                reply=$(wget -qO- --header="X-Sonar-Passcode: $SONAR_WEB_SYSTEMPASSCODE" http://${host}:{{ .Values.service.internalPort }}{{ .Values.livenessProbe.sonarWebContext }}api/system/liveness 2>&1)
-                if [ -z "$reply" ]; then exit 0; else exit 1; fi
+                wget --no-proxy --quiet -O /dev/null --timeout={{ .Values.livenessProbe.timeoutSeconds }} --header="X-Sonar-Passcode: $SONAR_WEB_SYSTEMPASSCODE" "http://${host}:{{ .Values.service.internalPort }}{{ .Values.livenessProbe.sonarWebContext }}api/system/liveness"
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
             failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
           readinessProbe:
             exec:
               command:
@@ -353,13 +348,14 @@ spec:
                 # A Sonarqube container is considered ready if the status is UP, DB_MIGRATION_NEEDED or DB_MIGRATION_RUNNING
                 # status about migration are added to prevent the node to be kill while sonarqube is upgrading the database.
                 host="$(hostname -i || echo '127.0.0.1')"
-                if wget --proxy off -qO- http://${host}:{{ .Values.service.internalPort }}{{ .Values.readinessProbe.sonarWebContext }}api/system/status | grep -q -e '"status":"UP"' -e '"status":"DB_MIGRATION_NEEDED"' -e '"status":"DB_MIGRATION_RUNNING"'; then
+                if wget --no-proxy -qO- http://${host}:{{ .Values.service.internalPort }}{{ .Values.readinessProbe.sonarWebContext }}api/system/status | grep -q -e '"status":"UP"' -e '"status":"DB_MIGRATION_NEEDED"' -e '"status":"DB_MIGRATION_RUNNING"'; then
                 	exit 0
                 fi
                 exit 1
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
             failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
           startupProbe:
             httpGet:
               scheme: HTTP
@@ -368,6 +364,7 @@ spec:
             initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.startupProbe.periodSeconds }}
             failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+            timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
           {{- if .Values.containerSecurityContext }}
           securityContext:
 {{- toYaml .Values.containerSecurityContext | nindent 12 }}
@@ -376,13 +373,12 @@ spec:
 {{- if .Values.persistence.mounts }}
 {{ toYaml .Values.persistence.mounts | indent 12 }}
 {{- end }}
-            {{- if or .Values.sonarProperties .Values.sonarSecretProperties }}
+{{- if .Values.extraVolumeMounts }}
+{{- .Values.extraVolumeMounts | toYaml | nindent 12 }}
+{{- end }}
+            {{- if or .Values.sonarProperties .Values.sonarSecretProperties .Values.sonarSecretKey (not .Values.elasticsearch.bootstrapChecks) }}
             - mountPath: {{ .Values.sonarqubeFolder }}/conf/
               name: concat-dir
-            {{- else if or .Values.sonarProperties (not .Values.elasticsearch.bootstrapChecks) }}
-            - mountPath: {{ .Values.sonarqubeFolder }}/conf/sonar.properties
-              subPath: sonar.properties
-              name: config
             {{- end }}
             {{- if .Values.sonarSecretKey }}
             - mountPath: {{ .Values.sonarqubeFolder }}/secret/
@@ -401,16 +397,9 @@ spec:
               name: sonarqube
               subPath: extensions
             {{- else if .Values.plugins.install }}
-            - mountPath: {{ .Values.sonarqubeFolder }}/extensions/downloads
+            - mountPath: {{ .Values.sonarqubeFolder }}/extensions/plugins
               name: sonarqube
-              subPath: extensions/downloads
-            {{- end }}
-            {{- if .Values.plugins.lib }}
-            {{- range $index, $val := .Values.plugins.lib }}
-            - mountPath: {{ $.Values.sonarqubeFolder }}/lib/common/{{ $val }}
-              name: sonarqube
-              subPath: lib/common/{{ $val }}
-            {{- end }}
+              subPath: extensions/plugins
             {{- end }}
             - mountPath: {{ .Values.sonarqubeFolder }}/temp
               name: sonarqube
@@ -428,6 +417,9 @@ spec:
               subPath: prometheus-ce-config.yaml
               name: prometheus-ce-config
             {{- end }}
+    {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+    {{- end }}
     {{- if .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
@@ -449,7 +441,10 @@ spec:
 {{- if .Values.persistence.volumes }}
 {{ tpl (toYaml .Values.persistence.volumes | indent 6) . }}
 {{- end }}
-      {{- if or .Values.sonarProperties (not .Values.elasticsearch.bootstrapChecks) }}
+{{- if .Values.extraVolumes }}
+{{- .Values.extraVolumes | toYaml | nindent 6 }}
+{{- end }}
+      {{- if or .Values.sonarProperties .Values.sonarSecretKey ( not .Values.elasticsearch.bootstrapChecks) }}
       - name: config
         configMap:
           name: {{ template "sonarqube.fullname" . }}-config
@@ -527,7 +522,7 @@ spec:
         {{- end  }}
       - name : tmp-dir
         emptyDir: {{- toYaml .Values.emptyDir | nindent 10 }}
-        {{- if or .Values.sonarProperties .Values.sonarSecretProperties }}
+        {{- if or .Values.sonarProperties .Values.sonarSecretProperties .Values.sonarSecretKey ( not .Values.elasticsearch.bootstrapChecks) }}
       - name : concat-dir
         emptyDir: {{- toYaml .Values.emptyDir | nindent 10 -}}
         {{- end }}
