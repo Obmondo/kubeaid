@@ -113,7 +113,6 @@ function update_helm_chart {
 
   # This chart does not have any dependencies, so lets not do helm dep up
   if [ "$HELM_CHART_DEP_PRESENT" -ne 0 ]; then
-    echo "HELM_CHART_DEP_PRESENT: ${HELM_CHART_DEP_PRESENT}"
     
     # It support helm chart updation for multiple dependencies
     # Iterate over each dependency and extract the desired values
@@ -121,10 +120,6 @@ function update_helm_chart {
         HELM_CHART_NAME=$(yq eval ".dependencies[$i].name" "$HELM_CHART_YAML")
         HELM_CHART_VERSION=$(yq eval ".dependencies[$i].version" "$HELM_CHART_YAML")
         HELM_REPOSITORY_URL=$(yq eval ".dependencies[$i].repository" "$HELM_CHART_YAML")
-        echo "HELM_CHART_NAME: $HELM_CHART_NAME"
-        echo "HELM_CHART_VERSION: $HELM_CHART_VERSION"
-        echo "HELM_REPOSITORY_URL: $HELM_REPOSITORY_URL"
-        echo "-----------------------------------------"
 
         # Add the repo
         if ! helm repo list -o yaml | yq eval -e ".[].name == \"$HELM_CHART_NAME\"" >/dev/null 2>/dev/null; then
