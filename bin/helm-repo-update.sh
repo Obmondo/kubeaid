@@ -117,7 +117,7 @@ function update_helm_chart {
     
     # It support helm chart updation for multiple dependencies
     # Iterate over each dependency and extract the desired values
-    for ((i = 0; i < $HELM_CHART_DEP_PRESENT; i++)); do
+    for ((i = 0; i < HELM_CHART_DEP_PRESENT; i++)); do
         HELM_CHART_NAME=$(yq eval ".dependencies[$i].name" "$HELM_CHART_YAML")
         HELM_CHART_VERSION=$(yq eval ".dependencies[$i].version" "$HELM_CHART_YAML")
         HELM_REPOSITORY_URL=$(yq eval ".dependencies[$i].repository" "$HELM_CHART_YAML")
