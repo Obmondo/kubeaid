@@ -23,14 +23,13 @@ spec:
     {{- if .Values.postgresql.storageClass }}
     storageClass: {{ .Values.postgresql.storageClass }}
     {{- end }}
-  numberOfInstances: 2
+  numberOfInstances: 1
   users:
-    sonarqube_admin:
+    sonarqube:
       - superuser
       - createdb
-    sonarqube_test: []
   databases:
-    sonarqube: sonarqube_admin
+    sonarqube: sonarqube
   postgresql:
-    version: "13"
+    version: "14"
   enableMasterLoadBalancer: false

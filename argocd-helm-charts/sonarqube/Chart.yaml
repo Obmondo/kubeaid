@@ -9,5 +9,5 @@ name: sonarqube
 version: 4.0.2+325
 dependencies:
   - name: sonarqube
-    version: 6.0.0+403
+    version: 10.1.0+628
     repository: https://SonarSource.github.io/helm-chart-sonarqube

@@ -1,6 +1,82 @@
 # SonarQube Chart Changelog
 All changes to this chart will be documented in this file.
 
+## [10.1.0]
+* Update SonarQube to 10.1.0
+* Support Kubernetes v1.27 while dropping v1.23
+* Changed default test process to wget, using sonarqube image as default
+* Update Chart's version to 10.1.0
+* Fix liveness probe to detect when a failure occurs.
+
+## [10.0.0]
+* Update SonarQube to 10.0.0
+* Helm chart versioning will now follow the SonarQube product versioning
+
+## [9.5.1]
+* Make `jvmOpts` and `jvmCeOpts` not override env vars and sonar properties
+
+## [9.5.0]
+* Add helm-chart-sonarqube as chart source
+
+## [9.4.2]
+* Fixed unsupported wget parameter `--proxy off` with `--no-proxy`
+
+## [9.4.1]
+* Fix install_plugins.sh not deleting previously installed plugins
+
+## [9.4.0]
+* Added support for `extraVolumes` and `extraVolumeMounts` in sonar pod.
+
+## [9.3.1]
+* Clarify doc for custom cacert secret
+
+## [9.3.0]
+* Refactor Deployment manifest to match the Statefulset manifest
+
+## [9.2.0]
+* Add a configurable Prometheus PodMonitor resource
+* Refactor Prometheus exporter's documentation and bump to version 0.17.2
+
+## [9.1.0]
+* Allow setting priorityClassName for StatefulSets
+
+## [9.0.1]
+* Adds timeoutSeconds parameter to probes
+
+## [9.0.0]
+* Update SonarQube logo
+* Bootstrap chart version 9.x.x dedicated to the future SonarQube 10.0
+## [8.0.0]
+* Update SonarQube to 9.9.0
+* Bootstrap chart version 8.x.x dedicated to SonarQube 9.9 LTS
+
+## [7.0.2]
+* Update the list of supported kubernetes versions
+
+## [7.0.1]
+* Set a new default (maximum) allowed size of the client request body on the ingress
+
+## [7.0.0]
+* Update SonarQube to 9.8.0
+
+## [6.2.1]
+* Update the postgresql chart's repository
+
+
+## [6.2.0]
+* Refactor Ingress to be compatible with static compatibitly test and 1.19 minimum requirement
+
+## [6.1.2]
+* Updated SonarQube to 9.7.1
+
+## [6.1.1]
+* Refactor templating of ConfigMap for sonar.properties
+* Fix the bug where sonarSecretKey was not applied without sonar.properties set
+
+## [6.1.0]
+* Fix the installation of plugins using the standard folder `extensions/plugins` instead of `extensions/downloads` and `lib/common`
+* Remove `plugins.lib` and other small edits in the documentation
+
 ## [6.0.0]
 * Updated SonarQube to 9.7.0
 
