@@ -111,28 +111,20 @@ function update_helm_chart {
     fi
   done
 
-  # Extract dependencies array from YAML file
-  dependencies=$(yq eval '.dependencies' "$HELM_CHART_YAML")
-
   # This chart does not have any dependencies, so lets not do helm dep up
   if [ "$HELM_CHART_DEP_PRESENT" -ne 0 ]; then
+    echo "HELM_CHART_DEP_PRESENT: ${HELM_CHART_DEP_PRESENT}"
     
     # It support helm chart updation for multiple dependencies
     # Iterate over each dependency and extract the desired values
-    while IFS='' read -r line; do
-      if [[ $line == *"name"* ]]; then
-      # Get dependency chart name
-        HELM_CHART_NAME=$(echo "$line" | awk '{print $2}')
-      elif [[ $line == *"version"* ]]; then
-      # Get dependency chart version
-        HELM_CHART_VERSION=$(echo "$line" | awk '{print $2}')
-      elif [[ $line == *"repository"* ]]; then
-      # Get dependency repository url
-        HELM_REPOSITORY_URL=$(echo "$line" | awk '{print $2}')
-        echo "HELM_CHART_NAME: $name"
-        echo "HELM_CHART_VERSION: $version"
-        echo "HELM_REPOSITORY_URL: $repository"
-        echo "-----"
+    for ((i = 0; i < $HELM_CHART_DEP_PRESENT; i++)); do
+        HELM_CHART_NAME=$(yq eval ".dependencies[$i].name" "$HELM_CHART_YAML")
+        HELM_CHART_VERSION=$(yq eval ".dependencies[$i].version" "$HELM_CHART_YAML")
+        HELM_REPOSITORY_URL=$(yq eval ".dependencies[$i].repository" "$HELM_CHART_YAML")
+        echo "HELM_CHART_NAME: $HELM_CHART_NAME"
+        echo "HELM_CHART_VERSION: $HELM_CHART_VERSION"
+        echo "HELM_REPOSITORY_URL: $HELM_REPOSITORY_URL"
+        echo "-----------------------------------------"
 
         # Add the repo
         if ! helm repo list -o yaml | yq eval -e ".[].name == \"$HELM_CHART_NAME\"" >/dev/null 2>/dev/null; then
@@ -155,7 +147,7 @@ function update_helm_chart {
             echo "HELMING $HELM_CHART_NAME"
 
             # Update the chart.yaml file
-            yq eval -i ".dependencies[].version = \"$HELM_UPSTREAM_CHART_VERSION\"" "$HELM_CHART_YAML"
+            yq eval -i ".dependencies[$i].version = \"$HELM_UPSTREAM_CHART_VERSION\"" "$HELM_CHART_YAML"
 
             # Go to helm chart, 1st layer
             helm dependencies update "$HELM_CHART_PATH"
@@ -181,8 +173,7 @@ function update_helm_chart {
           # Untar the tgz file
           tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz"
         fi
-      fi
-    done < <(yq eval '.dependencies[]' "$HELM_CHART_YAML")
+    done
   fi
 }
 
