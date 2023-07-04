@@ -1,0 +1,16 @@
+apiVersion: v2
+appVersion: 1.104.4
+description: OpenCost and OpenCost UI
+keywords:
+- cost-optimization
+- finops
+- kubecost
+- opencost
+- monitoring
+maintainers:
+- name: mattray
+  url: https://mattray.dev
+- name: toscott
+name: opencost
+type: application
+version: 1.16.1
