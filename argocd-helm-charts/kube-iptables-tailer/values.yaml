@@ -1,8 +1,8 @@
 kube-iptables-tailer:
   journalDirectory: "/var/log/journal"
   image:
-    repository: registry.obmondo.com/obmondo/dockerfiles/kube-iptables-tailer
-    tag: v1.0.0
+    repository: honestica/kube-iptables-tailer
+    tag: master-91
     pullPolicy: IfNotPresent
   imagePullSecrets:
     - name: obmondo-web-app-gitlab-registry
