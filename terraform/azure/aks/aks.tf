@@ -28,15 +28,29 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     private_cluster_enabled = var.private_cluster_enabled
     private_cluster_public_fqdn_enabled = true
     default_node_pool {
-        name                = "agentpool"
+        name                = var.nodepool_name
         node_count          = var.agent_count
         vm_size             = var.vm_size
         vnet_subnet_id      = azurerm_subnet.aks-default.id
         enable_auto_scaling = var.enable_auto_scaling
-        min_count           = var.min_node_count 
+        min_count           = var.min_node_count
         max_count           = var.max_node_count
     }
-
+    auto_scaler_profile {
+        balance_similar_node_groups       = var.balance_similar_node_groups
+        expander                          = var.expander
+        empty_bulk_delete_max             = var.empty_bulk_delete_max
+        max_graceful_termination_sec      = var.max_graceful_termination_sec
+        new_pod_scale_up_delay            = var.new_pod_scale_up_delay
+        scale_down_delay_after_add        = var.scale_down_delay_after_add
+        scale_down_delay_after_delete     = var.scale_down_delay_after_delete
+        scale_down_delay_after_failure    = var.scale_down_delay_after_failure
+        scale_down_unneeded               = var.scale_down_unneeded
+        scale_down_unready                = var.scale_down_unready
+        skip_nodes_with_local_storage     = var.skip_nodes_with_local_storage
+        scale_down_utilization_threshold  = var.scale_down_utilization_threshold
+        scan_interval                     = var.scan_interval
+    }
     identity {
      type = "SystemAssigned"
     }

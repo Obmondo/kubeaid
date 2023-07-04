@@ -81,10 +81,101 @@ variable "private_cluster_enabled" {
 variable "nodepools" {
   type = map
   default = {}
-}
+  }
 
 variable "mode" {
   type = string
   default = "System"
   description = "Should the added Node Pool be used for System or User resources?"
+}
+
+variable "nodepool_name" {
+  type = string
+  default = "internal"
+  description = "Name of the Node Pool"
+}
+
+variable "max_map_count" {
+  default = 262144
+  description = "Maximum number of memory map areas a process may have"
+}
+
+# auto_scaler_profile
+
+variable "balance_similar_node_groups" {
+  type = bool
+  default = false
+  description = "Should the autoscaler balance similar node groups?"
+}
+
+variable "expander" {
+  type = string
+  default = "random"
+  description = "Which expander to use when scaling"
+}
+
+variable "empty_bulk_delete_max" {
+  type = number
+  default = 10
+  description = "How many nodes can be deleted at once"
+}
+
+variable "max_graceful_termination_sec" {
+  type = number
+  default = 600
+  description = "How long should the autoscaler wait for pods to terminate gracefully"
+}
+
+variable "new_pod_scale_up_delay" {
+  type = string
+  default = "0s"
+  description = "How long should the autoscaler wait before scaling up"
+}
+
+variable "scale_down_delay_after_add" {
+  type = string
+  default = "10m"
+  description = "How long should the autoscaler wait before scaling down after a node was added"
+}
+
+variable "scale_down_delay_after_delete" {
+  type = string
+  default = "10s"
+  description = "How long should the autoscaler wait before scaling down after a node was deleted"
+}
+
+variable "scale_down_delay_after_failure" {
+  type = string
+  default = "3m"
+  description = "How long should the autoscaler wait before scaling down after a node was deleted due to a failure"
+}
+
+variable "scale_down_unneeded" {
+  type = string
+  default = "10m"
+  description = "How long should the autoscaler wait before scaling down unneeded nodes"
+}
+
+variable "scale_down_unready" {
+  type = string
+  default = "20m"
+  description = "How long should the autoscaler wait before scaling down unready nodes"
+}
+
+variable "skip_nodes_with_local_storage" {
+  type = bool
+  default = false
+  description = "Should the autoscaler skip nodes with local storage"
+}
+
+variable "scale_down_utilization_threshold" {
+  type = string
+  default = "0.5"
+  description = "How much of the node's resources must be utilized before it is considered for scale down"
+}
+
+variable "scan_interval" {
+  type = string
+  default = "10s"
+  description = "How often should the autoscaler scan for pods"
 }
