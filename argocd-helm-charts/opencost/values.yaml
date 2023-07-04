@@ -1,0 +1,15 @@
+opencost:
+  opencost:
+    metrics:
+      serviceMonitor:
+        enabled: true
+    prometheus:
+      external:
+        enabled: true
+        url: 'http://prometheus-k8s.monitoring:9090'
+      internal:
+        enabled: false
+    ui:
+      enabled: true
+      ingress:
+        enabled: true
