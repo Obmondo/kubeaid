@@ -1,0 +1,34 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: oncall-rabbitmq
+  labels:
+    velero.io/exclude-from-backup: "true"
+spec:
+  service:
+    type: ClusterIP
+    port: 5672
+    name: rabbitmq-port
+  replicas: {{ .Values.rabbitmq.replicas }}
+  rabbitmq:
+    additionalConfig: |
+      {{- range $key, $value := .Values.rabbitmq.additionalConfig }}
+      {{ $key }}: {{ $value }}
+      {{- end }}
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - oncall-rabbitmq
+          topologyKey: kubernetes.io/hostname
+  resources:
+    requests:
+      cpu: {{ .Values.rabbitmq.resources.requests.cpu }}
+      memory: {{ .Values.rabbitmq.resources.requests.memory }}
+    limits:
+      cpu: {{ .Values.rabbitmq.resources.limits.cpu }}
+      memory: {{ .Values.rabbitmq.resources.limits.memory }}

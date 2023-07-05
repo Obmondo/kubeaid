@@ -1,0 +1,83 @@
+oncall:
+  image:
+    tag: v1.3.1
+  oncall:
+    telegram:
+      enabled: true
+      token: ~
+      webhookUrl: ~
+  engine:
+    replicaCount: 1
+    resources:
+      limits:
+        memory: 1Gi
+      requests:
+        cpu: 600m
+        memory: 1Gi
+  celery:
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 300m
+        memory: 750Mi
+      requests:
+        cpu: 300m
+        memory: 750Mi
+  ingress-nginx:
+    enabled: false
+  cert-manager:
+    enabled: false
+  database:
+    type: postgresql
+  mariadb:
+    enabled: false
+  postgresql:
+    enabled: false
+  redis:
+    enabled: true
+  rabbitmq:
+    enabled: false
+  grafana:
+    enabled: false
+  externalGrafana:
+    url: https://grafana.kbm.obmondo.com
+  externalPostgresql:
+    host: oncall-pgsql-rw
+    port: 5432
+    db_name: oncall
+    user: oncall
+    existingSecret: oncall-pgsql-app
+    passwordKey: password
+  externalRabbitmq:
+    host: oncall-rabbitmq
+    port: 5672
+    vhost: '/'
+    existingSecret: oncall-rabbitmq-default-user
+    passwordKey: password
+    usernameKey: username
+  ingress:
+    enabled: true
+  uwsgi: null
+
+rabbitmq:
+  replicas: 1
+  additionalConfig:
+    vm_memory_high_watermark_paging_ratio: 0.99
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+
+postgresql:
+  size: 2Gi
+  logicalBackup: true
+  resources:
+    limits:
+      memory: 800Mi
+      cpu: 100m
+    requests:
+      memory: 500Mi
+      cpu: 100m
