@@ -182,3 +182,58 @@ Create the s3 bucket
 ```sh
 aws s3api create-bucket --bucket kbm-sealed-secrets-backups --region eu-west-1 --endpoint-url=https://s3.obmondo.com
 ```
+
+## How to access secrets in applications
+
+There are two ways to access secrets in applications.
+
+* In the deployment file, you can use syntax like this when specifying environment variables:
+
+  ```yaml
+
+  - name: CHAT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.goapi.chat.token }}
+                  key: chat
+
+  ```
+
+  In the `values.yaml` file, the value of `goapi.chat.token` can now be specified as, say, `go-tokens`. Now, if there is a sealed secret called `go-tokens` that's already created and accessible and that secret has a key `chat`, then the value of the key `chat` will be assigned to the environment variable `CHAT_TOKEN`.
+
+* Another way to access secrets is by adding a volume mount. In the deployment file, we can add something like this:
+
+  ```yaml
+  volumeMounts:
+              - name: jwt-tokens
+                mountPath: /etc/api/jwt
+                readOnly: true
+  ```
+
+  Here 'jwt-tokens' refers to a volume that's mounted and contains our secret. The deployment file must also contain details of the volume being mounted like so:
+
+  ```yaml
+  volumes:
+          - name: jwt-tokens
+            secret:
+              secretName: jwt-{{ include "api.fullname" . }}
+
+  ```
+
+  The secret name here refers to the name of the sealed secret that should already be created and accessible.
+
+  In this case, we're essentially accessing the secret from a mounted file path instead of directly accessing its value. So, the deployment file could contain an environment variable like so:
+
+  ```yaml
+   - name: JWT_RSA_PUBLIC_KEY_PATH
+     value: {{ .Values.goapi.jwt.key_path | quote}}
+
+  ```
+
+  `values.yaml` can then contain something like this:
+
+  ```yaml
+      key_path: '/etc/api/jwt/publickey'
+  ```
+
+  Notice that `/etc/api/jwt` here is the same path as the `mountPath` specified earlier. So, the secret will be accessed from the value of the key `publickey` from a file mounted at `/etc/api/jwt`.
