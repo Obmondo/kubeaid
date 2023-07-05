@@ -2,7 +2,7 @@ kube-iptables-tailer:
   journalDirectory: "/var/log/journal"
   image:
     repository: honestica/kube-iptables-tailer
-    tag: master-91
+    tag: master-100
     pullPolicy: IfNotPresent
   imagePullSecrets:
     - name: obmondo-web-app-gitlab-registry
