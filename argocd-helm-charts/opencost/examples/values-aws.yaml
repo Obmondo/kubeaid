@@ -1,0 +1,21 @@
+opencost:
+  podAnnotations:
+    iam.amazonaws.com/role: arn:aws:iam::12345678912:role/role-with-ec2-metadata
+  opencost:
+    exporter:
+      defaultClusterId: 'k8s.my.cluster.name'
+    ui:
+      ingress:
+        enabled: true
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt
+          # Middleware to add authentication
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-traefik-forward-auth@kubernetescrd
+        hosts:
+          - host: opencost.your.example.com
+            paths:
+              - /
+        tls:
+          - secretName: opencost-tls
+            hosts:
+              - opencost.your.example.com
