@@ -2,6 +2,7 @@ apiVersion: acid.zalan.do/v1
 kind: postgresql
 metadata:
   name: keycloakx-pgsql
+spec:
   databases:
     keycloak: keycloak
   enableMasterLoadBalancer: false
