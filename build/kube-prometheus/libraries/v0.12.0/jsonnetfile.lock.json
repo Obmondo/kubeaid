@@ -8,7 +8,7 @@
           "subdir": "contrib/prometheus-mixin"
         }
       },
-      "version": "bb942f1acfd6791ce4da535fe263dca88c664e76",
+      "version": "5efdc50a2dd807da7f289c286cf5b2397a257568",
       "sum": "nEL+LnPwnNqp7JXymClVcWs9mHWWprDA9Aig/wvU0hQ="
     },
     {
@@ -38,7 +38,7 @@
           "subdir": "contrib/mixin"
         }
       },
-      "version": "d6bc8279554f5235d5b2f105d64b3a6e1649b870",
+      "version": "d4f779a64360fb1bf9aa3b6160d8e8da4ca5b2aa",
       "sum": "W/Azptf1PoqjyMwJON96UY69MFugDA4IAYiKURscryc="
     },
     {
@@ -58,7 +58,7 @@
           "subdir": "grafonnet"
         }
       },
-      "version": "f0b70307b8e5f12236b277883d998af129a8211f",
+      "version": "a1d61cce1da59c71409b99b5c7568511fec661ea",
       "sum": "342u++/7rViR/zj2jeJOjshzglkZ1SY+hFNuyCBFMdc="
     },
     {
@@ -68,7 +68,7 @@
           "subdir": "grafonnet-7.0"
         }
       },
-      "version": "f0b70307b8e5f12236b277883d998af129a8211f",
+      "version": "a1d61cce1da59c71409b99b5c7568511fec661ea",
       "sum": "gCtR9s/4D5fxU9aKXg0Bru+/njZhA0YjLjPiASc61FM="
     },
     {
@@ -78,8 +78,18 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "d303b2031264728728dd1e1c05f74f67027139f6",
-      "sum": "tDR6yT2GVfw0wTU12iZH+m01HrbIr6g/xN+/8nzNkU0="
+      "version": "f33dff93db677a32303630c3e0910cf6d46a92cc",
+      "sum": "RJjFQa1n8CDbB6m1fBQQzPye7jhOhGTUbma27Gil81I="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/jsonnet-libs.git",
+          "subdir": "opensearch-mixin"
+        }
+      },
+      "version": "f33dff93db677a32303630c3e0910cf6d46a92cc",
+      "sum": "++mcLWFozLjcOodcNmfeBVoQkvoncXY/cDe3x81kmoM="
     },
     {
       "source": {
