@@ -1,21 +1,19 @@
 {{- if .Values.backup.enable -}}
-# snapshot
-# https://davidlu1001.github.io/2020/12/12/ElasticSearch-backup-with-AWS-S3/
-
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: curator-actions-snapshot
+  name: curator-actions-create-snapshot
 data:
-  actions_snapshot.yaml: |-
+  actions.yaml: |-
     actions:
       1:
         action: snapshot
         description: >-
-          Snapshot all indices for {{ .Values.backup.name }}. Wait for the snapshot to complete. Skip the repository filesystem access check. Use the other options to create the snapshot.
+          Snapshot all indices for {{ .Values.backup.name | default "opensearch-backup" }}. Wait for the snapshot to complete. Skip the repository filesystem access check. Use the other options to create the snapshot.
         options:
-          repository: {{ .Values.backup.repository }}
-          name: {{ .Values.backup.name }}-%Y%m%d%H%M
+          repository: {{ .Values.backup.repository | default "opensearch-s3-bucket" | quote }}
+          name: {{ .Values.backup.name | default "opensearch-backup" }}-%Y%m%d%H%M
           ignore_unavailable: False
           include_global_state: False
           partial: False
@@ -24,20 +22,30 @@ data:
           disable_action: False
         filters:
           - filtertype: none
-      2:
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: curator-actions-delete-snapshot
+data:
+  actions.yaml: |-
+    actions:
+      1:
         action: delete_snapshots
         description: >-
           Delete snapshots from the selected repository older than {{ .Values.backup.retention }} days (based on creation_date), for all snapshots.
         options:
-          repository: {{ .Values.backup.repository | quote }}
+          repository: {{ .Values.backup.repository | default "opensearch-s3-bucket" | quote }}
           disable_action: False
           ignore_empty_list: True
-          timeout_override: {{ .Values.backup.timeout_delete_snapshots | default 600 }}
+          retry_interval: 600
+          retry_count: 6
+          timeout_override: 3600
         filters:
           - filtertype: age
             source: creation_date
             direction: older
             unit: days
             unit_count: {{ .Values.backup.retention }}
-
+---
 {{- end -}}
