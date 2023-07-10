@@ -31,6 +31,19 @@ velero backup describe <backup_name>
 velero backup logs <backup_name>
 ```
 
+Velero uses `snapshot-controller` to backup PVCs by taking a Volume Snapshot.
+It uses the Snapshot APIs (snapshot.storage.k8s.io) to create a VolumeSnapshot and
+a VolumeSnapshotContent. The snapshot will be persisted to the cloud provider.
+E.g.- EBS Snapshots if you are using AWS.
+
+Sometimes, the volumesnapshot objects remain in the cluster even after the backup has
+been deleted. We need to keep an eye on these objects taking up space and remove them
+to avoid huge cloud bills.
+
+To delete a VolumeSnapshot, set the underlying VolumeSnapshotContent object's `spec.deletionPolicy`
+from `Retain` to `Delete`. Then delete the VolumeSnapshot and it will trigger the deletion
+of VolumeSnapshotContent as well as the Snapshot on your cloud provider.
+
 ## Create SealedSecret for Velero using file
 
 ```sh
