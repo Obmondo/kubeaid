@@ -27,6 +27,32 @@ If you're running multiple ASGs (Auto Scaling Groups), the `--expander` flag sup
 
 In the event of a tie, cluster autoscaler will fall back to `random`.
 
+## Create SealedSecret for cluster-autoscaler using literals
+
+```sh
+kubectl create secret generic cluster-autoscaler-azure-cluster-autoscaler -n  cluster-autoscaler \
+--dry-run=client \
+ --from-literal=SubscriptionID="jwdmkwd73eke38kjwkkwd" \
+ --from-literal=TenantID="klwdmkk79j99i9"  \
+ --from-literal=ClientID="keki9ieeennkjimdkwm" \
+ --from-literal=ClientSecret="ddkwwkwkdkdmkwmww" \
+ --from-literal=ResourceGroup="k8s-prod-az1" \
+ --from-literal=NodeResourceGroup="MC_k8s-prod-az1_prod_az1_kilroy_eu_northeurope" \
+ --from-literal=VMType="vmss" \
+ --from-literal=ClusterName="prod_az1_kilroy_eu" \
+ -o yaml | kubeseal --controller-namespace system --controller-name sealed-secrets > cluster-autoscaler.yaml
+```
+
+Where, the literals from cloud to cloud differs. And NOTE that this is only valid for Azure cloud.
+
+## Create Token
+
+Generating a azure token with role as contributor, scope as a subscription id for lifelong.
+
+```sh
+az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/<subscription-id>" --years 4000 --output json
+```
+
 ### Troubleshooting
 
 1) [Troubleshooting docs](https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/FAQ.md#troubleshooting)

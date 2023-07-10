@@ -31,6 +31,24 @@ velero backup describe <backup_name>
 velero backup logs <backup_name>
 ```
 
+## Create SealedSecret for Velero using file
+
+```sh
+kubectl create secret generic cloud-credentials -n velero  --from-file=cloud=cloud-credentials.yaml -o yaml --dry-run=client | kubeseal --controller-namespace system --controller-name sealed-secrets --format yaml > cloud.yaml
+```
+
+Where, contents of file `cloud-credentials.yaml` is shown below. From cloud to cloud the variable
+differs. And NOTE that this is only valid for Azure cloud.
+
+```text
+AZURE_SUBSCRIPTION_ID=fkfkfdfdfdkfjlss
+AZURE_TENANT_ID=wellllcmdndkdkd
+AZURE_CLIENT_ID=3920keeiwid93ri3jm3idn3din3
+AZURE_CLIENT_SECRET=ekji2ieje8eje3ij3i
+AZURE_RESOURCE_GROUP=MC_k8s-prod-ddkkwji
+AZURE_CLOUD_NAME=AwsPublicCloud
+```
+
 ## Create SealedSecret for Velero
 
 Depending on the cloud provider, run the script located inside `/bin/<cloud>` directory. (Currently only `Azure` is supported)
@@ -44,6 +62,14 @@ Depending on the cloud provider, run the script located inside `/bin/<cloud>` di
 ```
 
 Script will generate `credentials-velero.json` in same directory. User has to apply that file to the desired cluster.
+
+## Create Token
+
+Generating a azure token with role as contributor, scope as a subscription id for lifelong.
+
+```sh
+az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/<subscription-id>" --years 4000 --output json
+```
 
 ## References
 
