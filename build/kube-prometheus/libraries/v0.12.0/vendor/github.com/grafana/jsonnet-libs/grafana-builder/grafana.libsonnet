@@ -291,7 +291,6 @@
         format: 'time_series',
         intervalFactor: 2,
         legendFormat: ql.l,
-        step: 10,
       }
       for ql in qsandls
     ],
@@ -371,7 +370,6 @@
         instant: true,
         intervalFactor: 2,
         legendFormat: '',
-        step: 10,
         refId: std.char(65 + i),
       }
       for i in std.range(0, std.length(qs) - 1)
@@ -434,6 +432,7 @@
       '5xx': '#E24D42',
       success: '#7EB26D',
       'error': '#E24D42',
+      cancel: '#A9A9A9',
     },
     targets: [
       {
@@ -448,7 +447,6 @@
         intervalFactor: 2,
         legendFormat: '{{status}}',
         refId: 'A',
-        step: 10,
       },
     ],
   } + $.stack,
@@ -462,7 +460,6 @@
         intervalFactor: 2,
         legendFormat: '99th Percentile',
         refId: 'A',
-        step: 10,
       },
       {
         expr: 'histogram_quantile(0.50, sum(rate(%s_bucket%s[$__rate_interval])) by (le)) * %s' % [metricName, selector, multiplier],
@@ -470,7 +467,6 @@
         intervalFactor: 2,
         legendFormat: '50th Percentile',
         refId: 'B',
-        step: 10,
       },
       {
         expr: 'sum(rate(%s_sum%s[$__rate_interval])) * %s / sum(rate(%s_count%s[$__rate_interval]))' % [metricName, selector, multiplier, metricName, selector],
@@ -478,7 +474,6 @@
         intervalFactor: 2,
         legendFormat: 'Average',
         refId: 'C',
-        step: 10,
       },
     ],
     yaxes: $.yaxes('ms'),
