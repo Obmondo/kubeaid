@@ -78,6 +78,7 @@ local default_vars = {
     sealedsecrets: true,
     etcd: true,
     velero: false,
+    opensearch: false,
     'cert-manager': true,
     'kubernetes-version-info': true,
     'node-count-monthly-status': true,
@@ -135,6 +136,11 @@ local mixins = remove_nulls([
   addMixin(
     'node-memory',
     (import 'mixins/memory/mixin.libsonnet'),
+    vars,
+  ),
+  addMixin(
+    'opensearch',
+    (import 'github.com/grafana/jsonnet-libs/opensearch-mixin/mixin.libsonnet'),
     vars,
   ),
 ]);
