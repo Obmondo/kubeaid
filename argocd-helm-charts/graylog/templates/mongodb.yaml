@@ -55,10 +55,10 @@ spec:
   statefulSet:
     spec:
       volumeClaimTemplates:
-        spec:
-          resources:
-            requests:
-              storage: {{ .Values.mongodb.size}}
+        - spec:
+            resources:
+              requests:
+                storage: {{ .Values.mongodb.size}}
   users:
     - db: graylog
       name: graylog-user
