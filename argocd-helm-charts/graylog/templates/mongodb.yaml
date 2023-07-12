@@ -55,6 +55,7 @@ spec:
   statefulSet:
     spec:
       volumeClaimTemplates:
+        spec:
           resources:
             requests:
               storage: {{ .Values.mongodb.size}}
