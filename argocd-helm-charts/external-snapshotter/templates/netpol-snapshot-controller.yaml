@@ -1,0 +1,26 @@
+{{ if .Values.networkpolicies }}
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.snapshot-controller
+  namespace: aws
+spec:
+  order: 100
+  selector:
+    app.kubernetes.io/name == 'snapshot-controller'
+  types:
+  - Egress
+  egress:
+  # Allow access to the AWS API endpoints, who's IP addresses are very dynamic
+  # So we allow access to all public IP addresses
+  - action: Allow
+    protocol: TCP
+    destination:
+      nets:
+      - 10.0.0.0/8     # RFC1918
+      - 172.16.0.0/12  # RFC1918
+      - 192.168.0.0/16 # RFC1918
+      - 100.64.0.0/10  # RFC6598
+      ports:
+      - 443
+{{- end -}}
