@@ -45,7 +45,11 @@ spec:
             - name: ACT_TOKEN
               valueFrom:
                 secretKeyRef:
+                  {{- if not .Values.act_runner.existingToken }}
                   name: {{ include "act_runner.fullname" . }}-secret
+                  {{- else }}
+                  name: {{ .Values.act_runner.existingToken }}
+                  {{- end }}
                   key: act-runner-token
             - name: ACT_LABELS
               value: {{ join "," .Values.act_runner.labels }}
