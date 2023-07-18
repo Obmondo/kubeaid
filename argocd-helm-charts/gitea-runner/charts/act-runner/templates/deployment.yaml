@@ -61,11 +61,9 @@ spec:
         - name: act-runner-dind
           securityContext:
             privileged: true
-          image: docker:23.0.0-dind
+          image: docker:23.0.6-dind
           imagePullPolicy: IfNotPresent
           env:
-            - name: DOCKER_DRIVER
-              value: "overlay2"
             - name: DOCKER_TLS_CERTDIR
               value: ""
           volumeMounts:
