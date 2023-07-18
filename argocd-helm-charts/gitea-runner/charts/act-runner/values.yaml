@@ -65,6 +65,7 @@ act_runner:
   storageclass: "default"
   instance: "https://gitea.example.com"
   token: ""
+  existingToken: ""
   labels:
     - "ubuntu-latest:docker://node:16-bullseye"
     - "ubuntu-22.04:docker://node:16-bullseye"
