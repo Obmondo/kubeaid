@@ -68,5 +68,7 @@ spec:
         - db: graylog
           name: readWrite
       scramCredentialsSecretName: mongodb-replica-set
+  agent:
+    logLevel: INFO
 ---
 {{ end }}
