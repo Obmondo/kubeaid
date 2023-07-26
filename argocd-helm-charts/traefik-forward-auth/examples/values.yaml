@@ -1,0 +1,21 @@
+traefik-forward-auth:
+  traefikForwardAuth:
+    enabled: true
+    clientId: traefik-forward-auth
+    clientSecret:
+      valueFrom:
+        secretKeyRef:
+          key: client-secret
+          name: traefik-forward-auth-keycloak
+    oidcUri: https://keycloak.k8id.io/auth/realms/K8id
+    enableRBAC: true
+  replicaCount: 1
+  env:
+    GROUP_CLAIM_PREFIX: ""
+    ENABLE_V3_URL_PATTERN_MATCHING: "true"
+    # Optional: One or more routes which bypass authorization checks
+    AUTHZ_PASS_THROUGH: "/allow,/allowthisalso"
+
+middleware:
+  enabled: true
+  name: traefik-forward-auth

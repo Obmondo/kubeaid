@@ -1,13 +1,11 @@
 # Traefik Forward Auth
 
+https://github.com/mesosphere/traefik-forward-auth
+
 ## RBAC Support
 
-* enableRBAC: true needs to be set in values file.
-* rbacPassThroughPaths can accept list of url which is open to all the authenticated users.
+* Setup the value [file](./examples/values.yaml)
 * Configure the traefik-forward-auth client on keycloak
-* Make sure middleware.enabled is set to true (default is true)
-* For groups, you will have to prefix group name with `oidc:` in the clusterrolebinding
-  so members of the respective group can access the said urls.
 * Add required annotation to your ingress object
 
   ```yaml
@@ -29,6 +27,10 @@
   - nonResourceURLs:
     - /dashboard
     - /admin
+    # Regex pattern will work when `ENABLE_V3_URL_PATTERN_MATCHING:` is enabled in values file
+    - ~^https?://whoami-auth\.k8id\.io/
+    - ~^https?://traefik\.k8id\.io/
+    - ~^https?://queue\.job\.k8id\.io/
     verbs:
     - get
 
@@ -65,4 +67,8 @@
 
 * Open the link on your browser (whatever domain you have given in your ingress object).
   It should first authenticated you and if the requested endpoint is allowed for that user
-  it will give 200 otherwise 404 (Not Authorized)
+  or group it will give 200 otherwise 404 (Not Authorized)
+
+## Debug
+
+* Look at the traefik-forward-auth pods logs to see why the user is getting 404
