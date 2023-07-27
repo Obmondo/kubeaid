@@ -3,9 +3,8 @@ name: external-snapshotter
 version: 1.0.0
 dependencies:
   - name: snapshot-validation-webhook
-    version: 1.7.1
+    version: 1.7.4
     repository: https://piraeus.io/helm-charts
-
   - name: snapshot-controller
     repository: https://piraeus.io/helm-charts
-    version: 1.7.2
+    version: 1.8.3
