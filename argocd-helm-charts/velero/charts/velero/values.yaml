@@ -89,6 +89,30 @@ priorityClassName: ""
 # The number of seconds to allow for graceful termination of the pod. Optional.
 terminationGracePeriodSeconds: 3600
 
+# Liveness probe of the pod
+livenessProbe:
+  httpGet:
+    path: /metrics
+    port: http-monitoring
+    scheme: HTTP
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+
+# Readiness probe of the pod
+readinessProbe:
+  httpGet:
+    path: /metrics
+    port: http-monitoring
+    scheme: HTTP
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+
 # Tolerations to use for the Velero deployment. Optional.
 tolerations: []
 
@@ -249,6 +273,8 @@ configuration:
     prefix:
     # default indicates this location is the default backup storage location. Optional.
     default:
+    # validationFrequency defines how frequently Velero should validate the object storage. Optional.
+    validationFrequency:
     # accessMode determines if velero can write to this backup storage location. Optional.
     # default to ReadWrite, ReadOnly is used during migrations and restores.
     accessMode: ReadWrite
@@ -507,12 +533,26 @@ schedules: {}
 # Velero ConfigMaps.
 # Eg:
 # configMaps:
+    # See: https://velero.io/docs/v1.11/file-system-backup/
 #   fs-restore-action-config:
 #     labels:
 #       velero.io/plugin-config: ""
 #       velero.io/pod-volume-restore: RestoreItemAction
 #     data:
 #       image: velero/velero-restore-helper:v1.10.2
+#       cpuRequest: 200m
+#       memRequest: 128Mi
+#       cpuLimit: 200m
+#       memLimit: 128Mi
+#       secCtx: |
+#         capabilities:
+#           drop:
+#           - ALL
+#           add: []
+#         allowPrivilegeEscalation: false
+#         readOnlyRootFilesystem: true
+#         runAsUser: 1001
+#         runAsGroup: 999
 configMaps: {}
 
 ##

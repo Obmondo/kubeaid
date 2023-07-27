@@ -68,6 +68,7 @@ webhooks:
         - UPDATE
         resources:
         - volumesnapshots
+        - volumesnapshotclasses
         - volumesnapshotcontents
         scope: "*"
     clientConfig:

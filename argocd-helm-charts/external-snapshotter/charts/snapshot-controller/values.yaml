@@ -12,7 +12,10 @@ image:
   tag: ""
 
 imagePullSecrets: []
+
 podAnnotations: {}
+
+podLabels: {}
 
 podSecurityContext: {}
   # fsGroup: 2000
@@ -32,6 +35,10 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+pdb: {}
+
+topologySpreadConstraints: []
 
 rbac:
   # Specifies whether RBAC resources should be created
@@ -54,3 +61,6 @@ volumeSnapshotClasses: []
 #      velero.io/csi-volumesnapshot-class: "true"
 #    driver: linstor.csi.linbit.com
 #    deletionPolicy: Delete
+
+priorityClassName: ""
+  # Specifies wether a Priority Class should be attached to deployment pods

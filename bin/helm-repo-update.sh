@@ -115,7 +115,6 @@ function update_helm_chart {
 
   # This chart does not have any dependencies, so lets not do helm dep up
   if [ "$HELM_CHART_DEP_PRESENT" -ne 0 ]; then
-    
     # It support helm chart updation for multiple dependencies
     # Iterate over each dependency and extract the desired values
     for ((i = 0; i < HELM_CHART_DEP_PRESENT; i++)); do
@@ -131,9 +130,8 @@ function update_helm_chart {
 
         # Check if we have an upstream chart already present or not
         if test -f "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME/Chart.yaml"; then
-          
           if [ -z "$CHART_VERSION" ]; then
-            HELM_UPSTREAM_CHART_VERSION=$(helm search repo --regexp "${HELM_REPO_NAME}/${HELM_CHART_NAME}[^-]" --version ">=$HELM_CHART_VERSION" --output yaml | yq eval '.[].version' -)
+            HELM_UPSTREAM_CHART_VERSION=$(helm search repo --regexp "${HELM_CHART_NAME}/${HELM_CHART_NAME}[^-]" --version ">=$HELM_CHART_VERSION" --output yaml | yq eval '.[].version' -)
           else
             HELM_UPSTREAM_CHART_VERSION=$CHART_VERSION
           fi

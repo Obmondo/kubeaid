@@ -23,6 +23,7 @@ tls:
 
 imagePullSecrets: []
 podAnnotations: {}
+podLabels: {}
 
 networkPolicy:
   enabled: false
