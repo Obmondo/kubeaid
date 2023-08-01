@@ -1,6 +1,6 @@
 oncall:
-  image:
-    tag: v1.3.1
+  env:
+    FEATURE_SLACK_INTEGRATION_ENABLED: true
   oncall:
     telegram:
       enabled: true
@@ -40,7 +40,7 @@ oncall:
   grafana:
     enabled: false
   externalGrafana:
-    url: https://grafana.kbm.obmondo.com
+    url: https://grafana.k8id.io
   externalPostgresql:
     host: oncall-pgsql-rw
     port: 5432
