@@ -55,7 +55,11 @@ spec:
   statefulSet:
     spec:
       volumeClaimTemplates:
-        - spec:
+        - metadata:
+            name: logs-volume
+          spec:
+            accessModes:
+              - ReadWriteOnce
             resources:
               requests:
                 storage: {{ .Values.mongodb.size}}
