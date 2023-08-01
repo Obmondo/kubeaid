@@ -1,0 +1,3 @@
+cloudnative-pg:
+  monitoring:
+    podMonitorEnabled: true
