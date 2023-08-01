@@ -60,7 +60,8 @@ oncall:
   uwsgi: null
   backup:
     cloud: "aws"
-    destinationPath: https://s3.abc.com/oncall-backups
+    destinationPath: s3://oncall-backups
+    endpointURL: https://s3.abc.com
 
 rabbitmq:
   replicas: 1
