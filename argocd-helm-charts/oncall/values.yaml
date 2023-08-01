@@ -1,6 +1,4 @@
 oncall:
-  env:
-    FEATURE_SLACK_INTEGRATION_ENABLED: true
   oncall:
     telegram:
       enabled: true
