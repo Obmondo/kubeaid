@@ -8,9 +8,6 @@ spec:
     initdb:
       database: oncall
       owner: oncall
-    recovery:
-      backup:
-        name: backup-pgsql
   resources:
     limits:
       memory: {{ .Values.postgresql.resources.limits.memory | default "800Mi" }}
@@ -26,6 +23,7 @@ spec:
   backup:
     barmanObjectStore:
       destinationPath: {{ .Values.oncall.backup.destinationPath }}
+      endpointURL: {{ .Values.oncall.backup.endpointURL }}
       {{- if eq .Values.oncall.backup.cloud "aws" }}
       s3Credentials:
         accessKeyId:
