@@ -3,6 +3,19 @@ kind: postgresql
 metadata:
   name: mattermost-pgsql
 spec:
+  enableLogicalBackup: {{ .Values.postgresql.logicalBackup | default "true" }}
+  env:
+{{- if .Values.postgresql.access_key_id }}
+  - name: AWS_ACCESS_KEY_ID
+    value: {{ .Values.postgresql.access_key_id }}
+{{- end }}
+{{- if .Values.postgresql.access_secret }}
+  - name: AWS_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Values.postgresql.access_secret | default "mattermost-pgsql-postgres-pod-env" }}
+        key: AWS_SECRET_ACCESS_KEY
+{{- end }}
   databases:
     mattermost: mattermost
   enableMasterLoadBalancer: false
