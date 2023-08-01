@@ -58,6 +58,9 @@ oncall:
   ingress:
     enabled: true
   uwsgi: null
+  backup:
+    cloud: "aws"
+    destinationPath: https://s3.abc.com/oncall-backups
 
 rabbitmq:
   replicas: 1
