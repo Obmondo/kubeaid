@@ -36,9 +36,12 @@ oncall:
   rabbitmq:
     enabled: false
   grafana:
-    enabled: false
-  externalGrafana:
-    url: https://grafana.k8id.io
+    enabled: true
+    persistence:
+      size: 1Gi
+    grafana.ini:
+      analytics:
+        check_for_updates: true
   externalPostgresql:
     host: oncall-pgsql-rw
     port: 5432
