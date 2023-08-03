@@ -77,7 +77,6 @@ rabbitmq:
       memory: 2Gi
 
 postgresql:
-  instance: 2
   size: 2Gi
   logicalBackup: true
   resources:
