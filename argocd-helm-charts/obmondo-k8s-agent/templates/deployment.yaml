@@ -5,6 +5,7 @@ metadata:
   labels:
     {{- include "obmondo-k8s-agent.labels" . | nindent 4 }}
 spec:
+
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
@@ -20,6 +21,7 @@ spec:
       labels:
         {{- include "obmondo-k8s-agent.selectorLabels" . | nindent 8 }}
     spec:
+      serviceAccountName: {{ include "obmondo-k8s-agent.serviceAccountName" . }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
