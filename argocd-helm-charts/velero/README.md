@@ -10,6 +10,20 @@ kubectl get backup -n velero
 
 * https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/README.md
 
+## Upgrade
+
+Velero can be updated by updating the helm chart.
+
+NOTE: Please look at the respective plugin you use in velero, before updating the velero.
+
+* Version Matrix
+
+| Provider | Links |
+|--------------|-----|
+| AWS | https://github.com/vmware-tanzu/velero-plugin-for-aws#compatibility |
+| CSI | https://github.com/vmware-tanzu/velero-plugin-for-csi#compatibility |
+| Azure | https://github.com/vmware-tanzu/velero-plugin-for-microsoft-azure#compatibility |
+
 ## Issues
 
 Velero keeps a track of schedules even when they are deleted.
