@@ -3,3 +3,5 @@ networkPolicy: true
 # OPA policies
 policy:
   RequireRequestCpuMemAndLimitMem: true
+  # ExcludedNamespaces:
+  #   - argocd

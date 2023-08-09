@@ -69,3 +69,14 @@ argo-cd:
         repository: bitnami/redis-exporter
       serviceMonitor:
         enabled: true
+  notifications:
+    resources:
+      limits:
+        memory: 256Mi
+      requests:
+        cpu: 2m
+        memory: 64Mi
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true

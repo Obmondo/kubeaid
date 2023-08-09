@@ -44,12 +44,15 @@ spec:
       - ""
       kinds:
       - Pod
-    namespaces:
-      - "obmondo"
+    excludedNamespaces:
+    {{- range .Values.policy.ExcludedNamespaces }}
+    - {{ . | quote }}
+    {{- end }}
   parameters:
     limits:
     - memory
     requests:
     - cpu
     - memory
+  enforcementAction: {{ .Values.policy.EnforcementAction | default "dryrun" | quote }}
 {{- end}}
