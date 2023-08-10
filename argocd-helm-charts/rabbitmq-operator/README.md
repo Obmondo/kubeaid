@@ -154,3 +154,35 @@ from the application helm chart.
 This label will not propergate to the PVC, since they are created by the stateful set, which is actually what we want.
 
 This will not affect objects created by the messaging topology operator.
+
+## Backup of a RabbitMQ cluster'
+
+- Backup the rabbitmq cluster definition, by running the following command inside rabbimq pod:
+
+  ```bash
+  rabbitmqctl export_definitions /tmp/definition.json
+  ```
+
+- Backup the rabbitmq cluster data, by running the following command:
+
+  ```bash
+  # Get the data directory by running the command
+  $ DataPath=$(rabbitmqctl eval 'rabbit_mnesia:dir().')
+  "/bitnami/rabbitmq/mnesia/rabbit@product-catalog-rabbitmq-server-0.product-catalog-rabbitmq-nodes.product-catalog-rabbitmq"
+  ```
+
+- Backup the data directory
+
+  ```bash
+  # Run inside the rabbitmq pod
+  tar cvf rabbitmq-backup.tgz $DataPath
+  ```
+
+- Copy the backup files locally
+
+  ```bash
+  kubectl cp <rabbitmq-pod-name>:/tmp/definition.json definition.json
+  kubectl cp <rabbitmq-pod-name>:rabbitmq-backup.tgz rabbitmq-backup.tgz
+  ```
+
+- For more information [refer](https://www.rabbitmq.com/backup.html)
