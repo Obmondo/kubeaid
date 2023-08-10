@@ -8,15 +8,20 @@ global:
 kubernetes:
   host: https://kubernetes.default
 
+nameOverride: ""
+fullnameOverride: ""
+
 reloader:
   isArgoRollouts: false
   isOpenshift: false
   ignoreSecrets: false
   ignoreConfigMaps: false
   reloadOnCreate: false
+  syncAfterRestart: false
   reloadStrategy: default # Set to default, env-vars or annotations
   ignoreNamespaces: "" # Comma separated list of namespaces to ignore
-  namespaceSelector: "" # Comma separated list of 'key:value' labels for namespaces selection
+  namespaceSelector: "" # Comma separated list of k8s label selectors for namespaces selection
+  resourceLabelSelector: "" # Comma separated list of k8s label selectors for configmap/secret selection
   logFormat: "" #json
   watchGlobally: true
   # Set to true to enable leadership election allowing you to run multiple replicas
@@ -62,14 +67,26 @@ reloader:
     #     effect: "NoSchedule"
     tolerations: []
 
+    # Topology spread constraints for pod assignment
+    # Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+    # Example:
+    # topologySpreadConstraints:
+    #   - maxSkew: 1
+    #     topologyKey: zone
+    #     whenUnsatisfiable: DoNotSchedule
+    #     labelSelector:
+    #       matchLabels:
+    #         app: my-app
+    topologySpreadConstraints: []
+
     annotations: {}
     labels:
       provider: stakater
       group: com.stakater.platform
-      version: v1.0.5
+      version: v1.0.35
     image:
-      name: stakater/reloader
-      tag: v1.0.5
+      name: ghcr.io/stakater/reloader
+      tag: v1.0.35
       pullPolicy: IfNotPresent
     # Support for extra environment variables.
     env:
@@ -251,3 +268,10 @@ reloader:
     enabled: false
     # Set the minimum available replicas
     # minAvailable: 1
+
+  netpol:
+    enabled: false
+    from: []
+    # - podSelector:
+    #     matchLabels:
+    #       app.kubernetes.io/name: prometheus
