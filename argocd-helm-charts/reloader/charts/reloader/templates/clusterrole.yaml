@@ -17,7 +17,6 @@ metadata:
 {{ toYaml .Values.reloader.matchLabels | indent 4 }}
 {{- end }}
   name: {{ template "reloader-fullname" . }}-role
-  namespace: {{ .Values.namespace | default .Release.Namespace }}
 rules:
   - apiGroups:
       - ""
@@ -38,8 +37,10 @@ rules:
     resources:
       - namespaces
     verbs:
-      - get         
-{{- end }}      
+      - get
+      - list
+      - watch
+{{- end }}
 {{- if and (.Capabilities.APIVersions.Has "apps.openshift.io/v1") (.Values.reloader.isOpenshift) }}
   - apiGroups:
       - "apps.openshift.io"
