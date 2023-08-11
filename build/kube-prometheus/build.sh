@@ -129,7 +129,7 @@ if ! [ -e "${jsonnet_lib_path}" ]; then
 
   jb_install kube-prometheus "github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@${kube_prometheus_release}"
   jb_install prometheus-mixin github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin@main
-  jb_install ceph-mixins "github.com/ceph/ceph/monitoring/ceph-mixin@main"
+  jb_install ceph-mixins "github.com/ceph/ceph-mixins@master"
   jb_install cert-manager-mixin "gitlab.com/uneeq-oss/cert-manager-mixin@master"
   jb_install opensearch-mixin "github.com/grafana/jsonnet-libs/opensearch-mixin@master"
 
