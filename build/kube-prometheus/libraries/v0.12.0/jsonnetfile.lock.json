@@ -8,7 +8,7 @@
           "subdir": "contrib/prometheus-mixin"
         }
       },
-      "version": "5efdc50a2dd807da7f289c286cf5b2397a257568",
+      "version": "a0dd32c23a669cfed803507baf4f776b20212d5a",
       "sum": "nEL+LnPwnNqp7JXymClVcWs9mHWWprDA9Aig/wvU0hQ="
     },
     {
@@ -24,12 +24,12 @@
     {
       "source": {
         "git": {
-          "remote": "https://github.com/ceph/ceph-mixins.git",
-          "subdir": ""
+          "remote": "https://github.com/ceph/ceph.git",
+          "subdir": "monitoring/ceph-mixin"
         }
       },
-      "version": "77016201cd87c9aa7cd8e91f909a5c3740225ee5",
-      "sum": "ELegh2+E/3snTDHxcaNIYsNdtgSrFXfzCUxdX5dRdcg="
+      "version": "53f89ea09b71162e4d494ffa28b1f86104185c84",
+      "sum": "ZnyCIu25NBI6Q3Ru7QK1DHf7DBMEURSMQdEJXzCyIgA="
     },
     {
       "source": {
@@ -38,7 +38,7 @@
           "subdir": "contrib/mixin"
         }
       },
-      "version": "d4f779a64360fb1bf9aa3b6160d8e8da4ca5b2aa",
+      "version": "5d7c457873c2a6dd5e88a3dbaf58192154b0c6b5",
       "sum": "W/Azptf1PoqjyMwJON96UY69MFugDA4IAYiKURscryc="
     },
     {
@@ -78,8 +78,8 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "f33dff93db677a32303630c3e0910cf6d46a92cc",
-      "sum": "RJjFQa1n8CDbB6m1fBQQzPye7jhOhGTUbma27Gil81I="
+      "version": "672dec488b8126ba10b80f221a876735bcda2549",
+      "sum": "xEFMv4+ObwP5L1Wu0XK5agWci4AJzNApys6iKAQxLlQ="
     },
     {
       "source": {
@@ -88,7 +88,7 @@
           "subdir": "opensearch-mixin"
         }
       },
-      "version": "f33dff93db677a32303630c3e0910cf6d46a92cc",
+      "version": "672dec488b8126ba10b80f221a876735bcda2549",
       "sum": "++mcLWFozLjcOodcNmfeBVoQkvoncXY/cDe3x81kmoM="
     },
     {

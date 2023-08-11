@@ -28,7 +28,7 @@
           "subdir": "monitoring/ceph-mixin"
         }
       },
-      "version": "75389ba061dd62aa127e25e1ce0d200410396440",
+      "version": "53f89ea09b71162e4d494ffa28b1f86104185c84",
       "sum": "ZnyCIu25NBI6Q3Ru7QK1DHf7DBMEURSMQdEJXzCyIgA="
     },
     {
@@ -38,7 +38,7 @@
           "subdir": "contrib/mixin"
         }
       },
-      "version": "43f10cbd57b8b1c3f79f6efce99dd3b0b6a9e557",
+      "version": "1edd8baf3c6024eceb8b0d45062f0cebf7be9bc5",
       "sum": "GdePvMDfLQcVhwzk/Ephi/jC27ywGObLB5t0eC0lXd4="
     },
     {
@@ -159,7 +159,7 @@
           "subdir": "doc/alertmanager-mixin"
         }
       },
-      "version": "16cb0956534e681130d517d51d846f1a3809d118",
+      "version": "e1e59925cc7a4a953c7deba7fdb215224ed05fdb",
       "sum": "1d7ZKYArJKacAWXLUz0bRC1uOkozee/PPw97/W5zGhc=",
       "name": "alertmanager"
     },
@@ -201,7 +201,7 @@
           "subdir": "mixin"
         }
       },
-      "version": "84567ec1f7580d872c4893190759c81ec0ba53c7",
+      "version": "d6a8f0ba1937204e9e5bf0ed06f2c528c25d04a8",
       "sum": "WhheqsiX0maUXByZFsb9xhCEsGXK2955bPmPPf1x+Cs=",
       "name": "thanos-mixin"
     },

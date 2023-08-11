@@ -22,6 +22,28 @@
     "scope": "Namespaced",
     "versions": [
       {
+        "additionalPrinterColumns": [
+          {
+            "jsonPath": ".spec.window",
+            "name": "Window",
+            "type": "string"
+          },
+          {
+            "jsonPath": ".spec.target",
+            "name": "Target",
+            "type": "string"
+          },
+          {
+            "jsonPath": ".status.type",
+            "name": "Type",
+            "type": "string"
+          },
+          {
+            "jsonPath": ".metadata.creationTimestamp",
+            "name": "Age",
+            "type": "date"
+          }
+        ],
         "name": "v1alpha1",
         "schema": {
           "openAPIV3Schema": {
@@ -63,7 +85,7 @@
                     "description": "ServiceLevelIndicator is the underlying data source that indicates how the service is doing. This will be a Prometheus metric with specific selectors for your service.",
                     "properties": {
                       "bool_gauge": {
-                        "description": "BoolGauge is the indicator that measures wheter a boolean gauge is successul.",
+                        "description": "BoolGauge is the indicator that measures whether a boolean gauge is successful.",
                         "properties": {
                           "grouping": {
                             "description": "Total is the metric that returns how many requests there are in total.",
@@ -83,7 +105,7 @@
                         "type": "object"
                       },
                       "latency": {
-                        "description": "Latency is the indicator that measures a certain percentage to be faster than.",
+                        "description": "Latency is the indicator that measures a certain percentage to be faster than the expected latency.",
                         "properties": {
                           "grouping": {
                             "description": "Grouping allows an SLO to be defined for many SLI at once, like HTTP handlers for example.",
@@ -135,8 +157,7 @@
                           },
                           "latency": {
                             "description": "Latency the requests should be faster than.",
-                            "format": "int64",
-                            "type": "integer"
+                            "type": "string"
                           },
                           "total": {
                             "description": "Total is the metric that returns how many requests there are in total.",
@@ -219,6 +240,12 @@
               },
               "status": {
                 "description": "ServiceLevelObjectiveStatus defines the observed state of ServiceLevelObjective.",
+                "properties": {
+                  "type": {
+                    "description": "Type is the generated resource type, like PrometheusRule or ConfigMap",
+                    "type": "string"
+                  }
+                },
                 "type": "object"
               }
             },
@@ -226,7 +253,10 @@
           }
         },
         "served": true,
-        "storage": true
+        "storage": true,
+        "subresources": {
+          "status": {}
+        }
       }
     ]
   }
