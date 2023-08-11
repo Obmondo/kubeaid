@@ -4,8 +4,9 @@ metadata:
   name: {{ include "obmondo-k8s-agent.fullname" . }}
   labels:
     {{- include "obmondo-k8s-agent.labels" . | nindent 4 }}
+  annotations:
+    secret.reloader.stakater.com/reload: k8s-agent-tls
 spec:
-
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
