@@ -100,7 +100,7 @@ local vars = std.mergePatch(default_vars, ext_vars);
 local mixins = remove_nulls([
   addMixin(
     'ceph',
-    (import 'github.com/ceph/ceph/monitoring/ceph-mixin/mixin.libsonnet'),
+    (import 'github.com/ceph/ceph-mixins/mixin.libsonnet'),
     vars,
   ),
   addMixin(
