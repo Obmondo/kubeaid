@@ -81,7 +81,9 @@ local default_vars = {
     opensearch: false,
     'cert-manager': true,
     'kubernetes-version-info': true,
-    'node-count-monthly-status': true,
+    // Enable this when we move metrics generation into obmondo-k8s-agent
+    // gitea/EnableIT/internal/issues/21
+    'node-count-monthly-status': false,
     'node-memory': true,
   },
   mixin_configs: {
