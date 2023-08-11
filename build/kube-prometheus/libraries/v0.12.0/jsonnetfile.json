@@ -13,11 +13,11 @@
     {
       "source": {
         "git": {
-          "remote": "https://github.com/ceph/ceph-mixins.git",
-          "subdir": ""
+          "remote": "https://github.com/ceph/ceph.git",
+          "subdir": "monitoring/ceph-mixin"
         }
       },
-      "version": "master"
+      "version": "main"
     },
     {
       "source": {
