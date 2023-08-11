@@ -1,0 +1,6 @@
+reloader:
+  reloader:
+    watchGlobally: true
+    reloadOnCreate: true
+    serviceMonitor:
+      enabled: true
