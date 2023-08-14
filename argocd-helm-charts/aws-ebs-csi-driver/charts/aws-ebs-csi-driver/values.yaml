@@ -19,8 +19,9 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
-      tag: "v3.5.0-eks-1-27-3"
+      tag: "v3.5.0-eks-1-27-7"
     logLevel: 2
+    additionalArgs: []
     resources: {}
     # Tune leader lease election for csi-provisioner.
     # Leader election is on by default.
@@ -40,7 +41,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/external-attacher
-      tag: "v4.3.0-eks-1-27-3"
+      tag: "v4.3.0-eks-1-27-7"
     # Tune leader lease election for csi-attacher.
     # Leader election is on by default.
     leaderElection:
@@ -52,6 +53,7 @@ sidecars:
       # renewDeadline: "10s"
       # retryPeriod: "5s"
     logLevel: 2
+    additionalArgs: []
     resources: {}
     securityContext:
       readOnlyRootFilesystem: true
@@ -63,8 +65,9 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/external-snapshotter/csi-snapshotter
-      tag: "v6.2.1-eks-1-27-3"
+      tag: "v6.2.2-eks-1-27-7"
     logLevel: 2
+    additionalArgs: []
     resources: {}
     securityContext:
       readOnlyRootFilesystem: true
@@ -73,7 +76,8 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/livenessprobe
-      tag: "v2.10.0-eks-1-27-3"
+      tag: "v2.10.0-eks-1-27-7"
+    additionalArgs: []
     resources: {}
     securityContext:
       readOnlyRootFilesystem: true
@@ -83,29 +87,9 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/external-resizer
-      tag: "v1.8.0-eks-1-27-3"
-    logLevel: 2
-    resources: {}
-    securityContext:
-      readOnlyRootFilesystem: true
-      allowPrivilegeEscalation: false
-  nodeDriverRegistrar:
-    env: []
-    image:
-      pullPolicy: IfNotPresent
-      repository: public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar
-      tag: "v2.8.0-eks-1-27-3"
-    logLevel: 2
-    resources: {}
-    securityContext:
-      readOnlyRootFilesystem: true
-      allowPrivilegeEscalation: false
-  volumemodifier:
-    env: []
-    image:
-      pullPolicy: IfNotPresent
-      repository: public.ecr.aws/ebs-csi-driver/volume-modifier-for-k8s
-      tag: "v0.1.0"
+      tag: "v1.8.0-eks-1-27-7"
+    # Tune leader lease election for csi-resizer.
+    # Leader election is on by default.
     leaderElection:
       enabled: true
       # Optional values to tune lease behavior.
@@ -115,6 +99,39 @@ sidecars:
       # renewDeadline: "10s"
       # retryPeriod: "5s"
     logLevel: 2
+    additionalArgs: []
+    resources: {}
+    securityContext:
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+  nodeDriverRegistrar:
+    env: []
+    image:
+      pullPolicy: IfNotPresent
+      repository: public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar
+      tag: "v2.8.0-eks-1-27-7"
+    logLevel: 2
+    additionalArgs: []
+    resources: {}
+    securityContext:
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+  volumemodifier:
+    env: []
+    image:
+      pullPolicy: IfNotPresent
+      repository: public.ecr.aws/ebs-csi-driver/volume-modifier-for-k8s
+      tag: "v0.1.1"
+    leaderElection:
+      enabled: true
+      # Optional values to tune lease behavior.
+      # The arguments provided must be in an acceptable time.ParseDuration format.
+      # Ref: https://pkg.go.dev/flag#Duration
+      # leaseDuration: "15s"
+      # renewDeadline: "10s"
+      # retryPeriod: "5s"
+    logLevel: 2
+    additionalArgs: []
     resources: {}
     securityContext:
       readOnlyRootFilesystem: true
@@ -127,6 +144,11 @@ proxy:
 imagePullSecrets: []
 nameOverride:
 fullnameOverride:
+
+awsAccessSecret:
+  name: aws-secret
+  keyId: key_id
+  accessKey: access_key
 
 controller:
   volumeModificationFeature:
@@ -217,6 +239,7 @@ controller:
     create: true
     name: ebs-csi-controller-sa
     annotations: {}
+    automountServiceAccountToken: true
   tolerations:
     - key: CriticalAddonsOnly
       operator: Exists
@@ -241,8 +264,18 @@ controller:
     runAsUser: 1000
     runAsGroup: 1000
     fsGroup: 1000
+  # Add additional volume mounts on the controller with controller.volumes and controller.volumeMounts
   volumes: []
+  # Add additional volumes to be mounted onto the controller:
+  # - name: custom-dir
+  #   hostPath:
+  #     path: /path/to/dir
+  #     type: Directory
   volumeMounts: []
+  # And add mount paths for those additional volumes:
+  # - name: custom-dir
+  #   mountPath: /mount/path
+  # ---
   # securityContext on the controller container (see sidecars for securityContext on sidecar containers)
   containerSecurityContext:
     readOnlyRootFilesystem: true
@@ -290,6 +323,7 @@ node:
     create: true
     name: ebs-csi-node-sa
     annotations: {}
+    automountServiceAccountToken: true
   enableWindows: false
   # The "maximum number of attachable volumes" per node
   volumeAttachLimit:
@@ -304,6 +338,18 @@ node:
     runAsUser: 0
     runAsGroup: 0
     fsGroup: 0
+  # Add additional volume mounts on the node pods with node.volumes and node.volumeMounts
+  volumes: []
+  # Add additional volumes to be mounted onto the node pods:
+  # - name: custom-dir
+  #   hostPath:
+  #     path: /path/to/dir
+  #     type: Directory
+  volumeMounts: []
+  # And add mount paths for those additional volumes:
+  # - name: custom-dir
+  #   mountPath: /mount/path
+  # ---
   # securityContext on the node container (see sidecars for securityContext on sidecar containers)
   containerSecurityContext:
     readOnlyRootFilesystem: true
