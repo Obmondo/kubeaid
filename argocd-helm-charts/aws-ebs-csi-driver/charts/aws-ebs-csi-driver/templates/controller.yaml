@@ -104,18 +104,20 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
+            {{- with .Values.awsAccessSecret }}
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: aws-secret
-                  key: key_id
+                  name: {{ .name }}
+                  key: {{ .keyId }}
                   optional: true
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: aws-secret
-                  key: access_key
+                  name: {{ .name }}
+                  key: {{ .accessKey }}
                   optional: true
+            {{- end }}
             - name: AWS_EC2_ENDPOINT
               valueFrom:
                 configMapKeyRef:
@@ -132,10 +134,10 @@ spec:
             {{- with .Values.controller.env }}
             {{- . | toYaml | nindent 12 }}
             {{- end }}
+          {{- with .Values.controller.envFrom }}
           envFrom:
-            {{- with .Values.controller.envFrom }}
             {{- . | toYaml | nindent 12 }}
-            {{- end }}
+          {{- end }}
           volumeMounts:
             - name: socket-dir
               mountPath: /var/lib/csi/sockets/pluginproxy/
@@ -198,6 +200,9 @@ spec:
             {{- end }}
             {{- end }}
             - --default-fstype={{ .Values.controller.defaultFsType }}
+            {{- range .Values.sidecars.provisioner.additionalArgs }}
+            - {{ . }}
+            {{- end }}
           env:
             - name: ADDRESS
               value: /var/lib/csi/sockets/pluginproxy/csi.sock
@@ -207,10 +212,10 @@ spec:
             {{- with .Values.sidecars.provisioner.env }}
             {{- . | toYaml | nindent 12 }}
             {{- end }}
+          {{- with .Values.controller.envFrom }}
           envFrom:
-            {{- with .Values.controller.envFrom }}
             {{- . | toYaml | nindent 12 }}
-            {{- end }}
+          {{- end }}
           volumeMounts:
             - name: socket-dir
               mountPath: /var/lib/csi/sockets/pluginproxy/
@@ -240,6 +245,9 @@ spec:
             - --leader-election-retry-period={{ .Values.sidecars.attacher.leaderElection.retryPeriod }}
             {{- end }}
             {{- end }}
+            {{- range .Values.sidecars.attacher.additionalArgs }}
+            - {{ . }}
+            {{- end }}
           env:
             - name: ADDRESS
               value: /var/lib/csi/sockets/pluginproxy/csi.sock
@@ -249,10 +257,10 @@ spec:
             {{- with .Values.sidecars.attacher.env }}
             {{- . | toYaml | nindent 12 }}
             {{- end }}
+          {{- with .Values.controller.envFrom }}
           envFrom:
-            {{- with .Values.controller.envFrom }}
             {{- . | toYaml | nindent 12 }}
-            {{- end }}
+          {{- end }}
           volumeMounts:
             - name: socket-dir
               mountPath: /var/lib/csi/sockets/pluginproxy/
@@ -274,6 +282,9 @@ spec:
             {{- if .Values.controller.extraCreateMetadata }}
             - --extra-create-metadata
             {{- end}}
+            {{- range .Values.sidecars.snapshotter.additionalArgs }}
+            - {{ . }}
+            {{- end }}
           env:
             - name: ADDRESS
               value: /var/lib/csi/sockets/pluginproxy/csi.sock
@@ -283,10 +294,10 @@ spec:
             {{- with .Values.sidecars.snapshotter.env }}
             {{- . | toYaml | nindent 12 }}
             {{- end }}
+          {{- with .Values.controller.envFrom }}
           envFrom:
-            {{- with .Values.controller.envFrom }}
             {{- . | toYaml | nindent 12 }}
-            {{- end }}
+          {{- end }}
           volumeMounts:
             - name: socket-dir
               mountPath: /var/lib/csi/sockets/pluginproxy/
@@ -318,6 +329,9 @@ spec:
             - --leader-election-retry-period={{ .Values.sidecars.volumemodifier.leaderElection.retryPeriod }}
             {{- end }}
             {{- end }}
+            {{- range .Values.sidecars.volumemodifier.additionalArgs }}
+            - {{ . }}
+            {{- end }}
           env:
             - name: ADDRESS
               value: /var/lib/csi/sockets/pluginproxy/csi.sock
@@ -327,10 +341,10 @@ spec:
             {{- with .Values.sidecars.volumemodifier.env }}
             {{- . | toYaml | nindent 12 }}
             {{- end }}
+          {{- with .Values.controller.envFrom }}
           envFrom:
-            {{- with .Values.controller.envFrom }}
             {{- . | toYaml | nindent 12 }}
-            {{- end }}
+          {{- end }}
           volumeMounts:
             - name: socket-dir
               mountPath: /var/lib/csi/sockets/pluginproxy/
@@ -350,6 +364,21 @@ spec:
             - --csi-address=$(ADDRESS)
             - --v={{ .Values.sidecars.resizer.logLevel }}
             - --handle-volume-inuse-error=false
+            {{- with .Values.sidecars.resizer.leaderElection }}
+            - --leader-election={{ .enabled | default true }}
+            {{- if .leaseDuration }}
+            - --leader-election-lease-duration={{ .leaseDuration }}
+            {{- end }}
+            {{- if .renewDeadline }}
+            - --leader-election-renew-deadline={{ .renewDeadline }}
+            {{- end }}
+            {{- if .retryPeriod }}
+            - --leader-election-retry-period={{ .retryPeriod }}
+            {{- end }}
+            {{- end }}
+            {{- range .Values.sidecars.resizer.additionalArgs }}
+            - {{ . }}
+            {{- end }}
           env:
             - name: ADDRESS
               value: /var/lib/csi/sockets/pluginproxy/csi.sock
@@ -359,10 +388,10 @@ spec:
             {{- with .Values.sidecars.resizer.env }}
             {{- . | toYaml | nindent 12 }}
             {{- end }}
+          {{- with .Values.controller.envFrom }}
           envFrom:
-            {{- with .Values.controller.envFrom }}
             {{- . | toYaml | nindent 12 }}
-            {{- end }}
+          {{- end }}
           volumeMounts:
             - name: socket-dir
               mountPath: /var/lib/csi/sockets/pluginproxy/
@@ -379,10 +408,13 @@ spec:
           imagePullPolicy: {{ default .Values.image.pullPolicy .Values.sidecars.livenessProbe.image.pullPolicy }}
           args:
             - --csi-address=/csi/csi.sock
-          envFrom:
-            {{- with .Values.controller.envFrom }}
-            {{- . | toYaml | nindent 12 }}
+            {{- range .Values.sidecars.livenessProbe.additionalArgs }}
+            - {{ . }}
             {{- end }}
+          {{- with .Values.controller.envFrom }}
+          envFrom:
+            {{- . | toYaml | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: socket-dir
               mountPath: /csi
