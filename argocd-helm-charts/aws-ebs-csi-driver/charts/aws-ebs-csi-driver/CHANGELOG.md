@@ -1,5 +1,12 @@
 # Helm chart
 
+## v2.20.0
+* Bump driver version to `v1.21.0`
+* Enable additional volume mounts on node pods ([#1670](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/1670), [@AndrewSirenko](https://github.com/AndrewSirenko))
+* Enable customization of aws-secret name and keys in Helm Chart ([#1668](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/1668), [@AndrewSirenko](https://github.com/AndrewSirenko))
+* The sidecars have been updated. The new versions are:
+    - csi-snapshotter: `v6.2.2`
+
 ## v2.19.0
 * Bump driver version to `v1.19.0`
 * The sidecars have been updated. The new versions are:
