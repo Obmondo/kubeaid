@@ -12,7 +12,8 @@
 set -euo pipefail
 
 declare -i apply=0 \
-        debug=0
+        debug=0 \
+        build_all=0
 
 declare dry_run='' \
         cluster_dir=''
@@ -58,6 +59,9 @@ while (( $# > 0 )); do
     --dry-run=*)
       [[ "${1}" =~ --dry-run=(.+) ]]
       dry_run="${BASH_REMATCH[1]}"
+      ;;
+    --build-all)
+      build_all=1
       ;;
     -h|--help)
       usage
@@ -123,19 +127,38 @@ function jb_install() {
   fi
 }
 
-if ! [ -e "${jsonnet_lib_path}" ]; then
-  echo "INFO: '${jsonnet_lib_path}' doesn't exist; executing jsonnet-bundler"
-  jb init
+function build_for_tag() {
+  local kube_prometheus_release_tag="$1"
+  echo "Processing For Tag: $kube_prometheus_release_tag"
 
-  jb_install kube-prometheus "github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@${kube_prometheus_release}"
+  jb init
+  jb_install kube-prometheus "github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@${kube_prometheus_release_tag}"
   jb_install prometheus-mixin github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin@main
   jb_install ceph-mixins "github.com/ceph/ceph/monitoring/ceph-mixin@main"
   jb_install cert-manager-mixin "gitlab.com/uneeq-oss/cert-manager-mixin@master"
   jb_install opensearch-mixin "github.com/grafana/jsonnet-libs/opensearch-mixin@master"
 
-  mkdir -p "${basedir}/libraries/${kube_prometheus_release}"
-  mv vendor "${basedir}/libraries/${kube_prometheus_release}/"
-  mv jsonnetfile.json jsonnetfile.lock.json "${basedir}/libraries/${kube_prometheus_release}/"
+  mkdir -p "${basedir}/libraries/${kube_prometheus_release_tag}"
+  mv vendor "${basedir}/libraries/${kube_prometheus_release_tag}/"
+  mv jsonnetfile.json jsonnetfile.lock.json "${basedir}/libraries/${kube_prometheus_release_tag}/"
+
+  echo "Processed folder: $kube_prometheus_release_tag"
+  echo
+}
+
+if [ "$build_all" -eq 1 ]; then
+  for file_path in build/kube-prometheus/libraries/*; do
+  file_name=$(basename "$file_path")
+    echo "$file_name"
+    rm -rf "${basedir}/libraries/${file_name}"
+    build_for_tag "$file_name"
+  done
+
+  exit 0
+else
+  if ! [ -e "${jsonnet_lib_path}" ]; then
+    build_for_tag "$kube_prometheus_release"
+  fi
 fi
 
 echo "INFO: compiling jsonnet files into '${outdir}' from sources at ${jsonnet_lib_path}"
