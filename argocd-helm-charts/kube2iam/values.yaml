@@ -13,5 +13,3 @@ kube2iam:
     operator: Exists
   extraArgs:
     namespace-restrictions: ""
-  image:
-    tag: kube2iam-2.6.0
