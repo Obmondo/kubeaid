@@ -25,6 +25,8 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     resource_group_name     = var.resource_group
     dns_prefix              = var.dns_prefix
     kubernetes_version      = var.kubernetes_version
+    oidc_issuer_enabled     = var.oidc_issuer_enabled
+    oidc_issuer_url         = var.oidc_issuer_enabled ? var.oidc_issuer_url : ""
     private_cluster_enabled = var.private_cluster_enabled
     private_cluster_public_fqdn_enabled = true
     default_node_pool {
