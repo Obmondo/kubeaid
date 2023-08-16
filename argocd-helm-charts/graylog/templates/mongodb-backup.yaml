@@ -11,6 +11,13 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+        {{- if .Values.logicalbackup.annotations }}
+          annotations:
+            {{- toYaml .Values.logicalbackup.annotations | nindent 12 }}
+        {{- end }}
+          labels:
+            app: mongodb-backup
         spec:
           containers:
             - name: mongodb-backup
@@ -35,10 +42,15 @@ spec:
                 - name: BACKUP_PROVIDER
                   value: {{ (.Values.logicalbackup).provider | default "az" }}
               {{- if eq .Values.logicalbackup.provider "s3" }}
+                - name: S3_BUCKET
+                  value: {{ (.Values.logicalbackup).s3bucket }}
+                - name: S3_PATH
+                  value: {{ (.Values.logicalbackup).s3backuppath }}
+              {{- if not .Values.logicalbackup.useiamrole }}
                 - name: BACKUP_S3_REGION
                   value: {{ (.Values.logicalbackup).s3region | default "us-east-1" }}
                 - name: BACKUP_S3_ENDPOINT
-                  value: {{ (.Values.logicalbackup).s3region }}
+                  value: {{ (.Values.logicalbackup).s3endpoint }}
                 - name: AWS_ACCESS_KEY_ID
                   valueFrom:
                     secretKeyRef:
@@ -49,9 +61,8 @@ spec:
                     secretKeyRef:
                       name: mongodbbackup
                       key: AWS_SECRET_ACCESS_KEY
+              {{- end }}
               {{- else if eq .Values.logicalbackup.provider "az" }}
-                - name: BACKUP_PROVIDER
-                  value: "az"
                 - name: AZ_BACKUP_PATH
                   value:  {{ (.Values.logicalbackup).azbackuppath | default "mongodb-backup/graylog-mongodb" }}
                 - name: AZURE_STORAGE_ACCOUNT_NAME
