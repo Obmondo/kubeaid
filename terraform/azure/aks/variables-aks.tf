@@ -78,6 +78,15 @@ variable "private_cluster_enabled" {
   description = "Whether the cluster will be private or public"
 }
 
+variable "oidc_issuer_enabled" {
+  default = false
+  description = "Whether or not the OIDC feature is enabled or disabled"
+}
+
+variable "oidc_issuer_url" {
+  description = "The OIDC issuer URL that is associated with the cluster"
+}
+
 variable "nodepools" {
   type = map
   default = {}
