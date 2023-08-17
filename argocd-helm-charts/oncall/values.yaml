@@ -83,6 +83,8 @@ postgresql:
   resources:
     limits:
       memory: 800Mi
+      # As its required to add the cpu limit, have added the issue here
+      # https://github.com/cloudnative-pg/cloudnative-pg/issues/2586
       cpu: 4
     requests:
       memory: 500Mi
