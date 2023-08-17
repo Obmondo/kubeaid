@@ -83,7 +83,7 @@ postgresql:
   resources:
     limits:
       memory: 800Mi
-      cpu: 4000m
+      cpu: 4
     requests:
       memory: 500Mi
       cpu: 100m
