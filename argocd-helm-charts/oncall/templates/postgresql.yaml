@@ -11,6 +11,7 @@ spec:
   resources:
     limits:
       memory: {{ .Values.postgresql.resources.limits.memory | default "800Mi" }}
+      cpu: {{ .Values.postgresql.resources.limits.cpu | default "100m" }}
     requests:
       memory: {{ .Values.postgresql.resources.requests.memory | default "500Mi" }}
       cpu: {{ .Values.postgresql.resources.requests.cpu | default "100m" }}
