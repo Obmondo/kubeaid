@@ -45,6 +45,14 @@ argo-cd:
       enabled: true
       serviceMonitor:
         enabled: true
+    config:
+      resource.exclusions: |
+        - apiGroups:
+          - "velero.io"
+          kinds:
+          - "Backup"
+          clusters:
+          - "*"
   controller:
     resources:
       limits:
