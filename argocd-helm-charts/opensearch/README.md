@@ -151,7 +151,7 @@ kubectl patch pv <your-pv-name> -p '{"spec":{"persistentVolumeReclaimPolicy":"Re
 * Add s3 repo
 
 ```bash
-curl -s -u admin:admin -X GET http://opensearch-cluster-master:9200/_snapshot/ops-s3 -d '{"type": "s3", "settings": { "bucket": "<bucket-name>" } }'
+curl -s -u admin:admin -X PUT http://opensearch-cluster-master:9200/_snapshot/ops-s3 -d '{"type": "s3", "settings": { "bucket": "<bucket-name>" } }'
 ```
 
 * List snapshots
