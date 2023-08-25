@@ -5,10 +5,10 @@
 replicaCount: 1
 
 image:
-  repository: vqui/act_runner
+  repository: gitea/act_runner
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.2.3"
+  tag: 0.2.5
 
 imagePullSecrets: []
 nameOverride: ""

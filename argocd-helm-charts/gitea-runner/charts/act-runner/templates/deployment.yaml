@@ -33,16 +33,19 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["sh", "-c", "while ! nc -z localhost 2376 </dev/null; do echo 'waiting for docker daemon...'; sleep 5; done; /sbin/tini -- /opt/act/run.sh"]
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
             - name: DOCKER_HOST
-              value: "tcp://localhost:2375"
-            - name: DOCKER_TLS_CERTDIR
-              value: ""
-            - name: ACT_INSTANCE
+              value: "tcp://localhost:2376"
+            - name: DOCKER_CERT_PATH
+              value: /certs/client
+            - name: DOCKER_TLS_VERIFY
+              value: "1"
+            - name: GITEA_INSTANCE_URL
               value: {{ .Values.act_runner.instance }}
-            - name: ACT_TOKEN
+            - name: GITEA_RUNNER_REGISTRATION_TOKEN
               valueFrom:
                 secretKeyRef:
                   {{- if not .Values.act_runner.existingToken }}
@@ -51,13 +54,13 @@ spec:
                   name: {{ .Values.act_runner.existingToken }}
                   {{- end }}
                   key: act-runner-token
-            - name: ACT_LABELS
+            - name: GITEA_RUNNER_LABELS
               value: {{ join "," .Values.act_runner.labels }}
           volumeMounts:
-            - name: docker-data
-              mountPath: /shared
+            - name: docker-certs
+              mountPath: /certs
             - name: {{ include "act_runner.fullname" . }}-pvc
-              mountPath: /opt/act_runner
+              mountPath: /data
         - name: act-runner-dind
           securityContext:
             privileged: true
@@ -65,13 +68,17 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: DOCKER_TLS_CERTDIR
-              value: ""
+              value: /certs
           volumeMounts:
-            - name: docker-data
-              mountPath: /shared
+          - name: docker-certs
+            mountPath: /certs
+          - name: docker-graph-storage
+            mountPath: /var/lib/docker
       volumes:
-        - name: docker-data
-          emptyDir:
+        - name: docker-certs
+          emptyDir: {}
+        - name: docker-graph-storage
+          emptyDir: {}
         - name: {{ include "act_runner.fullname" . }}-pvc
           persistentVolumeClaim:
             claimName: {{ include "act_runner.fullname" . }}-pvc
