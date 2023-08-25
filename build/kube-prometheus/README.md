@@ -177,3 +177,15 @@ You can also simply output an object to a file by adding a line to the bottom of
 ```jsonnet
 + { debug: mixins }
 ```
+
+## Adding the Alertmanager secret
+
+Use the [example config](./examples/alertmanager-config/alertmanager-main-slack.yaml) to create your own `alertmanager-main` secret.
+
+The example file is a [templated sealed secret](https://github.com/bitnami-labs/sealed-secrets#sealedsecrets-as-templates-for-secrets)
+and the only encrypted part is your slack url.
+Run this command to seal the secret and pass your slack channel's url:
+
+```console
+kubectl create secret generic alertmanager-main --dry-run=client  --namespace monitoring  --from-literal=slack-url='https://your-slack-channel-url' -o yaml | kubeseal --controller-namespace system --controller-name sealed-secrets --namespace monitoring -o yaml --merge-into alertmanager-main.yaml
+```
