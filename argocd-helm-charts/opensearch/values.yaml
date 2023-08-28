@@ -12,8 +12,6 @@ backup:
 
 opensearch:
   # Helm chart points to 1.3.2, we want to use latest as of now which is 1.3.6
-  image:
-    tag: 1.3.6
   extraEnvs:
   - name: DISABLE_INSTALL_DEMO_CONFIG
     value: "false"
