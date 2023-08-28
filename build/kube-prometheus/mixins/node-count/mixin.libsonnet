@@ -30,7 +30,7 @@
               alert_id: 'ClusterFailedToUpdateNodeCountForOverTenDays',
             },
             annotations: {
-              description: 'The cluster **{{ .Labels.cluster_certname }}** has failed to update its node count for over ten days this month ( **{{ .Values }}** ). This will have an impact on the average node count calculation for the month.',
+              description: 'The cluster **{{ .Labels.cluster_certname }}** has failed to update its node count for over ten days this month ( **{{ .Value }}** ). This will have an impact on the average node count calculation for the month.',
               summary: 'The cluster has not added their respective node counts to the DB for more than 10 days this month.',
             },
           },
