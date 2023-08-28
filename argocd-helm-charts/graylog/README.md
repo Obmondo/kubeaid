@@ -95,22 +95,44 @@ kubectl create secret generic graylog-es-svc -n graylog --from-literal=url='http
 
 ## Upgrade Instruction
 
-* Take backup of mongodb
-  a. Login on mongodb-replica-set pods shell
-  b. and run these commands
+Graylog and OpenSearch are both under active development. This means that new versions are released
+frequently. This guide will help you upgrade your Graylog and OpenSearch installation to the
+latest version.
 
-  ```bash
-  cd /tmp
-  mongo dump
-  ```
+* Check the graylog interoperability chart to see which version of Graylog is compatible with the
+version of OpenSearch and mongodb you are upgrading to.
+https://go2docs.graylog.org/5-0/planning_your_deployment/planning_your_upgrade_to_opensearch.htm
 
-* Check the version of opensearch and mongodb which are supported by graylog
-  (there is a link on their website, cant find one now)
-* few things to look for, for now I have fixed locally on k8id repo
-  a. [issue#104](https://github.com/KongZ/charts/issues/104)
-* With graylog 4.3.x and opensearch 1.x we can disable the emulation(ES 7.x - set in opensearch values)
-* external url `externalUri` in graylog values should include `https://your-domain.com`
-* After the upgrade check the graylog pod and UI for any errors .
+### 1. Upgrading MongoDB
+
+* Take a backup of the mongodb by running the backup job manually.
+
+    ```bash
+    kubectl create job --from=cronjob/mongodb-backup manual-backup -n graylog
+    ```
+
+* In the graylog application Sync the mongodb-community crd changes first as the MongoDb v5.0
+  is not compatible with graylog v4.3.9.
+* Expect graylog to go down during the upgrade process.
+
+### 2. Upgrading Graylog
+
+* Sync the graylog application in the argocd.
+* Wait for the graylog pods to be in running state.
+* Check the logs
+* Check the graylog UI for any errors.
+
+### 3. Upgrading OpenSearch
+
+* Take a snapshot
+
+    ```bash
+    kubectl create job --from=cronjob/opensearch-s3-snapshot-create manual-snapshot -n graylog
+    ```
+
+* Sync the opensearch application in the argocd.
+* Wait for the opensearch pods to be in running state.
+* opensearch cluster are not downgradable, so please restore it from snapshot (look at opensearch helm chart readme)
 
 ## Restore Instruction
 
