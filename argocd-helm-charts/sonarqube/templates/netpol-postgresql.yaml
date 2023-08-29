@@ -7,7 +7,7 @@ metadata:
 spec:
   order: 100
   selector:
-    application == 'spilo'
+    application contains 'spilo'
   types:
   - Ingress
   - Egress
