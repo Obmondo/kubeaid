@@ -1,0 +1,37 @@
+apiVersion: mariadb.mmontes.io/v1alpha1
+kind: MariaDB
+metadata:
+  name: matomo-mariadb
+spec:
+  rootPasswordSecretKeyRef:
+    name: mariadb-secret
+    key: root-password
+
+  image:
+    repository: mariadb
+    tag: {{ .Values.mariadb.image.tag | default "11.0.3" }}
+    pullPolicy: IfNotPresent
+
+  port: 3306
+
+  volumeClaimTemplate:
+    resources:
+      requests:
+        storage: {{ .Values.mariadb.volumeClaimTemplate.resources.requests.storage | default "1Gi" }}
+    accessModes:
+      - ReadWriteOnce
+
+  myCnf: |
+    [mariadb]
+    bind-address=0.0.0.0
+    default_storage_engine=InnoDB
+    binlog_format=row
+    innodb_autoinc_lock_mode=2
+    max_allowed_packet=256M
+  resources:
+    requests:
+      cpu: {{ .Values.mariadb.resources.requests.cpu | default "100m" }}
+      memory: {{ .Values.mariadb.resources.requests.memory | default "128Mi" }}
+    limits:
+      cpu: {{ .Values.mariadb.resources.limits.cpu | default "300m" }}
+      memory: {{ .Values.mariadb.resources.limits.memory | default "512Mi" }}
