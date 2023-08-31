@@ -189,3 +189,50 @@ Run this command to seal the secret and pass your slack channel's url:
 ```console
 kubectl create secret generic alertmanager-main --dry-run=client  --namespace monitoring  --from-literal=slack-url='https://your-slack-channel-url' -o yaml | kubeseal --controller-namespace system --controller-name sealed-secrets --namespace monitoring -o yaml --merge-into alertmanager-main.yaml
 ```
+# Reset Admin Password for Grafana in Kubernetes
+
+![Grafana Logo](https://grafana.com/static/assets/img/grafana_logo.svg)
+
+This guide provides instructions on how to reset the admin password for Grafana running on a Kubernetes cluster.
+ The password reset command will be executed inside the Grafana container.
+
+## Resetting the Admin Password
+
+To reset the admin password for Grafana, follow these steps:
+
+1. Find the Grafana Pod: Use the following command to list the pods in the "monitoring" namespace and find the Grafana pod:
+
+    ```bash
+    GrafanaPod=$(kubectl get pods -n monitoring | grep grafana | awk '{print $1}')
+    ```
+
+2. Reset the admin password: Use the following command to reset the admin password for Grafana:
+
+    ```bash
+    $ kubectl exec -it $GrafanaPod -n monitoring -- grafana-cli admin reset-admin-password <new-password>
+
+    INFO [08-30|11:45:57] Starting Grafana                         logger=settings version= commit= branch= compiled=1970-01-01T00:00:00Z
+    INFO [08-30|11:45:57] Config loaded from                       logger=settings file=/usr/share/grafana/conf/defaults.ini
+    INFO [08-30|11:45:57] Config overridden from Environment variable logger=settings var="GF_PATHS_DATA=/var/lib/grafana"
+    INFO [08-30|11:45:57] Config overridden from Environment variable logger=settings var="GF_PATHS_LOGS=/var/log/grafana"
+    INFO [08-30|11:45:57] Config overridden from Environment variable logger=settings var="GF_PATHS_PLUGINS=/var/lib/grafana/plugins"
+    INFO [08-30|11:45:57] Config overridden from Environment variable logger=settings var="GF_PATHS_PROVISIONING=/etc/grafana/provisioning"
+    INFO [08-30|11:45:57] Path Home                                logger=settings path=/usr/share/grafana
+    INFO [08-30|11:45:57] Path Data                                logger=settings path=/var/lib/grafana
+    INFO [08-30|11:45:57] Path Logs                                logger=settings path=/var/log/grafana
+    INFO [08-30|11:45:57] Path Plugins                             logger=settings path=/var/lib/grafana/plugins
+    INFO [08-30|11:45:57] Path Provisioning                        logger=settings path=/etc/grafana/provisioning
+    INFO [08-30|11:45:57] App mode production                      logger=settings
+    INFO [08-30|11:45:57] Envelope encryption state                logger=secrets enabled=true current provider=secretKey.v1
+
+    Admin password changed successfully ✔
+
+    ```
+
+3. Access Grafana with the New Password: Once the command completes successfully, you can access Grafana's web
+    interface using the new admin password.
+    If that doesn't work, you can try to restart the Grafana pod:
+
+    ```bash
+    kubectl delete pod $GrafanaPod -n monitoring
+    ```
