@@ -83,10 +83,10 @@ and then restart sealed-secrets pod in kube-system to make it do its job (it has
 
 ## Templating Sealed Secrets
 
-Sealed secrets have an interesting feature which can use config files
-where only a part of the file needs to be encrypted. To use templates in sealed secrets,
-create a secret using the examples provided above, and add the `template:` part as
-given in the example below:
+Sealed secrets have an interesting feature which can use config files where only a
+part of the file needs to be encrypted. To use templates in sealed secrets, create a
+sealed secret yaml using the examples provided above, with palceholder values for data to
+be sealed, and add the template part as given in the example below:
 
 ```yaml
 apiVersion: bitnami.com/v1alpha1
