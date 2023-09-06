@@ -1,4 +1,5 @@
 {{ if .Values.networkpolicies }}
+---
 apiVersion: crd.projectcalico.org/v1
 kind: NetworkPolicy
 metadata:
@@ -15,18 +16,19 @@ spec:
     destination:
       ports:
       - 53
-      namespaceSelector: projectcalico.org/name == 'kube-system'
+      namespaceSelector: kubernetes.io/metadata.name == 'kube-system'
       selector: k8s-app == 'kube-dns'
   - action: Allow
     protocol: TCP
     destination:
       ports:
       - 53
-      namespaceSelector: projectcalico.org/name == 'kube-system'
+      namespaceSelector: kubernetes.io/metadata.name == 'kube-system'
       selector: k8s-app == 'kube-dns'
   - action: Log
   - action: Deny
   ingress:
   - action: Log
   - action: Deny
+---
 {{ end }}
