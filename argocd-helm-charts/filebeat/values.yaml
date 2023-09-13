@@ -9,7 +9,7 @@ filebeat:
     resources:
       requests:
         cpu: "200m"
-        memory: "200Mi"
+        memory: "256Mi"
       limits:
         cpu: null
-        memory: "200Mi"
+        memory: "512Mi"
