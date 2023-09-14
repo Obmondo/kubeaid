@@ -1,8 +1,8 @@
 apiVersion: v2
-appVersion: 13.0.0
+appVersion: 13.3.9
 description: Teleport Operator provides management of select Teleport resources.
 icon: https://goteleport.com/images/logos/logo-teleport-square.svg
 keywords:
 - Teleport
 name: teleport-operator
-version: 13.0.0
+version: 13.3.9

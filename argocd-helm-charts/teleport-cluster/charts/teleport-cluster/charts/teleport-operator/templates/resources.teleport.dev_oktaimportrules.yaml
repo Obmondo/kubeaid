@@ -2,23 +2,23 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   creationTimestamp: null
-  name: teleportoidcconnectors.resources.teleport.dev
+  name: teleportoktaimportrules.resources.teleport.dev
 spec:
   group: resources.teleport.dev
   names:
-    kind: TeleportOIDCConnector
-    listKind: TeleportOIDCConnectorList
-    plural: teleportoidcconnectors
+    kind: TeleportOktaImportRule
+    listKind: TeleportOktaImportRuleList
+    plural: teleportoktaimportrules
     shortNames:
-    - oidcconnector
-    - oidcconnectors
-    singular: teleportoidcconnector
+    - oktaimportrule
+    - oktaimportrules
+    singular: teleportoktaimportrule
   scope: Namespaced
   versions:
-  - name: v3
+  - name: v1
     schema:
       openAPIV3Schema:
-        description: OIDCConnector is the Schema for the oidcconnectors API
+        description: OktaImportRule is the Schema for the oktaimportrules API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -33,98 +33,68 @@ spec:
           metadata:
             type: object
           spec:
-            description: OIDCConnector resource definition v3 from Teleport
+            description: OktaImportRule resource definition v1 from Teleport
             properties:
-              acr_values:
-                description: ACR is an Authentication Context Class Reference value.
-                  The meaning of the ACR value is context-specific and varies for
-                  identity providers.
-                type: string
-              allow_unverified_email:
-                description: AllowUnverifiedEmail tells the connector to accept OIDC
-                  users with unverified emails.
-                type: boolean
-              claims_to_roles:
-                description: ClaimsToRoles specifies a dynamic mapping from claims
-                  to roles.
+              mappings:
+                description: Mappings is a list of matches that will map match conditions
+                  to labels.
                 items:
                   properties:
-                    claim:
-                      description: Claim is a claim name.
-                      type: string
-                    roles:
-                      description: Roles is a list of static teleport roles to match.
+                    add_labels:
+                      description: AddLabels specifies which labels to add if any
+                        of the previous matches match.
+                      nullable: true
+                      properties:
+                        key:
+                          type: string
+                        value:
+                          type: string
+                      type: object
+                    match:
+                      description: Match is a set of matching rules for this mapping.
+                        If any of these match, then the mapping will be applied.
                       items:
-                        type: string
+                        properties:
+                          app_ids:
+                            description: AppIDs is a list of app IDs to match against.
+                            items:
+                              type: string
+                            nullable: true
+                            type: array
+                          app_name_regexes:
+                            description: AppNameRegexes is a list of regexes to match
+                              against app names.
+                            items:
+                              type: string
+                            nullable: true
+                            type: array
+                          group_ids:
+                            description: GroupIDs is a list of group IDs to match
+                              against.
+                            items:
+                              type: string
+                            nullable: true
+                            type: array
+                          group_name_regexes:
+                            description: GroupNameRegexes is a list of regexes to
+                              match against group names.
+                            items:
+                              type: string
+                            nullable: true
+                            type: array
+                        type: object
                       nullable: true
                       type: array
-                    value:
-                      description: Value is a claim value to match.
-                      type: string
                   type: object
-                type: array
-              client_id:
-                description: ClientID is the id of the authentication client (Teleport
-                  Auth server).
-                type: string
-              client_secret:
-                description: ClientSecret is used to authenticate the client.
-                type: string
-              display:
-                description: Display is the friendly name for this provider.
-                type: string
-              google_admin_email:
-                description: GoogleAdminEmail is the email of a google admin to impersonate.
-                type: string
-              google_service_account:
-                description: GoogleServiceAccount is a string containing google service
-                  account credentials.
-                type: string
-              google_service_account_uri:
-                description: GoogleServiceAccountURI is a path to a google service
-                  account uri.
-                type: string
-              issuer_url:
-                description: IssuerURL is the endpoint of the provider, e.g. https://accounts.google.com.
-                type: string
-              max_age:
-                description: MaxAge is the amount of time that user logins are valid
-                  for. If a user logs in, but then does not login again within this
-                  time period, they will be forced to re-authenticate.
-                format: duration
-                type: string
-              prompt:
-                description: Prompt is an optional OIDC prompt. An empty string omits
-                  prompt. If not specified, it defaults to select_account for backwards
-                  compatibility.
-                type: string
-              provider:
-                description: Provider is the external identity provider.
-                type: string
-              redirect_url:
-                description: RedirectURLs is a list of callback URLs which the identity
-                  provider can use to redirect the client back to the Teleport Proxy
-                  to complete authentication. This list should match the URLs on the
-                  provider's side. The URL used for a given auth request will be chosen
-                  to match the requesting Proxy's public address. If there is no match,
-                  the first url in the list will be used.
-                items:
-                  type: string
-                type: array
-              scope:
-                description: Scope specifies additional scopes set by provider.
-                items:
-                  type: string
                 nullable: true
                 type: array
-              username_claim:
-                description: UsernameClaim specifies the name of the claim from the
-                  OIDC connector to be used as the user's username.
-                type: string
+              priority:
+                description: Priority represents the priority of the rule application.
+                  Lower numbered rules will be applied first.
+                format: int32
+                type: integer
             type: object
           status:
-            description: TeleportOIDCConnectorStatus defines the observed state of
-              TeleportOIDCConnector
             properties:
               conditions:
                 description: Conditions represent the latest available observations
