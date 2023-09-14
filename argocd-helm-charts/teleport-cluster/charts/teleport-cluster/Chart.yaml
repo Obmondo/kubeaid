@@ -1,13 +1,13 @@
 apiVersion: v2
-appVersion: 13.0.0
+appVersion: 13.3.9
 dependencies:
 - condition: installCRDs,operator.enabled
   name: teleport-operator
   repository: ""
-  version: 13.0.0
+  version: 13.3.9
 description: Teleport is an access platform for your infrastructure
 icon: https://goteleport.com/images/logos/logo-teleport-square.svg
 keywords:
 - Teleport
 name: teleport-cluster
-version: 13.0.0
+version: 13.3.9
