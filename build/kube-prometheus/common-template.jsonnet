@@ -59,6 +59,9 @@ local default_vars = {
   },
 
   grafana_keycloak_enable: false,
+  grafana_keycloak_url: '',
+  grafana_keycloak_realm: '',
+  grafana_keycloak_client_id: 'grafana',
   grafana_keycloak_secretref: {
     name: 'kube-prometheus-stack-grafana',
     key: 'grafana-keycloak-secret',
@@ -411,7 +414,9 @@ local kp =
               disable_signout_menu: false,
             } + (
               if vars.grafana_keycloak_enable then {
-                signout_redirect_url: vars.grafana_signout_redirect_url,
+                // NOTE: currently it ask user to logout from keycloak, would be nice to logout directly
+                // when we click on logout in grafana console. we will improve on this later
+                signout_redirect_url: vars.grafana_keycloak_url + '/auth/realms/' + vars.grafana_keycloak_realm + '/protocol/openid-connect/logout?post_logout_redirect_uri=' + vars.grafana_root_url + '/login&client_id=' + vars.grafana_keycloak_client_id,
               } else {}
             ),
             analytics: {
@@ -426,13 +431,18 @@ local kp =
                 'auth.generic_oauth': {
                   enabled: true,
                   allow_sign_up: true,
-                  scopes: 'openid profile email',
+                  email_attribute_path: 'email',
+                  scopes: 'openid email profile offline_access roles',
+                  groups_attribute_path: 'groups',
+                  login_attribute_path: 'username',
+                  name_attribute_path: 'full_name',
                   name: 'Keycloak',
-                  auth_url: vars.grafana_auth_url,
-                  token_url: vars.grafana_token_url,
-                  api_url: vars.grafana_api_url,
-                  client_id: 'grafana',
-                  role_attribute_path: "contains(not_null(roles[*],''), 'Admin') && 'Admin' || contains(not_null(roles[*],''), 'Editor') && 'Editor' || contains(not_null(roles[*],''), 'Viewer') && 'Viewer'|| ''",
+                  auth_url: vars.grafana_keycloak_url + '/auth/realms/' + vars.grafana_keycloak_realm + '/protocol/openid-connect/auth',
+                  token_url: vars.grafana_keycloak_url + '/auth/realms/' + vars.grafana_keycloak_realm + '/protocol/openid-connect/token',
+                  api_url: vars.grafana_keycloak_url + '/auth/realms/' + vars.grafana_keycloak_realm + '/protocol/openid-connect/userinfo',
+                  client_id: vars.grafana_keycloak_client_id,
+                  // Make sure your client role has exact the same name, case sensitive it is.
+                  role_attribute_path: "contains(roles[*], 'Admin') && 'Admin' || contains(roles[*], 'Editor') && 'Editor' || 'Viewer'",
 
                 },
               }
