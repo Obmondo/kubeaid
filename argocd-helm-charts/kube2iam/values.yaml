@@ -14,4 +14,4 @@ kube2iam:
   extraArgs:
     namespace-restrictions: ""
   image:
-    tag: kube2iam-2.6.0
+    tag: 0.11.1
