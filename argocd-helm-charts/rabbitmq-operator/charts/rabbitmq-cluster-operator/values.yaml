@@ -1,3 +1,6 @@
+# Copyright VMware, Inc.
+# SPDX-License-Identifier: APACHE-2.0
+
 ## @section Global parameters
 ## Global Docker image parameters
 ## Please, note that this will override the image parameters, including dependencies, configured to use the global value
@@ -62,7 +65,7 @@ diagnosticMode:
 rabbitmqImage:
   registry: docker.io
   repository: bitnami/rabbitmq
-  tag: 3.10.14-debian-11-r1
+  tag: 3.11.22-debian-11-r2
   digest: ""
   ## Optionally specify an array of imagePullSecrets.
   ## Secrets must be manually created in the namespace.
@@ -84,7 +87,7 @@ rabbitmqImage:
 credentialUpdaterImage:
   registry: docker.io
   repository: bitnami/rmq-default-credential-updater
-  tag: 1.0.2-scratch-r13
+  tag: 1.0.2-debian-11-r20
   digest: ""
   ## Optionally specify an array of imagePullSecrets.
   ## Secrets must be manually created in the namespace.
@@ -108,7 +111,7 @@ clusterOperator:
   image:
     registry: docker.io
     repository: bitnami/rabbitmq-cluster-operator
-    tag: 2.1.0-scratch-r3
+    tag: 2.5.0-debian-11-r0
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -347,6 +350,17 @@ clusterOperator:
     ## @param clusterOperator.rbac.create Specifies whether RBAC resources should be created
     ##
     create: true
+    ## ClusterRole parameters
+    ##
+    clusterRole:
+      ## @param clusterOperator.rbac.clusterRole.customRules Define custom access rules for the ClusterRole
+      ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole
+      ## e.g:
+      ## customRules:
+      ##   - apiGroups: A list of API groups (e.g., [""], ["apps"]).
+      ##   - resources: A list of resource names (e.g., ["configmaps", "pods"]).
+      ##   - verbs: A list of allowed access verbs (e.g., ["create", "get", "list"]).
+      customRules: []
 
   ## ServiceAccount configuration
   ##
@@ -476,6 +490,9 @@ clusterOperator:
 ## @section RabbitMQ Messaging Topology Operator Parameters
 ##
 msgTopologyOperator:
+  ## @param msgTopologyOperator.enabled Deploy RabbitMQ Messaging Topology Operator as part of the installation
+  ##
+  enabled: true
   ## Bitnami RabbitMQ Messaging Topology Operator image
   ## ref: https://hub.docker.com/r/bitnami/rmq-messaging-topology-operator/tags/
   ## @param msgTopologyOperator.image.registry RabbitMQ Messaging Topology Operator image registry
@@ -488,7 +505,7 @@ msgTopologyOperator:
   image:
     registry: docker.io
     repository: bitnami/rmq-messaging-topology-operator
-    tag: 1.10.0-scratch-r1
+    tag: 1.12.0-debian-11-r20
     digest: ""
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'

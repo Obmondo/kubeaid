@@ -1,12 +1,40 @@
 rabbitmq-cluster-operator:
   useCertManager: "true"
   clusterOperator:
+    podSecurityContext:
+      enabled: true
+      fsGroup: 1001
+    containerSecurityContext:
+      enabled: true
+      runAsUser: 1001
+      runAsNonRoot: true
+      readOnlyRootFilesystem: true
+      capabilities:
+          drop:
+          - ALL
+      allowPrivilegeEscalation: false
+      seccompProfile:
+        type: RuntimeDefault
     resources:
       limits: null
       requests:
         cpu: 100m
         memory: 250Mi
   msgTopologyOperator:
+    podSecurityContext:
+      enabled: true
+      fsGroup: 1001
+    containerSecurityContext:
+      enabled: true
+      runAsUser: 1001
+      runAsNonRoot: true
+      readOnlyRootFilesystem: true
+      capabilities:
+          drop:
+          - ALL
+      allowPrivilegeEscalation: false
+      seccompProfile:
+        type: RuntimeDefault
     resources:
       limits: null
       requests:
