@@ -10,3 +10,13 @@ postgres-operator:
     # https://github.com/zalando/postgres-operator/pull/583/files
     enable_pod_disruption_budget: true
     pod_environment_configmap: "postgres-pod-env"
+  securityContext:
+    runAsUser: 1000
+    runAsNonRoot: true
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
