@@ -13,7 +13,7 @@ image:
   repository: registry.obmondo.com/obmondo/dockerfiles/errbot
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "6.1.9"
+  tag: "6.1.10"
 
 imagePullSecrets: []
 
