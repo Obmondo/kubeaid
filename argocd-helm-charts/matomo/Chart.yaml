@@ -1,0 +1,7 @@
+apiVersion: v2
+name: matomo
+version: 2.1.0
+dependencies:
+  - name: matomo
+    version: 2.1.0
+    repository: https://charts.bitnami.com/bitnami

@@ -1,0 +1,25 @@
+matomo:
+  mariadb:
+    enabled: false
+  externalDatabase:
+    host: matomo-mariadb
+    port: 3306
+    user: matomo
+    database: matomo
+    existingSecret: mariadb-secret
+
+#  This are configs for external mariadb deployment
+mariadb:
+  image:
+    tag: "11.0.3"
+  volumeClaimTemplate:
+    resources:
+      requests:
+        storage: 1Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 512Mi
