@@ -16,5 +16,5 @@ spec:
     - "CREATE TEMPORARY TABLES"
   database: "*"
   table: "*"
-  username: user
+  username: matomo
   grantOption: true
