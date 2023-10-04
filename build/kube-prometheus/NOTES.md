@@ -2,18 +2,22 @@
 
 Includes alertmanager, grafana etc.
 
-
 ## Integrate Keycloak with Grafana
 
-* Steps to configure grafana client on keycloak
-https://github.com/Obmondo/Note-integrate-SSO-grafana
+Instead of granting access to your team using separate Grafana user account credentials, try something like Keycloak
+which is an Open Source OIDC provider. Your team can login to Grafana using existing OAuth configurations and you can
+maintain the RBAC policies per team too.
+
+* [Steps to configure grafana client on keycloak](https://github.com/Obmondo/Note-integrate-SSO-grafana)
 
 * Create secret with the token you get from the grafana client on keycloak
-```bash
+
+```console
 kubectl create secret generic kube-prometheus-stack-grafana -n monitoring --dry-run=client --from-literal=grafana-keycloak-secret=i_love_k8s -o json | kubeseal --controller-name sealed-secrets --controller-namespace system - > sealed-secrets/cluster_name/monitoring/kube-prometheus-stack-grafana.json
 ```
 
 ## Activate support from K8id Support team
+
 ```bash
 # You will get the private key and cert from K8id Support team.
 
@@ -56,6 +60,17 @@ kubectl create secret generic alertmanager-main --dry-run=client --from-literal=
 * Currently when you login and logout and login again (it fails here)
 * The second login works (confirmed by looking at the logging session in keycloak)
 * FIX:
-    a. Logout all the session from the keycloak
-    b. closed the browser (Now I was testing it in 'Private Mode')
-    c. start a new browser and login again
+  * Logout all the session from the keycloak
+  * closed the browser (Now I was testing it in 'Private Mode')
+  * start a new browser and login again
+* Alternate Fix:
+  * Open Dev Tools in Browser (`Ctrl` + `Shift` + `I`)
+  * Navigate to `Network` Tab
+  * Check `Disable cache`
+  * Navigate to `Application` Tab
+  * Click on `Cookies` in the left pane
+  * Delete the cookies.
+
+## References
+
+* [Grafana Docs with Keycloak](https://grafana.com/docs/grafana/next/setup-grafana/configure-security/configure-authentication/keycloak/)
