@@ -53,3 +53,27 @@ Setup Grafana Oncall with Telegram:
 
 We have to create a Telegram Bot to allow Grafana Oncall to send messages.
 Docs for creating a bot : https://core.telegram.org/bots#how-do-i-create-a-bot
+
+
+## Telegram Template for on call
+
+### Title
+```
+<b>{{ payload.labels.alertname }}</b>
+```
+
+### Body
+```
+<b>Title:</b> {{ payload.annotations.summary }}
+<b>Description:</b> {{ payload.annotations.description }}
+<b>Severity:</b> {{ payload.labels.severity }}
+<b>Status:</b> {{ payload.status }}
+<b>Start Time:</b> {{ payload.startsAt }}
+
+<b>Labels:</b>
+{%- for label in payload.labels -%}
+    {%- if label not in ["pushprox_target", "device", "alertname", "severity", "mountpoint", "alert_id"] %}
+<b>{{ label }}:</b> <i>{{ payload.labels[label] }}</i>
+    {%- endif -%}
+{% endfor %}
+```
