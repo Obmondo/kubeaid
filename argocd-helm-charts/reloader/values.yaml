@@ -4,3 +4,12 @@ reloader:
     reloadOnCreate: true
     serviceMonitor:
       enabled: true
+    deployment:
+      containerSecurityContext:
+        capabilities:
+          drop:
+            - ALL
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        seccompProfile:
+          type: RuntimeDefault
