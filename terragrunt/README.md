@@ -105,3 +105,35 @@
    ```sh
    helm template k8s/<clustername>/argocd-apps --show-only templates/root.yaml | kubectl apply -f -
    ```
+
+## Import existing resources into state file
+
+   We import existing resources into state file so that we can manage them using terragrunt if something is changed manually.
+
+   1. Backup the existing state file from the azure blob storage/s3 bucket.
+
+   2. Check the statefile structure what is the resource type and name if there is any similar resource already created.
+
+      ```sh
+      terraform state list
+      ```
+
+   3. Run the following command to import the existing resources into state file.
+
+      ```sh
+      terragrunt <RESOURCE_TYPE>.<RESOURCE_NAME> <EXISTING_RESOURCE_ID>
+
+      ```
+
+      For example, if you want to import existing azure route into state file, run the following command.
+
+      ```sh
+      terragrunt import 'azurerm_route.routes["172.20.249.0_wg"]' /subscriptions/bxxxxxxxxxxxx/resourceGroups/MC_k8s-prod-az1_prod/providers/Microsoft.Network/routeTables/aks-agentpool-routetable/routes/172.20.249.0_wg
+      ```
+
+   4. Verify the import
+
+      ```sh
+      # Example
+      terraform state show azurerm_route.routes["172.20.249.0_wg"]
+      ```
