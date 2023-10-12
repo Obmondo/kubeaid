@@ -208,3 +208,9 @@ variable "service_endpoints" {
   description = "Service Endpoints"
   default     = []
 }
+
+variable "vnet_subnet_id" {
+  description = "Resource ID of an existing subnet which you want your k8s cluster to use"
+  type        = string
+  default     = null
+}
