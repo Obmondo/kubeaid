@@ -12,6 +12,8 @@ resource "azurerm_virtual_network" "aksvnet" {
 
 # Create a Subnet for AKS
 resource "azurerm_subnet" "aks-default" {
+  count = var.vnet_subnet_id == null ? 1 : 0
+
   name                 = var.subnet_name
   virtual_network_name = var.vnet_name
   resource_group_name  = var.resource_group
@@ -34,7 +36,7 @@ resource "azurerm_kubernetes_cluster" "k8s" {
         name                = var.nodepool_name
         node_count          = var.default_agent_count
         vm_size             = var.vm_size
-        vnet_subnet_id      = azurerm_subnet.aks-default.id
+        vnet_subnet_id      = var.vnet_subnet_id != null ? var.vnet_subnet_id : azurerm_subnet.aks-default[0].id
         enable_auto_scaling = var.enable_auto_scaling
         min_count           = var.min_node_count
         max_count           = var.max_node_count
@@ -67,7 +69,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "nodepool" {
   kubernetes_cluster_id = azurerm_kubernetes_cluster.k8s.id
   vm_size               = each.value.vm_size
   node_count            = each.value.agent_count
-  vnet_subnet_id        = azurerm_subnet.aks-default.id
+  vnet_subnet_id        = var.vnet_subnet_id != null ? var.vnet_subnet_id : azurerm_subnet.aks-default[0].id
   enable_auto_scaling   = each.value.enable_auto_scaling
   min_count             = each.value.min_node_count
   max_count             = each.value.max_node_count
