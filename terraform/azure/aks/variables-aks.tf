@@ -9,6 +9,11 @@ variable "resource_group" {
   description = "Resource Group Name under which k8s cluster needs to be created"
 }
 
+variable "default_agent_count" {
+  default = 1
+  description = "The initial number of nodes in default node pool should exist in the Node Pool."
+}
+
 variable "agent_count" {
   default = 3
   description = "The initial number of nodes which should exist in the Node Pool."
@@ -83,10 +88,6 @@ variable "oidc_issuer_enabled" {
   description = "Whether or not the OIDC feature is enabled or disabled"
 }
 
-variable "oidc_issuer_url" {
-  description = "The OIDC issuer URL that is associated with the cluster"
-}
-
 variable "nodepools" {
   type = map
   default = {}
@@ -103,6 +104,13 @@ variable "nodepool_name" {
   default = "internal"
   description = "Name of the Node Pool"
 }
+
+variable "zones" {
+  type    = set(string)
+  default = []
+  description = "Availability Zones"
+}
+
 
 variable "max_map_count" {
   default = 262144
@@ -187,4 +195,16 @@ variable "scan_interval" {
   type = string
   default = "10s"
   description = "How often should the autoscaler scan for pods"
+}
+
+variable "sku_tier" {
+  type = string
+  description = "SKU Tier"
+  default = "Standard"
+}
+
+variable "service_endpoints" {
+  type        = list(string)
+  description = "Service Endpoints"
+  default     = []
 }
