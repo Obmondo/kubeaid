@@ -16,6 +16,7 @@ resource "azurerm_subnet" "aks-default" {
   virtual_network_name = var.vnet_name
   resource_group_name  = var.resource_group
   address_prefixes     = [var.subnet_prefixes]
+  service_endpoints    = var.service_endpoints
 }
 
 # Create AKS cluster
@@ -25,18 +26,19 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     resource_group_name     = var.resource_group
     dns_prefix              = var.dns_prefix
     kubernetes_version      = var.kubernetes_version
-    oidc_issuer_enabled     = var.oidc_issuer_enabled
-    oidc_issuer_url         = var.oidc_issuer_enabled ? var.oidc_issuer_url : ""
     private_cluster_enabled = var.private_cluster_enabled
     private_cluster_public_fqdn_enabled = true
+    sku_tier                = var.sku_tier
+    oidc_issuer_enabled     = var.oidc_issuer_enabled
     default_node_pool {
         name                = var.nodepool_name
-        node_count          = var.agent_count
+        node_count          = var.default_agent_count
         vm_size             = var.vm_size
         vnet_subnet_id      = azurerm_subnet.aks-default.id
         enable_auto_scaling = var.enable_auto_scaling
         min_count           = var.min_node_count
         max_count           = var.max_node_count
+        zones               = var.zones
     }
     auto_scaler_profile {
         balance_similar_node_groups       = var.balance_similar_node_groups
