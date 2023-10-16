@@ -2,8 +2,17 @@ data "azurerm_resource_group" "resource" {
   name     = var.resource_group
 }
 
+data "azurerm_virtual_network" "ext_vnet" {
+  count = var.ext_vnet_name != null && var.ext_vnet_resource_group != null ? 1 : 0
+  name                = var.ext_vnet_name
+  resource_group_name = var.ext_vnet_resource_group
+}
+
+
 # Create Virtual Network
 resource "azurerm_virtual_network" "aksvnet" {
+  count = var.vnet_name != null ? 1 : 0
+
   name                = var.vnet_name
   location            = var.location
   resource_group_name = var.resource_group
@@ -15,7 +24,7 @@ resource "azurerm_subnet" "aks-default" {
   count = var.vnet_subnet_id == null ? 1 : 0
 
   name                 = var.subnet_name
-  virtual_network_name = var.vnet_name
+  virtual_network_name = var.vnet_name != null ? var.vnet_name : data.azurerm_virtual_network.ext_vnet[0].name
   resource_group_name  = var.resource_group
   address_prefixes     = [var.subnet_prefixes]
   service_endpoints    = var.service_endpoints
