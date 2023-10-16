@@ -32,10 +32,15 @@ variable "cluster_vnet_id" {
 }
 
 variable "vnet_name" {
-  default = "aks-default-vnet"
+  default = null
   description = "Virtual network name"
 }
 
 variable "private_dns_zone_name" {
   type = string
+}
+
+variable "ext_vnet_name" {
+  type = string
+  default = null
 }
