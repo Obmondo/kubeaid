@@ -30,7 +30,7 @@ variable "cluster_name" {
 }
 
 variable "vnet_name" {
-  default = "aks-default-vnet"
+  default = null
   type = string
   description = "Virtual network name"
 }
@@ -209,8 +209,22 @@ variable "service_endpoints" {
   default     = []
 }
 
+# For using existing vnet and subnet 
+
 variable "vnet_subnet_id" {
   description = "Resource ID of an existing subnet which you want your k8s cluster to use"
+  type        = string
+  default     = null
+}
+
+variable "ext_vnet_name" {
+  description = "Name of the existing virtual network which you want your k8s cluster to use"
+  type        = string
+  default     = null
+}
+
+variable "ext_vnet_resource_group" {
+  description = "Resource Group Name of the existing virtual network which you want your k8s cluster to use"
   type        = string
   default     = null
 }
