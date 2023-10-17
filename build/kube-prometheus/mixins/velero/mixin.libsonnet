@@ -11,31 +11,17 @@
         name: 'velero',
         rules: [
           {
-            alert: 'VeleroBackupPartialFailures',
+            alert: 'VeleroUnsuccessfulBackup',
             expr: |||
-              sum_over_time(velero_backup_partial_failure_total{schedule!="", %(selector)s}[7d]) / sum_over_time(velero_backup_attempt_total{schedule!="", %(selector)s}[7d]) > 0.25
+              ((time() - velero_backup_last_successful_timestamp{schedule=~".*6hrly.*"}) + on(schedule) group_left velero_backup_attempt_total > (60 * 60 * 6) and ON() hour() >= 6.30 <= 18.30) or ((time() - velero_backup_last_successful_timestamp{schedule=~".*daily.*"}) + on(schedule) group_left velero_backup_attempt_total > (60 * 60 * 24) and ON() day_of_week() != 0) or ((time() - velero_backup_last_successful_timestamp{schedule=~".*weekly.*"}) + on(schedule) group_left velero_backup_attempt_total > (60 * 60 * 24 * 7))
             ||| % $._config,
             'for': '15m',
             labels: {
               severity: 'warning',
             },
             annotations: {
-              description: 'Velero backup {{ $labels.schedule }} has {{ $value | humanizePercentage }} partially failed backups.',
-              summary: 'Velero backup {{ $labels.schedule }} has too many partially failed backups',
-            },
-          },
-          {
-            alert: 'VeleroBackupFailures',
-            expr: |||
-              sum_over_time(velero_backup_failure_total{schedule!="", %(selector)s}[7d]) / sum_over_time(velero_backup_attempt_total{schedule!="", %(selector)s}[7d]) > 0.25
-            ||| % $._config,
-            'for': '15m',
-            labels: {
-              severity: 'warning',
-            },
-            annotations: {
-              description: 'Velero backup {{ $labels.schedule }} has {{ $value | humanizePercentage }} failed backups.',
-              summary: 'Velero backup {{ $labels.schedule }} has too many failed backups',
+              description: 'Velero backup was not successful for {{ $labels.schedule }}.',
+              summary: 'Velero backup for schedule {{ $labels.schedule }} was unsuccessful.',
             },
           },
         ],
