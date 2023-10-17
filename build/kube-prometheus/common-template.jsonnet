@@ -98,6 +98,7 @@ local default_vars = {
   },
   connect_keda: false,
   grafana_plugins+: [],
+  grafana_dashboards+: {},
 };
 
 local vars = std.mergePatch(default_vars, ext_vars);
@@ -387,6 +388,7 @@ local kp =
       grafana+: {
         plugins: vars.grafana_plugins,
         resources: vars.grafana_resources,
+        rawDashboards+:: vars.grafana_dashboards,
         analytics+: {
           check_for_updates: false,
         },
