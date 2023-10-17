@@ -22,7 +22,7 @@ dependency "peering" {
   config_path  = "../peering"
   mock_outputs = {
     cluster_vnet_id = "/subscriptions/bd59662e-a78e-4d7c-84f6-9d9ad1883726/resourceGroups/MC_k8s-qa-az1_qa_az1_abc_eu_northeurope/providers/Microsoft.Network/virtualNetworks/aks-vnet-41315820"
-   private_dns_zone_name = "863397e9-10d3-4075-b3ea-116f8fe4612d.privatelink.northeurope.azmk8s.io"}
+    private_dns_zone_name = "863397e9-10d3-4075-b3ea-116f8fe4612d.privatelink.northeurope.azmk8s.io"}
 }
 
 locals {
