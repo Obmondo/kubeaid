@@ -13,7 +13,7 @@ resource "azurerm_virtual_network_peering" "peer2" {
   name                      = var.peer_name
   resource_group_name       = var.wg_resource_group
   virtual_network_name      = var.wg_vnet_name
-  remote_virtual_network_id = var.cluster_vnet_id
+  remote_virtual_network_id = var.cluster_vnet_id != null ? var.cluster_vnet_id : var.ext_cluster_vnet_id
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "link_bastion_cluster" {
