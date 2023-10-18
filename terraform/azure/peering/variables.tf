@@ -49,3 +49,8 @@ variable "ext_vnet_name" {
   type = string
   default = null
 }
+
+variable "allow_forwarded_traffic" {
+  type = bool
+  default = true
+}
