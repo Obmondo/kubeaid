@@ -388,7 +388,7 @@ local kp =
       grafana+: {
         plugins: vars.grafana_plugins,
         resources: vars.grafana_resources,
-        rawDashboards+:: vars.grafana_dashboards,
+        folderDashboards+:: vars.grafana_dashboards,
         analytics+: {
           check_for_updates: false,
         },

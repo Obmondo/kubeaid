@@ -162,6 +162,35 @@ jsonnet -e '(import "mixin.libsonnet").prometheusAlerts' | gojsontoyaml > promet
 ```
 kubectl apply -f <path to alert rules file>.yaml -n monitoring
 ```
+## Adding Support for Custom Dashboards in Grafana
+
+### To add custom Grafana dashboards to Grafana via GitOps:
+
+- Open the **Dashboard settings** from Grafana for the dashboard you want to add.
+- Click on **JSON Model** on the left hand pane, and copy the JSON into a file on your k8id-config repo.
+- Add a _folder name_ and the path to the dashboard in your cluster specific jsonnet file.
+  See [example jsonnet file](./examples/k8id_managed.jsonnet) for details.
+  
+  ```jsonnet
+  grafana_dashboards: {
+    'Custom Grafana Folder': {
+      'custom-dashboard.json': (import '../path/to/custom-dashboard.json'),
+    },
+  },
+  ```
+
+- Run the [build command](#run-the-build-script) with the path to your _cluster specific jsonnet file_ to generate the changes.
+- Push the changes to your _k8id config_ repo and sync the changes in _kube-prometheus_ app on ArgoCD.
+- The Grafana pod will restart after the ArgoCD sync and will reflect the new dashboard once you are logged in.
+
+### To persist the changes made to a custom dashboard:
+
+- Save the changes made to the dashboard on Grafana.
+- Copy the JSON model of the dashboard from the **Dashboard Settings**.
+- Paste and overwrite the `custom-dashboard.json` file in your k8id-config repo.
+- Run the build script and merge the changes on your k8id-config repo.
+- Sync the changes in ArgocD app (expect changes in ConfigMap k8s resource).
+- The Grafana pod will restart and the dashboard changes will be persisted now.
 
 ## Jsonnet debugging
 
