@@ -1,0 +1,6 @@
+{{- if .Values.runner.nameSpace.create -}}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.runner.nameSpace.name }}
+{{- end -}}
