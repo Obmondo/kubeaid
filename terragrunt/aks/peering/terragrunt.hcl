@@ -15,6 +15,8 @@ dependency "aks" {
   }
 }
 
+mock_outputs_merge_strategy_with_state = "shallow"
+
 locals {
   vars = read_terragrunt_config(find_in_parent_folders("terragrunt.hcl"))
 }
