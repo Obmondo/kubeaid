@@ -2,11 +2,6 @@ provider "azurerm" {
   features {}
 }
 
-data "azurerm_kubernetes_cluster" "k8s" {
-  name                = var.cluster_name
-  resource_group_name = var.resource_group
-}
-
 resource "azurerm_virtual_network_peering" "peer1" {
   name                      = "clustertowg"
   resource_group_name       = var.resource_group
@@ -25,7 +20,7 @@ resource "azurerm_virtual_network_peering" "peer2" {
 
 resource "azurerm_private_dns_zone_virtual_network_link" "link_bastion_cluster" {
   name                  = "dnslink-wg-cluster"
-  private_dns_zone_name = var.private_dns_zone_name != null ? var.private_dns_zone_name : join(".", slice(split(".", data.azurerm_kubernetes_cluster.k8s.private_fqdn), 1, length(split(".", data.azurerm_kubernetes_cluster.k8s.private_fqdn))))
+  private_dns_zone_name = var.private_dns_zone_name
   resource_group_name   = "MC_${var.resource_group}_${var.cluster_name}_${var.location}"
   virtual_network_id    = var.wg_vnet_id
 }
