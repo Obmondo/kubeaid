@@ -27,5 +27,4 @@
   grafana_ingress_annotations: {
     'kubernetes.io/ingress.class': 'traefik-cert-manager',
   },
-
 }
