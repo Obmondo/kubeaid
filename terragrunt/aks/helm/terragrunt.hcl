@@ -25,6 +25,8 @@ dependency "peering" {
     private_dns_zone_name = "863397e9-10d3-4075-b3ea-116f8fe4612d.privatelink.northeurope.azmk8s.io"}
 }
 
+mock_outputs_merge_strategy_with_state = "shallow"
+
 locals {
   vars = read_terragrunt_config(find_in_parent_folders("terragrunt.hcl"))
 }
