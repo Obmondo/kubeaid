@@ -22,3 +22,17 @@ variable "restore_secrets" {
   type = bool
   default = false
 }
+
+variable "argocd_repos" {
+  type = map
+  default = {}
+}
+
+variable "repo_url"{
+  type = string
+  description = "URL to the repository (Git or Helm) that contains the application manifests."
+}
+variable "path"{
+  type = string
+  description = "Directory path within the repository. Only valid for applications sourced from Git."
+}

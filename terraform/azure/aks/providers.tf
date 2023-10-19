@@ -12,6 +12,11 @@ terraform {
     external = {
       version = ">=1.1.0"
     }
+
+    argocd = {
+      source = "oboukili/argocd"
+      version = "6.0.3"
+    }
   }
 }
 

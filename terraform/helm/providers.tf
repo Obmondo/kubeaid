@@ -6,3 +6,7 @@ provider "helm" {
     cluster_ca_certificate = base64decode(var.k8s_cluster_ca_certificate)
   }
 }
+
+provider "argocd" {
+  core = true 
+}

@@ -36,6 +36,17 @@ variable "ext_cluster_vnet_id" {
   default = null
 }
 
+variable "ext_vnet_resource_group" {
+  type = string
+  default = null
+}
+
+variable "remote_subs_id" {
+  description = "Remote subs id in which Vnet is present if not present in same subscription"
+  type = string
+  default = null
+}
+
 variable "vnet_name" {
   default = null
   description = "Virtual network name"
