@@ -36,6 +36,11 @@ variable "ext_cluster_vnet_id" {
   default = null
 }
 
+variable "ext_vnet_resource_group" {
+  type = string
+  default = null
+}
+
 variable "vnet_name" {
   default = null
   description = "Virtual network name"

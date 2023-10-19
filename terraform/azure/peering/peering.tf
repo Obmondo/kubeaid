@@ -4,7 +4,7 @@ provider "azurerm" {
 
 resource "azurerm_virtual_network_peering" "peer1" {
   name                      = "clustertowg"
-  resource_group_name       = var.resource_group
+  resource_group_name       = var.ext_vnet_name != null ? var.ext_vnet_resource_group : var.resource_group
   virtual_network_name      = var.vnet_name != null ? var.vnet_name : var.ext_vnet_name
   remote_virtual_network_id = var.wg_vnet_id
   allow_forwarded_traffic   = var.allow_forwarded_traffic
