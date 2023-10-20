@@ -3,5 +3,5 @@ name: matomo
 version: 2.1.0
 dependencies:
   - name: matomo
-    version: 2.1.0
+    version: 3.0.2
     repository: https://charts.bitnami.com/bitnami

@@ -1,6 +1,6 @@
 dependencies:
 - name: matomo
   repository: https://charts.bitnami.com/bitnami
-  version: 2.1.0
-digest: sha256:a87b9b1eca6001a05b01e684322e178b2efef7fb44cf1518bbb93bfc1e800ac7
-generated: "2023-08-29T14:33:18.959965806+05:30"
+  version: 3.0.2
+digest: sha256:585a4c81032d53af8d2e217cb9b694459b5eea4e85a7564e23b01edc9f8c8de9
+generated: "2023-10-20T14:23:08.135309982+05:30"
