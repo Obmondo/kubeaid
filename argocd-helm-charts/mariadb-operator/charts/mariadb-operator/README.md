@@ -6,7 +6,7 @@
 <img src="https://mariadb-operator.github.io/mariadb-operator/assets/mariadb-operator.png" alt="mariadb" width="250"/>
 </p>
 
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.19.0](https://img.shields.io/badge/Version-0.19.0-informational?style=flat-square) ![AppVersion: v0.0.19](https://img.shields.io/badge/AppVersion-v0.0.19-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![Version: 0.22.0](https://img.shields.io/badge/Version-0.22.0-informational?style=flat-square) ![AppVersion: v0.0.22](https://img.shields.io/badge/AppVersion-v0.0.22-informational?style=flat-square)
 
 Run and operate MariaDB in a cloud native way
 
@@ -66,7 +66,6 @@ helm uninstall mariadb-operator
 | webhook.certificate.default.certExpirationDays | int | `365` | Certificate expiration in days. |
 | webhook.certificate.default.hook | string | `""` | Helm hook to be added to the default certificate. |
 | webhook.certificate.path | string | `"/tmp/k8s-webhook-server/serving-certs"` | Path where the certificate will be mounted. |
-| webhook.enabled | bool | `true` | Enable webhooks. |
 | webhook.extrArgs | list | `[]` | Extra arguments to be passed to the webhook entrypoint |
 | webhook.extraVolumeMounts | list | `[]` | Extra volumes to mount to webhook container |
 | webhook.extraVolumes | list | `[]` | Extra volumes to pass to webhook Pod |
