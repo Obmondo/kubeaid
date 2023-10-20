@@ -56,8 +56,12 @@ rules:
   - ""
   resources:
   - endpoints
+  - endpoints/restricted
   verbs:
+  - create
+  - get
   - list
+  - patch
   - watch
 - apiGroups:
   - ""
@@ -399,7 +403,7 @@ roleRef:
   name: {{ $fullName }}
 subjects:
 - kind: ServiceAccount
-  name: {{ $fullName }}
+  name: {{ include "mariadb-operator.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -412,7 +416,7 @@ roleRef:
   name: {{ $fullName }}
 subjects:
 - kind: ServiceAccount
-  name: {{ $fullName }}
+  name: {{ include "mariadb-operator.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -425,6 +429,6 @@ roleRef:
   name: system:auth-delegator
 subjects:
 - kind: ServiceAccount
-  name: {{ $fullName }}
+  name: {{ include "mariadb-operator.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
 {{- end }}
