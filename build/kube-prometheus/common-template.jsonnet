@@ -262,6 +262,24 @@ local kp =
               }],
             },
             {
+              from: [{
+                namespaceSelector: {
+                  matchLabels: {
+                    'kubernetes.io/metadata.name': 'traefik',
+                  },
+                },
+                podSelector: {
+                  matchLabels: {
+                    'app.kubernetes.io/name': 'traefik',
+                  },
+                },
+              }],
+              ports: [{
+                port: 9090,
+                protocol: 'TCP',
+              }],
+            },
+            {
               from: [
                 {
                   namespaceSelector: {
