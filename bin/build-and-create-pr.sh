@@ -19,7 +19,7 @@ if ! [[ "${CI}" ]]; then
 fi
 
 case "${KUBERNETES_CONFIG_REPO_URL}" in
-  *gitlab*)
+  *gitea*)
     config_repo_username=oauth2
     config_repo_password="${KUBERNETES_CONFIG_REPO_TOKEN}"
     config_repo_auth="${config_repo_username}:${config_repo_password}"
@@ -45,8 +45,8 @@ deploy_target_branch="${OBMONDO_DEPLOY_TARGET_BRANCH:-main}"
 config_repo_name=$(echo "$KUBERNETES_CONFIG_REPO_URL" | sed -r "s/.+\/(.+)\..+/\1/")
 config_repo_path="/tmp/${config_repo_name}"
 
-git config --global user.email "${GITLAB_USER_EMAIL}"
-git config --global user.name "${GITLAB_USER_NAME}"
+git config --global user.email "${USER_EMAIL}"
+git config --global user.name "${USER_NAME}"
 
 git clone "${config_repo_url_with_auth}" "${config_repo_path}"
 git -C "${config_repo_path}" checkout -b "argocd-deploy" --track "origin/${deploy_target_branch}"
@@ -61,25 +61,66 @@ done
 # Check if we have modifications to commit
 CHANGES=$(git -C "${config_repo_path}" status --porcelain | wc -l)
 
-if (( CHANGES > 0)); then
+if (( CHANGES > 0 )); then
   title='Updated Prometheus builds'
 
   git -C "${config_repo_path}" status
   git -C "${config_repo_path}" commit -m "${title}"
 
-  # shellcheck disable=SC2094
-  output=$(2>&1 git -C "${config_repo_path}" push \
-                --force-with-lease \
-                -o merge_request.create \
-                -o merge_request.target="${deploy_target_branch}" \
-                -o merge_request.title="${title}" \
-                -o merge_request.merge_when_pipeline_succeeds \
-                -o merge_request.remove_source_branch \
-                -o merge_request.description="Auto-generated pull request from Obmondo, created from changes by ${GITLAB_USER_NAME} (${GITLAB_USER_EMAIL})." \
-                origin HEAD)
-  echo "${output}"
+  # Push changes to the remote repository
+  git -C "${config_repo_path}" push origin HEAD
+  
+  case "${KUBERNETES_CONFIG_REPO_URL}" in
+    *gitea*)
+      token=${gitea_token}
+      URL="gitea.obmondo.com"
+      owner="EnableIT"
+      ;;
+    *github*)
+      token=${github_token}
+      URL="api.github.com"
+      owner="Obmondo"
+  esac
 
+  # Create a pull request using the Gitea or GitHub API
+  output=$(curl -X POST \
+    -H "Authorization: token $token" \
+    -d '{
+      "title": "'"${title}"'",
+      "head": "your_branch_with_changes",
+      "base": "'"${deploy_target_branch}"'",
+      "body": "Auto-generated pull request from Obmondo, created from changes by '"${USER_NAME}"' ('"${USER_EMAIL}"')."
+    }' \
+    "https://${URL}/repos/$owner/$repo/pulls")
+  
+  # Check for warnings or errors in the output and handle as needed
   if grep -q WARNINGS <<< "${output}"; then
     exit 1
   fi
+
+  # Extract the pull request number from the output
+  pull_request_number=$(echo "$output" | jq -r '.number')
+
+  # Check the status of an Action workflow associated with the pull request
+  workflow_status=$(curl -s -H "Authorization: token $token" \
+    "https://${URL}/repos/$owner/$repo/actions/runs?event=workflow_dispatch" | \
+    jq --arg pr "$pull_request_number" '.workflow_runs[] | select(.head_repository.owner.login == "'"$owner"'" and .head_repository.name == "'"$repo"'" and .pull_requests[0].number == $pr)')
+
+  workflow_conclusion=$(echo "$workflow_status" | jq -r '.conclusion')
+
+  # If the workflow has succeeded, merge the pull request
+  if [ "$workflow_conclusion" == "success" ]; then
+    merge_response=$(curl -s -X PUT -H "Authorization: token $token" \
+      "https://${URL}/repos/$owner/$repo/pulls/$pull_request_number/merge")
+    echo "Merge response: $merge_response"
+  else
+    echo "Workflow has not succeeded, skipping merge."
+  fi
+
+  # Delete the source branch after merging
+  delete_branch_response=$(curl -X DELETE \
+    -H "Authorization: token $token" \
+    "https://${URL}/repos/OWNER/REPO_NAME/git/refs/heads/BRANCH_NAME")
+
+  echo "$delete_branch_response"
 fi

@@ -1,0 +1,31 @@
+name: Helm Diff
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    paths:
+      - 'argocd-helm-charts/**/*'
+
+
+jobs:
+  helm-actions:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install Helm
+      run: |
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        ./get-helm.sh
+        helm version
+
+    - name: Run helm-diff.sh
+      if: ${{ github.event_name == 'pull_request' && !startsWith(github.event.pull_request.title, ':no-diff') }}
+      run: |
+        chmod +x ./bin/helm-diff.sh
+        ./bin/helm-diff.sh
