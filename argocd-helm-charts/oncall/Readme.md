@@ -78,3 +78,19 @@ Docs for creating a bot : https://core.telegram.org/bots#how-do-i-create-a-bot
 {%- endif -%}
 {% endfor %}
 ```
+
+## Shift Override
+
+### Locate Overrides Section
+
+The `Overrides` section is located below the main schedule rotations.
+You can add overrides in this section to make one-time changes for specific shifts.
+
+### Adjusting schedules for specific dates/swapping shifts
+
+- Keep the Cursor on your name and the date you want to swap.
+  It will open the option for Override, click on that.
+- select the Employee from the drop-down menu with whom you have swapped and then save.
+- Repeat the same steps with the Employee with whom you have swapped the day.
+
+![override](images/override.png)
