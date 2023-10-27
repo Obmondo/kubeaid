@@ -88,7 +88,7 @@ You can add overrides in this section to make one-time changes for specific shif
 
 ### Adding Overrides
 
-- Keep the Cursor on your name and the date you want swap.
+- Keep the Cursor on your name and the date you want to swap.
   It will open the option for Override, click on that.
 - select the Employee from the drop-down menu with whom you have swapped and then save.
 - Repeat the same steps with the Employee with whom you have swapped the day.
