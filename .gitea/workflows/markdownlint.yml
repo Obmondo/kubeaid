@@ -1,0 +1,27 @@
+name: markdownlint
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  markdownlint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+
+    - name: Install dependencies
+      run: npm install -g markdownlint-cli
+
+    - name: Run markdownlint
+      if: ${{ github.event_name == 'pull_request' }}
+      run: markdownlint --config .markdownlint --ignore 'argocd-helm-charts/*/*/**' --ignore 'build/vendor/**' --ignore 'build/kube-prometheus/**' .

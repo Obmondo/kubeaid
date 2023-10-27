@@ -1,0 +1,25 @@
+name: OPA Test
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  opa-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install OPA
+      run: |
+        wget https://github.com/open-policy-agent/opa/releases/download/v0.43.0/opa_linux_amd64_static -O /usr/local/bin/opa
+        chmod +x /usr/local/bin/opa
+
+    - name: Run OPA tests
+      if: ${{ github.event_name == 'pull_request' }}
+      run: |
+        opa test ./argocd-helm-charts/gatekeeper/policies -v
