@@ -1,8 +1,7 @@
 resource "argocd_application" "helm" {
   metadata {
     name      = "root"
-    namespace = "argocd" 
-    finalizers = ["resources-finalizer.argocd.argoproj.io"]   
+    namespace = "argocd"
   }
 
   spec {
@@ -28,9 +27,9 @@ resource "argocd_application" "helm" {
 resource "argocd_repository" "private" {
   for_each        = var.argocd_repos
   name            = each.key
-  repo            = var.url
-  username        = var.username
-  ssh_private_key = var.ssh_private_key
+  repo            = each.value.url
+  username        = each.value.username
+  ssh_private_key = file(each.value.ssh_private_key)
 
   depends_on      = [argocd_application.helm]
 }
