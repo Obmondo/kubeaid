@@ -9,12 +9,14 @@
 {{- define "traefik.service-spec" -}}
   {{- $type := default "LoadBalancer" .Values.service.type }}
   type: {{ $type }}
+  {{- with .Values.service.loadBalancerClass }}
+  loadBalancerClass: {{ . }}
+  {{- end}}
   {{- with .Values.service.spec }}
   {{- toYaml . | nindent 2 }}
   {{- end }}
   selector:
-    app.kubernetes.io/name: {{ template "traefik.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- include "traefik.labelselector" . | nindent 4 }}
   {{- if eq $type "LoadBalancer" }}
   {{- with .Values.service.loadBalancerSourceRanges }}
   loadBalancerSourceRanges:
@@ -25,11 +27,43 @@
   externalIPs:
   {{- toYaml . | nindent 2 }}
   {{- end -}}
-  {{- if .Values.service.ipFamilyPolicy }}
-  ipFamilyPolicy: {{ .Values.service.ipFamilyPolicy }}
+  {{- with .Values.service.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ . }}
   {{- end }}
   {{- with .Values.service.ipFamilies }}
   ipFamilies:
   {{- toYaml . | nindent 2 }}
   {{- end -}}
+{{- end }}
+
+{{- define "traefik.service-ports" }}
+  {{- range $name, $config := . }}
+  {{- if $config.expose }}
+  - port: {{ default $config.port $config.exposedPort }}
+    name: {{ $name | quote }}
+    targetPort: {{ default $name $config.targetPort }}
+    protocol: {{ default "TCP" $config.protocol }}
+    {{- if $config.nodePort }}
+    nodePort: {{ $config.nodePort }}
+    {{- end }}
+    {{- if $config.appProtocol }}
+    appProtocol: {{ $config.appProtocol }}
+    {{- end }}
+  {{- end }}
+  {{- if $config.http3 }}
+  {{- if $config.http3.enabled }}
+  {{- $http3Port := default $config.exposedPort $config.http3.advertisedPort }}
+  - port: {{ $http3Port }}
+    name: "{{ $name }}-http3"
+    targetPort: {{ default $config.port $config.targetPort }}
+    protocol: UDP
+    {{- if $config.nodePort }}
+    nodePort: {{ $config.nodePort }}
+    {{- end }}
+    {{- if $config.appProtocol }}
+    appProtocol: {{ $config.appProtocol }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
 {{- end }}
