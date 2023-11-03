@@ -1,6 +1,6 @@
 name: Build and Create Pull Request
 
-on:
+"on":
   push:
     branches:
       - main
@@ -16,4 +16,4 @@ jobs:
 
       - name: Build and Create Pull Request
         run: |
-          ./bin/gitea-build-and-create-pr.sh
+          ./bin/build-and-create-pr.sh

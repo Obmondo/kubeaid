@@ -172,7 +172,7 @@ function update_helm_chart {
   fi
 }
 
-function merge_request() {
+function pull_request() {
   chart_name=$1
 
   config_repo_path=$(pwd)
@@ -183,23 +183,29 @@ function merge_request() {
 
   if (( CHANGES > 0 )); then
     title="[CI] Helm Chart Update ${chart_name}"
-    
-    git -C "${config_repo_path}" status
+
+    git add "$ARGOCD_CHART_PATH/${chart_name}"
+
     git -C "${config_repo_path}" commit -m "${title}"
 
     # Push changes to the remote repository
     git -C "${config_repo_path}" push origin HEAD
+
+    export GITEA_TOKEN
+    export GITHUB_TOKEN
     
     case "${KUBERNETES_CONFIG_REPO_URL}" in
       *gitea*)
-        token=${gitea_token}
+        token=${GITEA_TOKEN}
         URL="gitea.obmondo.com"
         owner="EnableIT"
+        repo="KubeAid"
         ;;
       *github*)
-        token=${github_token}
+        token=${GITHUB_TOKEN}
         URL="api.github.com"
-        owner="Obmondo"  
+        owner="Obmondo"
+        repo="kubeaid"  
     esac
 
     # Create a pull request using the Gitea or GitHub API
@@ -228,13 +234,13 @@ function merge_request() {
 
     workflow_conclusion=$(echo "$workflow_status" | jq -r '.conclusion')
 
-    # If the workflow has succeeded, merge the pull request
+    # If the workflow has succeeded, pull the pull request
     if [ "$workflow_conclusion" == "success" ]; then
-      merge_response=$(curl -s -X PUT -H "Authorization: token $token" \
-        "https://${URL}/repos/$owner/$repo/pulls/$pull_request_number/merge")
-      echo "Merge response: $merge_response"
+      pull_response=$(curl -s -X PUT -H "Authorization: token $token" \
+        "https://${URL}/repos/$owner/$repo/pulls/$pull_request_number/pull")
+      echo "Pull response: $pull_response"
     else
-      echo "Workflow has not succeeded, skipping merge."
+      echo "Workflow has not succeeded, skipping pull."
     fi
 
     # Delete the source branch after merging
@@ -250,13 +256,13 @@ if [ -n "$UPDATE_HELM_CHART" ]; then
   update_helm_chart "$ARGOCD_CHART_PATH/$UPDATE_HELM_CHART" "$CHART_VERSION"
 fi
 
-if "${GITLAB_CI}" ; then
+if "${ACTIONS}" ; then
   TEMPDIR=$(mktemp -d)
 
   git clone --depth 20 "https://oauth2:${HELM_UPDATE_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}" "${TEMPDIR}"
 
-  git config --global user.email "${GITLAB_USER_EMAIL}"
-  git config --global user.name "${GITLAB_USER_NAME}"
+  git config --global user.email "${USER_EMAIL}"
+  git config --global user.name "${USER_NAME}"
 
   cd "${TEMPDIR}"
 fi
@@ -271,8 +277,8 @@ if "$UPDATE_ALL"; then
     update_helm_chart "$path" "$CHART_VERSION"
 
     # Raise MR for each individual helm chart
-    if $MERGE_REQUEST; then
-      merge_request "$chart_name"
+    if $PULL_REQUEST; then
+      pull_request "$chart_name"
     fi
   done
 fi
