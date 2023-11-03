@@ -1,6 +1,6 @@
 name: yamllint
 
-on:
+"on":
   pull_request:
     types:
       - opened
@@ -14,14 +14,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
+    - name: Setup Python3 and Pip3
+      run: |
+        apt-get update
+        apt-get install python3 python3-pip -y
+        python3 --version
+        pip3 --version
 
     - name: Install yamllint
-      run: pip install yamllint
+      run: python3 -m pip install yamllint
 
     - name: Run yamllint
       if: ${{ github.event_name == 'pull_request' }}
-      run: yamllint --strict --config-file .yamllint .
+      run: |
+        yamllint --strict --config-file .yamllint .
