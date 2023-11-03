@@ -69,17 +69,23 @@ if (( CHANGES > 0 )); then
 
   # Push changes to the remote repository
   git -C "${config_repo_path}" push origin HEAD
-  
+
+
+  export GITEA_TOKEN
+  export GITHUB_TOKEN
+
   case "${KUBERNETES_CONFIG_REPO_URL}" in
     *gitea*)
-      token=${gitea_token}
+      token=${GITEA_TOKEN}
       URL="gitea.obmondo.com"
       owner="EnableIT"
+      repo="KubeAid"
       ;;
     *github*)
-      token=${github_token}
+      token=${GITHUB_TOKEN}
       URL="api.github.com"
       owner="Obmondo"
+      repo="kubeaid"
   esac
 
   # Create a pull request using the Gitea or GitHub API

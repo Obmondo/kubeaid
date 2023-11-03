@@ -1,6 +1,6 @@
 name: Jsonnet Lint
 
-on:
+"on":
   pull_request:
     types:
       - opened
@@ -13,6 +13,12 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+
+    - name: Install jsonnet
+      run: |
+        apt-get update
+        apt-get install -y jsonnet
+        jsonnet --version
 
     - name: Run lint-jsonnetfmt.sh
       if: ${{ github.event_name == 'pull_request' }}

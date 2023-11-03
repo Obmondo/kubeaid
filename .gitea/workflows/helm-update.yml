@@ -1,8 +1,8 @@
 name: Helm Update
 
-on:
+"on":
   schedule:
-    - cron: '0 0 * * *' # Schedule runs at midnight daily
+    - cron: '0 0 * * *'
 
 jobs:
   helm_repo_update:
@@ -12,10 +12,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Helm
-      uses: azure/setup-helm@v1
-      with:
-        helm-version: 'v3.8.0'
+    - name: Install Helm
+      run: |
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/v3.9.1/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        ./get_helm.sh
+
+    - name: Check Helm Version
+      run: helm version
 
     - name: Run Helm Repo Update
       if: ${{ github.event_name == 'schedule' }}

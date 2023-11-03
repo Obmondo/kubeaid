@@ -1,6 +1,6 @@
 name: shellcheck
 
-on:
+"on":
   pull_request:
     types:
       - opened
