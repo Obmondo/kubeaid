@@ -1,6 +1,6 @@
 name: Build and Create Pull Request
 
-on:
+"on":
   push:
     branches:
       - main
