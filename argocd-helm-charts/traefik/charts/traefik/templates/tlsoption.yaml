@@ -1,11 +1,42 @@
 {{- range $name, $config := .Values.tlsOptions }}
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: TLSOption
 metadata:
   name: {{ $name }}
+  namespace: {{ template "traefik.namespace" $ }}
   labels:
     {{- include "traefik.labels" $ | nindent 4 }}
+    {{- with $config.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
-  {{- toYaml $config | nindent 2 }}
+  {{- with $config.alpnProtocols }}
+  alpnProtocols:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $config.cipherSuites }}
+  cipherSuites:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $config.clientAuth }}
+  clientAuth:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $config.curvePreferences }}
+  curvePreferences:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}  
+  {{- if $config.maxVersion }}
+  maxVersion: {{ $config.maxVersion }}
+  {{- end }}
+  {{- if $config.minVersion }}
+  minVersion: {{ $config.minVersion }}
+  {{- end }}
+  {{- if $config.preferServerCipherSuites }}
+  preferServerCipherSuites: {{ $config.preferServerCipherSuites }}
+  {{- end }}
+  {{- if $config.sniStrict }}
+  sniStrict: {{ $config.sniStrict }}
+  {{- end }}
 ---
 {{- end -}}

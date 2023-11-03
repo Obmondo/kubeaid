@@ -1,13 +1,13 @@
 {{- if .Values.ingressClass.enabled -}}
-  {{- if (semverCompare "<2.3.0" (.Chart.AppVersion)) -}}
+  {{- if (semverCompare "<2.3.0" (include "imageVersion" $)) -}}
     {{- fail "ERROR: IngressClass cannot be used with Traefik < 2.3.0" -}}
   {{- end -}}
-  {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" -}}
+  {{- if semverCompare ">=1.19.0-0" .Capabilities.KubeVersion.Version  -}}
 apiVersion: networking.k8s.io/v1
-  {{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
+  {{- else if semverCompare ">=1.16.0-0" .Capabilities.KubeVersion.Version }}
 apiVersion: networking.k8s.io/v1beta1
   {{- else }}
-    {{- fail "\n\n ERROR: You must have at least networking.k8s.io/v1beta1 to use ingressClass" }}
+    {{- fail "ERROR: You must use at least Kubernetes v1.16 with this Chart" }}
   {{- end }}
 kind: IngressClass
 metadata:
@@ -15,7 +15,7 @@ metadata:
     ingressclass.kubernetes.io/is-default-class: {{ .Values.ingressClass.isDefaultClass | quote }}
   labels:
     {{- include "traefik.labels" . | nindent 4 }}
-  name: {{ template "traefik.fullname" . }}
+  name: {{ .Values.ingressClass.name | default (include "traefik.fullname" .) }}
 spec:
   controller: traefik.io/ingress-controller
 {{- end -}}

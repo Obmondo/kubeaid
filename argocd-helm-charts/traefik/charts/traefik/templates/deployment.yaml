@@ -1,3 +1,8 @@
+{{/* check helm version */}}
+{{- if (semverCompare "<v3.9.0" (.Capabilities.HelmVersion.Version | default "v3.0.0")) -}}
+    {{- fail "ERROR: Helm >= 3.9.0 is required" -}}
+{{- end -}}
+
 {{- if and .Values.deployment.enabled (eq .Values.deployment.kind "Deployment") -}}
   {{- if gt (int .Values.deployment.replicas) 1 -}}
     {{- with .Values.additionalArguments -}}
@@ -17,8 +22,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ template "traefik.fullname" . }}
+  namespace: {{ template "traefik.namespace" . }}
   labels:
-  {{- include "traefik.labels" . | nindent 4 -}}
+  {{- include "traefik.labels" . | nindent 4 }}
   {{- with .Values.deployment.labels }}
   {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -35,14 +41,8 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ template "traefik.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      {{- with .Values.rollingUpdate }}
-        {{- toYaml . | nindent 6 }}
-      {{- end }}
+      {{- include "traefik.labelselector" . | nindent 6 }}
+  strategy: {{ toYaml .Values.updateStrategy | nindent 4 }}
   minReadySeconds: {{ .Values.deployment.minReadySeconds }}
   template: {{ template "traefik.podTemplate" . }}
 {{- end -}}
