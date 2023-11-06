@@ -16,11 +16,13 @@ traefik:
     access:
       enabled: true
   ports:
+    web:
+      redirectTo:
+        port: websecure
     websecure:
       tls:
         enabled: true
-    web:
-      redirectTo: websecure
+
   # enable JWT handling
   # experimental:
   #   plugins:
