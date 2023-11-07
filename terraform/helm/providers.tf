@@ -7,6 +7,8 @@ provider "helm" {
   }
 }
 
-provider "argocd" {
-  core = true 
+
+provider "azurerm" {
+  skip_provider_registration = true
+  features {}
 }
