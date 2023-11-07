@@ -69,6 +69,14 @@ kubeseal --controller-namespace system --controller-name sealed-secrets < mysecr
 
 This can then be imported manually using kubectl apply for confirming.
 
+You can use this f.ex to create sealed secrets for adding repos to ArgoCD.
+
+(If you are using a token, the scope has to include full repo privilges, and the UN can be any **non-empty** string):
+
+  ```sh
+  kubectl create secret generic sample-git --namespace argocd --dry-run=client --from-literal=type='git' --from-literal=name='sample-git' --from-literal=url=https://gitlab.com/Obmondo/myreponame.git --from-literal=username='gitlab+deploy-token-20' --from-literal=password='lolpassword' --output yaml | yq eval '.metadata.labels.["argocd.argoproj.io/secret-type"]="repository"' - | yq eval '.metadata.annotations.["sealedsecrets.bitnami.com/managed"]="true"' - | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - | kubeseal --controller-namespace system --controller-name sealed-secrets --format yaml - > argocdrepo-myreponame.yaml
+  ```
+
 ### Important - verify
 
 Look in `argocd -> applications -> secrets` and verify it shows your unsealed secret as well as the sealed one.. if the
