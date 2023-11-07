@@ -88,6 +88,7 @@ local default_vars = {
     // gitea/EnableIT/internal/issues/21
     'node-count-monthly-status': false,
     'node-memory': true,
+    'argoCD-sync-state': true,
   },
   mixin_configs: {
     // Example:
@@ -132,6 +133,11 @@ local mixins = remove_nulls([
   addMixin(
     'node-count-monthly-status',
     (import 'mixins/node-count/mixin.libsonnet'),
+    vars,
+  ),
+  addMixin(
+    'argoCD-sync-state',
+    (import 'mixins/argocd-sync/mixin.libsonnet'),
     vars,
   ),
   addMixin(
