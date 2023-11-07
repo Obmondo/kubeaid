@@ -6,7 +6,7 @@
   prometheusAlerts+:: {
     groups+: [
       {
-        name: 'ArgoCDApplicationAlerts',
+        name: 'argoCD-sync-state',
         rules: [
           {
             alert: 'WhiteListedApplicationOutOfSync',
