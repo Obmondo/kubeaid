@@ -39,12 +39,17 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-          {{- if .Values.envVars }}
           env:
+          {{- range .Values.ArgoSecret.keys }}
+            - name: {{ .name }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.ArgoSecret.name }}
+                  key: {{ .key }}
+          {{- end }}
           {{- range $key, $value := .Values.envVars }}
             - name: {{ $key }}
               value: {{ $value | quote }}
-          {{- end }}
           {{- end }}
           {{- with .Values.image.volumeMounts}}
           volumeMounts:

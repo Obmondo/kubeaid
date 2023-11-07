@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: white-listed-apps-config
+  labels:
+  {{- include "obmondo-k8s-agent.labels" . | nindent 4 }}
+data:
+  white_listed_apps.yaml: |-
+    # This is a list of apps that are allowed to be synced automatically in the cluster
+    #testing-deployment
