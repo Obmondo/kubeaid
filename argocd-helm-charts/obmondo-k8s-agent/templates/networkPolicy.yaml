@@ -36,6 +36,12 @@ spec:
         ports:
           - 9090
     - action: Allow
+      protocol: TCP
+      destination:
+        selector: app.kubernetes.io/name == 'argocd-server'
+        ports:
+          - 8080
+    - action: Allow
       destination:
         ports:
           - 443

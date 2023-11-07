@@ -8,8 +8,10 @@ metadata:
 rules:
   - apiGroups:
       - networking.k8s.io
+      - argoproj.io
     resources:
       - networkpolicies
+      - applications
     verbs:
       - get
       - list
@@ -24,9 +26,19 @@ metadata:
     app: obmondo-k8s-agent
 subjects:
   - kind: ServiceAccount
-    name: {{ include "obmondo-k8s-agent.fullname" . }}
+    name: {{ include "obmondo-k8s-agent.serviceAccountName" . }}
     namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
   name: network-policy-viewer
   apiGroup: rbac.authorization.k8s.io
+---
+{{- if .Values.serviceAccount.create }}
+# ServiceAccount for obmondo-k8s-agent
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "obmondo-k8s-agent.serviceAccountName" . }}
+  labels:
+    app: obmondo-k8s-agent
+{{- end }}
