@@ -8,7 +8,7 @@ data:
   k8s-agent-config.yaml: |
     endOfLifeURL: "https://endoflife.date/api/kubernetes.json"
     prometheus_url: "http://prometheus-k8s.monitoring:9090"
-    api_url: "https://api.obmondo.com/api/clusters/node-count/"
+    api_url: "https://api.obmondo.com"
 
     # Server Configuration
     server:
@@ -32,3 +32,11 @@ data:
       cert_path: "/opt/obmondo-k8s-agent/tls.crt"
       key_path: "/opt/obmondo-k8s-agent/tls.key"
 
+    argo:
+        cron_sync_interval: 2h  # in duration format
+        user: ""       # enter either of the user and password or the token
+        password: ""
+        token: ""
+        service_url: "argocd-server.argocd:80"
+        white_listed_apps_path: "/opt/obmondo-k8s-agent/white_listed_apps.yaml"
+        time_out: 10m  # time to wait before marking a sync as failed
