@@ -39,17 +39,13 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+          {{- if .Values.envVars }}
           env:
-            - name: DURATION
-              value: {{ .Values.envVars.Duration | default "8h" }}
-            - name: AGENT_CERT_PATH
-              value: {{ .Values.envVars.certPath | default "/mnt/obmondo-k8s-agent/tls.crt" }}
-            - name: AGENT_KEY_PATH
-              value: {{ .Values.envVars.keyPath | default "/mnt/obmondo-k8s-agent/tls.key" }}
-            - name: PROMETHEUS_URL
-              value: {{ .Values.envVars.prometheusURL | default "http://prometheus-k8s.monitoring:9090" }}
-            - name: API_URL
-              value: {{ .Values.envVars.apiURL | default "https://api.obmondo.com/api/clusters/node-count/" }}
+          {{- range $key, $value := .Values.envVars }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+          {{- end }}
+          {{- end }}
           {{- with .Values.image.volumeMounts}}
           volumeMounts:
             {{- toYaml . | nindent 12}}
