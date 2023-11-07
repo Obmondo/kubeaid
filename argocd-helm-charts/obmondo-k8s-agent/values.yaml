@@ -42,8 +42,10 @@ ArgoSecret:
       key: "ARGO_USER"
     - name: "ARGO_PASSWORD"
       key: "ARGO_PASSWORD"
-    # - name: "ARGO_TOKEN"
-    #   key: "token"
+
+# Add Values like this for token:
+# - name: "ARGO_TOKEN"
+#   key: "token"
 
 nameOverride: ""
 fullnameOverride: ""
