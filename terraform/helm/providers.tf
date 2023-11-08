@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    argocd = {
+      source = "oboukili/argocd"
+      version = "6.0.3"
+    }
+  }
+}
+
 provider "helm" {
   kubernetes {
     host                   = var.k8s_host
@@ -9,6 +18,5 @@ provider "helm" {
 
 
 provider "azurerm" {
-  skip_provider_registration = true
   features {}
 }
