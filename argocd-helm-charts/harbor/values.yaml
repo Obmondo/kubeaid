@@ -1,1 +1,7 @@
 ---
+harbor:
+  persistence:
+    enabled: true
+    persistentVolumeClaim:
+      registry:
+        size: 20Gi
