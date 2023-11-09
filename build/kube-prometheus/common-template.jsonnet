@@ -538,7 +538,7 @@ local kp =
   ) + (
     if std.objectHas(vars, 'prometheus_ingress_host') then
     {
-      ingress+:: {
+      ingress+: {
         prometheus: utils.ingress(
           'prometheus',
           $.values.common.namespace,
@@ -563,8 +563,9 @@ local kp =
             secretName: 'kube-prometheus-tls',
             hosts: [
               vars.prometheus_ingress_host,
-            ]
-          }]
+            ],
+          }],
+          vars.prometheus_ingres_annotations,
         ),
       },
     } else {}
@@ -647,7 +648,7 @@ local kp =
     for name in std.objectFields(kp.prometheusAdapter)
   } else {}
 ) +
-(if std.objectHas(vars, 'grafana_ingress_host') then { [name + '-ingress']: kp.ingress[name] for name in std.objectFields(kp.ingress) } else {})
-(if std.objectHas(vars, 'prometheus_ingress_host') then { [name + '-ingress']: kp.ingress[name] for name in std.objectFields(kp.ingress) } else {})
+(if std.objectHas(vars, 'grafana_ingress_host') then { [name + '-ingress']: kp.ingress[name] for name in std.objectFields(kp.ingress) } else {}) +
+(if std.objectHas(vars, 'prometheus_ingress_host') then { [name + '-ingress']: kp.ingress[name] for name in std.objectFields(kp.ingress) } else {}) +
 // Rendering prometheusRules object. This is an object compatible with prometheus-operator CRD definition for prometheusRule
 { [o._config.name + '-prometheus-rules']: o.prometheusRules for o in std.filter((function(o) o.prometheusRules != null), mixins) }
