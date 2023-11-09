@@ -13,6 +13,11 @@ variable "k8s_cluster_ca_certificate" {
   sensitive = true
 }
 
+variable "argocd_admin_password" {
+  type      = string
+  sensitive = true
+}
+
 variable "k8s_host" {
   type      = string
   sensitive = true
