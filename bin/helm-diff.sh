@@ -4,9 +4,20 @@ set -eou pipefail
 
 TEMPDIR=$(mktemp -d)
 
-# NOTE: git diff does not work, cause gitlab only checkout only one branch
-# so there is nothing to compare.
-git clone "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}" "${TEMPDIR}"
+case "${KUBERNETES_CONFIG_REPO_URL}" in
+  *gitea*)
+    token=${GITEA_TOKEN}
+    URL="gitea.obmondo.com"
+    owner="EnableIT"
+    repo="KubeAid"
+    git clone "https://oauth2:${token}@${URL}/${owner}/${repo}" "${TEMPDIR}"
+    ;;
+  *github*)
+    URL="github.com"
+    owner="Obmondo"
+    repo="kubeaid"
+    git clone "https://${URL}/${owner}/${repo}" "${TEMPDIR}"
+esac
 
 cd "${TEMPDIR}"
 
