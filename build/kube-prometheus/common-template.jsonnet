@@ -552,7 +552,7 @@ local kp =
                   service: {
                     name: 'prometheus-k8s',
                     port: {
-                      name: 'http',
+                      name: 'web',
                     },
                   },
                 },
