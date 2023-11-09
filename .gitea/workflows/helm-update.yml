@@ -14,9 +14,9 @@ jobs:
 
     - name: Install Helm
       run: |
-        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/v3.9.1/scripts/get-helm-3
-        chmod 700 get_helm.sh
-        ./get_helm.sh
+        curl -LO https://get.helm.sh/helm-v3.9.1-linux-amd64.tar.gz
+        tar -zxvf helm-v3.9.1-linux-amd64.tar.gz
+        sudo mv linux-amd64/helm /usr/local/bin/helm
 
     - name: Check Helm Version
       run: helm version
