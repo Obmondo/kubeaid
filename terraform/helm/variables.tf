@@ -36,3 +36,8 @@ variable "path"{
   type = string
   description = "Directory path within the repository. Only valid for applications sourced from Git."
 }
+
+variable "secrets_file" {
+  type = string
+  default = "allsealkeys.yml"
+}

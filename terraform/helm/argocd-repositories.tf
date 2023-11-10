@@ -22,6 +22,7 @@ resource "argocd_application" "helm" {
       sync_options = ["ApplyOutOfSyncOnly=true"]
     }
   }
+  depends_on      = [argocd_repository.private]
 }
 
 resource "argocd_repository" "private" {
@@ -30,6 +31,4 @@ resource "argocd_repository" "private" {
   repo            = each.value.url
   username        = each.value.username
   ssh_private_key = file(each.value.ssh_private_key)
-
-  depends_on      = [argocd_application.helm]
 }
