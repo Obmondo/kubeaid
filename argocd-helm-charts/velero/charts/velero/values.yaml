@@ -1,4 +1,31 @@
 ##
+## Configuration settings related to Velero installation namespace
+##
+
+# Labels settings in namespace
+namespace:
+  labels: {}
+    # Enforce Pod Security Standards with Namespace Labels
+    # https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/
+    # - key: pod-security.kubernetes.io/enforce
+    #   value: privileged
+    # - key: pod-security.kubernetes.io/enforce-version
+    #   value: latest
+    # - key: pod-security.kubernetes.io/audit
+    #   value: privileged
+    # - key: pod-security.kubernetes.io/audit-version
+    #   value: latest
+    # - key: pod-security.kubernetes.io/warn
+    #   value: privileged
+    # - key: pod-security.kubernetes.io/warn-version
+    #   value: latest
+
+##
+## End of namespace-related settings.
+##
+
+
+##
 ## Configuration settings that directly affect the Velero deployment YAML.
 ##
 
@@ -6,7 +33,7 @@
 # enabling node-agent). Required.
 image:
   repository: velero/velero
-  tag: v1.11.0
+  tag: v1.12.1
   # Digest value example: sha256:d238835e151cec91c6a811fe3a89a66d3231d9f64d09e5f3c49552672d271f38.
   # If used, it will take precedence over the image.tag.
   # digest:
@@ -15,11 +42,17 @@ image:
   imagePullSecrets: []
   # - registrySecretName
 
+nameOverride: ""
+fullnameOverride: ""
+
 # Annotations to add to the Velero deployment's. Optional.
 #
 # If you are using reloader use the following annotation with your VELERO_SECRET_NAME
 annotations: {}
 # secret.reloader.stakater.com/reload: "<VELERO_SECRET_NAME>"
+
+# Annotations to add to secret
+secretAnnotations: {}
 
 # Labels to add to the Velero deployment's. Optional.
 labels: {}
@@ -35,6 +68,9 @@ podAnnotations: {}
 # ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 podLabels: {}
 
+# Number of old history to retain to allow rollback (If not set, default Kubernetes value is set to 10)
+# revisionHistoryLimit: 1
+
 # Resource requests/limits to specify for the Velero deployment.
 # https://velero.io/docs/v1.6/customize-installation/#customize-resource-requests-and-limits
 resources:
@@ -45,6 +81,15 @@ resources:
     cpu: 1000m
     memory: 512Mi
 
+# Resource requests/limits to specify for the upgradeCRDs job pod.
+upgradeJobResources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+
 # Configure the dnsPolicy of the Velero deployment
 # See: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
 dnsPolicy: ClusterFirst
@@ -53,13 +98,13 @@ dnsPolicy: ClusterFirst
 # If the value is a string then it is evaluated as a template.
 initContainers:
   # - name: velero-plugin-for-csi
-  #   image: velero/velero-plugin-for-csi:v0.5.0
+  #   image: velero/velero-plugin-for-csi:v0.6.0
   #   imagePullPolicy: IfNotPresent
   #   volumeMounts:
   #     - mountPath: /target
   #       name: plugins
   # - name: velero-plugin-for-aws
-  #   image: velero/velero-plugin-for-aws:v1.7.0
+  #   image: velero/velero-plugin-for-aws:v1.8.0
   #   imagePullPolicy: IfNotPresent
   #   volumeMounts:
   #     - mountPath: /target
@@ -179,6 +224,12 @@ metrics:
     enabled: false
     annotations: {}
     additionalLabels: {}
+
+    # metrics.serviceMonitor.metricRelabelings Specify Metric Relabelings to add to the scrape endpoint
+    # ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#relabelconfig
+    # metricRelabelings: []
+    # metrics.serviceMonitor.relabelings [array] Prometheus relabeling rules
+    # relabelings: []
     # ServiceMonitor namespace. Default to Velero namespace.
     # namespace:
     # ServiceMonitor connection scheme. Defaults to HTTP.
@@ -198,6 +249,7 @@ metrics:
     # tlsConfig: {}
 
   prometheusRule:
+    autodetect: true
     enabled: false
     # Additional labels to add to deployed PrometheusRule
     additionalLabels: {}
@@ -309,6 +361,11 @@ configuration:
   - name:
     # provider is the name for the volume snapshot provider.
     provider:
+    credential:
+      # name of the secret used by this volumeSnapshotLocation.
+      name:
+      # name of key that contains the secret data to be used.
+      key:
     # Additional provider-specific configuration. See link above
     # for details of required/optional fields for your provider.
     config: {}
