@@ -8,15 +8,21 @@ kind: VolumeSnapshotLocation
 metadata:
   name: {{ .name | default "default" }}
   namespace: {{ $.Release.Namespace }}
-  annotations:
-    "helm.sh/hook": post-install,post-upgrade,post-rollback
-    "helm.sh/hook-delete-policy": before-hook-creation
   labels:
     app.kubernetes.io/name: {{ include "velero.name" $ }}
     app.kubernetes.io/instance: {{ $.Release.Name }}
     app.kubernetes.io/managed-by: {{ $.Release.Service }}
     helm.sh/chart: {{ include "velero.chart" $ }}
 spec:
+  {{- if not (empty .credential) }}
+  credential:
+    {{- with .credential.name }}
+    name: {{ . }}
+    {{- end }}
+    {{- with .credential.key }}
+    key: {{ . }}
+    {{- end }}
+  {{- end }}
   provider: {{ .provider }}
 {{- with .config }}
   config:
