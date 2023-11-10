@@ -3,5 +3,5 @@ name: gitea-runner
 version: 1.0.0
 dependencies:
   - name: act-runner
-    version: 1.0.0
+    version: 0.1.1
     repository: https://vquie.github.io/helm-charts
