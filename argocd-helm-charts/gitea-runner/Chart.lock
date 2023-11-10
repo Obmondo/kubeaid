@@ -1,6 +1,6 @@
 dependencies:
 - name: act-runner
   repository: https://vquie.github.io/helm-charts
-  version: 0.1.1
-digest: sha256:cbe52c9955c6c1127d70156fa10960eeda39eff6555251003e693cb5eb433b48
-generated: "2023-07-18T09:41:56.965641382+05:30"
+  version: 1.0.0
+digest: sha256:8a683e9c7a05f62407eba87c0aea9ec2e32f93c2feae8cde10cc995d6a7b6b05
+generated: "2023-11-10T12:41:09.275793422+05:30"
