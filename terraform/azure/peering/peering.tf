@@ -26,7 +26,7 @@ resource "azurerm_virtual_network_peering" "peer2" {
   remote_virtual_network_id = var.cluster_vnet_id != null ? var.cluster_vnet_id : var.ext_cluster_vnet_id
   allow_forwarded_traffic   = var.allow_forwarded_traffic
 
-  provider                  = var.remote_subs_id ? azurerm.remotewg : azurerm.currentsubs
+  provider                  = azurerm.remotewg
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "link_bastion_cluster" {
