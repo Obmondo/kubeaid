@@ -30,6 +30,5 @@ resource "argocd_repository" "private" {
   name            = each.key
   repo            = each.value.url
   username        = each.value.username
-  insecure        = true
   ssh_private_key = file(each.value.ssh_private_key)
 }
