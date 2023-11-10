@@ -16,7 +16,7 @@ jobs:
       run: |
         curl -LO https://get.helm.sh/helm-v3.9.1-linux-amd64.tar.gz
         tar -zxvf helm-v3.9.1-linux-amd64.tar.gz
-        sudo mv linux-amd64/helm /usr/local/bin/helm
+        mv linux-amd64/helm /usr/local/bin/helm
 
     - name: Check Helm Version
       run: helm version
