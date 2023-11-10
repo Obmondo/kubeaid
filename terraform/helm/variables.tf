@@ -13,11 +13,6 @@ variable "k8s_cluster_ca_certificate" {
   sensitive = true
 }
 
-variable "argocd_admin_password" {
-  type      = string
-  sensitive = true
-}
-
 variable "k8s_host" {
   type      = string
   sensitive = true
@@ -40,4 +35,9 @@ variable "repo_url"{
 variable "path"{
   type = string
   description = "Directory path within the repository. Only valid for applications sourced from Git."
+}
+
+variable "secrets_file" {
+  type = string
+  default = "allsealkeys.yml"
 }
