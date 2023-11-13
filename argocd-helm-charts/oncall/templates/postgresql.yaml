@@ -1,13 +1,22 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
+  {{ if .Values.oncall.recover }}
+  name: oncall-pgsql-recover
+  {{ else }}
   name: oncall-pgsql
+  {{ end }}
 spec:
   instances: {{ ((.Values.postgresql).instance) | default 1 }}
+  {{ if .Values.oncall.recover }}
+  bootstrap:
+    recovery: oncall-pgsql
+  {{ else }}
   bootstrap:
     initdb:
       database: oncall
       owner: oncall
+  {{ end }}
   resources:
     limits:
       memory: {{ .Values.postgresql.resources.limits.memory | default "800Mi" }}
@@ -22,6 +31,39 @@ spec:
     {{- if .Values.postgresql.storageClass }}
     storageClass: {{ .Values.postgresql.storageClass }}
     {{- end }}
+  {{- if .Values.oncall.recover }}
+  externalClusters:
+    name: oncall-pgsql
+    barmanObjectStore:
+      destinationPath: {{ .Values.oncall.backup.destinationPath }}
+      endpointURL: {{ .Values.oncall.backup.endpointURL }}
+      {{- if eq .Values.oncall.backup.cloud "aws" }}
+      s3Credentials:
+        accessKeyId:
+          name: oncall-psql-backup-creds
+          key: ACCESS_KEY_ID
+        secretAccessKey:
+          name: oncall-psql-backup-creds
+          key: ACCESS_SECRET_KEY
+      {{- end }}
+      {{- if eq .Values.oncall.backup.cloud "azure" }}
+      azureCredentials:
+        connectionString:
+          name: oncall-psql-backup-creds
+          key: AZURE_CONNECTION_STRING
+        storageAccount:
+          name: oncall-psql-backup-creds
+          key: AZURE_STORAGE_ACCOUNT
+        storageKey:
+          name: oncall-psql-backup-creds
+          key: AZURE_STORAGE_KEY
+        storageSasToken:
+          name: oncall-psql-backup-creds
+          key: AZURE_STORAGE_SAS_TOKEN
+      {{- end }}
+        wal:
+          maxParallel: 8
+  {{- end }}
   backup:
     barmanObjectStore:
       destinationPath: {{ .Values.oncall.backup.destinationPath }}

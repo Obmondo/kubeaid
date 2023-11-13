@@ -63,6 +63,7 @@ oncall:
     cloud: "aws"
     destinationPath: s3://oncall-backups
     endpointURL: https://s3.abc.com
+  recover: false
 
 rabbitmq:
   replicas: 1
