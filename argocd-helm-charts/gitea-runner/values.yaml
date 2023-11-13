@@ -1,3 +1,16 @@
+act-runner:
+  podSecurityContext:
+    fsGroup: 1000
+  securityContext:
+    privileged: true
+    runAsUser: 1000
+    runAsGroup: 1000
+  image:
+    repository: vegardit/gitea-act-runner
+    tag: dind-rootless-0.2.6
+  act_runner:
+    storage:
+      size: 20Gi
 runner:
   nameSpace:
     create: false
