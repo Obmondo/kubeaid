@@ -32,6 +32,7 @@ data "kubernetes_secret" "argocd_admin_password" {
     name = "argocd-initial-admin-secret"
     namespace = "argocd"
   }
+  depends_on      = [helm_release.argocd]
 }
 
 provider "argocd" {
