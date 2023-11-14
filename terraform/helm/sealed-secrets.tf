@@ -6,4 +6,6 @@ resource "helm_release" "sealed-secrets" {
   namespace        = "system"
   values           = var.restore_secrets ? [file(var.secrets_file)] : null
   version          = "2.2.0"
+
+  depends_on      = [helm_release.argocd]
 }
