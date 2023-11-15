@@ -17,3 +17,9 @@ velero:
     requests:
       cpu: 3m
       memory: 128Mi
+  upgradeJobResources:
+    requests:
+      memory: 100Mi
+    limits:
+      cpu: 100m
+      memory: 300Mi
