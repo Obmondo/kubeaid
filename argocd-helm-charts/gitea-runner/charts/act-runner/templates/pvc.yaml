@@ -14,5 +14,5 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: "1024Mi"
+      storage: {{ .Values.act_runner.storage.size }}
   storageClassName: {{ .Values.act_runner.storageclass }}

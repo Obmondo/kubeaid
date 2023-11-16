@@ -63,6 +63,8 @@ affinity: {}
 
 act_runner:
   storageclass: "default"
+  storage:
+    size: 1024Mi
   instance: "https://gitea.example.com"
   token: ""
   existingToken: ""
