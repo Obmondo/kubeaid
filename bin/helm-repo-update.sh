@@ -259,7 +259,14 @@ fi
 if "${ACTIONS}" ; then
   TEMPDIR=$(mktemp -d)
 
-  git clone --depth 20 "https://oauth2:${HELM_UPDATE_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}" "${TEMPDIR}"
+  case "${KUBERNETES_CONFIG_REPO_URL}" in
+  *gitea*)
+    token=${GITEA_TOKEN}
+    git clone --depth 20 "https://oauth2:${token}@${URL}/${owner}/${repo}" "${TEMPDIR}"
+    ;;
+  *github*)
+    git clone --depth 20 "https://${URL}/${owner}/${repo}" "${TEMPDIR}"
+  esac
 
   git config --global user.email "${USER_EMAIL}"
   git config --global user.name "${USER_NAME}"
