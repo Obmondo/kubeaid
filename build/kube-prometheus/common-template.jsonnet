@@ -537,38 +537,38 @@ local kp =
       } else {}
   ) + (
     if std.objectHas(vars, 'prometheus_ingress_host') then
-    {
-      ingress+: {
-        prometheus: utils.ingress(
-          'prometheus',
-          $.values.common.namespace,
-          [{
-            host: vars.prometheus_ingress_host,
-            http: {
-              paths: [{
-                path: '/',
-                pathType: 'Prefix',
-                backend: {
-                  service: {
-                    name: 'prometheus-k8s',
-                    port: {
-                      name: 'web',
+      {
+        ingress+: {
+          prometheus: utils.ingress(
+            'prometheus',
+            $.values.common.namespace,
+            [{
+              host: vars.prometheus_ingress_host,
+              http: {
+                paths: [{
+                  path: '/',
+                  pathType: 'Prefix',
+                  backend: {
+                    service: {
+                      name: 'prometheus-k8s',
+                      port: {
+                        name: 'web',
+                      },
                     },
                   },
-                },
-              }],
-            },
-          }],
-          [{
-            secretName: 'kube-prometheus-tls',
-            hosts: [
-              vars.prometheus_ingress_host,
-            ],
-          }],
-          vars.prometheus_ingres_annotations,
-        ),
-      },
-    } else {}
+                }],
+              },
+            }],
+            [{
+              secretName: 'kube-prometheus-tls',
+              hosts: [
+                vars.prometheus_ingress_host,
+              ],
+            }],
+            vars.prometheus_ingres_annotations,
+          ),
+        },
+      } else {}
   );
 
 
