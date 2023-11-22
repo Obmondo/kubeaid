@@ -9,6 +9,7 @@ act-runner:
     repository: vegardit/gitea-act-runner
     tag: dind-rootless-0.2.6
   act_runner:
+    parallel_jobs: 2
     storage:
       size: 20Gi
 runner:
