@@ -39,7 +39,7 @@ spec:
             - name: GITEA_INSTANCE_URL
               value: {{ .Values.act_runner.instance }}
             - name: GITEA_RUNNER_MAX_PARALLEL_JOBS
-              value: {{ .Values.act_runner.parallel_jobs }}
+              value: "{{ .Values.act_runner.parallel_jobs }}"
             - name: GITEA_RUNNER_LABELS
               value: {{ join "," .Values.act_runner.labels }}
             - name: GITEA_RUNNER_REGISTRATION_TOKEN
