@@ -1,0 +1,41 @@
+{{- if .Values.policy.CronJobForbidConcurrency }}
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: cronjobforbidconcurrency
+spec:
+  crd:
+    spec:
+      names:
+        kind: CronJobForbidConcurrency
+      validation:
+        openAPIV3Schema:
+          properties:
+            spec:
+              properties:
+                concurrencyPolicy:
+                  type: string
+                  enum:
+                    - Forbid
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |-
+        {{ .Files.Get "policies/CronJobsPolicy.rego" | nindent 8 }}
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: CronJobForbidConcurrency
+metadata:
+  name: cronjob-must-forbid-concurrency
+spec:
+  match:
+    kinds:
+      - apiGroups:
+        - ""
+        kinds:
+        - CronJob
+    excludedNamespaces:
+    {{- range .Values.policy.ExcludedNamespaces }}
+    - {{ . | quote }}
+    {{- end }}
+    enforcementAction: {{ .Values.policy.EnforcementAction | default "dryrun" | quote }}
+{{- end}}
