@@ -5,6 +5,7 @@ kind: ClusterRole
 metadata:
   name: gatekeeper-admin-upgrade-crds
   labels:
+    {{- include "gatekeeper.commonLabels" . | nindent 4 }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
   annotations:
@@ -26,6 +27,7 @@ kind: ClusterRoleBinding
 metadata:
   name: gatekeeper-admin-upgrade-crds
   labels:
+    {{- include "gatekeeper.commonLabels" . | nindent 4 }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
   annotations:
@@ -46,6 +48,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
+    {{- include "gatekeeper.commonLabels" . | nindent 4 }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
   name: gatekeeper-admin-upgrade-crds
@@ -61,29 +64,23 @@ metadata:
   name: gatekeeper-update-crds-hook
   namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ template "gatekeeper.name" . }}
-    chart: {{ template "gatekeeper.name" . }}
-    gatekeeper.sh/system: "yes"
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
+    {{- include "gatekeeper.mandatoryLabels" . | nindent 4 }}
+    {{- include "gatekeeper.commonLabels" . | nindent 4 }}
   annotations:
     helm.sh/hook: pre-install,pre-upgrade
     helm.sh/hook-weight: "1"
     helm.sh/hook-delete-policy: "hook-succeeded,before-hook-creation"
 spec:
-  backoffLimit: 0
+  backoffLimit: 3
   template:
     metadata:
       name: gatekeeper-update-crds-hook
       annotations:
         {{- toYaml .Values.podAnnotations | trim | nindent 8 }}
       labels:
-        {{- include "gatekeeper.podLabels" . }}
-        app: '{{ template "gatekeeper.name" . }}'
-        chart: '{{ template "gatekeeper.name" . }}'
-        gatekeeper.sh/system: "yes"
-        heritage: '{{ .Release.Service }}'
-        release: '{{ .Release.Name }}'
+        {{- include "gatekeeper.podLabels" . | nindent 8 }}
+        {{- include "gatekeeper.mandatoryLabels" . | nindent 8 }}
+        {{- include "gatekeeper.commonLabels" . | nindent 8 }}
     spec:
       serviceAccountName: gatekeeper-admin-upgrade-crds
       restartPolicy: Never
@@ -91,12 +88,23 @@ spec:
       imagePullSecrets:
         {{- toYaml .Values.image.pullSecrets | nindent 8 }}
       {{- end }}
+      {{- if .Values.upgradeCRDs.priorityClassName }}
+      priorityClassName: {{ .Values.upgradeCRDs.priorityClassName }}
+      {{- end }}
       containers:
       - name: crds-upgrade
-        {{- if not .Values.image.release }}
-        image: '{{ .Values.image.crdRepository }}'
+        {{- if .Values.preInstall.crdRepository.image.repository }}
+          {{- if not .Values.preInstall.crdRepository.image.tag }}
+        image: '{{ .Values.preInstall.crdRepository.image.repository }}'
+          {{- else }}
+        image: '{{ .Values.preInstall.crdRepository.image.repository }}:{{ .Values.preInstall.crdRepository.image.tag }}'
+          {{- end }}
         {{- else }}
+          {{- if not .Values.image.release }}
+        image: '{{ .Values.image.crdRepository }}'
+          {{- else }}
         image: '{{ .Values.image.crdRepository }}:{{ .Values.image.release }}'
+          {{- end }}
         {{- end }}
         imagePullPolicy: '{{ .Values.image.pullPolicy }}'
         args:
