@@ -19,6 +19,13 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
+Expand the Application Image name.
+*/}}
+{{- define "sonarqube.image" -}}
+{{- printf "%s:%s" .Values.image.repository (tpl .Values.image.tag .) }}
+{{- end -}}
+
+{{/*
   Create a default fully qualified mysql/postgresql name.
   We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
@@ -174,4 +181,26 @@ Create the name of the service account to use
 {{- else -}}
     {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
+{{- end -}}
+
+{{/*
+Set sonarqube.webcontext, ensuring it starts and ends with a slash, in order to ease probes url template
+*/}}
+{{- define "sonarqube.webcontext" -}}
+{{- $tempWebcontext := .Values.sonarWebContext -}}
+{{- if and .Values.sonarProperties (hasKey (.Values.sonarProperties) "sonar.web.context") -}}
+{{- $tempWebcontext = (get .Values.sonarProperties "sonar.web.context") -}}
+{{- end -}}
+{{- range $index, $val := .Values.env -}}
+{{- if eq $val.name "SONAR_WEB_CONTEXT" -}}
+{{- $tempWebcontext = $val.value -}}
+{{- end -}}
+{{- end -}}
+{{- if not (hasPrefix "/" $tempWebcontext) -}}
+{{- $tempWebcontext = print "/" $tempWebcontext -}}
+{{- end -}}
+{{- if not (hasSuffix "/" $tempWebcontext) -}}
+{{- $tempWebcontext = print $tempWebcontext "/" -}}
+{{- end -}}
+{{ printf "%s" $tempWebcontext }}
 {{- end -}}
