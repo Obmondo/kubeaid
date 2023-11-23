@@ -236,6 +236,13 @@ spec:
                           description: Namespace is the resource namespace. It supports
                             wildcards.
                           type: string
+                        verbs:
+                          description: Verbs are the allowed Kubernetes verbs for
+                            the following resource.
+                          items:
+                            type: string
+                          nullable: true
+                          type: array
                       type: object
                     type: array
                   kubernetes_users:
@@ -690,6 +697,13 @@ spec:
                           description: Namespace is the resource namespace. It supports
                             wildcards.
                           type: string
+                        verbs:
+                          description: Verbs are the allowed Kubernetes verbs for
+                            the following resource.
+                          items:
+                            type: string
+                          nullable: true
+                          type: array
                       type: object
                     type: array
                   kubernetes_users:
@@ -949,8 +963,7 @@ spec:
                         mode:
                           description: Mode is the type of extension to be used --
                             currently critical-option is not supported
-                          format: int32
-                          type: integer
+                          x-kubernetes-int-or-string: true
                         name:
                           description: Name specifies the key to be used in the cert
                             extension.
@@ -958,8 +971,7 @@ spec:
                         type:
                           description: Type represents the certificate type being
                             extended, only ssh is supported at this time.
-                          format: int32
-                          type: integer
+                          x-kubernetes-int-or-string: true
                         value:
                           description: Value specifies the value to be used in the
                             cert extension.
@@ -981,6 +993,10 @@ spec:
                     description: CreateDatabaseUser enabled automatic database user
                       creation.
                     type: boolean
+                  create_db_user_mode:
+                    description: CreateDatabaseUserMode allows users to be automatically
+                      created on a database when not set to off.
+                    x-kubernetes-int-or-string: true
                   create_desktop_user:
                     description: CreateDesktopUser allows users to be automatically
                       created on a Windows desktop
@@ -992,8 +1008,7 @@ spec:
                   create_host_user_mode:
                     description: CreateHostUserMode allows users to be automatically
                       created on a host when not set to off
-                    format: int32
-                    type: integer
+                    x-kubernetes-int-or-string: true
                   desktop_clipboard:
                     description: DesktopClipboard indicates whether clipboard sharing
                       is allowed between the user's workstation and the remote desktop.
@@ -1099,13 +1114,12 @@ spec:
                     type: string
                   request_prompt:
                     description: RequestPrompt is an optional message which tells
-                      users what they aught to
+                      users what they aught to request.
                     type: string
                   require_session_mfa:
                     description: RequireMFAType is the type of MFA requirement enforced
                       for this user.
-                    format: int32
-                    type: integer
+                    x-kubernetes-int-or-string: true
                   ssh_file_copy:
                     description: SSHFileCopy indicates whether remote file operations
                       via SCP or SFTP are allowed over an SSH session. It defaults
@@ -1419,6 +1433,13 @@ spec:
                           description: Namespace is the resource namespace. It supports
                             wildcards.
                           type: string
+                        verbs:
+                          description: Verbs are the allowed Kubernetes verbs for
+                            the following resource.
+                          items:
+                            type: string
+                          nullable: true
+                          type: array
                       type: object
                     type: array
                   kubernetes_users:
@@ -1873,6 +1894,13 @@ spec:
                           description: Namespace is the resource namespace. It supports
                             wildcards.
                           type: string
+                        verbs:
+                          description: Verbs are the allowed Kubernetes verbs for
+                            the following resource.
+                          items:
+                            type: string
+                          nullable: true
+                          type: array
                       type: object
                     type: array
                   kubernetes_users:
@@ -2132,8 +2160,7 @@ spec:
                         mode:
                           description: Mode is the type of extension to be used --
                             currently critical-option is not supported
-                          format: int32
-                          type: integer
+                          x-kubernetes-int-or-string: true
                         name:
                           description: Name specifies the key to be used in the cert
                             extension.
@@ -2141,8 +2168,7 @@ spec:
                         type:
                           description: Type represents the certificate type being
                             extended, only ssh is supported at this time.
-                          format: int32
-                          type: integer
+                          x-kubernetes-int-or-string: true
                         value:
                           description: Value specifies the value to be used in the
                             cert extension.
@@ -2164,6 +2190,10 @@ spec:
                     description: CreateDatabaseUser enabled automatic database user
                       creation.
                     type: boolean
+                  create_db_user_mode:
+                    description: CreateDatabaseUserMode allows users to be automatically
+                      created on a database when not set to off.
+                    x-kubernetes-int-or-string: true
                   create_desktop_user:
                     description: CreateDesktopUser allows users to be automatically
                       created on a Windows desktop
@@ -2175,8 +2205,7 @@ spec:
                   create_host_user_mode:
                     description: CreateHostUserMode allows users to be automatically
                       created on a host when not set to off
-                    format: int32
-                    type: integer
+                    x-kubernetes-int-or-string: true
                   desktop_clipboard:
                     description: DesktopClipboard indicates whether clipboard sharing
                       is allowed between the user's workstation and the remote desktop.
@@ -2282,13 +2311,12 @@ spec:
                     type: string
                   request_prompt:
                     description: RequestPrompt is an optional message which tells
-                      users what they aught to
+                      users what they aught to request.
                     type: string
                   require_session_mfa:
                     description: RequireMFAType is the type of MFA requirement enforced
                       for this user.
-                    format: int32
-                    type: integer
+                    x-kubernetes-int-or-string: true
                   ssh_file_copy:
                     description: SSHFileCopy indicates whether remote file operations
                       via SCP or SFTP are allowed over an SSH session. It defaults
