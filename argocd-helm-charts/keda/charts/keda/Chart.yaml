@@ -1,9 +1,9 @@
 apiVersion: v2
-appVersion: 2.10.1
+appVersion: 2.12.0
 description: Event-based autoscaler for workloads on Kubernetes
 home: https://github.com/kedacore/keda
 icon: https://raw.githubusercontent.com/kedacore/keda/main/images/keda-logo-500x500-white.png
-kubeVersion: '>=v1.24.0-0'
+kubeVersion: '>=v1.23.0-0'
 maintainers:
 - email: ahmels@microsoft.com
   name: Ahmed ElSayed
@@ -16,4 +16,4 @@ maintainers:
 name: keda
 sources:
 - https://github.com/kedacore/keda
-version: 2.10.2
+version: 2.12.0
