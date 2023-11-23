@@ -1,6 +1,30 @@
 # SonarQube Chart Changelog
 All changes to this chart will be documented in this file.
 
+## [10.3.0]
+* Upgrade SonarQube to 10.3.0
+* Update Chart's version to 10.3.0
+* Update default images to the latest versions
+* Remove the nginx-proxy-body annotation when nginx is disabled
+* Enable post-upgrade in the change-admin-password hook
+* Update default ContainerSecurityContext, InitContainerSecurityContext and postgresql.securityContext to match restricted podSecurityStandard
+* Update initFs defaut securityContext to match baseline podSecurityStandard
+* Update Elasticsearch.configureNode to false by default after 3 year deprecation
+* Fix wrong condition on initSysctl feature
+* Update default image of initContainers to sonarqube image, allowing for faster loading time and less external images needed
+* Support Kubernetes v1.28
+* Avoid duplicate SONAR_WEB_SYSTEMPASSCODE secrets
+* Deprecate embedded PostgreSQL
+* Update nginx-ingress-controller dependency to version 4.8.3, please carefully read the changelog of this new major version.
+
+## [10.2.0]
+* Update SonarQube to 10.2.0
+* Update Chart's version to 10.2.0
+* Update curl image to 8.2.0
+* `readinessProbe.sonarWebContext`, `startupProbe.sonarWebContext`, `livenessProbe.sonarWebContext`, and `account.sonarWebContext` are deprecated, please use `sonarWebContext` at the value top level.
+* Updates ingress-nginx dependency to 4.7.1
+* Fixes broken table on README
+
 ## [10.1.0]
 * Update SonarQube to 10.1.0
 * Support Kubernetes v1.27 while dropping v1.23

@@ -9,16 +9,20 @@ metadata:
     gatekeeper.sh/system: "yes"
     heritage: '{{ .Release.Service }}'
     release: '{{ .Release.Name }}'
-  name: gatekeeper-validating-webhook-configuration
+  name: '{{ .Values.validatingWebhookName }}'
 webhooks:
 - admissionReviewVersions:
   - v1
   - v1beta1
   clientConfig:
+    {{- if .Values.validatingWebhookURL }}
+    url: https://{{ .Values.validatingWebhookURL }}/v1/admit
+    {{- else }}
     service:
       name: gatekeeper-webhook-service
       namespace: '{{ .Release.Namespace }}'
       path: /v1/admit
+    {{- end }}
   failurePolicy: {{ .Values.validatingWebhookFailurePolicy }}
   matchPolicy: Exact
   name: validation.gatekeeper.sh

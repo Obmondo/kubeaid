@@ -19,7 +19,7 @@ Before installing the chart, you must first install the cert-manager CustomResou
 This is performed in a separate step to allow you to easily uninstall and reinstall cert-manager without deleting your installed custom resources.
 
 ```bash
-$ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.crds.yaml
+$ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.2/cert-manager.crds.yaml
 ```
 
 To install the chart with the release name `my-release`:
@@ -29,7 +29,7 @@ To install the chart with the release name `my-release`:
 $ helm repo add jetstack https://charts.jetstack.io
 
 ## Install the cert-manager helm chart
-$ helm install my-release --namespace cert-manager --version v1.11.0 jetstack/cert-manager
+$ helm install my-release --namespace cert-manager --version v1.13.2 jetstack/cert-manager
 ```
 
 In order to begin issuing certificates, you will need to set up a ClusterIssuer
@@ -65,7 +65,7 @@ If you want to completely uninstall cert-manager from your cluster, you will als
 delete the previously installed CustomResourceDefinition resources:
 
 ```console
-$ kubectl delete -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.crds.yaml
+$ kubectl delete -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.2/cert-manager.crds.yaml
 ```
 
 ## Configuration
@@ -86,7 +86,7 @@ The following table lists the configurable parameters of the cert-manager chart 
 | `global.leaderElection.retryPeriod` | The duration the clients should wait between attempting acquisition and renewal of a leadership |  |
 | `installCRDs` | If true, CRD resources will be installed as part of the Helm chart. If enabled, when uninstalling CRD resources will be deleted causing all installed custom resources to be DELETED | `false` |
 | `image.repository` | Image repository | `quay.io/jetstack/cert-manager-controller` |
-| `image.tag` | Image tag | `v1.11.0` |
+| `image.tag` | Image tag | `v1.13.2` |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
 | `replicaCount`  | Number of cert-manager replicas  | `1` |
 | `clusterResourceNamespace` | Override the namespace used to store DNS provider credentials etc. for ClusterIssuer resources | Same namespace as cert-manager pod |
@@ -106,6 +106,13 @@ The following table lists the configurable parameters of the cert-manager chart 
 | `affinity` | Node affinity for pod assignment | `{}` |
 | `tolerations` | Node tolerations for pod assignment | `[]` |
 | `topologySpreadConstraints` | Topology spread constraints for pod assignment | `[]` |
+| `livenessProbe.enabled` | Enable or disable the liveness probe for the controller container in the controller Pod. See https://cert-manager.io/docs/installation/best-practice/ to learn about when you might want to enable this livenss probe. | `false` |
+| `livenessProbe.initialDelaySeconds` | The liveness probe initial delay (in seconds) | `10` |
+| `livenessProbe.periodSeconds` | The liveness probe period (in seconds) | `10` |
+| `livenessProbe.timeoutSeconds` | The liveness probe timeout (in seconds) | `10` |
+| `livenessProbe.periodSeconds` | The liveness probe period (in seconds) | `10` |
+| `livenessProbe.successThreshold` | The liveness probe success threshold | `1` |
+| `livenessProbe.failureThreshold` | The liveness probe failure threshold | `8` |
 | `ingressShim.defaultIssuerName` | Optional default issuer to use for ingress resources |  |
 | `ingressShim.defaultIssuerKind` | Optional default issuer kind to use for ingress resources |  |
 | `ingressShim.defaultIssuerGroup` | Optional default issuer group to use for ingress resources |  |
@@ -121,6 +128,9 @@ The following table lists the configurable parameters of the cert-manager chart 
 | `prometheus.servicemonitor.honorLabels` | Enable label honoring for metrics scraped by Prometheus (see [Prometheus scrape config docs](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config) for details). By setting `honorLabels` to `true`, Prometheus will prefer label contents given by cert-manager on conflicts. Can be used to remove the "exported_namespace" label for example.  | `false` |
 | `podAnnotations` | Annotations to add to the cert-manager pod | `{}` |
 | `deploymentAnnotations` | Annotations to add to the cert-manager deployment | `{}` |
+| `podDisruptionBudget.enabled` | Adds a PodDisruptionBudget for the cert-manager deployment | `false` |
+| `podDisruptionBudget.minAvailable` | Configures the minimum available pods for voluntary disruptions. Cannot used if `maxUnavailable` is set. | `1` |
+| `podDisruptionBudget.maxUnavailable` | Configures the maximum unavailable pods for voluntary disruptions. Cannot used if `minAvailable` is set. |  |
 | `podDnsPolicy` | Optional cert-manager pod [DNS policy](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pods-dns-policy) |  |
 | `podDnsConfig` | Optional cert-manager pod [DNS configurations](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pods-dns-config) |  |
 | `podLabels` | Labels to add to the cert-manager pod | `{}` |
@@ -129,12 +139,20 @@ The following table lists the configurable parameters of the cert-manager chart 
 | `http_proxy` | Value of the `HTTP_PROXY` environment variable in the cert-manager pod | |
 | `https_proxy` | Value of the `HTTPS_PROXY` environment variable in the cert-manager pod | |
 | `no_proxy` | Value of the `NO_PROXY` environment variable in the cert-manager pod | |
+| `dns01RecursiveNameservers` | Comma separated string with host and port of the recursive nameservers cert-manager should query | `` |
+| `dns01RecursiveNameserversOnly` | Forces cert-manager to only use the recursive nameservers for verification.  | `false` |
+| `enableCertificateOwnerRef` | When this flag is enabled, secrets will be automatically removed when the certificate resource is deleted | `false` |
+| `config` | ControllerConfiguration YAML used to configure flags for the controller. Generates a ConfigMap containing contents of the field. See `values.yaml` for example. | `{}` |
+| `enableServiceLinks` | Indicates whether information about services should be injected into pod's environment variables, matching the syntax of Docker links. | `false` |
 | `webhook.replicaCount` | Number of cert-manager webhook replicas | `1` |
 | `webhook.timeoutSeconds` | Seconds the API server should wait the webhook to respond before treating the call as a failure. | `10` |
 | `webhook.podAnnotations` | Annotations to add to the webhook pods | `{}` |
 | `webhook.podLabels` | Labels to add to the cert-manager webhook pod | `{}` |
 | `webhook.serviceLabels` | Labels to add to the cert-manager webhook service | `{}` |
 | `webhook.deploymentAnnotations` | Annotations to add to the webhook deployment | `{}` |
+| `webhook.podDisruptionBudget.enabled` | Adds a PodDisruptionBudget for the cert-manager deployment | `false` |
+| `webhook.podDisruptionBudget.minAvailable` | Configures the minimum available pods for voluntary disruptions. Cannot used if `maxUnavailable` is set. | `1` |
+| `webhook.podDisruptionBudget.maxUnavailable` | Configures the maximum unavailable pods for voluntary disruptions. Cannot used if `minAvailable` is set. |  |
 | `webhook.mutatingWebhookConfigurationAnnotations` | Annotations to add to the mutating webhook configuration | `{}` |
 | `webhook.validatingWebhookConfigurationAnnotations` | Annotations to add to the validating webhook configuration | `{}` |
 | `webhook.serviceAnnotations` | Annotations to add to the webhook service | `{}` |
@@ -153,7 +171,7 @@ The following table lists the configurable parameters of the cert-manager chart 
 | `webhook.tolerations` | Node tolerations for webhook pod assignment | `[]` |
 | `webhook.topologySpreadConstraints` | Topology spread constraints for webhook pod assignment | `[]` |
 | `webhook.image.repository` | Webhook image repository | `quay.io/jetstack/cert-manager-webhook` |
-| `webhook.image.tag` | Webhook image tag | `v1.11.0` |
+| `webhook.image.tag` | Webhook image tag | `v1.13.2` |
 | `webhook.image.pullPolicy` | Webhook image pull policy | `IfNotPresent` |
 | `webhook.securePort` | The port that the webhook should listen on for requests. | `10250` |
 | `webhook.securityContext` | Security context for webhook pod assignment | refer to [Default Security Contexts](#default-security-contexts) |
@@ -172,11 +190,15 @@ The following table lists the configurable parameters of the cert-manager chart 
 | `webhook.readinessProbe.periodSeconds` | The readiness probe period (in seconds) | `5` |
 | `webhook.readinessProbe.successThreshold` | The readiness probe success threshold | `1` |
 | `webhook.readinessProbe.timeoutSeconds` | The readiness probe timeout (in seconds) | `1` |
+| `webhook.enableServiceLinks` | Indicates whether information about services should be injected into pod's environment variables, matching the syntax of Docker links. | `false` |
 | `cainjector.enabled` | Toggles whether the cainjector component should be installed (required for the webhook component to work) | `true` |
 | `cainjector.replicaCount` | Number of cert-manager cainjector replicas | `1` |
 | `cainjector.podAnnotations` | Annotations to add to the cainjector pods | `{}` |
 | `cainjector.podLabels` | Labels to add to the cert-manager cainjector pod | `{}` |
 | `cainjector.deploymentAnnotations` | Annotations to add to the cainjector deployment | `{}` |
+| `cainjector.podDisruptionBudget.enabled` | Adds a PodDisruptionBudget for the cert-manager deployment | `false` |
+| `cainjector.podDisruptionBudget.minAvailable` | Configures the minimum available pods for voluntary disruptions. Cannot used if `maxUnavailable` is set. | `1` |
+| `cainjector.podDisruptionBudget.maxUnavailable` | Configures the maximum unavailable pods for voluntary disruptions. Cannot used if `minAvailable` is set. |  |
 | `cainjector.extraArgs` | Optional flags for cert-manager cainjector component | `[]` |
 | `cainjector.serviceAccount.create` | If `true`, create a new service account for the cainjector component | `true` |
 | `cainjector.serviceAccount.name` | Service account for the cainjector component to be used. If not set and `cainjector.serviceAccount.create` is `true`, a name is generated using the fullname template |  |
@@ -188,12 +210,13 @@ The following table lists the configurable parameters of the cert-manager chart 
 | `cainjector.tolerations` | Node tolerations for cainjector pod assignment | `[]` |
 | `cainjector.topologySpreadConstraints` | Topology spread constraints for cainjector pod assignment | `[]` |
 | `cainjector.image.repository` | cainjector image repository | `quay.io/jetstack/cert-manager-cainjector` |
-| `cainjector.image.tag` | cainjector image tag | `v1.11.0` |
+| `cainjector.image.tag` | cainjector image tag | `v1.13.2` |
 | `cainjector.image.pullPolicy` | cainjector image pull policy | `IfNotPresent` |
 | `cainjector.securityContext` | Security context for cainjector pod assignment | refer to [Default Security Contexts](#default-security-contexts) |
 | `cainjector.containerSecurityContext` | Security context to be set on cainjector component container | refer to [Default Security Contexts](#default-security-contexts) |
+| `cainjector.enableServiceLinks` | Indicates whether information about services should be injected into pod's environment variables, matching the syntax of Docker links. | `false` |
 | `acmesolver.image.repository` | acmesolver image repository | `quay.io/jetstack/cert-manager-acmesolver` |
-| `acmesolver.image.tag` | acmesolver image tag | `v1.11.0` |
+| `acmesolver.image.tag` | acmesolver image tag | `v1.13.2` |
 | `acmesolver.image.pullPolicy` | acmesolver image pull policy | `IfNotPresent` |
 | `startupapicheck.enabled` | Toggles whether the startupapicheck Job should be installed | `true` |
 | `startupapicheck.securityContext` | Security context for startupapicheck pod assignment | refer to [Default Security Contexts](#default-security-contexts) |
@@ -209,12 +232,13 @@ The following table lists the configurable parameters of the cert-manager chart 
 | `startupapicheck.tolerations` | Node tolerations for startupapicheck pod assignment | `[]` |
 | `startupapicheck.podLabels` | Optional additional labels to add to the startupapicheck Pods | `{}` |
 | `startupapicheck.image.repository` | startupapicheck image repository | `quay.io/jetstack/cert-manager-ctl` |
-| `startupapicheck.image.tag` | startupapicheck image tag | `v1.11.0` |
+| `startupapicheck.image.tag` | startupapicheck image tag | `v1.13.2` |
 | `startupapicheck.image.pullPolicy` | startupapicheck image pull policy | `IfNotPresent` |
 | `startupapicheck.serviceAccount.create` | If `true`, create a new service account for the startupapicheck component | `true` |
 | `startupapicheck.serviceAccount.name` | Service account for the startupapicheck component to be used. If not set and `startupapicheck.serviceAccount.create` is `true`, a name is generated using the fullname template |  |
 | `startupapicheck.serviceAccount.annotations` | Annotations to add to the service account for the startupapicheck component |  |
 | `startupapicheck.serviceAccount.automountServiceAccountToken` | Automount API credentials for the startupapicheck Service Account | `true` |
+| `startupapicheck.enableServiceLinks` | Indicates whether information about services should be injected into pod's environment variables, matching the syntax of Docker links. | `false` |
 | `maxConcurrentChallenges` | The maximum number of challenges that can be scheduled as 'processing' at once | `60` |
 
 ### Default Security Contexts

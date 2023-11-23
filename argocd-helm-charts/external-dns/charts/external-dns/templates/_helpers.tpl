@@ -1,3 +1,8 @@
+{{/*
+Copyright VMware, Inc.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
 {{/* vim: set filetype=mustache: */}}
 {{/*
 Expand the name of the chart.
@@ -31,23 +36,6 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{/* Helm required labels */}}
-{{- define "external-dns.labels" -}}
-app.kubernetes.io/name: {{ template "external-dns.name" . }}
-helm.sh/chart: {{ template "external-dns.chart" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- if .Values.podLabels }}
-{{ toYaml .Values.podLabels }}
-{{- end }}
-{{- end -}}
-
-{{/* matchLabels */}}
-{{- define "external-dns.matchLabels" -}}
-app.kubernetes.io/name: {{ template "external-dns.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end -}}
-
 {{/* podAnnotations */}}
 {{- define "external-dns.podAnnotations" -}}
 {{- if .Values.podAnnotations }}
@@ -62,23 +50,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Return the proper External DNS image name
 */}}
 {{- define "external-dns.image" -}}
-{{- $registryName := .Values.image.registry -}}
-{{- $repositoryName := .Values.image.repository -}}
-{{- $tag := .Values.image.tag | toString -}}
-{{/*
-Helm 2.11 supports the assignment of a value to a variable defined in a different scope,
-but Helm 2.9 and 2.10 doesn't support it, so we need to implement this if-else logic.
-Also, we can't use a single if because lazy evaluation is not an option
-*/}}
-{{- if .Values.global }}
-    {{- if .Values.global.imageRegistry }}
-        {{- printf "%s/%s:%s" .Values.global.imageRegistry $repositoryName $tag -}}
-    {{- else -}}
-        {{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
-    {{- end -}}
-{{- else -}}
-    {{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
-{{- end -}}
+{{ include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}
 {{- end -}}
 
 {{/*
@@ -118,9 +90,9 @@ Return true if a secret object should be created
     {{- true -}}
 {{- else if and (eq .Values.provider "alibabacloud") .Values.alibabacloud.accessKeyId .Values.alibabacloud.accessKeySecret (not .Values.alibabacloud.secretName) }}
     {{- true -}}
-{{- else if and (eq .Values.provider "aws") .Values.aws.credentials.secretKey .Values.aws.credentials.accessKey (not .Values.aws.credentials.secretName) }}
+{{- else if and (eq .Values.provider "aws") .Values.aws.credentials.secretKey .Values.aws.credentials.accessKey (not .Values.aws.credentials.secretName) (not (include "external-dns.aws-credentials-secret-ref-defined" . )) }}
     {{- true -}}
-{{- else if and (or (eq .Values.provider "azure") (eq .Values.provider "azure-private-dns")) (or (and .Values.azure.resourceGroup .Values.azure.tenantId .Values.azure.subscriptionId .Values.azure.aadClientId .Values.azure.aadClientSecret (not .Values.azure.useManagedIdentityExtension)) (and .Values.azure.resourceGroup .Values.azure.tenantId .Values.azure.subscriptionId .Values.azure.useManagedIdentityExtension)) (not .Values.azure.secretName) -}}
+{{- else if and (or (eq .Values.provider "azure") (eq .Values.provider "azure-private-dns")) (or (and .Values.azure.resourceGroup .Values.azure.tenantId .Values.azure.subscriptionId .Values.azure.aadClientId .Values.azure.aadClientSecret (not .Values.azure.useManagedIdentityExtension)) (and .Values.azure.resourceGroup .Values.azure.subscriptionId .Values.azure.useWorkloadIdentityExtension (not .Values.azure.useManagedIdentityExtension)) (and .Values.azure.resourceGroup .Values.azure.tenantId .Values.azure.subscriptionId .Values.azure.useManagedIdentityExtension)) (not .Values.azure.secretName) -}}
     {{- true -}}
 {{- else if and (eq .Values.provider "cloudflare") (or .Values.cloudflare.apiToken .Values.cloudflare.apiKey) (not .Values.cloudflare.secretName) -}}
     {{- true -}}
@@ -129,6 +101,8 @@ Return true if a secret object should be created
 {{- else if and (eq .Values.provider "designate") (or .Values.designate.applicationCredentialId .Values.designate.applicationCredentialSecret) -}}
     {{- true -}}
 {{- else if and (eq .Values.provider "digitalocean") .Values.digitalocean.apiToken (not .Values.digitalocean.secretName) -}}
+    {{- true -}}
+{{- else if and (eq .Values.provider "exoscale") .Values.exoscale.apiKey (not .Values.exoscale.secretName) -}}
     {{- true -}}
 {{- else if and (eq .Values.provider "google") .Values.google.serviceAccountKey (not .Values.google.serviceAccountSecret) -}}
     {{- true -}}
@@ -153,6 +127,8 @@ Return true if a secret object should be created
 {{- else if and (eq .Values.provider "vinyldns") (or .Values.vinyldns.secretKey .Values.vinyldns.accessKey) -}}
     {{- true -}}
 {{- else if and (eq .Values.provider "ns1") .Values.ns1.apiKey (not .Values.ns1.secretName) -}}
+    {{- true -}}
+{{- else if and (eq .Values.provider "civo") .Values.civo.apiToken (not .Values.civo.secretName) -}}
     {{- true -}}
 {{- else -}}
 {{- end -}}
@@ -186,6 +162,8 @@ Return the name of the Secret used to store the passwords
 {{- .Values.cloudflare.secretName }}
 {{- else if and (eq .Values.provider "digitalocean") .Values.digitalocean.secretName }}
 {{- .Values.digitalocean.secretName }}
+{{- else if and (eq .Values.provider "exoscale") .Values.exoscale.secretName }}
+{{- .Values.exoscale.secretName }}
 {{- else if and (eq .Values.provider "google") .Values.google.serviceAccountSecret }}
 {{- .Values.google.serviceAccountSecret }}
 {{- else if and (eq .Values.provider "hetzner") .Values.hetzner.secretName }}
@@ -204,6 +182,8 @@ Return the name of the Secret used to store the passwords
 {{- .Values.rfc2136.secretName }}
 {{- else if and (eq .Values.provider "ns1") .Values.ns1.secretName }}
 {{- .Values.ns1.secretName }}
+{{- else if and (eq .Values.provider "civo") .Values.civo.secretName }}
+{{- .Values.civo.secretName }}
 {{- else -}}
 {{- template "external-dns.fullname" . }}
 {{- end -}}
@@ -237,6 +217,13 @@ aws_secret_access_key = {{ .Values.aws.credentials.secretKey }}
 region = {{ .Values.aws.region }}
 {{ end }}
 
+{{- define "external-dns.aws-credentials-secret-ref-defined" -}}
+{{- if and .Values.aws.credentials.accessKeyIDSecretRef.name .Values.aws.credentials.accessKeyIDSecretRef.key .Values.aws.credentials.secretAccessKeySecretRef.name .Values.aws.credentials.secretAccessKeySecretRef.key -}}
+    {{- true -}}
+{{- else -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "external-dns.azure-credentials" -}}
 {
   {{- if .Values.azure.cloud }}
@@ -249,9 +236,12 @@ region = {{ .Values.aws.region }}
   "subscriptionId": "{{ .Values.azure.subscriptionId }}",
   {{- end }}
   "resourceGroup": "{{ .Values.azure.resourceGroup }}",
-  {{- if not .Values.azure.useManagedIdentityExtension }}
+  {{- if not (or .Values.azure.useManagedIdentityExtension .Values.azure.useWorkloadIdentityExtension) }}
   "aadClientId": "{{ .Values.azure.aadClientId }}",
   "aadClientSecret": "{{ .Values.azure.aadClientSecret }}"
+  {{- end }}
+  {{- if .Values.azure.useWorkloadIdentityExtension }}
+  "useWorkloadIdentityExtension":  true,
   {{- end }}
   {{- if and .Values.azure.useManagedIdentityExtension .Values.azure.userAssignedIdentityID }}
   "useManagedIdentityExtension": true,
@@ -276,7 +266,7 @@ compartment: {{ .Values.oci.compartmentOCID }}
 {{ end }}
 
 {{/*
-Compile all warnings into a single message, and call fail.
+Compile all warnings into a single message, and call fail if the validation is enabled
 */}}
 {{- define "external-dns.validateValues" -}}
 {{- $messages := list -}}
@@ -322,8 +312,10 @@ Compile all warnings into a single message, and call fail.
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
 
+{{- if .Values.validation.enabled -}}
 {{- if $message -}}
 {{-   printf "\nVALUES VALIDATION:\n%s" $message | fail -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 
@@ -560,7 +552,7 @@ Validate values of Azure DNS:
 - must provide the Azure AAD Client ID when provider is "azure", secretName is not set and MSI is disabled and aadClientSecret is set
 */}}
 {{- define "external-dns.validateValues.azure.aadClientId" -}}
-{{- if and (eq .Values.provider "azure") (not .Values.azure.secretName) (not .Values.azure.aadClientId) (not .Values.azure.useManagedIdentityExtension) .Values.azure.aadClientSecret -}}
+{{- if and (eq .Values.provider "azure") (not .Values.azure.secretName) (not .Values.azure.aadClientId) (not .Values.azure.useWorkloadIdentityExtension) (not .Values.azure.useManagedIdentityExtension) .Values.azure.aadClientSecret -}}
 external-dns: azure.aadClientId
     You must provide the Azure AAD Client ID when provider="azure" and aadClientSecret is set and useManagedIdentityExtension is not set.
     Please set the aadClientId parameter (--set azure.aadClientId="xxxx")
@@ -657,7 +649,7 @@ Validate values of Azure Private DNS:
 - must provide the Azure AAD Client ID when provider is "azure-private-dns", secret name is not set and MSI is disabled
 */}}
 {{- define "external-dns.validateValues.azurePrivateDns.aadClientId" -}}
-{{- if and (eq .Values.provider "azure-private-dns") (not .Values.azure.secretName) (not .Values.azure.aadClientId) (not .Values.azure.useManagedIdentityExtension) (not .Values.azure.userAssignedIdentityID) -}}
+{{- if and (eq .Values.provider "azure-private-dns") (not .Values.azure.secretName) (not .Values.azure.aadClientId) (not .Values.azure.useManagedIdentityExtension) (not .Values.azure.useWorkloadIdentityExtension) (not .Values.azure.userAssignedIdentityID) -}}
 external-dns: azure.useManagedIdentityExtension
     You must provide the Azure AAD Client ID when provider="azure-private-dns" and useManagedIdentityExtension is not set.
     Please set the aadClientSecret parameter (--set azure.aadClientId="xxxx")
@@ -669,7 +661,7 @@ Validate values of Azure Private DNS:
 - must provide the Azure AAD Client Secret when provider is "azure-private-dns", secretName is not set and MSI is disabled
 */}}
 {{- define "external-dns.validateValues.azurePrivateDns.aadClientSecret" -}}
-{{- if and (eq .Values.provider "azure-private-dns") (not .Values.azure.secretName) (not .Values.azure.aadClientSecret) (not .Values.azure.useManagedIdentityExtension) (not .Values.azure.userAssignedIdentityID) -}}
+{{- if and (eq .Values.provider "azure-private-dns") (not .Values.azure.secretName) (not .Values.azure.aadClientSecret) (not .Values.azure.useManagedIdentityExtension) (not .Values.azure.useWorkloadIdentityExtension) (not .Values.azure.userAssignedIdentityID) -}}
 external-dns: azure.useManagedIdentityExtension
     You must provide the Azure AAD Client Secret when provider="azure-private-dns" and useManagedIdentityExtension is not set.
     Please set the aadClientSecret parameter (--set azure.aadClientSecret="xxxx")
