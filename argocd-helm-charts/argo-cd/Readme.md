@@ -9,14 +9,6 @@
   helm template k8s/<clustername>/argocd-apps --show-only templates/root.yaml | kubectl apply -f -
   ```sh
 
-## Add Argocd repos
-
-* Git repos
-
-  ```sh
-  kubectl create secret generic sample-git --namespace argocd --dry-run=client --from-literal=type='git' --from-literal=name='sample-git' --from-literal=url=https://gitlab.com/Obmondo/sample-website.git --from-literal=username='gitlab+deploy-token-20' --from-literal=password='lolpassword' --output yaml | yq eval '.metadata.labels.["argocd.argoproj.io/secret-type"]="repository"' - | yq eval '.metadata.annotations.["sealedsecrets.bitnami.com/managed"]="true"' - | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - | kubeseal --controller-namespace system --controller-name sealed-secrets --format yaml - > sample-website-argocd-repo.yaml
-  ```
-
 ## Replace admin password
 
 * Run our script to do this:
@@ -33,6 +25,59 @@
   ```
 
   and KILL the pod(s) called `argo-cd-argocd-server-*`
+
+## Adding new/switching git repos for applications
+
+### Add Argocd repos
+
+* Before you attempt to add any new repos to ArgoCD, make sure you have both `yq` and the `kubeseal` client installed:
+
+```sh
+wget https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.18.0/kubeseal-0.18.0-linux-amd64.tar.gz
+tar xfz kubeseal-0.18.0-linux-amd64.tar.gz
+sudo install -m 755 kubeseal /usr/local/bin/kubeseal
+```
+
+```sh
+snap install yq
+```
+
+or (`wget` alternative for `yq`)
+
+```sh
+wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY}.tar.gz -O - |\
+  tar xz && mv ${BINARY} /usr/bin/yq
+```
+
+* ArgoCD requires 1 secret per repo it needs to connect to.
+
+* Create a secret `argocdrepo-myreponame.yaml` inside the `sealed-secrets/argocd` directory of your KubeAid config repo.
+
+* You can refer to the [sealed-secrets README](../sealed-secrets/README.md) for more info and a template you can use.
+
+* Apply the secret in the `argocd` namespace of your cluster:
+
+```sh
+kubectl apply -f argocdrepo-myreponame.yaml -n argocd
+```
+
+* Once the secret is applied it will sync automatically.
+
+* You can confirm the process was successful by navigating to the ArgoCD UI -> Settings -> Repositories.
+
+* `CONNECTION STATUS` should be `Successful`.
+
+### Switching source repos for your apps
+
+* Now you can switch the sources of any app in your cluster to use the newly-added repo instead.
+
+* You can do this by navigating to any of your root app's pages on ArgoCD's UI.
+
+* `APP DETAILS` -> `MANIFEST` and replacing the old repo's URL and other data with the new one's.
+
+* If your app is single-source, you can edit the source repo directly from the `SUMMARY` tab.
+
+* Re-sync the app to apply the changes.
 
 ## Argocd status stuck in Progressing
 
