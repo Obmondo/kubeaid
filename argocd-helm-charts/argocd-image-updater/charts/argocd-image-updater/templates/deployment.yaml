@@ -1,0 +1,192 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "argocd-image-updater.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "argocd-image-updater.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "argocd-image-updater.selectorLabels" . | nindent 6 }}
+  strategy:
+    {{- .Values.updateStrategy | toYaml | nindent 4 }}
+  template:
+    metadata:
+      annotations:
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      labels:
+      {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+        {{- include "argocd-image-updater.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "argocd-image-updater.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          command:
+            - /usr/local/bin/argocd-image-updater
+            - run
+            {{- with .Values.extraArgs }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+          - name: APPLICATIONS_API
+            valueFrom:
+              configMapKeyRef:
+                key: applications_api
+                name: argocd-image-updater-config
+                optional: true
+          - name: ARGOCD_GRPC_WEB
+            valueFrom:
+              configMapKeyRef:
+                key: argocd.grpc_web
+                name: argocd-image-updater-config
+                optional: true
+          - name: ARGOCD_SERVER
+            valueFrom:
+              configMapKeyRef:
+                key: argocd.server_addr
+                name: argocd-image-updater-config
+                optional: true
+          - name: ARGOCD_INSECURE
+            valueFrom:
+              configMapKeyRef:
+                key: argocd.insecure
+                name: argocd-image-updater-config
+                optional: true
+          - name: ARGOCD_PLAINTEXT
+            valueFrom:
+              configMapKeyRef:
+                key: argocd.plaintext
+                name: argocd-image-updater-config
+                optional: true
+          - name: ARGOCD_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: argocd.token
+                name: argocd-image-updater-secret
+                optional: true
+          - name: IMAGE_UPDATER_LOGLEVEL
+            valueFrom:
+              configMapKeyRef:
+                key: log.level
+                name: argocd-image-updater-config
+                optional: true
+          - name: GIT_COMMIT_USER
+            valueFrom:
+              configMapKeyRef:
+                key: git.user
+                name: argocd-image-updater-config
+                optional: true
+          - name: GIT_COMMIT_EMAIL
+            valueFrom:
+              configMapKeyRef:
+                key: git.email
+                name: argocd-image-updater-config
+                optional: true
+          - name: IMAGE_UPDATER_KUBE_EVENTS
+            valueFrom:
+              configMapKeyRef:
+                key: kube.events
+                name: argocd-image-updater-config
+                optional: true
+          {{- with .Values.extraEnv }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+            {{ if .Values.metrics.enabled }}
+            - name: metrics
+              containerPort: 8081
+              protocol: TCP
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 30
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - mountPath: /app/config
+            name: image-updater-conf
+          - mountPath: /tmp
+            name: tmp-dir
+          - mountPath: /app/config/ssh
+            name: ssh-known-hosts
+          - mountPath: /app/.ssh
+            name: ssh-config
+          {{- if .Values.authScripts.enabled }}
+          - mountPath: /scripts
+            name: authscripts
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 10}}
+          {{- end }}
+      volumes:
+      - configMap:
+          items:
+          - key: registries.conf
+            path: registries.conf
+          - key: git.commit-message-template
+            path: commit.template
+          name: argocd-image-updater-config
+          optional: true
+        name: image-updater-conf
+      {{- if .Values.authScripts.enabled }}
+      - configMap:
+          defaultMode: 0777
+          name: argocd-image-updater-authscripts
+        name: authscripts
+      {{- end }}
+      - emptyDir: {}
+        name: tmp-dir
+      - configMap:
+          name: argocd-ssh-known-hosts-cm
+          optional: true
+        name: ssh-known-hosts
+      - configMap:
+          name: argocd-image-updater-ssh-config
+          optional: true
+        name: ssh-config
+      {{- with .Values.volumes }}
+        {{- toYaml . | nindent 6}}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
