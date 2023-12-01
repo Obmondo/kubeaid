@@ -1,5 +1,47 @@
 # Oncall
 
+## Setup Oncall
+
+- After syncing the oncall application
+
+1. Open the oncall plugin and configure the grafana backend
+
+    [URL](https://oncall.kbm.obmondo.com/grafana/plugins/grafana-oncall-app)
+
+      ```text
+      Add the backendurl as
+      http://oncall-engine:8080
+      ```
+
+2. Inform all the members to sigin using keycloakx to have all the users .
+
+## Restore Oncall
+
+1. Copy the backup file to the psql pod
+2. Restore users and schedule
+
+    ```sh
+    psql
+    # Drops the database
+    DROP DATABASE oncall;
+    # Create Empty DB
+    CRETE DATABASE oncall;
+    ```
+
+    - Now the DB is clean restore the DB using the commands
+
+    ```sh
+    psql -d oncall -U postgres < backup.sql
+
+    # Reset the oncall password
+    psql
+    ALTER USER oncall WITH PASSWORD '<oncall user password which is in secrets>';
+    ```
+
+3. Kick the pods  `oncall-celery, oncall-grafana, oncall-engine` and wait for it to come back online .
+
+4. Inform all the users to signin using keycloakx ,
+
 ## User Telegram setup
 
 Prerequisites:
@@ -21,7 +63,7 @@ Prerequisites:
 
 Setup Grafana Oncall with Telegram:
 
-- Login to Grafana https://grafana.yourdomain.com
+- Login to [Grafana](https://grafana.yourdomain.com)
 - Open `Menu` from the top left icon from Grafana Dashboard\
 - Navigate to `Alerts & IRM > Oncall > Users`
 - Click on `Edit` button beside your username.
