@@ -9,6 +9,7 @@ spec:
   schedule: '0 0 * * 1-6'
   template:
     hooks: {}
+    csiSnapshotTimeout: 20m
     includedNamespaces:
     - '*'
     ttl: 720h0m0s
@@ -27,6 +28,7 @@ spec:
   schedule: '0 0 * * 0'
   template:
     hooks: {}
+    csiSnapshotTimeout: 20m
     includedNamespaces:
     - '*'
     ttl: 2160h0m0s
@@ -46,6 +48,7 @@ spec:
   schedule: '0 6,12,18 * * *'
   template:
     hooks: {}
+    csiSnapshotTimeout: 20m
     includedNamespaces:
     - '*'
     ttl: 336h0m0s
