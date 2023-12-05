@@ -4,6 +4,7 @@ args:
   tlsPrivateKeyFile: /etc/snapshot-validation/tls.key
   tlsCertFile: /etc/snapshot-validation/tls.crt
   port: 8443
+  # enableVolumeGroupSnapshotWebhook: true
 
 image:
   repository: registry.k8s.io/sig-storage/snapshot-validation-webhook

@@ -11,4 +11,4 @@ maintainers:
 - email: mhrabovcin.c@d2iq.com
   name: mhrabovcin
 name: traefik-forward-auth
-version: 0.3.8
+version: 0.3.10

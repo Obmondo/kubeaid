@@ -13,6 +13,102 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Security
 ---
+## [2.15.0]
+### Added
+- Updated OpenSearch Dashboards appVersion to 2.11.1
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.14.0]
+### Added
+- Updated OpenSearch Dashboards appVersion to 2.11.0
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.13.0]
+### Added
+- Updated OpenSearch Dashboards appVersion to 2.10.0
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.12.0]
+### Added
+- Updated OpenSearch Dashboards appVersion to 2.9.0
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+
+---
+## [2.11.1]
+### Added
+- Support string type for extraObjects
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.11.0]
+### Added
+- Updated OpenSearch Dashboards appVersion to 2.8.0
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.10.0]
+### Added
+- Updated OpenSearch Dashboards appVersion to 2.7.0
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.9.3]
+### Added
+- Added custom opensearch and dashboard annotations through values.yaml
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.9.2]
+### Added
+- Support setting ipFamilyPolicy on Service
+- Support setting ipFamilies on Service
+---
+## [2.9.1]
+### Added
+### Changed
+- Allow user-defined labels on ingress resource
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.9.0]
+### Added
+### Changed
+- Updated OpenSearch Dashboards appVersion to 2.6.0
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
 ## [2.8.0]
 ### Added
 ### Changed
@@ -189,7 +285,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Security
 
-[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.8.0...HEAD
+[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.15.0...HEAD
+[2.15.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.14.0...opensearch-dashboards-2.15.0
+[2.14.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.13.0...opensearch-dashboards-2.14.0
+[2.13.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.12.0...opensearch-dashboards-2.13.0
+[2.12.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.11.1...opensearch-dashboards-2.12.0
+[2.11.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.11.0...opensearch-dashboards-2.11.1
+[2.11.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.10.0...opensearch-dashboards-2.11.0
+[2.10.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.9.0...opensearch-dashboards-2.10.0
+[2.9.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.8.0...opensearch-dashboards-2.9.0
 [2.8.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.7.0...opensearch-dashboards-2.8.0
 [2.7.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.6.1...opensearch-dashboards-2.7.0
 [2.6.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-dashboards-2.6.0...opensearch-dashboards-2.6.1

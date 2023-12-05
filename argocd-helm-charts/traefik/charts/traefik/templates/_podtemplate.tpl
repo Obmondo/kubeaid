@@ -1,8 +1,8 @@
 {{- define "traefik.podTemplate" }}
     metadata:
       annotations:
-      {{- with .Values.deployment.podAnnotations }}
-      {{- toYaml . | nindent 8 }}
+      {{- if .Values.deployment.podAnnotations }}
+        {{- tpl (toYaml .Values.deployment.podAnnotations) . | nindent 8 }}
       {{- end }}
       {{- if .Values.metrics }}
       {{- if and (.Values.metrics.prometheus) (not .Values.metrics.prometheus.serviceMonitor) }}
@@ -74,6 +74,10 @@
             port: {{ $healthchecksPort }}
             scheme: {{ $healthchecksScheme }}
           {{- toYaml .Values.livenessProbe | nindent 10 }}
+        {{- with .Values.startupProbe}}
+        startupProbe:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         lifecycle:
           {{- with .Values.deployment.lifecycle }}
           {{- toYaml . | nindent 10 }}
@@ -96,14 +100,13 @@
           hostIP: {{ $config.hostIP }}
           {{- end }}
           protocol: {{ default "TCP" $config.protocol | quote }}
-        {{- if $config.http3 }}
-        {{- if and $config.http3.enabled $config.hostPort }}
-        {{- $http3Port := default $config.hostPort $config.http3.advertisedPort }}
+        {{- if ($config.http3).enabled }}
         - name: "{{ $name }}-http3"
           containerPort: {{ $config.port }}
-          hostPort: {{ $http3Port }}
-          protocol: UDP
+        {{- if $config.hostPort }}
+          hostPort: {{ default $config.hostPort $config.http3.advertisedPort }}
         {{- end }}
+          protocol: UDP
         {{- end }}
         {{- end }}
         {{- end }}
@@ -125,9 +128,13 @@
             mountPath: {{ .mountPath }}
             readOnly: true
           {{- end }}
-          {{- if .Values.experimental.plugins.enabled }}
+          {{- if gt (len .Values.experimental.plugins) 0 }}
           - name: plugins
             mountPath: "/plugins-storage"
+          {{- end }}
+          {{- if .Values.providers.file.enabled }}
+          - name: traefik-extra-config
+            mountPath: "/etc/traefik/dynamic"
           {{- end }}
           {{- if .Values.additionalVolumeMounts }}
             {{- toYaml .Values.additionalVolumeMounts | nindent 10 }}
@@ -510,6 +517,13 @@
           {{- end }}
           {{- end }}
           {{- end }}
+          {{- range $pluginName, $plugin := .Values.experimental.plugins }}
+          {{- if or (ne (typeOf $plugin) "map[string]interface {}") (not (hasKey $plugin "moduleName")) (not (hasKey $plugin "version")) }}
+            {{- fail  (printf "ERROR: plugin %s is missing moduleName/version keys !" $pluginName) }}
+          {{- end }}
+          - --experimental.plugins.{{ $pluginName }}.moduleName={{ $plugin.moduleName }}
+          - --experimental.plugins.{{ $pluginName }}.version={{ $plugin.version }}
+          {{- end }}
           {{- if .Values.providers.kubernetesCRD.enabled }}
           - "--providers.kubernetescrd"
           {{- if .Values.providers.kubernetesCRD.labelSelector }}
@@ -558,6 +572,14 @@
           {{- with .Values.providers.kubernetesIngress }}
           {{- if (and .enabled (or .namespaces (and $.Values.rbac.enabled $.Values.rbac.namespaced))) }}
           - "--providers.kubernetesingress.namespaces={{ template "providers.kubernetesIngress.namespaces" $ }}"
+          {{- end }}
+          {{- end }}
+          {{- with .Values.providers.file }}
+          {{- if .enabled }}
+          - "--providers.file.directory=/etc/traefik/dynamic"
+          {{- if .watch }}
+          - "--providers.file.watch=true"
+          {{- end }}
           {{- end }}
           {{- end }}
           {{- range $entrypoint, $config := $.Values.ports }}
@@ -720,9 +742,14 @@
         {{- if .Values.deployment.additionalVolumes }}
           {{- toYaml .Values.deployment.additionalVolumes | nindent 8 }}
         {{- end }}
-        {{- if .Values.experimental.plugins.enabled }}
+        {{- if gt (len .Values.experimental.plugins) 0 }}
         - name: plugins
           emptyDir: {}
+        {{- end }}
+        {{- if .Values.providers.file.enabled }}
+        - name: traefik-extra-config
+          configMap:
+            name: {{ template "traefik.fullname" . }}-file-provider
         {{- end }}
       {{- if .Values.affinity }}
       affinity:

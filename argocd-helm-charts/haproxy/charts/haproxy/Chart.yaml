@@ -1,8 +1,9 @@
 annotations:
   artifacthub.io/changes: |
-    - Add possibility to pass additional ports to Service
+    - Update base image to HAProxy 2.8.2
+    - Fix includes name in haproxy charts (#203)
 apiVersion: v2
-appVersion: 2.6.6
+appVersion: 2.8.2
 description: A Helm chart for HAProxy on Kubernetes
 home: https://github.com/haproxytech/helm-charts/tree/main/haproxy
 icon: https://raw.githubusercontent.com/haproxytech/helm-charts/main/haproxy/chart-icon.png
@@ -16,4 +17,4 @@ name: haproxy
 sources:
 - http://www.haproxy.org/
 type: application
-version: 1.17.6
+version: 1.19.3

@@ -33,7 +33,7 @@ label_matchers:
   scope: maintenance
 - labels:
   - feature::enhancement
-  scope: feature
+  scope: new-feature
 - labels:
   - maintenance::refactor
   scope: maintenance

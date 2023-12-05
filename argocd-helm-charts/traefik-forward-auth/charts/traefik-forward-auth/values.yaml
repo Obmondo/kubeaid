@@ -22,6 +22,7 @@ traefikForwardAuth:
   # This chart option allows us to stage TFA to the cluster and then
   # later update it with proper OIDC provider information.
   enabled: true
+  logLevel: warn
   clientId: traefik-forward-auth
   clientSecret:
     value: "do-not-use"
@@ -94,3 +95,5 @@ initContainers: []
 deploymentAnnotations: {}
 
 addonsInitializer: "mesosphere/kubeaddons-addon-initializer:v0.5.1"
+
+priorityClassName: ""

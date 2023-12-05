@@ -63,7 +63,7 @@ spec:
       serviceAccountName: {{ template "kubernetes-dashboard.serviceAccountName" . }}
       containers:
       - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         args:
           - --namespace={{ .Release.Namespace }}
@@ -143,6 +143,9 @@ spec:
         volumeMounts:
         - mountPath: /tmp
           name: tmp-volume
+{{- if .Values.optionalContainers.enabled }}
+{{ toYaml .Values.optionalContainers.containers | nindent 6 }}
+{{- end }}
 
 {{- if .Values.metricsScraper.containerSecurityContext }}
         securityContext:

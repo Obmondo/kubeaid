@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "gitlab-runner.fullname" . | quote }}
-  namespace: {{ default .Release.Namespace .Values.runners.namespace | quote }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     app: {{ include "gitlab-runner.fullname" . | quote }}
     chart: {{ include "gitlab-runner.chart" . | quote }}

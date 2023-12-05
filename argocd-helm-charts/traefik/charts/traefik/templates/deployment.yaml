@@ -17,6 +17,9 @@
     {{- fail "\n\n ERROR: latest tag should not be used" }}
   {{- end }}
 
+{{- if ne (typeOf .Values.experimental.plugins) "map[string]interface {}" }}
+  {{- fail (printf "ERROR: .Values.experimental.plugins should be a map (%s provided) !" (typeOf .Values.experimental.plugins)) }}
+{{- end }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -29,6 +32,9 @@ metadata:
   {{- toYaml . | nindent 4 }}
   {{- end }}
   annotations:
+  {{- if and .Values.providers.file.enabled (not .Values.providers.file.watch) }}
+    checksum/traefik-dynamic-conf: {{ include (print $.Template.BasePath "/provider-file-cm.yaml") . | sha256sum }}
+  {{- end }}
   {{- with .Values.deployment.annotations }}
   {{- toYaml . | nindent 4 }}
   {{- end }}

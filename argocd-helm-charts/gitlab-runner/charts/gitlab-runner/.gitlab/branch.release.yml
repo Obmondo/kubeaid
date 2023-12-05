@@ -1,0 +1,29 @@
+actions:
+  - changelog_entry:
+      scope: new-feature
+      entry: Update GitLab Runner version to v{{ .Release.AppVersion }}
+
+  - write:
+      file: Chart.yaml
+      contents: |
+        apiVersion: v1
+        name: gitlab-runner
+        version: {{ .Release.Version }}
+        appVersion: {{ .Release.AppVersion }}
+        description: GitLab Runner
+        keywords:
+        - git
+        - ci
+        - deploy
+        sources:
+        - https://gitlab.com/gitlab-org/charts/gitlab-runner
+        - https://gitlab.com/gitlab-org/gitlab-runner
+        - https://docs.gitlab.com/runner/
+        icon: https://gitlab.com/uploads/-/system/project/avatar/250833/runner_logo.png
+        maintainers:
+        - name: GitLab Inc.
+          email: support@gitlab.com
+
+  - commit:
+      files: [Chart.yaml]
+      message: Update Chart version to v{{ .Release.Version }} and used GitLab Runner version to v{{ .Release.AppVersion }}

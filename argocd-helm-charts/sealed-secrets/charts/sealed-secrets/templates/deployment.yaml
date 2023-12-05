@@ -9,6 +9,10 @@ metadata:
   annotations: {{- toYaml .Values.commonAnnotations | nindent 4 }}
   {{- end }}
 spec:
+  replicas: 1
+  {{- if .Values.revisionHistoryLimit }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  {{- end }}
   selector:
     matchLabels: {{- include "sealed-secrets.matchLabels" . | nindent 6 }}
   template:
@@ -46,9 +50,6 @@ spec:
       securityContext: {{- omit .Values.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "sealed-secrets.serviceAccountName" . }}
-      {{- if .Values.automountServiceAccountToken }}
-      automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
-      {{- end }}
       {{- if .Values.hostNetwork }}
       hostNetwork: true
       {{- end }}
@@ -70,6 +71,9 @@ spec:
             {{- if .Values.updateStatus }}
             - --update-status
             {{- end }}
+            {{- if .Values.skipRecreate }}
+            - --skip-recreate
+            {{- end }}
             {{- if .Values.keyrenewperiod }}
             - --key-renew-period
             - {{ .Values.keyrenewperiod | quote }}
@@ -87,6 +91,31 @@ spec:
             {{- if .Values.additionalNamespaces }}
             - --additional-namespaces
             - {{ join "," .Values.additionalNamespaces | quote }}
+            {{- end }}
+            {{- if $.Values.privateKeyAnnotations }}
+            {{- $privatekeyAnnotations := ""}}
+            {{- range $k, $v := $.Values.privateKeyAnnotations }}
+              {{- if not (and $v (kindIs "string" $v)) }}
+                {{ fail "Annotation values have to be strings"}}
+              {{- end }}
+              {{- $privatekeyAnnotations = printf "%s=%s,%s" $k $v $privatekeyAnnotations}}
+            {{- end }}
+            - --privatekey-annotations
+            - {{ trimSuffix "," $privatekeyAnnotations | quote }}
+            {{- end }}            
+            {{- if $.Values.privateKeyLabels }}
+            {{- $privateKeyLabels := ""}}
+            {{- range $k, $v := $.Values.privateKeyLabels }}
+              {{- if not (and $v (kindIs "string" $v)) }}
+                {{ fail "Label values have to be strings"}}
+              {{- end }}
+              {{- $privateKeyLabels = printf "%s=%s,%s" $k $v $privateKeyLabels}}
+            {{- end }}
+            - --privatekey-labels
+            - {{ trimSuffix "," $privateKeyLabels | quote }}
+            {{- end }}
+            {{- if .Values.logInfoStdout }}
+            - --log-info-stdout
             {{- end }}
           {{- end }}
           image: {{ printf "%s/%s:%s" .Values.image.registry .Values.image.repository .Values.image.tag }}

@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "gitlab-runner.fullname" . }}
-  namespace: {{ default .Release.Namespace .Values.runners.namespace | quote }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     app: {{ include "gitlab-runner.fullname" . }}
     chart: {{ include "gitlab-runner.chart" . }}
@@ -13,9 +13,9 @@ data:
     #!/bin/bash
     set -e
 
-    mkdir -p /home/gitlab-runner/.gitlab-runner/
-
-    cp /configmaps/config.toml /home/gitlab-runner/.gitlab-runner/
+    export CONFIG_PATH_FOR_INIT="{{ ternary "/.gitlab-runner/" "/home/gitlab-runner/.gitlab-runner/" (and (hasKey .Values.securityContext "runAsNonRoot") (not .Values.securityContext.runAsNonRoot)) }}"
+    mkdir -p ${CONFIG_PATH_FOR_INIT}
+    cp /configmaps/config.toml ${CONFIG_PATH_FOR_INIT}
 
     {{- if and (eq (default 1.0 .Values.replicas) 1.0) .Values.sessionServer .Values.sessionServer.enabled }}
     quit() {
@@ -60,16 +60,6 @@ data:
       export CI_SERVER_TOKEN=$(cat /secrets/runner-token)
     fi
 
-    {{- if and (not (empty .Values.runnerToken)) (ne "1" ((default "1" .Values.replicas) | toString)) }}
-    {{- fail "Using a runner token with more than 1 replica is not supported." }}
-    {{- end }}
-
-    # Validate this also at runtime in case the user has set a custom secret
-    if [[ ! -z "$CI_SERVER_TOKEN" && "{{ default 1 .Values.replicas }}" -ne "1" ]]; then
-      echo "Using a runner token with more than 1 replica is not supported."
-      exit 1
-    fi
-
     # Register the runner
     if ! sh /configmaps/register-the-runner; then
       exit 1
@@ -81,10 +71,14 @@ data:
     fi
 
     # Start the runner
-    exec /entrypoint run --user=gitlab-runner \
+    exec /entrypoint run \
+    {{- if and .Values.runners.executor (ne "shell" ((.Values.runners.executor) | toString)) }}
+      --user=gitlab-runner \
+    {{- end }}
       --working-directory=/home/gitlab-runner
 
   config.toml: |
+    shutdown_timeout = {{ .Values.shutdown_timeout }}
     concurrent = {{ .Values.concurrent }}
     check_interval = {{ .Values.checkInterval }}
     log_level = {{ default "info" .Values.logLevel | quote }}
@@ -92,7 +86,7 @@ data:
     log_format = {{ .Values.logFormat | quote }}
     {{- end }}
     {{- if .Values.metrics.enabled }}
-    listen_address = ':9252'
+    listen_address = ":{{ .Values.metrics.port }}"
     {{- end }}
     {{- if .Values.sentryDsn }}
     sentry_dsn = "{{ .Values.sentryDsn }}"
@@ -105,59 +99,41 @@ data:
     {{- end }}
 
   {{ if .Values.runners.config }}
-  config.template.toml: {{ tpl (toYaml .Values.runners.config) $ | indent 2 }}
+  config.template.toml: {{ tpl .Values.runners.config $ | toYaml | indent 2 }}
   {{ end }}
 
   register-the-runner: |
     #!/bin/bash
     MAX_REGISTER_ATTEMPTS=30
 
+    # Reset/unset the not needed flags when an authentication token
+    RUN_UNTAGGED="{{ ternary "--run-untagged=true" "" (and (hasKey .Values.runners "runUntagged") .Values.runners.runUntagged) }}"
+    ACCESS_LEVEL="{{ ternary "--access-level=ref_protected" "" (and (hasKey .Values.runners "protected") .Values.runners.protected) }}"
+
+    {{- if eq (include "gitlab-runner.isAuthToken" . ) "true" }}
+    RUN_UNTAGGED=""
+    ACCESS_LEVEL=""
+    unset REGISTER_LOCKED
+    unset RUNNER_TAG_LIST
+    {{- end }}
+
     for i in $(seq 1 "${MAX_REGISTER_ATTEMPTS}"); do
       echo "Registration attempt ${i} of ${MAX_REGISTER_ATTEMPTS}"
       /entrypoint register \
-        {{- range .Values.runners.imagePullSecrets }}
-        --kubernetes-image-pull-secrets {{ . | quote }} \
-        {{- end }}
-        {{- range $key, $val := .Values.runners.nodeSelector }}
-        --kubernetes-node-selector {{ $key | quote }}:{{ $val | quote }} \
-        {{- end }}
-        {{- range .Values.runners.nodeTolerations }}
-        {{-   $keyValue := .key }}
-        {{-   if eq (.operator | default "Equal") "Equal"  }}
-        {{-     $keyValue = print $keyValue "=" (.value | default "" ) }}
-        {{-   end }}
-        --kubernetes-node-tolerations {{ $keyValue }}:{{ .effect | quote }} \
-        {{- end }}
-        {{- range $key, $value := .Values.runners.podLabels }}
-        --kubernetes-pod-labels {{ $key | quote }}:{{ $value | quote }} \
-        {{- end }}
-        {{- range $key, $val := .Values.runners.podAnnotations }}
-        --kubernetes-pod-annotations {{ $key | quote }}:{{ $val | quote }} \
-        {{- end }}
         {{- if and (hasKey .Values.runners "name") .Values.runners.name }}
         --name={{ .Values.runners.name | quote -}} \
         {{- end }}
         {{- if and (hasKey .Values.runners "maximumTimeout") .Values.runners.maximumTimeout }}
         --maximum-timeout={{ .Values.runners.maximumTimeout | quote -}} \
         {{- end }}
-        {{- range $key, $value := .Values.runners.env }}
-        --env {{ $key | quote -}} = {{- $value | quote }} \
-        {{- end }}
-        {{- if and (hasKey .Values.runners "runUntagged") .Values.runners.runUntagged }}
-        --run-untagged=true \
-        {{- end }}
-        {{- if and (hasKey .Values.runners "protected") .Values.runners.protected }}
-        --access-level="ref_protected" \
-        {{- end }}
-        {{- if .Values.runners.pod_security_context }}
-        {{-   if .Values.runners.pod_security_context.supplemental_groups }}
-        {{-     range $gid := .Values.runners.pod_security_context.supplemental_groups }}
-        --kubernetes-pod-security-context-supplemental-groups {{ $gid | quote }} \
-        {{-     end }}
-        {{-   end }}
+        {{- if eq (include "gitlab-runner.isAuthToken" . ) "false" }}
+        ${RUN_UNTAGGED} \
+        ${ACCESS_LEVEL} \
         {{- end }}
         {{- if .Values.runners.config }}
         --template-config /configmaps/config.template.toml \
+        {{- else if .Values.runners.configPath }}
+        --template-config {{ .Values.runners.configPath }} \
         {{- end }}
         --non-interactive
 
@@ -176,13 +152,16 @@ data:
 
   check-live: |
     #!/bin/bash
-    if /usr/bin/pgrep -f .*register-the-runner; then
-      exit 0
-    elif /usr/bin/pgrep gitlab.*runner; then
-      exit 0
-    else
+    set -eou pipefail
+
+    if ! /usr/bin/pgrep -f ".*register-the-runner"  > /dev/null && ! /usr/bin/pgrep -f "gitlab.*runner"  > /dev/null ; then
       exit 1
     fi
+
+    name=$(awk -F'"' '/^  name = ".*"/ { print $2 }' "${HOME%/root}/.gitlab-runner/config.toml")
+    url=$(awk -F'"' '/^  url = ".*"/ { print $2 }' "${HOME%/root}/.gitlab-runner/config.toml")
+
+    gitlab-runner verify -n "$name" -u "$url" 2>&1 | grep -E "is alive|is valid"
 
   {{- if and (eq (default 1.0 .Values.replicas) 1.0) .Values.sessionServer .Values.sessionServer.enabled }}
   set-session-server-address: |
@@ -214,7 +193,7 @@ data:
         | grep '"hostname":' | cut -d ":" -f2 | xargs)
 
       ADDRESS="${SERVICEHOSTNAME:-$SERVICEIP}"
-      
+
       if [ -z "${ADDRESS}" ]
       then
         echo "Service LoadBalancer External Address not yet available"
@@ -222,11 +201,11 @@ data:
         sleep 5
       else
         has_address=true
-        sed -i -e "s/SESSION_SERVER_IP/${ADDRESS}/g" /home/gitlab-runner/.gitlab-runner/config.toml
+        sed -i -e "s/SESSION_SERVER_IP/${ADDRESS}/g" ${CONFIG_PATH_FOR_INIT}/config.toml
       fi
     done
     {{- else }}
-    sed -i -e "s/SESSION_SERVER_IP/{{ .Values.sessionServer.publicIP }}/g" /home/gitlab-runner/.gitlab-runner/config.toml
+    sed -i -e "s/SESSION_SERVER_IP/{{ .Values.sessionServer.publicIP }}/g" ${CONFIG_PATH_FOR_INIT}/config.toml
     {{- end}}
   {{ end }}
 

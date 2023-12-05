@@ -40,6 +40,7 @@ deployment:
   # -- Additional deployment labels (e.g. for filtering deployment by custom labels)
   labels: {}
   # -- Additional pod annotations (e.g. for mesh injection or prometheus scraping)
+  # It supports templating. One can set it with values like traefik/name: '{{ template "traefik.name" . }}'
   podAnnotations: {}
   # -- Additional Pod labels (e.g. for filtering Pod by custom labels)
   podLabels: {}
@@ -119,10 +120,12 @@ experimental:
   # This value is no longer used, set the image.tag to a semver higher than 3.0, e.g. "v3.0.0-beta3"
   # v3:
   # -- Enable traefik version 3
-  #  enabled: false
-  plugins:
-    # -- Enable traefik experimental plugins
-    enabled: false
+
+  # -- Enable traefik experimental plugins
+  plugins: {}
+  # demo:
+  #   moduleName: github.com/traefik/plugindemo
+  #   version: v0.2.1
   kubernetesGateway:
     # -- Enable traefik experimental GatewayClass CRD
     enabled: false
@@ -206,6 +209,17 @@ livenessProbe:
   # -- The number of seconds to wait for a probe response before considering it as failed.
   timeoutSeconds: 2
 
+# -- Define Startup Probe for container: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-startup-probes
+# eg.
+# `startupProbe:
+#   exec:
+#     command:
+#       - mycommand
+#       - foo
+#   initialDelaySeconds: 5
+#   periodSeconds: 5`
+startupProbe:
+
 providers:
   kubernetesCRD:
     # -- Load Kubernetes IngressRoute provider
@@ -240,6 +254,23 @@ providers:
       # Published Kubernetes Service to copy status from. Format: namespace/servicename
       # By default this Traefik service
       # pathOverride: ""
+
+  file:
+    # -- Create a file provider
+    enabled: false
+    # -- Allows Traefik to automatically watch for file changes
+    watch: true
+    # -- File content (YAML format, go template supported) (see https://doc.traefik.io/traefik/providers/file/)
+    content: ""
+      # http:
+      #   routers:
+      #     router0:
+      #       entryPoints:
+      #       - web
+      #       middlewares:
+      #       - my-basic-auth
+      #       service: service-foo
+      #       rule: Path(`/foo`)
 
 #
 # -- Add volumes to the traefik pod. The volume name will be passed to tpl.
@@ -487,7 +518,7 @@ metrics:
 # -- https://doc.traefik.io/traefik/observability/tracing/overview/
 tracing: {}
 #  openTelemetry: # traefik v3+ only
-#    grpc: {}
+#    grpc: true
 #    insecure: true
 #    address: localhost:4317
 # instana:

@@ -1,6 +1,6 @@
 dependencies:
 - name: rabbitmq-cluster-operator
   repository: https://charts.bitnami.com/bitnami
-  version: 3.8.0
-digest: sha256:caf7173879a6f47cc8d5bde7c8d2d0d249f1e3d04f26984a888f3fc186ca19ad
-generated: "2023-09-19T14:11:00.614864839+05:30"
+  version: 3.10.6
+digest: sha256:05f6bd26458e0ea2299e5e060aee6282109155094a3342385f955f2536c06884
+generated: "2023-12-05T14:18:23.714351074+05:30"

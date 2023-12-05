@@ -1,6 +1,6 @@
 {{- define "snippet.oncall.env" -}}
 - name: BASE_URL
-  value: https://{{ .Values.base_url }}
+  value: {{ .Values.base_url_protocol }}://{{ .Values.base_url }}
 - name: SECRET_KEY
   valueFrom:
     secretKeyRef:
@@ -19,6 +19,8 @@
   value: "admin"
 - name: OSS
   value: "True"
+- name: DETACHED_INTEGRATIONS_SERVER
+  value: {{ .Values.detached_integrations.enabled | toString | title | quote }}
 {{- include "snippet.oncall.uwsgi" . }}
 - name: BROKER_TYPE
   value: {{ .Values.broker.type | default "rabbitmq" }}
@@ -95,9 +97,16 @@
 {{- end }}
 
 {{- define "snippet.oncall.telegram.env" -}}
+{{- if .Values.telegramPolling.enabled -}}
+{{- $_ := set .Values.oncall.telegram "enabled" true -}}
+{{- end -}}
 - name: FEATURE_TELEGRAM_INTEGRATION_ENABLED
   value: {{ .Values.oncall.telegram.enabled | toString | title | quote }}
 {{- if .Values.oncall.telegram.enabled }}
+{{- if .Values.telegramPolling.enabled }}
+- name: FEATURE_TELEGRAM_LONG_POLLING_ENABLED
+  value: {{ .Values.telegramPolling.enabled | toString | title | quote }}
+{{- end }}
 - name: TELEGRAM_WEBHOOK_HOST
   value: {{ .Values.oncall.telegram.webhookUrl | default (printf "https://%s" .Values.base_url) | quote }}
 {{- if .Values.oncall.telegram.existingSecret }}
@@ -235,6 +244,12 @@
     secretKeyRef:
       name: {{ include "snippet.mysql.password.secret.name" . }}
       key: {{ include "snippet.mysql.password.secret.key" . | quote }}
+{{- if not .Values.mariadb.enabled }}
+{{- with .Values.externalMysql.options }}
+- name: MYSQL_OPTIONS
+  value: {{ . | quote }}
+{{- end }}
+{{- end }}
 {{- end }}
 
 {{- define "snippet.mysql.password.secret.name" -}}
@@ -309,6 +324,19 @@
     secretKeyRef:
       name: {{ include "snippet.postgresql.password.secret.name" . }}
       key: {{ include "snippet.postgresql.password.secret.key" . | quote }}
+{{- if not .Values.postgresql.enabled }}
+{{- with .Values.externalPostgresql.options }}
+- name: DATABASE_OPTIONS
+  value: {{ . | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "snippet.sqlite.env" -}}
+- name: DATABASE_TYPE
+  value: sqlite3
+- name: DATABASE_NAME
+  value: /etc/app/oncall.db
 {{- end }}
 
 {{- define "snippet.postgresql.password.secret.name" -}}
@@ -368,7 +396,7 @@
 {{- end }}
 
 {{- define "snippet.postgresql.user" -}}
-{{ if and (not .Values.postgresql.enabled) -}}
+{{ if not .Values.postgresql.enabled -}}
   {{ .Values.externalPostgresql.user | default "postgres" }}
 {{- else -}}
   {{ .Values.postgresql.auth.username | default "postgres" }}
@@ -376,7 +404,6 @@
 {{- end }}
 
 {{- define "snippet.rabbitmq.env" }}
-{{- if eq .Values.broker.type "rabbitmq" -}}
 - name: RABBITMQ_USERNAME
 {{- if and (not .Values.rabbitmq.enabled) .Values.externalRabbitmq.existingSecret .Values.externalRabbitmq.usernameKey (not .Values.externalRabbitmq.user) }}
   valueFrom:
@@ -399,7 +426,6 @@
   value: {{ include "snippet.rabbitmq.protocol" . | quote }}
 - name: RABBITMQ_VHOST
   value: {{ include "snippet.rabbitmq.vhost" . | quote }}
-{{- end }}
 {{- end }}
 
 {{- define "snippet.rabbitmq.user" -}}
@@ -464,12 +490,24 @@
 {{- end }}
 {{- end }}
 
+{{- define "snippet.redis.protocol" -}}
+{{ default "redis" .Values.externalRedis.protocol | quote }}
+{{- end }}
+
 {{- define "snippet.redis.host" -}}
 {{ if not .Values.redis.enabled -}}
   {{ required "externalRedis.host is required if not redis.enabled" .Values.externalRedis.host | quote }}
 {{- else -}}
   {{ include "oncall.redis.fullname" . }}-master
 {{- end }}
+{{- end }}
+
+{{- define "snippet.redis.port" -}}
+{{ default 6379 .Values.externalRedis.port | quote }}
+{{- end }}
+
+{{- define "snippet.redis.database" -}}
+{{ default 0 .Values.externalRedis.database | quote }}
 {{- end }}
 
 {{- define "snippet.redis.password.secret.name" -}}
@@ -505,15 +543,63 @@
 {{- end }}
 
 {{- define "snippet.redis.env" -}}
+- name: REDIS_PROTOCOL
+  value: {{ include "snippet.redis.protocol" . }}
 - name: REDIS_HOST
   value: {{ include "snippet.redis.host" . }}
 - name: REDIS_PORT
-  value: "6379"
+  value: {{ include "snippet.redis.port" . }}
+- name: REDIS_DATABASE
+  value: {{ include "snippet.redis.database" . }}
+- name: REDIS_USERNAME
+  value: {{ default "" .Values.externalRedis.username | quote }}
 - name: REDIS_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ include "snippet.redis.password.secret.name" . }}
       key: {{ include "snippet.redis.password.secret.key" . | quote}}
+{{- if and (not .Values.redis.enabled) .Values.externalRedis.ssl_options.enabled }}
+- name: REDIS_USE_SSL
+  value: "true"
+{{- with .Values.externalRedis.ssl_options.ca_certs }}
+- name: REDIS_SSL_CA_CERTS
+  value: {{ . | quote }}
+{{- end }}
+{{- with .Values.externalRedis.ssl_options.certfile }}
+- name: REDIS_SSL_CERTFILE
+  value: {{ . | quote }}
+{{- end }}
+{{- with .Values.externalRedis.ssl_options.keyfile }}
+- name: REDIS_SSL_KEYFILE
+  value: {{ . | quote }}
+{{- end }}
+{{- with .Values.externalRedis.ssl_options.cert_reqs }}
+- name: REDIS_SSL_CERT_REQS
+  value: {{ . | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- /*
+when broker.type != rabbitmq, we do not need to include rabbitmq environment variables
+*/}}
+{{- define "snippet.broker.env" -}}
+{{- include "snippet.redis.env" . }}
+{{- if eq .Values.broker.type "rabbitmq" -}}
+{{- include "snippet.rabbitmq.env" . }}
+{{- end }}
+{{- end }}
+
+{{- define "snippet.db.env" -}}
+{{- if eq .Values.database.type "mysql" }}
+{{- include "snippet.mysql.env" . }}
+{{- else if eq .Values.database.type "postgresql" }}
+{{- include "snippet.postgresql.env" . }}
+{{- else if eq .Values.database.type "sqlite" -}}
+{{- include "snippet.sqlite.env" . }}
+{{- else -}}
+{{- fail "value for .Values.db.type must be either 'mysql', 'postgresql', or 'sqlite'" }}
+{{- end }}
 {{- end }}
 
 {{- define "snippet.oncall.smtp.env" -}}
@@ -555,4 +641,16 @@
 - name: FEATURE_PROMETHEUS_EXPORTER_ENABLED
   value: {{ .Values.oncall.exporter.enabled | toString | title | quote }}
 {{- end }}
+{{- end }}
+
+{{- define "snippet.oncall.engine.env" -}}
+{{ include "snippet.oncall.env" . }}
+{{ include "snippet.oncall.slack.env" . }}
+{{ include "snippet.oncall.telegram.env" . }}
+{{ include "snippet.oncall.smtp.env" . }}
+{{ include "snippet.oncall.twilio.env" . }}
+{{ include "snippet.oncall.exporter.env" . }}
+{{ include "snippet.db.env" . }}
+{{ include "snippet.broker.env" . }}
+{{ include "oncall.extraEnvs" . }}
 {{- end }}

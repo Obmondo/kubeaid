@@ -45,6 +45,14 @@ securityContext:
   runAsUser: 1000
   runAsGroup: 1000
 
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  runAsNonRoot: true
+  readOnlyRootFilesystem: true
+
 priorityClassName: ""
 
 resources: {}
