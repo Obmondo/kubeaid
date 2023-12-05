@@ -45,8 +45,8 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/part-of: {{ include "chart.name" . }}
-{{- range $k, $v := .Values.labels }}
-{{ $k }}: {{ $v }}
+{{- if .Values.labels}}
+{{ toYaml .Values.labels }}
 {{- end }}
 {{- end -}}
 
@@ -75,4 +75,11 @@ Create the name of the service account to use
 {{- with .Values.imageCredentials }}
 {{- printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\",\"auth\":\"%s\"}}}" .registry .username .password .email (printf "%s:%s" .username .password | b64enc) | b64enc }}
 {{- end }}
+{{- end }}
+
+{{/*
+Create the name of the namespace
+*/}}
+{{- define "chart.namespaceName" -}}
+{{- default .Release.Namespace .Values.namespace }}
 {{- end }}

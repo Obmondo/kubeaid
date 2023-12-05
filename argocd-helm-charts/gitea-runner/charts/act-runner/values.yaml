@@ -8,7 +8,7 @@ image:
   repository: gitea/act_runner
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: 0.2.6
+  tag: "0.2.6"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -63,12 +63,8 @@ affinity: {}
 
 act_runner:
   storageclass: "default"
-  storage:
-    size: 1024Mi
   instance: "https://gitea.example.com"
-  parallel_jobs: 2
   token: ""
-  existingToken: ""
   labels:
     - "ubuntu-latest:docker://node:16-bullseye"
     - "ubuntu-22.04:docker://node:16-bullseye"

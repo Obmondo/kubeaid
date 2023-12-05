@@ -2,8 +2,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "metrics-server.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "metrics-server.labels" . | nindent 4 }}
+  {{- with .Values.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   replicas: {{ .Values.replicas }}
   {{- with .Values.updateStrategy }}
@@ -25,6 +30,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
     spec:
+      schedulerName: {{ .Values.schedulerName }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -49,21 +55,28 @@ spec:
           image: {{ include "metrics-server.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
-            - --cert-dir=/tmp
             - {{ printf "--secure-port=%d" (int .Values.containerPort) }}
-            - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
-            - --kubelet-use-node-status-port
-            {{- range .Values.args }}
+          {{- range .Values.defaultArgs }}
             - {{ . }}
-            {{- end }}
+          {{- end }}
+          {{- if .Values.metrics.enabled }}
+            - --authorization-always-allow-paths=/metrics
+          {{- end }}
+          {{- range .Values.args }}
+            - {{ . }}
+          {{- end }}
           ports:
           - name: https
             protocol: TCP
             containerPort: {{ .Values.containerPort }}
+          {{- with .Values.livenessProbe }}
           livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
           readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: tmp
               mountPath: /tmp
@@ -90,5 +103,9 @@ spec:
       {{- end }}
       {{- with .Values.tolerations }}
       tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
       {{- end }}

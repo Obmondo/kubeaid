@@ -111,14 +111,16 @@ yetibot:
 
 # postgresql sub chart config:
 postgresql:
-  persistence:
-    # you may need to set a storageClass if you don't have a default storage
-    # class:
-    # storageClass: fast
-    size: 16Gi
-  postgresqlDatabase: yetibot
-  postgresqlPassword: yetibot
-  postgresqlUsername: yetibot
+  primary:
+    persistence:
+      # you may need to set a storageClass if you don't have a default storage
+      # class:
+      # storageClass: fast
+      size: 16Gi
+  auth:
+    database: yetibot
+    username: yetibot
+    password: yetibot
   resources:
     limits:
       memory: 500Mi

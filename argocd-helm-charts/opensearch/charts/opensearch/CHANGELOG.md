@@ -13,6 +13,176 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Security
 ---
+## [2.17.0]
+### Added
+- Updated OpenSearch appVersion to 2.11.1
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.16.1]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Fixed missing lifecycle parameter in README for opensearch chart
+### Security
+---
+## [2.16.0]
+### Added
+- Updated OpenSearch appVersion to 2.11.0
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.15.0]
+### Added
+- Updated OpenSearch appVersion to 2.10.0
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.14.1]
+### Added
+- Add homepage and source urls to chart
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.14.0]
+### Added
+- Updated OpenSearch appVersion to 2.9.0
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.13.3]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Correct variable name in keystore import
+### Security
+---
+## [2.13.2]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Avoid CrashLoop when keystore secret has no data
+### Security
+---
+## [2.13.1]
+### Added
+- Support string type for extraObjects
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.13.0]
+### Added
+- Updated OpenSearch appVersion to 2.8.0
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.12.2]
+### Added
+- Support for toggling automountServiceAccountToken to comply with strict Kubernetes Policies
+### Changed
+- if/else logic for serviceAccountName to be more intelligent
+### Deprecated
+### Removed
+### Fixed
+- Whitespace under Resources blocks that was causing linting errors
+### Security
+---
+## [2.12.1]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Add imagePullPolicy to fsgroup-volume init container
+### Security
+---
+## [2.12.0]
+### Added
+- Updated OpenSearch appVersion to 2.7.0
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Add imagePullPolicy to fsgroup-volume init container
+### Security
+---
+## [2.11.5]
+### Added
+- Update the Readme and comments section.
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.11.4]
+### Added
+- Added custom opensearch deployment annotation through values.yaml
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.11.3]
+### Added
+- Support setting ipFamilyPolicy on Service
+- Support setting ipFamilies on Service
+---
+## [2.11.2]
+### Added
+- Service ports for performance analyzer
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.11.1]
+### Added
+- Support for lifecycle in the opensearch container in the StatefulSet
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.11.0]
+### Added
+### Changed
+- Updated OpenSearch appVersion to 2.6.0
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
 ## [2.10.0]
 ### Added
 ### Changed
@@ -186,7 +356,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 
-[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.10.0...HEAD
+[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.17.0...HEAD
+[2.17.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.16.1...opensearch-2.17.0
+[2.16.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.16.0...opensearch-2.16.1
+[2.16.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.15.0...opensearch-2.16.0
+[2.15.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.14.1...opensearch-2.15.0
+[2.14.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.14.0...opensearch-2.14.1
+[2.14.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.13.3...opensearch-2.14.0
+[2.13.3]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.13.1...opensearch-2.13.3
+[2.13.2]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.13.1...opensearch-2.13.2
+[2.13.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.13.0...opensearch-2.13.1
+[2.13.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.12.0...opensearch-2.13.0
+[2.12.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.11.5...opensearch-2.12.0
+[2.11.5]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.11.4...opensearch-2.11.5
+[2.11.4]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.11.3...opensearch-2.11.4
+[2.11.3]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.11.2...opensearch-2.11.3
+[2.11.2]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.11.1...opensearch-2.11.2
+[2.11.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.11.0...opensearch-2.11.1
+[2.11.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.10.0...opensearch-2.11.0
 [2.10.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.9.1...opensearch-2.10.0
 [2.9.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.9.0...opensearch-2.9.1
 [2.9.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.8.2...opensearch-2.9.0

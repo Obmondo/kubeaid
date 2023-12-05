@@ -43,6 +43,9 @@ spec:
       {{- if .Values.dnsPolicy }}
       dnsPolicy: {{ .Values.dnsPolicy | quote }}
       {{- end }}
+      {{- if .Values.hostAliases }}
+      hostAliases: {{- toYaml .Values.hostAliases | nindent 8 }}
+      {{- end }}
       {{- if or .Values.affinity (gt (int $replicaCount) 1) }}
       affinity:
         {{- if .Values.affinity }}
@@ -187,13 +190,16 @@ spec:
 {{- if .Values.extraVolumeMounts }}
   {{- toYaml .Values.extraVolumeMounts | nindent 8 }}
 {{- end }}
+{{- if .Values.extraContainers }}
+  {{- toYaml .Values.extraContainers | nindent 6 }}
+{{- end }}
       volumes:
       - name: "config"
         configMap:
           name: {{ .Release.Name }}
       - name: "auth-token"
         secret:
-          secretName: {{ .Values.secretName }}
+          secretName: {{ coalesce .Values.secretName .Values.joinTokenSecret.name }}
       {{- if not .Values.existingDataVolume }}
       - name: "data"
         emptyDir: {}

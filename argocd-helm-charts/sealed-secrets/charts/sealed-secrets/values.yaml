@@ -12,6 +12,7 @@ fullnameOverride: ""
 ## @param namespace Namespace where to deploy the Sealed Secrets controller
 ##
 namespace: ""
+
 ## @param extraDeploy [array] Array of extra objects to deploy with the release
 ##
 extraDeploy: []
@@ -33,7 +34,7 @@ commonAnnotations: {}
 image:
   registry: docker.io
   repository: bitnami/sealed-secrets-controller
-  tag: v0.19.5
+  tag: v0.24.4
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -47,6 +48,9 @@ image:
   ##   - myRegistryKeySecretName
   ##
   pullSecrets: []
+## @param revisionHistoryLimit Number of old history to retain to allow rollback (If not set, default Kubernetes value is set to 10)
+## e.g:
+revisionHistoryLimit: ""
 ## @param createController Specifies whether the Sealed Secrets controller should be created
 ##
 createController: true
@@ -56,6 +60,12 @@ secretName: "sealed-secrets-key"
 ## @param updateStatus Specifies whether the Sealed Secrets controller should update the status subresource
 ##
 updateStatus: true
+## @param skipRecreate Specifies whether the Sealed Secrets controller should skip recreating removed secrets
+## Setting it to true allows to optionally restore backward compatibility in low priviledge
+## environments when old versions of the controller did not require watch permissions on secrets
+## for secret re-creation.
+##
+skipRecreate: false
 ## @param keyrenewperiod Specifies key renewal period. Default 30 days
 ## e.g
 ## keyrenewperiod: "720h30m"
@@ -70,6 +80,15 @@ rateLimitBurst: ""
 ## @param additionalNamespaces List of namespaces used to manage the Sealed Secrets
 ##
 additionalNamespaces: []
+## @param privateKeyAnnotations Map of annotations to be set on the sealing keypairs
+## 
+privateKeyAnnotations: {}
+## @param privateKeyLabels Map of labels to be set on the sealing keypairs
+## 
+privateKeyLabels: {}
+## @param logInfoStdout Specifies whether the Sealed Secrets controller will log info to stdout
+##
+logInfoStdout: false
 ## @param command Override default container command
 ##
 command: []
@@ -151,15 +170,17 @@ podSecurityContext:
 ## @param containerSecurityContext.readOnlyRootFilesystem Whether the Sealed Secret container has a read-only root filesystem
 ## @param containerSecurityContext.runAsNonRoot Indicates that the Sealed Secret container must run as a non-root user
 ## @param containerSecurityContext.runAsUser Set Sealed Secret containers' Security Context runAsUser
+## @extra containerSecurityContext.capabilities Adds and removes POSIX capabilities from running containers (see `values.yaml`)
+## @skip  containerSecurityContext.capabilities.drop
 ##
 containerSecurityContext:
   enabled: true
   readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 1001
-
-## @param automountServiceAccountToken whether to automatically mount the service account API-token to a particular pod
-automountServiceAccountToken: ""
+  capabilities:
+    drop:
+      - ALL
 
 ## @param podLabels [object] Extra labels for Sealed Secret pods
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
@@ -316,6 +337,18 @@ networkPolicy:
   ## @param networkPolicy.enabled Specifies whether a NetworkPolicy should be created
   ##
   enabled: false
+  ## NetworkPolicy Egress configuration
+  ##
+  egress:
+    ## @param networkPolicy.egress.enabled Specifies wheter a egress is set in the NetworkPolicy
+    ##
+    enabled: false
+    ## @param networkPolicy.egress.kubeapiCidr Specifies the kubeapiCidr, which is the only egress allowed. If not set, kubeapiCidr will be found using Helm lookup
+    ##
+    kubeapiCidr: ""
+    ## @param networkPolicy.egress.kubeapiPort Specifies the kubeapiPort, which is the only egress allowed. If not set, kubeapiPort will be found using Helm lookup
+    ##
+    kubeapiPort: ""
 
 ## @section Other Parameters
 
@@ -336,8 +369,6 @@ serviceAccount:
   ## If not set and create is true, a name is generated using the sealed-secrets.fullname template
   ##
   name: ""
-  ## @param serviceAccount.automountServiceAccountToken Specifies, whether to mount the service account API-token
-  automountServiceAccountToken: ""
 ## RBAC configuration
 ##
 rbac:
@@ -347,6 +378,15 @@ rbac:
   ## @param rbac.clusterRole Specifies whether the Cluster Role resource should be created
   ##
   clusterRole: true
+  ## @param rbac.clusterRoleName Specifies the name for the Cluster Role resource
+  ##
+  clusterRoleName: "secrets-unsealer"
+  ## @param rbac.namespacedRoles Specifies whether the namespaced Roles should be created (in each of the specified additionalNamespaces)
+  ##
+  namespacedRoles: false
+  ## @param rbac.namespacedRolesName Specifies the name for the namesapced Role resource
+  ##
+  namespacedRolesName: "secrets-unsealer"
   ## @param rbac.labels Extra labels to be added to RBAC resources
   ##
   labels: {}
@@ -401,6 +441,22 @@ metrics:
     ## @param metrics.dashboards.labels Extra labels to be added to the Grafana dashboard ConfigMap
     ##
     labels: {}
+    ## @param metrics.dashboards.annotations Annotations to be added to the Grafana dashboard ConfigMap
+    ##
+    annotations: {}
     ## @param metrics.dashboards.namespace Namespace where Grafana dashboard ConfigMap is deployed
     ##
     namespace: ""
+
+## @section PodDisruptionBudget Parameters
+
+pdb:
+  ## @param pdb.create Specifies whether a PodDisruptionBudget should be created
+  ##
+  create: false
+  ## @param pdb.minAvailable The minimum number of pods (non number to omit)
+  ##
+  minAvailable: 1
+  ## @param pdb.maxUnavailable The maximum number of unavailable pods (non number to omit)
+  ##
+  maxUnavailable: ""

@@ -1,18 +1,14 @@
 annotations:
-  artifacthub.io/changes: "- \"feat: ✨ add healthcheck ingressRoute\"\n- \"feat: :boom:
-    support http redirections and http challenges with cert-manager\"\n- \"feat: :boom:
-    rework and allow update of namespace policy for Gateway\"\n- \"fix: disable ClusterRole
-    and ClusterRoleBinding when not needed\"\n- \"fix: detect correctly v3 version
-    when using sha in `image.tag`\"\n- \"fix: allow updateStrategy.rollingUpdate.maxUnavailable
-    to be passed in as an int or string\"\n- \"fix: add missing separator in crds\"\n-
-    \"fix: add Prometheus scraping annotations only if serviceMonitor not created\"\n-
-    \"docs: Fix typo in the default values file\"\n- \"chore: remove label whitespace
-    at TLSOption\"\n- \"chore(release): \U0001F680 publish v25.0.0\"\n- \"chore(deps):
-    update traefik docker tag to v2.10.5\"\n- \"chore(deps): update docker.io/helmunittest/helm-unittest
-    docker tag to v3.12.3\"\n- \"chore(ci): \U0001F527 \U0001F477 add e2e test when
-    releasing\"\n"
+  artifacthub.io/changes: "- \"fix: \U0001F41B improve confusing suggested value on
+    openTelemetry.grpc\"\n- \"fix: \U0001F41B declare http3 udp port, with or without
+    hostport\"\n- \"feat: \U0001F4A5 deployment.podannotations support interpolation
+    with tpl\"\n- \"feat: allow update of namespace policy for websecure listener\"\n-
+    \"feat: allow defining startupProbe\"\n- \"feat: add file provider\"\n- \"feat:
+    :boom: unify plugin import between traefik and this chart\"\n- \"chore(release):
+    \U0001F680 publish v26\"\n- \"chore(deps): update traefik docker tag to v2.10.6\"\n-
+    \"Release namespace for Prometheus Operator resources\"\n"
 apiVersion: v2
-appVersion: v2.10.5
+appVersion: v2.10.6
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
 icon: https://raw.githubusercontent.com/traefik/traefik/v2.3/docs/content/assets/img/traefik.logo.png
@@ -37,4 +33,4 @@ sources:
 - https://github.com/traefik/traefik
 - https://github.com/traefik/traefik-helm-chart
 type: application
-version: 25.0.0
+version: 26.0.0

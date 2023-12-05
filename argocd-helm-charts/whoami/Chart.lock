@@ -1,6 +1,6 @@
 dependencies:
 - name: whoami
   repository: https://cowboysysop.github.io/charts/
-  version: 2.7.0
-digest: sha256:48aa5572894edf31b1deaa4a9f21f918e4c95142193c7efe6134d33858de6b03
-generated: "2022-10-10T11:22:57.499703364Z"
+  version: 5.1.0
+digest: sha256:f543c715853bba70f7aa4e1213f1964b14a538e9a8d65d0a4e0a8c506015576e
+generated: "2023-12-05T14:57:02.900195027+05:30"
