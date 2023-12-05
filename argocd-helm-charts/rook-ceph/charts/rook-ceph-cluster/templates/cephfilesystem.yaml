@@ -5,6 +5,7 @@ apiVersion: ceph.rook.io/v1
 kind: CephFilesystem
 metadata:
   name: {{ $filesystem.name }}
+  namespace: {{ $root.Release.Namespace }} # namespace:cluster
 spec:
 {{ toYaml $filesystem.spec | indent 2 }}
 ---
@@ -21,10 +22,11 @@ parameters:
   pool: {{ $filesystem.name }}-{{ default "data0" $filesystem.storageClass.pool }}
   clusterID: {{ $root.Release.Namespace }}
 {{ with $filesystem.storageClass.parameters }}
-{{ toYaml . | indent 2 }}
+{{ tpl (toYaml .) $ | indent 2 }}
 {{ end }}
 reclaimPolicy: {{ default "Delete" $filesystem.storageClass.reclaimPolicy }}
 allowVolumeExpansion: {{ default "true" $filesystem.storageClass.allowVolumeExpansion }}
+volumeBindingMode: {{ default "Immediate" $filesystem.storageClass.volumeBindingMode }}
 {{- if $filesystem.storageClass.mountOptions }}
 mountOptions:
   {{- range $filesystem.storageClass.mountOptions }}

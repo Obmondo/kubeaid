@@ -160,6 +160,7 @@ rbac:
   create: false
   serviceAccountAnnotations: {}
   serviceAccountName: ""
+  automountServiceAccountToken: false
 
 podSecurityPolicy:
   create: false
@@ -251,6 +252,7 @@ enableServiceLinks: true
 protocol: https
 httpPort: 9200
 transportPort: 9300
+metricsPort: 9600
 
 service:
   labels: {}

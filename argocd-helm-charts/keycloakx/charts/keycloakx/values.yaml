@@ -11,7 +11,9 @@ image:
   # The Keycloak image repository
   repository: quay.io/keycloak/keycloak
   # Overrides the Keycloak image tag whose default is the chart appVersion
-  tag: "20.0.3"
+  tag: "22.0.4"
+  # Overrides the Keycloak image tag with a specific digest
+  digest: ""
   # The Keycloak image pull policy
   pullPolicy: IfNotPresent
 
@@ -489,7 +491,7 @@ prometheusRule:
   #     severity: warning
 
 autoscaling:
-  # If `true`, a autoscaling/v2beta2 HorizontalPodAutoscaler resource is created (requires Kubernetes 1.18 or above)
+  # If `true`, an autoscaling/v2 HorizontalPodAutoscaler resource is created (requires Kubernetes 1.23 or above)
   # Autoscaling seems to be most reliable when using KUBE_PING service discovery (see README for details)
   # This disables the `replicas` field in the StatefulSet
   enabled: false
@@ -521,9 +523,9 @@ test:
   enabled: false
   image:
     # The image for the test Pod
-    repository: docker.io/joyzoursky/python-chromedriver
+    repository: docker.io/seleniarm/standalone-chromium
     # The tag for the test Pod image
-    tag: 3.9-selenium
+    tag: "117.0"
     # The image pull policy for the test Pod image
     pullPolicy: IfNotPresent
   # SecurityContext for the entire test Pod

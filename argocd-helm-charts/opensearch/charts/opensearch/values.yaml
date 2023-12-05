@@ -132,6 +132,9 @@ image:
 podAnnotations: {}
   # iam.amazonaws.com/role: es-cluster
 
+# OpenSearch Statefulset annotations
+openSearchAnnotations: {}
+
 # additionals labels
 labels: {}
 
@@ -164,6 +167,8 @@ rbac:
   create: false
   serviceAccountAnnotations: {}
   serviceAccountName: ""
+  # Controls whether or not the Service Account token is automatically mounted to /var/run/secrets/kubernetes.io/serviceaccount
+  automountServiceAccountToken: false
 
 podSecurityPolicy:
   create: false
@@ -259,8 +264,10 @@ enableServiceLinks: true
 protocol: https
 httpPort: 9200
 transportPort: 9300
+metricsPort: 9600
 httpHostPort: ""
 transportHostPort: ""
+
 
 service:
   labels: {}
@@ -268,10 +275,18 @@ service:
   headless:
     annotations: {}
   type: ClusterIP
+  # The IP family and IP families options are to set the behaviour in a dual-stack environment
+  # Omitting these values will let the service fall back to whatever the CNI dictates the defaults
+  # should be
+  #
+  # ipFamilyPolicy: SingleStack
+  # ipFamilies:
+  # - IPv4
   nodePort: ""
   annotations: {}
   httpPortName: http
   transportPortName: transport
+  metricsPortName: metrics
   loadBalancerIP: ""
   loadBalancerSourceRanges: []
   externalTrafficPolicy: ""
@@ -312,9 +327,11 @@ securityConfig:
   config:
     # There are multiple ways to define the configuration here:
     # * If you define anything under data, the chart will automatically create
-    #   a secret and mount it.
+    #   a secret and mount it. This is best option to choose if you want to override all the
+    #   existing yml files at once.
     # * If you define securityConfigSecret, the chart will assume this secret is
-    #   created externally and mount it.
+    #   created externally and mount it. This is best option to choose if your intention is to
+    #   only update a single yml file.
     # * It is an error to define both data and securityConfigSecret.
     securityConfigSecret: ""
     dataComplete: true
@@ -387,6 +404,14 @@ nameOverride: ""
 fullnameOverride: ""
 
 masterTerminationFix: false
+
+opensearchLifecycle: {}
+  # preStop:
+  #   exec:
+  #     command: ["/bin/sh", "-c", "echo Hello from the preStart handler > /usr/share/message"]
+  # postStart:
+  #   exec:
+  #     command: ["/bin/sh", "-c", "echo Hello from the postStart handler > /usr/share/message"]
 
 lifecycle: {}
   # preStop:
@@ -476,3 +501,15 @@ extraObjects: []
   #       type: Opaque
   #       labels:
   #         app.kubernetes.io/part-of: argocd
+  # - |
+  #    apiVersion: policy/v1
+  #    kind: PodDisruptionBudget
+  #    metadata:
+  #      name: {{ template "opensearch.uname" . }}
+  #      labels:
+  #        {{- include "opensearch.labels" . | nindent 4 }}
+  #    spec:
+  #      minAvailable: 1
+  #      selector:
+  #        matchLabels:
+  #          {{- include "opensearch.selectorLabels" . | nindent 6 }}

@@ -3,8 +3,6 @@
 ## By default it's using registry.gitlab.com/gitlab-org/gitlab-runner:alpine-v{VERSION}
 ## where {VERSION} is taken from Chart.yaml from appVersion field
 ##
-## DEPRECATED: Setting `image: registry.gitlab.com/gitlab-org/gitlab-runner:alpine-v11.6.0` is deprecated
-##
 ## ref: https://gitlab.com/gitlab-org/gitlab-runner/container_registry/29383?orderBy=NAME&sort=asc&search[]=alpine-v&search[]=
 ##
 ## Note: If you change the image to the ubuntu release
@@ -15,6 +13,11 @@ image:
   registry: registry.gitlab.com
   image: gitlab-org/gitlab-runner
   # tag: alpine-v11.6.0
+
+## When using GitLab Runner Helm Chart with gitlab-runner-ubi-images (https://gitlab.com/gitlab-org/ci-cd/gitlab-runner-ubi-images/container_registry)
+## the installation fails because dumb-init is not packaged in the image. However, the tini is present.
+## This configuration will allow gitlab-runner-ubi-images users to explicitly enabled the use of `tini` instead of `dumb-init`
+useTini: false
 
 ## Specify a imagePullPolicy for the main runner deployment
 ## 'Always' if imageTag is 'latest', else set to 'IfNotPresent'
@@ -34,12 +37,10 @@ imagePullPolicy: IfNotPresent
 #   - name: "image-pull-secret"
 
 ## Timeout, in seconds, for liveness and readiness probes of a runner pod.
-# probeTimeoutSeconds: 1
+# probeTimeoutSeconds: 3
 
 ## How many runner pods to launch.
 ##
-## Note: Using more than one replica is not supported with a runnerToken. Use a runnerRegistrationToken
-## to create multiple runner replicas.
 # replicas: 1
 
 ## How many old ReplicaSets for this Deployment you want to retain
@@ -50,9 +51,9 @@ imagePullPolicy: IfNotPresent
 ##
 # gitlabUrl: http://gitlab.your-domain.com/
 
-## The Registration Token for adding new Runners to the GitLab Server. This must
-## be retrieved from your GitLab Instance.
-## ref: https://docs.gitlab.com/ce/ci/runners/index.html
+## DEPRECATED: The Registration Token for adding new Runners to the GitLab Server.
+##
+## ref: https://docs.gitlab.com/ee/ci/runners/new_creation_workflow.html
 ##
 # runnerRegistrationToken: ""
 
@@ -92,6 +93,11 @@ terminationGracePeriodSeconds: 3600
 ##
 concurrent: 10
 
+## Number of seconds until the forceful shutdown operation times out and exits the process.
+## ref: https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-global-section
+##
+shutdown_timeout: 0
+
 ## Defines in seconds how often to check GitLab for a new builds
 ## ref: https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-global-section
 ##
@@ -123,7 +129,7 @@ checkInterval: 30
 ## ref:
 ##
 ## When sessionServer is enabled, the user can either provide a public publicIP
-## or either rely on the external IP auto discovery
+## or rely on the external IP auto discovery
 ## When a serviceAccountName is used with the automounting to the pod disable,
 ## we recommend the usage of the publicIP
 sessionServer:
@@ -140,11 +146,6 @@ sessionServer:
 rbac:
   create: false
 
-  ## Define specific rbac permissions.
-  ## DEPRECATED: see .Values.rbac.rules
-  # resources: ["pods", "pods/exec", "secrets"]
-  # verbs: ["get", "list", "watch", "create", "patch", "delete"]
-
   ## Define list of rules to be added to the rbac role permissions.
   ## Each rule supports the keys:
   ## - apiGroups: default "" (indicates the core API group) if missing or empty.
@@ -153,14 +154,17 @@ rbac:
   ##
   ## Read more about the recommended rules on the following link
   ##
-  ## ref: https://docs.gitlab.com/runner/executors/kubernetes.html#configuring-executor-service-account
+  ## ref: https://docs.gitlab.com/runner/executors/kubernetes.html#configure-runner-api-permissions
   ##
   rules: []
-  # - resources: ["configmaps", "pods", "pods/attach", "secrets", "services"]
+  # - resources: ["configmaps", "events", "pods", "pods/attach", "pods/exec", "secrets", "services"]
   #   verbs: ["get", "list", "watch", "create", "patch", "update", "delete"]
   # - apiGroups: [""]
   #   resources: ["pods/exec"]
   #   verbs: ["create", "patch", "delete"]
+  # - apiGroups: [""]
+  #   resources: ["pods/log"]
+  #   verbs: ["get"]
 
   ## Run the gitlab-bastion container with the ability to deploy/manage containers of jobs
   ## cluster-wide or only within namespace
@@ -170,9 +174,12 @@ rbac:
   ##
   # serviceAccountName: default
 
-  ## Specify annotations for Service Accounts, useful for annotations such as eks.amazonaws.com/role-arn
+  ## Specify annotations for Service Accounts, useful for annotations such as eks.amazonaws.com/role-arn.
+  ## Values may refer other values as the _tpl_ function is implicitly applied. Mind the quotes when using this, e.g.
+  ## serviceAccountAnnotations:
+  ##   eks.amazonaws.com/role-arn: "arn:aws:iam::{{ .Values.global.accountId }}:role/{{ .Values.global.iamRoleName }}"
   ##
-  ## ref: https://docs.aws.amazon.com/eks/latest/userguide/specify-service-account-role.html
+  ## ref: https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html
   ##
   # serviceAccountAnnotations: {}
 
@@ -210,9 +217,13 @@ metrics:
   serviceMonitor:
     enabled: false
 
-    ## Provide additional labels to the service monitor ressource
+    ## Provide additional labels to the service monitor resource
     ##
     ## labels: {}
+
+    ## Provide annotations to the service monitor ressource
+    ##
+    ## annotations: {}
 
     ## Define a scrape interval (otherwise prometheus default is used)
     ##
@@ -226,7 +237,7 @@ metrics:
 
     ## Supply a tls configuration for the service monitor
     ##
-    ## ref: https://github.com/helm/charts/blob/master/stable/prometheus-operator/crds/crd-servicemonitor.yaml
+    ## ref: https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/charts/crds/crds/crd-servicemonitors.yaml
     ##
     # tlsConfig: {}
 
@@ -283,7 +294,7 @@ service:
   ##
   # loadBalancerSourceRanges: []
 
-  ## Specify the service type e.g., ClusterIP, NodePort, Loadbalancer or ExternalName
+  ## Specify the service type e.g., ClusterIP, NodePort, LoadBalancer or ExternalName
   ##
   ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
   ##
@@ -318,42 +329,26 @@ runners:
     [[runners]]
       [runners.kubernetes]
         namespace = "{{.Release.Namespace}}"
-        image = "ubuntu:16.04"
+        image = "alpine"
+
+  ## Absolute path for an existing runner configuration file
+  ## Can be used alongside "volumes" and "volumeMounts" to use an external config file
+  ## Active if runners.config is empty or null
+  configPath: ""
 
   ## Which executor should be used
   ##
   # executor: kubernetes
 
-  ## Default container image to use for builds when none is specified
+  ## DEPRECATED: Specify whether the runner should be locked to a specific project: true, false.
   ##
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  # image: ubuntu:16.04
-
-  ## Specify one or more imagePullSecrets
-  ##
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-  ##
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  # imagePullSecrets: []
-
-  ## Specify the image pull policy: never, if-not-present, always. The cluster default will be used if not set.
-  ##
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  # imagePullPolicy: ""
-
-  ## Defines number of concurrent requests for new job from GitLab
-  ## ref: https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-section
-  ##
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  # requestConcurrency: 1
-
-  ## Specify whether the runner should be locked to a specific project: true, false. Defaults to true.
+  ## ref: https://docs.gitlab.com/ee/ci/runners/new_creation_workflow.html
   ##
   # locked: true
 
-  ## Specify the tags associated with the runner. Comma-separated list of tags.
+  ## DEPRECATED: Specify the tags associated with the runner. Comma-separated list of tags.
   ##
-  ## ref: https://docs.gitlab.com/ee/ci/runners/configure_runners.html#use-tags-to-control-which-jobs-a-runner-can-run
+  ## ref: https://docs.gitlab.com/ee/ci/runners/new_creation_workflow.html
   ##
   # tags: ""
 
@@ -361,51 +356,26 @@ runners:
   ##
   # name: ""
 
-  ## Specify the maximum timeout (in seconds) that will be set for job when using this Runner
+  ## DEPRECATED:Specify the maximum timeout (in seconds) that will be set for job when using this Runner
+  ##
+  ## ref: https://docs.gitlab.com/ee/ci/runners/new_creation_workflow.html
   ##
   # maximumTimeout: ""
 
-  ## Specify if jobs without tags should be run.
-  ## If not specified, Runner will default to true if no tags were specified. In other case it will
-  ## default to false.
+  ## DEPRECATED: Specify if jobs without tags should be run.
   ##
-  ## ref: https://docs.gitlab.com/ee/ci/runners/configure_runners.html#set-a-runner-to-run-untagged-jobs
+  ## ref: https://docs.gitlab.com/ee/ci/runners/new_creation_workflow.html
   ##
   # runUntagged: true
 
-  ## Specify whether the runner should only run protected branches.
-  ## Defaults to false.
+  ## DEPRECATED: Specify whether the runner should only run protected branches.
   ##
-  ## ref: https://docs.gitlab.com/ee/ci/runners/configure_runners.html#prevent-runners-from-revealing-sensitive-information
+  ## ref: https://docs.gitlab.com/ee/ci/runners/new_creation_workflow.html
   ##
   # protected: true
 
-  ## Run all containers with the privileged flag enabled
-  ## This will allow the docker:dind image to run if you need to run Docker
-  ## commands. Please read the docs before turning this on:
-  ## ref: https://docs.gitlab.com/runner/executors/kubernetes.html#using-dockerdind
-  ##
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  # privileged: false
-
   ## The name of the secret containing runner-token and runner-registration-token
   # secret: gitlab-runner
-
-  ## Namespace to run Kubernetes jobs in (defaults to the same namespace of this release)
-  ##
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  # namespace:
-
-  ## The amount of time, in seconds, that needs to pass before the runner will
-  ## timeout attempting to connect to the container it has just created.
-  ## ref: https://docs.gitlab.com/runner/executors/kubernetes.html
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  # pollTimeout: 180
-
-  ## Set maximum build log size in kilobytes, by default set to 4096 (4MB)
-  ## ref: https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-section
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  # outputLimit: 4096
 
   ## Distributed runners caching
   ## ref: https://docs.gitlab.com/runner/configuration/autoscale.html#distributed-runners-caching
@@ -453,23 +423,6 @@ runners:
   ## ref: https://kubernetes.io/docs/concepts/configuration/secret/
 
   cache: {}
-    ## General settings
-    ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration and https://docs.gitlab.com/runner/install/kubernetes.html#using-cache-with-configuration-template
-    # cacheType: s3
-    # cachePath: "gitlab_runner"
-    # cacheShared: true
-
-    ## S3 settings
-    ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration and https://docs.gitlab.com/runner/install/kubernetes.html#using-cache-with-configuration-template
-    # s3ServerAddress: s3.amazonaws.com
-    # s3BucketName:
-    # s3BucketLocation:
-    # s3CacheInsecure: false
-
-    ## GCS settings
-    ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration and https://docs.gitlab.com/runner/install/kubernetes.html#using-cache-with-configuration-template
-    # gcsBucketName:
-
     ## S3 the name of the secret.
     # secretName: s3access
     ## Use this line for access using gcs-access-id and gcs-private-key
@@ -479,100 +432,13 @@ runners:
     ## Use this line for access using Azure with azure-account-name and azure-account-key
     # secretName: azureaccess
 
-
-  ## Build Container specific configuration
-  ##
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  builds: {}
-    # cpuLimit: 200m
-    # cpuLimitOverwriteMaxAllowed: 400m
-    # memoryLimit: 256Mi
-    # memoryLimitOverwriteMaxAllowed: 512Mi
-    # cpuRequests: 100m
-    # cpuRequestsOverwriteMaxAllowed: 200m
-    # memoryRequests: 128Mi
-    # memoryRequestsOverwriteMaxAllowed: 256Mi
-
-  ## Service Container specific configuration
-  ##
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  services: {}
-    # cpuLimit: 200m
-    # memoryLimit: 256Mi
-    # cpuRequests: 100m
-    # memoryRequests: 128Mi
-
-  ## Helper Container specific configuration
-  ##
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  helpers: {}
-    # cpuLimit: 200m
-    # memoryLimit: 256Mi
-    # cpuRequests: 100m
-    # memoryRequests: 128Mi
-    # image: "registry.gitlab.com/gitlab-org/gitlab-runner-helper:x86_64-${CI_RUNNER_REVISION}"
-
-  ## Helper container security context configuration
-  ## Refer to https://docs.gitlab.com/runner/executors/kubernetes.html#using-security-context
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  # pod_security_context:
-  #   run_as_non_root: true
-  #   run_as_user: 100
-  #   run_as_group: 100
-  #   fs_group: 65533
-  #   supplemental_groups: [101, 102]
-
-  ## Service Account to be used for runners
-  ##
-  # serviceAccountName:
-
-  ## If Gitlab is not reachable through $CI_SERVER_URL
-  ##
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  # cloneUrl:
-
-  ## Specify node labels for CI job pods assignment
-  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  ##
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  # nodeSelector: {}
-
-  ## Specify node tolerations for CI job pods assignment
-  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-  ##
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  # nodeTolerations: {}
-
-  ## Specify pod labels for CI job pods
-  ##
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  # podLabels: {}
-
-  ## Specify annotations for job pods, useful for annotations such as iam.amazonaws.com/role
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  # podAnnotations: {}
-
-  ## Configure environment variables that will be injected to the pods that are created while
-  ## the build is running. These variables are passed as parameters, i.e. `--env "NAME=VALUE"`,
-  ## to `gitlab-runner register` command.
-  ##
-  ## Note that `envVars` (see below) are only present in the runner pod, not the pods that are
-  ## created for each build.
-  ##
-  ## ref: https://docs.gitlab.com/runner/commands/#gitlab-runner-register
-  ##
-  ## DEPRECATED: See https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration
-  # env:
-  #   NAME: VALUE
-
-
 ## Specify the name of the scheduler which used to schedule runner pods.
 ## Kubernetes supports multiple scheduler configurations.
 ## ref: https://kubernetes.io/docs/reference/scheduling
 # schedulerName: "my-custom-scheduler"
 
 ## Configure securitycontext for the main container
-## ref: http://kubernetes.io/docs/user-guide/security-context/
+## ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/
 ##
 securityContext:
   allowPrivilegeEscalation: false
@@ -583,7 +449,7 @@ securityContext:
     drop: ["ALL"]
 
 ## Configure securitycontext valid for the whole pod
-## ref: http://kubernetes.io/docs/user-guide/security-context/
+## ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/
 ##
 podSecurityContext:
   runAsUser: 100
@@ -596,23 +462,37 @@ podSecurityContext:
   # fsGroup: 999
 
 ## Configure resource requests and limits
-## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 ##
 resources: {}
   # limits:
   #   memory: 256Mi
   #   cpu: 200m
+  #   ephemeral-storage: 512Mi
   # requests:
   #   memory: 128Mi
   #   cpu: 100m
+  #   ephemeral-storage: 256Mi
 
 ## Affinity for pod assignment
 ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 ##
 affinity: {}
 
+## TopologySpreadConstraints for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+##
+topologySpreadConstraints: {}
+  # Example: The gitlab runner should be evenly spread across zones
+  # - maxSkew: 1
+  #   topologyKey: zone
+  #   whenUnsatisfiable: DoNotSchedule
+  #   labelSelector:
+  #     matchLabels:
+  #       foo: bar
+
 ## Node labels for pod assignment
-## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
 ##
 nodeSelector: {}
   # Example: The gitlab runner manager should not run on spot instances so you can assign
@@ -648,6 +528,18 @@ hostAliases: []
   #   hostnames:
   #   - "foo.remote"
   #   - "bar.remote"
+
+## Annotations to be added to deployment
+##
+deploymentAnnotations: {}
+  # Example:
+  # downscaler/uptime: <my_uptime_period>
+
+## Labels to be added to deployment
+##
+deploymentLabels: {}
+  # Example:
+  # owner.team: <my_cool_team>
 
 ## Annotations to be added to manager pod
 ##
@@ -692,6 +584,11 @@ secrets: []
   #   items:
   #     - key: key_one
   #       path: path_one
+
+## Boolean to turn off the automountServiceAccountToken in the deployment
+## ref: https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/#bound-service-account-token-volume
+##
+# automountServiceAccountToken: false
 
 ## Additional config files to mount in the containers in `/configmaps`.
 ##

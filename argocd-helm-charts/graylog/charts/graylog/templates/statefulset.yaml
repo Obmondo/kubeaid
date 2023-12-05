@@ -15,6 +15,10 @@ spec:
 {{ include "graylog.selectorLabels" . | indent 6 }}
   updateStrategy:
     type: {{ .Values.graylog.updateStrategy }}
+    {{- if .Values.graylog.maxUnavailable }}
+    rollingUpdate:
+      maxUnavailable: {{ .Values.graylog.maxUnavailable }}
+    {{- end }}
   template:
     metadata:
       labels:

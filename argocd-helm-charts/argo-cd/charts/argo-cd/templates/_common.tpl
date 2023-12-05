@@ -39,6 +39,13 @@ Create Argo CD app version
 {{- end -}}
 
 {{/*
+Return valid version label
+*/}}
+{{- define "argo-cd.versionLabelValue" -}}
+{{ regexReplaceAll "[^-A-Za-z0-9_.]" (include "argo-cd.defaultTag" .) "-" | trunc 63 | trimAll "-" | trimAll "_" | trimAll "." | quote }}
+{{- end -}}
+
+{{/*
 Common labels
 */}}
 {{- define "argo-cd.labels" -}}
@@ -46,6 +53,7 @@ helm.sh/chart: {{ include "argo-cd.chart" .context }}
 {{ include "argo-cd.selectorLabels" (dict "context" .context "component" .component "name" .name) }}
 app.kubernetes.io/managed-by: {{ .context.Release.Service }}
 app.kubernetes.io/part-of: argocd
+app.kubernetes.io/version: {{ include "argo-cd.versionLabelValue" .context }}
 {{- with .context.Values.global.additionalLabels }}
 {{ toYaml . }}
 {{- end }}
@@ -119,4 +127,21 @@ nodeAffinity:
 {{- end }}
 {{- end -}}
 {{- end -}}
+{{- end -}}
+
+{{/*
+Common deployment strategy definition
+- Recreate don't have additional fields, we need to remove them if added by the mergeOverwrite
+*/}}
+{{- define "argo-cd.strategy" -}}
+{{- $preset := . -}}
+{{- if (eq (toString $preset.type) "Recreate") }}
+type: Recreate
+{{- else if (eq (toString $preset.type) "RollingUpdate") }}
+type: RollingUpdate
+{{- with $preset.rollingUpdate }}
+rollingUpdate:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- end }}
 {{- end -}}

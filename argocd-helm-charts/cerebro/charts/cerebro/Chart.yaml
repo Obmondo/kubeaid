@@ -8,14 +8,10 @@ keywords:
 - elasticsearch
 - admin
 maintainers:
-- email: cdesaintmartin@wiremind.io
-  name: desaintmartin
-- email: amrini@wiremind.io
-  name: machine424
-- email: fminaud@wiremind.io
-  name: francoisminaud
+- name: Wiremind
+  url: https://github.com/wiremind/wiremind-helm-charts
 name: cerebro
 sources:
 - https://github.com/wiremind/wiremind-helm-charts/tree/main/charts/cerebro
 - https://github.com/lmenezes/cerebro-docker
-version: 2.0.3
+version: 2.0.4

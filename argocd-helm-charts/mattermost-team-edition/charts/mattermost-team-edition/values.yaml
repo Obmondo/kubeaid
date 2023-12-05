@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 image:
   repository: mattermost/mattermost-team-edition
-  tag: 8.0.1@sha256:554b811b8e9692fa0b3dbda4cc637fcb711ce3fc6699b2215312594ca32a6917
+  tag: 9.2.3@sha256:cb5cadcc338f03b13742582e0af7147c995e7ed1e92041f6dcf06986868f1346
   imagePullPolicy: IfNotPresent
 
 initContainerImage:
@@ -247,3 +247,8 @@ readinessProbe:
   failureThreshold: 3
   timeoutSeconds: 5
   periodSeconds: 10
+
+## Additional annotations for test job
+
+testJob:
+  annotations: {}

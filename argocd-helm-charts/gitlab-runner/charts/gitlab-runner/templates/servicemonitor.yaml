@@ -4,7 +4,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ include "gitlab-runner.fullname" . | quote }}
-  namespace: {{ default .Release.Namespace .Values.runners.namespace | quote }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     app: {{ include "gitlab-runner.fullname" . | quote }}
     chart: {{ include "gitlab-runner.chart" . | quote }}
@@ -13,6 +13,9 @@ metadata:
     {{- if .Values.metrics.serviceMonitor.labels }}
       {{- toYaml .Values.metrics.serviceMonitor.labels | nindent 4 }}
     {{- end }}
+  {{- with .Values.metrics.serviceMonitor.annotations }}
+  annotations: {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   endpoints:
   - port: {{ .Values.metrics.portName | quote }}

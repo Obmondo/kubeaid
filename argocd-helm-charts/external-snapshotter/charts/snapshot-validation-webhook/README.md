@@ -1,5 +1,8 @@
 # snapshot-validation-webhook
 
+> **Discontinuing notice**: The chart has been merged with the [*snapshot-controller*](../snapshot-controller/README.md) chart
+> in the same repository. This chart has been archived.
+
 Deploys the [snapshot-validation-webhook](https://github.com/kubernetes-csi/external-snapshotter/#validating-webhook)
 and configures your cluster to validate every `VolumeSnapshot` and `VolumeSnapshotContent` resource by sending it to
 the webhook.
