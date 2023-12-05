@@ -22,7 +22,7 @@ spec:
 {{- else }}
   replicas: {{ .Values.reloader.deployment.replicas }}
 {{- end}}
-  revisionHistoryLimit: 2
+  revisionHistoryLimit: {{ .Values.reloader.deployment.revisionHistoryLimit }}
   selector:
     matchLabels:
       app: {{ template "reloader-fullname" . }}
@@ -205,6 +205,10 @@ spec:
             {{- if .Values.reloader.custom_annotations.match }}
           - "--search-match-annotation"
           - "{{ .Values.reloader.custom_annotations.match }}"
+            {{- end }}
+            {{- if .Values.reloader.webhookUrl }}
+          - "--webhook-url"
+          - "{{ .Values.reloader.webhookUrl }}"
             {{- end }}
           {{- end }}
           {{- if eq .Values.reloader.isArgoRollouts true }}

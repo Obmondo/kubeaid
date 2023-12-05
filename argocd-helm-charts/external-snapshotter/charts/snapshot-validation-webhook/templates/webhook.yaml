@@ -56,7 +56,7 @@ metadata:
     cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ include "snapshot-validation-webhook.fullname" . }}
   {{- end }}
 webhooks:
-  - name: {{ include "snapshot-validation-webhook.name" . }}.csi.kubernetes.io
+  - name: {{ include "snapshot-validation-webhook.name" . }}.snapshot.storage.k8s.io
     rules:
       - apiGroups:
         - snapshot.storage.k8s.io
@@ -80,8 +80,36 @@ webhooks:
       caBundle: {{ $ca }}
       {{- end }}
     admissionReviewVersions:
-    - v1
-    - v1beta1
+      - v1
+      - v1beta1
+    sideEffects: None
+    failurePolicy: {{ .Values.webhook.failurePolicy }}
+    timeoutSeconds: {{ .Values.webhook.timeoutSeconds }}
+  - name: {{ include "snapshot-validation-webhook.name" . }}.groupsnapshot.storage.k8s.io
+    rules:
+      - apiGroups:
+          - groupsnapshot.storage.k8s.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - volumegroupsnapshots
+          - volumegroupsnapshotcontents
+          - volumegroupsnapshotclasses
+        scope: "*"
+    clientConfig:
+      service:
+        namespace: {{ .Release.Namespace }}
+        name: {{ include "snapshot-validation-webhook.fullname" . }}
+        path: "/volumegroupsnapshot"
+      {{- if not .Values.tls.certManagerIssuerRef }}
+      caBundle: {{ $ca }}
+      {{- end }}
+    admissionReviewVersions:
+      - v1
+      - v1beta1
     sideEffects: None
     failurePolicy: {{ .Values.webhook.failurePolicy }}
     timeoutSeconds: {{ .Values.webhook.timeoutSeconds }}

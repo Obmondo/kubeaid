@@ -19,7 +19,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "haproxy.fullname" . }}
-  namespace: {{ template "haproxy.namespace" . }}
+  namespace: {{ include "haproxy.namespace" . }}
   labels:
     {{- include "haproxy.labels" . | nindent 4 }}
   {{- if .Values.podAnnotations }}
@@ -88,7 +88,7 @@ spec:
           projected:
             sources:
             - configMap:
-                name: includes
+                name: {{ include "haproxy.includes" . }}
         {{- end }}
         {{- range $mountedSecret := .Values.mountedSecrets }}
         - name: {{ $mountedSecret.volumeName }}
@@ -151,8 +151,8 @@ spec:
           {{- end }}
           volumeMounts:
             - name: haproxy-config
-              mountPath: /usr/local/etc/haproxy/haproxy.cfg
-              subPath: haproxy.cfg
+              mountPath: {{ .Values.configMount.mountPath }}
+              subPath: {{ .Values.configMount.subPath }}
             {{- if .Values.includes }}
             - name: includes
               mountPath: {{ .Values.includesMountPath }}

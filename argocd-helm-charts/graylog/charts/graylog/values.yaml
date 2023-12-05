@@ -356,6 +356,10 @@ graylog:
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   ##
   updateStrategy: RollingUpdate
+  ## Control the maximum number of Pods that can be unavailable during an update
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#maximum-unavailable-pods
+  ##
+  # maxUnavailable: 10%
 
   ## Graylog server pod termination grace period
   ##

@@ -1,9 +1,9 @@
 apiVersion: v2
-appVersion: 13.0.0
+appVersion: 14.2.1
 description: Teleport provides a secure SSH, Kubernetes, database and application
   remote access solution that doesn't get in the way.
 icon: https://goteleport.com/images/logos/logo-teleport-square.svg
 keywords:
 - Teleport
 name: teleport-kube-agent
-version: 13.0.0
+version: 14.2.1

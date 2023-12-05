@@ -1,9 +1,9 @@
 annotations:
   artifacthub.io/changes: |
-    - kind: added
-      description: "Initial release from official repo."
+    - kind: changed
+      description: "Changed the image registry location to registry.k8s.io."
 apiVersion: v2
-appVersion: 0.5.0
+appVersion: 0.6.2
 description: Metrics Server is a scalable, efficient source of container resource
   metrics for Kubernetes built-in autoscaling pipelines.
 home: https://github.com/kubernetes-sigs/metrics-server
@@ -23,4 +23,4 @@ name: metrics-server
 sources:
 - https://github.com/kubernetes-sigs/metrics-server
 type: application
-version: 3.5.0
+version: 3.8.4

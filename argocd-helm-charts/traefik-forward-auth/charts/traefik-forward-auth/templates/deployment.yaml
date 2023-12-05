@@ -25,6 +25,9 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       serviceAccountName: {{ include "traefik-forward-auth.fullname" . }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: "{{ .Values.priorityClassName }}"
+      {{- end }}
 {{- if .Values.initContainers }}
       initContainers:
         {{- toYaml .Values.initContainers | nindent 8 }}
@@ -86,8 +89,10 @@ spec:
               value: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
               {{- end }}
             {{- end }}
+            {{- if .Values.traefikForwardAuth.logLevel }}
             - name: LOG_LEVEL
-              value: "trace"
+              value: {{ .Values.traefikForwardAuth.logLevel | quote }}
+            {{- end }}
             - name: SERVICE_ACCOUNT_TOKEN_PATH
               value: "/var/run/secrets/kubernetes.io/serviceaccount/token"
             {{- if .Values.traefikForwardAuth.clientSecret.valueFrom.secretKeyRef }}

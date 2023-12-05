@@ -1,10 +1,10 @@
-# Copyright 2020 The Kubernetes Authors.
+# Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +20,7 @@
 image:
   ## Repository for container
   repository: kubernetesui/dashboard
-  tag: v2.7.0
+  tag: ""  # If not defined, uses appVersion of Chart.yaml
   pullPolicy: IfNotPresent
   pullSecrets: []
 
@@ -84,6 +84,7 @@ extraManifests: []
 ## To disable set the following configuration to null:
 # securityContext: null
 securityContext:
+  runAsNonRoot: true
   seccompProfile:
     type: RuntimeDefault
 
@@ -95,6 +96,8 @@ containerSecurityContext:
   readOnlyRootFilesystem: true
   runAsUser: 1001
   runAsGroup: 2001
+  capabilities:
+    drop: ["ALL"]
 
 ## @param podLabels Extra labels for OAuth2 Proxy pods
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
@@ -257,7 +260,7 @@ metricsScraper:
   enabled: false
   image:
     repository: kubernetesui/metrics-scraper
-    tag: v1.0.8
+    tag: v1.0.9
   resources: {}
   ## SecurityContext especially for the kubernetes dashboard metrics scraper container
   ## If not set, the global containterSecurityContext values will define these values
@@ -343,7 +346,12 @@ networkPolicy:
   # Whether to create a network policy that allows/restricts access to the service
   enabled: false
 
+  # Whether to set network policy to deny all ingress traffic for the kubernetes-dashboard
+  ingressDenyAll: false
+
 ## podSecurityPolicy for fine-grained authorization of pod creation and updates
+## Note that PSP is deprecated and has been removed from kubernetes 1.25 onwards.
+## For 1.25+ consider enabling PodSecurityAdmission, refer to chart README.md.
 podSecurityPolicy:
   # Specifies whether a pod security policy should be created
   enabled: false
@@ -355,3 +363,8 @@ serviceMonitor:
   labels: {}
   ## Here annotations can be added to the serviceMonitor
   annotations: {}
+
+## Optional containers, i.e. for auth addons.
+optionalContainers:
+  enabled: false
+  containers: []
