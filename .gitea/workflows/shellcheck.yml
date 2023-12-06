@@ -23,4 +23,4 @@ jobs:
     - name: Run shelllcheck
       if: ${{ github.event_name == 'pull_request' }}
       run: |
-        find . -not -path './argocd-helm-charts/*' -a -not -path './build/kube-prometheus/libraries/*' -a -not -path './build/vendor/*' -name '*.sh' -o -name '*.bash' | xargs shellcheck
+        find . -type f \( -name *.sh -o -name '*.bash' \) ! \( -path './argocd-helm-charts/*/charts/*' -o -path './build/vendor/*' -o -path './build/kube-prometheus/libraries/*' \) | xargs shellcheck
