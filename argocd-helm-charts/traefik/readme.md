@@ -1,6 +1,10 @@
-# Traefik Setup
+# Traefik - a loadbalancer
 
-## Internal
+## Traefik dashboard
+
+you can access it by doing ```kubectl -n traefik port-forward <podname> 9000:9000``` and opening http://localhost:9000/dashboard/ in your browser
+
+## Setup for Internal use
 
 * We setup an internal service which will have an internal loadbalance IP
 
@@ -9,12 +13,13 @@
 ```yaml
 service:
   annotations:
-    service.beta.kubernetes.io/aws-load-balancer-scheme: "internel"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internal"
 ```
 
 ### AKS
 
-```yaml
+```yamltraefik-zs6m9   0/1     Evicted                  0          60m
+
 service:
   annotations:
     service.beta.kubernetes.io/azure-load-balancer-internal: "true"
