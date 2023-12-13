@@ -89,6 +89,14 @@ upgradeJobResources: {}
 #   limits:
 #     cpu: 100m
 #     memory: 256Mi
+upgradeCRDsJob:
+  # Extra volumes for the Upgrade CRDs Job. Optional.
+  extraVolumes: []
+  # Extra volumeMounts for the Upgrade CRDs Job. Optional.
+  extraVolumeMounts: []
+  # Extra key/value pairs to be used as environment variables. Optional.
+  extraEnvVars: {}
+
 
 # Configure the dnsPolicy of the Velero deployment
 # See: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
@@ -471,7 +479,7 @@ serviceAccount:
 credentials:
   # Whether a secret should be used. Set to false if, for examples:
   # - using kube2iam or kiam to provide AWS IAM credentials instead of providing the key file. (AWS only)
-  # - using workload identity instead of providing the key file. (GCP only)
+  # - using workload identity instead of providing the key file. (Azure/GCP only)
   useSecret: true
   # Name of the secret to create if `useSecret` is true and `existingSecret` is empty
   name:
