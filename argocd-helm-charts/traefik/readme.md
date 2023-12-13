@@ -2,7 +2,8 @@
 
 ## Traefik dashboard
 
-you can access it by doing ```kubectl -n traefik port-forward <podname> 9000:9000``` and opening http://localhost:9000/dashboard/ in your browser
+you can access it by doing ```kubectl -n traefik port-forward <podname> 9000:9000```
+  and openinghttp://localhost:9000/dashboard/ in your browser
 
 ## Setup for Internal use
 
