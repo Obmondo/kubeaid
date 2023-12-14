@@ -36,40 +36,25 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-            - name: DOCKER_HOST
-              value: "tcp://localhost:2375"
-            - name: DOCKER_TLS_CERTDIR
-              value: ""
             - name: GITEA_INSTANCE_URL
               value: {{ .Values.act_runner.instance }}
+            - name: GITEA_RUNNER_MAX_PARALLEL_JOBS
+              value: {{ .Values.act_runner.parallel_jobs }}
+            - name: GITEA_RUNNER_LABELS
+              value: {{ join "," .Values.act_runner.labels }}
             - name: GITEA_RUNNER_REGISTRATION_TOKEN
               valueFrom:
                 secretKeyRef:
+                  {{- if not .Values.act_runner.existingToken }}
                   name: {{ include "act_runner.fullname" . }}-secret
+                  {{- else }}
+                  name: {{ .Values.act_runner.existingToken }}
+                  {{- end }}
                   key: act-runner-token
-            - name: GITEA_RUNNER_LABELS
-              value: {{ join "," .Values.act_runner.labels }}
           volumeMounts:
-            - name: docker-data
-              mountPath: /shared
-            - name: {{ include "act_runner.fullname" . }}-pvc
-              mountPath: /data
-        - name: act-runner-dind
-          securityContext:
-            privileged: true
-          image: docker:23.0.0-dind
-          imagePullPolicy: IfNotPresent
-          env:
-            - name: DOCKER_DRIVER
-              value: "overlay2"
-            - name: DOCKER_TLS_CERTDIR
-              value: ""
-          volumeMounts:
-            - name: docker-data
-              mountPath: /shared
+            - mountPath: /data
+              name: {{ include "act_runner.fullname" . }}-pvc
       volumes:
-        - name: docker-data
-          emptyDir:
         - name: {{ include "act_runner.fullname" . }}-pvc
           persistentVolumeClaim:
             claimName: {{ include "act_runner.fullname" . }}-pvc

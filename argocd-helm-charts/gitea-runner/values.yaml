@@ -11,7 +11,7 @@ act-runner:
   act_runner:
     parallel_jobs: 2
     storage:
-      size: 40Gi
+      size: 20Gi
 runner:
   nameSpace:
     create: false
