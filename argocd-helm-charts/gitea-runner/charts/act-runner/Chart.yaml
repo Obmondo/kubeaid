@@ -1,5 +1,4 @@
 apiVersion: v2
-appVersion: 0.2.6
 name: act-runner
-type: application
 version: 1.0.0
+appVersion: 0.2.6

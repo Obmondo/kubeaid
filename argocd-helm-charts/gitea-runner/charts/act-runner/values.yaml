@@ -64,6 +64,10 @@ affinity: {}
 act_runner:
   storageclass: "default"
   instance: "https://gitea.example.com"
+  storage:
+    size: 1024Mi
+  parallel_jobs: 2
+  existingToken: ""
   token: ""
   labels:
     - "ubuntu-latest:docker://node:16-bullseye"
