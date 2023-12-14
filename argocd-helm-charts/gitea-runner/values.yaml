@@ -1,19 +1,76 @@
-act-runner:
-  podSecurityContext:
-    fsGroup: 1000
-  securityContext:
-    privileged: true
-    runAsUser: 1000
-    runAsGroup: 1000
-  image:
-    repository: vegardit/gitea-act-runner
-    tag: dind-rootless-0.2.6
-  act_runner:
-    parallel_jobs: 2
+# Default values for act_runner.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: gitea/act_runner
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "0.2.6"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+act_runner:
+  storageclass: "default"
+  instance: "https://gitea.example.com"
     storage:
-      size: 40Gi
-runner:
-  nameSpace:
-    create: false
-  serviceAccount:
-    create: false
+    size: 1024Mi
+  parallel_jobs: 2
+  existingToken: ""
+  token: ""
+  labels:
+    - "ubuntu-latest:docker://node:16-bullseye"
+    - "ubuntu-22.04:docker://node:16-bullseye"
+    - "ubuntu-20.04:docker://node:16-bullseye"
+    - "ubuntu-18.04:docker://node:16-buster"
