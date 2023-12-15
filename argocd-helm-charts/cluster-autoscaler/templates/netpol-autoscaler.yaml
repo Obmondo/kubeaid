@@ -35,7 +35,7 @@ spec:
   - action: Allow
     protocol: TCP
     destination:
-      selector: kubernetes.io/role == 'master'
+      selector: kubernetes.io/role == master
       namespaceSelector: global()
       ports:
       - 443
