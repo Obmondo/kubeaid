@@ -1,7 +1,0 @@
-kube-prometheus-stack:
-  grafana:
-    enabled: false
-  nodeExporter:
-    enabled: false
-  kubeStateMetrics:
-    enabled: false
