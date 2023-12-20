@@ -55,6 +55,12 @@ wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY}.tar.
 
 * You can refer to the [sealed-secrets README](../sealed-secrets/README.md) for more info and a template you can use.
 
+* Generate sealedsecret by running following command
+
+```bash
+kubectl create secret generic repo-token-name --namespace argocd --dry-run=client --from-literal=type='git' --from-literal=name='repo-token-name' --from-literal=url='https://gitea.obmondo.com/EnableIT/repo-name.git' --from-literal=username='enableit_bot' --from-literal=password='SECRETPASSWORD' --output yaml | yq eval '.metadata.labels.["argocd.argoproj.io/secret-type"]="repository"' - | yq eval '.metadata.annotations.["sealedsecrets.bitnami.com/managed"]="true"' - | yq eval '.metadata.annotations.["managed-by"]="argocd.argoproj.io"' - | kubeseal --controller-namespace system --controller-name sealed-secrets --format yaml - > repo-token-name.yaml 
+```
+
 * Apply the secret in the `argocd` namespace of your cluster:
 
 ```sh
