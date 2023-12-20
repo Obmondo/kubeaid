@@ -1,1 +1,8 @@
 networkpolicies: true
+snapshot-controller:
+  webhook:
+    tls:
+      certManagerIssuerRef:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: selfsigned
