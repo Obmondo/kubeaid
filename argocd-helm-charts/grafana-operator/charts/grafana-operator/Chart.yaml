@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: v5.6.0
+description: A Helm chart for Kubernetes
+name: grafana-operator
+type: application
+version: v5.6.0
