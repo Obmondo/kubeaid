@@ -47,3 +47,22 @@ service:
     service.beta.kubernetes.io/azure-load-balancer-internal: "false"
     service.beta.kubernetes.io/azure-load-balancer-resource-group: <your-resource-group-name>
 ```
+
+### TLS (Auth)[https://doc.traefik.io/traefik/https/tls/#client-authentication-mtls]
+
+* NOTE: Make sure the key is either ca.crt or tls.ca
+
+```sh
+kubectl create secret generic internalca-cert --namespace traefik --dry-run=client --from-file=/path/to/ca.crt -o yaml | kubeseal --controller-namespace system --controller-name sealed-secrets -o yaml
+```
+
+* Add this in the values file
+
+```yaml
+tlsOptions:
+  tls-client-auth:
+    clientAuth:
+      clientAuthType: VerifyClientCertIfGiven
+      secretNames:
+        - internalca-cert
+```
