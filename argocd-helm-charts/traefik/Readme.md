@@ -48,8 +48,9 @@ service:
     service.beta.kubernetes.io/azure-load-balancer-resource-group: <your-resource-group-name>
 ```
 
-### TLS (Auth)[https://doc.traefik.io/traefik/https/tls/#client-authentication-mtls]
+### TLS Auth
 
+* [Doc](https://doc.traefik.io/traefik/https/tls/#client-authentication-mtls)
 * NOTE: Make sure the key is either ca.crt or tls.ca
 
 ```sh
