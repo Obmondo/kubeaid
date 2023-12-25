@@ -5,6 +5,7 @@ middleware:
     # public_key: <add your pubkey here>
 
 traefik:
+  instanceLabelOverride: traefik
   podDisruptionBudget:
     enabled: true
     maxUnavailable: 1
@@ -32,13 +33,12 @@ traefik:
     - "--entrypoints.web.proxyprotocol.insecure=true"
     - "--entrypoints.websecure.proxyprotocol=true"
     - "--entrypoints.websecure.proxyprotocol.insecure=true"
-  #  - "--experimental.plugins.jwt.moduleName=github.com/team-carepay/traefik-jwt-plugin"
-  #  - "--experimental.plugins.jwt.version=v0.0.13"
   # https://github.com/argoproj/argo-cd/issues/1704#issuecomment-904741817
   providers:
     kubernetesIngress:
       publishedService:
         enabled: true
+
 # defines an ingressroute (public url - custom traefik CRD that replaces generic ingress type) for traefik dashboard. Not advised to enable - and below needs addition of a specific url to be accessible.
 #  ingressRoute:
 #    dashboard:
