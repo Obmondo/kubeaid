@@ -39,7 +39,7 @@ rules:
   verbs:
     - '*'
 - apiGroups:
-    - traefik.containo.us
+    - traefik.io
   resources:
     - middlewares
   verbs:
