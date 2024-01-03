@@ -1,6 +1,8 @@
-# Self Hosted Monitoring by KubeAid
+# Self Hosted LinuxAid Monitoring (servers + vms) on Kubernetes
 
 ## Requirements
+
+NOTE: This is already present - if your cluster is managed by KubeAid, as its part of the KubeAid monitoring setup (kube-prometheus).
 
 * Need prometheus-operator and grafana-operator to be installed and running
 
