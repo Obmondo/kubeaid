@@ -6,7 +6,8 @@
 
 ## Deployments
 
-* The value file only needs the customer-id and rest everything is fine, unless we want to change anything and all the settings are for all the customer, we can fix this easily with helm logics
+* The value file only needs the customer-id and rest everything is fine, unless we want to change anything
+  and all the settings are for all the customer, we can fix this easily with helm logics
 
 ## Dashboards
 
@@ -20,9 +21,10 @@ mysql: https://github.com/percona/grafana-dashboards/blob/main/dashboards/MySQL/
 
 * The dashboard are added as (gzipJson](https://grafana.github.io/grafana-operator/docs/examples/dashboard_gzipped/readme/)
 
-  * WHY ? helm template consider some dashboard function as templateble and tries to parse it and fails, and yaml string `| or >` didn't worked for me.
+  * WHY ? helm template consider some dashboard function as templateble
+    and tries to parse it and fails, and yaml string `| or >` didn't worked for me.
 
-  ```
+  ```sh
   # cat /tmp/dashboard.json | gzip | base64 -w0
   # cat /tmp/posgres.json | gzip | base64 -w0 | xclip -selection clipboard -i
   ```
