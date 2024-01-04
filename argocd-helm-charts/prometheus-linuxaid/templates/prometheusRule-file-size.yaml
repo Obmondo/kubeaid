@@ -1,9 +1,9 @@
-{{- if .Values.prometheusRule.file }}
+{{- if .Values.prometheusRule.file_size }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: file-rules
+  name: file-size-rules
   namespace: monitoring-{{ .Values.customerid }}
 spec:
-  {{- $.Files.Get "rules/file.yaml" | nindent 4 }}
+  {{- $.Files.Get "rules/file_size.yaml" | nindent 4 }}
 {{- end }}
