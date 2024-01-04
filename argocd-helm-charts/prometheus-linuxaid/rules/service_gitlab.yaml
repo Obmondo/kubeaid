@@ -1,0 +1,32 @@
+---
+groups:
+  - name: monitor::system::service::gitlab
+    rules:
+    - alert: monitor::system::service::gitlab::ci_pending_builds
+      expr: |
+        (
+          sum (ci_pending_builds) by (certname) >= on (certname) group_left threshold::monitor::system::service::gitlab::ci_pending_builds_max
+          or
+          sum (ci_pending_builds) by (certname) >= 10
+        ) and on(certname) obmondo_monitoring{alert_id="monitor::system::service::gitlab::ci_pending_builds"} > 0
+      labels:
+        severity: warning
+        alert_id: monitor::system::service::gitlab::ci_pending_builds
+      annotations:
+        summary: 'GitLab on **{{ $labels.certname }}** has too many pending CI jobs'
+        description: |-2
+          GitLab on **{{ $labels.certname }}** has `{{ .Value }} > {{ $threshold := $labels.certname | printf "threshold::monitor::system::service::gitlab::ci_pending_builds_max{certname=\"%s\"}" | query }}{{ range $value := $threshold }}{{ $value | value }}{{ else }}unknown{{ end }}` pending CI jobs.
+
+          Possible causes: GitLab CI runners down, or a large amount of jobs suddenly created.
+
+    - alert: monitor::system::service::gitlab::update
+      expr: |
+        obmondo_gitlab_update_available == 1
+        and on(certname) obmondo_monitoring{alert_id="monitor::system::service::gitlab::update"} > 0
+      for: 21d
+      labels:
+        severity: critical
+        alert_id: monitor::system::service::gitlab::update
+      annotations:
+        summary: 'Gitlab update available for **{{ $labels.certname }}**'
+        description: 'An update is available for gitlab for instance **{{ $labels.certname }}**. Please update it to latest'

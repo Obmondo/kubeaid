@@ -1,0 +1,9 @@
+{{- if .Values.prometheusRule.dellhw }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: dellhw
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  {{- $.Files.Get "rules/dellhw.yaml" | nindent 4 }}
+{{- end }}

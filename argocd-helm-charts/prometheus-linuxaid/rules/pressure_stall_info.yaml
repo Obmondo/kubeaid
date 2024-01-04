@@ -1,0 +1,71 @@
+groups:
+  - name: psi
+    rules:
+    - record: record::monitor::system::psi::io
+      expr: rate(node_pressure_io_stalled_seconds_total[15m])
+      labels:
+        threshold: 0.5
+        alert_id: monitor::system::psi::io
+
+    - record: record::monitor::system::psi::memory
+      expr: rate(node_pressure_memory_stalled_seconds_total[15m])
+      labels:
+        threshold: 0.04
+        alert_id: monitor::system::psi::memory
+
+    - record: record::monitor::system::psi::cpu
+      expr: rate(node_pressure_cpu_waiting_seconds_total[15m])
+      labels:
+        threshold: 0.6
+        alert_id: monitor::system::psi::cpu
+
+    - alert: monitor::system::psi::io
+      expr: |
+        record::monitor::system::psi::io >
+        on (certname) group_left(threshold)
+        (
+            threshold::monitor::system::psi::io
+            or on(certname) count by (certname, threshold)
+            (record::monitor::system::psi::io) * 0 + 0.5
+        ) and on(certname) obmondo_monitoring{alert_id="monitor::system::psi::io"} > 0
+      for: 5m
+      labels:
+        severity: critical
+        alert_id: monitor::system::psi::io
+      annotations:
+        summary: "The PSI IO stalling is high for **{{ $labels.certname }}**"
+        description: "PSI IO stalling for **{{ $labels.certname }}** is {{ $value|humanize }} is above threshold of {{ $labels.threshold }}"
+
+    - alert: monitor::system::psi::memory
+      expr: |
+        record::monitor::system::psi::memory >
+        on (certname) group_left(threshold)
+        (
+            threshold::monitor::system::psi::memory
+            or on(certname) count by (certname, threshold)
+            (record::monitor::system::psi::memory) * 0 + 0.04
+        ) and on(certname) obmondo_monitoring{alert_id="monitor::system::psi::memory"} > 0
+      for: 5m
+      labels:
+        severity: critical
+        alert_id: monitor::system::psi::memory
+      annotations:
+        summary: "The PSI memory stalling is high for **{{ $labels.certname }}**"
+        description: "PSI memory stalling for **{{ $labels.certname }}** is {{ $value|humanize }} is above threshold of {{ $labels.threshold }}"
+
+    - alert: monitor::system::psi::cpu
+      expr: |
+        record::monitor::system::psi::cpu >
+        on (certname) group_left(threshold)
+        (
+            threshold::monitor::system::psi::cpu
+            or on(certname) count by (certname, threshold)
+            (record::monitor::system::psi::cpu) * 0 + 0.6
+        ) and on(certname) obmondo_monitoring{alert_id="monitor::system::psi::cpu"} > 0
+      for: 5m
+      labels:
+        severity: critical
+        alert_id: monitor::system::psi::cpu
+      annotations:
+        summary: "The PSI CPU waiting is high for **{{ $labels.certname }}**"
+        description: "PSI CPU waiting for **{{ $labels.certname }}** is {{ $value|humanize }} is above threshold of {{ $labels.threshold }}"

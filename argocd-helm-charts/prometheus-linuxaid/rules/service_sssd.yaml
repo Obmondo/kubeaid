@@ -1,0 +1,27 @@
+---
+groups:
+  - name: monitor::system::service::sssd
+    rules:
+    - alert: monitor::system::service::sssd::lookup_failed
+      expr: |
+        obmondo_service_sssd_user_check_last_lookup_exit_status != 0
+        and on(certname) obmondo_monitoring{alert_id="monitor::system::service::sssd::lookup_failed"} > 0
+      labels:
+        severity: critical
+        alert_id: monitor::system::service::sssd::lookup_failed
+      annotations:
+        summary: "SSSD on **{{ $labels.certname }}** is unable to look up user accounts"
+        description: |+2
+          SSSD on **{{ $labels.certname }}** is unable to look up users from AD. This could be due to the users no longer existing, SSSD being broken or trouble with AD.
+
+    - alert: monitor::system::service::sssd::check
+      expr: |
+        obmondo_sssd_status_check == 1
+        and on(certname) obmondo_monitoring{alert_id="monitor::system::service::sssd::check"} > 0
+      for: 5m
+      labels:
+        severity: critical
+        alert_id: monitor::system::service::sssd::check
+      annotations:
+        summary: 'SSSD is not online on **{{ $labels.certname }}**'
+        description: 'SSSD is not online on **{{ $labels.certname }}**. Please look into it'

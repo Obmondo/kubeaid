@@ -1,0 +1,9 @@
+{{- if .Values.prometheusRule.prometheus }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: prometheus-rules
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  {{- $.Files.Get "rules/prometheus.yaml" | nindent 4 }}
+{{- end }}

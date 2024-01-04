@@ -1,0 +1,54 @@
+groups:
+  - name: monitor::system::load
+    rules:
+    - alert: monitor::system::load::load1_percpu
+      expr: |
+        (
+          sum(node_load1) by (certname) / count(node_cpu_seconds_total{mode="idle"}) by (certname) * 100 >= on(certname) threshold::monitor::system::load::load1_percpu
+          or
+          sum(node_load1) by (certname) / count(node_cpu_seconds_total{mode="idle"}) by (certname) * 100 >= 600
+        ) and on (certname) obmondo_monitoring{alert_id="monitor::system::load::load_percpu"} > 0
+      for: 10m
+      labels:
+        alert_id: monitor::system::load::load_percpu
+        severity: critical
+      annotations:
+        summary: 'System load1 average per CPU too high'
+        description: |
+          System `load1` average per CPU on **{{ .Labels.certname }}** is {{ .Value|humanize }}% which is above the threshold of {{ with printf "threshold::monitor::system::load::load1_percpu{certname='%s'}" .Labels.certname | query }}{{ . | first | value }}{{ else }}{{ "600" }}{{ end }}% for 5 minutes.
+
+  - name: system_load5
+    rules:
+    - alert: monitor::system::load::load5_percpu
+      expr: |
+        (
+          sum(node_load5) by (certname) / count(node_cpu_seconds_total{mode="idle"}) by (certname) * 100 >= on(certname) threshold::monitor::system::load::load5_percpu
+          or
+          sum(node_load5) by (certname) / count(node_cpu_seconds_total{mode="idle"}) by (certname) * 100 >= 400
+        ) and on (certname) obmondo_monitoring{alert_id="monitor::system::load::load_percpu"} > 0
+      for: 10m
+      labels:
+        severity: critical
+        alert_id: monitor::system::load::load_percpu
+      annotations:
+        summary: 'System load5 average per CPU too high'
+        description: |
+          System `load5` average per CPU on **{{ .Labels.certname }}** is {{ .Value|humanize }}% which is above the threshold of {{ with printf "threshold::monitor::system::load::load5_percpu{certname='%s'}" .Labels.certname | query }}{{ . | first | value }}{{ else }}{{ "400" }}{{ end }}% for 10 minutes.
+
+  - name: system_load15
+    rules:
+    - alert: monitor::system::load::load15_percpu
+      expr: |
+        (
+          sum(node_load15) by (certname) / count(node_cpu_seconds_total{mode="idle"}) by (certname) * 100 >= on(certname) threshold::monitor::system::load::load15_percpu
+          or
+          sum(node_load15) by (certname) / count(node_cpu_seconds_total{mode="idle"}) by (certname) * 100 >= 300
+        ) and on (certname) obmondo_monitoring{alert_id="monitor::system::load::load_percpu"} > 0
+      for: 10m
+      labels:
+        severity: critical
+        alert_id: monitor::system::load::load_percpu
+      annotations:
+        summary: 'System load15 average per CPU too high'
+        description: |
+          System `load15` average per CPU on **{{ .Labels.certname }}** is {{ .Value|humanize }}% which is above the threshold of {{ with printf "threshold::monitor::system::load::load15_percpu{certname='%s'}" .Labels.certname | query }}{{ . | first | value }}{{ else }}{{ "300" }}{{ end }}% for 15 minutes.

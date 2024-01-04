@@ -1,0 +1,34 @@
+groups:
+  - name: monitor::system::puppet::last_run
+    rules:
+    - alert: monitor::system::puppet::last_run
+      expr: time() - puppet_report{environment="production", host!~".+.niwyocdmk2"} >= 86400 * 2
+      labels:
+        alert_id: 'monitor::system::puppet::last_run'
+        severity: warning
+      annotations:
+        summary: 'Puppet has not run on **{{ $labels.host }}** for more than {{ $value | humanizeDuration }}'
+        description: |-2
+          Last Puppet run on **{{ $labels.host }}** was on {{ $labels.host | printf "puppet_report{host=\"%s\"}" | query | first | value | humanizeTimestamp }}, more than the limit of 2 days ago.
+
+          This could be due to any number of things, e.g. Puppet crashing or hanging, or cron/systemd timers being broken.
+
+    - alert: monitor::system::puppet::total_resources
+      expr: count(puppet_status{state="failed",environment="production"} == 1) > 5
+      for: 48h
+      labels:
+        alert_id: 'monitor::system::puppet::total_resources'
+        severity: warning
+      annotations:
+        summary: 'Puppet run has failed on more than {{ $value }} nodes'
+        description: |-2
+          Most likely this is due to Puppet failing with an error on the node.
+
+          You can get the list of nodes on prom dashboard by running this query
+          ```sh
+          sum by (host) (puppet_status{environment="production",state="failed"} == 1)
+          ```
+
+          Puppetboard for the corresponding node should show that the past
+          Puppet runs has resulted in failures:
+          https://dashboard.obmondo.com/nodes?status=failed

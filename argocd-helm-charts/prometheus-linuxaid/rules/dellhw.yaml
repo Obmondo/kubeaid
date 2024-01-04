@@ -1,0 +1,14 @@
+groups:
+  - name: monitor::system::service::dellhw
+    rules:
+    - alert: monitor::system::service::dellhw::disk_healthy
+      expr: |
+        dell_hw_storage_pdisk_status == 1
+        and on(certname) obmondo_monitoring{alert_id="monitor::system::service::dellhw::disk_healthy"} > 0
+      for: 5m
+      labels:
+        severity: critical
+        alert_id: monitor::system::service::dellhw::disk_healthy
+      annotations:
+        summary: 'Disk status for disk **{{ $labels.disk }}** on **{{ $labels.certname }}** has failed'
+        description: 'Disk status for disk **{{ $labels.disk }}** on **{{ $labels.certname }}** has failed'

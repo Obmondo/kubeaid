@@ -1,0 +1,9 @@
+{{- if .Values.prometheusRule.iptables }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: iptables-rules
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  {{- $.Files.Get "rules/iptables.yaml" | nindent 4 }}
+{{- end }}
