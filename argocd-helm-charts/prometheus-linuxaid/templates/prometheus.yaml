@@ -4,18 +4,28 @@ metadata:
   name: {{ .Values.customerid }}
   namespace: monitoring-{{ .Values.customerid }}
 spec:
+  podMetadata:
+    labels:
+      app.kubernetes.io/instance: {{ .Values.customerid }}
+      app.kubernetes.io/name: prometheus
+  podMonitorNamespaceSelector: {}
+  podMonitorSelector: {}
+  probeNamespaceSelector: {}
+  probeSelector: {}
+  replicas: 1
+  retention: 15d
+  ruleNamespaceSelector: {}
+  ruleSelector: {}
   externalUrl: /{{ .Values.customerid }}
   routePrefix: /{{ .Values.customerid }}
   evaluationInterval: 30s
   portName: web
-  replicas: 1
   resources:
     limits:
       memory: 4Gi
     requests:
       cpu: 200m
       memory: 2Gi
-  retention: 30d
   scrapeInterval: 30s
   securityContext:
     fsGroup: 2000
