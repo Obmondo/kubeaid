@@ -4,19 +4,26 @@ set -eou pipefail
 
 TEMPDIR=$(mktemp -d)
 
-case "${KUBERNETES_CONFIG_REPO_URL}" in
-  *gitea*)
+# Set default authentication method
+AUTH_METHOD='gitea'
+
+# Override authentication method if GitHub URL is detected
+if [[ "$KUBERNETES_CONFIG_REPO_URL" == "https://github.com/"* ]]; then
+    AUTH_METHOD='github'
+fi
+
+case "${AUTH_METHOD}" in
+  'gitea')
     token=${GITEA_TOKEN}
-    URL="gitea.obmondo.com"
-    owner="EnableIT"
-    repo="KubeAid"
-    git clone "https://oauth2:${token}@${URL}/${owner}/${repo}" "${TEMPDIR}"
+    git clone "https://oauth2:${token}@${KUBERNETES_CONFIG_REPO_URL}" "${TEMPDIR}"
     ;;
-  *github*)
-    URL="github.com"
-    owner="Obmondo"
-    repo="kubeaid"
-    git clone "https://${URL}/${owner}/${repo}" "${TEMPDIR}"
+  'github')
+    git clone "${KUBERNETES_CONFIG_REPO_URL}" "${TEMPDIR}"
+    ;;
+  *)
+    echo "Invalid authentication method: ${AUTH_METHOD}"
+    exit 1
+    ;;
 esac
 
 cd "${TEMPDIR}"
