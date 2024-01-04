@@ -1,0 +1,9 @@
+{{- if .Values.prometheusRule.service_omsagent }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: service-omsagent-rules
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  {{- $.Files.Get "rules/service_omsagent.yaml" | nindent 4 }}
+{{- end }}

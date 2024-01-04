@@ -1,0 +1,48 @@
+groups:
+  - name: monitor::system::cpu
+    rules:
+    - alert: monitor::system::cpu::usage
+      expr: |
+        (
+          100 - avg by(certname) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100 >= on(certname) threshold::monitor::system::cpu::usage
+          or
+          100 - avg by(certname) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100 >= 80
+        ) and on(certname) obmondo_monitoring{alert_id="monitor::system::cpu::usage"} > 0
+      for: 15m
+      labels:
+        severity: critical
+        alert_id: monitor::system::cpu::usage
+      annotations:
+        summary: "CPU usage above threshold"
+        description: |
+          CPU usage on **{{ .Labels.certname }}** is around {{ .Value|humanize }}% which is above the threshold of {{ with printf "threshold::monitor::system::cpu::usage{certname='%s'}" .Labels.certname | query }}{{ . | first | value }}{{ else }}{{ "80" }}{{ end }}
+
+    - alert: monitor::system::cpu::temperature
+      expr: |
+        (
+          avg by(certname,chip) (node_hwmon_temp_celsius * on(chip, sensor, certname) group_left(label) node_hwmon_sensor_label) >= threshold::monitor::system::cpu::temperature
+          or
+          avg by(certname,chip) (node_hwmon_temp_celsius * on(chip, sensor, certname) group_left(label) node_hwmon_sensor_label) >= 104
+        ) and on(certname) obmondo_monitoring{alert_id="monitor::system::cpu::temperature"} > 0
+      for: 15m
+      labels:
+        severity: warning
+        alert_id: monitor::system::cpu::temperature
+      annotations:
+        summary: "CPU temperature above threshold"
+        description: CPU temperature on **{{ .Labels.certname }}** for **{{ .Labels.chip }}** is around {{ .Value|humanize }}c which is above the threshold of {{ with printf "threshold::monitor::system::cpu::temperature{certname='%s'}" .Labels.certname | query }}{{ . | first | value }}{{ else }}{{ "104" }}{{ end }}c
+
+    - alert: monitor::system::cpu::temperature
+      expr: |
+        (
+          avg by(certname,chip) (node_hwmon_temp_celsius * on(chip, sensor, certname) group_left(label) node_hwmon_sensor_label) >= threshold::monitor::system::cpu::temperature
+          or
+          avg by(certname,chip) (node_hwmon_temp_celsius * on(chip, sensor, certname) group_left(label) node_hwmon_sensor_label) >= 110
+        ) and on(certname) obmondo_monitoring{alert_id="monitor::system::cpu::temperature"} > 0
+      for: 15m
+      labels:
+        severity: critical
+        alert_id: monitor::system::cpu::temperature
+      annotations:
+        summary: "CPU temperature above threshold"
+        description: CPU temperature on **{{ .Labels.certname }}** for **{{ .Labels.chip }}** is around {{ .Value|humanize }}c which is above the threshold of {{ with printf "threshold::monitor::system::cpu::temperature{certname='%s'}" .Labels.certname | query }}{{ . | first | value }}{{ else }}{{ "110" }}{{ end }}c

@@ -1,0 +1,9 @@
+{{- if .Values.prometheusRule.service_sssd }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: service-sssd-rules
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  {{- $.Files.Get "rules/service_sssd.yaml" | nindent 4 }}
+{{- end }}

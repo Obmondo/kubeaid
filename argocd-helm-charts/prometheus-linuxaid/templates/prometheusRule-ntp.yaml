@@ -1,0 +1,9 @@
+{{- if .Values.prometheusRule.ntp }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: ntp-rules
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  {{- $.Files.Get "rules/ntp.yaml" | nindent 4 }}
+{{- end }}

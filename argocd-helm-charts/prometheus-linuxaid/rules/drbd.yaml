@@ -1,0 +1,28 @@
+groups:
+  - name: monitor::system::drbd
+    rules:
+    - alert: monitor::system::drbd::uptodate
+      expr: |
+        node_drbd_disk_state_is_up_to_date == 0
+        and on(certname) obmondo_monitoring{alert_id="monitor::system::drbd::uptodate"} > 0
+      for: 15m
+      labels:
+        severity: critical
+        alert_id: monitor::system::drbd::uptodate
+      annotations:
+        summary: "Drbd node is NOT up to date."
+        description: |
+          The DRBD **{{ .Labels.node }}** node for server **{{ .Labels.certname }}** for device **{{ .Labels.device }}** is not up to date.
+
+    - alert: monitor::system::drbd::connected
+      expr: |
+        node_drbd_connected == 0
+        and on(certname) obmondo_monitoring{alert_id="monitor::system::drbd::connected"} > 0
+      for: 15m
+      labels:
+        severity: critical
+        alert_id: monitor::system::drbd::connected
+      annotations:
+        summary: "Drbd node is NOT connected."
+        description: |
+          The DRBD server **{{ .Labels.certname }}** for device **{{ .Labels.device }}** is not connected.

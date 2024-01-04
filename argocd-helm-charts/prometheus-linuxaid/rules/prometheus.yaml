@@ -1,0 +1,67 @@
+groups:
+  - name: prometheus
+    rules:
+    - alert: monitor::metrics::missing::pushprox
+      expr: |
+        (up{job="pushprox"} == 0) * on (certname) group_left(job) (node_time_seconds - node_boot_time_seconds > 600)
+        and on(certname) obmondo_monitoring{alert_id="monitor::metrics::missing::pushprox"} > 0
+      for: 30m
+      labels:
+        severity: critical
+        alert_id: monitor::metrics::missing::pushprox
+      annotations:
+        summary: |
+          Missing Pushprox metrics for target {{ $labels.pushprox_target }} on **{{ $labels.instance }}**
+        description: |
+          Prometheus is missing Pushprox metrics for target {{ $labels.pushprox_target }} from instance **{{ $labels.instance }}**
+
+    - alert: PrometheusTsdbWalCorruptions
+      expr: |
+        increase(prometheus_tsdb_wal_corruptions_total[3m]) > 0
+        and on(certname) obmondo_monitoring{alert_id="monitor::prometheus::walcorruptions"} > 0
+      for: 5m
+      labels:
+        severity: critical
+        alert_id: prometheus
+      annotations:
+        summary: 'Prometheus database corruption'
+        description: 'Prometheus  encountered {{ $value }} TSDB WAL corruptions (instance {{ $labels.instance }})'
+
+    - alert: PrometheusLargeScrape
+      expr: |
+        increase(prometheus_target_scrapes_exceeded_sample_limit_total[10m]) > 10
+        and on(certname) obmondo_monitoring{alert_id="monitor::prometheus::largescrape"} > 0
+      for: 5m
+      labels:
+        severity: warning
+        alert_id: prometheus
+      annotations:
+        summary: 'Prometheus scrapes exceed sample limit'
+        description: 'Prometheus scrapes on {{ $labels.instance }} has exceed sample limit over the past 10 minutes.'
+
+    - alert: PrometheusTargetScrapingSlow
+      expr: |
+        prometheus_target_interval_length_seconds{quantile="0.9"} > 61
+        and on(certname) obmondo_monitoring{alert_id="monitor::prometheus::scrapingslow"} > 0
+      for: 5m
+      labels:
+        severity: warning
+        alert_id: prometheus
+      annotations:
+        summary: 'Prometheus scrape intervals are above 61 seconds - should not happen.'
+        description: 'Prometheus on {{ $labels.instance }} is scraping targets with an interval > 61 seconds.'
+
+    - alert: Watchdog
+      expr: vector(1)
+      labels:
+        severity: none
+        alert_id: monitor::prometheus::watchdog
+      annotations:
+        summary: 'Watchdog is working fine'
+        description: |+2
+          This is an alert meant to ensure that the entire alerting pipeline is
+          functional. This alert is always firing, therefore it should always be
+          firing in Alertmanager and always fire against a receiver. There are
+          integrations with various notification mechanisms that send a
+          notification when this alert is not firing. For example the
+          "DeadMansSnitch" integration in PagerDuty.

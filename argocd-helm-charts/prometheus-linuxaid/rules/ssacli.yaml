@@ -1,0 +1,14 @@
+groups:
+  - name: monitor::system::service::ssacli
+    rules:
+    - alert: monitor::system::service::ssacli::disk_healthy
+      expr: |
+        hp_smart_array_disk_status == 0
+        and on(certname) obmondo_monitoring{alert_id="monitor::system::service::ssacli::disk_healthy"} > 0
+      for: 5m
+      labels:
+        severity: critical
+        alert_id: monitor::system::service::ssacli::disk_healthy
+      annotations:
+        summary: 'Disk status for bay **{{ $labels.bay }}** on **{{ $labels.certname }}** has failed'
+        description: 'Disk status for bay **{{ $labels.bay }}** on **{{ $labels.certname }}** has failed'
