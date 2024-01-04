@@ -51,3 +51,4 @@ keycloakx:
 
 postgresql:
   size: 4Gi
+  enableLogicalBackup: true
