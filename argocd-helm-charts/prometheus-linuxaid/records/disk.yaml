@@ -1,0 +1,78 @@
+groups:
+  - name: monitor::system::disk
+    rules:
+    # record rules are basically create X metrics based on Y metrics
+    # In this case we want to get disk used in % based on the disk size and add
+    # custom threshold value
+    - record: record::monitor::system::disk::filesystem_space_percentage
+      expr: |
+        100 - (node_filesystem_avail_bytes{fstype!="cifs",fstype!="btrfs",fstype!="nfs",fstype!="nfs4"} / node_filesystem_size_bytes * 100)
+        and
+        node_filesystem_size_bytes <= (1024*1024*1024*100)
+      labels:
+        threshold: 80
+        disk_group: 0_to_100_GB
+        alert_id: 'monitor::system::disk::usage'
+
+    - record: record::monitor::system::disk::filesystem_space_percentage
+      # Apply threshold of 85% if disk size is between 100 to 250 GB
+      expr: |
+        100 - (node_filesystem_avail_bytes{fstype!="cifs",fstype!="btrfs",fstype!="nfs",fstype!="nfs4"} / node_filesystem_size_bytes * 100)
+        and
+        node_filesystem_size_bytes > (1024*1024*1024*100)
+        and
+        node_filesystem_size_bytes <= (1024*1024*1024*250)
+      labels:
+        threshold: 85
+        disk_group: 100_to_250_GB
+        alert_id: 'monitor::system::disk::usage'
+
+    - record: record::monitor::system::disk::filesystem_space_percentage
+      # Apply threshold of 90% if disk size is between 250 to 400 GB
+      expr: |
+        100 - (node_filesystem_avail_bytes{fstype!="cifs",fstype!="btrfs",fstype!="nfs",fstype!="nfs4"} / node_filesystem_size_bytes * 100)
+        and
+        node_filesystem_size_bytes > (1024*1024*1024*250)
+        and
+        node_filesystem_size_bytes <= (1024*1024*1024*400)
+      labels:
+        threshold: 90
+        disk_group: 250_to_400_GB
+        alert_id: 'monitor::system::disk::usage'
+
+    - record: record::monitor::system::disk::filesystem_space_percentage
+      # Apply threshold of 92% if disk size is between 400 to 600 GB
+      expr: |
+        100 - (node_filesystem_avail_bytes{fstype!="cifs",fstype!="btrfs",fstype!="nfs",fstype!="nfs4"} / node_filesystem_size_bytes * 100)
+        and
+        node_filesystem_size_bytes > (1024*1024*1024*400)
+        and
+        node_filesystem_size_bytes <= (1024*1024*1024*600)
+      labels:
+        threshold: 92
+        disk_group: 400_to_600_GB
+        alert_id: 'monitor::system::disk::usage'
+
+    - record: record::monitor::system::disk::filesystem_space_percentage
+      # Apply threshold of 95% if disk size is between 600 to 1000 GB
+      expr: |
+        100 - (node_filesystem_avail_bytes{fstype!="cifs",fstype!="btrfs",fstype!="nfs",fstype!="nfs4"} / node_filesystem_size_bytes * 100)
+        and
+        node_filesystem_size_bytes > (1024*1024*1024*600)
+        and
+        node_filesystem_size_bytes <= (1024*1024*1024*1024)
+      labels:
+        threshold: 95
+        disk_group: 600_to_1000_GB
+        alert_id: 'monitor::system::disk::usage'
+
+    - record: record::monitor::system::disk::filesystem_space_percentage
+      # Apply threshold of 97% if disk size is more then 1000 GB
+      expr: |
+        100 - (node_filesystem_avail_bytes{fstype!="cifs",fstype!="btrfs",fstype!="nfs",fstype!="nfs4"} / node_filesystem_size_bytes * 100)
+        and
+        node_filesystem_size_bytes > (1024*1024*1024*1024)
+      labels:
+        threshold: 97
+        disk_group: 1000_GB_plus
+        alert_id: 'monitor::system::disk::usage'
