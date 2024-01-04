@@ -33,9 +33,9 @@ rules:
     - update
     - patch
 - apiGroups:
-    - acid.zalan.do
+    - postgresql.cnpg.io 
   resources:
-    - postgresqls
+    - clusters 
   verbs:
     - '*'
 - apiGroups:
