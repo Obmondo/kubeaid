@@ -1,9 +1,9 @@
-{{- if .Values.prometheusRule.lsof }}
+{{- if .Values.prometheusRule.psi }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: lsof-record-rules
+  name: psi-record-rules
   namespace: monitoring-{{ .Values.customerid }}
 spec:
-  {{- $.Files.Get "records/lsof.yaml" | nindent 4 }}
+  {{- $.Files.Get "records/psi.yaml" | nindent 4 }}
 {{- end }}
