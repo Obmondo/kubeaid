@@ -22,9 +22,9 @@ prometheusRule:
   prometheus: true
   psi: true
   puppet: true
-  service: true
-  service: true
-  service: true
+  service_gitlab: true
+  service_sssd: true
+  service_omsagent: true
   services: true
   smart: true
   ssacli: true
