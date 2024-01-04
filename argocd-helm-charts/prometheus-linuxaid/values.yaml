@@ -2,21 +2,21 @@ prometheus_server: prometheus.obmondo.com
 prometheusRule:
   backup: true
   btrfs: true
-  cert: true
+  cert_expiry: true
   cpu: true
   dellhw: true
   disk: true
   drbd: true
   elasticsearch: true
-  file: true
+  file_size: true
   haproxy: true
   iptables: true
   load: true
   lsof: true
   mdraid: true
   memory: true
-  monitoring: true
-  node: true
+  monitoring_stack: true
+  node_count: true
   ntp: true
   opsmondo: true
   prometheus: true
