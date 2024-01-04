@@ -14,9 +14,7 @@ spec:
   probeSelector: {}
   replicas: 1
   retention: 15d
-  ruleNamespaceSelector:
-    matchNames:
-      - monitoring-{{ .Values.customerid }}
+  ruleNamespaceSelector: null
   ruleSelector: {}
   externalUrl: /{{ .Values.customerid }}
   routePrefix: /{{ .Values.customerid }}
