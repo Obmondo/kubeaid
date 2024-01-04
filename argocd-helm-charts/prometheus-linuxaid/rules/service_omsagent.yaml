@@ -1,4 +1,3 @@
----
 groups:
   - name: monitor::system::service::omsagent
     rules:
