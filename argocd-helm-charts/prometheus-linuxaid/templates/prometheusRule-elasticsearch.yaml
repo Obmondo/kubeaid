@@ -1,0 +1,9 @@
+{{- if .Values.prometheusRule.elasticsearch }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: elasticsearch-rules
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  {{- $.Files.Get "rules/elasticsearch.yaml" | nindent 4 }}
+{{- end }}

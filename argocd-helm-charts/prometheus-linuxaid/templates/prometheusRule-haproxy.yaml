@@ -1,0 +1,9 @@
+{{- if .Values.prometheusRule.haproxy }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: haproxy-rules
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  {{- $.Files.Get "rules/haproxy.yaml" | nindent 4 }}
+{{- end }}

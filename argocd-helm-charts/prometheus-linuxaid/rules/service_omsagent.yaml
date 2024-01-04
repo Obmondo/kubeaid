@@ -1,0 +1,15 @@
+---
+groups:
+  - name: monitor::system::service::omsagent
+    rules:
+    - alert: monitor::system::service::omsagent::update
+      expr: |
+        obmondo_omsagent_update_check == 1
+        and on(certname) obmondo_monitoring{alert_id="monitor::system::service::omsagent::update"} > 0
+      for: 5m
+      labels:
+        severity: critical
+        alert_id: monitor::system::service::omsagent::update
+      annotations:
+        summary: 'Omsagent update is available'
+        description: 'An update is available for **Omsagent**. Please update it to latest'

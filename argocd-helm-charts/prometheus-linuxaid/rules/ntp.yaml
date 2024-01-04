@@ -1,0 +1,41 @@
+groups:
+  - name: monitor::system::ntp
+    rules:
+    - record: record::monitor::system::ntp::time_offset
+      expr:
+          abs(node_timex_offset_seconds)
+      labels:
+        threshold: 3
+
+    - alert: monitor::system::ntp::skew
+      expr: |
+        record::monitor::system::ntp::time_offset >
+        on (certname) group_left(threshold)
+        (
+            threshold::monitor::system::ntp::skew
+            or on(certname) count by (certname, threshold)
+            (record::monitor::system::ntp::time_offset) * 0 + 3000
+        ) and on(certname) obmondo_monitoring{alert_id="monitor::system::ntp::skew"} > 0
+      for: 5m
+      labels:
+        alert_id: 'monitor::system::ntp::skew'
+        severity: critical
+      annotations:
+        summary: "NTP clock skew"
+        description: 'System time on **{{ $labels.certname }}** is offset compared to average across all nodes'
+
+    - alert: monitor::system::ntp::sync
+      expr: |
+        (
+          min_over_time(node_timex_sync_status[5m]) == 0
+          and
+          node_timex_maxerror_seconds >= 16
+        ) and on(certname) obmondo_monitoring{alert_id="monitor::system::ntp::sync"} > 0
+      for: 1h
+      labels:
+        alert_id: 'monitor::system::ntp::sync'
+        severity: warning
+      annotations:
+        summary: 'NTP clock out of sync for 60 minutes on **{{ $labels.certname }}**'
+        description: |+2
+          System time on **{{ $labels.certname }}** has been unable to synchronize with NTP servers for 30 minutes or more.

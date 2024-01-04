@@ -1,1 +1,30 @@
 prometheus_server: prometheus.obmondo.com
+prometheusRule:
+  backup: true
+  btrfs: true
+  cert: true
+  cpu: true
+  dellhw: true
+  disk: true
+  drbd: true
+  elasticsearch: true
+  file: true
+  haproxy: true
+  iptables: true
+  load: true
+  lsof: true
+  mdraid: true
+  memory: true
+  monitoring: true
+  node: true
+  ntp: true
+  opsmondo: true
+  prometheus: true
+  psi: true
+  puppet: true
+  service: true
+  service: true
+  service: true
+  services: true
+  smart: true
+  ssacli: true

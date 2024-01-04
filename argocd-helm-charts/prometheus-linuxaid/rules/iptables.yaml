@@ -1,0 +1,18 @@
+groups:
+  - name: monitor::system::iptables
+    rules:
+    - alert: monitor::system::iptables::dropall
+      expr: |
+        (
+          rate(iptables_rule_packets_total[10m]) >= on(certname) threshold::monitor::system::iptables::dropall
+          or
+          rate(iptables_rule_packets_total[10m]) >= 5.0
+        ) and on(certname) obmondo_monitoring{alert_id="monitor::system::iptables::dropall"} > 0
+      for: 10m
+      labels:
+        severity: critical
+        alert_id: monitor::system::iptables::dropall
+      annotations:
+        summary: "The iptables Drop packets is high for **{{ $labels.certname }}**"
+        description: |
+          The iptables Drop packets is **{{ $value|humanize }}** for **{{ $labels.certname }}** is above threshold of {{ with printf "threshold::monitor::system::iptables::dropall{certname='%s'}" .Labels.certname | query }}{{ . | first | value }}{{ else }}{{ "5" }}{{ end }} for 10 minutes.

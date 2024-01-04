@@ -1,0 +1,9 @@
+{{- if .Values.prometheusRule.mdraid }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: mdraid-rules
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  {{- $.Files.Get "rules/mdraid.yaml" | nindent 4 }}
+{{- end }}

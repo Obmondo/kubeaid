@@ -1,0 +1,9 @@
+{{- if .Values.prometheusRule.drbd }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: drbd-rules
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  {{- $.Files.Get "rules/drbd.yaml" | nindent 4 }}
+{{- end }}

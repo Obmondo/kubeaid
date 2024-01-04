@@ -1,0 +1,12 @@
+groups:
+  - name: monitor::system::file_size
+    rules:
+       - alert: monitor::system::file::size
+         expr: (file_stat_size_bytes == 0) and on (certname) obmondo_monitoring{alert_id="monitor::system::file::size"} > 0
+         for: 5m
+         labels:
+          severity: warning
+          alert_id: monitor::system::file::size
+         annotations:
+          summary: "Zero-byte file found in {{$labels.certname}}"
+          description: "The {{$labels.path}} has a size of 0 byte"

@@ -1,0 +1,9 @@
+{{- if .Values.prometheusRule.cpu }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cpu-rules
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  {{- $.Files.Get "rules/cpu.yaml" | nindent 4 }}
+{{- end }}

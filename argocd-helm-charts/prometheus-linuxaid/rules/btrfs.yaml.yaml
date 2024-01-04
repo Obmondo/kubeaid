@@ -1,12 +1,7 @@
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  name: btrfs-rules
-  namespace: monitoring-{{ .Values.customerid }}
-spec:
-  groups:
+groups:
   - name: monitor::system::disk::btrfs
     rules:
+
     - alert: monitor::system::disk::btrfs
       expr: |
         (node_btrfs_size_bytes / node_btrfs_used_bytes) * 100  >= on(certname, block_group_type, uuid) threshold::monitor::system::disk::btrfs

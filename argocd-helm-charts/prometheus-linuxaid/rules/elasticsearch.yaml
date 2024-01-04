@@ -1,0 +1,38 @@
+groups:
+  - name: elasticsearch
+    rules:
+    - record: 'record::monitor::service::elasticsearch::filesystem_data_used_percent'
+      expr: |
+        100 * (elasticsearch_filesystem_data_size_bytes - elasticsearch_filesystem_data_free_bytes) / elasticsearch_filesystem_data_size_bytes
+
+    - record: 'record::monitor::service::elasticsearch::filesystem_data_free_percent'
+      expr: '100 - elasticsearch_filesystem_data_used_percent'
+
+    - alert: 'monitor::service::elasticsearch::TooFewNodesRunning'
+      expr: |
+        (elasticsearch_cluster_health_number_of_nodes < 3)
+        and on(certname) obmondo_monitoring{alert_id="monitor::service::elasticsearch::TooFewNodesRunning"} > 0
+      for: 5m
+      labels:
+        severity: critical
+        alert_id: 'monitor::service::elasticsearch::TooFewNodesRunning'
+      annotations:
+        summary: 'Elasticsearch cluster {{$labels.cluster}} running on less than 3 nodes'
+        description: |+2
+          There are only `{{$value}} < 3` Elasticsearch nodes running
+
+    - alert: 'monitor::service::elasticsearch::ElasticsearchHeapTooHigh'
+      expr: |+2
+        (
+          elasticsearch_jvm_memory_used_bytes{area="heap"} /
+            elasticsearch_jvm_memory_max_bytes{area="heap"}
+          > 0.9
+        ) and on(certname) obmondo_monitoring{alert_id="monitor::service::elasticsearch::ElasticsearchHeapTooHigh"} > 0
+      for: 15m
+      labels:
+        severity: critical
+        alert_id: 'monitor::service::elasticsearch::ElasticsearchHeapTooHigh'
+      annotations:
+        summary: 'Elasticsearch node {{$labels.name}} on **{{$labels.certname}}** heap usage is high'
+        description: |+2
+          Heap usage of `{{ .Value | humanizePercentage }} > 90%` for 15m.
