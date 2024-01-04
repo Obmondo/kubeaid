@@ -6,6 +6,7 @@ spec:
   databases:
     keycloak: keycloak
   enableMasterLoadBalancer: false
+  enableLogicalBackup: {{ .Values.postgresql.enableLogicalBackup | default true }}
   numberOfInstances: {{ ((.Values.postgresql).instance) | default 1 }}
   postgresql:
     version: "12"
