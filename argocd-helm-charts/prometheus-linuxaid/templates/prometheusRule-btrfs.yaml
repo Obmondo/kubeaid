@@ -3,7 +3,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   labels:
-    prometheus: k8s
+    prometheus: {{ .Values.customerid }}
   name: btrfs-rules
   namespace: monitoring-{{ .Values.customerid }}
 spec:
