@@ -1,12 +1,6 @@
 groups:
   - name: monitor::system::ntp
     rules:
-    - record: record::monitor::system::ntp::time_offset
-      expr:
-          abs(node_timex_offset_seconds)
-      labels:
-        threshold: 3
-
     - alert: monitor::system::ntp::skew
       expr: |
         record::monitor::system::ntp::time_offset >

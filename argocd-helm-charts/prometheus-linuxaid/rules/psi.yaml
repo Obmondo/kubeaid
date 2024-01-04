@@ -1,24 +1,6 @@
 groups:
   - name: psi
     rules:
-    - record: record::monitor::system::psi::io
-      expr: rate(node_pressure_io_stalled_seconds_total[15m])
-      labels:
-        threshold: 0.5
-        alert_id: monitor::system::psi::io
-
-    - record: record::monitor::system::psi::memory
-      expr: rate(node_pressure_memory_stalled_seconds_total[15m])
-      labels:
-        threshold: 0.04
-        alert_id: monitor::system::psi::memory
-
-    - record: record::monitor::system::psi::cpu
-      expr: rate(node_pressure_cpu_waiting_seconds_total[15m])
-      labels:
-        threshold: 0.6
-        alert_id: monitor::system::psi::cpu
-
     - alert: monitor::system::psi::io
       expr: |
         record::monitor::system::psi::io >

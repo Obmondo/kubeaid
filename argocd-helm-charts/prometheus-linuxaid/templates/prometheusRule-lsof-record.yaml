@@ -1,0 +1,9 @@
+{{- if .Values.prometheusRule.lsof }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: lsof-record-rules
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  {{- $.Files.Get "records/lsof.yaml" | nindent 4 }}
+{{- end }}

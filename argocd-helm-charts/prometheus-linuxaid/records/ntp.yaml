@@ -1,0 +1,8 @@
+groups:
+  - name: monitor::system::ntp
+    rules:
+    - record: record::monitor::system::ntp::time_offset
+      expr:
+          abs(node_timex_offset_seconds)
+      labels:
+        threshold: "3"
