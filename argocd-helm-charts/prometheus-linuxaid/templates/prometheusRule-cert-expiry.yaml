@@ -1,0 +1,9 @@
+{{- if .Values.prometheusRule.cert_expiry }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cert-expiry-rules
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  {{- $.Files.Get "rules/cert_expiry.yaml" | nindent 4 }}
+{{- end }}

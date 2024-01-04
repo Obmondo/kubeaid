@@ -1,0 +1,11 @@
+{{- if .Values.prometheusRule.btrfs }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    prometheus: {{ .Values.customerid }}
+  name: btrfs-rules
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  {{- $.Files.Get "rules/btrfs.yaml" | nindent 4 }}
+{{- end }}

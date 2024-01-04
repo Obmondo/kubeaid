@@ -1,0 +1,88 @@
+groups:
+  - name: monitor::system::disk
+    rules:
+    - alert: monitor::system::disk::usage
+      expr: |
+        ((
+          record::monitor::system::disk::filesystem_space_percentage{disk_group="0_to_100_GB"} > on (mountpoint, certname) group_left(threshold)
+          (
+            threshold::monitor::system::disk::usage
+            or on(mountpoint, certname) count by (mountpoint, certname, threshold)
+            (record::monitor::system::disk::filesystem_space_percentage) * 0 + 80
+          )
+         ) or (
+          record::monitor::system::disk::filesystem_space_percentage{disk_group="100_to_250_GB"} > on (mountpoint, certname) group_left(threshold)
+          (
+            threshold::monitor::system::disk::usage
+            or on(mountpoint, certname) count by (mountpoint, certname, threshold)
+            (record::monitor::system::disk::filesystem_space_percentage) * 0 + 85
+          )
+         ) or (
+           record::monitor::system::disk::filesystem_space_percentage{disk_group="250_to_400_GB"} > on (mountpoint, certname) group_left(threshold)
+          (
+            threshold::monitor::system::disk::usage
+            or on(mountpoint, certname) count by (mountpoint, certname, threshold)
+            (record::monitor::system::disk::filesystem_space_percentage) * 0 + 90
+          )
+         ) or (
+           record::monitor::system::disk::filesystem_space_percentage{disk_group="400_to_600_GB"} > on (mountpoint, certname) group_left(threshold)
+          (
+            threshold::monitor::system::disk::usage
+            or on(mountpoint, certname) count by (mountpoint, certname, threshold)
+            (record::monitor::system::disk::filesystem_space_percentage) * 0 + 92
+          )
+        ) or (
+           record::monitor::system::disk::filesystem_space_percentage{disk_group="60_to_100_GB"} > on (mountpoint, certname) group_left(threshold)
+          (
+            threshold::monitor::system::disk::usage
+            or on(mountpoint, certname) count by (mountpoint, certname, threshold)
+            (record::monitor::system::disk::filesystem_space_percentage) * 0 + 95
+           )
+        ) or (
+           record::monitor::system::disk::filesystem_space_percentage{disk_group="1000_GB_plus"} > on (mountpoint, certname) group_left(threshold)
+          (
+            threshold::monitor::system::disk::usage
+            or on(mountpoint, certname) count by (mountpoint, certname, threshold)
+            (record::monitor::system::disk::filesystem_space_percentage) * 0 + 97
+           )
+        ))
+        and on(certname) obmondo_monitoring{alert_id="monitor::system::disk::usage"} > 0
+      for: 10m
+      labels:
+        alert_id: 'monitor::system::disk::usage'
+        severity: warning
+      annotations:
+        summary: 'Available disk space on {{ $labels.mountpoint }} on **{{ $labels.certname }}** is low'
+        description: Available space is very low on filesystem `{{ $labels.mountpoint }}` and current usage is around {{ humanize $value }}% which is above the threshold of {{ with printf "threshold::monitor::system::disk::usage{certname='%s', mountpoint='%s'}" .Labels.certname .Labels.mountpoint| query }}{{ . | first | value }}{{ else }}{{ $labels.threshold }}{{ end }}%
+
+    - alert: monitor::system::disk::mountpoint::readonly
+      expr: |
+        (
+          node_filesystem_readonly{mountpoint="/"} > 0
+          or
+          node_filesystem_readonly{mountpoint="/home"} > 0
+        ) and on(certname) obmondo_monitoring{alert_id="monitor::system::disk::mountpoint::readonly"} > 0
+      for: 5m
+      labels:
+        severity: critical
+        alert_id: monitor::system::disk::mountpoint::readonly
+      annotations:
+        summary: "Filesystem {{ $labels.mountpoint }} is in read-only mode on **{{ $labels.certname }}**"
+        description: "Filesystem `{{ $labels.mountpoint }}` is in read-only mode on **{{ $labels.certname }}**"
+
+    - alert: monitor::system::disk::fillingup
+      expr: |
+        node_filesystem_avail_bytes{fstype!="cifs",fstype!="btrfs",fstype!="nfs",fstype!="nfs4"} / node_filesystem_size_bytes * 100 < 20
+        and
+        on(certname, mountpoint) predict_linear(node_filesystem_free_bytes{fstype!="cifs",fstype!="btrfs",fstype!="nfs",fstype!="nfs4"}[6h], 2 * 24 * 3600) < 0
+        and
+        on(certname) obmondo_monitoring{alert_id="monitor::system::disk::fillingup"} > 0
+      for: 1h
+      labels:
+        severity: critical
+        alert_id: monitor::system::disk::fillingup
+      annotations:
+        summary: "partition `{{ $labels.mountpoint}}` is running out of space"
+        description: |
+          Based on last 6h sampling, the mount {{ $labels.mountpoint }} on server {{ $labels.certname }} is expected to fill up within 2 days.
+          Currently {{ printf "%.2f" $value }}% is available.

@@ -1,0 +1,48 @@
+groups:
+  - name: monitor::system::ram
+    rules:
+    - alert: monitor::system::ram::used
+      expr: |
+        (
+          100 - sum by (certname) (node_memory_MemAvailable_bytes) / sum by (certname) (node_memory_MemTotal_bytes) * 100 >= on(certname) threshold::monitor::system::ram::used
+          or
+          100 - sum by (certname) (node_memory_MemAvailable_bytes) / sum by (certname) (node_memory_MemTotal_bytes) * 100  >= 80
+        ) and on(certname) obmondo_monitoring{alert_id="monitor::system::ram::used"} > 0
+      for: 30m
+      labels:
+        severity: warning
+        alert_id: monitor::system::ram::used
+      annotations:
+        summary: "System RAM usage too high"
+        description: |
+          Memory use on **{{ .Labels.certname }}** is around {{ .Value |humanize }}% which is above the threshold of {{ with printf "threshold::monitor::system::ram::used{certname='%s'}" .Labels.certname | query }}{{ . | first | value }}{{ else }}{{ "80" }}{{ end }}% for 30 minutes.
+
+    - alert: monitor::system::ram::used
+      expr: |
+        (
+          100 - sum by (certname) (node_memory_MemAvailable_bytes) / sum by (certname) (node_memory_MemTotal_bytes) * 100 >= on(certname) threshold::monitor::system::ram::used_high
+          or
+          100 - sum by (certname) (node_memory_MemAvailable_bytes) / sum by (certname) (node_memory_MemTotal_bytes) * 100  >= 95
+        ) and on(certname) obmondo_monitoring{alert_id="monitor::system::ram::used"} > 0
+      for: 10m
+      labels:
+        severity: critical
+        alert_id: monitor::system::ram::used
+      annotations:
+        summary: "System RAM usage too high"
+        description: |
+          Memory use on **{{ .Labels.certname }}** is around {{ .Value |humanize }}% which is above the threshold of {{ with printf "threshold::monitor::system::ram::used_high{certname='%s'}" .Labels.certname | query }}{{ . | first | value }}{{ else }}{{ "95" }}{{ end }}% for 10 minutes.
+
+    - alert: monitor::system::ram::oom
+      expr: |
+        (
+          node_vmstat_oom_kill -
+          on (certname) (node_vmstat_oom_kill offset 15m)
+        ) > 0
+        and on(certname) obmondo_monitoring{alert_id="monitor::system::ram::oom"} > 0
+      labels:
+        severity: critical
+        alert_id: monitor::system::ram::oom
+      annotations:
+        summary: "System RAM out-of-memory killer triggered"
+        description: "OOM-killer has been triggered on **{{ $labels.certname }}** in the past 15 minutes"

@@ -1,0 +1,37 @@
+# https://iximiuz.com/en/posts/prometheus-vector-matching/
+groups:
+  - name: monitor::system::services
+    rules:
+    - record: record::monitor::system::service::down
+      expr: |
+        node_systemd_unit_state{state="failed", name=~".+\\.service$", name!="fwupd-refresh.service", name!="run-puppet.service", type!~"dbus"} != 0
+
+    - alert: monitor::system::service::down
+      # take only name and certname label from left side and match against all the metrics from the right side with `name` and `certname` label
+      # if match is true (means the said down service is blacklisted) then give no result and if no match then give result
+      expr: |
+        (
+          sum (record::monitor::system::service::down) by (name, certname)
+          unless threshold::monitor::system::service::down::blacklist
+        ) and on(certname) obmondo_monitoring{alert_id="monitor::system::service::down"} > 0
+      for: 30m
+      labels:
+        severity: critical
+        alert_id: monitor::system::service::down
+      annotations:
+        summary: "The system unit **{{ .Labels.name }}** failed on **{{ .Labels.certname }}**"
+        description: "The system unit **{{ .Labels.name }}** failed on **{{ .Labels.certname }}**. Once resolved please clear using `systemctl reset-failed {{ .Labels.name }}`."
+
+    - alert: monitor::system::service::down::fwupd-refresh
+      # This alert to trigger fwupd-refresh.service which already been failed from one month
+      expr: |
+        node_systemd_unit_state{state="failed", name="fwupd-refresh.service", type="oneshot"} != 0
+        and on(certname) obmondo_monitoring{alert_id="monitor::system::service::down"} > 0
+      for: 29d
+      labels:
+        severity: critical
+        alert_id: monitor::system::service::down
+      annotations:
+        summary: "The system unit **{{ .Labels.name }}** failed on **{{ .Labels.certname }}**"
+        description: |+2
+          "The system unit **{{ .Labels.name }}** failed on **{{ .Labels.certname }}**. Once resolved please clear using `systemctl reset-failed {{ .Labels.name }}`."

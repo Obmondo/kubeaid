@@ -1,0 +1,134 @@
+groups:
+  - name: haproxy
+    rules:
+      # average response time per backend in milliseconds
+      - record: record::monitor::service::haproxy::backend_response_time_seconds
+        expr: |
+          avg_over_time(haproxy_backend_response_time_average_seconds{proxy!="obmondo-monitoring"}[5m])
+          and on (certname) obmondo_monitoring{alert_id="monitor::service::haproxy::backend_response_time"} > 0
+        labels:
+          alert_id: "monitor::service::haproxy::backend_response_time"
+
+      - record: record::monitor::service::haproxy::frontend_current_sessions_average
+        expr: avg_over_time(haproxy_frontend_current_sessions{proxy!="obmondo-monitoring"}[5m])
+        labels:
+          alert_id: "monitor::service::haproxy::backend_response_time"
+
+      - alert: monitor::service::haproxy::5xx_error
+        expr: |
+          ((sum by (proxy,certname) (rate(haproxy_server_http_responses_total{code="5xx"}[5m])) / sum by (proxy,certname) (rate(haproxy_server_http_responses_total[5m]))) * 100) > 5
+          and on (certname) obmondo_monitoring{alert_id="monitor::service::haproxy::5xx_error"} > 0
+        for: 5m
+        labels:
+          severity: warning
+          alert_id: monitor::service::haproxy::5xx_error
+        annotations:
+          summary: "HAProxy high HTTP 5xx error rate server on {{ .Labels.certname }}"
+          description: "Too many HTTP requests with status 5xx on backend {{ .Labels.proxy }} is more then {{ .Value | humanize}}%"
+
+      - alert: monitor::service::haproxy::5xx_error
+        expr: |
+          ((sum by (proxy,certname) (rate(haproxy_server_http_responses_total{code="5xx"}[15m])) / sum by (proxy,certname) (rate(haproxy_server_http_responses_total[15m]))) * 100) > 50
+          and on (certname) obmondo_monitoring{alert_id="monitor::service::haproxy::5xx_error"} > 0
+        for: 5m
+        labels:
+          severity: critical
+          alert_id: monitor::service::haproxy::5xx_error
+        annotations:
+          summary: "HAProxy high HTTP 5xx error rate server on {{ .Labels.certname }}"
+          description: "Too many HTTP requests with status 5xx on backend {{ .Labels.proxy }} is more then {{ .Value | humanize}}%"
+
+      - alert: monitor::service::haproxy::redispatch_warnings
+        # expression: redispatch warning count increase per second AND alert_enabled
+        expr: |
+          rate(haproxy_backend_redispatch_warnings_total[10m]) > 0
+          and on (certname, proxy) obmondo_monitoring{alert_id="monitor::service::haproxy::redispatch_warnings"} > 0
+          and on (certname) obmondo_monitoring{alert_id="monitor::service::haproxy::response_errors", proxy!~".+"} > 0
+        labels:
+          severity: warning
+          alert_id: monitor::service::haproxy::redispatch_warnings
+        annotations:
+          summary: "Haproxy redispatch warnings rate too high during the last 10 minutes"
+          description: "The haproxy backend {{ .Labels.certname }} {{ .Labels.proxy }} redispatch warning count has increased by an average of {{ .Value }} per second over the last 10 minutes."
+
+      - alert: monitor::service::haproxy::retry_warnings
+        # expression: retry warning count increase per second AND alert_enabled
+        expr: |
+          rate(haproxy_backend_retry_warnings_total[10m]) > 0
+          and on (certname, proxy) obmondo_monitoring{alert_id="monitor::service::haproxy::retry_warnings"} > 0
+          and on (certname) obmondo_monitoring{alert_id="monitor::service::haproxy::response_errors", proxy!~".+"} > 0
+        labels:
+          severity: warning
+          alert_id: monitor::service::haproxy::retry_warnings
+        annotations:
+          summary: "Haproxy retry warnings rate too high during the last 10 minutes"
+          description: "The haproxy backend {{ .Labels.certname }} {{ .Labels.proxy }} retry warning count has increased by an average of {{ .Value }} per second over the last 10 minutes."
+
+      - alert: monitor::service::haproxy::response_errors
+        # expression: response error count increase per second AND alert_enabled
+        expr: |
+          rate(haproxy_backend_response_errors_total[10m]) > 0
+          and on (certname, proxy) obmondo_monitoring{alert_id="monitor::service::haproxy::response_errors"} > 0
+          and on (certname) obmondo_monitoring{alert_id="monitor::service::haproxy::response_errors", proxy!~".+"} > 0
+        labels:
+          severity: warning
+          alert_id: monitor::service::haproxy::response_errors
+        annotations:
+          summary: "Haproxy response error rate too high during the last 10 minutes"
+          description: "The haproxy backend {{ .Labels.certname }} {{ .Labels.proxy }} response error count has increased by an average of {{ .Value }} per second over the last 10 minutes."
+
+      - alert: monitor::service::haproxy::backend_response_time
+        # expression:
+        # response_time > (threshold or 0.5s) and sessions_count > 1 and alert_enabled
+        expr: |
+          record::monitor::service::haproxy::backend_response_time_seconds >
+            on (certname, proxy) group_left()
+            (
+              threshold::monitor::service::haproxy::backend_response_time_seconds
+              or on (certname, proxy)
+              (record::monitor::service::haproxy::backend_response_time_seconds) * 0 + 0.5
+            )
+            and on (certname, proxy) record::monitor::service::haproxy::frontend_current_sessions_average > 1
+            and on (certname, proxy) obmondo_monitoring{alert_id="monitor::service::haproxy::backend_response_time"} > 0
+            and on (certname) obmondo_monitoring{alert_id="monitor::service::haproxy::backend_response_time", proxy!~".+"} > 0
+        labels:
+          severity: warning
+          alert_id: "monitor::service::haproxy::backend_response_time"
+        annotations:
+          summary: "Haproxy average response time from backend servers too high"
+          description: "The average response time on backend **{{ $labels.certname }}** **{{ .Labels.proxy }}** is {{ .Value | humanizeDuration }}"
+
+      - alert: monitor::service::haproxy::backend_down
+        expr: |
+          haproxy_backend_active_servers{proxy!="obmondo-monitoring"} + haproxy_backend_backup_servers == 0
+          unless on (certname, proxy) threshold::monitor::service::haproxy::ignore_backends
+          and on (certname) obmondo_monitoring{alert_id="monitor::service::haproxy::backend_down"} > 0
+        for: 10m
+        labels:
+          severity: critical
+          alert_id: monitor::service::haproxy::backend_down
+        annotations:
+          summary: "Haproxy backend server is down"
+          description: "The backend server **{{ .Labels.proxy }}** is down for **{{ .Labels.certname }}**"
+
+      - alert: monitor::service::haproxy::requests_denied_mild
+        expr: |
+          avg_over_time(haproxy_frontend_requests_denied_total[10m]) > 5
+          and on (certname) obmondo_monitoring{alert_id="monitor::service::haproxy::requests_denied_mild"} > 0
+        labels:
+          severity: warning
+          alert_id: monitor::service::haproxy::requests_denied_mild
+        annotations:
+          summary: "DDoS Protection has started kicking in"
+          description: "The frontend server **{{ .Labels.proxy }}** is denying some requests for **{{ .Labels.certname }}**"
+
+      - alert: monitor::service::haproxy::requests_denied_severe
+        expr: |
+          avg_over_time(haproxy_frontend_requests_denied_total[10m]) > 1000
+          and on (certname) obmondo_monitoring{alert_id="monitor::service::haproxy::requests_denied_severe"} > 0
+        labels:
+          severity: critical
+          alert_id: monitor::service::haproxy::requests_denied_severe
+        annotations:
+          summary: "DDoS Protection is blocking a lot of requests"
+          description: "The frontend server **{{ .Labels.proxy }}** is denying a lot of requests for **{{ .Labels.certname }}**"

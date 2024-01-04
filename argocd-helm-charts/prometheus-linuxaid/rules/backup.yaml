@@ -1,0 +1,15 @@
+groups:
+  - name: monitor::system::backup
+    rules:
+    - alert: monitor::system::backup::status
+      expr: |
+        count by (certname) (time() - file_stat_modif_time_seconds < 60 * 60 * 24 * 1) >= bool on() group_left() count(file_glob_match_number) == 0
+        and
+        on(certname) obmondo_monitoring{alert_id="monitor::system::backup::status"} > 0
+      for: 10m
+      labels:
+        severity: critical
+        alert_id: monitor::system::backup::status
+      annotations:
+        summary: "Daily backup failed on server **{{ $labels.certname }}**"
+        description: "There is a backup failuer on server **{{ $labels.certname }}**"
