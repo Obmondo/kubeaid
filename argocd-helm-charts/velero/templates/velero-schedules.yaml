@@ -9,7 +9,8 @@ spec:
   schedule: '0 {{ randInt 0 12 }} * * 1-6'
   template:
     hooks: {}
-    csiSnapshotTimeout: 20m
+    csiSnapshotTimeout: 40m
+    itemOperationTimeout: 300m
     includedNamespaces:
     - '*'
     ttl: 720h0m0s
@@ -28,7 +29,8 @@ spec:
   schedule: '0 0 * * 0'
   template:
     hooks: {}
-    csiSnapshotTimeout: 20m
+    csiSnapshotTimeout: 40m
+    itemOperationTimeout: 300m
     includedNamespaces:
     - '*'
     ttl: 2160h0m0s
@@ -48,7 +50,8 @@ spec:
   schedule: '0 6,12,18 * * *'
   template:
     hooks: {}
-    csiSnapshotTimeout: 20m
+    csiSnapshotTimeout: 40m
+    itemOperationTimeout: 300m
     includedNamespaces:
     - '*'
     ttl: 336h0m0s
