@@ -4,6 +4,10 @@ metadata:
   name: {{ .Values.customerid }}
   namespace: monitoring-{{ .Values.customerid }}
 spec:
+  alerting:
+    - namespace: monitoring-{{ .Values.customerid }}
+      name: alertmanager-main
+      port: web
   podMetadata:
     labels:
       app.kubernetes.io/instance: {{ .Values.customerid }}
