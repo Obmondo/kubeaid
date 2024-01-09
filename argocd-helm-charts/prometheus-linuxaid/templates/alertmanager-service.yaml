@@ -3,12 +3,17 @@ kind: Service
 metadata:
   name: alertmanager-main
   namespace: monitoring-{{ .Values.customerid }}
+  labels:
+    app.kubernetes.io/name: alertmanager
 spec:
   type: ClusterIP
   ports:
   - name: web
     port: 9093
     targetPort: web
+  - name: reloader-web
+    port: 8080
+    targetPort: reloader-web
   selector:
-    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/name: alertmanager
   sessionAffinity: ClientIP
