@@ -238,7 +238,6 @@ function(params) {
       args: [
         '--cert-dir=/var/run/serving-cert',
         '--config=/etc/adapter/config.yaml',
-        '--logtostderr=true',
         '--metrics-relist-interval=1m',
         '--prometheus-url=' + pa._config.prometheusURL,
         '--secure-port=6443',
@@ -281,7 +280,9 @@ function(params) {
       securityContext: {
         allowPrivilegeEscalation: false,
         readOnlyRootFilesystem: true,
+        runAsNonRoot: true,
         capabilities: { drop: ['ALL'] },
+        seccompProfile: { type: 'RuntimeDefault' },
       },
     };
 
@@ -301,7 +302,12 @@ function(params) {
           },
         },
         template: {
-          metadata: { labels: pa._config.commonLabels },
+          metadata: {
+            annotations: {
+              'checksum.config/md5': std.md5(std.manifestYamlDoc(pa._config.config)),
+            },
+            labels: pa._config.commonLabels,
+          },
           spec: {
             containers: [c],
             serviceAccountName: $.serviceAccount.metadata.name,

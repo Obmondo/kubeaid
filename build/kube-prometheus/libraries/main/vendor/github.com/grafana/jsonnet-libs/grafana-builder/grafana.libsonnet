@@ -109,7 +109,7 @@
             value: datasource,
           },
           hide: 0,
-          label: 'Data Source',
+          label: 'Data source',
           name: 'datasource',
           options: [],
           query: 'prometheus',
@@ -289,7 +289,6 @@
         legendLink: legendLink,
         expr: ql.q,
         format: 'time_series',
-        intervalFactor: 2,
         legendFormat: ql.l,
       }
       for ql in qsandls
@@ -305,7 +304,6 @@
         expr: query,
         format: 'time_series',
         instant: true,
-        intervalFactor: 2,
         refId: 'A',
       },
     ],
@@ -368,7 +366,6 @@
         expr: qs[i],
         format: 'table',
         instant: true,
-        intervalFactor: 2,
         legendFormat: '',
         refId: std.char(65 + i),
       }
@@ -430,6 +427,7 @@
       '3xx': '#6ED0E0',
       '4xx': '#EF843C',
       '5xx': '#E24D42',
+      OK: '#7EB26D',
       success: '#7EB26D',
       'error': '#E24D42',
       cancel: '#A9A9A9',
@@ -441,10 +439,9 @@
             sum by (status) (
               label_replace(label_replace(rate(%s[$__rate_interval]),
               "status", "${1}xx", "%s", "([0-9]).."),
-              "status", "${1}", "%s", "([a-z]+)"))
+              "status", "${1}", "%s", "([a-zA-Z]+)"))
           ||| % [selector, statusLabelName, statusLabelName],
         format: 'time_series',
-        intervalFactor: 2,
         legendFormat: '{{status}}',
         refId: 'A',
       },
@@ -457,21 +454,18 @@
       {
         expr: 'histogram_quantile(0.99, sum(rate(%s_bucket%s[$__rate_interval])) by (le)) * %s' % [metricName, selector, multiplier],
         format: 'time_series',
-        intervalFactor: 2,
         legendFormat: '99th Percentile',
         refId: 'A',
       },
       {
         expr: 'histogram_quantile(0.50, sum(rate(%s_bucket%s[$__rate_interval])) by (le)) * %s' % [metricName, selector, multiplier],
         format: 'time_series',
-        intervalFactor: 2,
         legendFormat: '50th Percentile',
         refId: 'B',
       },
       {
         expr: 'sum(rate(%s_sum%s[$__rate_interval])) * %s / sum(rate(%s_count%s[$__rate_interval]))' % [metricName, selector, multiplier, metricName, selector],
         format: 'time_series',
-        intervalFactor: 2,
         legendFormat: 'Average',
         refId: 'C',
       },
