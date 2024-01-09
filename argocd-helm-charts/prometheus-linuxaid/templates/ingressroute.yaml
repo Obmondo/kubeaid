@@ -10,9 +10,6 @@ spec:
   - kind: Rule
     match: Host(`{{ .Values.prometheus.server }}`) && Path(`/{{ .Values.customerid }}`)
     priority: 10
-    middlewares:
-    - name: jwt
-      namespace: traefik
     services:
     - kind: Service
       name: prometheus-main
@@ -20,7 +17,3 @@ spec:
       passHostHeader: true
       port: web
       nativeLB: true
-  tls:
-    options:
-      name: prometheus-puppet-agent-tls-auth
-      namespace: traefik
