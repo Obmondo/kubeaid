@@ -14,3 +14,58 @@ spec:
     security:
       admin_user: root
       admin_password: secret
+  deployment:
+    spec:
+      strategy:
+        type: Recreate
+      template:
+        spec:
+          containers:
+          - name: grafana-{{ .Values.customerid }}
+            env:
+            - name: GF_AUTH_PROXY_ENABLED
+              value: 'true'
+            - name: GF_AUTH_PROXY_HEADER_NAME
+              value: 'X-WEBAUTH-USER'
+            - name: GF_AUTH_PROXY_HEADER_PROPERTY
+              value: 'username'
+            - name: GF_AUTH_PROXY_AUTO_SIGN_UP
+              value: 'true'
+            - name: GF_USERS_ALLOW_SIGN_UP
+              value: 'false'
+            - name: GF_USERS_ALLOW_ORG_CREATE
+              value: 'true'
+            - name: GF_USERS_EDITORS_CAN_ADMIN
+              value: 'true'
+            - name: GF_USERS_AUTO_ASSIGN_ORG
+              value: 'true'
+            - name: GF_USERS_AUTO_ASSIGN_ORG_ROLE
+              value: 'Editor'
+            - name: GF_LOG_LEVEL
+              value: 'info'
+            - name: GF_SECURITY_ALLOW_EMBEDDING
+              value: 'true'
+              # TODO: https://grafana.github.io/grafana-operator/docs/examples/plugins/readme/
+            - name: GF_INSTALL_PLUGINS
+              value: 'grafana-clock-panel,grafana-piechart-panel'
+            image: grafana/grafana:9.5.3
+            readinessProbe:
+              failureThreshold: 3
+            resources:
+              limits:
+                memory: 200Mi
+              requests:
+                cpu: 6m
+                memory: 100Mi
+          volumes:
+          - name: grafana-data
+            persistentVolumeClaim:
+              claimName: grafana-{{ .Values.customerid }}-pvc
+  persistentVolumeClaim:
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      volumeMode: Filesystem
