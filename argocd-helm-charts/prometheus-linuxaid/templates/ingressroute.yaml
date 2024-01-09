@@ -8,7 +8,7 @@ spec:
     - websecure
   routes:
   - kind: Rule
-    match: Host(`{{ .Values.prometheus.server }}`) && Path(`/{{ .Values.customerid }}`)
+    match: Host(`{{ .Values.prometheus.server }}`) && PathPrefix(`/{{ .Values.customerid }}`)
     priority: 10
     services:
     - kind: Service
