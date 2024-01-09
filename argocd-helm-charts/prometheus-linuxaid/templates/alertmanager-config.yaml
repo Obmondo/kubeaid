@@ -13,7 +13,7 @@ spec:
     repeatInterval: 15m
     receiver: 'mattermost'
     routes:
-      - receiver: ops
+      - receiver: opsmondo
         continue: true
       - receiver: mattermost
         match_re:
