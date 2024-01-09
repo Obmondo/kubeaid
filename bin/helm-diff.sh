@@ -8,7 +8,7 @@ TEMPDIR=$(mktemp -d)
 AUTH_METHOD='gitea'
 
 # Override authentication method if GitHub URL is detected
-if [[ "$KUBERNETES_CONFIG_REPO_URL" == "https://github.com/"* ]]; then
+if [[ "$KUBERNETES_CONFIG_REPO_URL" =~ ^https://github\.com/ ]]; then
     AUTH_METHOD='github'
 fi
 
