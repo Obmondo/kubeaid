@@ -22,17 +22,16 @@ spec:
         continue: true
   receivers:
   - name: mattermost
-    slack_configs:
-      - api_url: {{ .Values.alertmanager.slack_webhook }}
+    slackConfigs:
+      - apiURL: {{ .Values.alertmanager.slack_webhook }}
         text: |-
           {{ range .Alerts }}
             **Alert:** {{ .Labels.severity }} - {{ .Annotations.summary }}
             **Description:** {{ .Annotations.description }}
             **Hostname:** {{ .Labels.instance }}
           {{ end }}
-        send_resolved: true
+        sendResolved: true
   - name: opsmondo
-    webhook_configs:
+    webhookConfigs:
       - url: https://alerts.obmondo.com/hooks/alertmanager
-        send_resolved: true
-
+        sendResolved: true
