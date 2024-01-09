@@ -50,6 +50,15 @@ resource "azurerm_kubernetes_cluster" "k8s" {
         min_count           = var.min_node_count
         max_count           = var.max_node_count
         zones               = var.zones
+        orchestrator_version = var.kubernetes_version
+      linux_os_config {
+        sysctl_config {
+          vm_max_map_count = var.vm_max_map_count
+        }
+      }
+      tags = {
+        Environment = var.environment
+      }
     }
     auto_scaler_profile {
         balance_similar_node_groups       = var.balance_similar_node_groups
@@ -84,11 +93,11 @@ resource "azurerm_kubernetes_cluster_node_pool" "nodepool" {
   max_count             = each.value.max_node_count
   linux_os_config {
     sysctl_config {
-      vm_max_map_count = each.value.max_map_count
+      vm_max_map_count = var.vm_max_map_count
     }
   }
 
   tags = {
-    Environment = each.value.tags
+    Environment = each.value.environment
   }
 }
