@@ -39,8 +39,9 @@ spec:
         httpConfig:
           tlsConfig:
             cert:
-              key: tls.crt
-              name: puppet-agent-tls-auth
+              secret:
+                key: tls.crt
+                name: puppet-agent-tls-auth
             keySecret:
               key: tls.key
               name: puppet-agent-tls-auth
