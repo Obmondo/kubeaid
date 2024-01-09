@@ -21,7 +21,7 @@ A set of Grafana dashboards and Prometheus alerts for Kubernetes.
 | release-0.10 | v1.20+             | v2.11.0+  | v2.0+ |
 | release-0.11 | v1.23+             | v2.11.0+  | v2.0+ |
 | release-0.12 | v1.23+             | v2.11.0+  | v2.0+ |
-| master       | v1.23+             | v2.11.0+  | v2.0+ |
+| master       | v1.26+             | v2.11.0+  | v2.0+ |
 
 In Kubernetes 1.14 there was a major [metrics overhaul](https://github.com/kubernetes/enhancements/issues/1206) implemented.
 Therefore v0.1.x of this repository is the last release to support Kubernetes 1.13 and previous version on a best effort basis.
@@ -248,7 +248,7 @@ While the community has not yet fully agreed on alert severities and their to be
 
 * For more motivation, see
 "[The RED Method: How to instrument your services](https://kccncna17.sched.com/event/CU8K/the-red-method-how-to-instrument-your-services-b-tom-wilkie-kausal?iframe=no&w=100%&sidebar=yes&bg=no)" talk from CloudNativeCon Austin.
-* For more information about monitoring mixins, see this [design doc](https://docs.google.com/document/d/1A9xvzwqnFVSOZ5fD3blKODXfsat5fg6ZhnKu9LK3lB4/edit#).
+* For more information about monitoring mixins, see this [design doc](DESIGN.md).
 
 ## Note
 
