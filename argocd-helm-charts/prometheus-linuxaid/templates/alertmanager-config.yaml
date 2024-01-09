@@ -4,7 +4,7 @@ metadata:
   name: alertmanager-config-{{ .Values.customerid }}
   namespace: monitoring-{{ .Values.customerid }}
   labels:
-    alertmanagerConfig: alertmanager-config-{{ .Values.customerid }}
+    alertmanagerConfig: {{ .Values.customerid }}
 spec:
   route:
     groupBy: ['certname', 'alert_id']
@@ -26,12 +26,12 @@ spec:
       - apiURL:
           key: webhook
           name: slack-webhook
-        text: |-
-          {{ range .Alerts }}
-            **Alert:** {{ .Labels.severity }} - {{ .Annotations.summary }}
-            **Description:** {{ .Annotations.description }}
-            **Hostname:** {{ .Labels.instance }}
-          {{ end }}
+        text: |
+        {{ range .Alerts }}
+          **Alert:** {{ .Labels.severity }} - {{ .Annotations.summary }}
+          **Description:** {{ .Annotations.description }}
+          **Hostname:** {{ .Labels.instance }}
+        {{ end }}
         sendResolved: true
   - name: opsmondo
     webhookConfigs:
