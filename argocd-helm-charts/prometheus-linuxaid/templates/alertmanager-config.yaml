@@ -11,7 +11,7 @@ spec:
     groupWait: 10s
     groupInterval: 10s
     repeatInterval: 15m
-    receiver: 'mattermost'
+    receiver: 'obmondo'
     routes:
       - receiver: opsmondo
         continue: true
@@ -46,4 +46,5 @@ spec:
               key: tls.key
               name: puppet-agent-tls-auth
         maxAlerts: 0
+        serverName: alerts.obmondo.com
         sendResolved: true

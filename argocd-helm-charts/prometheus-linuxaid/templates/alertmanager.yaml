@@ -16,6 +16,7 @@ spec:
     runAsNonRoot: true
     runAsUser: 1000
   serviceAccountName: alertmanager-main
+  portName: web
   version: v0.26.0
   alertmanagerConfiguration:
     name: alertmanager-config-{{ .Values.customerid }}

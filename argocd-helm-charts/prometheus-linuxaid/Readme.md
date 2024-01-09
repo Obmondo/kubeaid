@@ -36,3 +36,4 @@ mysql: https://github.com/percona/grafana-dashboards/blob/main/dashboards/MySQL/
 * fail if no customer-id is given
 * validate dashboard maybe ?
 * allow customer to add their own dashboard (this is should be top prio)
+* promtool rule validate
