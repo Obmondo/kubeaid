@@ -5,6 +5,7 @@ metadata:
   namespace: monitoring-{{ .Values.customerid }}
 spec:
   alerting:
+    alertmanagers:
     - namespace: monitoring-{{ .Values.customerid }}
       name: alertmanager-main
       port: web
