@@ -23,7 +23,9 @@ spec:
   receivers:
   - name: mattermost
     slackConfigs:
-      - apiURL: {{ .Values.alertmanager.slack_webhook }}
+      - apiURL:
+          key: webhook
+          name: slack-webhook
         text: |-
           {{ range .Alerts }}
             **Alert:** {{ .Labels.severity }} - {{ .Annotations.summary }}
