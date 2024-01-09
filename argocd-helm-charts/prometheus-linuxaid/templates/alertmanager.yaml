@@ -16,7 +16,7 @@ spec:
     runAsNonRoot: true
     runAsUser: 1000
   serviceAccountName: alertmanager-main
-  version: 0.26.0
+  version: v0.26.0
   alertmanagerConfigSelector:
     matchLabels:
       alertmanagerConfig: {{ .Values.customerid }}
