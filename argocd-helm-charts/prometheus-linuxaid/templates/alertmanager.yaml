@@ -6,8 +6,17 @@ metadata:
 spec:
   replicas: 1
   resources:
+    limits:
+      memory: 50Mi
     requests:
-      memory: 100Mi
+      cpu: 10m
+      memory: 20Mi
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
+  serviceAccountName: alertmanager-main
+  version: 0.26.0
   alertmanagerConfigSelector:
     matchLabels:
-      alertmanagerConfig: alertmanager-config-{{ .Values.customerid }}
+      alertmanagerConfig: {{ .Values.customerid }}
