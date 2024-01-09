@@ -6,12 +6,6 @@ metadata:
   labels:
     dashboards: "grafana"
 spec:
-  config:
-    log:
-      mode: "console"
-    auth:
-      disable_login_form: "false"
-      admin_password: secret
   deployment:
     spec:
       strategy:
@@ -46,7 +40,7 @@ spec:
               # TODO: https://grafana.github.io/grafana-operator/docs/examples/plugins/readme/
             - name: GF_INSTALL_PLUGINS
               value: 'grafana-clock-panel,grafana-piechart-panel'
-            image: grafana/grafana:9.5.3
+            image: docker.io/grafana/grafana:9.5.3
             resources:
               limits:
                 memory: 200Mi
