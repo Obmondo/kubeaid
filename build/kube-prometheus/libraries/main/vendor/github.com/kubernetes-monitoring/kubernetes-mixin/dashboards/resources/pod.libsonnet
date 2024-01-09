@@ -73,18 +73,18 @@ local template = grafana.template;
         },
         'Value #A': {
           alias: 'IOPS(Reads)',
-          unit: 'short',
-          decimals: -1,
+          unit: 'iops',
+          decimals: 3,
         },
         'Value #B': {
           alias: 'IOPS(Writes)',
-          unit: 'short',
-          decimals: -1,
+          unit: 'iops',
+          decimals: 3,
         },
         'Value #C': {
           alias: 'IOPS(Reads + Writes)',
-          unit: 'short',
-          decimals: -1,
+          unit: 'iops',
+          decimals: 3,
         },
         'Value #D': {
           alias: 'Throughput(Read)',
@@ -103,6 +103,8 @@ local template = grafana.template;
       g.dashboard(
         '%(dashboardNamePrefix)sCompute Resources / Pod' % $._config.grafanaK8s,
         uid=($._config.grafanaDashboardIDs['k8s-resources-pod.json']),
+        datasource_regex=$._config.datasourceFilterRegex,
+        datasource=$._config.datasourceName,
       )
       .addRow(
         g.row('CPU Usage')
