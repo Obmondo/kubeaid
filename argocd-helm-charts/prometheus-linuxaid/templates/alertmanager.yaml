@@ -19,3 +19,5 @@ spec:
   portName: web
   version: v0.26.0
   configSecret: alertmanager-config-{{ .Values.customerid }}
+  secrets:
+  - puppet-agent-tls-auth
