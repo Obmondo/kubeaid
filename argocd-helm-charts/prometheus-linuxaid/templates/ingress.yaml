@@ -1,3 +1,4 @@
+{{- if .Values.prometheus.ingress.enable -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -7,7 +8,7 @@ metadata:
     kubernetes.io/ingress.class: traefik-cert-manager
     cert-manager.io/cluster-issuer: letsencrypt
     traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/router.tls.domains.0.main: {{ .Values.prometheus_server }}
+    traefik.ingress.kubernetes.io/router.tls.domains.0.main: {{ .Values.prometheus.server }}
     traefik.ingress.kubernetes.io/router.tls.options: traefik-prometheus-puppet-agent-tls-auth@kubernetescrd
 spec:
   rules:
@@ -25,3 +26,4 @@ spec:
   - hosts:
     - {{ .Values.prometheus_server }}
     secretName: prometheus-{{ .Values.customerid }}-tls
+{{- end -}}

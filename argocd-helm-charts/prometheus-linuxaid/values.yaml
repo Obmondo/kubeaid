@@ -1,4 +1,7 @@
-prometheus_server: prometheus.obmondo.com
+prometheus:
+  server: prometheus.obmondo.com
+  ingress:
+    enable: false
 prometheusRule:
   backup: true
   btrfs: true
