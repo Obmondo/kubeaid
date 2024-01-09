@@ -36,4 +36,13 @@ spec:
   - name: opsmondo
     webhookConfigs:
       - url: https://alerts.obmondo.com/hooks/alertmanager
+        httpConfig:
+          tlsConfig:
+            cert:
+              key: tls.crt
+              name: puppet-agent-tls-auth
+            keySecret:
+              key: tls.key
+              name: puppet-agent-tls-auth
+        maxAlerts: 0
         sendResolved: true
