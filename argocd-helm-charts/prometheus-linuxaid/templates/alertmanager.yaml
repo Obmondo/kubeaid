@@ -17,6 +17,5 @@ spec:
     runAsUser: 1000
   serviceAccountName: alertmanager-main
   version: v0.26.0
-  alertmanagerConfigSelector:
-    matchLabels:
-      alertmanagerConfig: {{ .Values.customerid }}
+  alertmanagerConfiguration:
+    name: alertmanager-config-{{ .Values.customerid }}
