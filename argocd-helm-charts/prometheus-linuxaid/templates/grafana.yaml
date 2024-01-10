@@ -24,11 +24,7 @@ spec:
       auto_assign_org_role: "Editor"
     security:
       allow_embedding: "true"
-  persistentVolumeClaim:
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: 1Gi
-      volumeMode: Filesystem
+  dataStorage:
+    accessModes:
+    - ReadWriteOnce
+    size: 1Gi
