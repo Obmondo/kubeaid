@@ -24,7 +24,14 @@ spec:
       auto_assign_org_role: "Editor"
     security:
       allow_embedding: "true"
-  dataStorage:
-    accessModes:
-    - ReadWriteOnce
-    size: 1Gi
+  persistentVolumeClaim:
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      volumeMode: Filesystem
+      selector:
+        matchLabels:
+          dashboards: "grafana"
