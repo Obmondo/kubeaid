@@ -13,5 +13,5 @@ spec:
       Keys:
         - {{- .Values.middleware.jwt.public_key | toYaml | indent 8 }}
       JwtHeaders:
-        Subject: sub
+        X-Subject: sub
 {{- end }}
