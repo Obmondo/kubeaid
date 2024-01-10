@@ -19,7 +19,7 @@ cert-manager:
   cainjector:
     resources:
       limits:
-        memory: 128Mi
+        memory: 256Mi
       requests:
         cpu: 1m
         memory: 64Mi
@@ -34,3 +34,4 @@ issuer:
   enabled: false
   production: false
 networkpolicies: false
+enableCertificateOwnerRef: true
