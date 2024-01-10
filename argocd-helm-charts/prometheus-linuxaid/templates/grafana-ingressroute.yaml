@@ -8,15 +8,15 @@ spec:
     - websecure
   routes:
   - kind: Rule
-    match: Host(`{{ .Values.grafana.server }}`) && PathPrefix(`/{{ .Values.customerid }}`)
+    match: Host(`{{ .Values.grafana.server }}`)
     priority: 10
     middlewares:
     - name: jwt
       namespace: traefik
     services:
     - kind: Service
-      name: grafana-main
+      name: grafana-{{ .Values.customerid }}-service
       namespace: monitoring-{{ .Values.customerid }}
       passHostHeader: true
-      port: web
+      port: grafana
       nativeLB: true
