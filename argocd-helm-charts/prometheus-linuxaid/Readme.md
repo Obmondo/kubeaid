@@ -36,3 +36,6 @@ mysql: https://github.com/percona/grafana-dashboards/blob/main/dashboards/MySQL/
 * fail if no customer-id is given
 * validate dashboard maybe ?
 * allow customer to add their own dashboard (this is should be top prio)
+* promtool rule validate
+* grafana pvc is not supported https://github.com/grafana/grafana-operator/issues/296
+* grafana resource as well, the crd seems to be little broken when grafana guys migrated from v4 to v5

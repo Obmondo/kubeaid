@@ -11,6 +11,27 @@ spec:
       mode: "console"
     auth:
       disable_login_form: "false"
+    auth.proxy:
+      enabled: "true"
+      header_name: "X-WEBAUTH-USER"
+      header_property: "username"
+      auto_sign_up: "true"
+    users:
+      allow_sign_up: "false"
+      allow_org_create: "false"
+      editors_can_admin: "true"
+      auto_assign_org: "true"
+      auto_assign_org_role: "Editor"
     security:
-      admin_user: root
-      admin_password: secret
+      allow_embedding: "true"
+      admin_user: "root"
+      admin_password: "secretroot"
+  # TODO: https://github.com/grafana/grafana-operator/issues/296
+  persistentVolumeClaim:
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      volumeMode: Filesystem
