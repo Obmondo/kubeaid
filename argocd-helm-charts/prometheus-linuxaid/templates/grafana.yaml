@@ -7,15 +7,21 @@ metadata:
     dashboards: "grafana"
 spec:
   config:
+    analytics:
+      check_for_updates: "false"
     log:
       mode: "console"
     auth:
       disable_login_form: "false"
+      disable_signout_menu: "true"
     auth.proxy:
       enabled: "true"
       header_name: "X-WEBAUTH-USER"
       header_property: "username"
       auto_sign_up: "true"
+    server:
+      root_url: "https://{{ .Values.grafana.server }}/{{ .Values.customerid }}"
+      serve_from_sub_path: "true"
     users:
       allow_sign_up: "false"
       allow_org_create: "false"
@@ -26,7 +32,13 @@ spec:
       allow_embedding: "true"
       admin_user: "root"
       admin_password: "secretroot"
-  # TODO: https://github.com/grafana/grafana-operator/issues/296
+  deployment:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: grafana
+              image: grafana/grafana:9.5.3
   persistentVolumeClaim:
     spec:
       accessModes:
