@@ -24,6 +24,22 @@ spec:
       auto_assign_org_role: "Editor"
     security:
       allow_embedding: "true"
+      admin_user: "root"
+      admin_password: "secretroot"
+  deployment:
+    envFrom:
+      - configMapRef:
+          name: grafana-plugins
+  requests:
+    cpu: 100m
+    memory: 100Mi
+      resources:
+        limits:
+          memory: 200Mi
+        requests:
+          cpu: 6m
+          memory: 100Mi
+  # TODO: https://github.com/grafana/grafana-operator/issues/296
   persistentVolumeClaim:
     spec:
       accessModes:
@@ -32,6 +48,3 @@ spec:
         requests:
           storage: 1Gi
       volumeMode: Filesystem
-      selector:
-        matchLabels:
-          dashboards: "grafana"
