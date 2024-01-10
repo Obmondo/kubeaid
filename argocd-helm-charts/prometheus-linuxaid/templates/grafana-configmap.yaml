@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: grafana-{{ .Values.customerid }}
-  namespace: monitoring-{{ .Values.customerid }}
-data:
-  GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-piechart-panel
