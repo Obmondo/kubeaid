@@ -16,7 +16,7 @@ spec:
       disable_signout_menu: "true"
     auth.proxy:
       enabled: "true"
-      header_name: "X-WEBAUTH-USER"
+      header_name: "X-SUBJECT"
       header_property: "username"
       auto_sign_up: "true"
     server:
