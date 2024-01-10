@@ -1,0 +1,23 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ .Values.customerid }}
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - kind: Rule
+    match: Host(`{{ .Values.prometheus.server }}`) && PathPrefix(`/{{ .Values.customerid }}`)
+    priority: 10
+    services:
+    - kind: Service
+      name: prometheus-main
+      namespace: monitoring-{{ .Values.customerid }}
+      passHostHeader: true
+      port: web
+      nativeLB: true
+  tls:
+    options:
+      name: prometheus-puppet-agent-tls-auth
+      namespace: traefik

@@ -1,0 +1,18 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: grafana-prometheus-{{ .Values.customerid }}
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  datasource:
+    name: prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus-main:9090/{{ .Values.customerid }}
+    isDefault: true
+    jsonData:
+      'timeInterval': "1m"
+    editable: false

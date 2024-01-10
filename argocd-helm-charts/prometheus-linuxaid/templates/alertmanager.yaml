@@ -6,5 +6,18 @@ metadata:
 spec:
   replicas: 1
   resources:
+    limits:
+      memory: 50Mi
     requests:
-      memory: 400Mi
+      cpu: 10m
+      memory: 20Mi
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
+  serviceAccountName: alertmanager-main
+  portName: web
+  version: v0.26.0
+  configSecret: alertmanager-config-{{ .Values.customerid }}
+  secrets:
+  - puppet-agent-tls-auth
