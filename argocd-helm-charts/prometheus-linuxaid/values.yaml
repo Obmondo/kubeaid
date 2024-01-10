@@ -2,6 +2,8 @@ prometheus:
   server: prometheus.obmondo.com
   ingress:
     enable: false
+grafana:
+  server: graphs.obmondo.com
 prometheusRule:
   backup: true
   btrfs: true
