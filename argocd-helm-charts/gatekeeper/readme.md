@@ -5,6 +5,13 @@ This custom chart depends upon the OPA Gatekeeper upstream Helm chart from
 
 ## How Gatekeeper works
 
+To get the violations in the cluster run
+
+```sh
+kubectl describe K8sRequiredResources                        
+
+```
+
 Gatekeeper is project under Open Policy Agent which targets running OPA policies inside Kubernetes clusters.
 
 Gatekeeper requires Constraint Templates and Constraints to impose policies on k8s objects.
@@ -121,6 +128,10 @@ Readiness and Liveness probes failing continuously. To correct this, disable the
 `gatekeeper-netpol` network policy from the _values.yaml_ file by specifying `networkPolicy: false`.
 This has been observed in bare metal clusters and after removing the network policy, the
 pods come back to healthy state after a restart.
+
+- If the total violation count is higher but the violations are not listed, it might be due to the
+`constraintViolationsLimit` set in the values.yaml file. This is a limit on the number of violations
+that can be listed in the `kubectl describe` command. To list all the violations, set this value to higer number.
 
 ## References
 
