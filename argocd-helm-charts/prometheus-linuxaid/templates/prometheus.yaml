@@ -13,15 +13,14 @@ spec:
     labels:
       app.kubernetes.io/instance: {{ .Values.customerid }}
       app.kubernetes.io/name: prometheus
-  podMonitorNamespaceSelector: {}
-  podMonitorSelector: {}
-  probeNamespaceSelector: {}
-  probeSelector: {}
-  scrapeConfigNamespaceSelector: null
+  podMonitorNamespaceSelector: null
+  podMonitorSelector: null
+  probeNamespaceSelector: null
+  probeSelector: null
   replicas: 1
   retention: 15d
   ruleNamespaceSelector: null
-  ruleSelector: {}
+  ruleSelector: null
   externalUrl: /{{ .Values.customerid }}
   routePrefix: /{{ .Values.customerid }}
   evaluationInterval: 30s
