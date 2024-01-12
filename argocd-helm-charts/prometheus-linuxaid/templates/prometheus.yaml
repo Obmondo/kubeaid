@@ -21,6 +21,8 @@ spec:
   ruleSelector: {}
   scrapeConfigNamespaceSelector: null
   scrapeConfigSelector: {}
+  serviceMonitorNamespaceSelector: null
+  serviceMonitorSelector: {}
   replicas: 1
   retention: 15d
   externalUrl: /{{ .Values.customerid }}
