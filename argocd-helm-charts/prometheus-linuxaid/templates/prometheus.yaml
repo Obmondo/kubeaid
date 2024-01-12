@@ -13,24 +13,23 @@ spec:
     labels:
       app.kubernetes.io/instance: {{ .Values.customerid }}
       app.kubernetes.io/name: prometheus
-  podMonitorNamespaceSelector: {}
+  podMonitorNamespaceSelector: null
   podMonitorSelector: {}
-  probeNamespaceSelector: {}
+  probeNamespaceSelector: null
   probeSelector: {}
-  replicas: 1
-  retention: 15d
   ruleNamespaceSelector: null
   ruleSelector: {}
+  scrapeConfigNamespaceSelector: null
+  scrapeConfigSelector: {}
+  serviceMonitorNamespaceSelector: null
+  serviceMonitorSelector: {}
+  replicas: 1
+  retention: 15d
   externalUrl: /{{ .Values.customerid }}
   routePrefix: /{{ .Values.customerid }}
   evaluationInterval: 30s
   portName: web
-  resources:
-    limits:
-      memory: 4Gi
-    requests:
-      cpu: 200m
-      memory: 2Gi
+  resources: {{ toYaml .Values.prometheus.resources | nindent 4 }}
   scrapeInterval: 30s
   securityContext:
     fsGroup: 2000
@@ -48,5 +47,5 @@ spec:
           requests:
             storage: 30Gi
         storageClassName: rook-ceph-block
-  version: v2.43.0
+  version: v2.48.1
   enableRemoteWriteReceiver: true

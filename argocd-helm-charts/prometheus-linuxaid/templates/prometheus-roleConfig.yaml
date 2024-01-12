@@ -7,6 +7,26 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - configmaps
+  - services
+  - endpoints
+  - pods
   verbs:
   - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
