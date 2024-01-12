@@ -17,6 +17,7 @@ spec:
   podMonitorSelector: {}
   probeNamespaceSelector: {}
   probeSelector: {}
+  scrapeConfigNamespaceSelector: null
   replicas: 1
   retention: 15d
   ruleNamespaceSelector: null
@@ -48,5 +49,5 @@ spec:
           requests:
             storage: 30Gi
         storageClassName: rook-ceph-block
-  version: v2.43.0
+  version: v2.48.1
   enableRemoteWriteReceiver: true
