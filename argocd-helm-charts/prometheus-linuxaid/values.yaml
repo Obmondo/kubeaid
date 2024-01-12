@@ -2,6 +2,12 @@ prometheus:
   server: prometheus.obmondo.com
   ingress:
     enable: false
+  resources:
+    limits:
+      memory: 4Gi
+    requests:
+      cpu: 400m
+      memory: 2Gi
 grafana:
   server: graphs.obmondo.com
 prometheusRule:

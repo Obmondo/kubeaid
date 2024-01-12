@@ -26,12 +26,7 @@ spec:
   routePrefix: /{{ .Values.customerid }}
   evaluationInterval: 30s
   portName: web
-  resources:
-    limits:
-      memory: 4Gi
-    requests:
-      cpu: 200m
-      memory: 2Gi
+  resources: {{ toYaml .Values.prometheus.resources | nindent 4 }}
   scrapeInterval: 30s
   securityContext:
     fsGroup: 2000
