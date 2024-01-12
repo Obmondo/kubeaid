@@ -40,13 +40,6 @@ spec:
               containerPort: 8080
               protocol: TCP
           env:
-          {{- range .Values.ArgoSecret.keys }}
-            - name: {{ .name }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $.Values.ArgoSecret.name }}
-                  key: {{ .key }}
-          {{- end }}
           {{- range $key, $value := .Values.envVars }}
             - name: {{ $key }}
               value: {{ $value | quote }}
