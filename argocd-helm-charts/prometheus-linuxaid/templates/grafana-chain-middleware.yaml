@@ -1,0 +1,10 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: grafana-chain-{{ .Values.customerid }}
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  chain:
+    middlewares:
+    - name: jwt
+    - name: grafana-header-{{ .Values.customerid }}
