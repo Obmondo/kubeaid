@@ -2,7 +2,13 @@
 middleware:
   jwt:
     enabled: false
-    # public_key: <add your pubkey here>
+    headers:
+      X-Subject: sub
+    # public_key: |
+    #   -----BEGIN PUBLIC KEY-----
+    #   Asdads
+    #   -----END PUBLIC KEY-----
+
 
 traefik:
   instanceLabelOverride: traefik
