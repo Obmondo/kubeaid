@@ -4,12 +4,10 @@ middleware:
     enabled: false
     headers:
       X-Subject: sub
-    # public_key: |
-    #   -----BEGIN PUBLIC KEY-----
-    #   Asdads
-    #   -----END PUBLIC KEY-----
-
-
+      # public_key: |
+      #   -----BEGIN PUBLIC KEY-----
+      #   Asdads
+      #   -----END PUBLIC KEY-----
 traefik:
   instanceLabelOverride: traefik
   podDisruptionBudget:
@@ -30,10 +28,6 @@ traefik:
       tls:
         enabled: true
 
-  # enable JWT handling
-  # experimental:
-  #   plugins:
-  #      enabled: true
   additionalArguments:
     - "--entrypoints.web.proxyprotocol=true"
     - "--entrypoints.web.proxyprotocol.insecure=true"

@@ -18,5 +18,5 @@ spec:
       port: grafana
       nativeLB: true
     middlewares:
-      - name: jwt
-        namespace: traefik
+      - name: grafana-chain-{{ .Values.customerid }}
+        namespace: monitoring-{{ .Values.customerid }}
