@@ -4,6 +4,16 @@
     {
       "source": {
         "git": {
+          "remote": "https://github.com/adinhodovic/argo-cd-mixin.git",
+          "subdir": ""
+        }
+      },
+      "version": "990172dd478bdd9235fe7b184709e3d984c5e6e7",
+      "sum": "0m7YC/PLi4DxrZJ0SB7dvfAAjchzY0ucwt1EkKNUONg="
+    },
+    {
+      "source": {
+        "git": {
           "remote": "https://github.com/bitnami-labs/sealed-secrets.git",
           "subdir": "contrib/prometheus-mixin"
         }
@@ -110,6 +120,16 @@
       },
       "version": "3e38892d0777c11bb7fe6fddba262e2bd732c6d0",
       "sum": "9QuSLePtDrAYJJYiv6KcejPSD65eqh11jc4fXcgHYEU="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/grafonnet.git",
+          "subdir": "gen/grafonnet-v10.1.0"
+        }
+      },
+      "version": "41a43666c3a7c943b83d8fbc5d07eb954f4af753",
+      "sum": "1MPN9hxJ00RQ/D6je4xWXmY9CIeZDd8HWT2q5qDn9tg="
     },
     {
       "source": {
