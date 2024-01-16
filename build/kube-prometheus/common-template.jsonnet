@@ -78,6 +78,7 @@ local default_vars = {
   },
   addMixins: {
     ceph: true,
+    'argo-cd': true,
     sealedsecrets: true,
     etcd: true,
     velero: false,
@@ -105,6 +106,11 @@ local default_vars = {
 local vars = std.mergePatch(default_vars, ext_vars);
 
 local mixins = remove_nulls([
+  addMixin(
+    'argo-cd',
+    (import 'github.com/adinhodovic/argo-cd-mixin/mixin.libsonnet'),
+    vars,
+  ),
   addMixin(
     'ceph',
     (import 'github.com/ceph/ceph/monitoring/ceph-mixin/mixin.libsonnet'),
