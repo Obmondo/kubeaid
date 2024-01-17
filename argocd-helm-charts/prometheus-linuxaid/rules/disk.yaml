@@ -72,9 +72,9 @@ groups:
 
     - alert: monitor::system::disk::fillingup
       expr: |
-        node_filesystem_avail_bytes{fstype!="cifs",fstype!="btrfs",fstype!="nfs",fstype!="nfs4"} / node_filesystem_size_bytes * 100 < 20
+        node_filesystem_avail_bytes{fstype!="cifs",fstype!="btrfs",fstype!="nfs",fstype!="nfs4",fstype!="fuse.lxcfs",fstype!="tmpfs",fstype!="vfat"} / node_filesystem_size_bytes * 100 < 20
         and
-        on(certname, mountpoint) predict_linear(node_filesystem_free_bytes{fstype!="cifs",fstype!="btrfs",fstype!="nfs",fstype!="nfs4"}[6h], 2 * 24 * 3600) < 0
+        on(certname, mountpoint) predict_linear(node_filesystem_free_bytes{fstype!="cifs",fstype!="btrfs",fstype!="nfs",fstype!="nfs4",fstype!="fuse.lxcfs",fstype!="tmpfs",fstype!="vfat"}[6h], 2 * 24 * 3600) < 0
         and
         on(certname) obmondo_monitoring{alert_id="monitor::system::disk::fillingup"} > 0
       for: 1h
