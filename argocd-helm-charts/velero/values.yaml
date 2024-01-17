@@ -5,7 +5,7 @@ schedule:
   sixhourly: false
 velero:
   configuration:
-    logLevel: debug
+    logLevel: info
     features: EnableCSI
   metrics:
     enabled: true
