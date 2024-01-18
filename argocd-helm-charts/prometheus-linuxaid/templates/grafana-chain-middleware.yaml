@@ -6,5 +6,5 @@ metadata:
 spec:
   chain:
     middlewares:
-    - name: jwt
+    - name: grafana-jwt-{{ .Values.customerid }}
     - name: grafana-header-{{ .Values.customerid }}
