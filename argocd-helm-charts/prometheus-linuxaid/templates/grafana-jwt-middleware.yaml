@@ -1,3 +1,4 @@
+{{- if and .Values.middleware.jwt.enabled .Values.middleware.jwt.public_key }}
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
@@ -12,3 +13,4 @@ spec:
       Keys:
         - {{- .Values.middleware.jwt.public_key | toYaml | indent 8 }}
       JwtHeaders: {{ toYaml .Values.middleware.jwt.headers | nindent 8 }}
+{{- end }}
