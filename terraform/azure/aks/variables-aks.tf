@@ -68,12 +68,12 @@ variable "enable_auto_scaling" {
 }
 
 variable "min_node_count" {
-  default = 1
+  default = null
   description = "The minimum number of nodes which should exist in the Node Pool. Valid only when auto scaling is enabled"
 }
 
 variable "max_node_count" {
-  default = 3
+  default = null
   description = "The maximum number of nodes which should exist in the Node Pool. Valid only when auto scaling is enabled"
 }
 
@@ -112,8 +112,8 @@ variable "zones" {
 }
 
 
-variable "max_map_count" {
-  default = 262144
+variable "vm_max_map_count" {
+  default = "262144"
   description = "Maximum number of memory map areas a process may have"
 }
 
@@ -227,4 +227,10 @@ variable "ext_vnet_resource_group" {
   description = "Resource Group Name of the existing virtual network which you want your k8s cluster to use"
   type        = string
   default     = null
+}
+
+variable "environment" {
+  description = "Name of environment"
+  type        = string
+  default     = "dev"
 }
