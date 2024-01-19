@@ -29,6 +29,8 @@ imagePullSecrets:
 
 envVars:
   GIN_MODE: release
+  PROMETHEUS_URL: http://prometheus-k8s.monitoring:9090
+  API_URL: https://api.obmondo.com
 
 # Add Values like this:
 #envVars:
