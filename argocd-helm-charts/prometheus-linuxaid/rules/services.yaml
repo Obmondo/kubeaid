@@ -4,7 +4,7 @@ groups:
     rules:
     - record: record::monitor::system::service::down
       expr: |
-        node_systemd_unit_state{state="failed", name=~".+\\.service$", name!="fwupd-refresh.service", name!="run-puppet.service", type!~"dbus"} != 0
+        node_systemd_unit_state{state="failed", name=~".+\\.service$",  name!~".*user.*@.*" ,name!="fwupd-refresh.service", name!="run-puppet.service", type!~"dbus"} !=0
 
     - alert: monitor::system::service::down
       # take only name and certname label from left side and match against all the metrics from the right side with `name` and `certname` label
