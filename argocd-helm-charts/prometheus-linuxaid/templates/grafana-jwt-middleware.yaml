@@ -13,4 +13,5 @@ spec:
       Keys:
         - {{- .Values.middleware.jwt.public_key | toYaml | indent 8 }}
       JwtHeaders: {{ toYaml .Values.middleware.jwt.headers | nindent 8 }}
+      JwtCookieKey: jwt
 {{- end }}
