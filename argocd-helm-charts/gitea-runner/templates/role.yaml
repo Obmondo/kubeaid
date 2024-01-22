@@ -21,6 +21,13 @@ rules:
   verbs:
     - '*'
 - apiGroups:
+    - databases.spotahome.com
+  resources:
+    - redisfailovers
+    - redisfailovers/finalizers
+  verbs:
+    - '*'
+- apiGroups:
     - networking.k8s.io
   resources:
     - ingresses
