@@ -45,7 +45,7 @@ spec:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 30Gi
-        storageClassName: rook-ceph-block
+            storage: {{ .Values.prometheus.storage.size }}
+        storageClassName: {{ .Values.prometheus.storage.className }}
   version: v2.48.1
   enableRemoteWriteReceiver: true
