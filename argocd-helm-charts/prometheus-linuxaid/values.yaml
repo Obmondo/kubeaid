@@ -2,6 +2,9 @@ prometheus:
   server: prometheus.obmondo.com
   ingress:
     enable: false
+  storage:
+    size: 30Gi
+    className: rook-ceph-block
   resources:
     limits:
       memory: 4Gi
