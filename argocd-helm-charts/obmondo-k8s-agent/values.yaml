@@ -5,10 +5,10 @@
 replicaCount: 1
 
 image:
-  repository: registry.obmondo.com/obmondo/dockerfiles/obmondo-k8s-agent
+  repository: ghcr.io/obmondo/obmondo-k8s-agent
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.0.7"
+  tag: "1.0.8"
   volumeMounts:
   - mountPath: /opt/obmondo-k8s-agent/tls.crt
     name: k8s-agent-tls
