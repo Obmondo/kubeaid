@@ -1,0 +1,11 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: alertmanager-client-cn-{{ .Values.customerid }}
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  plugin:
+    headerauthentication:
+      header:
+        key: {{ .Values.customerid }}
+        name: X-Obmondo-Customerid
