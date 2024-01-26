@@ -1,4 +1,5 @@
 act-runner:
+  replicaCount: 2
   podSecurityContext:
     fsGroup: 1000
   securityContext:
