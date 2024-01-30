@@ -34,7 +34,8 @@ oncall:
   redis:
     enabled: true
     auth:
-      enabled: false
+      enabled: true
+      existingSecret: oncall-redis
   rabbitmq:
     enabled: false
   grafana:
