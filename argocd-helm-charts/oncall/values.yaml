@@ -33,6 +33,10 @@ oncall:
     enabled: false
   redis:
     enabled: true
+    auth:
+      enabled: true
+      existingSecret: oncall-redis
+      existingSecretPasswordKey: redis-password
   rabbitmq:
     enabled: false
   grafana:
@@ -71,10 +75,10 @@ rabbitmq:
     vm_memory_high_watermark_paging_ratio: 0.99
   resources:
     limits:
-      cpu: 1000m
+      cpu: 100m
       memory: 2Gi
     requests:
-      cpu: 1000m
+      cpu: 100m
       memory: 2Gi
 
 postgresql:

@@ -22,7 +22,7 @@ spec:
       memory: {{ .Values.postgresql.resources.limits.memory | default "800Mi" }}
       # As its required to add the cpu limit, have added the issue here
       # https://github.com/cloudnative-pg/cloudnative-pg/issues/2586
-      cpu: 4
+      cpu: "2"
     requests:
       memory: {{ .Values.postgresql.resources.requests.memory | default "500Mi" }}
       cpu: {{ .Values.postgresql.resources.requests.cpu | default "100m" }}
@@ -92,7 +92,7 @@ spec:
           name: oncall-psql-backup-creds
           key: AZURE_STORAGE_SAS_TOKEN
       {{- end }}
-    wal:
-      compression: gzip
-      encryption: AES256
+      wal:
+        compression: gzip
+        encryption: AES256
     retentionPolicy: "30d"
