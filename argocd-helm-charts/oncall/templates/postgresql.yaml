@@ -92,7 +92,7 @@ spec:
           name: oncall-psql-backup-creds
           key: AZURE_STORAGE_SAS_TOKEN
       {{- end }}
-    wal:
-      compression: gzip
-      encryption: AES256
+      wal:
+        compression: gzip
+        encryption: AES256
     retentionPolicy: "30d"
