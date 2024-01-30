@@ -5,10 +5,6 @@ metadata:
   labels:
     velero.io/exclude-from-backup: "true"
 spec:
-  service:
-    type: ClusterIP
-    port: 5672
-    name: rabbitmq-port
   replicas: {{ .Values.rabbitmq.replicas }}
   rabbitmq:
     additionalConfig: |
