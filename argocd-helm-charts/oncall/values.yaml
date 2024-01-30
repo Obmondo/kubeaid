@@ -33,6 +33,8 @@ oncall:
     enabled: false
   redis:
     enabled: true
+    auth:
+      enabled: false
   rabbitmq:
     enabled: false
   grafana:
