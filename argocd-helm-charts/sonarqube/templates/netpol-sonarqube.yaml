@@ -61,7 +61,7 @@ spec:
     protocol: TCP
     source:
       selector: app.kubernetes.io/name == 'traefik-public'
-      namespaceSelector: kubernetes.io/metadata.name == 'traefik-public'
+      namespaceSelector: kubernetes.io/metadata.name == 'traefik'
       nets:
         - 199.232.24.209
     destination:
