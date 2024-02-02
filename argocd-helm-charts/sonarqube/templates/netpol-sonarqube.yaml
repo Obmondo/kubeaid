@@ -28,6 +28,13 @@ spec:
         - 443
       nets:
         - 199.232.24.209
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+        - 443
+      nets:
+        - 10.5.0.0/16
   # install-plugin is accessing https://github.com
   - action: Allow
     protocol: TCP
@@ -53,8 +60,8 @@ spec:
   - action: Allow
     protocol: TCP
     source:
-      selector: app.kubernetes.io/name == 'traefik'
-      namespaceSelector: kubernetes.io/metadata.name == 'traefik'
+      selector: app.kubernetes.io/name == 'traefik-public'
+      namespaceSelector: kubernetes.io/metadata.name == 'traefik-public'
       nets:
         - 199.232.24.209
     destination:
