@@ -1,7 +1,4 @@
 mattermost-team-edition:
-  image:
-    repository: mattermost/mattermost-team-edition
-    tag: 6.7.0@sha256:cf0c182aeff6553d93e33485858c3dd9de1c8dd73d140dda18d926721f8ff7a0
   mysql:
     enabled: false
   externalDB:
@@ -18,7 +15,7 @@ mattermost-team-edition:
         name: mattermost.mattermost-pgsql.credentials.postgresql.acid.zalan.do
         key: password
   - name: MM_SQLSETTINGS_DATASOURCE
-    value: postgres://$(MM_DB_USERNAME):$(MM_DB_PASSWORD)@mattermost-pgsql:5432/mattermost?sslmode=require&connect_timeout=10
+    value: postgres://$(MM_DB_USERNAME):$(MM_DB_PASSWORD)@mattermost-pgsql:5432/mattermost?sslmode=require&connect_timeout=100
   - name: MM_GITLABSETTINGS_ID
     valueFrom:
       secretKeyRef:
@@ -41,6 +38,13 @@ mattermost-team-edition:
     runAsUser: 2000
     runAsGroup: 2000
     fsGroup: 2000
+  # For fixing premature crashloopbackoff error
+  startupProbe:
+    initialDelaySeconds: 100
+  livenessProbe:
+    initialDelaySeconds: 10
+  readinessProbe:
+    initialDelaySeconds: 150
 
 postgresql:
   size: 8Gi
