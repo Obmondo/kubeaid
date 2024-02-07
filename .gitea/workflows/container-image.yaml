@@ -1,6 +1,6 @@
 name: kubeaid CI image
 
-on:
+"on":
   push:
     branches:
       - main
@@ -10,17 +10,13 @@ on:
 permissions:
   contents: read
 
-env:
-  PROJECT_PATH: .gitea
-  IMAGE_NAME: obmondo/kubeaid-ci
-
 jobs:
   docker-image-build-pull-request:
-    if: github.event_name == 'push'
     uses: Obmondo/gitea-actions/.gitea/workflows/build-image.yaml@main
     with:
       push: true
-      context: ${{ env.PROJECT_PATH }}
+      context: .gitea
+      image_name: obmondo/kubeaid-ci
       tags: 1.2.0
     secrets:
       username: ${{ secrets.HARBOR_USERNAME }}
