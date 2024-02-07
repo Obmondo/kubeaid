@@ -10,6 +10,8 @@ jobs:
   promtool:
     name: Prometheus rule test
     runs-on: ubuntu-latest
+    container:
+      image: harbor.obmondo.com/obmondo/kubeaid-ci:1.2.0
     steps:
       - name: checkout
         uses: actions/checkout@v3
