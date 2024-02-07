@@ -1,0 +1,38 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/disk.yaml
+
+# FIXME: enable tests when we can actually toggle alerts
+tests: []
+  # - interval: 1m
+  #   input_series:
+  #     - series: obmondo_monitoring{certname="test.abc", status="disabled", alert_id="monitor::system::disk::usage"}
+  #       values: 1+0x30
+  #     - series: obmondo_monitoring{certname="example.abc", status="disabled", alert_id="monitor::system::disk::usage"}
+  #       values: 1+0x30
+  #       # simulate metrics when test.abc with /var has value of 81 for 10min
+  #     - series: record::monitor::system::disk::filesystem_space_percentage{mountpoint="/var", certname="test.abc", threshold="80", disk_group="0_to_100_GB", alert_id="monitor::system::disk::usage"}
+  #       values: 81+0x10
+  #       # simulate metrics when test.abc with /tmp has value of 60 for first
+  #       # 10min and 90 after 10min
+  #     - series: record::monitor::system::disk::filesystem_space_percentage{mountpoint="/tmp", certname="test.abc", threshold="85", disk_group="100_to_250_GB", alert_id="monitor::system::disk::usage"}
+  #       values: 60+0x10 90+0x10
+  #     - series: record::monitor::system::disk::filesystem_space_percentage{mountpoint="/mnt", certname="example.abc", threshold="97", disk_group="1000_GB_plus", alert_id="monitor::system::disk::usage"}
+  #       values: 90+0x10
+  #     - series: disk_filesystem_space_custom_threshold{mountpoint="/mnt", certname="example.abc", threshold="85"}
+  #       values: 85+0x20
+
+  #   alert_rule_test:
+  #     # Should not alert because percentage is not above threshold till 9th min
+  #     - alertname: monitor::system::disk::usage
+  #       eval_time: 9m
+  #       exp_alerts: []
+  #       # + Alert when 81% is used and have been for last 10min
+  #       #
+  #       # + Alert when custom threshold of 85% is crossed, when default
+  #       #   threshold is around 97%
+  #     - alertname: monitor::system::disk::usage
+  #       eval_time: 11m
+  #       exp_alerts: []

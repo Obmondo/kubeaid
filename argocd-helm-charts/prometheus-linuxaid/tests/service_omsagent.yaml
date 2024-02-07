@@ -1,0 +1,32 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/service_omsagent.yaml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="abc.enableit", alert_id="monitor::system::service::omsagent::update"}
+        values: 1x100000
+      - series: obmondo_monitoring{certname="xyz.enableit", alert_id="monitor::system::service::omsagent::update"}
+        values: 1x100000
+      - series: obmondo_omsagent_update_check{certname="xyz.enableit", instance="xyz.enableit:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 0x100000
+      - series: obmondo_omsagent_update_check{certname="abc.enableit", instance="abc.enableit:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 1x100000
+
+    alert_rule_test:
+      - alertname: 'monitor::system::service::omsagent::update'
+        eval_time: 21d
+        exp_alerts:
+          - exp_labels:
+              severity: 'critical'
+              certname: 'abc.enableit'
+              alert_id: 'monitor::system::service::omsagent::update'
+              instance: 'abc.enableit:9100'
+              job: 'pushprox'
+              pushprox_target: 'node_exporter'
+            exp_annotations:
+              summary: 'Omsagent update is available'
+              description: 'An update is available for **Omsagent**. Please update it to latest'

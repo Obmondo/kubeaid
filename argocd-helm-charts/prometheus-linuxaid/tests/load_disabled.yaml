@@ -1,0 +1,41 @@
+---
+# https://speakerdeck.com/tksm/unit-testing-for-prometheus-rules?slide=15
+# https://howardburgess.github.io/prometheus-unit-testing/
+
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/load.yaml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{instance="test.abc", status="disabled", alert_id="system_load_avg"}
+        values: 1+0x10
+        # load1 series has a default threshold of 0.95
+      - series: record::monitor::system::load::load1_percpu{instance="test.abc", threshold="0.95", alert_id="system_load_avg"}
+        values: 0.98+0x10
+        # load5 series has a default threshold of 0.90
+      - series: record::monitor::system::load::load5_percpu{instance="test.abc", threshold="0.90", alert_id="system_load_avg"}
+        values: 12+0x10
+        # load15 series has a default threshold of 0.85
+      - series: record::monitor::system::load::load15_percpu{instance="test.abc", threshold="0.85", alert_id="system_load_avg"}
+        values: 0.87+0x10
+        # Custom threshold for load1 percpu
+      - series: obmondo_system_load5_percpu_threshold{instance="test.abc", threshold="10"}
+        values: 10+0x10
+    alert_rule_test:
+      # There should not any alert till 9th minute
+      - alertname: monitor::system::load::load1_percpu
+        eval_time: 9m
+        exp_alerts: []
+      # Alert if value is same since last 10 minute
+      - alertname: monitor::system::load::load1_percpu
+        eval_time: 10m
+        exp_alerts: []
+      - alertname: system_load_average_percpu_over_5m
+        eval_time: 10m
+        exp_alerts: []
+      - alertname: system_load_average_percpu_over_15m
+        eval_time: 10m
+        exp_alerts: []

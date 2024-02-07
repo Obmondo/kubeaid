@@ -1,0 +1,46 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../records/disk.yaml
+
+tests:
+  # Disk space check
+  - interval: 1m
+    input_series:
+      # simulate that example.abc with "/" has metrics value as 8 for first 20
+      # min and then 200 after 20 min and then 5000 after 40 min
+      - series: node_filesystem_avail_bytes{fstype="xfs", mountpoint="/mnt/samba", certname="atat.enableit", device="//somehost/build", instance="atat.enableit:9100", job="pushprox", pushprox_target="node_exporter",}
+        values: 1551834316x20 15518343160x20 155183431600x20 # (* 31036686336 0.05)
+      - series: node_filesystem_size_bytes{fstype="xfs", mountpoint="/mnt/samba", certname="atat.enableit", device="//somehost/build", instance="atat.enableit:9100", job="pushprox", pushprox_target="node_exporter",}
+        values: 31036686336x20 410366863360x20 6103668633600x20
+
+    # promql_expr_test, simply test the expression of the prometheus
+    promql_expr_test:
+      # formula is used/total * 100
+      # f.ex 2/10.5 * 100 = 19.0476190476
+      - expr: record::monitor::system::disk::filesystem_space_percentage
+        eval_time: 20m
+        exp_samples:
+          # if the value are like above for first 20 min and then it should have
+          # value of 19%
+          - labels: record::monitor::system::disk::filesystem_space_percentage{threshold="80", disk_group="0_to_100_GB", certname="atat.enableit", alert_id="monitor::system::disk::usage", fstype="xfs", mountpoint="/mnt/samba", device="//somehost/build", instance="atat.enableit:9100", job="pushprox", pushprox_target="node_exporter"}
+            value: 9.50000000025776E+01
+
+      # 300 / 502 * 100
+      - expr: record::monitor::system::disk::filesystem_space_percentage
+        eval_time: 40m
+        exp_samples:
+          # if the value are like above after 20 min and then it should have
+          # value of 60%
+          - labels: record::monitor::system::disk::filesystem_space_percentage{threshold="90", disk_group="250_to_400_GB", certname="atat.enableit", alert_id="monitor::system::disk::usage", fstype="xfs", mountpoint="/mnt/samba", device="//somehost/build", instance="atat.enableit:9100", job="pushprox", pushprox_target="node_exporter"}
+            value: 9.621842196688617E+01
+
+      # 20000 / 25005 * 100
+      - expr: record::monitor::system::disk::filesystem_space_percentage
+        eval_time: 60m
+        exp_samples:
+          # if the value are like above after 40 min and then it should have
+          # value of 80%
+          - labels: record::monitor::system::disk::filesystem_space_percentage{threshold="97", disk_group="1000_GB_plus", certname="atat.enableit", alert_id="monitor::system::disk::usage", fstype="xfs", mountpoint="/mnt/samba", device="//somehost/build", instance="atat.enableit:9100", job="pushprox", pushprox_target="node_exporter"}
+            value: 9.745753839345517E+01

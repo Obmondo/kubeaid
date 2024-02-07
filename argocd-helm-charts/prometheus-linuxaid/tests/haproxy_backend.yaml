@@ -1,0 +1,155 @@
+---
+# https://speakerdeck.com/tksm/unit-testing-for-prometheus-rules?slide=15
+# https://howardburgess.github.io/prometheus-unit-testing/
+
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/haproxy.yaml
+
+tests:
+  - interval: 1s
+    # rate and irate needs two minimum sample to work the data, but I'm simply populating it for full 10 min and interval needs to be sec here.
+    # cause rate and irate works on sec basis
+    input_series:
+      - series: 'haproxy_backend_response_time_average_seconds{certname="bar", proxy="www", alert_id="monitor::service::haproxy::backend_response_time"}'
+        values: '0.6x600 0.4x600 0.7x1800'
+      - series: 'haproxy_backend_response_time_average_seconds{certname="foo", proxy="www", alert_id="monitor::service::haproxy::backend_response_time"}'
+        values: '0.6x600 0.6x600 0.7x1800'
+      - series: 'haproxy_frontend_current_sessions{certname="bar", proxy="www", alert_id="monitor::service::haproxy::backend_response_time"}'
+        values: '1.1x600 1.1x600 1.1x1800'
+      - series: 'haproxy_frontend_current_sessions{certname="foo", proxy="www", alert_id="monitor::service::haproxy::backend_response_time"}'
+        values: '1.1x600 0.9x600 1.1x1800'
+      - series: 'obmondo_monitoring{certname="bar", proxy="www", alert_id="monitor::service::haproxy::backend_response_time"}'
+        values: '1x3000'
+      - series: 'obmondo_monitoring{certname="foo", proxy="www", alert_id="monitor::service::haproxy::backend_response_time"}'
+        values: '1x1800 0x600 1x600'
+      - series: 'obmondo_monitoring{certname="bar", alert_id="monitor::service::haproxy::backend_response_time"}'
+        values: '1x2400 0x600'
+      - series: 'obmondo_monitoring{certname="foo", alert_id="monitor::service::haproxy::backend_response_time"}'
+        values: '1x3000'
+      - series: 'obmondo_monitoring{certname="foo", proxy="zzz", alert_id="monitor::service::haproxy::backend_response_time"}'
+        values: '1x3000'
+      - series: 'threshold::monitor::service::haproxy::backend_response_time_seconds{certname="foo", proxy="zzz"}'
+        values: '2x3000'
+      - series: 'haproxy_backend_response_time_average_seconds{certname="foo", proxy="zzz", alert_id="monitor::service::haproxy::backend_response_time"}'
+        values: '0.5x600 2.5x600 1.5x1800'
+      - series: 'haproxy_frontend_current_sessions{certname="foo", proxy="zzz", alert_id="monitor::service::haproxy::backend_response_time"}'
+        values: '1.1x3000'
+      - series: 'obmondo_monitoring{certname="foo", proxy="yyy", alert_id="monitor::service::haproxy::backend_response_time"}'
+        values: '0x3000'
+      - series: 'threshold::monitor::service::haproxy::backend_response_time_seconds{certname="foo", proxy="yyy"}'
+        values: '2x3000'
+      - series: 'haproxy_backend_response_time_average_seconds{certname="foo", proxy="yyy", alert_id="monitor::service::haproxy::backend_response_time"}'
+        values: '0.5x600 2.5x600 1.5x1800'
+      - series: 'haproxy_frontend_current_sessions{certname="foo", proxy="yyy", alert_id="monitor::service::haproxy::backend_response_time"}'
+        values: '1.1x3000'
+      - series: obmondo_monitoring{certname="test", alert_id="monitor::service::haproxy::backend_down"}
+        values: '1x660'
+      - series: 'haproxy_backend_active_servers{certname="test", proxy="server01"}'
+        values: '0x660'
+      - series: 'haproxy_backend_active_servers{certname="test", proxy="server02"}'
+        values: '5x660'
+      - series: 'haproxy_backend_active_servers{certname="test", proxy="server03"}'
+        values: '0x660'
+      - series: 'haproxy_backend_backup_servers{certname="test", proxy="server01"}'
+        values: '0x660'
+      - series: 'haproxy_backend_backup_servers{certname="test", proxy="server02"}'
+        values: '0x660'
+      - series: 'haproxy_backend_backup_servers{certname="test", proxy="server03"}'
+        values: '0x660'
+      - series: 'threshold::monitor::service::haproxy::ignore_backends{certname="test", proxy="server03"}'
+        values: '0x660'
+
+    alert_rule_test:
+      - eval_time: 10m  # Both www backends are alerting for different reasons
+        alertname: monitor::service::haproxy::backend_response_time
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              certname: bar
+              proxy: www
+              alert_id: 'monitor::service::haproxy::backend_response_time'
+            exp_annotations:
+              summary: "Haproxy average response time from backend servers too high"
+              description: "The average response time on backend **bar** **www** is 600ms"
+          - exp_labels:
+              severity: warning
+              certname: foo
+              proxy: www
+              alert_id: 'monitor::service::haproxy::backend_response_time'
+            exp_annotations:
+              summary: "Haproxy average response time from backend servers too high"
+              description: "The average response time on backend **foo** **www** is 600ms"
+
+      - eval_time: 20m  # zzz starts despite higher tolerance, the others are reset
+        alertname: monitor::service::haproxy::backend_response_time
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              certname: foo
+              proxy: zzz
+              alert_id: 'monitor::service::haproxy::backend_response_time'
+            exp_annotations:
+              summary: "Haproxy average response time from backend servers too high"
+              description: "The average response time on backend **foo** **zzz** is 2.5s"
+
+      - eval_time: 30m  # both start again due to above changes being undone
+        alertname: monitor::service::haproxy::backend_response_time
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              certname: bar
+              proxy: www
+              alert_id: 'monitor::service::haproxy::backend_response_time'
+            exp_annotations:
+              summary: "Haproxy average response time from backend servers too high"
+              description: "The average response time on backend **bar** **www** is 700ms"
+          - exp_labels:
+              severity: warning
+              certname: foo
+              proxy: www
+              alert_id: 'monitor::service::haproxy::backend_response_time'
+            exp_annotations:
+              summary: "Haproxy average response time from backend servers too high"
+              description: "The average response time on backend **foo** **www** is 700ms"
+
+      - eval_time: 40m  # foo stopped by disabling alert on its www backend
+        alertname: monitor::service::haproxy::backend_response_time
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              certname: bar
+              proxy: www
+              alert_id: 'monitor::service::haproxy::backend_response_time'
+            exp_annotations:
+              summary: "Haproxy average response time from backend servers too high"
+              description: "The average response time on backend **bar** **www** is 700ms"
+
+      - eval_time: 50m  # bar stopped by disabling alert on certname
+        alertname: monitor::service::haproxy::backend_response_time
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              certname: foo
+              proxy: www
+              alert_id: 'monitor::service::haproxy::backend_response_time'
+            exp_annotations:
+              summary: "Haproxy average response time from backend servers too high"
+              description: "The average response time on backend **foo** **www** is 700ms"
+
+      - eval_time: 5m
+        alertname: monitor::service::haproxy::backend_down
+        exp_alerts: []
+
+      - eval_time: 11m
+        alertname: monitor::service::haproxy::backend_down
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: test
+              proxy: server01
+              alert_id: 'monitor::service::haproxy::backend_down'
+            exp_annotations:
+              summary: "Haproxy backend server is down"
+              description: "The backend server **server01** is down for **test**"

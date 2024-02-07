@@ -1,0 +1,108 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/disk.yaml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="atat.enableit", alert_id="monitor::system::disk::usage"}
+        values: 1x30
+      - series: record::monitor::system::disk::filesystem_space_percentage{mountpoint="/var", certname="atat.enableit", threshold="80", disk_group="0_to_100_GB", alert_id="monitor::system::disk::usage"}
+        values: 80x20
+        # simulate metrics when atat.enableit with /tmp has value of 60 for first 10min and 90 after 10min
+      - series: record::monitor::system::disk::filesystem_space_percentage{mountpoint="/tmp", certname="atat.enableit", threshold="85", disk_group="100_to_250_GB", alert_id="monitor::system::disk::usage"}
+        values: 70x20
+      - series: threshold::monitor::system::disk::usage{mountpoint="/var", certname="atat.enableit"}
+        values: 70x20
+
+    alert_rule_test:
+      # Should not alert because percentage is not above threshold till 9th min
+      - alertname: monitor::system::disk::usage
+        eval_time: 9m
+        exp_alerts: []
+        # Alert when 81% is used and have been for last 10min
+        # Alert when custom threshold of 85% is crossed, when default threshold is around 97%
+      - alertname: monitor::system::disk::usage
+        eval_time: 16m
+        exp_alerts:
+          - exp_labels:
+              severity: "warning"
+              mountpoint: /var
+              certname: atat.enableit
+              disk_group: 0_to_100_GB
+              alert_id: monitor::system::disk::usage
+            exp_annotations:
+              summary: 'Available disk space on /var on **atat.enableit** is low'
+              description: 'Available space is very low on filesystem `/var` and current usage is around 80% which is above the threshold of 70%'
+
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="jaina.enableit", status="enabled", alert_id="monitor::system::disk::usage"}
+        values: 1x30
+      - series: record::monitor::system::disk::filesystem_space_percentage{mountpoint="/mnt", certname="jaina.enableit", threshold="97", disk_group="1000_GB_plus", alert_id="monitor::system::disk::usage"}
+        values: 90x20
+      - series: threshold::monitor::system::disk::usage{mountpoint="/mnt", certname="jaina.enableit"}
+        values: 75x20
+
+    alert_rule_test:
+      # Should not alert because percentage is not above threshold till 9th min
+      - alertname: monitor::system::disk::usage
+        eval_time: 9m
+        exp_alerts: []
+        # Alert when 81% is used and have been for last 10min
+        # Alert when custom threshold of 85% is crossed, when default threshold is around 97%
+      - alertname: monitor::system::disk::usage
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              severity: "warning"
+              mountpoint: /mnt
+              certname: jaina.enableit
+              disk_group: 1000_GB_plus
+              alert_id: monitor::system::disk::usage
+            exp_annotations:
+              summary: 'Available disk space on /mnt on **jaina.enableit** is low'
+              description: 'Available space is very low on filesystem `/mnt` and current usage is around 90% which is above the threshold of 75%'
+
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="ddkcphapp01.7ejidqmfi9", alert_id="monitor::system::disk::usage"}
+        values: 1x30
+      - series: record::monitor::system::disk::filesystem_space_percentage{alert_id="monitor::system::disk::usage", certname="ddkcphapp01.7ejidqmfi9", device="/dev/mapper/ubuntu--vg-data", disk_group="0_to_100_GB", fstype="ext4", instance="ddkcphapp01.7ejidqmfi9:9100", job="pushprox", mountpoint="/local", pushprox_target="node_exporter", threshold="80"}
+        values: 94+0.1x50
+      - series: record::monitor::system::disk::filesystem_space_percentage{alert_id="monitor::system::disk::usage", certname="ddkcphapp01.7ejidqmfi9", device="/dev/mapper/ubuntu--vg-ubuntu--lv", disk_group="0_to_100_GB", fstype="ext4", instance="ddkcphapp01.7ejidqmfi9:9100", job="pushprox", mountpoint="/", pushprox_target="node_exporter", threshold="80"}
+        values: 31+0.061x50
+      - series: record::monitor::system::disk::filesystem_space_percentage{alert_id="monitor::system::disk::usage", certname="ddkcphapp01.7ejidqmfi9", device="/dev/sda2", disk_group="0_to_100_GB", fstype="ext4", instance="ddkcphapp01.7ejidqmfi9:9100", job="pushprox", mountpoint="/boot", pushprox_target="node_exporter", threshold="80"}
+        values: 72.45+0.1x50
+      - series: record::monitor::system::disk::filesystem_space_percentage{alert_id="monitor::system::disk::usage", certname="ddkcphapp01.7ejidqmfi9", device="10.45.13.166:/home", disk_group="1000_GB_plus", fstype="nfs4", instance="ddkcphapp01.7ejidqmfi9:9100", job="pushprox", mountpoint="/home", pushprox_target="node_exporter", threshold="97"}
+        values: 36+0.28x50
+      - series: threshold::monitor::system::disk::usage{mountpoint="/local", certname="ddkcphapp01.7ejidqmfi9"}
+        values: 70x20
+
+    alert_rule_test:
+      # Should not alert because percentage is not above threshold till 9th min
+      - alertname: monitor::system::disk::usage
+        eval_time: 9m
+        exp_alerts: []
+        # Alert when 81% is used and have been for last 10min
+        # Alert when custom threshold of 85% is crossed, when default threshold is around 97%
+      - alertname: monitor::system::disk::usage
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              alert_id: "monitor::system::disk::usage"
+              alertname: "monitor::system::disk::usage"
+              certname: "ddkcphapp01.7ejidqmfi9"
+              device: "/dev/mapper/ubuntu--vg-data"
+              disk_group: "0_to_100_GB"
+              fstype: "ext4"
+              instance: "ddkcphapp01.7ejidqmfi9:9100"
+              job: "pushprox"
+              mountpoint: "/local"
+              pushprox_target: "node_exporter"
+              severity: "warning"
+            exp_annotations:
+              summary: 'Available disk space on /local on **ddkcphapp01.7ejidqmfi9** is low'
+              description: 'Available space is very low on filesystem `/local` and current usage is around 96% which is above the threshold of 70%'

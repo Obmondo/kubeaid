@@ -1,0 +1,94 @@
+---
+# https://speakerdeck.com/tksm/unit-testing-for-prometheus-rules?slide=15
+# https://howardburgess.github.io/prometheus-unit-testing/
+
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/memory.yaml
+
+tests:
+  # memory use check
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="cert1.abc", alert_id="monitor::system::ram::used"}
+        values: 1x1000
+      - series: obmondo_monitoring{certname="remdev.abc", alert_id="monitor::system::ram::used"}
+        values: 1x1000
+      - series: threshold::monitor::system::ram::used{certname="cert1.abc"}
+        values: 40+0x30
+      - series: node_memory_MemAvailable_bytes{certname="cert1.abc"}
+        values: 2048x10 4098x10 2048x10
+      - series: node_memory_MemTotal_bytes{certname="cert1.abc"}
+        values: 8096x30
+      - series: threshold::monitor::system::ram::used{certname="remdev.abc"}
+        values: 20+0x30
+      - series: node_memory_MemAvailable_bytes{certname="remdev.abc"}
+        values: 6024x30
+      - series: node_memory_MemTotal_bytes{certname="remdev.abc"}
+        values: 8096x10 8096x10 8096x10
+
+    alert_rule_test:
+      - alertname: monitor::system::ram::used
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              certname: cert1.abc
+              alert_id: monitor::system::ram::used
+            exp_annotations:
+              summary: "System RAM usage too high"
+              description: |
+                Memory use on **cert1.abc** is around 74.7% which is above the threshold of 40% for 30 minutes.
+          - exp_labels:
+              severity: warning
+              certname: remdev.abc
+              alert_id: monitor::system::ram::used
+            exp_annotations:
+              summary: "System RAM usage too high"
+              description: |
+                Memory use on **remdev.abc** is around 25.59% which is above the threshold of 20% for 30 minutes.
+
+      - alertname: monitor::system::ram::oom
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="cert1.abc", alert_id="monitor::system::ram::used"}
+        values: 1x1000
+      - series: obmondo_monitoring{certname="remdev.abc", alert_id="monitor::system::ram::used"}
+        values: 1x1000
+      - series: threshold::monitor::system::ram::used_high{certname="cert1.abc"}
+        values: 24x30
+      - series: node_memory_MemAvailable_bytes{certname="cert1.abc"}
+        values: 2048x10 1x10 2048x10
+      - series: node_memory_MemTotal_bytes{certname="cert1.abc"}
+        values: 8096x30
+      - series: threshold::monitor::system::ram::used_high{certname="remdev.abc"}
+        values: 45x30
+      - series: node_memory_MemAvailable_bytes{certname="remdev.abc"}
+        values: 2222x10 24x10 3333x10
+      - series: node_memory_MemTotal_bytes{certname="remdev.abc"}
+        values: 8096x30
+
+    alert_rule_test:
+      - alertname: monitor::system::ram::used
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: cert1.abc
+              alert_id: monitor::system::ram::used
+            exp_annotations:
+              summary: "System RAM usage too high"
+              description: |
+                Memory use on **cert1.abc** is around 74.7% which is above the threshold of 24% for 10 minutes.
+          - exp_labels:
+              severity: critical
+              certname: remdev.abc
+              alert_id: monitor::system::ram::used
+            exp_annotations:
+              summary: "System RAM usage too high"
+              description: |
+                Memory use on **remdev.abc** is around 58.83% which is above the threshold of 45% for 10 minutes.

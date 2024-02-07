@@ -1,0 +1,57 @@
+---
+# https://speakerdeck.com/tksm/unit-testing-for-prometheus-rules?slide=15
+# https://howardburgess.github.io/prometheus-unit-testing/
+
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/ntp.yaml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::ntp::skew"}
+        values: 1x1000
+      - series: record::monitor::system::ntp::time_offset{certname="test.abc", threshold="3000", alert_id="monitor::system::ntp::skew"}
+        values: 3200x10
+      - series: obmondo_monitoring{certname="test.xyz", alert_id="monitor::system::ntp::skew"}
+        values: 0x1000
+      - series: record::monitor::system::ntp::time_offset{certname="test.xyz", threshold="3000", alert_id="monitor::system::ntp::skew"}
+        values: 3200x10
+
+    alert_rule_test:
+      - alertname: monitor::system::ntp::skew
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: test.abc
+              threshold: 3000
+              alert_id: 'monitor::system::ntp::skew'
+            exp_annotations:
+              summary: "NTP clock skew"
+              description: 'System time on **test.abc** is offset compared to average across all nodes'
+
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="test.abc", status="enabled", alert_id="monitor::system::ntp::sync"}
+        values: 1x1000
+      - series: record::monitor::system::ntp::time_offset{certname="test.abc", threshold="3000", alert_id="monitor::system::ntp::sync"}
+        values: 3200x10
+      - series: node_timex_sync_status{certname="test.abc"}
+        values: 0x1000
+      - series: node_timex_maxerror_seconds{certname="test.abc"}
+        values: 18x1000
+
+    alert_rule_test:
+      - alertname: monitor::system::ntp::sync
+        eval_time: 75m
+        exp_alerts:
+          - exp_labels:
+              alert_id: 'monitor::system::ntp::sync'
+              certname: test.abc
+              severity: warning
+            exp_annotations:
+              summary: 'NTP clock out of sync for 60 minutes on **test.abc**'
+              description: |+2
+                System time on **test.abc** has been unable to synchronize with NTP servers for 30 minutes or more.

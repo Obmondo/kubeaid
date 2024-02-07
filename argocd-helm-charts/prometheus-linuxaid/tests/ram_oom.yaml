@@ -1,0 +1,64 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/memory.yaml
+
+tests:
+  # positive enabled
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::ram::oom"}
+        values: 1x1000
+      - series: node_vmstat_oom_kill{certname="test.abc"}
+        values: 1+1x1000
+
+    alert_rule_test:
+      - alertname: monitor::system::ram::oom
+        eval_time: 50m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: test.abc
+              alert_id: monitor::system::ram::oom
+            exp_annotations:
+              summary: "System RAM out-of-memory killer triggered"
+              description: "OOM-killer has been triggered on **test.abc** in the past 15 minutes"
+
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::ram::oom"}
+        values: 0x1000
+      - series: node_vmstat_oom_kill{certname="test.abc"}
+        values: 1+1x1000
+
+    alert_rule_test:
+      - alertname: monitor::system::ram::oom
+        eval_time: 50m
+        exp_alerts: []
+
+  # positive disabled
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="test.abc", alert_id="system_memory_usage"}
+        values: 0x1000
+      - series: node_vmstat_oom_kill{certname="test.abc"}
+        values: 1+1x1000
+
+    alert_rule_test:
+      - alertname: obmondo_system_ram_oom
+        eval_time: 50m
+        exp_alerts: []
+
+  # negative enabled
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="test.abc", alert_id="system_memory_usage"}
+        values: 1x1000
+      - series: node_vmstat_oom_kill{certname="test.abc"}
+        values: 1+1x10 1x100
+
+    alert_rule_test:
+      - alertname: obmondo_system_ram_oom
+        eval_time: 50m
+        exp_alerts: []
