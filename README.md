@@ -1,9 +1,9 @@
-# Welcome to **K8id.io** - The home of Kubernetes Aid
+# Welcome to **KubeAid.io** - The home of Kubernetes Aid
 
-**K8id** is a Kubernetes management suite, offering a way to setup and operate K8s clusters, following gitops and
+**KubeAid** is a Kubernetes management suite, offering a way to setup and operate K8s clusters, following gitops and
 automation principles.
 
-K8id feature goals:
+KubeAid feature goals:
 
 - Setup of k8s clusters on physical servers (on-premise or at e.g. [Hetzner.com](https://hetzner.com)) and in cloud
   providers like Azure AKS, Amazon AWS or Google GCE
