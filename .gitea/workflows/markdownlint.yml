@@ -17,5 +17,5 @@ jobs:
       - name: markdownlint
         uses: https://gitea.obmondo.com/Obmondo/gitea-actions/.gitea/actions/markdownlint-cli2-action@main
         with:
-          config: .markdownlint.yaml
+          config: .markdownlint-cli2.yaml
           globs: '**/*.md'
