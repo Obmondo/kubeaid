@@ -11,13 +11,13 @@ tests:
         values: 1x1000
       - series: threshold::monitor::system::service::down::blacklist{certname="test.abc",name="nginx.service"}
         values: 1x1000
-      - series: record::monitor::system::service::down{certname="test.abc",name="nginx.service",state="failed"}
+      - series: record::monitor::system::service::down{certname="test.abc",name="nginx.service",state="failed",type="simple"}
         values: 1x1000
       - series: obmondo_monitoring{certname="test.xyz", alert_id="monitor::system::service::down"}
         values: 0x1000
       - series: threshold::monitor::system::service::down::blacklist{certname="test.xyz",name="nginx.service"}
         values: 1x1000
-      - series: record::monitor::system::service::down{certname="test.xyz",name="nginx.service",state="failed"}
+      - series: record::monitor::system::service::down{certname="test.xyz",name="nginx.service",state="failed",type="simple"}
         values: 1x1000
 
     # since the blacklisted service and the down service is same, we dont want an alert
@@ -50,6 +50,7 @@ tests:
               severity: critical
               certname: test.abc
               name: nginx.service
+              state: failed
               alert_id: monitor::system::service::down
             exp_annotations:
               summary: "The system unit **nginx.service** failed on **test.abc**"
