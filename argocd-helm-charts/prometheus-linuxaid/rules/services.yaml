@@ -11,8 +11,8 @@ groups:
       # if match is true (means the said down service is blacklisted) then give no result and if no match then give result
       expr: |
         (
-          sum (record::monitor::system::service::down) by (name, certname)
-          unless threshold::monitor::system::service::down::blacklist
+          record::monitor::system::service::down unless
+          ignoring (state, type) threshold::monitor::system::service::down::blacklist
         ) and on(certname) obmondo_monitoring{alert_id="monitor::system::service::down"} > 0
       for: 30m
       labels:
