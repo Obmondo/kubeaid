@@ -1,0 +1,44 @@
+name: kubeaid
+
+"on":
+  pull_request:
+    types:
+      - opened
+      - synchronize
+  schedule:
+    - cron: '23 0 * * *'
+
+jobs:
+  kubeaid:
+    name: KubeAid CI
+    runs-on: ubuntu-latest
+    container:
+      image: harbor.obmondo.com/obmondo/kubeaid-ci:1.0.0
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: shellcheck
+      run: |
+        find . -type f \( -name *.sh -o -name '*.bash' \) ! \( -path './argocd-helm-charts/*/charts/*' -o -path './build/vendor/*' -o -path './build/kube-prometheus/libraries/*' \) | xargs shellcheck
+    - name: yamllint
+      run: |
+        yamllint --strict --config-file .yamllint .
+    - name: opa
+      run: |
+        opa test ./argocd-helm-charts/gatekeeper/policies -
+    - name: helm-diff
+      if: ${{ github.event_name == 'pull_request' && !startsWith(github.event.pull_request.title, ':no-diff') }}
+      run: |
+        export KUBERNETES_CONFIG_REPO_URL=${{ secrets.KUBERNETES_CONFIG_REPO_URL }}
+        export GITEA_TOKEN=${{ secrets.GITEA_TOKEN }}
+        export CI_MERGE_REQUEST_TARGET_BRANCH_NAME=${{ github.base_ref }}
+        export CI_MERGE_REQUEST_SOURCE_BRANCH_NAME=${{ github.head_ref }}
+        chmod +x ./bin/helm-diff.sh
+    - name: jsonnetlint
+      run: ./bin/lint-jsonnetfmt.sh
+    - name: helm-update
+      if: ${{ github.event_name == 'schedule' }}
+      run: ./bin/helm-repo-update.sh --update-all --pull-request --gitea-actions --skip-charts argo-cd
+
+
+
