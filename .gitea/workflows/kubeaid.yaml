@@ -28,7 +28,7 @@ jobs:
 
     - name: opa
       run: |
-        opa test ./argocd-helm-charts/gatekeeper/policies -
+        opa test ./argocd-helm-charts/gatekeeper/policies -v
 
     - name: helm-diff
       if: ${{ github.event_name == 'pull_request' && !startsWith(github.event.pull_request.title, ':no-diff') }}
