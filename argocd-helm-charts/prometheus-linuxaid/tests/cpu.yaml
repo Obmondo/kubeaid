@@ -10,9 +10,9 @@ tests:
       - series: obmondo_monitoring{certname="cert.abc", alert_id="monitor::system::cpu::usage"}
         values: 1x2400
       - series: node_cpu_seconds_total{mode="idle", certname="cert.abc", cpu="1"}
-        values: 1024+0.15x2400 # 1102409+0.010x1200
+        values: 1024+0.15x2400  # 1102409+0.010x1200
       - series: node_cpu_seconds_total{mode="idle", certname="cert.abc", cpu="2"}
-        values: 1024+0.21x2400 # 1105909+0.01x1200
+        values: 1024+0.21x2400
       - series: threshold::monitor::system::cpu::usage{certname="cert.abc"}
         values: 80+0x2400
     alert_rule_test:
@@ -25,9 +25,9 @@ tests:
       - series: obmondo_monitoring{certname="cert.abc", alert_id="monitor::system::cpu::usage"}
         values: 1x2400
       - series: node_cpu_seconds_total{mode="idle", certname="cert.abc", cpu="1"}
-        values: 1024+0.15x1200 # 1102409+0.010x1200
+        values: 1024+0.15x1200
       - series: node_cpu_seconds_total{mode="idle", certname="cert.abc", cpu="2"}
-        values: 1024+0.21x1200 # 1105909+0.01x1200
+        values: 1024+0.21x1200
     alert_rule_test:
       - alertname: monitor::system::cpu::usage
         eval_time: 18m
@@ -56,7 +56,7 @@ tests:
       - series: node_hwmon_temp_celsius{chip="platform_coretemp_0", sensor="temp5", certname="cert.xyz"}
         values: 120x1200
       - series: node_hwmon_sensor_label{chip="platform_coretemp_0", sensor="temp2", certname="cert.xyz", label="core_0"}
-        values: 1x2400 # 1105909+0.01x1200
+        values: 1x2400  # 1105909+0.01x1200
       - series: node_hwmon_sensor_label{chip="platform_coretemp_0", sensor="temp3", certname="cert.xyz", label="core_1"}
         values: 1x2400
       - series: node_hwmon_sensor_label{chip="platform_coretemp_0", sensor="temp4", certname="cert.xyz", label="core_2"}

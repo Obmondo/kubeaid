@@ -10,7 +10,7 @@ tests:
       - series: obmondo_monitoring{certname="example.xyz", alert_id="monitor::raid::mdraid::degraded"}
         values: 1x2000
       - series: node_md_disks_required{device="md0", certname="example.xyz"}
-        values: 4x2000 # Means 4 disk is required.
+        values: 4x2000  # Means 4 disk is required.
       - series: node_md_disks{state="active", device="md0", certname="example.xyz"}
         values: 3x2000
     alert_rule_test:
@@ -34,7 +34,7 @@ tests:
       - series: obmondo_monitoring{certname="example.xyz", alert_id="monitor::raid::mdraid::failed"}
         values: 1x2000
       - series: node_md_disks_required{device="md0", certname="example.xyz"}
-        values: 4x2000 # Means 4 disk is required.
+        values: 4x2000
       - series: node_md_disks{state="failed", device="md0", certname="example.xyz"}
         values: 3x2000
     alert_rule_test:
