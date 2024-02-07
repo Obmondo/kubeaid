@@ -1,0 +1,47 @@
+---
+# https://speakerdeck.com/tksm/unit-testing-for-prometheus-rules?slide=15
+# https://howardburgess.github.io/prometheus-unit-testing/
+
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/haproxy.yaml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'haproxy_frontend_requests_denied_total{certname="example.node", proxy="web"}'
+        values: 1+50x200
+      - series: 'obmondo_monitoring{certname="example.node", alert_id="monitor::service::haproxy::requests_denied_severe"}'
+        values: 1+1x200
+      - series: 'obmondo_monitoring{certname="example.node", alert_id="monitor::service::haproxy::requests_denied_mild"}'
+        values: 1+1x200
+
+    alert_rule_test:
+      - eval_time: 0m
+        alertname: monitor::service::haproxy::requests_denied_mild
+        exp_alerts: []
+
+      - eval_time: 15m
+        alertname: monitor::service::haproxy::requests_denied_mild
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              certname: example.node
+              proxy: web
+              alert_id: monitor::service::haproxy::requests_denied_mild
+            exp_annotations:
+              summary: "DDoS Protection has started kicking in"
+              description: "The frontend server **web** is denying some requests for **example.node**"
+
+      - eval_time: 180m
+        alertname: monitor::service::haproxy::requests_denied_severe
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: example.node
+              proxy: web
+              alert_id: monitor::service::haproxy::requests_denied_severe
+            exp_annotations:
+              summary: "DDoS Protection is blocking a lot of requests"
+              description: "The frontend server **web** is denying a lot of requests for **example.node**"

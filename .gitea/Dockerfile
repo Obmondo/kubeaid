@@ -13,6 +13,7 @@ RUN apt-get update                                          \
     && apt-get update                                       \
     && apt-get install -y                                   \
         shellcheck                                          \
+        prometheus                                          \
         golang-1.19
 
 # jsonnet

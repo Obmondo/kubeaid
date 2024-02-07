@@ -1,0 +1,47 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/btrfs.yaml
+
+tests:
+  # btrfs use check
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="cert1.abc", block_group_type="/data", uuid="4321", alert_id="monitor::system::disk::btrfs"}
+        values: 1x1000
+      - series: obmondo_monitoring{certname="remdev.abc", block_group_type="/metadata", uuid="5321", alert_id="monitor::system::disk::btrfs"}
+        values: 1x1000
+      - series: threshold::monitor::system::disk::btrfs{certname="cert1.abc", block_group_type="/data", uuid="4321"}
+        values: 90+0x30
+      - series: node_btrfs_size_bytes{certname="cert1.abc", block_group_type="/data", uuid="4321"}
+        values: 8198x30
+      - series: node_btrfs_used_bytes{certname="cert1.abc", block_group_type="/data", uuid="4321"}
+        values: 9096x30
+      - series: node_btrfs_size_bytes{certname="remdev.abc", block_group_type="/metadata", uuid="5321"}
+        values: 8024x30
+      - series: node_btrfs_used_bytes{certname="remdev.abc", block_group_type="/metadata", uuid="5321"}
+        values: 9096x30
+
+    alert_rule_test:
+      - alertname: monitor::system::disk::btrfs
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              certname: cert1.abc
+              block_group_type: /data
+              uuid: 4321
+              alert_id: monitor::system::disk::btrfs
+            exp_annotations:
+              summary: "Available Block space on **/data** for **cert1.abc** is low"
+              description: Available space is very low on btrfs filesystem for Block /data and current usage is around 90.13% which is above the threshold of 90%.
+          - exp_labels:
+              severity: warning
+              certname: remdev.abc
+              block_group_type: /metadata
+              uuid: 5321
+              alert_id: monitor::system::disk::btrfs
+            exp_annotations:
+              summary: "Available Block space on **/metadata** for **remdev.abc** is low"
+              description: Available space is very low on btrfs filesystem for Block /metadata and current usage is around 88.21% which is above the threshold of 80%.

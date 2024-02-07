@@ -1,0 +1,37 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/file_size.yaml
+tests:
+  - interval: 1s
+    input_series:
+      - series: file_stat_size_bytes{certname="test.abc"}
+        values: '1x600'
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::file::size"}
+        values: '1x1000'
+
+    alert_rule_test:
+      - alertname: monitor::system::file::size
+        eval_time: 5m
+        exp_alerts: []
+
+
+  - interval: 1s
+    input_series:
+      - series: file_stat_size_bytes{certname="test2.abc", path="file.txt"}
+        values: '0x600'
+      - series: obmondo_monitoring{certname="test2.abc", alert_id="monitor::system::file::size"}
+        values: '1x1000'
+    alert_rule_test:
+      - alertname: monitor::system::file::size
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              alert_id: monitor::system::file::size
+              certname: "test2.abc"
+              path: "file.txt"
+            exp_annotations:
+              summary: "Zero-byte file found in test2.abc"
+              description: "The file.txt has a size of 0 byte"

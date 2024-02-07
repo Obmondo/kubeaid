@@ -1,0 +1,99 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/puppet.yaml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'puppet_report{host="atat.enableit",environment="production"}'
+        values: 0x3000
+      - series: 'puppet_status{state="failed",host="atat01.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat02.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat03.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat04.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat05.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat06.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat07.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat08.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat09.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat10.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat11.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat12.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat13.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat14.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat15.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat16.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat17.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat18.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat19.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat20.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat21.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat22.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat23.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat24.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat25.enableit",environment="production"}'
+        values: 1x3000
+      - series: 'puppet_status{state="failed",host="atat26.enableit",environment="production"}'
+        values: 1x3000  # 2 days
+
+    alert_rule_test:
+      - alertname: 'monitor::system::puppet::last_run'
+        # time function take this as a value, rather than local time
+        eval_time: 50h
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              host: atat.enableit
+              alert_id: 'monitor::system::puppet::last_run'
+              environment: production
+            exp_annotations:
+              summary: 'Puppet has not run on **atat.enableit** for more than 2d 2h 0m 0s'
+              description: |-2
+                Last Puppet run on **atat.enableit** was on 1970-01-01 00:00:00 +0000 UTC, more than the limit of 2 days ago.
+
+                This could be due to any number of things, e.g. Puppet crashing or hanging, or cron/systemd timers being broken.
+      - alertname: 'monitor::system::puppet::total_resources'
+        eval_time: 50h
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              alert_id: 'monitor::system::puppet::total_resources'
+            exp_annotations:
+              summary: 'Puppet run has failed on more than 26 nodes'
+              description: |-2
+                Most likely this is due to Puppet failing with an error on the node.
+
+                You can get the list of nodes on prom dashboard by running this query
+                ```sh
+                sum by (host) (puppet_status{environment="production",state="failed"} == 1)
+                ```
+
+                Puppetboard for the corresponding node should show that the past
+                Puppet runs has resulted in failures:
+                https://dashboard.obmondo.com/nodes?status=failed

@@ -1,0 +1,56 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/services.yaml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::service::down"}
+        values: 1x1000
+      - series: threshold::monitor::system::service::down::blacklist{certname="test.abc",name="nginx.service"}
+        values: 1x1000
+      - series: record::monitor::system::service::down{certname="test.abc",name="nginx.service",state="failed"}
+        values: 1x1000
+      - series: obmondo_monitoring{certname="test.xyz", alert_id="monitor::system::service::down"}
+        values: 0x1000
+      - series: threshold::monitor::system::service::down::blacklist{certname="test.xyz",name="nginx.service"}
+        values: 1x1000
+      - series: record::monitor::system::service::down{certname="test.xyz",name="nginx.service",state="failed"}
+        values: 1x1000
+
+    # since the blacklisted service and the down service is same, we dont want an alert
+    alert_rule_test:
+      - alertname: monitor::system::service::down
+        eval_time: 40m
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::service::down"}
+        values: 1x1000
+      - series: threshold::monitor::system::service::down::blacklist{certname="test.abc",name="apache2.service"}
+        values: 1x1000
+      - series: record::monitor::system::service::down{certname="test.abc",name="nginx.service",state="failed"}
+        values: 1x1000
+      - series: obmondo_monitoring{certname="test.xyz", alert_id="monitor::system::service::down"}
+        values: 0x1000
+      - series: threshold::monitor::system::service::down::blacklist{certname="test.xyz",name="apache2.service"}
+        values: 1x1000
+      - series: record::monitor::system::service::down{certname="test.xyz",name="nginx.service",state="failed"}
+        values: 1x1000
+
+    # since the blacklisted service and the down service is NOT same, so we want an alert
+    alert_rule_test:
+      - alertname: monitor::system::service::down
+        eval_time: 45m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: test.abc
+              name: nginx.service
+              alert_id: monitor::system::service::down
+            exp_annotations:
+              summary: "The system unit **nginx.service** failed on **test.abc**"
+              description: "The system unit **nginx.service** failed on **test.abc**. Once resolved please clear using `systemctl reset-failed nginx.service`."

@@ -1,0 +1,54 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/mdraid.yaml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="example.xyz", alert_id="monitor::raid::mdraid::degraded"}
+        values: 1x2000
+      - series: node_md_disks_required{device="md0", certname="example.xyz"}
+        values: 4x2000  # Means 4 disk is required.
+      - series: node_md_disks{state="active", device="md0", certname="example.xyz"}
+        values: 3x2000
+    alert_rule_test:
+      - alertname: monitor::raid::mdraid::degraded
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: example.xyz
+              device: md0
+              alert_id: monitor::raid::mdraid::degraded
+            exp_annotations:
+              summary: RAID Array is degraded
+              description: |
+                RAID array 'md0' on example.xyz is in degraded
+                state due to one or more disks failures. Number of spare drives is insufficient
+                to fix issue automatically.
+
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="example.xyz", alert_id="monitor::raid::mdraid::failed"}
+        values: 1x2000
+      - series: node_md_disks_required{device="md0", certname="example.xyz"}
+        values: 4x2000
+      - series: node_md_disks{state="failed", device="md0", certname="example.xyz"}
+        values: 3x2000
+    alert_rule_test:
+      - alertname: monitor::raid::mdraid::failed
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              certname: example.xyz
+              device: md0
+              state: failed
+              alert_id: monitor::raid::mdraid::failed
+            exp_annotations:
+              summary: Failed device in RAID array
+              description: |
+                At least one device in RAID array on example.xyz failed.
+                Array 'md0' needs attention and possibly a disk swap.

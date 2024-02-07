@@ -1,0 +1,27 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/iptables.yaml
+
+tests:
+  - interval: 1s
+    input_series:
+      - series: obmondo_monitoring{certname="cert.abc", alert_id="monitor::system::iptables::dropall"}
+        values: 1x2400
+      - series: iptables_rule_packets_total{certname="cert.abc"}
+        values: 1+20.0x2400
+      - series: threshold::monitor::system::iptables::dropall{certname="cert.abc"}
+        values: 5.0+0x2400
+    alert_rule_test:
+      - alertname: monitor::system::iptables::dropall
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: cert.abc
+              alert_id: monitor::system::iptables::dropall
+            exp_annotations:
+              summary: "The iptables Drop packets is high for **cert.abc**"
+              description: |
+                The iptables Drop packets is **20** for **cert.abc** is above threshold of 5 for 10 minutes.

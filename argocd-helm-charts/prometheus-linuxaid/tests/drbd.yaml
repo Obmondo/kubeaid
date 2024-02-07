@@ -1,0 +1,45 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/drbd.yaml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::drbd::uptodate"}
+        values: 1x1000
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::drbd::connected"}
+        values: 1x1000
+      - series: node_drbd_disk_state_is_up_to_date{certname="test.abc",device="drbd1",node="local"}
+        values: 0x1000
+      - series: node_drbd_connected{certname="test.abc",device="drbd1"}
+        values: 0x1000
+
+    alert_rule_test:
+      - alertname: monitor::system::drbd::uptodate
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: test.abc
+              alert_id: monitor::system::drbd::uptodate
+              device: drbd1
+              node: local
+            exp_annotations:
+              summary: "Drbd node is NOT up to date."
+              description: |
+                The DRBD **local** node for server **test.abc** for device **drbd1** is not up to date.
+
+      - alertname: monitor::system::drbd::connected
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: test.abc
+              alert_id: monitor::system::drbd::connected
+              device: drbd1
+            exp_annotations:
+              summary: "Drbd node is NOT connected."
+              description: |
+                The DRBD server **test.abc** for device **drbd1** is not connected.

@@ -1,0 +1,69 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/elasticsearch.yaml
+
+tests:
+  - interval: 1s
+    # rate and irate needs two minimum sample to work the data, but I'm simply populating it for full 10 min and interval needs to be sec here.
+    # cause rate and irate works on sec basis
+    input_series:
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::service::elasticsearch::TooFewNodesRunning"}
+        values: 1x1000
+      - series: 'elasticsearch_cluster_health_number_of_nodes{certname="test.abc", cluster="general", alert_id="monitor::service::elasticsearch::TooFewNodesRunning"}'
+        values: '2+0x600'
+
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: "monitor::service::elasticsearch::TooFewNodesRunning"
+        exp_alerts:
+          - exp_labels:
+              cluster: general
+              severity: critical
+              certname: test.abc
+              alert_id: 'monitor::service::elasticsearch::TooFewNodesRunning'
+            exp_annotations:
+              summary: 'Elasticsearch cluster general running on less than 3 nodes'
+              description: |+2
+                There are only `2 < 3` Elasticsearch nodes running
+
+  - interval: 1s
+    # rate and irate needs two minimum sample to work the data, but I'm simply populating it for full 10 min and interval needs to be sec here.
+    # cause rate and irate works on sec basis
+    input_series:
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::service::elasticsearch::TooFewNodesRunning"}
+        values: 1x1000
+      - series: 'elasticsearch_cluster_health_number_of_nodes{dimension="bar"}'
+        values: '3+0x600'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: 'monitor::service::elasticsearch::TooFewNodesRunning'
+        exp_alerts: []
+
+  - interval: 15s
+    # rate and irate needs two minimum sample to work the data, but I'm simply populating it for full 10 min and interval needs to be sec here.
+    # cause rate and irate works on sec basis
+    input_series:
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::service::elasticsearch::ElasticsearchHeapTooHigh"}
+        values: 1x1000
+      - series: 'elasticsearch_jvm_memory_used_bytes{certname="test.abc", area="heap", cluster="general", name="node01", alert_id="monitor::service::elasticsearch::ElasticsearchHeapTooHigh"}'
+        values: '26500000000+0x600'
+      - series: 'elasticsearch_jvm_memory_max_bytes{certname="test.abc", area="heap", cluster="general", name="node01", alert_id="monitor::service::elasticsearch::ElasticsearchHeapTooHigh"}'
+        values: '27000000000+0x600'
+
+    alert_rule_test:
+      - eval_time: 20m
+        alertname: 'monitor::service::elasticsearch::ElasticsearchHeapTooHigh'
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              cluster: general
+              alert_id: 'monitor::service::elasticsearch::ElasticsearchHeapTooHigh'
+              area: heap
+              name: node01
+              certname: test.abc
+            exp_annotations:
+              summary: 'Elasticsearch node node01 on **test.abc** heap usage is high'
+              description: |+2
+                Heap usage of `98.15% > 90%` for 15m.
