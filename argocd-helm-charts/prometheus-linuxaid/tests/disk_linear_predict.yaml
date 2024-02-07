@@ -1,0 +1,28 @@
+rule_files:
+  - ../rules/disk.yaml
+
+tests:
+  - interval: 1s
+    input_series:
+      - series: obmondo_monitoring{certname="cert.abc", alert_id="monitor::system::disk::fillingup"}
+        values: 1+0x7200
+      - series: node_filesystem_free_bytes{certname="cert.abc", mountpoint="/lol"}
+        values: 90+0x1200 80+0x1200 20+0x2400 00+0x2400
+      - series: node_filesystem_avail_bytes{certname="cert.abc", mountpoint="/lol"}
+        values: 100+0x7200
+      - series: node_filesystem_size_bytes{certname="cert.abc", mountpoint="/lol"}
+        values: 1000+0x7200
+    alert_rule_test:
+      - alertname: monitor::system::disk::fillingup
+        eval_time: 2h
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: cert.abc
+              alert_id: monitor::system::disk::fillingup
+              mountpoint: '/lol'
+            exp_annotations:
+              summary: "partition `/lol` is running out of space"
+              description: |
+                Based on last 6h sampling, the mount /lol on server cert.abc is expected to fill up within 2 days.
+                Currently 10.00% is available.

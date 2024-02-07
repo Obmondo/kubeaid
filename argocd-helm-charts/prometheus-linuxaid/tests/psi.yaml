@@ -1,0 +1,86 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/psi.yaml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::psi::io"}
+        values: 1x1000
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::psi::memory"}
+        values: 1x1000
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::psi::cpu"}
+        values: 1x1000
+      - series: record::monitor::system::psi::io{certname="test.abc",threshold="0.5", alert_id="monitor::system::psi::io"}
+        values: 1+100x1000
+      - series: record::monitor::system::psi::memory{certname="test.abc", threshold="0.04", alert_id="monitor::system::psi::memory"}
+        values: 1+100x1000
+      - series: record::monitor::system::psi::cpu{certname="test.abc", threshold="0.6", alert_id="monitor::system::psi::cpu"}
+        values: 1+100x1000
+
+    alert_rule_test:
+      - alertname: 'monitor::system::psi::io'
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: test.abc
+              threshold: 0.5
+              alert_id: monitor::system::psi::io
+            exp_annotations:
+              summary: "The PSI IO stalling is high for **test.abc**"
+              description: "PSI IO stalling for **test.abc** is 3.001k is above threshold of 0.5"
+
+      - alertname: 'monitor::system::psi::memory'
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: test.abc
+              threshold: 0.04
+              alert_id: monitor::system::psi::memory
+            exp_annotations:
+              summary: "The PSI memory stalling is high for **test.abc**"
+              description: "PSI memory stalling for **test.abc** is 3.001k is above threshold of 0.04"
+
+      - alertname: 'monitor::system::psi::cpu'
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: test.abc
+              threshold: 0.6
+              alert_id: monitor::system::psi::cpu
+            exp_annotations:
+              summary: "The PSI CPU waiting is high for **test.abc**"
+              description: "PSI CPU waiting for **test.abc** is 3.001k is above threshold of 0.6"
+
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::psi::io"}
+        values: 0x1000
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::psi::memory"}
+        values: 0x1000
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::psi::cpu"}
+        values: 0x1000
+      - series: record::monitor::system::psi::io{certname="test.abc",threshold="0.5", alert_id="monitor::system::psi::io"}
+        values: 1+100x1000
+      - series: record::monitor::system::psi::memory{certname="test.abc", threshold="0.04", alert_id="monitor::system::psi::memory"}
+        values: 1+100x1000
+      - series: record::monitor::system::psi::cpu{certname="test.abc", threshold="0.6", alert_id="monitor::system::psi::cpu"}
+        values: 1+100x1000
+
+    alert_rule_test:
+      - alertname: 'monitor::system::psi::io'
+        eval_time: 30m
+        exp_alerts: []
+
+      - alertname: 'monitor::system::psi::memory'
+        eval_time: 30m
+        exp_alerts: []
+
+      - alertname: 'monitor::system::psi::cpu'
+        eval_time: 30m
+        exp_alerts: []

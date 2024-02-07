@@ -1,0 +1,34 @@
+---
+# These tests live in this file because we need to set evaluation_interval to a
+# large value. If we do that in services.yaml the other tests will take ages to
+# run.
+evaluation_interval: 1d
+
+rule_files:
+  - ../rules/services.yaml
+
+tests:
+  - interval: 1d
+    input_series:
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::service::down"}
+        values: 1x1000
+      - series: threshold::monitor::system::service::blacklist{certname="test.abc",name="fwupd-refresh.service"}
+        values: 1x1
+      - series: node_systemd_unit_state{certname="test.abc", state="failed", name="fwupd-refresh.service", type="oneshot"}
+        values: 1x1000
+
+    alert_rule_test:
+      - alertname: monitor::system::service::down::fwupd-refresh
+        eval_time: 35d
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: test.abc
+              name: fwupd-refresh.service
+              state: failed
+              type: oneshot
+              alert_id: monitor::system::service::down
+            exp_annotations:
+              summary: "The system unit **fwupd-refresh.service** failed on **test.abc**"
+              description: |+2
+                "The system unit **fwupd-refresh.service** failed on **test.abc**. Once resolved please clear using `systemctl reset-failed fwupd-refresh.service`."

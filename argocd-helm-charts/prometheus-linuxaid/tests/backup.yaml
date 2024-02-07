@@ -1,0 +1,28 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/backup.yaml
+
+tests:
+  - interval: 1s
+    input_series:
+      - series: obmondo_monitoring{certname="cert.abc", alert_id="monitor::system::backup::status"}
+        values: 1x2400
+      - series: file_stat_modif_time_seconds{ certname="cert.abc"}
+        values: 1674090018.+0.75x2400
+      - series: file_glob_match_number{ certname="cert.abc", pattern="mysql-backup.*"}
+        values: 10+0x2400
+      - series: file_glob_match_number{ certname="cert.abc", pattern="pgsql-backup.*"}
+        values: 10+0x2400
+    alert_rule_test:
+      - alertname: monitor::system::backup::status
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: cert.abc
+              alert_id: monitor::system::backup::status
+            exp_annotations:
+              summary: Daily backup failed on server **cert.abc**
+              description: There is a backup failuer on server **cert.abc**

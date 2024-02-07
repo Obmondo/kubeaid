@@ -1,0 +1,25 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/lsof.yaml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="test.somecust", alert_id="monitor::system::service::lsof::open_deleted_files"}
+        values: 1x1000
+      - series: size_of_deleted_open_files{certname="test.somecust"}
+        values: 600000000x1000
+
+    alert_rule_test:
+      - alertname: 'monitor::system::service::lsof::open_deleted_files'
+        eval_time: 40m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: test.somecust
+              alert_id: monitor::system::service::lsof::open_deleted_files
+            exp_annotations:
+              summary: "Size of open deleted files on **test.somecust** is higher than 500 MB"
+              description: "There are large files that are actually deleted but are open in fds and consuming disk space."

@@ -1,0 +1,26 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/disk.yaml
+
+tests:
+  - interval: 5m
+    input_series:
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::disk::mountpoint::readonly"}
+        values: 1x1000
+      - series: node_filesystem_readonly{certname="test.abc",mountpoint="/home"}
+        values: 1
+
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: monitor::system::disk::mountpoint::readonly
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: test.abc
+              mountpoint: /home
+              alert_id: monitor::system::disk::mountpoint::readonly
+            exp_annotations:
+              summary: "Filesystem /home is in read-only mode on **test.abc**"
+              description: "Filesystem `/home` is in read-only mode on **test.abc**"

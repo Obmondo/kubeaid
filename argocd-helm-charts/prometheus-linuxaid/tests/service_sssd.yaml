@@ -1,0 +1,48 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/service_sssd.yaml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="test.somecust", alert_id="monitor::system::service::sssd::lookup_failed"}
+        values: 1x1000
+      - series: obmondo_service_sssd_user_check_last_lookup_exit_status{certname="test.somecust"}
+        values: 2x1000
+
+    alert_rule_test:
+      - alertname: 'monitor::system::service::sssd::lookup_failed'
+        eval_time: 40m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: test.somecust
+              alert_id: 'monitor::system::service::sssd::lookup_failed'
+            exp_annotations:
+              summary: "SSSD on **test.somecust** is unable to look up user accounts"
+              description: |+2
+                SSSD on **test.somecust** is unable to look up users from AD. This could be due to the users no longer existing, SSSD being broken or trouble with AD.
+
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="gitlab01.enableit", alert_id="monitor::system::service::sssd::check"}
+        values: 1x1000
+      - series: obmondo_sssd_status_check{certname="gitlab01.enableit", instance="gitlab01.enableit:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 1x1000
+
+    alert_rule_test:
+      - alertname: 'monitor::system::service::sssd::check'
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              severity: 'critical'
+              certname: 'gitlab01.enableit'
+              alert_id: 'monitor::system::service::sssd::check'
+              instance: 'gitlab01.enableit:9100'
+              job: 'pushprox'
+              pushprox_target: 'node_exporter'
+            exp_annotations:
+              summary: 'SSSD is not online on **gitlab01.enableit**'
+              description: 'SSSD is not online on **gitlab01.enableit**. Please look into it'

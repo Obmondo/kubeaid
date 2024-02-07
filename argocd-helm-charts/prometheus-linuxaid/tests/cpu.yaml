@@ -1,0 +1,88 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/cpu.yaml
+
+tests:
+  - interval: 1s
+    input_series:
+      - series: obmondo_monitoring{certname="cert.abc", alert_id="monitor::system::cpu::usage"}
+        values: 1x2400
+      - series: node_cpu_seconds_total{mode="idle", certname="cert.abc", cpu="1"}
+        values: 1024+0.15x2400 # 1102409+0.010x1200
+      - series: node_cpu_seconds_total{mode="idle", certname="cert.abc", cpu="2"}
+        values: 1024+0.21x2400 # 1105909+0.01x1200
+      - series: threshold::monitor::system::cpu::usage{certname="cert.abc"}
+        values: 80+0x2400
+    alert_rule_test:
+      - alertname: monitor::system::cpu::usage
+        eval_time: 10m
+        exp_alerts: []
+
+  - interval: 1s
+    input_series:
+      - series: obmondo_monitoring{certname="cert.abc", alert_id="monitor::system::cpu::usage"}
+        values: 1x2400
+      - series: node_cpu_seconds_total{mode="idle", certname="cert.abc", cpu="1"}
+        values: 1024+0.15x1200 # 1102409+0.010x1200
+      - series: node_cpu_seconds_total{mode="idle", certname="cert.abc", cpu="2"}
+        values: 1024+0.21x1200 # 1105909+0.01x1200
+    alert_rule_test:
+      - alertname: monitor::system::cpu::usage
+        eval_time: 18m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: cert.abc
+              alert_id: monitor::system::cpu::usage
+            exp_annotations:
+              summary: "CPU usage above threshold"
+              description: |
+                CPU usage on **cert.abc** is around 82% which is above the threshold of 80
+
+  - interval: 1s
+    input_series:
+      - series: obmondo_monitoring{certname="cert.xyz", alert_id="monitor::system::cpu::temperature"}
+        values: 1x2400
+      - series: obmondo_monitoring{certname="cert.xyz", alert_id="monitor::system::cpu::temperature"}
+        values: 1x2400
+      - series: node_hwmon_temp_celsius{chip="platform_coretemp_0", sensor="temp2", certname="cert.xyz"}
+        values: 119x1200
+      - series: node_hwmon_temp_celsius{chip="platform_coretemp_0", sensor="temp3", certname="cert.xyz"}
+        values: 117x1200
+      - series: node_hwmon_temp_celsius{chip="platform_coretemp_0", sensor="temp4", certname="cert.xyz"}
+        values: 114x1200
+      - series: node_hwmon_temp_celsius{chip="platform_coretemp_0", sensor="temp5", certname="cert.xyz"}
+        values: 120x1200
+      - series: node_hwmon_sensor_label{chip="platform_coretemp_0", sensor="temp2", certname="cert.xyz", label="core_0"}
+        values: 1x2400 # 1105909+0.01x1200
+      - series: node_hwmon_sensor_label{chip="platform_coretemp_0", sensor="temp3", certname="cert.xyz", label="core_1"}
+        values: 1x2400
+      - series: node_hwmon_sensor_label{chip="platform_coretemp_0", sensor="temp4", certname="cert.xyz", label="core_2"}
+        values: 1x2400
+      - series: node_hwmon_sensor_label{chip="platform_coretemp_0", sensor="temp5", certname="cert.xyz", label="core_3"}
+        values: 1x2400
+      - series: threshold::monitor::system::cpu::temperature{certname="cert.xyz"}
+        values: 115+0x1200
+
+    alert_rule_test:
+      - alertname: monitor::system::cpu::temperature
+        eval_time: 18m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              chip: platform_coretemp_0
+              certname: cert.xyz
+              alert_id: monitor::system::cpu::temperature
+            exp_annotations:
+              summary: "CPU temperature above threshold"
+              description: "CPU temperature on **cert.xyz** for **platform_coretemp_0** is around 117.5c which is above the threshold of 115c"
+          - exp_labels:
+              severity: critical
+              chip: platform_coretemp_0
+              certname: cert.xyz
+              alert_id: monitor::system::cpu::temperature
+            exp_annotations:
+              summary: "CPU temperature above threshold"
+              description: "CPU temperature on **cert.xyz** for **platform_coretemp_0** is around 117.5c which is above the threshold of 115c"

@@ -1,0 +1,136 @@
+---
+# https://speakerdeck.com/tksm/unit-testing-for-prometheus-rules?slide=15
+# https://howardburgess.github.io/prometheus-unit-testing/
+
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/haproxy.yaml
+
+tests:
+  - interval: 1s
+    # rate and irate needs two minimum sample to work the data, but I'm simply populating it for full 10 min and interval needs to be sec here.
+    # cause rate and irate works on sec basis
+    input_series:
+      - series: 'obmondo_monitoring{certname="example.node", alert_id="monitor::service::haproxy::5xx_error"}'
+        values: 1x1500
+      - series: 'haproxy_server_http_responses_total{certname="example.node", proxy="www"}'
+        values: '0+2000x600 0x900'
+      - series: 'haproxy_server_http_responses_total{certname="example.node", proxy="xyz"}'
+        values: '0x600 0+1x900'
+      - series: 'haproxy_server_http_responses_total{code="5xx", certname="example.node", proxy="www"}'
+        values: '0+106x600 0x900'
+      - series: 'haproxy_server_http_responses_total{code="5xx", certname="example.node", proxy="xyz"}'
+        values: '0x600 0+3x900'
+      - series: 'haproxy_backend_redispatch_warnings_total{certname="bar", proxy="www"}'
+        values: '1+1x600 0x599 2+2x1201'
+      - series: 'haproxy_backend_retry_warnings_total{certname="bar", proxy="www"}'
+        values: '0+1x600 0x600 0+2x1200'
+      - series: 'haproxy_backend_response_errors_total{certname="bar", proxy="www"}'
+        values: '0+1x600 0x600 0+2x1200'
+      - series: 'obmondo_monitoring{certname="bar", alert_id="monitor::service::haproxy::redispatch_warnings"}'
+        values: '1x2400'
+      - series: 'obmondo_monitoring{certname="bar", alert_id="monitor::service::haproxy::retry_warnings"}'
+        values: '1x2400'
+      - series: 'obmondo_monitoring{certname="bar", alert_id="monitor::service::haproxy::redispatch_warnings"}'
+        values: '1+0x2400'
+      - series: 'obmondo_monitoring{certname="example.node", alert_id="monitor::service::haproxy::5xx_error", status="enabled"}'
+        values: '1+0x2400'
+      - series: 'obmondo_monitoring{certname="example.node", alert_id="monitor::service::haproxy::5xx_error_high", status="enabled"}'
+        values: '1+0x2400'
+      - series: 'obmondo_monitoring{certname="bar", alert_id="monitor::service::haproxy::response_errors"}'
+        values: '1x2400'
+      - series: 'obmondo_monitoring{proxy="www", certname="bar", alert_id="monitor::service::haproxy::redispatch_warnings"}'
+        values: '1x1800 0x600'
+      - series: 'obmondo_monitoring{proxy="www", certname="bar", alert_id="monitor::service::haproxy::retry_warnings"}'
+        values: '1x2400'
+      - series: 'obmondo_monitoring{proxy="www", certname="bar", alert_id="monitor::service::haproxy::response_errors"}'
+        values: '1x2400'
+
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: monitor::service::haproxy::5xx_error
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              certname: example.node
+              proxy: www
+              alert_id: monitor::service::haproxy::5xx_error
+            exp_annotations:
+              summary: "HAProxy high HTTP 5xx error rate server on example.node"
+              description: "Too many HTTP requests with status 5xx on backend www is more then 5.033%"
+      - eval_time: 25m
+        alertname: monitor::service::haproxy::5xx_error
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              certname: example.node
+              proxy: xyz
+              alert_id: monitor::service::haproxy::5xx_error
+            exp_annotations:
+              summary: "HAProxy high HTTP 5xx error rate server on example.node"
+              description: "Too many HTTP requests with status 5xx on backend xyz is more then 75%"
+          - exp_labels:
+              severity: critical
+              certname: example.node
+              proxy: xyz
+              alert_id: monitor::service::haproxy::5xx_error
+            exp_annotations:
+              summary: "HAProxy high HTTP 5xx error rate server on example.node"
+              description: "Too many HTTP requests with status 5xx on backend xyz is more then 75%"
+
+      - eval_time: 10m
+        alertname: monitor::service::haproxy::redispatch_warnings
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              certname: bar
+              proxy: www
+              alert_id: monitor::service::haproxy::redispatch_warnings
+            exp_annotations:
+              summary: "Haproxy redispatch warnings rate too high during the last 10 minutes"
+              description: "The haproxy backend bar www redispatch warning count has increased by an average of 1 per second over the last 10 minutes."
+
+      - eval_time: 10m
+        alertname: monitor::service::haproxy::retry_warnings
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              certname: bar
+              proxy: www
+              alert_id: monitor::service::haproxy::retry_warnings
+            exp_annotations:
+              summary: "Haproxy retry warnings rate too high during the last 10 minutes"
+              description: "The haproxy backend bar www retry warning count has increased by an average of 1 per second over the last 10 minutes."
+
+      - eval_time: 10m
+        alertname: monitor::service::haproxy::response_errors
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              certname: bar
+              proxy: www
+              alert_id: monitor::service::haproxy::response_errors
+            exp_annotations:
+              summary: "Haproxy response error rate too high during the last 10 minutes"
+              description: "The haproxy backend bar www response error count has increased by an average of 1 per second over the last 10 minutes."
+
+      - eval_time: 20m
+        alertname: monitor::service::haproxy::redispatch_warnings
+        exp_alerts: []
+
+      - eval_time: 30m
+        alertname: monitor::service::haproxy::redispatch_warnings
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              certname: bar
+              proxy: www
+              alert_id: monitor::service::haproxy::redispatch_warnings
+            exp_annotations:
+              summary: "Haproxy redispatch warnings rate too high during the last 10 minutes"
+              description: "The haproxy backend bar www redispatch warning count has increased by an average of 2 per second over the last 10 minutes."
+
+      - eval_time: 40m
+        alertname: monitor::service::haproxy::redispatch_warnings
+        exp_alerts: []
