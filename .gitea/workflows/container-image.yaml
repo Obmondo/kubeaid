@@ -1,0 +1,28 @@
+name: kubeaid CI image
+
+"on":
+  push:
+    branches:
+      - main
+    paths:
+      - '.gitea/Dockerfile'
+
+permissions:
+  contents: read
+
+env:
+  KUBEAID_CI_IMAGE: ${{ vars.KUBEAID_CI_IMAGE }}
+  KUBEAID_CI_TAG: ${{ vars.KUBEAID_CI_TAG }}
+
+jobs:
+  docker-image-build-pull-request:
+    uses: Obmondo/gitea-actions/.gitea/workflows/build-image.yaml@main
+    with:
+      push: true
+      context: .gitea
+      image_name: ${{ env.KUBEAID_CI_IMAGE }}
+      tags: ${{ env.KUBEAID_CI_TAG }}
+      registry: ${{ secrets.HARBOR_REGISTRY }}
+    secrets:
+      username: ${{ secrets.HARBOR_USERNAME }}
+      password: ${{ secrets.HARBOR_PASSWORD }}
