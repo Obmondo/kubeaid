@@ -1,0 +1,19 @@
+name: promtool
+
+"on":
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  promtool:
+    name: Prometheus rule test
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: promtool
+        working-directory: argocd-helm-charts/prometheus-linuxaid/tests
+        run: promtool test rules *.yaml
