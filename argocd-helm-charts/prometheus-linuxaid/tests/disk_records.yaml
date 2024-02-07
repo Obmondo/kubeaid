@@ -11,7 +11,7 @@ tests:
       # simulate that example.abc with "/" has metrics value as 8 for first 20
       # min and then 200 after 20 min and then 5000 after 40 min
       - series: node_filesystem_avail_bytes{fstype="xfs", mountpoint="/mnt/samba", certname="atat.enableit", device="//somehost/build", instance="atat.enableit:9100", job="pushprox", pushprox_target="node_exporter",}
-        values: 1551834316x20 15518343160x20 155183431600x20 # (* 31036686336 0.05)
+        values: 1551834316x20 15518343160x20 155183431600x20  # (* 31036686336 0.05)
       - series: node_filesystem_size_bytes{fstype="xfs", mountpoint="/mnt/samba", certname="atat.enableit", device="//somehost/build", instance="atat.enableit:9100", job="pushprox", pushprox_target="node_exporter",}
         values: 31036686336x20 410366863360x20 6103668633600x20
 
