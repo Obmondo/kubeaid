@@ -11,7 +11,7 @@ jobs:
     name: Prometheus rule test
     runs-on: ubuntu-latest
     container:
-      image: harbor.obmondo.com/obmondo/kubeaid-ci:1.2.0
+      image: ${{ secrets.HARBOR_REGISTRY }}/${{ vars.KUBEAID_CI_IMAGE }}:${{ vars.KUBEAID_CI_TAG }}
     steps:
       - name: checkout
         uses: actions/checkout@v3
