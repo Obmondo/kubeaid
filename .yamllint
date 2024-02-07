@@ -7,6 +7,8 @@ ignore: |-2
   argocd-helm-charts/**/charts
   **/templates/**
   .git/**
+  terraform/**/.terraform
+  terragrunt/**/.terragrunt-cache
 
 rules:
   line-length: disable

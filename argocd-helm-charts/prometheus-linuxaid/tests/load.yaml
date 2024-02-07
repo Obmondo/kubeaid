@@ -1,0 +1,184 @@
+---
+# https://speakerdeck.com/tksm/unit-testing-for-prometheus-rules?slide=15
+# https://howardburgess.github.io/prometheus-unit-testing/
+
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/load.yaml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="ramsam.dev", alert_id="monitor::system::load::load_percpu"}
+        values: 1x1000
+      - series: obmondo_monitoring{certname="cert1.abc", alert_id="monitor::system::load::load_percpu"}
+        values: 1x1000
+      # 4 core test for load1
+      - series: node_cpu_seconds_total{mode="idle", certname="ramsam.dev", cpu="0", instance="ramsam.dev:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 7853966x30
+      - series: node_cpu_seconds_total{mode="idle", certname="ramsam.dev", cpu="1", instance="ramsam.dev:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 7666663x30
+      - series: node_cpu_seconds_total{mode="idle", certname="ramsam.dev", cpu="2", instance="ramsam.dev:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 7685382x30
+      - series: node_cpu_seconds_total{mode="idle", certname="ramsam.dev", cpu="3", instance="ramsam.dev:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 7733851x30
+      - series: node_load1{certname="ramsam.dev", instance="ramsam.dev:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 28x30
+      - series: node_load5{certname="ramsam.dev", instance="ramsam.dev:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 18x30
+      - series: node_load15{certname="ramsam.dev", instance="ramsam.dev:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 14x30
+      - series: node_load1{certname="cert1.abc", instance="cert1.abc:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 0.96x30
+      - series: node_load5{certname="cert1.abc", instance="cert1.abc:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 10x30
+      - series: node_load15{certname="cert1.abc", instance="cert1.abc:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 8x30
+      - series: node_cpu_seconds_total{certname="cert1.abc", cpu="0", instance="cert1.abc:9100", job="pushprox", mode="idle", pushprox_target="node_exporter"}
+        values: 385594x30
+      - series: node_cpu_seconds_total{certname="cert1.abc", cpu="1", instance="cert1.abc:9100", job="pushprox", mode="idle", pushprox_target="node_exporter"}
+        values: 439438x30
+
+
+    alert_rule_test:
+      # Alert if value is same since last 10 minute
+      - alertname: monitor::system::load::load1_percpu
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: ramsam.dev
+              alert_id: monitor::system::load::load_percpu
+            exp_annotations:
+              summary: 'System load1 average per CPU too high'
+              description: |
+                System `load1` average per CPU on **ramsam.dev** is 700% which is above the threshold of 600% for 5 minutes.
+
+      - alertname: monitor::system::load::load5_percpu
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: cert1.abc
+              alert_id: monitor::system::load::load_percpu
+            exp_annotations:
+              summary: 'System load5 average per CPU too high'
+              description: |
+                System `load5` average per CPU on **cert1.abc** is 500% which is above the threshold of 400% for 10 minutes.
+          - exp_labels:
+              severity: critical
+              certname: ramsam.dev
+              alert_id: monitor::system::load::load_percpu
+            exp_annotations:
+              summary: 'System load5 average per CPU too high'
+              description: |
+                System `load5` average per CPU on **ramsam.dev** is 450% which is above the threshold of 400% for 10 minutes.
+
+      - alertname: monitor::system::load::load15_percpu
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: cert1.abc
+              alert_id: monitor::system::load::load_percpu
+            exp_annotations:
+              summary: 'System load15 average per CPU too high'
+              description: |
+                System `load15` average per CPU on **cert1.abc** is 400% which is above the threshold of 300% for 15 minutes.
+          - exp_labels:
+              severity: critical
+              certname: ramsam.dev
+              alert_id: monitor::system::load::load_percpu
+            exp_annotations:
+              summary: 'System load15 average per CPU too high'
+              description: |
+                System `load15` average per CPU on **ramsam.dev** is 350% which is above the threshold of 300% for 15 minutes.
+
+  # tests using custom thresholds
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="ramsam.dev", alert_id="monitor::system::load::load_percpu"}
+        values: 1x1000
+      - series: obmondo_monitoring{certname="cert1.abc", alert_id="monitor::system::load::load_percpu"}
+        values: 1x1000
+      - series: threshold::monitor::system::load::load1_percpu{certname="cert1.abc", instance="cert1.abc:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 50x30
+      - series: threshold::monitor::system::load::load5_percpu{certname="cert1.abc", instance="cert1.abc:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 45x30
+      - series: threshold::monitor::system::load::load15_percpu{certname="cert1.abc", instance="cert1.abc:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 40x30
+      - series: threshold::monitor::system::load::load1_percpu{certname="ramsam.dev", instance="ramsam.dev:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 50x30
+      - series: threshold::monitor::system::load::load5_percpu{certname="ramsam.dev", instance="ramsam.dev:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 20x30
+      - series: threshold::monitor::system::load::load15_percpu{certname="ramsam.dev", instance="ramsam.dev:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 40x30
+      - series: node_load1{certname="cert1.abc", instance="cert1.abc:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 0.65x30
+      - series: node_load5{certname="cert1.abc", instance="cert1.abc:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 0.52x30
+      - series: node_load15{certname="cert1.abc", instance="cert1.abc:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 0.48x30
+      - series: node_cpu_seconds_total{mode="idle", cpu="0", certname="cert1.abc", instance="cert1.abc:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 40x30
+      - series: node_load1{certname="ramsam.dev", instance="ramsam.dev:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 0.10x30
+      - series: node_load5{certname="ramsam.dev", instance="ramsam.dev:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 0.90x30
+      - series: node_load15{certname="ramsam.dev", instance="ramsam.dev:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 0.38x30
+      - series: node_cpu_seconds_total{mode="idle", certname="ramsam.dev", cpu="0"}
+        values: 385594x30
+      - series: node_cpu_seconds_total{mode="idle", certname="ramsam.dev", cpu="1"}
+        values: 385594x30
+      - series: node_cpu_seconds_total{mode="idle", certname="ramsam.dev", cpu="2"}
+        values: 385594x30
+      - series: node_cpu_seconds_total{mode="idle", certname="ramsam.dev", cpu="3"}
+        values: 385594x30
+
+    alert_rule_test:
+      # Alert if value is same since last 10 minute
+      - alertname: monitor::system::load::load1_percpu
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: cert1.abc
+              alert_id: monitor::system::load::load_percpu
+            exp_annotations:
+              summary: 'System load1 average per CPU too high'
+              description: |
+                System `load1` average per CPU on **cert1.abc** is 65% which is above the threshold of 50% for 5 minutes.
+
+      - alertname: monitor::system::load::load5_percpu
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: cert1.abc
+              alert_id: monitor::system::load::load_percpu
+            exp_annotations:
+              summary: 'System load5 average per CPU too high'
+              description: |
+                System `load5` average per CPU on **cert1.abc** is 52% which is above the threshold of 45% for 10 minutes.
+          - exp_labels:
+              severity: critical
+              certname: ramsam.dev
+              alert_id: monitor::system::load::load_percpu
+            exp_annotations:
+              summary: 'System load5 average per CPU too high'
+              description: |
+                System `load5` average per CPU on **ramsam.dev** is 22.5% which is above the threshold of 20% for 10 minutes.
+
+      - alertname: monitor::system::load::load15_percpu
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: cert1.abc
+              alert_id: monitor::system::load::load_percpu
+            exp_annotations:
+              summary: 'System load15 average per CPU too high'
+              description: |
+                System `load15` average per CPU on **cert1.abc** is 48% which is above the threshold of 40% for 15 minutes.

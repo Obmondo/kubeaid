@@ -1,0 +1,98 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/service_gitlab.yaml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="gitlab02.enableit", alert_id="monitor::system::service::gitlab::ci_pending_builds"}
+        values: 1x1000
+      - series: ci_pending_builds{certname="gitlab02.enableit", instance="gitlab02.enableit:9104", job="pushprox", namespace="2", pushprox_target="gitlab_gitlab_exporter", shared_runners="no"}
+        values: 2x1000
+      - series: ci_pending_builds{certname="gitlab02.enableit", instance="gitlab02.enableit:9104", job="pushprox", pushprox_target="gitlab_gitlab_exporter", shared_runners="no"}
+        values: 10x1000
+      - series: threshold::monitor::system::service::gitlab::ci_pending_builds_max{certname="gitlab02.enableit"}
+        values: 8x1000
+
+    alert_rule_test:
+      - alertname: 'monitor::system::service::gitlab::ci_pending_builds'
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              severity: 'warning'
+              certname: 'gitlab02.enableit'
+              alert_id: 'monitor::system::service::gitlab::ci_pending_builds'
+            exp_annotations:
+              summary: 'GitLab on **gitlab02.enableit** has too many pending CI jobs'
+              description: |-2
+                GitLab on **gitlab02.enableit** has `12 > 8` pending CI jobs.
+
+                Possible causes: GitLab CI runners down, or a large amount of jobs suddenly created.
+
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="gitlab02.enableit", alert_id="monitor::system::service::gitlab::ci_pending_builds"}
+        values: 1x1000
+      - series: ci_pending_builds{certname="gitlab02.enableit", instance="gitlab02.enableit:9104", job="pushprox", namespace="2", pushprox_target="gitlab_gitlab_exporter", shared_runners="no"}
+        values: 2x1000
+      - series: ci_pending_builds{certname="gitlab02.enableit", instance="gitlab02.enableit:9104", job="pushprox", pushprox_target="gitlab_gitlab_exporter", shared_runners="no"}
+        values: 10x1000
+      - series: threshold::monitor::system::service::gitlab::ci_pending_builds_max{certname="gitlab02.enableit"}
+        values: 20x1000
+
+    alert_rule_test: []
+
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="gitlab02.enableit", alert_id="monitor::system::service::gitlab::ci_pending_builds"}
+        values: 1x1000
+      - series: ci_pending_builds{certname="gitlab02.enableit", instance="gitlab02.enableit:9104", job="pushprox", namespace="2", pushprox_target="gitlab_gitlab_exporter", shared_runners="no"}
+        values: 2x1000
+      - series: ci_pending_builds{certname="gitlab02.enableit", instance="gitlab02.enableit:9104", job="pushprox", pushprox_target="gitlab_gitlab_exporter", shared_runners="no"}
+        values: 10x1000
+
+    alert_rule_test:
+      - alertname: 'monitor::system::service::gitlab::ci_pending_builds'
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              severity: 'warning'
+              certname: 'gitlab02.enableit'
+              alert_id: 'monitor::system::service::gitlab::ci_pending_builds'
+            exp_annotations:
+              summary: 'GitLab on **gitlab02.enableit** has too many pending CI jobs'
+              description: |-2
+                GitLab on **gitlab02.enableit** has `12 > unknown` pending CI jobs.
+
+                Possible causes: GitLab CI runners down, or a large amount of jobs suddenly created.
+
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="gitlab01.enableit", alert_id="monitor::system::service::gitlab::update"}
+        values: 1x100000
+      - series: obmondo_monitoring{certname="gitlab02.enableit", alert_id="monitor::system::service::gitlab::update"}
+        values: 1x100000
+      - series: obmondo_gitlab_update_available{certname="gitlab02.enableit", instance="gitlab02.enableit:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 0x100000
+      - series: obmondo_gitlab_update_available{certname="gitlab01.enableit", instance="gitlab01.enableit:9100", job="pushprox", pushprox_target="node_exporter"}
+        values: 1x100000
+
+    alert_rule_test:
+      - alertname: 'monitor::system::service::gitlab::update'
+        eval_time: 14d
+        exp_alerts: []
+      - alertname: 'monitor::system::service::gitlab::update'
+        eval_time: 21d
+        exp_alerts:
+          - exp_labels:
+              severity: 'critical'
+              certname: 'gitlab01.enableit'
+              alert_id: 'monitor::system::service::gitlab::update'
+              instance: 'gitlab01.enableit:9100'
+              job: 'pushprox'
+              pushprox_target: 'node_exporter'
+            exp_annotations:
+              summary: 'Gitlab update available for **gitlab01.enableit**'
+              description: 'An update is available for gitlab for instance **gitlab01.enableit**. Please update it to latest'
