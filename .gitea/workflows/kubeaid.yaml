@@ -13,7 +13,7 @@ jobs:
     name: KubeAid CI
     runs-on: ubuntu-latest
     container:
-      image: harbor.obmondo.com/obmondo/kubeaid-ci:1.0.0
+      image: harbor.obmondo.com/obmondo/kubeaid-ci:1.1.0
     steps:
     - name: checkout
       uses: actions/checkout@v2
