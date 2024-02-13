@@ -1,6 +1,21 @@
 
 # Migrate mattermost-team-edition to k8S
 
+## Upgrading Mattermost on Kubernetes
+
+- check mattermost helm chart on kubeaid and compare it with upstream (raise PR if diff)
+- trigger a manual cronjob via k9s (with `t` keystroke)
+- pg_dump -d mattermost | gzip  > /tmp/mattermost-db.sql.gz (take a manual one, so it easier to recover
+against taking from s3)
+- kubectl cp mattermost/mattermost-pgsql-0:/tmp/mattermost-db.sql.gz ./mattermost_dbdump_2024-02-13.sql.gz
+- take the PV backups by following the guide 'Taking Mattermost PV backups' down below.
+- edit the deployment via k9s and set replicas to 0
+- refresh the mattermost app on argocd and see the diff (if all good, sync it)
+- look for events and description of the pod
+
+NOTE: only mattermost pod should be touched, nothing else and that too via the means of downscaling it
+using deployment as mentioned in point '6'.
+
 ## Updating upstream chart
 
 Update it the regular way then reapply git patch from the MR that adds support for plugins with their own webservers.
@@ -190,3 +205,122 @@ For more info refer to - <https://devopstales.github.io/sso/mattermost-keycloak-
     ```text
     Solution - Delete the old mattermost-team-edition deployment resource from the argocd UI .
     ```
+
+### Taking Mattermost PV backups
+
+- It must be kept in mind that Velero must be running in the cluster where you intend to take
+volumesnapshots, you can check it using the command
+
+```sh
+sbdtu5498@sbdtu5498-TUF-Gaming-FX505DT-FX505DT:~$ kubectl get all -n velero
+NAME                          READY   STATUS    RESTARTS   AGE
+pod/velero-6d4c7f5448-sdpxz   1/1     Running   0          15d
+
+NAME             TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+service/velero   ClusterIP   10.110.241.242   <none>        8085/TCP   96d
+
+NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/velero   1/1     1            1           96d
+```
+
+- Now take a look at the PVCs present in the 'mattermost' namespace using the command
+
+```sh
+sbdtu5498@sbdtu5498-TUF-Gaming-FX505DT-FX505DT:~/Videos/Personal Stuff$ kubectl get pvc -n mattermost
+NAME                              STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS
+AGE
+mattermost-team-edition           Bound    pvc-0cb29fa5-83b5-4cfa-a918-25097b52a72b   10Gi       RWO            rook-ceph-block
+6d21h
+mattermost-team-edition-plugins   Bound    pvc-b43a5e89-77c9-468a-aca7-ed08d3d756f2   1Gi        RWO            rook-ceph-block
+6d21h
+pgdata-mattermost-pgsql-0         Bound    pvc-82603507-4970-4591-ba77-8f480361d280   32Gi       RWO            rook-ceph-block
+6d21h
+sbdtu5498@sbdtu5498-TUF-Gaming-FX505DT-FX505DT:~/Videos/Personal Stuff$
+```
+
+- Now we need to take the snapshots of all these PVCs and the PVs that back them in order to be
+safe. In order to do so we need to have a volumesnapshotclass in our cluster. Let's check if we
+have one or not using the following command
+
+```sh
+sbdtu5498@sbdtu5498-TUF-Gaming-FX505DT-FX505DT:~/Videos/Personal Stuff$ kubectl get volumesnapshotclass
+NAME              DRIVER                       DELETIONPOLICY   AGE
+velero-snapshot   rook-ceph.rbd.csi.ceph.com   Retain           44d
+sbdtu5498@sbdtu5498-TUF-Gaming-FX505DT-FX505DT:~/Videos/Personal Stuff$
+```
+
+- As we have checked if we have volumesnapshotclass or not, we can proceed with the next step i.e.
+to create volumesnapshot, so for all the PVCs in 'mattermost' namespace we can have the following
+manifests to create volumesnapshot
+
+```sh
+snapshot-pgsql.yaml ---
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: snapshot-pgsql
+spec:
+  volumeSnapshotClassName: velero-snapshot
+  source:
+    persistentVolumeClaimName: pgdata-mattermost-pgsql-0
+```
+
+```sh
+snapshot-team-edition-plugins.yaml ---
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: snapshot-team-edition-plugins
+spec:
+  volumeSnapshotClassName: velero-snapshot
+  source:
+    persistentVolumeClaimName: mattermost-team-edition-plugins
+```
+
+```sh
+snapshot-team-edition.yaml ---
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: snapshot-team-edition
+spec:
+  volumeSnapshotClassName: velero-snapshot
+  source:
+    persistentVolumeClaimName: mattermost-team-edition
+```
+
+We need to apply these volumesnapshots in 'mattermost' namespace and that will do
+the job for us
+
+- Just validate the snapshots creations using the command and Voila!
+
+```sh
+sbdtu5498@sbdtu5498-TUF-Gaming-FX505DT-FX505DT:~/Videos/Personal Stuff$ kubectl get volumesnapshot -n mattermost
+NAME                                           READYTOUSE   SOURCEPVC                         SOURCESNAPSHOTCONTENT
+RESTORESIZE   SNAPSHOTCLASS     SNAPSHOTCONTENT                                    CREATIONTIME   AGE
+snapshot-pgsql                                 true         pgdata-mattermost-pgsql-0
+32Gi          velero-snapshot   snapcontent-46e9e97d-07d3-4102-b643-9571cdf66ae1   38s            40s
+snapshot-team-edition                          true         mattermost-team-edition
+10Gi          velero-snapshot   snapcontent-a822c014-d5bf-414a-93b3-942c62475c1c   18s            20s
+snapshot-team-edition-plugins                  true         mattermost-team-edition-plugins
+1Gi           velero-snapshot   snapcontent-c50154d7-ebd8-4afb-b937-e061bcaba3c2   28s            30s
+velero-mattermost-team-edition-d4l78           true         mattermost-team-edition
+10Gi          velero-snapshot   snapcontent-337ae4b4-f01e-4504-ba9e-dcf1e3561bee   27d            27d
+velero-mattermost-team-edition-hmqd7           true         mattermost-team-edition
+10Gi          velero-snapshot   snapcontent-98d15eb1-a05b-4d6a-ab4d-c5bfcf5d3ac6   28d            28d
+velero-mattermost-team-edition-k52mt           true         mattermost-team-edition
+10Gi          velero-snapshot   snapcontent-463781fc-97de-400a-bfc5-3002933bff90   27d            27d
+velero-mattermost-team-edition-plugins-blqrp   true         mattermost-team-edition-plugins
+1Gi           velero-snapshot   snapcontent-bdb4b3b5-0333-4c67-a4bb-288055b4f116   27d            27d
+velero-mattermost-team-edition-plugins-lmqdw   true         mattermost-team-edition-plugins
+1Gi           velero-snapshot   snapcontent-529850de-5a75-424d-ac88-876ef8078aa4   28d            28d
+velero-mattermost-team-edition-plugins-qbztm   true         mattermost-team-edition-plugins
+1Gi           velero-snapshot   snapcontent-4d414dff-37c7-4f0d-9d24-81fad3b65c97   27d            27d
+velero-pgdata-mattermost-pgsql-0-62dlx         true         pgdata-mattermost-pgsql-0
+32Gi          velero-snapshot   snapcontent-d21f6195-ab8e-4d17-bc17-c770d15b44d3   27d            27d
+velero-pgdata-mattermost-pgsql-0-8d8gv         true         pgdata-mattermost-pgsql-0
+32Gi          velero-snapshot   snapcontent-95658f5d-14ab-48d2-a151-d7b321be318c   28d            28d
+velero-pgdata-mattermost-pgsql-0-lzzqs         true         pgdata-mattermost-pgsql-0
+32Gi          velero-snapshot   snapcontent-4f967d06-d9ce-4052-bd51-f2bd717cad01   27d            27d
+sbdtu5498@sbdtu5498-TUF-Gaming-FX505DT-FX505DT:~/Videos/Personal Stuff$ kubectl get volumesnapshot velero-mattermost-team-edition-d4l78 -n mattermost -o yaml
+```
