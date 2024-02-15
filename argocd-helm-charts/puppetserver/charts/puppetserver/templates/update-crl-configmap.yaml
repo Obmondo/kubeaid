@@ -1,0 +1,72 @@
+{{- if .Values.singleCA.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "puppetserver.fullname" . }}-crl-config
+  labels:
+    {{- include "puppetserver.puppetserver.labels" . | nindent 4 }}
+    {{- with .Values.puppetserver.masters.extraLabels }}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    "helm.sh/hook": "pre-install"
+    "helm.sh/hook-weight": "0"
+data:
+  crl_kubernetes_cronjob.sh: |-
+    url={{ required "A valid .Values.singleCA.crl.url required!" .Values.singleCA.crl.url }}
+    curl -o /tmp/crl.pem $url || { echo 'could not retrieve crl.pem' ; exit 1; }
+
+    mv /tmp/crl.pem /crl/crl.pem
+
+    grep -q "BEGIN X509 CRL" "/crl/crl.pem" > /dev/null 2>&1 || { echo 'crl.pem file is not in the right format'; cat /crl/crl.pem ; exit 1; }
+
+  crl.sh: |-
+    {{- if .Values.singleCA.config }}
+    {{ .Values.singleCA.config | nindent 6 }}
+    {{- else }}
+    #!/usr/bin/env sh
+    url={{ required "A valid .Values.singleCA.crl.url required!" .Values.singleCA.crl.url }}
+
+    curl -s -o /tmp/crl.pem $url
+    retVal=$?
+
+    mv /tmp/crl.pem $SSL_PATH/crl.pem
+    grep -q "BEGIN X509 CRL" "$SSL_PATH/crl.pem" > /dev/null 2>&1
+    grepVal=$?
+
+    if [[ "$retVal" -ne "0" || "$grepVal" -ne "0" ]]; then
+      rm ~/.crl_cronjob.success > /dev/null 2>&1
+      retVal=1
+    else
+      touch ~/.crl_cronjob.success > /dev/null 2>&1
+    fi
+
+    exit $retVal
+    {{- end }}
+
+  crl_cronjob.sh: |
+    #!/usr/bin/env sh
+    $CRL_SCRIPT_PATH/crl.sh > ~/.crl_cronjob.out 2>&1
+    retVal=$?
+    if [ "$retVal" -eq "0" ]; then
+      touch ~/.crl_cronjob.success > /dev/null 2>&1
+    else
+      rm ~/.crl_cronjob.success > /dev/null 2>&1
+    fi
+
+    exit $retVal
+
+  crl_entrypoint.sh: |
+    #!/usr/bin/env sh
+    set -e
+    if [ ! -f $SSL_PATH/crl.pem ]; then
+      /bin/sh -c $CRL_SCRIPT_PATH/crl_cronjob.sh
+    fi
+    cat > ~/.crl_crontab <<'EOF'
+    {{ .Values.singleCA.crl.cronJob.schedule }} /bin/sh -c $CRL_SCRIPT_PATH/crl_cronjob.sh
+    EOF
+    # tail -Fq ~/.crl_cronjob.out &
+    touch ~/.crl_cronjob.success > /dev/null 2>&1
+    exec supercronic ~/.crl_crontab
+
+{{- end }}

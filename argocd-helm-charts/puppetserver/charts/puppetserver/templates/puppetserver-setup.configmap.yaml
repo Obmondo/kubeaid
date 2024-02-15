@@ -1,0 +1,40 @@
+{{- if .Values.global.runAsNonRoot }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "puppetserver.fullname" . }}-docker-entrypoint-config
+  labels:
+    {{- include "puppetserver.r10k.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-install
+data:
+  docker-entrypoint.sh: |
+    #!/bin/bash
+    # bash is required to pass ENV vars with dots as sh cannot
+    set -e
+
+    for f in /docker-entrypoint.d/*.sh; do
+        echo "Running $f"
+        "$f"
+    done
+
+    if [ -d /docker-custom-entrypoint.d/ ]; then
+        find /docker-custom-entrypoint.d/ -type f -name "*.sh" \
+            -exec chmod +x {} \;
+        sync
+        find /docker-custom-entrypoint.d/ -type f -name "*.sh" \
+            -exec echo Running {} \; -exec {} \;
+    fi
+
+    # service puppetserver start
+    exec /opt/puppetlabs/bin/puppetserver "$@" &
+
+    sleep 30
+
+    echo 'Waiting for puppetserver to become ready...'
+    until printf "." && curl --noproxy '*' --silent --fail --insecure 'https://{{ template "puppetserver.puppetserver-masters.serviceName" . }}:{{ template "puppetserver.puppetserver-masters.port" . }}/status/v1/simple' | grep -q '^running$'; do
+      sleep 2;
+    done;
+    echo 'Puppetserver OK ✓'
+    service puppetserver stop
+{{- end }}

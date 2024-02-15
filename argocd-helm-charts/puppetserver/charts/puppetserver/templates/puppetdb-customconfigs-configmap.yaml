@@ -1,0 +1,14 @@
+{{- if .Values.puppetdb.customconfigs.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "puppetdb.fullname" . }}-custom-configs
+  labels:
+    {{- include "puppetserver.puppetdb.labels" . | nindent 4 }}
+    {{- range $key, $value := .Values.puppetdb.extraLabels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+data:
+{{- toYaml .Values.puppetdb.customconfigs.configmaps | nindent 2 }}
+{{- end }}
+

@@ -1,0 +1,105 @@
+suite: test puppetserver master podDisruptionBudget creation
+templates:
+  - puppetserver-masters.pdb.yaml
+release:
+  name: puppetserver
+  namespace: puppet
+tests:
+  - it: manifest should match snapshot
+    set:
+      puppetserver.masters.podDisruptionBudget.enabled: true
+      puppetserver.masters.multiMasters.enabled: true
+      puppetserver.masters.multiMasters.manualScaling.masters: 2
+      puppetserver.masters.multiMasters.autoScaling.enabled: true
+      puppetserver.masters.multiMasters.autoScaling.minMasters: 2
+      puppetserver.masters.podDisruptionBudget.maxUnavailable: 2
+    asserts:
+      - matchSnapshot: {}
+  - it: should not create the podDisruptionBudget by default
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should not create the podDisruptionBudget if multi masters mode is not enable
+    set:
+      puppetserver.masters.podDisruptionBudget.enabled: true
+      puppetserver.masters.multiMasters.enabled: false
+      puppetserver.masters.multiMasters.manualScaling.masters: 2
+      puppetserver.masters.multiMasters.autoScaling.enabled: true
+      puppetserver.masters.multiMasters.autoScaling.minMasters: 2
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should not create the podDisruptionBudget if multi masters mode is enable but number of master is equals to 1
+    set:
+      puppetserver.masters.podDisruptionBudget.enabled: true
+      puppetserver.masters.multiMasters.enabled: true
+      puppetserver.masters.multiMasters.manualScaling.masters: 1
+      puppetserver.masters.multiMasters.autoScaling.enabled: false
+      puppetserver.masters.multiMasters.autoScaling.minMasters: 2
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should  create the podDisruptionBudget if multi masters mode is enable and number of master is greather than to 1
+    set:
+      puppetserver.masters.podDisruptionBudget.enabled: true
+      puppetserver.masters.multiMasters.enabled: true
+      puppetserver.masters.multiMasters.manualScaling.masters: 3
+      puppetserver.masters.multiMasters.autoScaling.enabled: false
+      puppetserver.masters.multiMasters.autoScaling.minMasters: 2
+    asserts:
+      - isKind:
+          of: PodDisruptionBudget
+      - equal:
+          path: metadata.name
+          value: puppetserver-masters
+  - it: should not create the podDisruptionBudget if autoScaling mode is enable with 1 minMasters
+    set:
+      puppetserver.masters.podDisruptionBudget.enabled: true
+      puppetserver.masters.multiMasters.enabled: true
+      puppetserver.masters.multiMasters.manualScaling.masters: 2
+      puppetserver.masters.multiMasters.autoScaling.enabled: true
+      puppetserver.masters.multiMasters.autoScaling.minMasters: 1
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should create the podDisruptionBudget if autoScaling mode is enable with more than 1 minMasters
+    set:
+      puppetserver.masters.podDisruptionBudget.enabled: true
+      puppetserver.masters.multiMasters.enabled: true
+      puppetserver.masters.multiMasters.manualScaling.masters: 2
+      puppetserver.masters.multiMasters.autoScaling.enabled: true
+      puppetserver.masters.multiMasters.autoScaling.minMasters: 2
+    asserts:
+      - isKind:
+          of: PodDisruptionBudget
+      - equal:
+          path: metadata.name
+          value: puppetserver-masters
+  - it: should update minAvailable
+    set:
+      puppetserver.masters.podDisruptionBudget.enabled: true
+      puppetserver.masters.multiMasters.enabled: true
+      puppetserver.masters.multiMasters.manualScaling.masters: 2
+      puppetserver.masters.multiMasters.autoScaling.enabled: true
+      puppetserver.masters.multiMasters.autoScaling.minMasters: 2
+      puppetserver.masters.podDisruptionBudget.minAvailable: 2
+    asserts:
+      - isKind:
+          of: PodDisruptionBudget
+      - equal:
+          path: spec.minAvailable
+          value: 2
+  - it: should update maxUnavailable
+    set:
+      puppetserver.masters.podDisruptionBudget.enabled: true
+      puppetserver.masters.multiMasters.enabled: true
+      puppetserver.masters.multiMasters.manualScaling.masters: 2
+      puppetserver.masters.multiMasters.autoScaling.enabled: true
+      puppetserver.masters.multiMasters.autoScaling.minMasters: 2
+      puppetserver.masters.podDisruptionBudget.maxUnavailable: 2
+    asserts:
+      - isKind:
+          of: PodDisruptionBudget
+      - equal:
+          path: spec.maxUnavailable
+          value: 2

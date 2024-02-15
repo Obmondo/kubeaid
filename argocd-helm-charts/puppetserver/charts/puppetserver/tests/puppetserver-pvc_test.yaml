@@ -1,0 +1,20 @@
+suite: test puppet puppet volume creation
+templates:
+  - puppetserver-pvc.yaml
+release:
+  name: puppetserver
+  namespace: puppet
+tests:
+  - it: manifest should match snapshot
+    asserts:
+      - matchSnapshot: {}
+  - it: should not create the volume if "puppetserver.persistence.puppet.existingClaim" is non-empty
+    set:
+      puppetserver.persistence.puppet.existingClaim: dummy
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should create the volume by default
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim

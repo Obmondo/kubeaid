@@ -1,0 +1,61 @@
+{{- if .Values.puppetserver.psp.create }}
+apiVersion: {{ include "podsecuritypolicy.apiVersion" . }}
+kind: PodSecurityPolicy
+metadata:
+  name: {{ template "puppetserver.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "puppetserver.puppetserver.labels" . | nindent 4 }}
+    {{- with .Values.puppetserver.masters.extraLabels }}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if or .Values.puppetserver.preGeneratedCertsJob.enabled .Values.singleCA.enabled .Values.global.runAsNonRoot }}
+    helm.sh/hook: pre-install
+    helm.sh/hook-delete-policy: before-hook-creation
+    helm.sh/hook-weight: "-10"
+    {{- end }}
+    {{- with .Values.puppetserver.psp.annotations -}}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  privileged: false
+  requiredDropCapabilities:
+    - all
+  allowedCapabilities:
+    - CAP_CHOWN
+    - CAP_SETUID
+    - CAP_SETGID
+    - CAP_DAC_OVERRIDE
+    - CAP_AUDIT_WRITE
+    - CAP_FOWNER
+    - CHOWN
+    - SETUID
+    - SETGID
+    - DAC_OVERRIDE
+    - AUDIT_WRITE
+    - FOWNER
+  volumes:
+    - 'configMap'
+    - 'secret'
+    - 'persistentVolumeClaim'
+    - 'emptyDir'
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: 'RunAsAny'
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1
+        max: 65535
+  fsGroup:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1
+        max: 65535
+  readOnlyRootFilesystem: false
+{{- end }}

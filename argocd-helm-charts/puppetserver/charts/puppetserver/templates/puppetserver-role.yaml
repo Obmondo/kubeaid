@@ -1,0 +1,29 @@
+{{- if .Values.puppetserver.rbac.create }}
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ template "puppetserver.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "puppetserver.puppetserver.labels" . | nindent 4 }}
+    {{- with .Values.puppetserver.masters.extraLabels }}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if or .Values.puppetserver.preGeneratedCertsJob.enabled .Values.singleCA.enabled .Values.global.runAsNonRoot }}
+    helm.sh/hook: pre-install
+    helm.sh/hook-delete-policy: before-hook-creation
+    helm.sh/hook-weight: "-10"
+    {{- end }}
+    {{- with .Values.puppetserver.rbac.annotations -}}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+rules:
+  {{- if .Values.puppetserver.psp.create }}
+  - apiGroups: ["extensions"]
+    resources: ["podsecuritypolicies"]
+    verbs: ["use"]
+    resourceNames:
+      - {{ template "puppetserver.fullname" . }}
+  {{- end }}
+{{- end }}
