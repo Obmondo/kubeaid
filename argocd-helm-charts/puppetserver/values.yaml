@@ -25,11 +25,23 @@ puppetboard:
   image: ghcr.io/voxpupuli/puppetboard
   tag: 4.2.5
 
+global:
+  postgresql:
+    auth:
+      existingSecret: puppet-pgsql-app
+      secretKeys:
+        usernameKey: username
+        userPasswordKey: password
+
 postgresql:
-    host: oncall-pgsql-rw
-    port: 5432
-    db_name: oncall
-    user: oncall
-    existingSecret: oncall-pgsql-app
-    passwordKey: password
+  instance: 1
+  size: 2Gi
+  recover: false
+  backup: {}
+  resources:
+    limits:
+      memory: 256Mi
+    requests:
+      memory: 256Mi
+      cpu: 100m
 
