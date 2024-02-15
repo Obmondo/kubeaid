@@ -64,6 +64,7 @@ spec:
         wal:
           maxParallel: 8
   {{- end }}
+  {{- if .Values.postgresql.backup }}
   backup:
     barmanObjectStore:
       destinationPath: {{ .Values.postgresql.backup.destinationPath }}
@@ -96,3 +97,4 @@ spec:
         compression: gzip
         encryption: AES256
     retentionPolicy: "30d"
+  {{- end }}
