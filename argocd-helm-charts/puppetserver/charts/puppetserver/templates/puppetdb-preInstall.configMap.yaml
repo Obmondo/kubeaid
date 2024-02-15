@@ -1,0 +1,20 @@
+{{- if and (.Values.puppetserver.preGeneratedCertsJob.enabled) (not .Values.singleCA.enabled) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "puppetdb.fullname" . }}-preinstall
+  labels:
+    {{- include "puppetserver.puppetdb.labels" . | nindent 4 }}
+    {{- range $key, $value := .Values.puppetdb.extraLabels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+  annotations:
+    "helm.sh/hook": "pre-install"
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
+binaryData:
+  {{- $root := . }}
+  {{- range $path, $bytes := .Files.Glob "init/puppet-certs/puppetdb/*.gz" }}
+  {{ base $path }}: {{ $root.Files.Get $path | b64enc | quote }}
+  {{- end }}
+{{- end }}

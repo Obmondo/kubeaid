@@ -1,0 +1,65 @@
+{{- if .Values.puppetdb.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ template "puppetdb.fullname" . }}
+  labels:
+    {{- include "puppetserver.puppetdb.labels" . | nindent 4 }}
+    {{- with .Values.puppetserver.masters.extraLabels }}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "puppetserver.puppetdb.matchLabels" . | nindent 6 }}
+  policyTypes:
+    {{- toYaml .Values.puppetdb.networkPolicy.policyTypes | nindent 4 }}
+  ingress:
+    - from:
+      - podSelector: {}
+      ports:
+        - port: 8081
+    {{- if .Values.puppetdb.networkPolicy.additionnalIngressRules }}
+    {{- toYaml .Values.puppetdb.networkPolicy.additionnalIngressRules | nindent 4 }}
+    {{- end }}
+  egress:
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: kube-system
+        podSelector:
+          matchLabels:
+            k8s-app: kube-dns
+      ports:
+      - protocol: TCP
+        port: 53
+      - protocol: UDP
+        port: 53
+    - to:
+      - ipBlock:
+          cidr: 0.0.0.0/0
+      ports:
+      - port: 53
+    - to:
+      - podSelector:
+          matchLabels:
+            {{- include "puppetserver.puppetserver.matchLabels" . | nindent 12 }}
+      ports:
+        - port: 8140
+    - to:
+      - podSelector: {}
+      ports:
+        - port: 8081
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: {{ .Release.Namespace }}
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: postgresql
+      ports:
+        - port: 5432
+    {{- if .Values.puppetdb.networkPolicy.additionnalEgressRules }}
+    {{- toYaml .Values.puppetdb.networkPolicy.additionnalEgressRules | nindent 4 }}
+    {{- end }}
+{{- end }}

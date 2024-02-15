@@ -1,0 +1,30 @@
+{{- if .Values.puppetserver.masters.multiMasters.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "puppetserver.fullname" . }}-init-masters-config
+  labels:
+    {{- include "puppetserver.puppetserver.labels" . | nindent 4 }}
+    {{- with .Values.puppetserver.masters.extraLabels }}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+data:
+  check_for_masters.sh: |
+    #!/usr/bin/env bash
+    PUPPET_SSL_CERT_PEM=/etc/puppetlabs/puppet/ssl/certs/puppet.pem
+    if [[ -d "$PUPPET_SSL_DIR" ]]; then
+        ls -la /etc/puppetlabs/puppet/ssl/certs/
+        echo "A Puppetserver master has already started running."
+        echo "Waiting to finish the generation of the Puppet SSL certs..."
+        sleep 5
+        while [[ ! -f "$PUPPET_SSL_CERT_PEM" ]];
+            do
+              echo "Still waiting..."
+              sleep 5
+            done
+        sleep 15
+        echo "Puppet SSL certs have been generated. Continuing..."
+    else
+        echo "No other Puppetserver master is running. Continuing..."
+    fi
+{{- end }}

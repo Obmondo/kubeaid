@@ -1,0 +1,109 @@
+suite: test puppetserver compilers podDisruptionBudget creation
+templates:
+  - puppetserver-compilers.pdb.yaml
+release:
+  name: puppetserver
+  namespace: puppet
+tests:
+  - it: manifest should match snapshot
+    set:
+      puppetserver.compilers.podDisruptionBudget.enabled: true
+      puppetserver.compilers.enabled: true
+      puppetserver.compilers.manualScaling.compilers: 1
+      puppetserver.compilers.autoScaling.enabled: true
+      puppetserver.compilers.autoScaling.minCompilers: 2
+      puppetserver.compilers.podDisruptionBudget.maxUnavailable: 2
+    asserts:
+      - matchSnapshot: {}
+  - it: should not create the podDisruptionBudget by default
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should not create the podDisruptionBudget if compilers is not enable
+    set:
+      puppetserver.compilers.podDisruptionBudget.enabled: true
+      puppetserver.compilers.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should not create the podDisruptionBudget if compilers podDisruptionBudget is not enable
+    set:
+      puppetserver.compilers.podDisruptionBudget.enabled: false
+      puppetserver.compilers.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should not create the podDisruptionBudget if compilers is enable but number of compilers is equals to 1
+    set:
+      puppetserver.compilers.podDisruptionBudget.enabled: true
+      puppetserver.compilers.enabled: true
+      puppetserver.compilers.manualScaling.compilers: 1
+      puppetserver.compilers.autoScaling.enabled: false
+      puppetserver.compilers.autoScaling.minCompilers: 2
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should create the podDisruptionBudget if compilers is enable and number of compilers is greather than to 1
+    set:
+      puppetserver.compilers.podDisruptionBudget.enabled: true
+      puppetserver.compilers.enabled: true
+      puppetserver.compilers.manualScaling.compilers: 2
+      puppetserver.compilers.autoScaling.enabled: false
+      puppetserver.compilers.autoScaling.minCompilers: 2
+    asserts:
+      - isKind:
+          of: PodDisruptionBudget
+      - equal:
+          path: metadata.name
+          value: puppetserver-compilers
+  - it: should not create the podDisruptionBudget if autoScaling mode is enable with 1 mincompilers
+    set:
+      puppetserver.compilers.podDisruptionBudget.enabled: true
+      puppetserver.compilers.enabled: true
+      puppetserver.compilers.manualScaling.compilers: 2
+      puppetserver.compilers.autoScaling.enabled: true
+      puppetserver.compilers.autoScaling.minCompilers: 1
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should create the podDisruptionBudget if autoScaling mode is enable with more than 1 mincompilers
+    set:
+      puppetserver.compilers.podDisruptionBudget.enabled: true
+      puppetserver.compilers.enabled: true
+      puppetserver.compilers.manualScaling.compilers: 1
+      puppetserver.compilers.autoScaling.enabled: true
+      puppetserver.compilers.autoScaling.minCompilers: 2
+    asserts:
+      - isKind:
+          of: PodDisruptionBudget
+      - equal:
+          path: metadata.name
+          value: puppetserver-compilers
+  - it: should update minAvailable
+    set:
+      puppetserver.compilers.podDisruptionBudget.enabled: true
+      puppetserver.compilers.enabled: true
+      puppetserver.compilers.manualScaling.compilers: 1
+      puppetserver.compilers.autoScaling.enabled: true
+      puppetserver.compilers.autoScaling.minCompilers: 2
+      puppetserver.compilers.podDisruptionBudget.minAvailable: 2
+    asserts:
+      - isKind:
+          of: PodDisruptionBudget
+      - equal:
+          path: spec.minAvailable
+          value: 2
+  - it: should update maxUnavailable
+    set:
+      puppetserver.compilers.podDisruptionBudget.enabled: true
+      puppetserver.compilers.enabled: true
+      puppetserver.compilers.manualScaling.compilers: 1
+      puppetserver.compilers.autoScaling.enabled: true
+      puppetserver.compilers.autoScaling.minCompilers: 2
+      puppetserver.compilers.podDisruptionBudget.maxUnavailable: 2
+    asserts:
+      - isKind:
+          of: PodDisruptionBudget
+      - equal:
+          path: spec.maxUnavailable
+          value: 2

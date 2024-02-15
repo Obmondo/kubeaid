@@ -1,0 +1,27 @@
+{{- if .Values.puppetserver.compilers.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "puppetserver.puppetserver-compilers.serviceName" . }}
+  labels:
+    {{- include "puppetserver.puppetserver-compilers.labels" . | nindent 4 }}
+    {{- if .Values.puppetserver.compilers.service.labels }}
+    {{- toYaml .Values.puppetserver.compilers.service.labels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.puppetserver.compilers.service.annotations }}
+  annotations:
+    {{- toYaml .Values.puppetserver.compilers.service.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  ports:
+    {{- range $key, $value := .Values.puppetserver.compilers.service.ports }}
+    - name: {{ $key }}
+      {{- toYaml $value | nindent 6 }}
+    {{- end }}
+  selector:
+    {{- include "puppetserver.puppetserver-compilers.matchLabels" . | nindent 4 }}
+  type: {{ .Values.puppetserver.compilers.service.type }}
+  {{- if (and (eq .Values.puppetserver.compilers.service.type "LoadBalancer") (not (empty .Values.puppetserver.compilers.service.loadBalancerIP))) }}
+  loadBalancerIP: {{ .Values.puppetserver.compilers.service.loadBalancerIP }}
+  {{- end }}
+{{- end }}

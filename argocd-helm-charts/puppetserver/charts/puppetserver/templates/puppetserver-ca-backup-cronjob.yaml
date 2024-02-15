@@ -1,0 +1,90 @@
+{{- if and .Values.puppetserver.masters.backup.enabled (not .Values.singleCA.enabled) }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ template "puppetserver.fullname" . }}-master-backup
+  labels:
+    {{- include "puppetserver.puppetserver.labels" . | nindent 4 }}
+    {{- with .Values.puppetserver.masters.extraLabels -}}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  concurrencyPolicy: Forbid
+  suspend: false
+  failedJobsHistoryLimit: {{ .Values.puppetserver.masters.backup.failedJobsHistoryLimit }}
+  schedule: "{{ .Values.puppetserver.masters.backup.schedule }}"
+  successfulJobsHistoryLimit: {{ .Values.puppetserver.masters.backup.successfulJobsHistoryLimit }}
+  jobTemplate:
+    metadata:
+      labels:
+        {{- include "puppetserver.puppetserver.labels" . | nindent 8 }}
+        {{- with .Values.puppetserver.masters.extraLabels -}}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      template:
+        spec:
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchLabels:
+                    {{- include "puppetserver.puppetserver.matchLabels" . | nindent 20 }}
+                topologyKey: kubernetes.io/hostname
+          restartPolicy: OnFailure
+          containers:
+          - name: restic-backup
+            image: "{{ .Values.puppetserver.masters.backup.image }}:{{ .Values.puppetserver.masters.backup.tag }}"
+            imagePullPolicy: {{ .Values.puppetserver.masters.backup.pullPolicy }}
+            command:
+            - /bin/sh
+            - -c
+            - |-
+              set -euf
+              restic snapshots -q || restic init -q
+              restic backup --tag=puppet-ca --host={{ template "puppetserver.fullname" . }} /backup
+              restic forget --prune --keep-last {{ .Values.puppetserver.masters.backup.restic.keep_last }}
+            resources:
+              {{- toYaml .Values.puppetserver.masters.backup.resources | nindent 14 }}
+            env:
+            - name: RESTIC_REPOSITORY
+              value: {{ .Values.puppetserver.masters.backup.restic.repository | quote }}
+            - name: RESTIC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "puppetserver.fullname" . }}-restic-backup-creds
+                  key: restic_password
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "puppetserver.fullname" . }}-restic-backup-creds
+                  key: access_key_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "puppetserver.fullname" . }}-restic-backup-creds
+                  key: secret_access_key
+            volumeMounts:
+            - name: puppet-ca-storage
+              mountPath: /backup/etc/puppetlabs/puppetserver/ca/
+            - name: puppet-puppet-storage
+              mountPath: /backup/etc/puppetlabs/puppet/
+            {{- if .Values.puppetserver.masters.backup.caConfigMap }}
+            - name: restic-ca-certificates
+              mountPath: /etc/ssl/certs/ca-certificates.crt
+              subPath: ca-certificates.crt
+            {{- end }}
+          volumes:
+          - name: puppet-ca-storage
+            persistentVolumeClaim:
+              claimName: {{ template "puppetserver.persistence.ca.claimName" . }}
+          - name: puppet-puppet-storage
+            persistentVolumeClaim:
+              claimName: {{ template "puppetserver.persistence.puppet.claimName" . }}
+          {{- if .Values.puppetserver.masters.backup.caConfigMap }}
+          - name: restic-ca-certificates
+            configMap:
+              name: {{ .Values.puppetserver.masters.backup.caConfigMap }}
+              defaultMode: 0777
+          {{- end }}
+{{- end }}

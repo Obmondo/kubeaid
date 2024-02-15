@@ -1,0 +1,52 @@
+{{- if and .Values.puppetserver.compilers.enabled .Values.puppetserver.compilers.ingress.enabled -}}
+{{- $releaseName := .Release.Name -}}
+{{- $serviceName := include "puppetserver.puppetserver-compilers.serviceName" . }}
+{{- $servicePort := .Values.puppetserver.compilers.service.ports.puppetserver.port -}}
+{{- $pathType := .Values.puppetserver.compilers.ingress.pathType | default "ImplementationSpecific" -}}
+{{- $apiIsStable := eq (include "puppetserver.ingress.isStable" .) "true" -}}
+{{- $ingressSupportsPathType := eq (include "puppetserver.ingress.supportsPathType" .) "true" -}}
+apiVersion: {{ include "puppetserver.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  {{- if .Values.puppetserver.compilers.ingress.annotations }}
+  annotations:
+    {{ toYaml .Values.puppetserver.compilers.ingress.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "puppetserver.puppetserver.labels" . | nindent 4 }}
+    {{- range $key, $value := .Values.puppetserver.compilers.ingress.extraLabels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+  name: {{ template "puppetserver.fullname" . }}-compilers
+spec:
+  {{- if $apiIsStable }}
+  {{- if .Values.puppetserver.compilers.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.puppetserver.compilers.ingress.ingressClassName }}
+  {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.puppetserver.compilers.ingress.hosts }}
+    {{- $url := splitList "/" . }}
+    - host: {{ first $url }}
+      http:
+        paths:
+          - path: /{{ rest $url | join "/" }}
+            {{- if and $pathType $ingressSupportsPathType }}
+            pathType: {{ $pathType }}
+            {{- end }}
+            backend:
+              {{- if $apiIsStable }}
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: {{ $servicePort }}
+              {{- else }}
+              serviceName: {{ $serviceName }}
+              servicePort: {{ $servicePort }}
+              {{- end }}
+    {{- end -}}
+  {{- if .Values.puppetserver.compilers.ingress.tls }}
+  tls:
+    {{ toYaml .Values.puppetserver.compilers.ingress.tls | nindent 4 }}
+  {{- end -}}
+{{- end -}}
