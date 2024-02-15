@@ -404,7 +404,7 @@ local kp =
 
       nodeExporter+: {
         resources: vars.node_exporter_resources,
-        kubeRbacProxyMain+: {
+        kubeRbacProxy+: {
           resources+: vars.node_exporter_kubeRbacProxyMain_resources,
         },
       },
