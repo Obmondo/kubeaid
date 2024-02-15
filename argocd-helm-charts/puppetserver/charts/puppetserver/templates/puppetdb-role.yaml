@@ -1,0 +1,24 @@
+{{- if .Values.puppetdb.rbac.create }}
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ template "puppetdb.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "puppetserver.puppetdb.labels" . | nindent 4 }}
+    {{- range $key, $value := .Values.puppetdb.extraLabels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+  annotations:
+    {{- with .Values.puppetdb.rbac.annotations -}}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+rules:
+  {{- if .Values.puppetdb.psp.create }}
+  - apiGroups: ["extensions"]
+    resources: ["podsecuritypolicies"]
+    verbs: ["use"]
+    resourceNames:
+      - {{ template "puppetdb.fullname" . }}
+  {{- end }}
+{{- end }}

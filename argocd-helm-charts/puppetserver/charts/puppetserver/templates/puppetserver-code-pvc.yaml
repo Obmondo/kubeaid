@@ -1,0 +1,32 @@
+{{- if not .Values.puppetserver.persistence.code.existingClaim }}
+{{- if or ( eq .Values.puppetserver.compilers.kind "Deployment" ) ( not .Values.puppetserver.compilers.enabled ) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ template "puppetserver.fullname" . }}-code-claim
+  labels:
+    {{- include "puppetserver.puppetserver.labels" . | nindent 4 }}
+    {{- with .Values.global.extraLabels }}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.global.runAsNonRoot }}
+    helm.sh/hook: pre-install
+    {{- end }}
+    {{- include "puppetserver.persistence.code.annotations" . | nindent 4 }}
+spec:
+  accessModes:
+    {{- toYaml ( .Values.puppetserver.persistence.code.accessModes | default .Values.storage.accessModes ) | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ .Values.puppetserver.persistence.code.size | default .Values.storage.size | quote }}
+  {{- $storageClass := include "puppetserver.persistence.code.storageClass" . }}
+  {{- if $storageClass }}
+  {{- if (eq "-" $storageClass) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: "{{ $storageClass }}"
+  {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}

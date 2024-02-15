@@ -1,0 +1,54 @@
+{{- if and (.Values.puppetdb.enabled) (.Values.puppetdb.psp.create) }}
+apiVersion: {{ include "podsecuritypolicy.apiVersion" . }}
+kind: PodSecurityPolicy
+metadata:
+  name: {{ template "puppetdb.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "puppetserver.puppetdb.labels" . | nindent 4 }}
+    {{- range $key, $value := .Values.puppetdb.extraLabels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+  annotations:
+    {{- with .Values.puppetdb.psp.annotations -}}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  privileged: false
+  requiredDropCapabilities:
+    - all
+  allowedCapabilities:
+    - CAP_FOWNER
+    - CAP_CHOWN
+    - CAP_SETUID
+    - CAP_SETGID
+    - CAP_DAC_OVERRIDE
+    - FOWNER
+    - CHOWN
+    - SETUID
+    - SETGID
+    - DAC_OVERRIDE
+  volumes:
+    - 'configMap'
+    - 'secret'
+    - 'persistentVolumeClaim'
+    - 'emptyDir'
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    rule: 'RunAsAny'
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1
+        max: 65535
+  fsGroup:
+    rule: 'MustRunAs'
+    ranges:
+      - min: 1
+        max: 65535
+  readOnlyRootFilesystem: false
+{{- end }}

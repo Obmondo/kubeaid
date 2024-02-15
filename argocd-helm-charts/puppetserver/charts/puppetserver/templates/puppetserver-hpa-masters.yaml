@@ -1,0 +1,37 @@
+{{- if .Values.puppetserver.masters.multiMasters.enabled }}
+{{- if .Values.puppetserver.masters.multiMasters.autoScaling.enabled }}
+apiVersion: {{ include "puppetserver.autoscaling.apiVersion" . }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "puppetserver.fullname" . }}-masters-autoscaler
+  labels:
+    {{- include "puppetserver.puppetserver.labels" . | nindent 4 }}
+    {{- with .Values.puppetserver.masters.extraLabels }}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ template "puppetserver.fullname" . }}-puppetserver-master
+  minReplicas: {{ .Values.puppetserver.masters.multiMasters.autoScaling.minMasters }}
+  maxReplicas: {{ .Values.puppetserver.masters.multiMasters.autoScaling.maxMasters }}
+  metrics:
+  {{- with .Values.puppetserver.masters.multiMasters.autoScaling.cpuUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ . }}
+  {{- end }}
+  {{- with .Values.puppetserver.masters.multiMasters.autoScaling.memoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ . }}
+  {{- end }}
+{{- end }}
+{{- end }}

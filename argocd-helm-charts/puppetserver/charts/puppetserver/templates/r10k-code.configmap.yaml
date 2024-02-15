@@ -1,0 +1,59 @@
+{{- if .Values.puppetserver.puppeturl }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "puppetserver.fullname" . }}-r10k-code-config
+  labels:
+    {{- include "puppetserver.r10k.labels" . | nindent 4 }}
+data:
+  r10k_code.yaml: |
+    # The location to use for storing cached Git repos
+    :cachedir: '/etc/puppetlabs/code/r10k_cache'
+    # A list of git repositories to create
+    {{- if .Values.r10k.code.extraSettings }}
+    {{- toYaml .Values.r10k.code.extraSettings | nindent 4 }}
+    {{- end }}
+    :sources:
+      # This will clone the git repository and instantiate an environment per
+      # branch in '/etc/puppetlabs/code/environments'
+      :puppet_repo:
+        remote: '{{ .Values.puppetserver.puppeturl }}'
+        basedir: '{{ .Values.puppetserver.puppetbasedir }}'
+        {{- if .Values.r10k.code.defaultRepoExtraConf }}
+        {{- toYaml .Values.r10k.code.defaultRepoExtraConf | nindent 8 }}
+        {{- end }}
+    {{- if .Values.r10k.code.extraRepos }}
+    {{- toYaml .Values.r10k.code.extraRepos | nindent 6 }}
+    {{- end }}
+
+  r10k_code_cronjob.sh: |
+    #!/usr/bin/env sh
+    {{- if .Values.r10k.code.cronJob.splay }}
+    sleep $(( RANDOM % {{ int .Values.r10k.code.cronJob.splayLimit }} ))
+    {{- end }}
+    {{ with .Values.r10k.code.cronJob.timeout }}timeout -s 9 {{ int . }} {{ end }}/docker-entrypoint.sh deploy environment --config /etc/puppetlabs/puppet/r10k_code.yaml \
+    --puppetfile {{ template "r10k.code.args" . }} > ~/.r10k_code_cronjob.out 2>&1
+    retVal=$?
+    if [ "$retVal" -eq "0" ]; then
+      touch {{ .Values.r10k.code.cronJob.successFile }} > /dev/null 2>&1
+    else
+      rm {{ .Values.r10k.code.cronJob.successFile }} > /dev/null 2>&1
+    fi
+    exit $retVal
+
+  r10k_code_entrypoint.sh: |
+    #!/usr/bin/env sh
+    set -e
+    {{- if .Values.r10k.code.cronJob.enabled }}
+    cat > ~/.r10k_code_crontab <<'EOF'
+    {{ .Values.r10k.code.cronJob.schedule }} /bin/sh -c /etc/puppetlabs/puppet/r10k_code_cronjob.sh
+    EOF
+    tail -Fq ~/.r10k_code_cronjob.out &
+    {{- end }}
+    touch {{ .Values.r10k.code.cronJob.successFile }} > /dev/null 2>&1
+    {{- if .Values.r10k.code.cronJob.enabled }}
+    exec supercronic ~/.r10k_code_crontab
+    {{- else}}
+    tail -f /dev/null
+    {{- end }}
+{{- end }}

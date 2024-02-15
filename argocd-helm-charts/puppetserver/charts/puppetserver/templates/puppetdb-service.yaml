@@ -1,0 +1,42 @@
+{{- if .Values.puppetdb.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "puppetdb.fullname" . }}
+  labels:
+    {{- include "puppetserver.puppetdb.labels" . | nindent 4 }}
+    {{- if .Values.puppetdb.service.labels }}
+    {{- toYaml .Values.puppetdb.service.labels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.puppetdb.service.annotations }}
+  annotations:
+    {{- toYaml .Values.puppetdb.service.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  ports:
+    - name: pdb-http
+      port: 8080
+      targetPort: pdb-http
+    - name: pdb-https
+      port: 8081
+      targetPort: pdb-https
+    {{- if .Values.puppetboard.enabled }}
+    - name: puppetboard
+      port: {{ .Values.puppetboard.port }}
+      targetPort: {{ .Values.puppetboard.service.targetPort }}
+    {{- end }}
+    {{- if .Values.metrics.prometheus.enabled }}
+    - name: metrics
+      port: {{ .Values.metrics.prometheus.port }}
+      targetPort: {{ .Values.metrics.prometheus.port }}
+    {{- end }}
+  {{- if eq .Values.puppetdb.service.type "ClusterIP" }}
+  clusterIP: {{ .Values.puppetdb.service.clusterIP  }}
+  {{- end }}
+  selector:
+    {{- include "puppetserver.puppetdb.matchLabels" . | nindent 4 }}
+  type: {{ .Values.puppetdb.service.type }}
+  {{- if (and (eq .Values.puppetdb.service.type "LoadBalancer") (not (empty .Values.puppetdb.service.loadBalancerIP))) }}
+  loadBalancerIP: {{ .Values.puppetdb.service.loadBalancerIP }}
+  {{- end }}
+{{- end }}

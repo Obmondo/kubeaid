@@ -1,0 +1,42 @@
+suite: test puppet code volume creation
+templates:
+  - puppetserver-code-pvc.yaml
+release:
+  name: puppetserver
+  namespace: puppet
+tests:
+  - it: manifest should match snapshot
+    set:
+      puppetserver.compilers.enabled: true
+    asserts:
+      - matchSnapshot: {}
+  - it: should not create the volume if "puppetserver.persistence.code.existingClaim" is non-empty
+    set:
+      puppetserver.persistence.code.existingClaim: dummy
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should not create the volume if compiler is used as StatefulSet
+    set:
+      puppetserver.compilers.enabled: true
+      puppetserver.compilers.kind: StatefulSet
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should create the volume by default
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+  - it: should create the volume if compilers is not deployed
+    set:
+      puppetserver.compilers.enabled: false
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+  - it: should create the volume if compiler is used as Deployment
+    set:
+      puppetserver.compilers.enabled: true
+      puppetserver.compilers.kind: Deployment
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim

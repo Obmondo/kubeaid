@@ -1,0 +1,7 @@
+apiVersion: v2
+name: puppetserver
+version: 1.0.0
+dependencies:
+  - name: puppetserver
+    version: 9.1.0
+    repository: https://puppetlabs.github.io/puppetserver-helm-chart
