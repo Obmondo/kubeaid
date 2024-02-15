@@ -1,0 +1,35 @@
+puppetserver:
+  name: puppetserver
+  image: ghcr.io/voxpupuli/container-puppetserver
+  tag: 7.13.0
+  ingress:
+    enabled: true
+    hosts:
+      - puppet.kbm.obmondo.com
+    tls:
+      - secretName: puppet-kbm-obmondo-com
+        hosts:
+          - puppet.kbm.obmondo.com
+
+puppetdb:
+  enabled: true
+  name: puppetdb
+  image: ghcr.io/voxpupuli/container-puppetdb
+  tag: 7.14.0
+  postgresql:
+    enabled: false
+
+puppetboard:
+  enabled: false
+  name: puppetboard
+  image: ghcr.io/voxpupuli/puppetboard
+  tag: 4.2.5
+
+postgresql:
+    host: oncall-pgsql-rw
+    port: 5432
+    db_name: oncall
+    user: oncall
+    existingSecret: oncall-pgsql-app
+    passwordKey: password
+
