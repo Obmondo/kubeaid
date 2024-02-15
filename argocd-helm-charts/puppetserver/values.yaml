@@ -1,26 +1,23 @@
-
 fullnameOverride: puppetstack
+nameOverride: puppetstack
 
 puppetserver:
   name: puppetserver
   image: ghcr.io/voxpupuli/container-puppetserver
   tag: 7.13.0
   ingress:
-    enabled: true
-    hosts:
-      - puppet.kbm.obmondo.com
-    tls:
-      - secretName: puppet-kbm-obmondo-com
-        hosts:
-          - puppet.kbm.obmondo.com
+    enabled: false
+
+postgresql:
+  enabled: false
 
 puppetdb:
   enabled: true
   name: puppetdb
   image: ghcr.io/voxpupuli/container-puppetdb
   tag: 7.14.0
-  postgresql:
-    enabled: false
+  extraEnv:
+    PUPPETDB_POSTGRES_HOSTNAME: puppet-pgsql-rw
 
 puppetboard:
   enabled: false
