@@ -1,3 +1,6 @@
+
+fullnameOverride: puppetstack
+
 puppetserver:
   name: puppetserver
   image: ghcr.io/voxpupuli/container-puppetserver
