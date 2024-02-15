@@ -2,20 +2,20 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   {{ if .Values.postgresql.recover }}
-  name: postgresql-pgsql-recover
+  name: puppet-pgsql-recover
   {{ else }}
-  name: postgresql-pgsql
+  name: puppet-pgsql
   {{ end }}
 spec:
   instances: {{ ((.Values.postgresql).instance) | default 1 }}
   {{ if .Values.postgresql.recover }}
   bootstrap:
-    recovery: postgresql-pgsql
+    recovery: puppet-pgsql
   {{ else }}
   bootstrap:
     initdb:
-      database: postgresql
-      owner: postgresql
+      database: puppetdb
+      owner: puppetdb
   {{ end }}
   resources:
     limits:
