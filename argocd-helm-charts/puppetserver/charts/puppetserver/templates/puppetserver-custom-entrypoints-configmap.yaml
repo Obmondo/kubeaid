@@ -1,0 +1,14 @@
+{{- if .Values.puppetserver.customentrypoints.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "puppetserver.fullname" . }}-customentrypoints
+  labels:
+    {{- include "puppetserver.puppetserver.labels" . | nindent 4 }}
+    {{- with .Values.puppetserver.masters.extraLabels }}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+data:
+{{- toYaml .Values.puppetserver.customentrypoints.configmaps | nindent 2 }}
+{{- end }}
+

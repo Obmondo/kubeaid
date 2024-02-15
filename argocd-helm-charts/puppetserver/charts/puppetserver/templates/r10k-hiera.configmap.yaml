@@ -1,0 +1,61 @@
+{{- if (include "hiera.enable" .) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "puppetserver.fullname" . }}-r10k-hiera-config
+  labels:
+    {{- include "puppetserver.r10k.labels" . | nindent 4 }}
+data:
+  r10k_hiera.yaml: |
+    # The location to use for storing cached Git repos
+    :cachedir: '/etc/puppetlabs/code/r10k_cache'
+    {{- if .Values.r10k.hiera.extraSettings }}
+    {{- toYaml .Values.r10k.hiera.extraSettings | nindent 4 }}
+    {{- end }}
+    # A list of git repositories to create
+    :sources:
+      {{- if .Values.hiera.hieradataurl }}
+      # This will clone the git repository and instantiate an environment per
+      # branch in '/etc/puppetlabs/code/hiera-data'
+      :hiera_repo:
+        remote: '{{ .Values.hiera.hieradataurl }}'
+        basedir: '/etc/puppetlabs/code/hiera-data'
+        {{- if .Values.r10k.hiera.defaultRepoExtraConf }}
+        {{- toYaml .Values.r10k.hiera.defaultRepoExtraConf | nindent 8 }}
+        {{- end }}
+      {{- end }}
+      {{- if .Values.r10k.hiera.extraRepository }}
+      {{- toYaml .Values.r10k.hiera.extraRepository | nindent 6 }}
+      {{- end }}
+
+  r10k_hiera_cronjob.sh: |
+    #!/usr/bin/env sh
+    {{- if .Values.r10k.hiera.cronJob.splay }}
+    sleep $(( RANDOM % {{ int .Values.r10k.hiera.cronJob.splayLimit }} ))
+    {{- end }}
+    {{ with .Values.r10k.hiera.cronJob.timeout }}timeout -s 9 {{ int . }} {{ end }}/docker-entrypoint.sh deploy environment --config /etc/puppetlabs/puppet/r10k_hiera.yaml \
+    --puppetfile {{ template "r10k.hiera.args" . }} > ~/.r10k_hiera_cronjob.out 2>&1
+    retVal=$?
+    if [ "$retVal" -eq "0" ]; then
+      touch {{ .Values.r10k.hiera.cronJob.successFile }} > /dev/null 2>&1
+    else
+      rm {{ .Values.r10k.hiera.cronJob.successFile }} > /dev/null 2>&1
+    fi
+    exit $retVal
+
+  r10k_hiera_entrypoint.sh: |
+    #!/usr/bin/env sh
+    set -e
+    {{- if .Values.r10k.hiera.cronJob.enabled }}
+    cat > ~/.r10k_hiera_crontab <<'EOF'
+    {{ .Values.r10k.hiera.cronJob.schedule }} /bin/sh -c /etc/puppetlabs/puppet/r10k_hiera_cronjob.sh
+    EOF
+    tail -Fq ~/.r10k_hiera_cronjob.out &
+    {{- end }}
+    touch {{ .Values.r10k.hiera.cronJob.successFile }} > /dev/null 2>&1
+    {{- if .Values.r10k.hiera.cronJob.enabled }}
+    exec supercronic ~/.r10k_hiera_crontab
+    {{- else}}
+    tail -f /dev/null
+    {{- end }}
+{{- end }}

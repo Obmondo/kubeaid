@@ -1,0 +1,13 @@
+{{- if .Values.metrics.prometheus.jmx.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "puppetserver.fullname" . }}-jmx-config
+  labels:
+    {{- include "puppetserver.puppetserver.labels" . | nindent 4 }}
+    {{- include "puppetserver.puppetserver-compilers.labels" . | nindent 4 }}
+data:
+  jmx_exporter.yaml: |-
+    {{ .Values.metrics.prometheus.jmx.config | nindent 4 }}
+{{- end }}
+

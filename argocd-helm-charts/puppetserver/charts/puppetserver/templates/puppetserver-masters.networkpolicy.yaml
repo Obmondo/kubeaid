@@ -1,0 +1,57 @@
+{{- if .Values.puppetserver.masters.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ template "puppetserver.fullname" . }}-puppetserver
+  labels:
+    {{- include "puppetserver.puppetserver.labels" . | nindent 4 }}
+    {{- with .Values.puppetserver.masters.extraLabels }}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "puppetserver.puppetserver.matchLabels" . | nindent 6 }}
+  policyTypes:
+    {{- toYaml .Values.puppetserver.masters.networkPolicy.policyTypes | nindent 4 }}
+  ingress:
+    # Needed for the initial cert generation & puppetdb initContainer
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: "{{ .Values.puppetserver.name }}"
+      ports:
+        - port: 8140
+    {{- if .Values.puppetserver.masters.networkPolicy.additionnalIngressRules }}
+    {{- toYaml .Values.puppetserver.masters.networkPolicy.additionnalIngressRules | nindent 4 }}
+    {{- end }}
+  egress:
+    # needed to resolve kubernetes dns query
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: kube-system
+        podSelector:
+          matchLabels:
+            k8s-app: kube-dns
+      ports:
+      - protocol: TCP
+        port: 53
+      - protocol: UDP
+        port: 53
+    # needed to resolve external dns query ( like proxy )
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 53
+    - to:
+      - podSelector:
+          matchLabels:
+            {{- include "puppetserver.puppetdb.matchLabels" . | nindent 12 }}
+      ports:
+        - port: 8081
+    {{- if .Values.puppetserver.masters.networkPolicy.additionnalEgressRules }}
+    {{- toYaml .Values.puppetserver.masters.networkPolicy.additionnalEgressRules | nindent 4 }}
+    {{- end }}
+{{- end }}

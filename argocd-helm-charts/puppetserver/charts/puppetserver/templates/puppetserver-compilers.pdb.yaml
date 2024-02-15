@@ -1,0 +1,21 @@
+{{- if and .Values.puppetserver.compilers.enabled .Values.puppetserver.compilers.podDisruptionBudget.enabled (or ( and (gt ( int .Values.puppetserver.compilers.manualScaling.compilers ) 1) ( not .Values.puppetserver.compilers.autoScaling.enabled)) (and .Values.puppetserver.compilers.autoScaling.enabled (gt ( int .Values.puppetserver.compilers.autoScaling.minCompilers ) 1)))}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "puppetserver.fullname" . }}-compilers
+  labels:
+    {{- include "puppetserver.puppetserver-compilers.labels" . | nindent 4 }}
+    {{- with .Values.puppetserver.compilers.extraLabels }}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- with .Values.puppetserver.compilers.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ . }}
+  {{- end }}
+  {{- with .Values.puppetserver.compilers.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ . }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "puppetserver.puppetserver-compilers.matchLabels" . | nindent 6 }}
+{{- end }}

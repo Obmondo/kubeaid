@@ -1,0 +1,21 @@
+{{- if and .Values.puppetserver.masters.podDisruptionBudget.enabled .Values.puppetserver.masters.multiMasters.enabled (or ( and (gt ( int .Values.puppetserver.masters.multiMasters.manualScaling.masters ) 1) ( not .Values.puppetserver.masters.multiMasters.autoScaling.enabled)) (and .Values.puppetserver.masters.multiMasters.autoScaling.enabled (gt ( int .Values.puppetserver.masters.multiMasters.autoScaling.minMasters ) 1)))}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "puppetserver.fullname" . }}-masters
+  labels:
+    {{- include "puppetserver.puppetserver.labels" . | nindent 4 }}
+    {{- with .Values.puppetserver.masters.extraLabels }}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- with .Values.puppetserver.masters.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ . }}
+  {{- end }}
+  {{- with .Values.puppetserver.masters.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ . }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "puppetserver.puppetserver.matchLabels" . | nindent 6 }}
+{{- end }}
