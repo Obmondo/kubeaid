@@ -40,9 +40,9 @@ rules:
     - update
     - patch
 - apiGroups:
-    - postgresql.cnpg.io 
+    - postgresql.cnpg.io
   resources:
-    - clusters 
+    - clusters
   verbs:
     - '*'
 - apiGroups:
@@ -51,6 +51,9 @@ rules:
     - middlewares
   verbs:
     - get
+    - patch
+    - list
+    - watch
     - create
     - delete
 - apiGroups:
