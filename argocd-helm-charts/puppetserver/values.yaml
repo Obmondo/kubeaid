@@ -1,37 +1,38 @@
-fullnameOverride: puppetstack
-nameOverride: puppetstack
-
 puppetserver:
-  name: puppetserver
-  image: ghcr.io/voxpupuli/container-puppetserver
-  tag: 7.13.0
-  ingress:
+  fullnameOverride: puppetstack
+  nameOverride: puppetstack
+
+  puppetserver:
+    name: puppetserver
+    image: ghcr.io/voxpupuli/container-puppetserver
+    tag: 7.13.0
+    ingress:
+      enabled: false
+
+  postgresql:
     enabled: false
 
-postgresql:
-  enabled: false
+  puppetdb:
+    enabled: true
+    name: puppetdb
+    image: ghcr.io/voxpupuli/container-puppetdb
+    tag: 7.14.0
+    extraEnv:
+      PUPPETDB_POSTGRES_HOSTNAME: puppet-pgsql-rw
 
-puppetdb:
-  enabled: true
-  name: puppetdb
-  image: ghcr.io/voxpupuli/container-puppetdb
-  tag: 7.14.0
-  extraEnv:
-    PUPPETDB_POSTGRES_HOSTNAME: puppet-pgsql-rw
+  puppetboard:
+    enabled: false
+    name: puppetboard
+    image: ghcr.io/voxpupuli/puppetboard
+    tag: 4.2.5
 
-puppetboard:
-  enabled: false
-  name: puppetboard
-  image: ghcr.io/voxpupuli/puppetboard
-  tag: 4.2.5
-
-global:
-  postgresql:
-    auth:
-      existingSecret: puppet-pgsql-app
-      secretKeys:
-        usernameKey: username
-        userPasswordKey: password
+  global:
+    postgresql:
+      auth:
+        existingSecret: puppet-pgsql-app
+        secretKeys:
+          usernameKey: username
+          userPasswordKey: password
 
 postgresql:
   instance: 1
