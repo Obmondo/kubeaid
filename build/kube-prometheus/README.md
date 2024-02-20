@@ -162,6 +162,25 @@ jsonnet -e '(import "mixin.libsonnet").prometheusAlerts' | gojsontoyaml > promet
 ```
 kubectl apply -f <path to alert rules file>.yaml -n monitoring
 ```
+
+## Deleting metrics using Prometheus Admin APIs
+
+* Port forward the prometheus server to access the UI and the api endpoints.
+```
+kubectl port-forward pod/prometheus-k8s-0 -n monitoring 9090:9090
+```
+
+* The web.enable-admin-api flag should be enabled. You can check this in the Prometheus UI.
+```
+http://localhost:9090/rules
+```
+
+* Delete the metrics by hitting the `/api/v1/admin/tsdb/delete_series?match[]=` endpoint.
+```
+curl -X POST -g 'http://localhost:9090/api/v1/admin/tsdb/delete_series?match[]=ceph_pool_metadata{job="job"}'
+```
+Note that this does not delete the metrics instantly. You can check [here](https://faun.pub/how-to-drop-and-delete-metrics-in-prometheus-7f5e6911fb33) for more details.
+
 ## Adding Support for Custom Dashboards in Grafana
 
 ### To add custom Grafana dashboards to Grafana via GitOps:
