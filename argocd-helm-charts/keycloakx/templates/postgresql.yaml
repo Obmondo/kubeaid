@@ -8,7 +8,6 @@ spec:
   enableMasterLoadBalancer: false
   enableLogicalBackup: {{ .Values.postgresql.enableLogicalBackup }}
   numberOfInstances: {{ ((.Values.postgresql).instance) | default 1 }}
-  podAnnotations: {{ .Values.postgresql.podAnnotations | toYaml | nindent 4 }}
   postgresql:
     version: "12"
   teamId: keycloakx

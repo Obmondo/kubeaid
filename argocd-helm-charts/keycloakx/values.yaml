@@ -51,5 +51,3 @@ keycloakx:
 postgresql:
   size: 4Gi
   enableLogicalBackup: true
-  podAnnotations:
-    backup.velero.io/backup-volumes-excludes: "pgdata-keycloakx-pgsql-0"
