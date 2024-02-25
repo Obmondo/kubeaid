@@ -314,7 +314,7 @@ local timeSeries = import 'timeseries_panel.libsonnet';
                        '$datasource')
     .addTargets(
       [$.addTargetSchema(expr, legendFormat)]
-    ) + { gridPos: { x: x, y: y, w: w, h: h } },
+    ) + { type: 'timeseries' } + { fieldConfig: { defaults: { unit: formatY1, custom: { fillOpacity: 8, showPoints: 'never' } } } } + { gridPos: { x: x, y: y, w: w, h: h } },
 
   simpleSingleStatPanel(format,
                         title,
@@ -523,6 +523,16 @@ local timeSeries = import 'timeseries_panel.libsonnet';
       gridPos: gridPosition,
       maxDataPoints: maxDataPoints,
       interval: interval,
+    },
+
+  addBarGaugePanel(title='',
+                   description='',
+                   datasource='${DS_PROMETHEUS}',
+                   gridPosition={},
+                   unit='percentunit',
+                   thresholds={})::
+    g.barGaugePanel.new(title, description, datasource, unit, thresholds) + {
+      gridPos: gridPosition,
     },
   addTableExtended(
     title='',
