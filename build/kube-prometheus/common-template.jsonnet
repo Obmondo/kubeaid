@@ -76,6 +76,9 @@ local default_vars = {
   grafana_ingress_annotations: {
     'cert-manager.io/cluster-issuer': 'letsencrypt',
   },
+  prometheus_ingress_annotations: {
+    'cert-manager.io/cluster-issuer': 'letsencrypt',
+  },
   addMixins: {
     ceph: true,
     'argo-cd': true,
@@ -223,6 +226,7 @@ local kp =
     prometheus+: {
       prometheus+: {
         spec+: {
+          externalUrl: 'https://' + vars.prometheus_ingress_host,
           replicas: 1,
           resources: vars.prometheus_resources,
           retention: vars.prometheus.retention,
@@ -538,9 +542,9 @@ local kp =
   ) + (
     if std.objectHas(vars, 'prometheus_ingress_host') then
       {
-        ingress+: {
+        ingress+:: {
           prometheus: utils.ingress(
-            'prometheus',
+            'prometheus-k8s',
             $.values.common.namespace,
             [{
               host: vars.prometheus_ingress_host,
@@ -560,17 +564,16 @@ local kp =
               },
             }],
             [{
-              secretName: 'kube-prometheus-tls',
+              secretName: 'kube-prometheus-prometheus-tls',
               hosts: [
                 vars.prometheus_ingress_host,
               ],
             }],
-            vars.prometheus_ingres_annotations,
+            vars.prometheus_ingress_annotations,
           ),
         },
       } else {}
   );
-
 
 {
   'setup/0namespace-namespace': kp.kubePrometheus.namespace +
