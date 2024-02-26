@@ -2,6 +2,8 @@ apiVersion: acid.zalan.do/v1
 kind: postgresql
 metadata:
   name: keycloakx-pgsql
+  labels:
+    velero.io/exclude-from-backup: true
 spec:
   databases:
     keycloak: keycloak
