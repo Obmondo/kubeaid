@@ -6,7 +6,7 @@
   prometheusAlerts+:: {
     groups+: [
       {
-        name: 'argoCD-sync-state',
+        name: 'argocd-sync-state',
         rules: [
           {
             alert: 'WhiteListedApplicationOutOfSync',
@@ -30,7 +30,7 @@
               alert_id: 'CronSyncFailed',
             },
             annotations: {
-              description: 'ArgoCD WhiteListed Application **{{ Labels.argocd_application_name }}**/**{{ Labels.application_namespace }}** sync failed.',
+              description: 'Argo CD WhiteListed Application **{{ Labels.argocd_application_name }}**/**{{ Labels.application_namespace }}** sync failed.',
               summary: 'The application**{{ Labels.argocd_application_name }}**/**{{ Labels.application_namespace }}** has been out of sync for more than 15 minutes.',
             },
           },
