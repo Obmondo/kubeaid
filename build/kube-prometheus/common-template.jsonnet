@@ -226,7 +226,9 @@ local kp =
     prometheus+: {
       prometheus+: {
         spec+: {
-          externalUrl: 'https://' + vars.prometheus_ingress_host,
+          externalUrl: if std.objectHas(vars, 'prometheus_ingress_host') then (
+            'https://' + vars.prometheus_ingress_host
+          ) else {},
           replicas: 1,
           resources: vars.prometheus_resources,
           retention: vars.prometheus.retention,
