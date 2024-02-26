@@ -76,6 +76,9 @@ local default_vars = {
   grafana_ingress_annotations: {
     'cert-manager.io/cluster-issuer': 'letsencrypt',
   },
+  prometheus_ingress_annotations: {
+    'cert-manager.io/cluster-issuer': 'letsencrypt',
+  },
   addMixins: {
     ceph: true,
     'argo-cd': true,
@@ -223,6 +226,9 @@ local kp =
     prometheus+: {
       prometheus+: {
         spec+: {
+          externalUrl: if std.objectHas(vars, 'prometheus_ingress_host') then (
+            'https://' + vars.prometheus_ingress_host
+          ) else {},
           replicas: 1,
           resources: vars.prometheus_resources,
           retention: vars.prometheus.retention,
@@ -535,8 +541,41 @@ local kp =
           ),
         },
       } else {}
+  ) + (
+    if std.objectHas(vars, 'prometheus_ingress_host') then
+      {
+        ingress+:: {
+          prometheus: utils.ingress(
+            'prometheus-k8s',
+            $.values.common.namespace,
+            [{
+              host: vars.prometheus_ingress_host,
+              http: {
+                paths: [{
+                  path: '/',
+                  pathType: 'Prefix',
+                  backend: {
+                    service: {
+                      name: 'prometheus-k8s',
+                      port: {
+                        name: 'web',
+                      },
+                    },
+                  },
+                }],
+              },
+            }],
+            [{
+              secretName: 'kube-prometheus-prometheus-tls',
+              hosts: [
+                vars.prometheus_ingress_host,
+              ],
+            }],
+            vars.prometheus_ingress_annotations,
+          ),
+        },
+      } else {}
   );
-
 
 {
   'setup/0namespace-namespace': kp.kubePrometheus.namespace +
@@ -614,6 +653,7 @@ local kp =
     for name in std.objectFields(kp.prometheusAdapter)
   } else {}
 ) +
-(if std.objectHas(vars, 'grafana_ingress_host') then { [name + '-ingress']: kp.ingress[name] for name in std.objectFields(kp.ingress) } else {})
+(if std.objectHas(vars, 'grafana_ingress_host') then { [name + '-ingress']: kp.ingress[name] for name in std.objectFields(kp.ingress) } else {}) +
+(if std.objectHas(vars, 'prometheus_ingress_host') then { [name + '-ingress']: kp.ingress[name] for name in std.objectFields(kp.ingress) } else {}) +
 // Rendering prometheusRules object. This is an object compatible with prometheus-operator CRD definition for prometheusRule
-+ { [o._config.name + '-prometheus-rules']: o.prometheusRules for o in std.filter((function(o) o.prometheusRules != null), mixins) }
+{ [o._config.name + '-prometheus-rules']: o.prometheusRules for o in std.filter((function(o) o.prometheusRules != null), mixins) }
