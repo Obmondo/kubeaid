@@ -78,6 +78,7 @@ local default_vars = {
   },
   addMixins: {
     ceph: true,
+    'argo-cd': true,
     sealedsecrets: true,
     etcd: true,
     velero: false,
@@ -88,7 +89,7 @@ local default_vars = {
     // gitea/EnableIT/internal/issues/21
     'node-count-monthly-status': false,
     'node-memory': true,
-    'argoCD-sync-state': true,
+    'argo-cd-sync-state': true,
   },
   mixin_configs: {
     // Example:
@@ -136,13 +137,18 @@ local mixins = remove_nulls([
     vars,
   ),
   addMixin(
-    'argoCD-sync-state',
-    (import 'mixins/argocd-sync/mixin.libsonnet'),
+    'cert-manager',
+    (import 'gitlab.com/uneeq-oss/cert-manager-mixin/mixin.libsonnet'),
     vars,
   ),
   addMixin(
-    'cert-manager',
-    (import 'gitlab.com/uneeq-oss/cert-manager-mixin/mixin.libsonnet'),
+    'argo-cd',
+    (import 'github.com/adinhodovic/argo-cd-mixin/mixin.libsonnet'),
+    vars,
+  ),
+  addMixin(
+    'argo-cd-sync-state',
+    (import 'mixins/argo-cd-sync/mixin.libsonnet'),
     vars,
   ),
   addMixin(

@@ -1,0 +1,5 @@
+exclusions:
+ template-job-rule:
+ panel-job-instance-rule:
+ target-rate-interval-rule:
+ panel-datasource-rule:
