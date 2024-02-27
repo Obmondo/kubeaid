@@ -4,15 +4,6 @@
     {
       "source": {
         "git": {
-          "remote": "https://github.com/adinhodovic/argo-cd-mixin.git",
-          "subdir": ""
-        }
-      },
-      "version": "main"
-    },
-    {
-      "source": {
-        "git": {
           "remote": "https://github.com/bitnami-labs/sealed-secrets.git",
           "subdir": "contrib/prometheus-mixin"
         }
