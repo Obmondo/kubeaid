@@ -243,6 +243,7 @@ local kp =
               },
             },
           },
+          ruleNamespaceSelector: null,
         },
       },
       networkPolicy+: {
