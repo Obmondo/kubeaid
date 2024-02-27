@@ -133,11 +133,10 @@ function build_for_tag() {
 
   jb init
   jb_install kube-prometheus "github.com/prometheus-operator/kube-prometheus/jsonnet/kube-prometheus@${kube_prometheus_release_tag}"
-  jb_install prometheus-mixin github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin@main
+  jb_install prometheus-mixin "github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin@main"
   jb_install ceph-mixins "github.com/ceph/ceph/monitoring/ceph-mixin@main"
   jb_install cert-manager-mixin "gitlab.com/uneeq-oss/cert-manager-mixin@master"
   jb_install opensearch-mixin "github.com/grafana/jsonnet-libs/opensearch-mixin@master"
-  jb_install argo-cd-mixin "github.com/adinhodovic/argo-cd-mixin@main"
 
   mkdir -p "${basedir}/libraries/${kube_prometheus_release_tag}"
   mv vendor "${basedir}/libraries/${kube_prometheus_release_tag}/"
