@@ -4,6 +4,8 @@ kind: postgresql
 metadata:
   name: teamname-postgresql
   namespace: sonarqube
+  labels:
+    velero.io/exclude-from-backup: "true"
 spec:
   teamId: teamname
   volume:

@@ -9,6 +9,8 @@ postgres-operator:
     # default is set to true
     # https://github.com/zalando/postgres-operator/pull/583/files
     enable_pod_disruption_budget: true
+    inherited_labels:
+    - "velero.io/exclude-from-backup"
   securityContext:
     runAsUser: 1000
     runAsNonRoot: true

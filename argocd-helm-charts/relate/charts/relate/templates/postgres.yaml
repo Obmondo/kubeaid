@@ -3,6 +3,8 @@ kind: postgresql
 metadata:
   name: obmondo-postgresql
   namespace: relate
+  labels:
+    velero.io/exclude-from-backup: "true"
 spec:
   enableLogicalBackup: {{ .Values.postgresql.logicalBackup | default "true" }}
   teamId: obmondo
