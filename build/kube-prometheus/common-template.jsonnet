@@ -243,6 +243,11 @@ local kp =
               },
             },
           },
+          ruleNamespaceSelector: {
+            matchNames: [
+              'monitoring',
+            ]
+          },
         },
       },
       networkPolicy+: {
