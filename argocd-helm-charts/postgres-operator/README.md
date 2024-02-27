@@ -193,6 +193,8 @@ So that postgres-operator will use that to manage the instance
   kind: postgresql
   metadata:
     name: keycloakx-pgsql
+    labels:
+      velero.io/exclude-from-backup: "true"
   spec:
   env:
   - name: AWS_SECRET_ACCESS_KEY
