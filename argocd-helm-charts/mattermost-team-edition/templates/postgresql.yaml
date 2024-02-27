@@ -2,6 +2,8 @@ apiVersion: acid.zalan.do/v1
 kind: postgresql
 metadata:
   name: mattermost-pgsql
+  labels:
+    velero.io/exclude-from-backup: "true"
 spec:
   enableLogicalBackup: {{ .Values.postgresql.logicalBackup | default "true" }}
   env:

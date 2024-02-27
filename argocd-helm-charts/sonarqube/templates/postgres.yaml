@@ -3,6 +3,8 @@ kind: postgresql
 metadata:
   name: sonarqube-pgsql
   namespace: sonarqube
+  labels:
+    velero.io/exclude-from-backup: "true"
 spec:
   enableLogicalBackup: {{ .Values.postgresql.logicalBackup | default "true" }}
   env:
