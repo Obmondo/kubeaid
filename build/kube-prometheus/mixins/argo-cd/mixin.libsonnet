@@ -34,6 +34,31 @@
               summary: 'The application**{{ Labels.argocd_application_name }}**/**{{ Labels.application_namespace }}** has been out of sync for more than 15 minutes.',
             },
           },
+          // Inspiration from here https://github.com/adinhodovic/argo-cd-mixin/blob/main/alerts/alerts.libsonnet
+          {
+            alert: 'ArgoCdAppOutOfSync',
+            expr: 'sum by (job, dest_server, project, sync_status) (argocd_app_info{job=~".*",sync_status!="Synced"}) >= 1',
+            labels: {
+              severity: 'warning',
+            },
+            'for': '15m',
+            annotations: {
+              summary: 'ArgoCD Application is Out Of Sync.',
+              description: 'Multiple application under {{ $labels.project }} is out of sync with the sync status {{ $labels.sync_status }} for the past 15m',
+            },
+          },
+          {
+            alert: 'ArgoCdAppUnhealthy',
+            expr: 'sum by (job, project, dest_server, health_status) (argocd_app_info{health_status!~"Healthy|Progressing"}) >= 1',
+            labels: {
+              severity: 'warning',
+            },
+            'for': '15m',
+            annotations: {
+              summary: 'ArgoCD Application is not healthy.',
+              description: 'Multiple application under {{ $labels.project }} is not healthy with the health status {{ $labels.health_status }} for the past 15m',
+            },
+          },
         ],
       },
     ],

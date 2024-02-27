@@ -146,12 +146,7 @@ local mixins = remove_nulls([
   ),
   addMixin(
     'argo-cd',
-    (import 'github.com/adinhodovic/argo-cd-mixin/mixin.libsonnet'),
-    vars,
-  ),
-  addMixin(
-    'argo-cd-sync-state',
-    (import 'mixins/argo-cd-sync/mixin.libsonnet'),
+    (import 'mixins/argo-cd/mixin.libsonnet'),
     vars,
   ),
   addMixin(
