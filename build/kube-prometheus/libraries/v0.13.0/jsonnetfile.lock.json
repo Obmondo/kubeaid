@@ -4,21 +4,11 @@
     {
       "source": {
         "git": {
-          "remote": "https://github.com/adinhodovic/argo-cd-mixin.git",
-          "subdir": ""
-        }
-      },
-      "version": "3733302a12ec49d71b10f9e094fb1ad76589d8e1",
-      "sum": "22XLGeGbsO5nEZ6ZDpntqzkfjDJ2ZsUfXR7xLkuc1Rg="
-    },
-    {
-      "source": {
-        "git": {
           "remote": "https://github.com/bitnami-labs/sealed-secrets.git",
           "subdir": "contrib/prometheus-mixin"
         }
       },
-      "version": "38c2a6e93686e8e5fdf294755c4e4f7ae67c0630",
+      "version": "b47834d4d82463afe5bf6a3863e83f4eb28bc7bb",
       "sum": "uqhnRGEja2PfXTtsHkmbcrc8Wr0oox9xZKPP6zYXsJE="
     },
     {
@@ -38,7 +28,7 @@
           "subdir": "monitoring/ceph-mixin"
         }
       },
-      "version": "9dd5232c2eec43384afdff0fcef105d20c1c0e33",
+      "version": "b11e6e21f7271bc622c662de6f6c148d6da5c6fb",
       "sum": "ZnyCIu25NBI6Q3Ru7QK1DHf7DBMEURSMQdEJXzCyIgA="
     },
     {
@@ -85,16 +75,6 @@
       "source": {
         "git": {
           "remote": "https://github.com/grafana/grafonnet.git",
-          "subdir": "gen/grafonnet-latest"
-        }
-      },
-      "version": "fe65a22df6d3a897729fff47cff599805a2c5710",
-      "sum": "mDHkB1avJU5IqvwCsXPmPt8pSiGjupLVqx3zCgFKzbw="
-    },
-    {
-      "source": {
-        "git": {
-          "remote": "https://github.com/grafana/grafonnet.git",
           "subdir": "gen/grafonnet-v10.0.0"
         }
       },
@@ -104,21 +84,11 @@
     {
       "source": {
         "git": {
-          "remote": "https://github.com/grafana/grafonnet.git",
-          "subdir": "gen/grafonnet-v10.2.0"
-        }
-      },
-      "version": "fe65a22df6d3a897729fff47cff599805a2c5710",
-      "sum": "9xwtVj7WmdsFWoQ5CTcvDBKEgIPnAF9DsD6dnKl3M/U="
-    },
-    {
-      "source": {
-        "git": {
           "remote": "https://github.com/grafana/jsonnet-libs.git",
           "subdir": "common-lib"
         }
       },
-      "version": "3e38892d0777c11bb7fe6fddba262e2bd732c6d0",
+      "version": "d235125fa89f4bdef7e1c279c1b692b90cb9babd",
       "sum": "9QuSLePtDrAYJJYiv6KcejPSD65eqh11jc4fXcgHYEU="
     },
     {
@@ -128,7 +98,7 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "3e38892d0777c11bb7fe6fddba262e2bd732c6d0",
+      "version": "d235125fa89f4bdef7e1c279c1b692b90cb9babd",
       "sum": "B49EzIY2WZsFxNMJcgRxE/gcZ9ltnS8pkOOV6Q5qioc="
     },
     {
@@ -138,7 +108,7 @@
           "subdir": "opensearch-mixin"
         }
       },
-      "version": "3e38892d0777c11bb7fe6fddba262e2bd732c6d0",
+      "version": "d235125fa89f4bdef7e1c279c1b692b90cb9babd",
       "sum": "sNR0fA29E0zYBx79NRrft4lfQawJ8R0A9HUUXCej3mA="
     },
     {
@@ -240,7 +210,7 @@
           "subdir": "docs/node-mixin"
         }
       },
-      "version": "3a02ab1cf051d2f80f3b688c977961033300fda3",
+      "version": "c371a7f582bf2b9a185fc51bd0d3e842937a8ab2",
       "sum": "PqPMf2Lqp7tW7T752kxdbMqF7JJ6vC8XrBN8WL5MMCc="
     },
     {
