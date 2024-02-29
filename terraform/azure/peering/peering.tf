@@ -29,6 +29,8 @@ resource "azurerm_virtual_network_peering" "peer2" {
   provider                  = azurerm.remotewg
 }
 
+# MC_xxx resource group is created by AKS automatically https://learn.microsoft.com/en-us/azure/aks/faq#why-are-two-resource-groups-created-with-aks
+
 resource "azurerm_private_dns_zone_virtual_network_link" "link_bastion_cluster" {
   name                  = "dnslink-wg-cluster"
   private_dns_zone_name = var.private_dns_zone_name

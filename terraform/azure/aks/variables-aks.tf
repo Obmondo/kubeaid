@@ -35,6 +35,12 @@ variable "vnet_name" {
   description = "Virtual network name"
 }
 
+variable "private_subnet_name" {
+  default = "aks-private-subnet"
+  type = string
+  description = "Private Subnet used for private endpoint"
+}
+
 variable "subnet_name" {
   default = "aks-default-subnet"
   type = string
@@ -233,4 +239,34 @@ variable "environment" {
   description = "Name of environment"
   type        = string
   default     = "dev"
+}
+
+
+variable "backp_bucket_name" {
+  type = string
+  default = "420241backup"
+}
+
+variable "endpoint_subnet_prefixes" {
+  type = string
+  default = "10.229.128.0/17"
+}
+
+# Private endpoint
+
+variable "private_dns_zone_ids" {
+  description = "ID of the private dns zone"
+  type = list(string)
+  default     = null
+}
+
+variable "ext_dns_subscription_id" {
+  description = "Subscription ID of the external account where DNS zone is created"
+  type        = string
+  default     = null
+}
+variable "ext_dns_subs_resource_group" {
+  description = "Resource Group Name of the external account where DNS zone is created"
+  type        = string
+  default     = null 
 }
