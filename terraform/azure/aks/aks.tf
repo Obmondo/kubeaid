@@ -8,6 +8,12 @@ data "azurerm_virtual_network" "ext_vnet" {
   resource_group_name = var.ext_vnet_resource_group
 }
 
+provider "azurerm" {
+  subscription_id = var.ext_dns_subscription_id
+  features {}
+  alias = "externalsubs"
+  skip_provider_registration = true
+}
 
 # Create Virtual Network
 resource "azurerm_virtual_network" "aksvnet" {
@@ -21,6 +27,8 @@ resource "azurerm_virtual_network" "aksvnet" {
 
 # Create a Subnet for AKS
 resource "azurerm_subnet" "aks-default" {
+  depends_on = [ azurerm_virtual_network.aksvnet ]
+
   count = var.vnet_subnet_id == null ? 1 : 0
 
   name                 = var.subnet_name
@@ -28,6 +36,68 @@ resource "azurerm_subnet" "aks-default" {
   resource_group_name  = var.resource_group
   address_prefixes     = [var.subnet_prefixes]
   service_endpoints    = var.service_endpoints
+}
+
+# Subnet for private endpoint
+resource "azurerm_subnet" "endpoint-subnet" {
+  depends_on = [ azurerm_virtual_network.aksvnet ]
+
+  count = var.private_dns_zone_ids != null ? 1 : 0
+
+  name                 = "private-endpoint-subnet"
+  virtual_network_name = azurerm_virtual_network.aksvnet[0].name
+  resource_group_name  = var.resource_group
+  address_prefixes     = [var.endpoint_subnet_prefixes]
+  enforce_private_link_endpoint_network_policies = true
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "link_private_dns" {
+  depends_on = [ azurerm_subnet.endpoint-subnet ]
+  count = var.private_dns_zone_ids != null ? 1 : 0
+
+  name                  = "private-endpoint-link"
+  resource_group_name   = var.ext_dns_subs_resource_group
+  private_dns_zone_name = "privatelink.blob.core.windows.net"
+  virtual_network_id    = azurerm_virtual_network.aksvnet[0].id
+  registration_enabled = true
+  provider = azurerm.externalsubs
+}
+# Create Private Endpoint for AKS storage account
+resource "azurerm_private_endpoint" "storage_account" {
+  count = var.private_dns_zone_ids != null ? 1 : 0
+
+  name                = "StorageAccountEndpoint"
+  location            = var.location
+  resource_group_name = var.resource_group
+  subnet_id           = azurerm_subnet.endpoint-subnet[count.index].id
+
+  private_service_connection {
+    name                           = "private-storage-blob"
+    private_connection_resource_id = azurerm_storage_account.cluster_backup[count.index].id
+    subresource_names              = ["blob"]
+    is_manual_connection           = false
+  }
+  
+  private_dns_zone_group {
+    name                 = "dns-zone-group"
+    private_dns_zone_ids =  var.private_dns_zone_ids
+  }
+}
+
+resource "azurerm_storage_account" "cluster_backup" {
+  count = var.private_dns_zone_ids != null ? 1 : 0
+
+  name                     = "${var.backp_bucket_name}"
+  resource_group_name      = var.resource_group
+  location                 = var.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  min_tls_version = "TLS1_2"
+  network_rules {
+    default_action             = "Deny"
+    ip_rules                   = []
+
+  }
 }
 
 # Create AKS cluster
