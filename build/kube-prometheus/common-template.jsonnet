@@ -20,7 +20,7 @@ local default_vars = {
     limits: { memory: '80Mi' },
     requests: { cpu: '20m', memory: '80Mi' },
   },
-  prometheus_operator_kubeRbacProxyMain_resources: {
+  prometheus_operator_kubeRbacProxy_resources: {
     limits: { memory: '40Mi' },
     requests: { cpu: '1m', memory: '40Mi' },
   },
@@ -390,8 +390,8 @@ local kp =
 
       prometheusOperator+: {
         resources: vars.prometheus_operator_resources,
-        kubeRbacProxyMain+: {
-          resources+: vars.prometheus_operator_kubeRbacProxyMain_resources,
+        kubeRbacProxy+: {
+          resources+: vars.prometheus_operator_kubeRbacProxy_resources,
         },
       },
       prometheusAdapter+: {
