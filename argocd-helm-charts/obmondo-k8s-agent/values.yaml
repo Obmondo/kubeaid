@@ -95,7 +95,7 @@ metrics:
     relabelings: []
     metricRelabelings: []
 
-networkPolicy: true
+networkPolicy: false
 
 ingress:
   enabled: false
