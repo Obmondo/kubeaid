@@ -1,5 +1,5 @@
 haproxy:
-  # This is necessary to clear the default ports. They cannpt be cleared in a
+  # This is necessary to clear the default ports. They cannot be cleared in a
   # cluster value file because of a bug in helm.
   # See https://github.com/helm/helm/issues/9027
   containerPorts:
