@@ -6,7 +6,7 @@ metadata:
   name: backup-sealed-secrets
 spec:
   concurrencyPolicy: Forbid
-  failedJobsHistoryLimit: 20
+  failedJobsHistoryLimit: 5
   jobTemplate:
     spec:
       template:
@@ -70,6 +70,6 @@ spec:
             name: scripts
   schedule: {{ .Values.backup.schedule | quote }}
   startingDeadlineSeconds: 180
-  successfulJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: 1
 ---
 {{ end }}
