@@ -14,7 +14,7 @@ local default_vars = {
     'argocd',
     'system',
     'cert-manager',
-    'traefik'
+    'traefik',
   ],
 
   prometheus_operator_resources: {
