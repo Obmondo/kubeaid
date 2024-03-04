@@ -17,7 +17,7 @@
               alert_id: 'WhiteListedApplicationOutOfSync',
             },
             annotations: {
-              description: 'The application **{{ Labels.argocd_application_name }}**/**{{ Labels.application_namespace }}** has been out of sync for more than 30 minutes.',
+              description: 'The application **{{ .Labels.argocd_application_name }}**/**{{ .Labels.application_namespace }}** has been out of sync for more than 30 minutes.',
               summary: 'Kubernetes version is close to end of support',
             },
           },
@@ -30,8 +30,8 @@
               alert_id: 'CronSyncFailed',
             },
             annotations: {
-              description: 'Argo CD WhiteListed Application **{{ Labels.argocd_application_name }}**/**{{ Labels.application_namespace }}** sync failed.',
-              summary: 'The application**{{ Labels.argocd_application_name }}**/**{{ Labels.application_namespace }}** has been out of sync for more than 15 minutes.',
+              description: 'Argo CD WhiteListed Application **{{ .Labels.argocd_application_name }}**/**{{ .Labels.application_namespace }}** sync failed.',
+              summary: 'The application**{{ .Labels.argocd_application_name }}**/**{{ .Labels.application_namespace }}** has been out of sync for more than 15 minutes.',
             },
           },
           // Inspiration from here https://github.com/adinhodovic/argo-cd-mixin/blob/main/alerts/alerts.libsonnet
@@ -44,7 +44,7 @@
             'for': '15m',
             annotations: {
               summary: 'ArgoCD Application is Out Of Sync.',
-              description: 'Multiple application under {{ $labels.project }} is out of sync with the sync status {{ $labels.sync_status }} for the past 15m',
+              description: 'Multiple application under {{ .Labels.project }} is out of sync with the sync status {{ .Labels.sync_status }} for the past 15m',
             },
           },
           {
@@ -56,7 +56,7 @@
             'for': '15m',
             annotations: {
               summary: 'ArgoCD Application is not healthy.',
-              description: 'Multiple application under {{ $labels.project }} is not healthy with the health status {{ $labels.health_status }} for the past 15m',
+              description: 'Multiple application under {{ .Labels.project }} is not healthy with the health status {{ .Labels.health_status }} for the past 15m',
             },
           },
         ],
