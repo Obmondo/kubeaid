@@ -33,5 +33,6 @@ cert-manager:
 issuer:
   enabled: false
   production: false
+  preferredChain: null
 networkpolicies: false
 enableCertificateOwnerRef: true
