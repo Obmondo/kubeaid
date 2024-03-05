@@ -6,7 +6,7 @@ metadata:
 spec:
   acme:
     email: {{ .Values.issuer.issuerEmail }}
-    preferredChain: ""
+    preferredChain: {{ .Values.issuer.preferredChain }}
     privateKeySecretRef:
       name: {{ .Values.issuer.secret }}
     {{- if .Values.issuer.production }}
