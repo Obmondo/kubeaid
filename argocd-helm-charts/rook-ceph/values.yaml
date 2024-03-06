@@ -169,8 +169,12 @@ rook-ceph-cluster:
           instances: 1
           priorityClassName: system-cluster-critical
         healthCheck:
-          bucket:
-            interval: 60s
+          startupProbe:
+            disabled: false
+          readinessProbe:
+            disabled: false
+            periodSeconds: 60
+            failureThreshold: 2
       storageClass:
         enabled: true
         name: ceph-bucket
