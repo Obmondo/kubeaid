@@ -1,0 +1,10 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: {{ .Values.ipaddresspool.name }}
+spec:
+  # A list of IP address ranges over which MetalLB has
+  # authority. You can list multiple ranges in a single pool, they
+  # will all share the same settings. Each range can be either a
+  # CIDR prefix, or an explicit start-end range of IPs.
+  addresses: {{ .Values.ipaddresspool.addresses }}
