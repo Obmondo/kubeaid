@@ -9,6 +9,65 @@
   helm template k8s/<clustername>/argocd-apps --show-only templates/root.yaml | kubectl apply -f -
   ```sh
 
+## How ArgoCD works with Helm
+
+Argocd generates kubernetes yaml objects, by running Helm template command on the chart, with the
+values files given in the Application. It then inserts those objects itself - so you CANNOT use Helm
+to operate on the cluster directly (and should not - since that is NOT a GitOPS way of working! - see
+guides on gitops)
+
+This means that to make something different in Kubernetes objects, you MUST do it, by ONLY modifying
+values files for charts.
+
+If a chart does not support what we need - ask your colleagues and consult upstream Chart maintainers
+(typically via github issues) to see if the feature we need has been asked about previously - and if
+not - if they would be interested in getting a PR for it. We DO NOT do changes, that upstream won't
+accept (as that would be the same as forking the project).
+
+## Tips on ArgoCD UI
+
+* out-of-sync does not mean missing necessarily. look at application diff (in compact view)
+* NEVER do force/replace on argocd (as that will KILL argocd - which means it won't finish)
+* argocd does NOT handle EVERYTHING in cluster. kops handles kube-proxy and everything else
+in kube-proxy namespace.ONLY Ashish and Klavs can run KOPS (until we find a fix) - on customer
+clouds
+
+## ArgoCD CLI
+
+* You can manage applications using argocd cli. Login into argocd server by installing argocd cli on
+your system.
+
+* To install ArgoCD CLI use
+
+```bash
+curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+rm argocd-linux-amd64
+```
+
+* To do login into argocd via CLI from your local desktop, you can use Kubernetes API server for
+authentication. To do so you need to simply log into the desired cluster you are working with via
+KubeConfig (at EnableIT we use Teleport to do this securely), then use the following commands
+
+```bash
+kubectl config set-context --current --namespace=argocd
+argocd login <argocd-server-url> --core
+```
+
+and happy hacking! you can modify the ArgoCD resources via argocd CLI itself.
+
+* [HACK] You can also get a shell of argocd server and use argocd inside the pod.
+To login into argocd on pod use the following command:
+
+    ```bash
+    argocd login <podname>:8080
+    ```
+
+    argocd-server-id is the id of argocd server pod. Default port is `8080`.
+
+* If you dont know the admin password for argocd ask the appropriate authority or the reset
+it in case it is unretrievable.
+
 ## Replace admin password
 
 * Run our script to do this:
@@ -157,3 +216,34 @@ kubectl apply -f argocdrepo-myreponame.yaml -n argocd
 * Verify your keycloak user roles and group memberships for your username by logging into the keycloak server from UI.
 * The URL for keycloak server would be https://keycloak.your.domain.com. Refer [Keycloak readme](../keycloak/README.md).
 * Check the `values-argo-cd.yaml` in the k8id-config repo for the k8s cluster. Match policy.csv with the roles in Keycloak
+
+## Development with ArgoCD and Helm chart
+
+To create a new application in ArgoCD using a Helm chart, we need to go through the following
+
+* Checkout a new feature branch from main branch of k8id repo
+* Create a folder inside `argocd-helm-charts` folder in the k8id repo (or the kubernetes-config-enableit repo)
+* Add your helm chart files inside the folder - e.g. Chart.yaml, values.yaml, etc
+* Using `helm template` command, verify the objects that would be created in the cluster
+* Execute `bin/helm-repo-update.sh` from the k8id repo to update the dependencies for the Helm chart.
+* If the objects are being generated correctly, then push the changes to the feature branch and create a Merge Request
+* To create a new application in ArgoCD (till v2.3), create a values-appName.yaml and templates/appName.yaml
+in the respective customer's k8id-config repo.
+* Add the above config related changes to a new branch and do an MR on the config repo.
+* Sync the root app in ArgoCD. AgroCD will create the application and it would show up as `Out of Sync`.
+* Sync the app so that ArgoCD fetches the files from the Helm chart and runs `helm template`. The yaml output of
+the command is sent to the k8s api to create the objects accordingly in the cluster.
+* Once the objects have been created, the app would be in `Healthy` state.
+* To make and test further changes, change the values in the Helm chart. Test using `helm template` as mentioned
+earlier and push the changes to feature branch. Sync the app again from ArgoCD to apply the changes.
+
+Link to detailed workflow : https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/readme.md
+
+## Links
+
+* Full docs on ArgoCD - see doc on Application CRD f.ex.
+https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#applications
+* ArgoCD application CRD spec - incl. description for every field:
+https://github.com/argoproj/argo-cd/blob/master/manifests/crds/application-crd.yaml
+* Article on devops and Argocd advanced usage
+https://itnext.io/level-up-your-argo-cd-game-with-applicationset-ccd874977c4c
