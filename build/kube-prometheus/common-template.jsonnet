@@ -314,6 +314,26 @@ local kp =
                 protocol: 'TCP',
               }],
             },
+            {
+              from: [
+                {
+                  namespaceSelector: {
+                    matchLabels: {
+                      'kubernetes.io/metadata.name': 'opencost',
+                    },
+                  },
+                  podSelector: {
+                    matchLabels: {
+                      'app.kubernetes.io/name': 'opencost',
+                    },
+                  },
+                },
+              ],
+              ports: [{
+                port: 9090,
+                protocol: 'TCP',
+              }],
+            },
           ] + (
             if vars.connect_keda then [{
               from: [
