@@ -50,6 +50,7 @@ This Helm chart is a lightweight way to configure and run our official
   - [How do I get multiple beats agents working with hostNetworking enabled?](#how-do-i-get-multiple-beats-agents-working-with-hostnetworking-enabled)
   - [How to change readinessProbe for outputs which don't support testing](#how-to-change-readinessprobe-for-outputs-which-dont-support-testing)
 - [Contributing](#contributing)
+- [Troubleshooting](#troubleshooting)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <!-- Use this to update TOC: -->
@@ -268,3 +269,14 @@ about our development and testing process.
 [tolerations]: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 [updateStrategy]: https://kubernetes.io/docs/tasks/manage-daemon/update-daemon-set/#daemonset-update-strategy
 [values.yaml]: https://github.com/elastic/helm-charts/tree/main/filebeat/values.yaml
+
+
+## Troubleshooting
+
+Sometimes, the pod may crashloop with the following error:
+
+```txt
+Exiting: cannot obtain lockfile: connot start, data directory belongs to process with pid 8
+```
+
+So you can delete the lockfile located at `data/filebeat.lock` by ssh'ing in the pod, this should fix the crashloop.
