@@ -279,4 +279,7 @@ Sometimes, the pod may crashloop with the following error:
 Exiting: cannot obtain lockfile: connot start, data directory belongs to process with pid 8
 ```
 
-So you can delete the lockfile located at `data/filebeat.lock` by ssh'ing in the pod, this should fix the crashloop.
+Sometimes, filebeat crashes unexpectedly and doesn't clean up the lockfile. For solving this follow the steps below:
+
+- make sure that the filebeat instance is not running on the node
+- then you can delete the lockfile located at `data/filebeat.lock` by ssh'ing in the pod
