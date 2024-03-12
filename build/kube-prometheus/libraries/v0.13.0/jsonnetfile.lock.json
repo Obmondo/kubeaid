@@ -4,6 +4,16 @@
     {
       "source": {
         "git": {
+          "remote": "https://github.com/adinhodovic/rabbitmq-mixin.git",
+          "subdir": ""
+        }
+      },
+      "version": "1e8ded5f04a03972c1faa52dd19265a86ad9cb7f",
+      "sum": "cUjGIAbkyn2GhL6fQlvEBMmlsLqkxWLQk0gwJfDVMLY="
+    },
+    {
+      "source": {
+        "git": {
           "remote": "https://github.com/bitnami-labs/sealed-secrets.git",
           "subdir": "contrib/prometheus-mixin"
         }
