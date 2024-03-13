@@ -94,7 +94,7 @@ local default_vars = {
     'node-count-monthly-status': false,
     'node-memory': true,
     'argo-cd-sync-state': true,
-    rabbitmq: false
+    rabbitmq: false,
   },
   mixin_configs: {
     // Example:
@@ -163,7 +163,7 @@ local mixins = remove_nulls([
   ),
   addMixin(
     'rabbitmq',
-    (import 'https://github.com/adinhodovic/rabbitmq-mixin'),
+    (import 'github.com/adinhodovic/rabbitmq-mixin/mixin.libsonnet'),
     vars,
   ),
 ]);
