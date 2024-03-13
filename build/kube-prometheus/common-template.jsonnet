@@ -94,6 +94,7 @@ local default_vars = {
     'node-count-monthly-status': false,
     'node-memory': true,
     'argo-cd-sync-state': true,
+    rabbitmq: false
   },
   mixin_configs: {
     // Example:
@@ -158,6 +159,11 @@ local mixins = remove_nulls([
   addMixin(
     'opensearch',
     (import 'github.com/grafana/jsonnet-libs/opensearch-mixin/mixin.libsonnet'),
+    vars,
+  ),
+  addMixin(
+    'rabbitmq',
+    (import 'https://github.com/adinhodovic/rabbitmq-mixin'),
     vars,
   ),
 ]);
