@@ -25,6 +25,10 @@ local default_vars = {
     limits: { memory: '40Mi' },
     requests: { cpu: '1m', memory: '40Mi' },
   },
+  prometheus_operator_configReloaderResources: {
+    limits: { cpu: '0', memory: '' },
+    resources: { cpu: '', memory: '' },
+  },
   alertmanager_resources: {
     limits: { memory: '50Mi' },
     requests: { cpu: '1m', memory: '50Mi' },
@@ -417,6 +421,7 @@ local kp =
 
       prometheusOperator+: {
         resources: vars.prometheus_operator_resources,
+        configReloaderResources+: vars.prometheus_operator_configReloaderResources,
         kubeRbacProxy+: {
           resources+: vars.prometheus_operator_kubeRbacProxy_resources,
         },
