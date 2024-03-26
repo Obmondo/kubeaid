@@ -1,5 +1,5 @@
 apiVersion: v2
-name: hcloud-cloud-controller-manager
+name: hcloud-ccm
 version: 1.0.0
 dependencies:
   - name: hcloud-cloud-controller-manager
