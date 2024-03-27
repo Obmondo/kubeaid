@@ -33,7 +33,7 @@ spec:
                 - name: PGUSER
                   value: {{ .Values.postgresql.user | default "api" }}
                 - name: PGDATABASE
-                  value: {{ .Values.postgresql.db | default "api" }}
+                  value: {{ .Values.postgresql.db }}
                 - name: CLUSTER_NAME_LABEL
                   value: {{ (.Values.postgresql.logicalBackup).pgOperatorClusterName | default "api-postgresql" }}
                 - name: AWS_ACCESS_KEY_ID
