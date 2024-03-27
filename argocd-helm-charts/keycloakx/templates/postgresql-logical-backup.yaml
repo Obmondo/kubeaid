@@ -28,7 +28,7 @@ spec:
                 - name: PGPASSWORD
                   valueFrom:
                     secretKeyRef:
-                      name: {{ .Values.postgresql.pass }}
+                      name: "{{ .Values.postgresql.pass }}"
                       key: password
                 - name: PGPORT
                   value: "{{ .Values.postgresql.port | default 5432 }}"
