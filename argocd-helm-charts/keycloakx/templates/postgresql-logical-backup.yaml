@@ -25,11 +25,6 @@ spec:
                       fieldPath: metadata.namespace
                 - name: PGHOST
                   value: "{{ .Values.postgresql.host }}"
-                - name: PGPASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: {{ (.Values.postgresql).pass | default "" }}
-                      key: password
                 - name: PGPORT
                   value: "{{ .Values.postgresql.port | default 5432 }}"
                 - name: PGUSER
@@ -40,11 +35,6 @@ spec:
                   value: {{ (.Values.postgresql.logicalBackup).pgOperatorClusterName | default "api-postgresql" }}
                 - name: AWS_ACCESS_KEY_ID
                   value: {{ (.Values.postgresql.logicalBackup).s3accesskeyid }}
-                - name: AWS_SECRET_ACCESS_KEY
-                  valueFrom:
-                    secretKeyRef:
-                      name: {{ (.Values.postgresql.logicalBackup).s3accesssecretkey | default "" }}
-                      key: aws-secret-key
                 - name: PG_VERSION
                   value: "{{ (.Values.postgresql.logicalBackup).pgversion | default 16 }}"
                 - name: LOGICAL_BACKUP_S3_ENDPOINT
@@ -61,6 +51,9 @@ spec:
                   value: {{ (.Values.postgresql.logicalBackup).retention }}
                 - name: POSTGRES_OPERATOR
                   value: cngp
+
+                {{- toYaml .Values.postgresql.extraEnvVars | nindent 16 }}
+
               resources:
                 limits:
                   cpu: 100m
