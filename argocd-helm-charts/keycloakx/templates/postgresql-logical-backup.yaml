@@ -28,7 +28,7 @@ spec:
                 - name: PGPASSWORD
                   valueFrom:
                     secretKeyRef:
-                      name: keycloak.keycloakx-pgsql.credentials.postgresql.acid.zalan.do
+                      name: {{ quote .Values.postgresql.pass }}
                       key: password
                 - name: PGPORT
                   value: "{{ .Values.postgresql.port | default 5432 }}"
