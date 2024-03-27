@@ -28,7 +28,7 @@ spec:
                 - name: PGPASSWORD
                   valueFrom:
                     secretKeyRef:
-                      name: "{{ .Values.postgresql.pass | default (quote "keycloak.keycloakx-pgsql.credentials.postgresql.acid.zalan.do") }}"
+                      name: {{ (.Values.postgresql).pass | default "" }}
                       key: password
                 - name: PGPORT
                   value: "{{ .Values.postgresql.port | default 5432 }}"
@@ -43,7 +43,7 @@ spec:
                 - name: AWS_SECRET_ACCESS_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: {{ (.Values.postgresql.logicalBackup).s3accesssecretkey }}
+                      name: {{ (.Values.postgresql.logicalBackup).s3accesssecretkey | default "" }}
                       key: aws-secret-key
                 - name: PG_VERSION
                   value: "{{ (.Values.postgresql.logicalBackup).pgversion | default 16 }}"
