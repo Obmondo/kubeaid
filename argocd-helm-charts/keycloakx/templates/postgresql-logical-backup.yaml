@@ -19,7 +19,7 @@ spec:
           containers:
             - name: logical-backup
               image: ghcr.io/obmondo/logical-backup:fix-logical-backup
-              imagePullPolicy: IfNotPresent
+              imagePullPolicy: Always
               env:
                 - name: POD_NAMESPACE
                   valueFrom:
