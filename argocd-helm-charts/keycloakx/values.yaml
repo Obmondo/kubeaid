@@ -50,4 +50,8 @@ keycloakx:
 
 postgresql:
   size: 4Gi
-  enableLogicalBackup: true
+  host: keycloakx-pgsql
+  user: keycloak
+  db: keycloak
+  logicalBackup:
+    enabled: true

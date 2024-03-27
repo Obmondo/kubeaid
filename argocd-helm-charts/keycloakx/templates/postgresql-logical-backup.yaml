@@ -1,5 +1,5 @@
-{{ if (.Values.logicalbackup).enabled  }}
-
+{{ if (.Values.postgresql.logicalBackup).enabled  }}
+---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -7,7 +7,7 @@ metadata:
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 1
-  schedule: {{ (.Values.logicalbackup).schedule | default "30 00 * * *" }}
+  schedule: {{ (.Values.postgresql.logicalBackup).schedule | default "30 00 * * *" }}
   successfulJobsHistoryLimit: 3
   jobTemplate:
     spec:
@@ -15,7 +15,7 @@ spec:
         spec:
           containers:
             - name: logical-backup
-              image: ghcr.io/obmondo/logical-backup:latest
+              image: ghcr.io/obmondo/logical-backup:1.0.1
               imagePullPolicy: IfNotPresent
               env:
                 - name: POD_NAMESPACE
@@ -23,53 +23,51 @@ spec:
                     fieldRef:
                       apiVersion: v1
                       fieldPath: metadata.namespace
-                - name: LOGICAL_BACKUP_PROVIDER
-                  value: {{ (.Values.logicalbackup).provider | default "s3" }}
-                - name: LOGICAL_BACKUP_S3_BUCKET_SCOPE_SUFFIX
-                  value: {{ (.Values.logicalbackup).s3bucketscopesuffix | default "logicalBackup" }}
-                - name: LOGICAL_BACKUP_S3_BUCKET
-                  value: {{ (.Values.logicalbackup).s3bucket }}
-                - name: PG_VERSION
-                  value: "{{ (.Values.logicalbackup).pgversion | default "15" }}"
-                - name: PG_PORT
-                  value: "{{ (.Values.logicalbackup).pgport | default "5432" }}"
-                - name: PGSSLMODE
-                  value: {{ (.Values.logicalbackup).pgsslmode | default "require" }}
+                - name: PGHOST
+                  value: "{{ .Values.postgresql.host }}"
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.postgresql.pass }}
+                      key: password
+                - name: PGPORT
+                  value: "{{ .Values.postgresql.port | default 5432 }}"
                 - name: PGUSER
-                  value: {{ (.Values.logicalbackup).pguser | default "keycloakx" }}
+                  value: {{ .Values.postgresql.user | default "api" }}
                 - name: PGDATABASE
-                  value: {{ (.Values.logicalbackup).pgdatabase | default "keycloakx" }}
+                  value: {{ .Values.postgresql.db | default "api" }}
                 - name: CLUSTER_NAME_LABEL
-                  value: {{ (.Values.logicalbackup).pgOperatorClusterName | default "keycloakx-pgsql" }}
-
-              {{- if eq .Values.logicalbackup.provider "az" }}
-                - name: LOGICAL_BACKUP_PROVIDER
-                  value: "az"
-                - name: LOGICAL_BACKUP_AZURE_STORAGE_ACCOUNT_NAME
-                  value: {{ (.Values.logicalbackup).azurecontainer }}
-                - name: LOGICAL_BACKUP_AZURE_STORAGE_CONTAINER
-                  value: {{ (.Values.logicalbackup).s3bucket }}
-
-              {{- else if eq .Values.logicalbackup.provider "s3" }}
+                  value: {{ (.Values.postgresql.logicalBackup).pgOperatorClusterName | default "api-postgresql" }}
+                - name: AWS_ACCESS_KEY_ID
+                  value: {{ (.Values.postgresql.logicalBackup).s3accesskeyid }}
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ (.Values.postgresql.logicalBackup).s3accesssecretkey }}
+                      key: aws-secret-key
+                - name: PG_VERSION
+                  value: "{{ (.Values.postgresql.logicalBackup).pgversion | default 16 }}"
+                - name: LOGICAL_BACKUP_S3_ENDPOINT
+                  value: {{ (.Values.postgresql.logicalBackup).s3endpoint }}
                 - name: LOGICAL_BACKUP_PROVIDER
                   value: "s3"
-                - name: AWS_ACCESS_KEY_ID
-                  value: {{ (.Values.logicalbackup).awsaccesskeyid }}
+                - name: LOGICAL_BACKUP_S3_BUCKET_SCOPE_SUFFIX
+                  value: {{ (.Values.postgresql.logicalBackup).s3bucketscopesuffix | default "logicalBackup" }}
                 - name: LOGICAL_BACKUP_S3_REGION
-                  value: {{ (.Values.logicalbackup).s3region }}
-                - name: LOGICAL_BACKUP_S3_ENDPOINT
-                  value: {{ (.Values.logicalbackup).s3endpoint }}
-              {{- end }}
-
-                {{- toYaml .Values.logicalbackup.extraEnvVars | nindent 16 }}
-
+                  value: {{ (.Values.postgresql.logicalBackup).s3region }}
+                - name: LOGICAL_BACKUP_S3_BUCKET
+                  value: {{ (.Values.postgresql.logicalBackup).s3bucket }}
+                - name: LOGICAL_BACKUP_S3_RETENTION_TIME
+                  value: {{ (.Values.postgresql.logicalBackup).retention }}
+                - name: POSTGRES_OPERATOR
+                  value: cngp
               resources:
                 limits:
-                  cpu: "1"
-                  memory: 500Mi
+                  cpu: 100m
+                  memory: 128Mi
                 requests:
                   cpu: 100m
-                  memory: 100Mi
+                  memory: 128Mi
               securityContext:
                 allowPrivilegeEscalation: true
                 privileged: false
@@ -78,8 +76,5 @@ spec:
               terminationMessagePolicy: File
           dnsPolicy: ClusterFirst
           restartPolicy: Never
-          serviceAccount: "{{ .Values.logicalbackup.serviceAccount | default "postgres-pod" }}"
-          serviceAccountName: "{{ .Values.logicalbackup.serviceAccountName | default "postgres-pod" }}"
           terminationGracePeriodSeconds: 300
-
 {{ end }}
