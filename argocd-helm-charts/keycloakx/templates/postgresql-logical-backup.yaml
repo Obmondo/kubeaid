@@ -4,8 +4,6 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: postgres-logical-backup
-  annotations:
-    iam.amazonaws.com/role: arn:aws:iam::438423213058:role/k8s-zalando-operator-staging
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 1
@@ -14,6 +12,9 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          annotations:
+            iam.amazonaws.com/role: arn:aws:iam::438423213058:role/k8s-zalando-operator-staging
         spec:
           containers:
             - name: logical-backup
