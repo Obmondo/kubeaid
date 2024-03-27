@@ -25,6 +25,11 @@ spec:
                       fieldPath: metadata.namespace
                 - name: PGHOST
                   value: "{{ .Values.postgresql.host }}"
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.postgresql.pass | default "keycloak.keycloakx-pgsql.credentials.postgresql.acid.zalan.do"}}
+                      key: password
                 - name: PGPORT
                   value: "{{ .Values.postgresql.port | default 5432 }}"
                 - name: PGUSER
