@@ -13,8 +13,10 @@ spec:
     spec:
       template:
         metadata:
+{{ if .Values.postgresql.logicalBackup.annotations }}
           annotations:
-            iam.amazonaws.com/role: arn:aws:iam::438423213058:role/k8s-zalando-operator-staging
+{{ toYaml (.Values.postgresql.logicalBackup.annotations) | indent 10 }}
+{{- end }}
         spec:
           containers:
             - name: logical-backup
