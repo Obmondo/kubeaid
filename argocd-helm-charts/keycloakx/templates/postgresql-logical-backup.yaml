@@ -13,10 +13,8 @@ spec:
     spec:
       template:
         metadata:
-{{ if .Values.postgresql.logicalBackup.annotations }}
           annotations:
-{{ toYaml (.Values.postgresql.logicalBackup.annotations) | indent 10 }}
-{{- end }}
+  {{ toYaml (.Values.postgresql.logicalBackup).annotations | indent 10 }}
         spec:
           containers:
             - name: logical-backup
