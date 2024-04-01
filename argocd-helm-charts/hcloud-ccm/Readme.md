@@ -55,6 +55,8 @@
 * Accept values for generating cluster from value file, so move this to a helm chart and dynamically generate
   cluster yaml based on the value file, which is per cluster, so one can manage via argocd easily
 
+* It's strictly binded to caph-system namespace for now and runs on v1.0.0-beta.33 [added support in helm chart]
+
 ## Troubleshootings
 
 * Node will be restart again and again, simply delete the machine from cluster, for forcefull, remove the finalizers
