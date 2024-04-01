@@ -1,0 +1,19 @@
+---
+{{- range $key, $value := .Values.nodes }}
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: HetznerBareMetalHost
+metadata:
+  name: {{ $value.name }}
+  labels:
+    role: {{ $.Values.name }}-control-plane
+spec:
+  serverID: {{ $key }}
+  maintenanceMode: {{ $value.maintenanceMode }}
+  rootDeviceHints:
+    raid:
+      wwn:
+      {{- range $value.wwn }}
+        - {{ . | quote }}
+      {{- end }}
+  description: "{{ $.Values.name }} Master control plane node ${{ $value.name }}"
+{{- end }}
