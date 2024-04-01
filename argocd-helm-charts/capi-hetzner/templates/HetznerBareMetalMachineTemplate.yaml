@@ -1,0 +1,45 @@
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: HetznerBareMetalMachineTemplate
+metadata:
+  name: ${CLUSTER_NAME}-control-plane
+  namespace: caph-system
+spec:
+  template:
+    spec:
+      hostSelector:
+        matchLabels:
+          role: ${CLUSTER_NAME}-control-plane
+      installImage:
+        image:
+          path: /root/.oldroot/nfs/images/Ubuntu-2204-jammy-amd64-base.tar.gz
+        partitions:
+        - fileSystem: ext4
+          mount: /boot
+          size: 1024M
+        - fileSystem: vg0
+          mount: lvm
+          size: 100G
+        swraid: 1
+        swraidLevel: 1
+        logicalVolumeDefinitions:
+        - vg: vg0
+          name: root
+          mount: /
+          filesystem: ext4
+          size: 20G
+        postInstallScript: |
+          #!/bin/bash
+          mkdir -p /etc/cloud/cloud.cfg.d && touch /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
+          echo "network: { config: disabled }" > /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
+          apt-get update && apt-get install -y cloud-init apparmor apparmor-utils
+          cloud-init clean --logs
+      sshSpec:
+        portAfterCloudInit: 22
+        portAfterInstallImage: 22
+        secretRef:
+          key:
+            name: sshkey-name
+            privateKey: ssh-privatekey
+            publicKey: ssh-publickey
+          name: robot-ssh
