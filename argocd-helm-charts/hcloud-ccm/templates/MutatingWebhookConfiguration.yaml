@@ -31,7 +31,7 @@ webhooks:
   - v1
   clientConfig:
     service:
-      ame: caph-webhook-service
+      name: caph-webhook-service
       namespace: caph-system
       path: /mutate-infrastructure-cluster-x-k8s-io-v1beta1-hetznerbaremetalremediationtemplate
   failurePolicy: Fail
