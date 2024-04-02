@@ -6,12 +6,17 @@ metadata:
   namespace: caph-system
 spec:
   controlPlaneEndpoint:
-    host: ""
-    port: 443
+    host: {{ .Values.controlPlaneEndpoint.host }}
+    port: {{ .Values.controlPlaneEndpoint.port | default 6443 }}
   controlPlaneLoadBalancer:
-    region: hel1
+    {{- if .Values.controlPlaneLoadBalancer.region }}
+    region: {{ .Values.controlPlaneLoadBalancer.region }}
+    {{- end }}
+    enabled: {{ .Values.controlPlaneLoadBalancer.enabled }}
   controlPlaneRegions:
-  - hel1
+  {{- range .Values.controlPlaneRegions }}
+  - {{ . | quote }}
+  {{- end }}
   hcloudNetwork:
     enabled: false
   hcloudPlacementGroups:
