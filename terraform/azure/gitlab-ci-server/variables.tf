@@ -53,3 +53,7 @@ variable "location" {
 variable "source_addresses" {
   type = list
 }
+
+variable "resource_group_name" {
+  type = string
+}

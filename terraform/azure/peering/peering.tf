@@ -1,3 +1,10 @@
+data "azurerm_virtual_network" "ext_vnet" {
+  count = var.ext_vnet_name != null && var.ext_vnet_resource_group != null ? 1 : 0
+  name                = var.ext_vnet_name
+  resource_group_name = var.ext_vnet_resource_group
+  provider = azurerm.currentsubs
+}
+
 provider "azurerm" {
   features {}
   alias = "currentsubs"
@@ -7,12 +14,13 @@ provider "azurerm" {
   features {}
   subscription_id = var.remote_subs_id
   alias = "remotewg"
+  skip_provider_registration = true
 }
 
 resource "azurerm_virtual_network_peering" "peer1" {
   name                      = "clustertowg"
   resource_group_name       = var.ext_vnet_name != null ? var.ext_vnet_resource_group : var.resource_group
-  virtual_network_name      = var.vnet_name != null ? var.vnet_name : var.ext_vnet_name
+  virtual_network_name      = var.ext_vnet_name != null ? data.azurerm_virtual_network.ext_vnet[0].name : var.vnet_name
   remote_virtual_network_id = var.wg_vnet_id
   allow_forwarded_traffic   = var.allow_forwarded_traffic
 

@@ -6,6 +6,7 @@ data "azurerm_virtual_network" "ext_vnet" {
   count = var.ext_vnet_name != null && var.ext_vnet_resource_group != null ? 1 : 0
   name                = var.ext_vnet_name
   resource_group_name = var.ext_vnet_resource_group
+
 }
 
 provider "azurerm" {
@@ -17,8 +18,6 @@ provider "azurerm" {
 
 # Create Virtual Network
 resource "azurerm_virtual_network" "aksvnet" {
-  count = var.vnet_name != null ? 1 : 0
-
   name                = var.vnet_name
   location            = var.location
   resource_group_name = var.resource_group
@@ -45,7 +44,7 @@ resource "azurerm_subnet" "endpoint-subnet" {
   count = var.private_dns_zone_ids != null ? 1 : 0
 
   name                 = "private-endpoint-subnet"
-  virtual_network_name = azurerm_virtual_network.aksvnet[0].name
+  virtual_network_name = azurerm_virtual_network.aksvnet.name
   resource_group_name  = var.resource_group
   address_prefixes     = [var.endpoint_subnet_prefixes]
   enforce_private_link_endpoint_network_policies = true
@@ -58,7 +57,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "link_private_dns" {
   name                  = "private-endpoint-link"
   resource_group_name   = var.ext_dns_subs_resource_group
   private_dns_zone_name = "privatelink.blob.core.windows.net"
-  virtual_network_id    = azurerm_virtual_network.aksvnet[0].id
+  virtual_network_id    = azurerm_virtual_network.aksvnet.id
   registration_enabled = true
   provider = azurerm.externalsubs
 }
