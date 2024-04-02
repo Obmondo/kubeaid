@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~>2.0"
+      version = "~>3.97.1"
     }
     pass = {
       source = "camptocamp/pass"
@@ -11,11 +11,16 @@ terraform {
   }
 }
 
-# subscription_id will change based on which subscription VM will be added to
+# Subscription_id where wireguard VM will be created, it can be an external subscription ID also.
 provider "azurerm" {
-    features {}
-    subscription_id = var.subscription_id
-    skip_provider_registration = true
+  subscription_id = var.subscription_id
+  features {}
+  skip_provider_registration = true
+  alias = "externalsubs"
+}
+
+provider "azurerm" {
+  features {}
 }
 
 provider "pass" {}
@@ -24,24 +29,65 @@ data "pass_password" "myterraformvm" {
   path = var.admin_account_passwordstore_path
 }
 
+data "azurerm_resource_group" "resource" {
+  count = var.wg_resource_group == null ? 1 : 0
+
+  name     = var.wg_resource_group
+}
+
 # Create a resource group if it doesn't exist
 resource "azurerm_resource_group" "resourcegroup" {
-    name     = var.resource_group
+  count = var.wg_resource_group != null ? 0 : 1
+
+    name     = var.wg_resource_group
     location = var.location
 
   tags = var.tags
+}
+
+# Create virtual network
+resource "azurerm_virtual_network" "wireguard_network" {
+  name                = var.wg_vnet_name
+  address_space       = var.wg_vnet_cidr
+  location            = var.location
+  resource_group_name = var.wg_resource_group != null ? var.wg_resource_group : data.azurerm_resource_group.resource[0].name
+
+  tags = {
+    environment = "Terraform"
+  }
+}
+
+# Create subnet
+resource "azurerm_subnet" "wg_subnet" {
+  name                 = "wg_subnet"
+  resource_group_name  = var.wg_resource_group != null ? var.wg_resource_group : data.azurerm_resource_group.resource[0].name
+  virtual_network_name = azurerm_virtual_network.wireguard_network.name
+  address_prefixes     = var.wg_subnet_cidr
+}
+
+# Create public IPs
+resource "azurerm_public_ip" "wg_public_ip" {
+  name                = "wg_public_ip"
+  location            = var.location
+  resource_group_name = var.wg_resource_group != null ? var.wg_resource_group : data.azurerm_resource_group.resource[0].name
+  allocation_method   = "Dynamic"
+
+  tags = {
+    environment = "Terraform"
+  }
 }
 
 # Create network interface
 resource "azurerm_network_interface" "nic" {
   name                = "nic-${upper(var.vm_name)}-00"
   location            = var.location
-  resource_group_name = azurerm_resource_group.resourcegroup.name
-
+  resource_group_name = var.wg_resource_group != null ? var.wg_resource_group : data.azurerm_resource_group.resource[0].name
+  provider = azurerm.externalsubs
   ip_configuration {
-    name            = "GN"
-    subnet_id       = var.subnet_id
+    name            = "wireguard"
+    subnet_id       = azurerm_subnet.wg_subnet.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.wg_public_ip.id
   }
 
   tags = var.tags
@@ -50,7 +96,7 @@ resource "azurerm_network_interface" "nic" {
 # Create storage account for boot diagnostics
 resource "azurerm_storage_account" "mystorageaccount" {
   name                     = var.storage_account
-  resource_group_name      = azurerm_resource_group.resourcegroup.name
+  resource_group_name      = var.wg_resource_group != null ? var.wg_resource_group : data.azurerm_resource_group.resource[0].name
   location                 = var.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
@@ -69,14 +115,14 @@ resource "tls_private_key" "example_ssh" {
 resource "azurerm_linux_virtual_machine" "myterraformvm" {
   name                  = upper(var.vm_name)
   location              = var.location
-  resource_group_name   = azurerm_resource_group.resourcegroup.name
+  resource_group_name   = var.wg_resource_group != null ? var.wg_resource_group : data.azurerm_resource_group.resource[0].name
   network_interface_ids = [azurerm_network_interface.nic.id]
   size                  = var.vm_size
-
+  
   os_disk {
     name                 = "${upper(var.vm_name)}-OSdisk-00"
     caching              = "ReadWrite"
-    storage_account_type = "Premium_LRS"
+    storage_account_type = "Standard_LRS"
   }
 
   source_image_reference {
@@ -117,7 +163,7 @@ resource "azurerm_managed_disk" "mydisk" {
   for_each             = var.disks
   name                 = "${upper(var.vm_name)}-datadisk-${each.key}"
   location             = var.location
-  resource_group_name  = azurerm_resource_group.resourcegroup.name
+  resource_group_name  = var.wg_resource_group != null ? var.wg_resource_group : data.azurerm_resource_group.resource[0].name
   storage_account_type = var.storage_account_type
   create_option        = "Empty"
   disk_size_gb         = each.value.size

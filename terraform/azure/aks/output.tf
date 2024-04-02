@@ -32,7 +32,7 @@ output "private_dns_zone_name" {
 }
 
 output "cluster_vnet_id" {
-  value = var.vnet_name != null ? azurerm_virtual_network.aksvnet[0].id : data.azurerm_virtual_network.ext_vnet[0].id
+  value = var.vnet_name != null ? azurerm_virtual_network.aksvnet.id : data.azurerm_virtual_network.ext_vnet[0].id
   sensitive = true
 }
 

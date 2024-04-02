@@ -3,14 +3,14 @@ variable "location" {
   default = "eastus"
 }
 
-variable "resource_group" {
+variable "wg_resource_group" {
   type = string
 }
 
-variable "subnet_id" {
+variable "wg_vnet_name" {
   type = string
+  default = "wg_vnet"
 }
-
 variable "storage_account" {
   type = string
 }
@@ -54,6 +54,17 @@ variable "admin_account_passwordstore_path" {
 
 variable "wg_port" {
   default = 51820
+}
+
+variable "wg_vnet_cidr" {
+  description = "CIDR for the Wireguard VNET"
+  default = ["10.61.0.0/16"]
+}
+
+variable "wg_subnet_cidr" {
+  description = "CIDR for the Wireguard Subnet"
+  default = ["10.61.61.0/24"]
+  
 }
 
 variable "wg_address" {

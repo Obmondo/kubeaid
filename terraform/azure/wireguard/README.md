@@ -1,18 +1,33 @@
 # Setup VM with wireguard installed and configured
 
+## Prequisites
+
+- [Go pass](https://github.com/gopasspw/gopass/blob/master/docs/setup.md#ubuntu-debian-deepin-devuan-kali-linux-pardus-parrot-raspbian)
+- [Wireguard](https://wireguard.how/client/debian/)
+
 1. Initialize terraform
 
    ```sh
    terraform init
    ```
 
-2. Configure your client wg config by creating the public and private key
+2. Configure your client wg config by creating the public and private key which will be passed to the vm
 
    ```sh
    wg genkey | sudo tee /etc/wireguard/privatekey | wg pubkey | sudo tee /etc/wireguard/publickey
    ```
 
-3. Pass this public key as `wg_client_pubkey` variable in `variables.tf` file
+3. Pass the values for `wg_peers` variable in the `terraform.tfvars` file
+
+   ```sh
+   wg_peers = [ {
+    name = "<Peer name>>"
+    public_key = "<Client public key>>"
+    allowed_ips = "<Ip range>"
+    }]
+   ```
+
+   Example [terraform.tfvars.example](./terraform.tfvars.example)
 
 4. Plan your terraform
 
@@ -60,17 +75,20 @@ sudo systemctl start wg-quick@wg0.service
 
 ```text
 location = "North Europe"
-subnet_id = "/subscriptions/bd59662e-a78e-4/resourceGroups/obmondo-aks/providers/Microsoft.Network/virtualNetworks/obmondo-vnet/subnets/obmondo-subnet"
-vm_name = "vpn-az1"
+vm_name = "vpn-prod"
 vm_size = "Standard_D2_v4"
-resource_group = "obmondo-aks"
-storage_account = "obmondo"
-subscription_id = "bd59662esnwqoiqno"
-domain = "example.com
+wg_resource_group = "alz-network-hub"
+storage_account = "wireguardprodbucket"
+subscription_id = ""
+domain = "obmondo.net"
 tags = {}
-admin_account_passwordstore_path = server/vpn-az1/admin
-wg_client_pubkey = "HBu2xw9U9plaO6N/ySBcU"
-wg_address = "10.0.0.1/24"
+admin_account_passwordstore_path = "cluster/vpn-prod/user/ubuntu"
+wg_address = "10.0.0.1/24" 
 wg_peer_address = "10.0.0.2/24"
 public_iface = "wg0"
+wg_peers = [ {
+    name = "peer1"
+    public_key = "97c6GTiYkGxxxxxsthQZ0U0w6HM="
+    allowed_ips = "10.0.0.2/24"
+    }]
 ```

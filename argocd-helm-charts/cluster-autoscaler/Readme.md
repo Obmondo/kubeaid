@@ -37,9 +37,9 @@ kubectl create secret generic cluster-autoscaler-azure-cluster-autoscaler -n  cl
  --from-literal=ClientID="keki9ieeennkjimdkwm" \
  --from-literal=ClientSecret="ddkwwkwkdkdmkwmww" \
  --from-literal=ResourceGroup="k8s-prod-az1" \
- --from-literal=NodeResourceGroup="MC_k8s-prod-az1_prod_az1_kilroy_eu_northeurope" \
+ --from-literal=NodeResourceGroup="MC_k8s-prod-az1_prod_az1_obmondo_eu_northeurope" \
  --from-literal=VMType="vmss" \
- --from-literal=ClusterName="prod_az1_kilroy_eu" \
+ --from-literal=ClusterName="obmondo" \
  -o yaml | kubeseal --controller-namespace system --controller-name sealed-secrets > cluster-autoscaler.yaml
 ```
 

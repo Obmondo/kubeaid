@@ -19,11 +19,9 @@ dependency "aks" {
 locals {
   vars = read_terragrunt_config(find_in_parent_folders("terragrunt.hcl"))
 }
-
-inputs = merge(
-  local.vars.locals.customer_vars,
-  {
-    cluster_vnet_id       = dependency.aks.outputs.cluster_vnet_id,
-    private_dns_zone_name = dependency.aks.outputs.private_dns_zone_name,
-  }
+  inputs = merge(
+    local.vars.locals.customer_vars,
+    {
+      private_dns_zone_name = dependency.aks.outputs.private_dns_zone_name,
+    }
 )

@@ -30,7 +30,7 @@ variable "cluster_name" {
 }
 
 variable "vnet_name" {
-  default = null
+  default = "aks-cluster"
   type = string
   description = "Virtual network name"
 }
@@ -249,7 +249,7 @@ variable "backp_bucket_name" {
 
 variable "endpoint_subnet_prefixes" {
   type = string
-  default = "10.229.128.0/17"
+  default = "10.250.0.0/24"
 }
 
 # Private endpoint

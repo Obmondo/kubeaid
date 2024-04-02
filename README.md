@@ -222,7 +222,7 @@ Sample config file `example.tfvars`
 **TODO:** Describe what the configuration keys mean
 
 ```text
-gitlab_vm_name = "kilroy-gitlab"
+gitlab_vm_name = "obmondo-gitlab"
 location = "North Europe"
 resource_group_name = "obmondo-aks"
 create_public_ip = true
