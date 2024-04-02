@@ -3,5 +3,5 @@ name: hcloud-ccm
 version: 1.0.0
 dependencies:
   - name: ccm-hcloud
-    version: 1.19.0
+    version: ""
     repository: https://charts.syself.com
