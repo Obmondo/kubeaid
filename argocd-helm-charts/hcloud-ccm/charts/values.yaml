@@ -1,8 +1,5 @@
 # hccm program command line arguments.
-# The following flags are managed by the chart and should *not* be set directly here:
-# --allocate-node-cidrs
-# --cluster-cidr
-# --leader-elect
+# The "--allocate-node-cidrs" + "--cluster-cidr" + "--leader-elect" arguments are managed by the chart and should *not* be set directly here.
 args:
   cloud-provider: hcloud
   allow-untagged-cloud: ""
@@ -16,41 +13,26 @@ args:
   # https://github.com/hetznercloud/hcloud-cloud-controller-manager/issues/492
   webhook-secure-port: "0"
 
-# Change deployment kind from "Deployment" to "DaemonSet"
-kind: Deployment
-
-# change replicaCount (only used when kind is "Deployment")
 replicaCount: 1
 
 # hccm environment variables
 env:
-  # The following variables are managed by the chart and should *not* be set here:
+  # The following two variables should *not* be set here:
   # HCLOUD_METRICS_ENABLED - see monitoring.enabled
   # HCLOUD_NETWORK - see networking.enabled
-  # ROBOT_ENABLED - see robot.enabled
-
   HCLOUD_TOKEN:
     valueFrom:
       secretKeyRef:
         name: hcloud
         key: token
-
-  ROBOT_USER:
+  NODE_NAME:
     valueFrom:
-      secretKeyRef:
-        name: hcloud
-        key: robot-user
-        optional: true
-  ROBOT_PASSWORD:
-    valueFrom:
-      secretKeyRef:
-        name: hcloud
-        key: robot-password
-        optional: true
+      fieldRef:
+        fieldPath: spec.nodeName
 
 image:
-  repository: hetznercloud/hcloud-cloud-controller-manager
-  tag: 'v{{ $.Chart.Version }}'
+  repository: quay.io/syself/hetzner-cloud-controller-manager
+  tag: '{{ $.Chart.Version }}'
 
 monitoring:
   # When enabled, the hccm Pod will serve metrics on port :8233
@@ -96,10 +78,3 @@ selectorLabels:
   app.kubernetes.io/instance: '{{ $.Release.Name }}'
 
 additionalTolerations: []
-
-nodeSelector: {}
-  # node-role.kubernetes.io/control-plane: ""
-
-robot:
-  # Set to true to enable support for Robot (Dedicated) servers.
-  enabled: false
