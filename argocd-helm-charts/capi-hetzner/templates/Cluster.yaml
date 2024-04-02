@@ -7,7 +7,7 @@ spec:
   clusterNetwork:
     pods:
       cidrBlocks:
-      - 10.244.0.0/16
+      - {{ .Values.pods.cidrBlocks | default "10.244.0.0/16" }}
   controlPlaneRef:
     apiVersion: controlplane.cluster.x-k8s.io/v1beta1
     kind: KubeadmControlPlane
