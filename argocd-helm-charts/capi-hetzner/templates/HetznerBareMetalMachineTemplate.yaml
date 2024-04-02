@@ -2,14 +2,14 @@
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: HetznerBareMetalMachineTemplate
 metadata:
-  name: ${CLUSTER_NAME}-control-plane
+  name: {{ .Values.name }}-control-plane
   namespace: caph-system
 spec:
   template:
     spec:
       hostSelector:
         matchLabels:
-          role: ${CLUSTER_NAME}-control-plane
+          role: {{ .Values.name }}-control-plane
       installImage:
         image:
           path: /root/.oldroot/nfs/images/Ubuntu-2204-jammy-amd64-base.tar.gz
