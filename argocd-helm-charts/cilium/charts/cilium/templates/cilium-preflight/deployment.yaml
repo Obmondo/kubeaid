@@ -4,6 +4,10 @@ kind: Deployment
 metadata:
   name: cilium-pre-flight-check
   namespace: {{ .Release.Namespace }}
+  {{- with .Values.preflight.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     app.kubernetes.io/part-of: cilium
     app.kubernetes.io/name: cilium-pre-flight-check
@@ -39,7 +43,7 @@ spec:
           args:
           - -ec
           - |
-            cilium preflight validate-cnp;
+            cilium-dbg preflight validate-cnp;
             touch /tmp/ready-validate-cnp;
             sleep 1h;
           livenessProbe:
@@ -56,6 +60,10 @@ spec:
               - /tmp/ready-validate-cnp
             initialDelaySeconds: 5
             periodSeconds: 5
+          {{- with .Values.preflight.extraVolumeMounts }}
+          volumeMounts:
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
           env:
           {{- if .Values.k8sServiceHost }}
           - name: KUBERNETES_SERVICE_HOST
@@ -73,11 +81,16 @@ spec:
             {{- toYaml . | trim | nindent 12 }}
           {{- end }}
           terminationMessagePolicy: FallbackToLogsOnError
+      {{- with .Values.preflight.extraVolumes }}
+      volumes:
+      {{- toYaml . | trim | nindent 6 }}
+      {{- end }}
       hostNetwork: true
       restartPolicy: Always
       priorityClassName: {{ include "cilium.priorityClass" (list $ .Values.preflight.priorityClassName "system-cluster-critical") }}
       serviceAccount: {{ .Values.serviceAccounts.preflight.name | quote }}
       serviceAccountName: {{ .Values.serviceAccounts.preflight.name | quote }}
+      automountServiceAccountToken: {{ .Values.serviceAccounts.preflight.automount }}
       terminationGracePeriodSeconds: {{ .Values.preflight.terminationGracePeriodSeconds }}
       {{- with .Values.preflight.affinity }}
       affinity:

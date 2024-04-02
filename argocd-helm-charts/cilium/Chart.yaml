@@ -3,5 +3,5 @@ name: cilium
 version: 1.0.0
 dependencies:
   - name: cilium
-    version: 1.14.4
+    version: 1.15.2
     repository: https://helm.cilium.io/
