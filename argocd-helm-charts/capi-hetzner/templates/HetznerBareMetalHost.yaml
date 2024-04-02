@@ -1,4 +1,3 @@
----
 {{- range $key, $value := .Values.nodes }}
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: HetznerBareMetalHost
@@ -15,5 +14,6 @@ spec:
       {{- range $value.wwn }}
         - {{ . | quote }}
       {{- end }}
-  description: "{{ $.Values.name }} Master control plane node ${{ $value.name }}"
+  description: "Cluster {{ $.Values.name }} control plane node {{ $value.name }}"
+---
 {{- end }}
