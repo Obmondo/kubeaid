@@ -1,0 +1,41 @@
+apiVersion: addons.cluster.x-k8s.io/v1alpha1
+kind: HelmChartProxy
+metadata:
+  name: cilium
+spec:
+  clusterSelector:
+    matchLabels:
+      cluster.x-k8s.io/name: {{ .Values.global.clusterName }}
+  repoURL: https://helm.cilium.io/
+  chartName: cilium
+  namespace: cilium
+  options:
+    waitForJobs: true
+    wait: true
+    timeout: 5m
+    install:
+      createNamespace: true
+  valuesTemplate: |
+    rollOutCiliumPods: true
+    priorityClassName: "system-node-critical"
+    hubble:
+      metrics:
+        enabled:
+          - dns:query;ignoreAAAA
+          - drop
+          - tcp
+          - flow
+          - icmp
+          - http
+      relay:
+        enabled: true
+        rollOutPods: true
+      ui:
+        enabled: true
+        rollOutPods: true
+    ipam:
+      mode: "kubernetes"
+    kubeProxyReplacement: "partial"
+    operator:
+      rollOutPods: true
+      priorityClassName: "system-node-critical"
