@@ -1,0 +1,9 @@
+dependencies:
+- name: ccm-hetzner
+  repository: https://charts.syself.com
+  version: 1.1.11
+- name: cluster-api-operator
+  repository: https://kubernetes-sigs.github.io/cluster-api-operator
+  version: 0.9.1
+digest: sha256:877284463d78bba2f87b9b895412079d100df32d4f387e767216733e6f771e0d
+generated: "2024-04-03T16:02:38.144496762+05:30"
