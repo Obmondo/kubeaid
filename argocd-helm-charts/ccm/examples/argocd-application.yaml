@@ -10,7 +10,7 @@ spec:
     server: 'https://kubernetes.default.svc'
   sources:
     - repoURL: https://github.com/Obmondo/kubeaid.git
-      path: argocd-helm-charts/capi-hetzner
+      path: argocd-helm-charts/capi-clusters
       targetRevision: HEAD
       helm:
         valueFiles:
