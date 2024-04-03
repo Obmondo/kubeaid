@@ -4,6 +4,8 @@ kind: HetznerCluster
 metadata:
   name: {{ .Values.name }}
   namespace: caph-system
+  labels:
+    cluster.x-k8s.io/name: {{ .Values.name }}
 spec:
   controlPlaneEndpoint:
     host: {{ .Values.controlPlaneEndpoint.host }}
