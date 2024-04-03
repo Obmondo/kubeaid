@@ -43,7 +43,7 @@
 * Install clusterapi
 
   ```sh
-  clusterctl init --core cluster-api --bootstrap kubeadm --control-plane kubeadm --infrastructure hetzner
+  clusterctl init --core cluster-api --bootstrap kubeadm --control-plane kubeadm --infrastructure hetzner # pinned to v1.0.0-beta.33
   ```
 
 * Create required secrets
@@ -56,7 +56,7 @@
 
 * Generate argocd application using one of the [examples](./examples/argocd-application.yaml)
 
-* Sync it in argocd (sync root app and then the actual application **dev-capi-hetzner**)
+* Added a value file as show in this [example](./examples/hetzner-robot-control-plane.yaml) Sync it in argocd (sync root app and then the actual application **dev-capi-hetzner**)
 
 ## Improvements
 

@@ -1,29 +1,33 @@
-name: <cluster-name>
-pods:
-  cidrBlock: 10.244.0.0/16
-controlPlaneEndpoint:
-  host: 8.18.2.17
-  port: 6443  # kube-apiserver pod listen on this port
-controlPlaneLoadBalancer:
-  enabled: false
-controlPlaneRegions:
-  - hel1
-nodes:
-  1866fff:
-    name: <cluster-name>01
-    maintenanceMode: false
-    wwn:
-      - '0x50000397cb700acd'
-      - '0x500003981be00179'
-  1866fff:
-    name: <cluster-name>02
-    maintenanceMode: false
-    wwn:
-      - "0x5000cca25ed86494"
-      - "0x5000cca25ecf496b"
-  1866fff:
-    name: <cluster-name>03
-    maintenanceMode: false
-    wwn:
-      - "0x50014ee2097c6ca4"
-      - "0x50014ee2097c9304"
+provider:
+  hetzner: true
+
+hetzner:
+  name: <cluster-name>
+  pods:
+    cidrBlock: 10.244.0.0/16
+  controlPlaneEndpoint:
+    host: 8.18.2.17
+    port: 6443  # kube-apiserver pod listen on this port
+  controlPlaneLoadBalancer:
+    enabled: false
+  controlPlaneRegions:
+    - hel1
+  nodes:
+    1866fff:
+      name: <cluster-name>01
+      maintenanceMode: false
+      wwn:
+        - '0x50000397cb700acd'
+        - '0x500003981be00179'
+    1866fff:
+      name: <cluster-name>02
+      maintenanceMode: false
+      wwn:
+        - "0x5000cca25ed86494"
+        - "0x5000cca25ecf496b"
+    1866fff:
+      name: <cluster-name>03
+      maintenanceMode: false
+      wwn:
+        - "0x50014ee2097c6ca4"
+        - "0x50014ee2097c9304"
