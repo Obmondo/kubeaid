@@ -5,7 +5,7 @@ metadata:
 spec:
   clusterSelector:
     matchLabels:
-      cluster.x-k8s.io/name: {{ .Values.name }}
+      cluster.x-k8s.io/name: {{ .Release.name }}
   repoURL: https://argoproj.github.io/argo-helm
   chartName: argo-cd
   namespace: argo-cd
