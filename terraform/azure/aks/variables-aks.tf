@@ -270,3 +270,9 @@ variable "ext_dns_subs_resource_group" {
   type        = string
   default     = null 
 }
+
+variable "temporary_name_for_rotation" {
+  description = "Temporary name for rotation"
+  type        = string
+  default     = "tempnodepool"
+}
