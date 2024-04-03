@@ -120,6 +120,7 @@ resource "azurerm_kubernetes_cluster" "k8s" {
         min_count           = var.min_node_count
         max_count           = var.max_node_count
         zones               = var.zones
+        temporary_name_for_rotation = var.temporary_name_for_rotation
         orchestrator_version = var.kubernetes_version
       linux_os_config {
         sysctl_config {
