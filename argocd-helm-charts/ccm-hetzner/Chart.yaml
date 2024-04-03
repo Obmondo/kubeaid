@@ -1,5 +1,5 @@
 apiVersion: v2
-name: hcloud-ccm
+name: ccm-hetzner
 version: 1.0.0
 dependencies:
   - name: ccm-hetzner
