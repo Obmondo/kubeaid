@@ -9,9 +9,11 @@
 * Syself has developed CAPH which works with hetzner robot, the official only supported the cloud.
   But good news is that syself changes are merged into official
   [here is the PR](https://github.com/hetznercloud/hcloud-cloud-controller-manager/pull/561/)
+
   **NOTE** The official ccm didn't worked for me, so currently we are using ccm from syself (v1.18.0-0.0.5)
 
 * This ccm-hetzner helm chart will setup both for you in same NS
+
   **NOTE** charts/cluster-api-provider-hetzner is manually maintained based on this [file](https://github.com/syself/cluster-api-provider-hetzner/releases/download/v1.0.0-beta.33/infrastructure-components.yaml)
 
 ## Pre-Requisites
