@@ -1,0 +1,5 @@
+cluster-api-operator:
+  addon: helm
+  bootstrap: kubeadm:v1.5.1
+  controlPlane: kubeadm:v1.5.1
+  core: cluster-api:v1.5.1
