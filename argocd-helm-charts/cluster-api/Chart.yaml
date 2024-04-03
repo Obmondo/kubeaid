@@ -1,0 +1,10 @@
+apiVersion: v2
+name: cluster-api
+version: 1.0.0
+dependencies:
+  - name: ccm-hetzner
+    version: 1.1.11
+    repository: https://charts.syself.com
+  - name: cluster-api-operator
+    version: 0.9.1
+    repository: https://kubernetes-sigs.github.io/cluster-api-operator
