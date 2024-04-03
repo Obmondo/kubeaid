@@ -1,0 +1,6 @@
+dependencies:
+- name: hetzner
+  repository: file://charts/hetzner
+  version: 1.0.0
+digest: sha256:b121eed1dfb35a13d25423736ad8c29e6bfb8960c9a6399ae8ca8903b9022fdc
+generated: "2024-04-03T13:58:00.643153458+05:30"

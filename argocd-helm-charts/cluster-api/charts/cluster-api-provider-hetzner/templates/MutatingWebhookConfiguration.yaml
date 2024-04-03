@@ -1,0 +1,175 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: caph-system/caph-serving-cert
+  labels:
+    cluster.x-k8s.io/provider: infrastructure-hetzner
+  name: caph-mutating-webhook-configuration
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: caph-webhook-service
+      namespace: caph-system
+      path: /mutate-infrastructure-cluster-x-k8s-io-v1beta1-hcloudremediationtemplate
+  failurePolicy: Fail
+  name: mhcloudremediationtemplate.kb.io
+  rules:
+  - apiGroups:
+    - infrastructure.cluster.x-k8s.io
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - hcloudremediationtemplates
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: caph-webhook-service
+      namespace: caph-system
+      path: /mutate-infrastructure-cluster-x-k8s-io-v1beta1-hetznerbaremetalremediationtemplate
+  failurePolicy: Fail
+  name: mhetznerbaremetalremediationtemplate.kb.io
+  rules:
+  - apiGroups:
+    - infrastructure.cluster.x-k8s.io
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - hetznerbaremetalremediationtemplates
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: caph-webhook-service
+      namespace: caph-system
+      path: /mutate-infrastructure-cluster-x-k8s-io-v1beta1-hcloudmachine
+  failurePolicy: Fail
+  name: mutation.hcloudmachine.infrastructure.cluster.x-k8s.io
+  rules:
+  - apiGroups:
+    - infrastructure.cluster.x-k8s.io
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - hcloudmachines
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: caph-webhook-service
+      namespace: caph-system
+      path: /mutate-infrastructure-cluster-x-k8s-io-v1beta1-hcloudremediation
+  failurePolicy: Fail
+  name: mutation.hcloudremediation.infrastructure.cluster.x-k8s.io
+  rules:
+  - apiGroups:
+    - infrastructure.cluster.x-k8s.io
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - hcloudremediations
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: caph-webhook-service
+      namespace: caph-system
+      path: /mutate-infrastructure-cluster-x-k8s-io-v1beta1-hetznerbaremetalhost
+  failurePolicy: Fail
+  name: mutation.hetznerbaremetalhost.infrastructure.cluster.x-k8s.io
+  rules:
+  - apiGroups:
+    - infrastructure.cluster.x-k8s.io
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - hetznerbaremetalhosts
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: caph-webhook-service
+      namespace: caph-system
+      path: /mutate-infrastructure-cluster-x-k8s-io-v1beta1-hetznerbaremetalmachine
+  failurePolicy: Fail
+  name: mutation.hetznerbaremetalmachine.infrastructure.cluster.x-k8s.io
+  rules:
+  - apiGroups:
+    - infrastructure.cluster.x-k8s.io
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - hetznerbaremetalmachines
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: caph-webhook-service
+      namespace: caph-system
+      path: /mutate-infrastructure-cluster-x-k8s-io-v1beta1-hetznerbaremetalremediation
+  failurePolicy: Fail
+  name: mutation.hetznerbaremetalremediation.infrastructure.cluster.x-k8s.io
+  rules:
+  - apiGroups:
+    - infrastructure.cluster.x-k8s.io
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - hetznerbaremetalremediations
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: caph-webhook-service
+      namespace: caph-system
+      path: /mutate-infrastructure-cluster-x-k8s-io-v1beta1-hetznercluster
+  failurePolicy: Fail
+  name: mutation.hetznercluster.infrastructure.cluster.x-k8s.io
+  rules:
+  - apiGroups:
+    - infrastructure.cluster.x-k8s.io
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - hetznerclusters
+  sideEffects: None
