@@ -1,12 +1,12 @@
-# Hcloud + Syself Hetzner CAPI (Robot + Cloud)
+# Syself Hetzner CAPH (Robot + Cloud)
 
 ## Background
 
-* CCM (Cloud Controller Manager) an syself for Hetzner which talks to Hetzner api
+* CCM (Cloud Controller Manager) from syself which talks to Hetzner api
 
 * CAPH (Cluster API Provider Hetzner) which will takecare of node lifecycle (which it does via above CCM)
 
-* Syself has developed capi which works with hetzner robot, the official only supported the cloud.
+* Syself has developed CAPH which works with hetzner robot, the official only supported the cloud.
   But good news is that syself changes are merged into official
   [here is the PR](https://github.com/hetznercloud/hcloud-cloud-controller-manager/pull/561/)
   **NOTE** The official ccm didn't worked for me, so currently we are using ccm from syself (v1.18.0-0.0.5)
@@ -38,6 +38,12 @@
   export HETZNER_SSH_PRIV_PATH="/home/foo/.ssh/robot_id_rsa"
   ```
 
+* Install clusterapi
+
+  ```sh
+  clusterctl init --core cluster-api --bootstrap kubeadm --control-plane kubeadm --infrastructure hetzner
+  ```
+
 * Create required secrets
 
   ```sh
@@ -62,3 +68,7 @@
   but it comes up eventually, if manual ssh works.
 
 * Some more detail that I faced [here](https://github.com/syself/cluster-api-provider-hetzner/issues/252)
+
+## Guide
+
+[Quickstart](https://github.com/syself/cluster-api-provider-hetzner/blob/main/docs/topics/quickstart.md)
