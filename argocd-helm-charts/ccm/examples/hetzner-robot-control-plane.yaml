@@ -13,19 +13,19 @@ hetzner:
   controlPlaneRegions:
     - hel1
   nodes:
-    1866fff:
+    1866aff:
       name: <cluster-name>01
       maintenanceMode: false
       wwn:
         - '0x50000397cb700acd'
         - '0x500003981be00179'
-    1866fff:
+    1866bff:
       name: <cluster-name>02
       maintenanceMode: false
       wwn:
         - "0x5000cca25ed86494"
         - "0x5000cca25ecf496b"
-    1866fff:
+    1866cff:
       name: <cluster-name>03
       maintenanceMode: false
       wwn:
