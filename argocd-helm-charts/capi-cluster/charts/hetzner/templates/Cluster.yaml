@@ -1,10 +1,10 @@
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: Cluster
 metadata:
-  name: {{ .Values.name }}
+  name: {{ .Values.global.clusterName }}
   namespace: caph-system
   labels:
-    cluster.x-k8s.io/name: {{ .Values.name }}
+    cluster.x-k8s.io/name: {{ .Values.global.clusterName }}
 spec:
   clusterNetwork:
     pods:
@@ -13,8 +13,8 @@ spec:
   controlPlaneRef:
     apiVersion: controlplane.cluster.x-k8s.io/v1beta1
     kind: KubeadmControlPlane
-    name: {{ .Values.name }}-control-plane
+    name: {{ .Values.global.clusterName }}-control-plane
   infrastructureRef:
     apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
     kind: HetznerCluster
-    name: {{ .Values.name }}
+    name: {{ .Values.global.clusterName }}

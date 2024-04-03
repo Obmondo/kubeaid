@@ -4,7 +4,7 @@ kind: HetznerBareMetalHost
 metadata:
   name: {{ $value.name }}
   labels:
-    role: {{ $.Values.name }}-control-plane
+    role: {{ $.Values.global.clusterName }}-control-plane
 spec:
   serverID: {{ $key }}
   maintenanceMode: {{ $value.maintenanceMode }}
@@ -14,6 +14,6 @@ spec:
       {{- range $value.wwn }}
         - {{ . | quote }}
       {{- end }}
-  description: "Cluster {{ $.Values.name }} control plane node {{ $value.name }}"
+  description: "Cluster {{ $.Values.global.clusterName }} control plane node {{ $value.name }}"
 ---
 {{- end }}
