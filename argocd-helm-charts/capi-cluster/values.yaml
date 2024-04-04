@@ -1,3 +1,6 @@
 provider:
   hetzner: false
   aws: false
+
+clusterAPI:
+  version: v1.6.3

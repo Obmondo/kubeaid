@@ -1,0 +1,24 @@
+apiVersion: addons.cluster.x-k8s.io/v1alpha1
+kind: HelmChartProxy
+metadata:
+  name: cluster-api
+spec:
+  clusterSelector:
+    matchLabels:
+      cluster.x-k8s.io/name: {{ .Values.global.clusterName }}
+  repoURL: https://kubernetes-sigs.github.io/cluster-api-operator
+  chartName: cluster-api-operator
+  namespace: cluster-api
+  version: 0.9.1
+  options:
+    waitForJobs: true
+    wait: true
+    timeout: 5m0s
+    install:
+      createNamespace: true
+  valuesTemplate: |
+    addon: helm
+    bootstrap: kubeadm:{{ .Values.clusterAPI.version }}
+    controlPlane: kubeadm:{{ .Values.clusterAPI.version }}
+    core: cluster-api:{{ .Values.clusterAPI.version }}
+    infrastructure: {{ .Values.clusterAPI.infrastructure }}
