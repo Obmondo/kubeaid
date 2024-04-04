@@ -16,7 +16,7 @@ Alternative solutions to achieve cross account connectivity
 
 ## Procedure
 
-### AWS Private Link
+### AWS Private Link Setup
 
 AWS Private Link is a regional service offered by AWS to allow connection between two VPCs.
 Using AWS Private Link, requests can be routed via a Network Load Balancer to target groups
@@ -119,7 +119,7 @@ To verify if we can connect to the microservice:
 Spin up an EC2 instance in the consumer VPC.
 Run these commands to find out if DNS is resolved correctly and connection can be established.
 The DNS names are available in the VPC Endpoint, the first one would be the regional DNS name,
-the remaining will be specific to AZ. 
+the remaining will be specific to AZ.
 
 ```shell
 # Check if DNS is resolved correctly
@@ -143,19 +143,21 @@ $ curl -sv --resolve $host:443:$ip https://$host
 - Load balance the requests to the same AZ.
 - Have an subnet per AZ to save on cross AZ data costs.
 
-> Pricing per VPC endpoint per AZ ($/hour): $0.011
-
-> Data Processed per month ($/GB): $0.01
+Pricing per VPC endpoint per AZ ($/hour): $0.011
+Data Processed per month ($/GB): $0.01
 
 [Ref #6](#references)
 
 ## Caveats
 
-- Endpoint services are available in the AWS Region in which they are created and can be accessed in remote AWS Regions using inter-Region VPC peering.
+- Endpoint services are available in the AWS Region in which they are created and can be accessed in
+remote AWS Regions using inter-Region VPC peering.
 - The private DNS of the endpoint does not resolve outside of the Amazon VPC.
-- Availability Zone names in a customer account might not map to the same locations as Availability Zone names in another account.
-- Traffic will be sourced from the Network Load Balancer inside the service provider Amazon VPC. When service consumers send traffic to a
-service through an interface endpoint, the source IP addresses provided to the application are the private IP addresses of the
+- Availability Zone names in a customer account might not map to the same locations as Availability
+Zone names in another account.
+- Traffic will be sourced from the Network Load Balancer inside the service provider Amazon VPC. When
+service consumers send traffic to a service through an interface endpoint, the source IP addresses
+provided to the application are the private IP addresses of the
 Network Load Balancer nodes, and not the IP addresses of the service consumers.
 - 20 VPC endpoints per VPC (you can increase this to 40)
 - 10 Gbps throughput per VPC endpoint elastic network interface, although this can burst higher upto 40Gbps
