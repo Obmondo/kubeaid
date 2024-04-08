@@ -1,0 +1,11 @@
+# Sets the maximum request body to 2GB
+# https://doc.traefik.io/traefik/middlewares/http/buffering/#maxrequestbodybytes
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: traefik-request-body-limit
+  namespace: traefik
+spec:
+  buffering:
+    maxRequestBodyBytes: 2000000000
