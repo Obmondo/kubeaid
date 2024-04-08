@@ -67,3 +67,8 @@ tlsOptions:
       secretNames:
         - internalca-cert
 ```
+
+## Troubleshooting
+
+Traefik has a default limit on Request Body that can affect file uploads. To re-configure it
+using a middleware, [see this example.](./examples/request-body-middleware.yaml)
