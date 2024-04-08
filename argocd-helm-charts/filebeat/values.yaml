@@ -1,5 +1,6 @@
 networkpolicies: false
 filebeat:
+  imageTag: "8.7.1"
   daemonset:
     tolerations:
       - effect: NoSchedule
