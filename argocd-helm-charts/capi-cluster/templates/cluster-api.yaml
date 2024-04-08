@@ -18,7 +18,7 @@ spec:
       createNamespace: true
   valuesTemplate: |
     addon: helm
-    bootstrap: kubeadm:{{ .Values.clusterAPI.version }}
-    controlPlane: kubeadm:{{ .Values.clusterAPI.version }}
-    core: cluster-api:{{ .Values.clusterAPI.version }}
-    infrastructure: {{ .Values.clusterAPI.infrastructure }}
+    bootstrap: kubeadm:{{ .Values.cluster.api.version }}
+    controlPlane: kubeadm:{{ .Values.cluster.api.version }}
+    core: cluster-api:{{ .Values.cluster.api.version }}
+    infrastructure: {{ .Values.cluster.api.infrastructure }}

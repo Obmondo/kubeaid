@@ -213,4 +213,4 @@ spec:
       kind: HetznerBareMetalMachineTemplate
       name: {{ .Values.global.clusterName }}-control-plane
   replicas: 3
-  version: v1.28.4
+  version: {{ .Values.global.kubernetes.version }}
