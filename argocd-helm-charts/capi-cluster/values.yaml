@@ -2,5 +2,14 @@ provider:
   hetzner: false
   aws: false
 
-clusterAPI:
-  version: v1.6.3
+global:
+  kubernetes:
+    version: v1.29.3
+
+cluster:
+  api:
+    version: v1.6.3
+  kubeaid:
+    repo: https://github.com/Obmondo/kubeaid.git
+  KubeaidConfig:
+    repo: https://github.com/Obmondo/kubeaid-config.git
