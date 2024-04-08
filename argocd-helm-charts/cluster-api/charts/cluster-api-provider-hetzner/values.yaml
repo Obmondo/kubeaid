@@ -1,3 +1,0 @@
-hcloud-cloud-controller-manager:
-  robot:
-    enabled: true
