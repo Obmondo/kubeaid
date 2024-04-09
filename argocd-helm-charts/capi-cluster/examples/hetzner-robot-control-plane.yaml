@@ -1,12 +1,24 @@
 provider:
   hetzner: true
 
+global:
+  clusterName: kubeaid-test
+  kubernetes:
+    version: v1.28.6
+
+cluster:
+  api:
+    infrastructure: hetzner:v1.0.0-beta.33
+  kubeaid:
+    repo: https://github.com/Obmondo/kubeaid.git
+  kubeaidConfig:
+    repo: https://github.com/Obmondo/kubeaid-config.git
+
 hetzner:
-  name: <cluster-name>
   pods:
     cidrBlock: 10.244.0.0/16
   controlPlaneEndpoint:
-    host: 8.18.2.17
+    host: x.x.x.x  # buy floating IP from hetzner
     port: 6443  # kube-apiserver pod listen on this port
   controlPlaneLoadBalancer:
     enabled: false
@@ -14,19 +26,19 @@ hetzner:
     - hel1
   nodes:
     1866aff:
-      name: <cluster-name>01
+      name: htzhel1-41d.kubeaid.io
       maintenanceMode: false
       wwn:
         - '0x50000397cb700acd'
         - '0x500003981be00179'
     1866bff:
-      name: <cluster-name>02
+      name: htzhel1-41e.kubeaid.io
       maintenanceMode: false
       wwn:
         - "0x5000cca25ed86494"
         - "0x5000cca25ecf496b"
     1866cff:
-      name: <cluster-name>03
+      name: htzhel1-41f.kubeaid.io
       maintenanceMode: false
       wwn:
         - "0x50014ee2097c6ca4"
