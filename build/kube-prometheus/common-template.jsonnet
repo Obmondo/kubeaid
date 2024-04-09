@@ -99,6 +99,7 @@ local default_vars = {
     'node-memory': true,
     'argo-cd-sync-state': true,
     rabbitmq: false,
+    'monitor-prometheus-stack': false,
   },
   mixin_configs: {
     // Example:
@@ -168,6 +169,11 @@ local mixins = remove_nulls([
   addMixin(
     'rabbitmq',
     (import 'github.com/adinhodovic/rabbitmq-mixin/mixin.libsonnet'),
+    vars,
+  ),
+  addMixin(
+    'monitoring',
+    (import 'mixins/monitoring/mixin.libsonnet'),
     vars,
   ),
 ]);
