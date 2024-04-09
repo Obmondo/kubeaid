@@ -1,4 +1,4 @@
-gitlab_vm_name = "kilroy-gitlab"
+gitlab_vm_name = "obmondo-gitlab"
 location = "North Europe"
 resource_group_name = "obmondo-aks"
 create_public_ip = true
