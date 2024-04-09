@@ -9,27 +9,17 @@ spec:
   repoURL: https://argoproj.github.io/argo-helm
   chartName: argo-cd
   namespace: argo-cd
+  releaseName: argo-cd
   options:
     waitForJobs: true
     wait: true
     timeout: 5m0s
     install:
       createNamespace: true
-  configs:
-    cmp:
-      create: true
+  valuesTemplate: |
+    configs:
       repositories:
         kubeaid-repo:
           name: kubeaid
           type: {{ .Values.cluster.kubeaid.type }}
           url: {{ .Values.cluster.kubeaid.repo }}
-        kubeaid-config-repo:
-          name: kubeaid-config
-          type: {{ .Values.cluster.kubeaidConfig.type }}
-          url: {{ .Values.cluster.kubeaidConfig.repo }}
-  server:
-    initContainers:
-    - name: kubeaid-bootstrap-setup
-      image: ghcr.io/obmondo/kubeaid-bootstrap-setup:latest
-      command:
-      - /usr/local/bin/kubeaid-bootstrap-setup

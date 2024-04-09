@@ -9,6 +9,8 @@ spec:
   repoURL: https://helm.cilium.io/
   chartName: cilium
   namespace: cilium
+  releaseName: cilium
+  version: 1.15.3
   options:
     waitForJobs: true
     wait: true

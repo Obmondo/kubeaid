@@ -12,6 +12,7 @@ cluster:
   kubeaid:
     repo: https://github.com/Obmondo/kubeaid.git
     type: git
-  kubeaidConfig:
-    repo: https://github.com/Obmondo/kubeaid-config.git
-    type: git
+  monitoring:
+    provider: kubeadm
+    connectObmondo: false
+    version: "v0.13.0"
