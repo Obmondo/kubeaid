@@ -11,5 +11,7 @@ cluster:
     version: v1.6.3
   kubeaid:
     repo: https://github.com/Obmondo/kubeaid.git
-  KubeaidConfig:
+    type: git
+  kubeaidConfig:
     repo: https://github.com/Obmondo/kubeaid-config.git
+    type: git

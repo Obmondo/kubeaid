@@ -32,7 +32,7 @@
   #!/bin/bash
 
   export HCLOUD_SSH_KEY="cluster" \
-  export CLUSTER_NAME="kcm.obmondo.com" \
+  export CLUSTER_NAME="kubeaid-test.kubeaid.io" \
   export HCLOUD_TOKEN="xxx" \
   export HETZNER_ROBOT_USER="xxx" \
   export HETZNER_ROBOT_PASSWORD="xxx" \
@@ -40,28 +40,23 @@
   export HETZNER_SSH_PRIV_PATH="/home/foo/.ssh/robot_id_rsa"
   ```
 
-* Install clusterapi
+* Install cluster-api
 
   ```sh
-  clusterctl init --core cluster-api --bootstrap kubeadm --control-plane kubeadm --infrastructure hetzner # pinned to v1.0.0-beta.33
+  Generate argocd application using one of the [examples](./examples/argocd-application.yaml)
   ```
 
 * Create required secrets
 
   ```sh
-  kubectl -n caph-system create secret generic hetzner --dry-run=client --from-literal=hcloud=$HCLOUD_TOKEN --from-literal=robot-user=$HETZNER_ROBOT_USER --from-literal=robot-password=$HETZNER_ROBOT_PASSWORD -o yaml | kubeseal --controller-name sealed-secrets --controller-namespace system -o yaml > hetzner.yaml
+  kubectl -n capi-cluster create secret generic hetzner --dry-run=client --from-literal=hcloud=$HCLOUD_TOKEN --from-literal=robot-user=$HETZNER_ROBOT_USER --from-literal=robot-password=$HETZNER_ROBOT_PASSWORD -o yaml | kubeseal --controller-name sealed-secrets --controller-namespace system -o yaml > hetzner.yaml
 
-   kubectl create secret generic robot-ssh --dry-run=client -n capi-system --from-literal=sshkey-name=cluster --from-file=ssh-privatekey=$HETZNER_SSH_PRIV_PATH --from-file=ssh-publickey=$HETZNER_SSH_PUB_PATH -o yaml | kubeseal --controller-name sealed-secrets --controller-namespace system -o yaml > robot-ssh.yaml
+   kubectl create secret generic robot-ssh --dry-run=client -n capi-cluster --from-literal=sshkey-name=cluster --from-file=ssh-privatekey=$HETZNER_SSH_PRIV_PATH --from-file=ssh-publickey=$HETZNER_SSH_PUB_PATH -o yaml | kubeseal --controller-name sealed-secrets --controller-namespace system -o yaml > robot-ssh.yaml
   ```
 
-* Generate argocd application using one of the [examples](./examples/argocd-application.yaml)
+* Sync in root app and then cluster-api app
 
-* Added a value file as show in this [example](./examples/hetzner-robot-control-plane.yaml) Sync it in argocd (sync root app and then the actual application **dev-capi-hetzner**)
-
-## Improvements
-
-* It's strictly binded to caph-system namespace for now and runs on v1.0.0-beta.33 [added support in helm chart]
-
+* The cluster-api is completed, now you can create k8s cluster using [this chart](../../capi-cluster)
 ## Troubleshootings
 
 * Node will be restart again and again, simply delete the machine from cluster, for forcefull, remove the finalizers
