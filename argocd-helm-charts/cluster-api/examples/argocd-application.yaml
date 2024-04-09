@@ -1,21 +1,20 @@
----
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: dev-capi-hetzner
+  name: cluster-api
   namespace: argocd
 spec:
   destination:
-    namespace: caph-system
+    namespace: cluster-api
     server: 'https://kubernetes.default.svc'
   sources:
     - repoURL: https://github.com/Obmondo/kubeaid.git
-      path: argocd-helm-charts/capi-clusters
+      path: argocd-helm-charts/cluster-api
       targetRevision: HEAD
       helm:
         valueFiles:
-          - $values/k8s/dev/argocd-apps/values-dev-capi-hetzner.yaml
-    - repoURL: https://github.com/Obmondo/your-config-repo.git
+          - $values/k8s/test/argocd-apps/values-cluster-api.yaml
+    - repoURL: https://github.com/Obmondo/kubeaid-config.git
       targetRevision: HEAD
       ref: values
   project: default
