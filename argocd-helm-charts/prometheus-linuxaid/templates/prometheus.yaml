@@ -24,7 +24,7 @@ spec:
   serviceMonitorNamespaceSelector: null
   serviceMonitorSelector: {}
   replicas: 1
-  retention: {{ if .Values.prometheus.retention }}{{ .Values.prometheus.retention }}{{ else }}15d{{ end }}
+  retention: {{ .Values.prometheus.retention | default "15d" | }}
   externalUrl: /{{ .Values.customerid }}
   routePrefix: /{{ .Values.customerid }}
   evaluationInterval: 30s
