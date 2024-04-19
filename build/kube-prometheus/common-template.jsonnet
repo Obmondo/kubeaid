@@ -18,7 +18,7 @@ local default_vars = {
   ],
 
   prometheus_operator_resources: {
-    limits: { memory: '80Mi' },
+    limits: { memory: '120Mi' },
     requests: { cpu: '20m', memory: '80Mi' },
   },
   prometheus_operator_kubeRbacProxy_resources: {
@@ -34,8 +34,8 @@ local default_vars = {
     requests: { cpu: '1m', memory: '50Mi' },
   },
   prometheus_resources: {
-    limits: { memory: '3Gi' },
-    requests: { cpu: '200m', memory: '2500Mi' },
+    limits: { memory: '7Gi' },
+    requests: { cpu: '200m', memory: '5Gi' },
   },
   prometheus_adapter_resources: {
     limits: { memory: '2Gi' },
