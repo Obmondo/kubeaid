@@ -15,3 +15,8 @@ opensearch:
   extraEnvs:
   - name: DISABLE_INSTALL_DEMO_CONFIG
     value: "false"
+
+serviceMonitor:
+  enabled: false
+  path: /metrics
+  interval: 10s
