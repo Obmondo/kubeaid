@@ -1,0 +1,14 @@
+{{- if and (not (.Values.logicalbackup).enabled) (.Values.cnpglogicalbackup).enabled  }}
+
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: backup-pgsql
+spec:
+  schedule: "0 0 0 * * *"
+  immediate: true
+  backupOwnerReference: self
+  cluster:
+    name: keycloak-pgsql
+
+{{ end }}

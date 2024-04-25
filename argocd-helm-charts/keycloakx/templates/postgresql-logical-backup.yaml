@@ -1,4 +1,4 @@
-{{ if (.Values.logicalbackup).enabled  }}
+{{- if and (not (.Values.cnpglogicalbackup).enabled) (.Values.logicalbackup).enabled }}
 
 apiVersion: batch/v1
 kind: CronJob
