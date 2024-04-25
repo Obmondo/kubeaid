@@ -1,90 +1,60 @@
-# Default values for redis-operator.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+---
+redisOperator:
+  name: redis-operator
+  imageName: quay.io/opstree/redis-operator
+  # Overrides the image tag whose default is the chart appVersion.
+  imageTag: ""
+  imagePullPolicy: Always
 
-# Name of the image repository to pull the container image from.
-image:
-  repository: quay.io/spotahome/redis-operator
-  pullPolicy: IfNotPresent
-  tag: v1.2.4
-  cli_args: ""
+  # Additional pod annotations
+  podAnnotations: {}
+  # Additional Pod labels (e.g. for filtering Pod by custom labels)
+  podLabels: {}
 
-imageCredentials:
-  create: false
-  registry: url.private.registry
-  username: someone
-  password: somepassword
-  email: someone@example.com
-  # Use exists secrets in namespace
-  existsSecrets:
-    - registrysecret
+  # Additional arguments for redis-operator container
+  extraArgs: []
 
-updateStrategy:
-  type: RollingUpdate
+  #  - -zap-log-level=error
+  watch_namespace: ""
+  env: []
+  webhook: false
+
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 500Mi
+  requests:
+    cpu: 500m
+    memory: 500Mi
 
 replicas: 1
 
-# A name in place of the chart name for `app:` labels.
-nameOverride: ""
-
-# A name to substitute for the full names of resources.
-fullnameOverride: ""
-
-# The name of the Namespace to deploy
-# If not set, `.Release.Namespace` is used
-namespace: null
-
-serviceAccount:
-  # Enable service account creation.
-  create: true
-  # Annotations to be added to the service account.
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template.
-  name: ""
+serviceAccountName: redis-operator
 
 service:
-  type: ClusterIP
-  port: 9710
+  name: webhook-service
+  namespace: redis-operator
 
-container:
-  port: 9710
+certificate:
+  name: serving-cert
+  secretName: webhook-server-cert
 
-# Container [security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container).
-# See the [API reference](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context-1) for details.
-securityContext:
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
-  runAsUser: 1000
+issuer:
+  type: selfSigned
+  name: redis-operator-issuer
+  email: shubham.gupta@opstree.com
+  server: https://acme-v02.api.letsencrypt.org/directory
+  privateKeySecretName: letsencrypt-prod
+  solver:
+    enabled: true
+    ingressClass: nginx
 
-# Container resource [requests and limits](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/).
-# See the [API reference](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources) for details.
-# @default -- No requests or limits.
-resources: {}
-#   requests:
-#     cpu: 100m
-#     memory: 128Mi
-#   limits:
-#     cpu: 100m
-#     memory: 128Mi
-
-### Monitoring
-###############
-monitoring:
-  # Enable Prometheus PodMonitor to monitor the operator.
+certmanager:
   enabled: false
-  serviceMonitor: false
-  serviceAnnotations: {}
-  prometheus:
-    name: unknown
-
-# Annotations to be added to pods and deployments.
-annotations: {}
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
 
 priorityClassName: ""
+nodeSelector: {}
+tolerateAllTaints: false
+tolerations: []
+affinity: {}

@@ -1,20 +1,21 @@
-apiVersion: v1
-kind: Service
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
 metadata:
+  name: {{ .Values.redisOperator.name }}
   labels:
     app.kubernetes.io/name : {{ .Values.redisOperator.name }}
     helm.sh/chart : {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app.kubernetes.io/managed-by : {{ .Release.Service }}
     app.kubernetes.io/instance : {{ .Release.Name }}
     app.kubernetes.io/version : {{ .Chart.AppVersion }}
-    app.kubernetes.io/component: webhook
+    app.kubernetes.io/component: role-binding
     app.kubernetes.io/part-of : {{ .Release.Name }}
-  name: {{ .Values.service.name }}
-  namespace:  {{ .Release.Namespace }}
-spec:
-  ports:
-    - port: 443
-      protocol: TCP
-      targetPort: 9443
-  selector:
-    name: {{ .Values.redisOperator.name }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.serviceAccountName }}
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ .Values.redisOperator.name }}
+  apiGroup: rbac.authorization.k8s.io

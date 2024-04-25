@@ -1,6 +1,6 @@
 dependencies:
 - name: redis-operator
-  repository: https://spotahome.github.io/redis-operator
-  version: 3.2.9
-digest: sha256:6ad1b17a32b671a7baea4307f7543d9c7ab7d292f2658c95310709e98fcadd83
-generated: "2024-03-07T18:09:07.326555232+05:30"
+  repository: https://ot-container-kit.github.io/helm-charts
+  version: 0.15.9
+digest: sha256:a41129bc9a709f2626bfabbd49d5a02f4a7ee10ace7a83947eab2e87cd7c88aa
+generated: "2024-04-22T16:55:35.479535043+05:30"
