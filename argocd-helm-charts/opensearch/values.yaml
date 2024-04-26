@@ -20,3 +20,5 @@ serviceMonitor:
   enabled: false
   path: /metrics
   interval: 10s
+
+metricsPort: 9600
