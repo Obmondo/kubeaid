@@ -9,6 +9,7 @@ spec:
   repoURL: https://kubernetes-sigs.github.io/cluster-api-operator
   chartName: cluster-api-operator
   namespace: cluster-api
+  releaseName: cluster-api
   version: 0.9.1
   options:
     waitForJobs: true
