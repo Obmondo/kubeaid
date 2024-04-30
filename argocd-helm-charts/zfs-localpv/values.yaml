@@ -24,6 +24,7 @@ zfs-localpv:
   zfsExporter:
     enable: true
     name: zfs-exporter
+    port: 9134
     image:
       # Make sure that registry name end with a '/'.
       # For example : registry.k8s.io/ is a correct value here and quay.io is incorrect

@@ -115,7 +115,7 @@ spec:
         - name: {{ .Values.zfsExporter.name }}
           image: "{{ .Values.zfsExporter.image.registry }}{{ .Values.zfsExporter.image.repository }}:{{ .Values.zfsExporter.image.tag }}"
           ports:
-            - containerPort: 9134
+            - containerPort: {{ .Values.zfsExporter.port }}
           resources:
             {{- with .Values.zfsExporter.resources }}
             limits:

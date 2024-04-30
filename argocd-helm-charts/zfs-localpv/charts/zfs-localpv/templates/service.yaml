@@ -1,0 +1,15 @@
+{{- if .Values.zfsExporter.enable }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "zfslocalpv.fullname" . }}-exporter
+  labels:
+    app: {{ template "zfslocalpv.fullname" . }}-exporter
+spec:
+  selector:
+    name: openebs-zfs-node
+  ports:
+    - protocol: TCP
+      port: {{ .Values.zfsExporter.port }}
+      targetPort: {{ .Values.zfsExporter.port }}
+{{- end }}
