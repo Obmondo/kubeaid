@@ -26,24 +26,29 @@
 
 ## Setup
 
+* Install cluster-api
+
+  ```sh
+  Generate argocd application using one of the [examples](./examples/argocd-application.yaml)
+  ```
+
 * Setup required envs
 
   ```sh
   #!/bin/bash
 
+  export CLUSTER_NAME=kcm \
   export HCLOUD_SSH_KEY="cluster" \
-  export CLUSTER_NAME="kubeaid-test.kubeaid.io" \
   export HCLOUD_TOKEN="xxx" \
   export HETZNER_ROBOT_USER="xxx" \
   export HETZNER_ROBOT_PASSWORD="xxx" \
   export HETZNER_SSH_PUB_PATH= "/home/foo/.ssh/robot_id_rsa.pub" \
-  export HETZNER_SSH_PRIV_PATH="/home/foo/.ssh/robot_id_rsa"
-  ```
-
-* Install cluster-api
-
-  ```sh
-  Generate argocd application using one of the [examples](./examples/argocd-application.yaml)
+  export HETZNER_SSH_PRIV_PATH="/home/foo/.ssh/robot_id_rsa" \
+  export ARGOCD_KUBEAID_CONFIG_REPO_URL=https://github.com/Obmondo/kubeaid-config-enableit.git \
+  export ARGOCD_REPO_TOKEN=xxx \
+  export ARGOCD_REPO_USERNAME=kubeaid-bot \
+  export GIT_KUBEAID_CONFIG_REPO_URL=https://github.com/Obmondo/kubeaid-config.git \
+  export KUBEAIDCONFIG=~/.kube/config
   ```
 
 * Create required secrets
@@ -57,6 +62,25 @@
 * Sync in root app and then cluster-api app
 
 * The cluster-api is completed, now you can create k8s cluster using [this chart](../../capi-cluster)
+
+* Sync the cluster app on argo-cd
+
+* Make sure the floating IP is pointing to correct node on robot UI
+
+* Get the new cluster kubeconfig
+
+  ```sh
+  clusterctl get kubeconfig -n capi-cluster kcm > /tmp/x.config
+  ```
+
+* Make sure to remove the taint from control-plane nodes, so it can schedule the pod
+
+```yaml
+  taints:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/control-plane
+```
+
 ## Troubleshootings
 
 * Node will be restart again and again, simply delete the machine from cluster, for forcefull, remove the finalizers
