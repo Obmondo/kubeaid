@@ -8,14 +8,7 @@ name: markdownlint
 
 jobs:
   markdownlint:
-    name: Markdown Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v3
-
-      - name: markdownlint
-        uses: https://gitea.obmondo.com/Obmondo/gitea-actions/.gitea/actions/markdownlint-cli2-action@main
-        with:
-          config: .markdownlint-cli2.yaml
-          globs: '**/*.md'
+    uses: Obmondo/gitea-actions/.gitea/workflows/markdownlint.yml@main
+    with:
+      config: .markdownlint-cli2.yaml
+      globs: '**/*.md'
