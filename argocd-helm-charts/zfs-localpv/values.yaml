@@ -19,20 +19,24 @@ zfs-localpv:
     priorityClass:
       create: true
       name: zfs-csi-controller-critical
-  
+
   # zfsExporter Confiration
   zfsExporter:
     enable: true
+    serviceMonitor:
+      enabled: true
+      path: /metrics
+      interval: 10s
     name: zfs-exporter
     port: 9134
     image:
       # Make sure that registry name end with a '/'.
       # For example : registry.k8s.io/ is a correct value here and quay.io is incorrect
-      registry:
-      repository: deveshs23/zfs_exporter #Need to replace
+      registry: harbor.obmondo.com/
+      repository: obmondo/zfs_exporter
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: v2.3.4_2 # Need to replace
+      tag: v2.3.4_1 # Need to replace
     resources:
       limits:
         cpu: 100m
