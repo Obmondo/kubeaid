@@ -3,11 +3,12 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ template "zfslocalpv.fullname" . }}-exporter
+  namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ template "zfslocalpv.fullname" . }}-exporter
+    {{- include "zfslocalpv.zfsNode.labels" . | nindent 4 }}
 spec:
   selector:
-    name: openebs-zfs-node
+    {{- include "zfslocalpv.zfsNode.matchLabels" . | nindent 4 }}
   ports:
     - protocol: TCP
       port: {{ .Values.zfsExporter.port }}
