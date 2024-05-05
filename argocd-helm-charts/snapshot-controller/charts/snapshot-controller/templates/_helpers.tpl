@@ -11,10 +11,14 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */}}
 {{- define "snapshot-controller.fullname" -}}
+{{- if .Values.controller.fullnameOverride -}}
+{{- .Values.controller.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
 {{- if contains .Chart.Name .Release.Name }}
 {{- .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- else }}
 {{- printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" }}
+{{- end }}
 {{- end }}
 {{- end }}
 
@@ -69,10 +73,14 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */}}
 {{- define "snapshot-validation-webhook.fullname" -}}
+{{- if .Values.webhook.fullnameOverride -}}
+{{- .Values.webhook.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
 {{- if contains .Chart.Name .Release.Name }}
 {{- "snapshot-validation-webhook" }}
 {{- else }}
 {{- printf "%s-%s" .Release.Name "snapshot-validation-webhook" | trunc 63 | trimSuffix "-" }}
+{{- end }}
 {{- end }}
 {{- end }}
 
