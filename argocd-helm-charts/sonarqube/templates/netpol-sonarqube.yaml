@@ -35,6 +35,12 @@ spec:
         - 443
       nets:
         - 10.5.0.0/16
+  # sonarqube-change-admin-password-hook
+  - action: Allow
+    destination:
+      ports:
+        - 9000
+    protocol: TCP
   # install-plugin is accessing https://github.com
   - action: Allow
     protocol: TCP
@@ -64,6 +70,14 @@ spec:
       namespaceSelector: kubernetes.io/metadata.name == 'traefik'
       nets:
         - 199.232.24.209
+    destination:
+      ports:
+      - 9000
+  - action: Allow
+    protocol: TCP
+    source:
+      namespaceSelector: kubernetes.io/metadata.name == 'sonarqube'
+      selector: app == 'sonarqube'
     destination:
       ports:
       - 9000
