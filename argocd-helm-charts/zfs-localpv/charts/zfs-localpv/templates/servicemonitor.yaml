@@ -9,9 +9,9 @@ metadata:
 spec:
   selector:
     matchLabels:
-      {{- include "zfslocalpv.zfsNode.matchLabels" . | nindent 4 }}
+      {{- include "zfslocalpv.zfsNode.matchLabels" . | nindent 6 }}
   endpoints:
-  - port: {{ .Values.zfsExporter.port }}
+  - port: {{ .Values.zfsExporter.port | quote }}
     interval: {{ .Values.zfsExporter.serviceMonitor.interval }}
     path: {{ .Values.zfsExporter.serviceMonitor.path }}
 {{- end }}
