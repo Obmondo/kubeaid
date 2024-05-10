@@ -1,3 +1,5 @@
+{{- if (.Values.postgresql).enabled }}
+
 apiVersion: acid.zalan.do/v1
 kind: postgresql
 metadata:
@@ -21,3 +23,5 @@ spec:
     {{- if .Values.postgresql.storageClass }}
     storageClass: {{ .Values.postgresql.storageClass }}
     {{- end }}
+
+{{ end }}

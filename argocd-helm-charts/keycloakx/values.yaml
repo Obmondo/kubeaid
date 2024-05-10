@@ -20,12 +20,12 @@ keycloakx:
     - name: KC_DB_USERNAME
       valueFrom:
         secretKeyRef:
-          name: keycloak.keycloakx-pgsql.credentials.postgresql.acid.zalan.do
+          name: keycloak-pgsql-app
           key: username
     - name: KC_DB_PASSWORD
       valueFrom:
         secretKeyRef:
-          name: keycloak.keycloakx-pgsql.credentials.postgresql.acid.zalan.do
+          name: keycloak-pgsql-app
           key: password
     - name: KEYCLOAK_ADMIN
       value: admin
@@ -48,6 +48,13 @@ keycloakx:
   dbchecker:
     enabled: true
 
+cnpg:
+  instance: 1
+  size: 4Gi
+  recover: false
+  storageClass: default
+
 postgresql:
+  enabled: false
   size: 4Gi
   enableLogicalBackup: true
