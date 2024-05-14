@@ -60,14 +60,14 @@ spec:
     volumeClaimTemplate:
       spec:
         # storageClassName: standard
-        accessModes: ["ReadWriteOnce"]
+        accessModes: [ReadWriteOnce]
         resources:
           requests:
             storage: 1Gi
     nodeConfVolume: true
     nodeConfVolumeClaimTemplate:
       spec:
-        accessModes: ["ReadWriteOnce"]
+        accessModes: [ReadWriteOnce]
         resources:
           requests:
             storage: 1Gi
