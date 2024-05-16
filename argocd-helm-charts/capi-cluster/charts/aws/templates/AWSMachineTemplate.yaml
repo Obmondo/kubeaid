@@ -6,8 +6,8 @@ spec:
   template:
     spec:
       iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
-      instanceType: {{ .Values.aws.controlPlane.instanceType }}
-      sshKeyName: {{ .Values.aws.controlPlane.sshKeyName }}
+      instanceType: {{ .Values.controlPlane.instanceType }}
+      sshKeyName: {{ .Values.controlPlane.sshKeyName }}
 
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
@@ -18,5 +18,5 @@ spec:
   template:
     spec:
       iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
-      instanceType: {{ .Values.aws.workerNodes.instanceType }}
-      sshKeyName: {{ .Values.aws.workerNodes.sshKeyName }}
+      instanceType: {{ .Values.workerNodes.instanceType }}
+      sshKeyName: {{ .Values.workerNodes.sshKeyName }}

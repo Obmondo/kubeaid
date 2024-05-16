@@ -1,6 +1,6 @@
 provider:
-  hetzner: false
   aws: false
+  hetzner: false
 
 global:
   kubernetes:

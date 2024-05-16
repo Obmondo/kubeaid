@@ -4,7 +4,7 @@ metadata:
   name: {{ .Values.global.clusterName }}-md-0
 spec:
   clusterName: {{ .Values.global.clusterName }}
-  replicas: {{ .Values.aws.workerNodes.replicas }}
+  replicas: {{ .Values.workerNodes.replicas }}
   selector:
     matchLabels: null
   template:
