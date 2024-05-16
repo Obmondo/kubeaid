@@ -68,4 +68,16 @@ rules:
     - delete
     - update
     - patch
+- apiGroups:
+    - redis.redis.opstreelabs.in
+  resources:
+    - redisclusters
+  verbs:
+    - get
+    - list
+    - watch
+    - create
+    - patch
+    - update
+    - delete
 {{- end -}}
