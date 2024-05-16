@@ -4,7 +4,7 @@ metadata:
   name: {{ .Values.global.clusterName }}-md-0
 spec:
   clusterName: {{ .Values.global.clusterName }}
-  replicas: {{
+  replicas: {{ .Values.aws.workerNodes.replicas }}
   selector:
     matchLabels: null
   template:
@@ -14,7 +14,7 @@ spec:
           apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
           kind: KubeadmConfigTemplate
           name: {{ .Values.global.clusterName }}-md-0
-      clusterName: ${CLUSTER_NAME}
+      clusterName: {{ .Values.global.clusterName }}
       infrastructureRef:
         apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
         kind: AWSMachineTemplate

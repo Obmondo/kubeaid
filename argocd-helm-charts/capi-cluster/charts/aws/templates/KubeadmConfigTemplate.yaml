@@ -9,4 +9,4 @@ spec:
         nodeRegistration:
           kubeletExtraArgs:
             cloud-provider: external
-          name: '{{ ds.meta_data.local_hostname }}'
+          name: '{{"{{"}} ds.meta_data.local_hostname {{"}}"}}'
