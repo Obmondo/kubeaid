@@ -8,6 +8,7 @@ name: markdownlint
 
 jobs:
   markdownlint:
+    runs-on: ubuntu-22.04-bantha
     uses: Obmondo/gitea-actions/.gitea/workflows/markdownlint.yml@main
     with:
       config: .markdownlint-cli2.yaml
