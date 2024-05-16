@@ -5,5 +5,5 @@ metadata:
   labels:
     cluster.x-k8s.io/name: {{ .Values.global.clusterName }}
 spec:
-  region: {{ .Values.aws.region }}
-  sshKeyName: {{ .Values.aws.sshKeyName }}
+  region: {{ .Values.region }}
+  sshKeyName: {{ .Values.sshKeyName }}

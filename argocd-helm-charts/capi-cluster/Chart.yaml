@@ -8,3 +8,7 @@ dependencies:
     version: 1.0.0
     repository: 'file://charts/hetzner'
     condition: provider.hetzner
+  - name: aws
+    version: 1.0.0
+    repository: 'file://charts/aws'
+    condition: provider.aws
