@@ -1,7 +1,7 @@
 apiVersion: addons.cluster.x-k8s.io/v1alpha1
 kind: HelmChartProxy
 metadata:
-  name: ccm-hetzner
+  name: ccm-hetzner-{{ .Values.global.clusterName }}
 spec:
   clusterSelector:
     matchLabels:
