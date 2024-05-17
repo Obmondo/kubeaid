@@ -25,4 +25,13 @@
   value: {{ .value | quote }}
 {{- end }}
 {{- end }}
+{{- range $key, $value := .Values.extraEnv }}
+- name: {{ $key }}
+  value: {{ $value | quote }}
+{{- end }}
+{{- range $key, $value := .Values.extraEnvFrom }}
+- name: {{ $key }}
+  valueFrom: 
+    {{- toYaml $value | nindent 4 }}
+{{- end }}
 {{- end }}
