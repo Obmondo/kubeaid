@@ -193,7 +193,7 @@ function pull_request() {
 
     export GITEA_TOKEN
     export GITHUB_TOKEN
-    
+
     case "${KUBERNETES_CONFIG_REPO_URL}" in
       *gitea*)
         token=${GITEA_TOKEN}
@@ -205,7 +205,7 @@ function pull_request() {
         token=${GITHUB_TOKEN}
         URL="api.github.com"
         owner="Obmondo"
-        repo="kubeaid"  
+        repo="kubeaid"
     esac
 
     # Create a pull request using the Gitea or GitHub API
@@ -218,7 +218,7 @@ function pull_request() {
         "body": "Auto-generated pull request from Obmondo, created from changes by '"${USER_NAME}"' ('"${USER_EMAIL}"')."
       }' \
       "https://${URL}/repos/$owner/$repo/pulls")
-    
+
     # Check for warnings or errors in the output and handle as needed
     if grep -q WARNINGS <<< "${output}"; then
       exit 1
