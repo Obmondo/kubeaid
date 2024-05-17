@@ -1,6 +1,6 @@
 {{- if .Values.graylog.ingress.enabled -}}
 {{- $extraPaths := .Values.graylog.ingress.extraPaths -}}
-{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/IngressClass" }}
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
 apiVersion: networking.k8s.io/v1
 {{- else }}
 apiVersion: networking.k8s.io/v1beta1
@@ -19,7 +19,7 @@ metadata:
 {{- end }}
   name: {{ template "graylog.fullname" . }}-web
 spec:
-  {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/IngressClass" }}
+  {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
   ingressClassName: {{ .Values.graylog.ingress.ingressClassName }}
   {{- end }}
   rules:
@@ -30,7 +30,7 @@ spec:
           {{ if $extraPaths }}
 {{ toYaml $extraPaths | indent 10 }}
           {{- end }}
-          {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/IngressClass" }}
+          {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
           - backend:
               service:
                 name: {{ template "graylog.fullname" $ }}-web
