@@ -34,6 +34,7 @@ spec:
         {{- toYaml .Values.r10k.podSecurityContext | nindent 8 }}
         runAsUser: {{ .Values.global.securityContext.runAsUser }}
         runAsGroup: {{ .Values.global.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.global.securityContext.fsGroup }}
       containers:
         - name: r10k-code
           image: "{{ tpl .Values.r10k.image . }}:{{ tpl .Values.r10k.tag . }}"
@@ -78,6 +79,13 @@ spec:
           - name: r10k-code-netrc
             mountPath: /home/puppet/.netrc
             subPath: .netrc
+          {{- end }}
+          {{- end }}
+          {{- with .Values.r10k.code.viaHttps.customCa }}
+          {{- if or .existingSecret .cert.value }}
+          - name: r10k-code-cert
+            mountPath: /home/puppet/code-certs/ca.pem
+            subPath: ca.pem
           {{- end }}
           {{- end }}
           - name: puppet-code-storage
@@ -197,6 +205,15 @@ spec:
                 path: id_rsa
               - key: known_hosts
                 path: known_hosts
+        {{- end }}
+        {{- if or .Values.r10k.code.viaHttps.customCa.existingSecret .Values.r10k.code.viaHttps.customCa.cert.value }}
+        - name: r10k-code-cert
+          secret:
+            secretName: {{ template "r10k.code.viaHttps.customCa.secret" . }}
+            defaultMode: 288 # = mode 0440
+            items:
+              - key: cert
+                path: ca.pem
         {{- end }}
         {{- if or .Values.r10k.code.viaHttps.credentials.existingSecret .Values.r10k.code.viaHttps.credentials.netrc.value }}
         - name: r10k-code-netrc

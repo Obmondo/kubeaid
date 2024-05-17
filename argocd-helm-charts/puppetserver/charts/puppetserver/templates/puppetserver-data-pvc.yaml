@@ -1,4 +1,4 @@
-{{- if not .Values.puppetserver.persistence.data.existingClaim }}
+{{- if and (not .Values.puppetserver.persistence.data.existingClaim) (eq .Values.puppetserver.persistence.data.enabled true) }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

@@ -141,7 +141,9 @@ spec:
               mkdir -p /opt/puppetlabs/server/data/puppetserver/dropsonde/bin/;
               touch /opt/puppetlabs/server/data/puppetserver/dropsonde/bin/dropsonde;
               chown puppet:puppet -R /opt/puppetlabs/server/data/puppetserver/;
+              {{- if eq .Values.puppetserver.persistence.confd.enabled true }}
               cp -rp /etc/puppetlabs/puppetserver/conf.d/* /conf.d/;
+              {{- end}}
           securityContext:
             runAsUser: 0
             runAsNonRoot: false
@@ -162,8 +164,10 @@ spec:
                 - AUDIT_WRITE
                 - FOWNER
           volumeMounts:
+            {{- if eq .Values.puppetserver.persistence.confd.enabled true }}
             - name: puppet-confd
               mountPath: /conf.d/
+            {{- end}}
             - name: puppet-puppet-storage
               mountPath: /etc/puppetlabs/puppet/
             {{- if and .Values.puppetserver.puppeturl (not .Values.puppetserver.compilers.enabled) }}
@@ -217,8 +221,10 @@ spec:
             - name: manifests-volume
               mountPath: /tmp/puppet/configmap/site.pp
               subPath: site.pp
+            {{- if eq .Values.puppetserver.persistence.data.enabled true }}
             - name: puppet-serverdata-storage
               mountPath: /opt/puppetlabs/server/data/puppetserver/
+            {{- end }}
       {{- end }}
       containers:
         - name: {{ template "puppetserver.fullname" . }}
@@ -294,8 +300,10 @@ spec:
           volumeMounts:
             - name: puppet-puppet-storage
               mountPath: /etc/puppetlabs/puppet/
+            {{- if eq .Values.puppetserver.persistence.data.enabled true }}
             - name: puppet-serverdata-storage
               mountPath: /opt/puppetlabs/server/data/puppetserver/
+            {{- end }}
             - name: puppet-ca-storage
               mountPath: /etc/puppetlabs/puppetserver/ca/
             {{- range $key, $value := .Values.puppetserver.customconfigs.configmaps }}
@@ -312,8 +320,10 @@ spec:
             - name: puppet-puppetserver
               mountPath: /etc/puppetlabs/puppetserver/
             {{- else }}
+            {{- if eq .Values.puppetserver.persistence.confd.enabled true }}
             - name: puppet-confd
               mountPath: /etc/puppetlabs/puppetserver/conf.d/
+            {{- end }}
             {{- end }}
             {{- if (not .Values.puppetserver.compilers.enabled) }}
             - name: puppet-code-storage
@@ -390,6 +400,13 @@ spec:
           - name: r10k-code-netrc
             mountPath: /home/puppet/.netrc
             subPath: .netrc
+          {{- end }}
+          {{- end }}
+          {{- with .Values.r10k.code.viaHttps.customCa }}
+          {{- if or .existingSecret .cert.value }}
+          - name: r10k-code-cert
+            mountPath: /home/puppet/code-certs/ca.pem
+            subPath: ca.pem
           {{- end }}
           {{- end }}
           - name: puppet-code-storage
@@ -605,9 +622,11 @@ spec:
           configMap:
             name: {{ template "puppetserver.fullname" . }}-crl-config
         {{- end }}
+        {{- if eq .Values.puppetserver.persistence.data.enabled true }}
         - name: puppet-serverdata-storage
           persistentVolumeClaim:
             claimName: {{ template "puppetserver.persistence.data.claimName" . }}
+        {{- end }}
         {{- if .Values.puppetserver.masters.multiMasters.enabled }}
         - name: init-masters-volume
           configMap:
@@ -680,6 +699,15 @@ spec:
               - key: netrc
                 path: .netrc
         {{- end }}
+        {{- if or .Values.r10k.code.viaHttps.customCa.existingSecret .Values.r10k.code.viaHttps.customCa.cert.value }}
+        - name: r10k-code-cert
+          secret:
+            secretName: {{ template "r10k.code.viaHttps.customCa.secret" . }}
+            defaultMode: 288 # = mode 0440
+            items:
+              - key: cert
+                path: ca.pem
+        {{- end }}
         {{- if .Values.puppetserver.puppeturl }}
         - name: r10k-code-volume
           configMap:
@@ -713,9 +741,11 @@ spec:
           persistentVolumeClaim:
             claimName: {{ template "puppetserver.persistence.server.claimName" . }}
         {{- else }}
+        {{- if eq .Values.puppetserver.persistence.confd.enabled true }}
         - name: puppet-confd
           persistentVolumeClaim:
             claimName: {{ template "puppetserver.persistence.confd.claimName" . }}
+        {{- end }}
         {{- end }}
         {{- range $extraSecret := .Values.puppetserver.extraSecrets }}
         - name: {{ $extraSecret.name }}
