@@ -1,3 +1,103 @@
+## v0.64.1 (2024-05-03)
+
+### New features
+
+- Update GitLab Runner version to v16.11.1
+
+## v0.64.0 (2024-04-18)
+
+### New features
+
+- Update GitLab Runner version to v16.11.0
+- Add support for connection_max_age parameter !468
+- Propagate Service Account Name from values !367 (Martin Odstrčilík @martin.odstrcilik)
+
+### Bug fixes
+
+- Fix liveness probe for Runner Pod !466
+
+## v0.63.0 (2024-03-22)
+
+### New features
+
+- Update GitLab Runner version to v16.10.0
+
+### Bug fixes
+
+- Remove the 'replicas' field from the helm template if not used by user !467 (Alexis Boissiere @alexis974)
+
+## v0.62.1 (2024-03-01)
+
+### New features
+
+- Update GitLab Runner version to v16.9.1
+
+## v0.62.0 (2024-02-15)
+
+### New features
+
+- Update GitLab Runner version to v16.9.0
+- Template the image string to allow using `{{.Chart.AppVersion}}` reference !464 (Marc Bollhalder @NoRelect)
+- Add hostname option !463
+- Fix liveness check for runners with multiple tags !462 (Arran Walker @ajwalker)
+- Add support for extra objects and env vars !451 (Caleb Hansard @caleb.hansard)
+
+### Bug fixes
+
+- Convert Values.replicas from float64 to int64 !465
+- Remove function keyword in register script !461
+- Add and use isSessionServerAllowed helper !459 (Florian Berchtold @florian.berchtold)
+- Remove function keyword in register script !461
+- feat: add tpl in secret helper template !455 (Frederic Mereu @frederic.mereu)
+- Fix non terminating runner in register loop !450
+- fix: immediately use replica value to allow 0 !460 (d3adb5 @d3adb5)
+- Fix non terminating runner in register loop !450
+
+### Maintenance
+
+- Improve wording of comments !439 (Kolja Lucht @k0jak)
+
+## v0.61.2 (2024-02-09)
+
+### New features
+
+- Update GitLab Runner version to v16.8.0
+
+### Bug fixes
+
+- Remove function keyword in register script !461
+
+## v0.61.1 (2024-02-05)
+
+### New features
+
+- Update GitLab Runner version to v16.8.0
+
+### Bug fixes
+
+- Fix non terminating runner in register loop !450
+
+## v0.61.0 (2024-01-19)
+
+### New features
+
+- Update GitLab Runner version to v16.8.0
+
+## v0.60.0 (2023-12-21)
+
+### New features
+
+- Update GitLab Runner version to v16.7.0
+
+### Bug fixes
+
+- Keep tag list for registration token !452
+- Keep tag list for registration token !452
+
+### Other changes
+
+- Allow user-defined deployment strategies for multi-replica deployments !427 (Thomas Spear @tspearconquest)
+
 ## v0.59.2 (2023-11-25)
 
 ### New features

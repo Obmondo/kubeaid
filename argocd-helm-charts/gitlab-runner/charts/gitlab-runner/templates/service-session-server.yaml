@@ -1,4 +1,4 @@
-{{- if and (eq (default 1.0 .Values.replicas) 1.0) .Values.sessionServer .Values.sessionServer.enabled }}
+{{- if eq (include "gitlab-runner.isSessionServerAllowed" . ) "true" }}
 apiVersion: v1
 kind: Service
 metadata:

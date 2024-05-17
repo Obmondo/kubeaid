@@ -13,11 +13,11 @@ data:
     #!/bin/bash
     set -e
 
-    export CONFIG_PATH_FOR_INIT="{{ ternary "/.gitlab-runner/" "/home/gitlab-runner/.gitlab-runner/" (and (hasKey .Values.securityContext "runAsNonRoot") (not .Values.securityContext.runAsNonRoot)) }}"
+    export CONFIG_PATH_FOR_INIT="{{ ternary "/etc/gitlab-runner/" "/home/gitlab-runner/.gitlab-runner/" (and (hasKey .Values.podSecurityContext "runAsUser") (eq 0 (.Values.podSecurityContext.runAsUser | int64))) }}"
     mkdir -p ${CONFIG_PATH_FOR_INIT}
     cp /configmaps/config.toml ${CONFIG_PATH_FOR_INIT}
 
-    {{- if and (eq (default 1.0 .Values.replicas) 1.0) .Values.sessionServer .Values.sessionServer.enabled }}
+    {{- if eq (include "gitlab-runner.isSessionServerAllowed" . ) "true" }}
     quit() {
       kill -TERM "$child"
     }
@@ -91,7 +91,10 @@ data:
     {{- if .Values.sentryDsn }}
     sentry_dsn = "{{ .Values.sentryDsn }}"
     {{- end }}
-    {{- if and (eq (default 1.0 .Values.replicas) 1.0) .Values.sessionServer .Values.sessionServer.enabled }}
+    {{- if .Values.connectionMaxAge }}
+    connection_max_age = "{{ .Values.connectionMaxAge }}"
+    {{- end }}
+    {{- if eq (include "gitlab-runner.isSessionServerAllowed" . ) "true" }}
     [session_server]
       session_timeout = {{ include "gitlab-runner.server-session-timeout" . }}
       listen_address = "0.0.0.0:{{ include "gitlab-runner.server-session-internal-port" . }}"
@@ -104,6 +107,15 @@ data:
 
   register-the-runner: |
     #!/bin/bash
+    signal_handler() {
+      if [ ! -d "/proc/$register_pid" ]; then
+        wait $register_pid
+      fi
+      exit
+    }
+    trap 'signal_handler' SIGQUIT
+    trap 'signal_handler' SIGINT
+
     MAX_REGISTER_ATTEMPTS=30
 
     # Reset/unset the not needed flags when an authentication token
@@ -135,8 +147,10 @@ data:
         {{- else if .Values.runners.configPath }}
         --template-config {{ .Values.runners.configPath }} \
         {{- end }}
-        --non-interactive
+        --non-interactive &
 
+      register_pid=$!
+      wait $register_pid
       retval=$?
 
       if [ ${retval} = 0 ]; then
@@ -154,16 +168,15 @@ data:
     #!/bin/bash
     set -eou pipefail
 
+    export CONFIG_PATH_FOR_INIT="{{ ternary "/etc/gitlab-runner/" "/home/gitlab-runner/.gitlab-runner/" (and (hasKey .Values.podSecurityContext "runAsUser") (eq 0 (.Values.podSecurityContext.runAsUser | int64))) }}"
+
     if ! /usr/bin/pgrep -f ".*register-the-runner"  > /dev/null && ! /usr/bin/pgrep -f "gitlab.*runner"  > /dev/null ; then
       exit 1
     fi
 
-    name=$(awk -F'"' '/^  name = ".*"/ { print $2 }' "${HOME%/root}/.gitlab-runner/config.toml")
-    url=$(awk -F'"' '/^  url = ".*"/ { print $2 }' "${HOME%/root}/.gitlab-runner/config.toml")
+    awk -F'"' '/^  name = ".*"/ { print $2 }' "${CONFIG_PATH_FOR_INIT}/config.toml" | xargs -I{} gitlab-runner verify -n {} 2>&1 | grep -E "is alive|is valid"
 
-    gitlab-runner verify -n "$name" -u "$url" 2>&1 | grep -E "is alive|is valid"
-
-  {{- if and (eq (default 1.0 .Values.replicas) 1.0) .Values.sessionServer .Values.sessionServer.enabled }}
+  {{- if eq (include "gitlab-runner.isSessionServerAllowed" . ) "true" }}
   set-session-server-address: |
     #!/bin/bash
 
