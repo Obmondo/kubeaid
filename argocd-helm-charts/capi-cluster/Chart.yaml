@@ -11,4 +11,4 @@ dependencies:
   - name: aws
     version: 1.0.0
     repository: 'file://charts/aws'
-    condition: provider.aws
+    condition: aws.bastion

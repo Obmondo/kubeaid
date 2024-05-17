@@ -7,3 +7,9 @@ metadata:
 spec:
   region: {{ .Values.region }}
   sshKeyName: {{ .Values.sshKeyName }}
+  bastion: {{ .Values.bastion }}
+  networkSpec:
+    vpc:
+      cidrBlock: {{ .Values.vpc.cidrBlock }}
+  controlPlaneLoadBalancer:
+    loadBalancerType: {{ .Values.controlPlane.loadBalancerType }}
