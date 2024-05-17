@@ -1,0 +1,12 @@
+{{- if .Values.aws }}
+apiVersion: operator.cluster.x-k8s.io/v1alpha2
+kind: InfrastructureProvider
+metadata:
+  name: aws-{{ .Values.global.customerid }}
+  namespace: capi-cluster-{{ .Values.global.customerid }}
+spec:
+  configSecret:
+    name: capi-cluster-token
+    namespace: capi-cluster-{{ .Values.global.customerid }}
+  version: {{ .Values.aws.capaVersion }}
+{{- end }}
