@@ -38,10 +38,10 @@ $ helm install [RELEASE_NAME] openebs-zfslocalpv/zfs-localpv
 ```
 
 **Note:** If moving from the operator to helm
-- Make sure the namespace provided in the helm install command is same as `OPENEBS_NAMESPACE` (by default it is `openebs`) env in the controller statefulset.
-- Before installing, clean up the stale statefulset and daemonset from `kube-system` namespace using the below commands
+- Make sure the namespace provided in the helm install command is same as `OPENEBS_NAMESPACE` (by default it is `openebs`) env in the controller deployment.
+- Before installing, clean up the stale deployment and daemonset from `kube-system` namespace using the below commands
 ```sh
-kubectl delete sts openebs-zfs-controller -n kube-system
+kubectl delete deploy openebs-zfs-controller -n kube-system
 kubectl delete ds openebs-zfs-node -n kube-system
 ```
 
@@ -78,7 +78,7 @@ The following table lists the configurable parameters of the OpenEBS ZFS Localpv
 | `zfsPlugin.image.registry`| Registry for openebs-zfs-plugin image| `""`|
 | `zfsPlugin.image.repository`| Image repository for openebs-zfs-plugin| `openebs/zfs-driver`|
 | `zfsPlugin.image.pullPolicy`| Image pull policy for openebs-zfs-plugin| `IfNotPresent`|
-| `zfsPlugin.image.tag`| Image tag for openebs-zfs-plugin| `2.3.0`|
+| `zfsPlugin.image.tag`| Image tag for openebs-zfs-plugin| `2.5.0`|
 | `zfsNode.allowedTopologyKeys`| Custom topology keys required for provisioning| `"kubernetes.io/hostname,"`|
 | `zfsNode.driverRegistrar.image.registry`| Registry for csi-node-driver-registrar image| `registry.k8s.io/`|
 | `zfsNode.driverRegistrar.image.repository`| Image repository for csi-node-driver-registrar| `sig-storage/csi-node-driver-registrar`|
@@ -99,27 +99,32 @@ The following table lists the configurable parameters of the OpenEBS ZFS Localpv
 | `zfsController.resizer.image.repository`| Image repository for csi-resizer| `sig-storage/csi-resizer`|
 | `zfsController.resizer.image.pullPolicy`| Image pull policy for csi-resizer| `IfNotPresent`|
 | `zfsController.resizer.image.tag`| Image tag for csi-resizer| `v1.8.0`|
+| `zfsController.resizer.extraArgs`| Extra command line arguments| `[]`|
 | `zfsController.snapshotter.image.registry`| Registry for csi-snapshotter image| `registry.k8s.io/`|
 | `zfsController.snapshotter.image.repository`| Image repository for csi-snapshotter| `sig-storage/csi-snapshotter`|
 | `zfsController.snapshotter.image.pullPolicy`| Image pull policy for csi-snapshotter| `IfNotPresent`|
 | `zfsController.snapshotter.image.tag`| Image tag for csi-snapshotter| `v6.2.2`|
+| `zfsController.snapshotter.extraArgs`| Extra command line arguments| `[]`|
 | `zfsController.snapshotController.image.registry`| Registry for snapshot-controller image| `registry.k8s.io/`|
 | `zfsController.snapshotController.image.repository`| Image repository for snapshot-controller| `sig-storage/snapshot-controller`|
 | `zfsController.snapshotController.image.pullPolicy`| Image pull policy for snapshot-controller| `IfNotPresent`|
 | `zfsController.snapshotController.image.tag`| Image tag for snapshot-controller| `v6.2.2`|
+| `zfsController.snapshotController.extraArgs`| Extra command line arguments| `[]`|
 | `zfsController.provisioner.image.registry`| Registry for csi-provisioner image| `registry.k8s.io/`|
 | `zfsController.provisioner.image.repository`| Image repository for csi-provisioner| `sig-storage/csi-provisioner`|
 | `zfsController.provisioner.image.pullPolicy`| Image pull policy for csi-provisioner| `IfNotPresent`|
 | `zfsController.provisioner.image.tag`| Image tag for csi-provisioner| `v3.5.0`|
-| `zfsController.updateStrategy.type`| Update strategy for zfs localpv controller statefulset | `RollingUpdate` |
-| `zfsController.annotations` | Annotations for zfs localpv controller statefulset metadata| `""`|
-| `zfsController.podAnnotations`| Annotations for zfs localpv controller statefulset's pods metadata | `""`|
-| `zfsController.resources`| Resource and request and limit for zfs localpv controller statefulset containers | `""`|
-| `zfsController.labels`| Labels for zfs localpv controller statefulset metadata | `""`|
-| `zfsController.podLabels`| Appends labels to the zfs localpv controller statefulset pods| `""`|
-| `zfsController.nodeSelector`| Nodeselector for zfs localpv controller statefulset pods| `""`|
-| `zfsController.tolerations` | zfs localpv controller statefulset's pod toleration values | `""`|
-| `zfsController.securityContext` | Seurity context for zfs localpv controller statefulset container | `""`|
+| `zfsController.provisioner.extraArgs`| Extra command line arguments| `[]`|
+| `zfsController.updateStrategy.type`| Update strategy for zfs localpv controller deployment | `RollingUpdate` |
+| `zfsController.annotations` | Annotations for zfs localpv controller deployment metadata| `""`|
+| `zfsController.podAnnotations`| Annotations for zfs localpv controller deployment's pods metadata | `""`|
+| `zfsController.replicas` | Number of zfs localpv controller replicas | `1` |
+| `zfsController.resources`| Resource and request and limit for zfs localpv controller deployment containers | `""`|
+| `zfsController.labels`| Labels for zfs localpv controller deployment metadata | `""`|
+| `zfsController.podLabels`| Appends labels to the zfs localpv controller deployment pods| `""`|
+| `zfsController.nodeSelector`| Nodeselector for zfs localpv controller deployment pods| `""`|
+| `zfsController.tolerations` | zfs localpv controller deployment's pod toleration values | `""`|
+| `zfsController.securityContext` | Seurity context for zfs localpv controller deployment container | `""`|
 | `rbac.pspEnabled` | Enable PodSecurityPolicy | `false` |
 | `serviceAccount.zfsNode.create` | Create a service account for zfsnode or not| `true`|
 | `serviceAccount.zfsNode.name` | Name for the zfsnode service account| `openebs-zfs-node-sa`|
