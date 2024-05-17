@@ -5,10 +5,10 @@ metadata:
   {{- if or .Values.certificates.certManager.enabled .Values.additionalAnnotations }}
   annotations:
     {{- if .Values.certificates.certManager.enabled }}
-    {{- if .Values.certificates.certManager.generateCA }}
-    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ .Values.operator.name }}-ca
-    {{- else }}
+    {{- if and (not .Values.certificates.certManager.generateCA) .Values.certificates.certManager.issuer.generate }}
     cert-manager.io/inject-ca-from-secret: {{ .Release.Namespace }}/{{ .Values.certificates.certManager.caSecretName }}
+    {{- else }}
+    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ .Values.operator.name }}-tls-certificates
     {{- end }}
     {{- end }}
     {{- if .Values.additionalAnnotations }}
@@ -42,6 +42,54 @@ webhooks:
     - UPDATE
     resources:
     - scaledobjects
+  sideEffects: None
+  timeoutSeconds: 10
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: {{ .Values.webhooks.name }}
+      namespace: {{ .Release.Namespace }}
+      path: /validate-keda-sh-v1alpha1-triggerauthentication
+  failurePolicy: {{ .Values.webhooks.failurePolicy }}
+  matchPolicy: Equivalent
+  name: vstriggerauthentication.kb.io
+  namespaceSelector: {}
+  objectSelector: {}
+  rules:
+  - apiGroups:
+    - keda.sh
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - triggerauthentications
+  sideEffects: None
+  timeoutSeconds: 10
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: {{ .Values.webhooks.name }}
+      namespace: {{ .Release.Namespace }}
+      path: /validate-keda-sh-v1alpha1-clustertriggerauthentication
+  failurePolicy: {{ .Values.webhooks.failurePolicy }}
+  matchPolicy: Equivalent
+  name: vsclustertriggerauthentication.kb.io
+  namespaceSelector: {}
+  objectSelector: {}
+  rules:
+  - apiGroups:
+    - keda.sh
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - clustertriggerauthentications
   sideEffects: None
   timeoutSeconds: 10
 {{- end }}
