@@ -31,6 +31,17 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
+Allow the release namespace to be overridden
+*/}}
+{{- define "opencost.namespace" -}}
+  {{- if .Values.namespaceOverride -}}
+    {{- .Values.namespaceOverride -}}
+  {{- else -}}
+    {{- .Release.Namespace -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
@@ -82,21 +93,66 @@ Create the name of the controller service account to use
 */}}
 {{- define "opencost.prometheusServerEndpoint" -}}
   {{- if .Values.opencost.prometheus.external.enabled -}}
-    {{ .Values.opencost.prometheus.external.url }}
+    {{ tpl .Values.opencost.prometheus.external.url . }}
+  {{- else if (and .Values.opencost.prometheus.amp.enabled .Values.opencost.sigV4Proxy) -}}
+    {{- $port := .Values.opencost.sigV4Proxy.port | int }}
+    {{- $ws := .Values.opencost.prometheus.amp.workspaceId }}
+    {{- printf "http://localhost:%d/workspaces/%v" $port $ws -}}
   {{- else -}}
-    {{- $host := .Values.opencost.prometheus.internal.serviceName }}
-    {{- $ns := .Values.opencost.prometheus.internal.namespaceName }}
+    {{- $host := tpl .Values.opencost.prometheus.internal.serviceName . }}
+    {{- $ns := tpl .Values.opencost.prometheus.internal.namespaceName . }}
     {{- $port := .Values.opencost.prometheus.internal.port | int }}
-    {{- printf "http://%s.%s.svc:%d" $host $ns $port -}}
+    {{- printf "http://%s.%s.svc.cluster.local:%d" $host $ns $port -}}
   {{- end -}}
 {{- end -}}
 
+{{/*
+Check that either thanos external or internal is defined
+*/}}
+{{- define "opencost.thanosServerEndpoint" -}}
+  {{- if .Values.opencost.prometheus.thanos.external.enabled -}}
+    {{ .Values.opencost.prometheus.thanos.external.url }}
+  {{- else -}}
+    {{- $host := .Values.opencost.prometheus.thanos.internal.serviceName }}
+    {{- $ns := .Values.opencost.prometheus.thanos.internal.namespaceName }}
+    {{- $port := .Values.opencost.prometheus.thanos.internal.port | int }}
+    {{- printf "http://%s.%s.svc.cluster.local:%d" $host $ns $port -}}
+  {{- end -}}
+{{- end -}}
 
 {{/*
-Check that either prometheus external or internal is defined
+Check that the config is valid
 */}}
 {{- define "isPrometheusConfigValid" -}}
-  {{- if and .Values.opencost.prometheus.external.enabled .Values.opencost.prometheus.internal.enabled -}}
-    {{- fail "Only use one of the prometheus setups, internal or external" -}}
+  {{- $prometheusModes := add .Values.opencost.prometheus.external.enabled .Values.opencost.prometheus.internal.enabled .Values.opencost.prometheus.amp.enabled | int }}
+  {{- if gt $prometheusModes 1 -}}
+    {{- fail "Only use one of the prometheus setups: internal, external, or amp" -}}
   {{- end -}}
+  {{- if .Values.opencost.prometheus.thanos.enabled -}}
+    {{- if and .Values.opencost.prometheus.thanos.external.enabled .Values.opencost.prometheus.thanos.internal.enabled -}}
+      {{- fail "Only use one of the thanos setups: internal or external" -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
+Define opencost config file name
+*/}}
+{{- define "opencost.configFileName" -}}
+  {{- if  eq .Values.opencost.customPricing.provider "custom" -}}
+    {{- print "default" -}}
+  {{- else -}}
+    {{- .Values.opencost.customPricing.provider -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
+Get api version of networking.k8s.io
+*/}}
+{{- define "networkingAPIVersion" -}}
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+apiVersion: networking.k8s.io/v1
+{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
+apiVersion: networking.k8s.io/v1beta1
+{{- end }}
 {{- end -}}
