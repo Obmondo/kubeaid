@@ -5,6 +5,7 @@ cert-manager:
   enabled: false
   fullnameOverride: "cert-manager"
   namespace: "cert-manager"
+  installCRDs: true
 # ---
 # Cluster API provider options
 core: ""
@@ -25,7 +26,7 @@ leaderElection:
 image:
   manager:
     repository: registry.k8s.io/capi-operator/cluster-api-operator
-    tag: v0.9.1
+    tag: v0.10.1
     pullPolicy: IfNotPresent
 env:
   manager: []
