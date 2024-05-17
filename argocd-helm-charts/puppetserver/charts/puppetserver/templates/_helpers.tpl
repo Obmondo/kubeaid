@@ -40,6 +40,14 @@ Create the args array for "r10k_code_cronjob.sh"
 {{- end -}}
 
 {{/*
+Create the base URL for custom CA repo configuration
+*/}}
+{{- define "r10k.code.viaHttps.customCa.repoUrl" -}}
+{{- $parsedRepo := urlParse .Values.puppetserver.puppeturl -}}
+{{- printf "%s://%s" $parsedRepo.scheme $parsedRepo.host }}
+{{- end -}}
+
+{{/*
 Create the args array for "r10k_hiera_cronjob.sh"
 */}}
 {{- define "r10k.hiera.args" -}}
@@ -575,6 +583,18 @@ Create the name for the r10k.code.viaHttps secret.
   {{- .Values.r10k.code.viaHttps.credentials.existingSecret -}}
 {{- else -}}
   {{ template "puppetserver.fullname" . }}-r10k-code-creds
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name for the r10k.code.viaHttps.customCa secret.
+ Defaults to "r10k.code.viaHttps.secret"
+*/}}
+{{- define "r10k.code.viaHttps.customCa.secret" -}}
+{{- if .Values.r10k.code.viaHttps.customCa.existingSecret -}}
+  {{- .Values.r10k.code.viaHttps.customCa.existingSecret -}}
+{{- else -}}
+  {{ template "r10k.code.viaHttps.secret" . }}
 {{- end -}}
 {{- end -}}
 

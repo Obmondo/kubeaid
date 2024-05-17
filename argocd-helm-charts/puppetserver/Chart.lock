@@ -1,6 +1,6 @@
 dependencies:
 - name: puppetserver
   repository: https://puppetlabs.github.io/puppetserver-helm-chart
-  version: 9.1.0
-digest: sha256:e50da7e15281cc42137de09cdc8ebe63aad0341c4c4ae8763545380829ac9af6
-generated: "2024-02-15T15:06:41.441750049+05:30"
+  version: 9.5.1
+digest: sha256:017add18818c7ee1f1e5b262d1ae4f61dff22708b09ee292e951e79c0d35d1f2
+generated: "2024-05-17T13:39:01.745680039+02:00"

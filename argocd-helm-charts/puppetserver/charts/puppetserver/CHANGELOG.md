@@ -5,6 +5,43 @@ numbering uses [semantic versioning](http://semver.org).
 
 NOTE: The change log until version `v0.2.4` is auto-generated.
 
+## [v9.5.1](https://github.com/puppetlabs/puppetserver-helm-chart/tree/v9.5.1) (2024-05-09)
+- Fix: #228 - fixed check for puppet certs in a multimaster setup
+
+## [v9.5.0](https://github.com/puppetlabs/puppetserver-helm-chart/tree/v9.5.0) (2024-05-09)
+- Feat: ability to disable persistence of `var-dir` and `confd` volumes
+
+## [v9.4.2](https://github.com/puppetlabs/puppetserver-helm-chart/tree/v9.4.2) (2024-05-03)
+- Fix: #215 fixed ability to use customconfigs with PuppetDB
+
+## [v9.4.1](https://github.com/puppetlabs/puppetserver-helm-chart/tree/v9.4.1) (2024-05-02)
+- Feat: allow option to import CA to only deal with CA and not puppetdb
+
+## [v9.4.0](https://github.com/puppetlabs/puppetserver-helm-chart/tree/v9.4.0) (2024-04-19)
+- Fix: Update Vox Pupuli Containers
+
+## [v9.3.4](https://github.com/puppetlabs/puppetserver-helm-chart/tree/v9.3.4) (2024-04-11)
+- Fix: Bump bitnami/jmx-exporter to latest stable for container patches
+
+## [v9.3.3](https://github.com/puppetlabs/puppetserver-helm-chart/tree/v9.3.3) (2024-04-10)
+- Fix: Update cURL container to address CVE-2023-38545 & CVE-2023-38546
+
+## [v9.3.2](https://github.com/puppetlabs/puppetserver-helm-chart/tree/v9.3.2) (2024-04-08)
+- Fix: Fixes bug in puppet-preinstall template when puppetserver.preGeneratedCertsJob is enabled. 
+
+## [v9.3.1](https://github.com/puppetlabs/puppetserver-helm-chart/tree/v9.3.1) (2024-04-03)
+- Fix: Fixes bug when viaHttps.customCa is not provided
+
+## [v9.3.0](https://github.com/puppetlabs/puppetserver-helm-chart/tree/v9.3.0) (2024-03-28)
+- Feat: Use custom CA file for r10k HTTPS code repository
+
+## [v9.2.1](https://github.com/puppetlabs/puppetserver-helm-chart/tree/v9.2.1) (2024-03-27)
+- Fix: Add 'netrc' credentials documentation for r10k and hiera repos
+
+## [v9.2.0](https://github.com/puppetlabs/puppetserver-helm-chart/tree/v9.2.0) (2024-04-05)
+- Feat: Add `.Values.global.securityContext.fsGroup`
+- Fix: Add `spec.template.spec.securityContext.fsGroup` to prevent "Permission denied" error
+
 ## [v9.1.0](https://github.com/puppetlabs/puppetserver-helm-chart/tree/v9.1.0) (2024-01-31)
 - Fix: Remove `PUPPETDB_JAVA_ARGS` value on puppetdb container additional variables, to avoid error `unrecognized option: -Xlog:gc....` that causes the puppetdb pod to crash.
 
