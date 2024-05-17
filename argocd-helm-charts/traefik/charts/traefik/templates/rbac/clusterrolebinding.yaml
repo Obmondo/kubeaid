@@ -1,4 +1,5 @@
 {{- if and .Values.rbac.enabled (or .Values.providers.kubernetesIngress.enabled (not .Values.rbac.namespaced)) -}}
+{{- if or (not .Values.rbac.namespaced) (not .Values.providers.kubernetesIngress.disableIngressClassLookup) -}}
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -14,4 +15,5 @@ subjects:
   - kind: ServiceAccount
     name: {{ include "traefik.serviceAccountName" . }}
     namespace: {{ template "traefik.namespace" . }}
+{{- end -}}
 {{- end -}}

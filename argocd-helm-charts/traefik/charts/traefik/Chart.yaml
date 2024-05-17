@@ -1,14 +1,12 @@
 annotations:
-  artifacthub.io/changes: "- \"fix: \U0001F41B improve confusing suggested value on
-    openTelemetry.grpc\"\n- \"fix: \U0001F41B declare http3 udp port, with or without
-    hostport\"\n- \"feat: \U0001F4A5 deployment.podannotations support interpolation
-    with tpl\"\n- \"feat: allow update of namespace policy for websecure listener\"\n-
-    \"feat: allow defining startupProbe\"\n- \"feat: add file provider\"\n- \"feat:
-    :boom: unify plugin import between traefik and this chart\"\n- \"chore(release):
-    \U0001F680 publish v26\"\n- \"chore(deps): update traefik docker tag to v2.10.6\"\n-
-    \"Release namespace for Prometheus Operator resources\"\n"
+  artifacthub.io/changes: "- \"style: \U0001F3A8 consistent capitalization on `--entryPoints`
+    CLI flag\"\n- \"fix: \U0001F41B only expose http3 port on service when TCP variant
+    is exposed\"\n- \"fix: \U0001F41B logs filters on status codes\"\n- \"feat: ✨
+    add support of `experimental-v3.0` unstable version\"\n- \"feat: ability to override
+    liveness and readiness probe paths\"\n- \"feat(ports): add transport options\"\n-
+    \"chore(release): publish v28.0.0\"\n"
 apiVersion: v2
-appVersion: v2.10.6
+appVersion: v3.0.0
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
 icon: https://raw.githubusercontent.com/traefik/traefik/v2.3/docs/content/assets/img/traefik.logo.png
@@ -16,21 +14,18 @@ keywords:
 - traefik
 - ingress
 - networking
-kubeVersion: '>=1.16.0-0'
+kubeVersion: '>=1.22.0-0'
 maintainers:
-- email: emile@vauge.com
-  name: emilevauge
-- email: daniel.tomcej@gmail.com
-  name: dtomcej
-- email: ldez@traefik.io
-  name: ldez
 - email: michel.loiseleur@traefik.io
   name: mloiseleur
 - email: charlie.haley@traefik.io
   name: charlie-haley
+- email: remi.buisson@traefik.io
+  name: darkweaver87
+- name: jnoordsij
 name: traefik
 sources:
 - https://github.com/traefik/traefik
 - https://github.com/traefik/traefik-helm-chart
 type: application
-version: 26.0.0
+version: 28.0.0
