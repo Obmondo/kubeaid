@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 release:
-  version: "2.4.0"
+  version: "2.5.1"
 
 imagePullSecrets:
 # - name: "image-pull-secret"
@@ -60,17 +60,16 @@ zfsNode:
   # For example:
   # allowedTopologyKeys: "kubernetes.io/hostname,openebs.io/rack"
   allowedTopologyKeys: "All"
-  initContainers: []
-  additionalVolumes: []
+  initContainers: {}
+  additionalVolumes: {}
 
 # zfsController contains the configurables for
-# the zfs controller statefulset
+# the zfs controller deployment
 zfsController:
   componentName: openebs-zfs-controller
-  initContainers: []
-  additionalVolumes: []
+  initContainers: {}
+  additionalVolumes: {}
   replicas: 1
-  serviceName: openebs-zfs
   resizer:
     name: "csi-resizer"
     image:
@@ -81,6 +80,7 @@ zfsController:
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: v1.8.0
+    extraArgs: []
   snapshotter:
     name: "csi-snapshotter"
     image:
@@ -91,6 +91,7 @@ zfsController:
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: v6.2.2
+    extraArgs: []
   snapshotController:
     name: "snapshot-controller"
     image:
@@ -101,6 +102,7 @@ zfsController:
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: v6.2.2
+    extraArgs: []
   provisioner:
     name: "csi-provisioner"
     image:
@@ -111,6 +113,7 @@ zfsController:
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: v3.5.0
+    extraArgs: []
   updateStrategy:
     type: RollingUpdate
   annotations: {}
@@ -134,7 +137,7 @@ zfsController:
 
 
 # zfsPlugin is the common csi container used by the
-# controller statefulset and node daemonset
+# controller deployment and node daemonset
 zfsPlugin:
   name: "openebs-zfs-plugin"
   image:
@@ -144,15 +147,10 @@ zfsPlugin:
     repository: openebs/zfs-driver
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 2.4.0
+    tag: 2.5.0
 
 role: openebs-zfs
 
-crd:
-  enableInstall: true
-  # Specify installation of the kubernetes-csi volume snapshot CRDs if your Kubernetes distribution
-  # or another storage operator already manages them.
-  volumeSnapshot: true
 serviceAccount:
   zfsController:
     # Specifies whether a service account should be created
@@ -173,3 +171,12 @@ zfs:
   # If you use a non-standard path to the zfs binary, specify it here
   # bin: /run/current-system/sw/bin/zfs
   bin: zfs
+
+crds:
+  zfsLocalPv:
+    # Install zfs-localpv CRDs
+    enabled: true
+  csi:
+    volumeSnapshots:
+      # Install Volume Snapshot CRDs
+      enabled: true
