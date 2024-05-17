@@ -1,0 +1,18 @@
+{{- if .Values.graylog.podDisruptionBudget.create }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "graylog.fullname" . }}
+  labels:
+{{ include "graylog.metadataLabels" . | indent 4 }}
+spec:
+  {{- with .Values.graylog.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ . }}
+  {{- end }}
+  {{- with .Values.graylog.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ . }}
+  {{- end }}
+  selector:
+    matchLabels:
+{{ include "graylog.selectorLabels" . | indent 6 }}
+{{- end }}
