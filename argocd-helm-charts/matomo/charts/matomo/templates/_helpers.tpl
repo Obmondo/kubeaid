@@ -1,5 +1,5 @@
 {{/*
-Copyright VMware, Inc.
+Copyright Broadcom, Inc. All Rights Reserved.
 SPDX-License-Identifier: APACHE-2.0
 */}}
 
@@ -161,6 +161,8 @@ Return the matomo pods needed initContainers
     runAsUser: 0
   {{- if .Values.volumePermissions.resources }}
   resources: {{- toYaml .Values.volumePermissions.resources | nindent 4 }}
+  {{- else if ne .Values.volumePermissions.resourcesPreset "none" }}
+  resources: {{- include "common.resources.preset" (dict "type" .Values.volumePermissions.resourcesPreset) | nindent 4 }}
   {{- end }}
   volumeMounts:
     - name: matomo-data
@@ -174,17 +176,20 @@ Return the matomo pods needed initContainers
   {{- range (default .Values.image.pullSecrets .Values.certificates.image.pullSecrets) }}
     - name: {{ . }}
   {{- end }}
-  command:
+  securityContext:
+    runAsUser: 0
   {{- if .Values.certificates.command }}
   command: {{- include "common.tplvalues.render" (dict "value" .Values.certificates.command "context" $) | nindent 4 }}
   {{- else if .Values.certificates.customCertificate.certificateSecret }}
-  - sh
-  - -c
-  - install_packages ca-certificates openssl
+  command:
+    - sh
+    - -c
+    - install_packages ca-certificates openssl
   {{- else }}
-  - sh
-  - -c
-  - install_packages ca-certificates openssl
+  command:
+    - sh
+    - -c
+    - install_packages ca-certificates openssl
     && openssl req -new -x509 -days 3650 -nodes -sha256
       -subj "/CN=$(hostname)" -addext "subjectAltName = DNS:$(hostname)"
       -out  /etc/ssl/certs/ssl-cert-snakeoil.pem
