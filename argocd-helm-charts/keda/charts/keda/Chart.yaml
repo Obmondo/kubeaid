@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: 2.12.1
+appVersion: 2.14.0
 description: Event-based autoscaler for workloads on Kubernetes
 home: https://github.com/kedacore/keda
 icon: https://raw.githubusercontent.com/kedacore/keda/main/images/keda-logo-500x500-white.png
@@ -11,9 +11,9 @@ maintainers:
   name: Jorge Turrado
 - email: kerkhove.tom@gmail.com
   name: Tom Kerkhove
-- email: zroubali@redhat.com
+- email: zbynek@kedify.io
   name: Zbynek Roubalik
 name: keda
 sources:
 - https://github.com/kedacore/keda
-version: 2.12.1
+version: 2.14.2
