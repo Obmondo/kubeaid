@@ -49,30 +49,60 @@ Create chart name and version as used by the chart label.
 Common labels
 */}}
 {{- define "kubernetes-dashboard.labels" -}}
-app.kubernetes.io/name: {{ include "kubernetes-dashboard.name" . }}
 helm.sh/chart: {{ include "kubernetes-dashboard.chart" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/part-of: {{ include "kubernetes-dashboard.name" . }}
 {{- end -}}
 
 {{/*
 Common label selectors
 */}}
 {{- define "kubernetes-dashboard.matchLabels" -}}
-app.kubernetes.io/name: {{ include "kubernetes-dashboard.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/part-of: {{ include "kubernetes-dashboard.name" . }}
 {{- end -}}
 
-{{/*
-Name of the service account to use
-*/}}
-{{- define "kubernetes-dashboard.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create -}}
-    {{ default (include "kubernetes-dashboard.fullname" .) .Values.serviceAccount.name }}
+{{- define "kubernetes-dashboard.app.csrf.secret.name" -}}
+{{- printf "%s-%s" ( include "kubernetes-dashboard.fullname" . ) "csrf"}}
+{{- end -}}
+
+{{- define "kubernetes-dashboard.app.ingress.secret.name" -}}
+{{- printf "%s-%s" ( include "kubernetes-dashboard.fullname" . ) "certs"}}
+{{- end -}}
+
+{{- define "kubernetes-dashboard.app.csrf.secret.key" -}}
+{{- printf "private.key" }}
+{{- end -}}
+
+{{- define "kubernetes-dashboard.app.csrf.secret.value" -}}
+{{- $secretName := (include "kubernetes-dashboard.app.csrf.secret.name" .) -}}
+{{- $secret := lookup "v1" "Secret" .Release.Namespace $secretName -}}
+{{- if .Values.app.security.csrfKey -}}
+private.key: {{ .Values.app.security.csrfKey | b64enc | quote }}
+{{- else if and $secret (hasKey $secret "data") (hasKey $secret.data "private.key") (index $secret.data "private.key") -}}
+private.key: {{ index $secret.data "private.key" }}
 {{- else -}}
-    {{ default "default" .Values.serviceAccount.name }}
+private.key: {{ randBytes 256 | b64enc | quote }}
+{{- end -}}
+{{- end -}}
+
+{{- define "kubernetes-dashboard.metrics-scraper.name" -}}
+{{- printf "%s-%s" ( include "kubernetes-dashboard.fullname" . ) ( .Values.metricsScraper.role )}}
+{{- end -}}
+
+{{- define "kubernetes-dashboard.web.configMap.settings.name" -}}
+{{- printf "%s-%s-%s" ( include "kubernetes-dashboard.fullname" . ) ( .Values.web.role ) "settings" }}
+{{- end -}}
+
+{{- define "kubernetes-dashboard.validate.mode" -}}
+{{- if not (or (eq .Values.app.mode "dashboard") (eq .Values.app.mode "api")) -}}
+{{- fail "value of .Values.app.mode must be one of [dashboard, api]"}}
+{{- end -}}
+{{- end -}}
+
+{{- define "kubernetes-dashboard.validate.ingressIssuerScope" -}}
+{{- if not (or (eq .Values.app.ingress.issuer.scope "disabled") (eq .Values.app.ingress.issuer.scope "default") (eq .Values.app.ingress.issuer.scope "cluster")) }}
+{{- fail "value of .Values.app.ingress.issuer.scope must be one of [default, cluster, disabled]"}}
 {{- end -}}
 {{- end -}}

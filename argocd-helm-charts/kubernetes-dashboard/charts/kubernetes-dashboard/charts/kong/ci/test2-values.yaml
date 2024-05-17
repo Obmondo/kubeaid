@@ -1,0 +1,79 @@
+# This tests the following unrelated aspects of Ingress Controller
+# - ingressController deploys with a database
+# - stream listens work
+# - a mixture of controller, Kong, and shared volumes successfully mount
+# - watchNamespaces is set
+# - the admission webhook is enabled; has the timeout explicitly set
+ingressController:
+  enabled: true
+  admissionWebhook:
+    enabled: true
+    timeoutSeconds: 5
+  env:
+    anonymous_reports: "false"
+  envFrom:
+  - configMapRef:
+      name: env-config
+  customEnv:
+    TZ: "Europe/Berlin"
+  watchNamespaces:
+  - default
+postgresql:
+  enabled: true
+  auth:
+    username: kong
+    password: kong
+env:
+  anonymous_reports: "off"
+  database: "postgres"
+envFrom:
+- configMapRef:
+    name: env-config
+# - ingress resources are created without hosts
+admin:
+  ingress:
+    enabled: true
+    hosts: []
+    path: /
+proxy:
+  ingress:
+    enabled: true
+    hostname: proxy.kong.example
+    annotations: {}
+    path: /
+# - add stream listens
+  stream:
+  - containerPort: 9000
+    servicePort: 9000
+    parameters: []
+  - containerPort: 9001
+    servicePort: 9001
+    parameters:
+    - ssl
+
+# update strategy
+updateStrategy:
+  type: "RollingUpdate"
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+deployment:
+  initContainers:
+    - name: "bash"
+      image: "bash:latest"
+      command: ["/bin/sh", "-c", "true"]
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "64Mi"
+        requests:
+          cpu: "100m"
+          memory: "64Mi"
+
+extraObjects:
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: env-config
+  data:
+    test-env: test
