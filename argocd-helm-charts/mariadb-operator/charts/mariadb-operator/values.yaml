@@ -21,7 +21,7 @@ ha:
   replicas: 3
 
 metrics:
-  # -- Enable prometheus metrics. Prometheus must be installed in the cluster
+  # -- Enable operator internal metrics. Prometheus must be installed in the cluster
   enabled: false
   serviceMonitor:
     # -- Enable controller ServiceMonitor
@@ -53,6 +53,9 @@ rbac:
 
 # -- Extra arguments to be passed to the controller entrypoint
 extrArgs: []
+
+# -- Extra environment variables to be passed to the controller
+extraEnv: []
 
 # -- Extra volumes to pass to pod.
 extraVolumes: []
@@ -108,12 +111,14 @@ webhook:
       renewBefore: ""
     # -- Annotatioms to be added to webhook TLS secret.
     secretAnnotations: {}
+    # -- Labels to be added to webhook TLS secret.
+    secretLabels: {}
     # -- Path where the CA certificate will be mounted.
     caPath: /tmp/k8s-webhook-server/certificate-authority
     # -- Path where the certificate will be mounted.
     path: /tmp/k8s-webhook-server/serving-certs
   # -- Port to be used by the webhook server
-  port: 10250
+  port: 9443
   # -- Expose the webhook server in the host network
   hostNetwork: false
   serviceMonitor:
