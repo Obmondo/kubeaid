@@ -11,6 +11,9 @@ metadata:
   {{- end }}
 spec:
   replicas: {{ .Values.replicas }}
+  {{- if or (kindIs "float64" .Values.revisionHistoryLimit) (kindIs "int64" .Values.revisionHistoryLimit) }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit | int64 }}
+  {{- end }}
   {{- with .Values.updateStrategy }}
   strategy:
     {{- toYaml . | nindent 4 }}
@@ -45,6 +48,10 @@ spec:
       {{- end }}
       {{- if .Values.hostNetwork.enabled }}
       hostNetwork: true
+      {{- end }}
+      {{- with .Values.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
         - name: metrics-server
@@ -87,9 +94,48 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+        {{- if .Values.addonResizer.enabled }}
+        - name: metrics-server-nanny
+          {{- with .Values.addonResizer.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: {{ include "metrics-server.addonResizer.image" . }}
+          env:
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: MY_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          command:
+            - /pod_nanny
+            - --config-dir=/etc/config
+            - --deployment={{ include "metrics-server.fullname" . }}
+            - --container=metrics-server
+            - --threshold={{ .Values.addonResizer.nanny.threshold }}
+            - --poll-period={{ .Values.addonResizer.nanny.pollPeriod }}
+            - --estimator=exponential
+            - --minClusterSize={{ .Values.addonResizer.nanny.minClusterSize }}
+            - --use-metrics=true
+          volumeMounts:
+            - name: nanny-config-volume
+              mountPath: /etc/config
+          {{- with .Values.addonResizer.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- end }}
       volumes:
         - name: tmp
-          emptyDir: {}
+          {{- toYaml .Values.tmpVolume | nindent 10 }}
+      {{- if .Values.addonResizer.enabled }}
+        - name: nanny-config-volume
+          configMap:
+            name: {{ include "metrics-server.addonResizer.configMap" . }}
+      {{- end }}
       {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
