@@ -6,8 +6,15 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "aws-ebs-csi-driver.labels" . | nindent 4 }}
+  {{- with .Values.controller.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   replicas: {{ .Values.controller.replicaCount }}
+  {{- if or (kindIs "float64" .Values.controller.revisionHistoryLimit) (kindIs "int64" .Values.controller.revisionHistoryLimit) }}
+  revisionHistoryLimit: {{ .Values.controller.revisionHistoryLimit }}
+  {{- end }}
   {{- with .Values.controller.updateStrategy }}
   strategy:
     {{- toYaml . | nindent 4 }}
@@ -486,7 +493,15 @@ spec:
       {{- end }}
       volumes:
         - name: socket-dir
+          {{- if .Values.controller.socketDirVolume }}
+          {{- toYaml .Values.controller.socketDirVolume | nindent 10 }}
+          {{- else }}
           emptyDir: {}
+          {{- end }}
         {{- with .Values.controller.volumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+  {{- if .Values.controller.dnsConfig }}
+  dnsConfig:
+    {{- toYaml .Values.controller.dnsConfig | nindent 4 }}
+  {{- end }}
