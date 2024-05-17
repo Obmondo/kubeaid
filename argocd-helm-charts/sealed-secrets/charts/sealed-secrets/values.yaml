@@ -21,6 +21,11 @@ extraDeploy: []
 ##
 commonAnnotations: {}
 
+## @param commonLabels [object] Labels to add to all deployed resources
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+## 
+commonLabels: {}
+
 ## @section Sealed Secrets Parameters
 
 ## Sealed Secrets image
@@ -34,7 +39,7 @@ commonAnnotations: {}
 image:
   registry: docker.io
   repository: bitnami/sealed-secrets-controller
-  tag: v0.24.4
+  tag: 0.26.2
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -69,6 +74,7 @@ skipRecreate: false
 ## @param keyrenewperiod Specifies key renewal period. Default 30 days
 ## e.g
 ## keyrenewperiod: "720h30m"
+## To disable use "0", with quotes!
 ##
 keyrenewperiod: ""
 ## @param rateLimit Number of allowed sustained request per second for verify endpoint
@@ -89,6 +95,12 @@ privateKeyLabels: {}
 ## @param logInfoStdout Specifies whether the Sealed Secrets controller will log info to stdout
 ##
 logInfoStdout: false
+## @param logLevel Specifies log level of controller (INFO,ERROR)
+##
+logLevel: ""
+## @param logFormat Specifies log format (text,json)
+##
+logFormat: ""
 ## @param command Override default container command
 ##
 command: []
@@ -393,6 +405,22 @@ rbac:
   ## @param rbac.pspEnabled PodSecurityPolicy
   ##
   pspEnabled: false
+  ## "Proxier" RBAC Role configuration
+  ##
+  serviceProxier:
+    ## @param rbac.serviceProxier.create Specifies whether to create the "proxier" role, to allow external users to access the SealedSecret API
+    ##
+    create: true
+    ## @param rbac.serviceProxier.bind Specifies whether to create a RoleBinding for the "proxier" role
+    ##
+    bind: true
+    ## @param rbac.serviceProxier.subjects Specifies the RBAC subjects to grant the "proxier" role to, in the created RoleBinding
+    ## It is best to change this to something narrower, as the default binding gives `system:authenticated` access, which is very broad
+    ##
+    subjects: |
+      - apiGroup: rbac.authorization.k8s.io
+        kind: Group
+        name: system:authenticated
 
 ## @section Metrics parameters
 
@@ -447,6 +475,25 @@ metrics:
     ## @param metrics.dashboards.namespace Namespace where Grafana dashboard ConfigMap is deployed
     ##
     namespace: ""
+
+  ## Sealed Secret Metrics service parameters
+  ##
+  service:
+    ## @param metrics.service.type Sealed Secret Metrics service type
+    ##
+    type: ClusterIP
+    ## @param metrics.service.port Sealed Secret service Metrics HTTP port
+    ##
+    port: 8081
+    ## @param metrics.service.nodePort Node port for HTTP
+    ## Specify the nodePort value for the LoadBalancer and NodePort service types
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
+    ## NOTE: choose port between <30000-32767>
+    ##
+    nodePort: ""
+    ## @param metrics.service.annotations [object] Additional custom annotations for Sealed Secret Metrics service
+    ##
+    annotations: {}
 
 ## @section PodDisruptionBudget Parameters
 
