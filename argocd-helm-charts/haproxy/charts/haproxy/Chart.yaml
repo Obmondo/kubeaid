@@ -1,9 +1,9 @@
 annotations:
   artifacthub.io/changes: |
-    - Update base image to HAProxy 2.8.2
-    - Fix includes name in haproxy charts (#203)
+    - Add support for NodePort custom ports (#234)
+    - Update base image to HAProxy 2.9.6
 apiVersion: v2
-appVersion: 2.8.2
+appVersion: 2.9.6
 description: A Helm chart for HAProxy on Kubernetes
 home: https://github.com/haproxytech/helm-charts/tree/main/haproxy
 icon: https://raw.githubusercontent.com/haproxytech/helm-charts/main/haproxy/chart-icon.png
@@ -17,4 +17,4 @@ name: haproxy
 sources:
 - http://www.haproxy.org/
 type: application
-version: 1.19.3
+version: 1.22.0

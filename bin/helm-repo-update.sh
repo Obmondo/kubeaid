@@ -23,12 +23,13 @@ Usage $0 [OPTIONS]:
   --update-all              Update all the helm chart   	  [Default: false]
   --pull-request            Raise Pull request         		  [Default: false] (Only in CI)
   --actions           	    Run inside a GitHub or Gitea Action   [Default: false] (Only in CI)
-  --skip-chart              Skip updating certain chart 	  [Default: none]
+  --skip-charts             Skip updating certain charts 	  [Default: none]
   --chart-version           Helm chart version          	  [Default: latest]
   -h|--help
 
 Example:
 # $0 --update-helm-chart traefik
+# $0 --update-all --skip-charts 'aws-efs-csi-driver,capi-cluster,grafana-operator,strimzi-kafka-operator'
 "
 }
 
@@ -107,10 +108,10 @@ function update_helm_chart {
   HELM_CHART_DEP_PATH="$HELM_CHART_PATH/charts"
 
   for SKIP_HELM_CHART in "${SKIP_HELM_CHARTS[@]}"; do
-    if [ "$HELM_REPO_NAME" == "$SKIP_HELM_CHART" ]; then
-      echo "Skipping $SKIP_HELM_CHART"
-      return
-    fi
+      if [ "$HELM_REPO_NAME" == "$SKIP_HELM_CHART" ]; then
+          echo "Skipping $SKIP_HELM_CHART"
+          return
+      fi
   done
 
   # This chart does not have any dependencies, so lets not do helm dep up
@@ -193,7 +194,7 @@ function pull_request() {
 
     export GITEA_TOKEN
     export GITHUB_TOKEN
-    
+
     case "${KUBERNETES_CONFIG_REPO_URL}" in
       *gitea*)
         token=${GITEA_TOKEN}
@@ -205,7 +206,7 @@ function pull_request() {
         token=${GITHUB_TOKEN}
         URL="api.github.com"
         owner="Obmondo"
-        repo="kubeaid"  
+        repo="kubeaid"
     esac
 
     # Create a pull request using the Gitea or GitHub API
@@ -218,7 +219,7 @@ function pull_request() {
         "body": "Auto-generated pull request from Obmondo, created from changes by '"${USER_NAME}"' ('"${USER_EMAIL}"')."
       }' \
       "https://${URL}/repos/$owner/$repo/pulls")
-    
+
     # Check for warnings or errors in the output and handle as needed
     if grep -q WARNINGS <<< "${output}"; then
       exit 1

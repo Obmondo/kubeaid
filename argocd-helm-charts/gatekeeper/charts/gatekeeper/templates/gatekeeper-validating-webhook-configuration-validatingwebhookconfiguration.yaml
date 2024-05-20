@@ -24,6 +24,9 @@ webhooks:
       path: /v1/admit
     {{- end }}
   failurePolicy: {{ .Values.validatingWebhookFailurePolicy }}
+  {{- if ge (int .Capabilities.KubeVersion.Minor) 28 }}
+  matchConditions: {{ toYaml .Values.validatingWebhookMatchConditions | nindent 4 }}
+  {{- end }}
   matchPolicy: Exact
   name: validation.gatekeeper.sh
   namespaceSelector:
@@ -43,7 +46,7 @@ webhooks:
       - {{ . }}
       {{- end }}
     {{- end }}
-  objectSelector: {{ toYaml .Values.validatingWebhookObjectSelector }}
+  objectSelector: {{ toYaml .Values.validatingWebhookObjectSelector | nindent 4 }}
   rules:
   {{- if .Values.validatingWebhookCustomRules }}
   {{- toYaml .Values.validatingWebhookCustomRules | nindent 2 }}

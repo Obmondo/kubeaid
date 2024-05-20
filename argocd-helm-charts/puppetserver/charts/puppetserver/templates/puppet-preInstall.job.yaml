@@ -93,8 +93,10 @@ spec:
               subPath: private_key.pkcs7.pem
             {{- end }}
             {{- end }}
+            {{- if eq .Values.puppetserver.persistence.data.enabled true }}
             - name: puppet-serverdata-storage
               mountPath: /opt/puppetlabs/server/data/puppetserver/
+            {{- end}}
           securityContext:
             runAsUser: 0
             runAsNonRoot: false
@@ -167,10 +169,12 @@ spec:
               mountPath: /crl
             {{- end }}
             {{- end }}
+          {{- if .Values.global.runAsNonRoot }}
           securityContext:
             runAsUser: {{ .Values.global.securityContext.runAsUser }}
             runAsGroup: {{ .Values.global.securityContext.runAsGroup }}
-        {{- if .Values.puppetdb.enabled }}
+          {{- end }}
+        {{- if and .Values.puppetdb.enabled .Values.puppetserver.preGeneratedCertsJob.importPuppetdb }}
         - name: copy-ro-puppetdb-certs
           image: "{{.Values.puppetdb.image}}:{{.Values.puppetdb.tag}}"
           imagePullPolicy: "{{.Values.puppetdb.pullPolicy}}"
@@ -223,9 +227,11 @@ spec:
               mountPath: /crl
             {{- end }}
             {{- end }}
+          {{- if .Values.global.runAsNonRoot }}
           securityContext:
             runAsUser: {{ .Values.global.securityContext.runAsUser }}
             runAsGroup: {{ .Values.global.securityContext.runAsGroup }}
+          {{- end }}
         {{- end }}
         {{- end }}
         {{- if .Values.global.runAsNonRoot }}
@@ -281,8 +287,10 @@ spec:
               mountPath: /etc/puppetlabs/code/
             - name: puppet-puppet-storage
               mountPath: /etc/puppetlabs/puppet/
+            {{- if eq .Values.puppetserver.persistence.data.enabled true }}
             - name: puppet-serverdata-storage
               mountPath: /opt/puppetlabs/server/data/puppetserver/
+            {{- end }}
             - name: puppet-ca-storage
               mountPath: /etc/puppetlabs/puppetserver/ca/
             {{- range $key, $value := .Values.puppetserver.customconfigs.configmaps }}
@@ -337,9 +345,11 @@ spec:
         - name: puppet-ca-storage
           persistentVolumeClaim:
             claimName: {{ template "puppetserver.persistence.ca.claimName" . }}
+        {{- if eq .Values.puppetserver.persistence.data.enabled true }}
         - name: puppet-serverdata-storage
           persistentVolumeClaim:
             claimName: {{ template "puppetserver.persistence.data.claimName" . }}
+        {{- end }}
         - name: puppet-docker-entrypoint-config
           configMap:
             name: {{ template "puppetserver.fullname" . }}-docker-entrypoint-config
@@ -373,7 +383,7 @@ spec:
         - name: puppetserver-certs
         {{- if not .Values.singleCA.enabled }}
           configMap:
-            name: "{{ template "puppetserver.fullname" . }}-puppetserver-preinstall"
+            name: "{{ template "puppetserver.fullname" . }}-preinstall"
         {{- else }}
           secret:
             secretName: {{ .Values.singleCA.certificates.existingSecret.puppetserver }}

@@ -5,9 +5,13 @@ metadata:
   name: {{ include "sealed-secrets.fullname" . }}
   namespace: {{ include "sealed-secrets.namespace" . }}
   labels: {{- include "sealed-secrets.labels" . | nindent 4 }}
-  {{- if .Values.commonAnnotations }}
-  annotations: {{- toYaml .Values.commonAnnotations | nindent 4 }}
-  {{- end }}
+    {{- if .Values.commonLabels }}
+    {{- include "sealed-secrets.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- include "sealed-secrets.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
 spec:
   replicas: 1
   {{- if .Values.revisionHistoryLimit }}
@@ -117,12 +121,22 @@ spec:
             {{- if .Values.logInfoStdout }}
             - --log-info-stdout
             {{- end }}
+            {{- if .Values.logLevel }}
+            - --log-level
+            - {{ .Values.logLevel }}
+            {{- end }}
+            {{- if .Values.logFormat }}
+            - --log-format
+            - {{ .Values.logFormat }}
+            {{- end }}
           {{- end }}
           image: {{ printf "%s/%s:%s" .Values.image.registry .Values.image.repository .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 8080
               name: http
+            - containerPort: 8081
+              name: metrics
           {{- if .Values.startupProbe.enabled }}
           startupProbe: {{- include "sealed-secrets.render" (dict "value" (omit .Values.startupProbe "enabled") "context" $) | nindent 12 }}
             tcpSocket:

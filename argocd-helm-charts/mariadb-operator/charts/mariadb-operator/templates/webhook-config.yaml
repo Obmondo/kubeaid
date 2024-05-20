@@ -9,7 +9,7 @@ metadata:
     {{- if .Values.webhook.cert.certManager.enabled }}
     cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ include "mariadb-operator.fullname" . }}-webhook-cert
     {{- else }}
-    mariadb.mmontes.io/webhook: ""
+    k8s.mariadb.com/webhook: ""
     {{- end }}
     {{ with .Values.webhook.annotations }}
     {{ toYaml . | indent 4 }}
@@ -21,12 +21,12 @@ webhooks:
     service:
       name: {{ $fullName }}-webhook
       namespace: {{ .Release.Namespace }}
-      path: /mutate-mariadb-mmontes-io-v1alpha1-mariadb
+      path: /mutate-k8s-mariadb-com-v1alpha1-mariadb
   failurePolicy: Fail
   name: mmariadb.kb.io
   rules:
   - apiGroups:
-    - mariadb.mmontes.io
+    - k8s.mariadb.com
     apiVersions:
     - v1alpha1
     operations:
@@ -46,7 +46,7 @@ metadata:
     {{- if .Values.webhook.cert.certManager.enabled }}
     cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ include "mariadb-operator.fullname" . }}-webhook-cert
     {{- else }}
-    mariadb.mmontes.io/webhook: ""
+    k8s.mariadb.com/webhook: ""
     {{- end }}
     {{ with .Values.webhook.annotations }}
     {{ toYaml . | indent 4 }}
@@ -58,12 +58,12 @@ webhooks:
       service:
         name: {{ $fullName }}-webhook
         namespace: {{ .Release.Namespace }}
-        path: /validate-mariadb-mmontes-io-v1alpha1-backup
+        path: /validate-k8s-mariadb-com-v1alpha1-backup
     failurePolicy: Fail
     name: vbackup.kb.io
     rules:
       - apiGroups:
-          - mariadb.mmontes.io
+          - k8s.mariadb.com
         apiVersions:
           - v1alpha1
         operations:
@@ -78,12 +78,12 @@ webhooks:
       service:
         name: {{ $fullName }}-webhook
         namespace: {{ .Release.Namespace }}
-        path: /validate-mariadb-mmontes-io-v1alpha1-connection
+        path: /validate-k8s-mariadb-com-v1alpha1-connection
     failurePolicy: Fail
     name: vconnection.kb.io
     rules:
       - apiGroups:
-          - mariadb.mmontes.io
+          - k8s.mariadb.com
         apiVersions:
           - v1alpha1
         operations:
@@ -98,12 +98,12 @@ webhooks:
       service:
         name: {{ $fullName }}-webhook
         namespace: {{ .Release.Namespace }}
-        path: /validate-mariadb-mmontes-io-v1alpha1-database
+        path: /validate-k8s-mariadb-com-v1alpha1-database
     failurePolicy: Fail
     name: vdatabase.kb.io
     rules:
       - apiGroups:
-          - mariadb.mmontes.io
+          - k8s.mariadb.com
         apiVersions:
           - v1alpha1
         operations:
@@ -118,12 +118,12 @@ webhooks:
       service:
         name: {{ $fullName }}-webhook
         namespace: {{ .Release.Namespace }}
-        path: /validate-mariadb-mmontes-io-v1alpha1-grant
+        path: /validate-k8s-mariadb-com-v1alpha1-grant
     failurePolicy: Fail
     name: vgrant.kb.io
     rules:
       - apiGroups:
-          - mariadb.mmontes.io
+          - k8s.mariadb.com
         apiVersions:
           - v1alpha1
         operations:
@@ -138,12 +138,12 @@ webhooks:
       service:
         name: {{ $fullName }}-webhook
         namespace: {{ .Release.Namespace }}
-        path: /validate-mariadb-mmontes-io-v1alpha1-mariadb
+        path: /validate-k8s-mariadb-com-v1alpha1-mariadb
     failurePolicy: Fail
     name: vmariadb.kb.io
     rules:
       - apiGroups:
-          - mariadb.mmontes.io
+          - k8s.mariadb.com
         apiVersions:
           - v1alpha1
         operations:
@@ -153,17 +153,37 @@ webhooks:
           - mariadbs
     sideEffects: None
   - admissionReviewVersions:
+    - v1
+    clientConfig:
+      service:
+        name: {{ $fullName }}-webhook
+        namespace: {{ .Release.Namespace }}
+        path: /validate-k8s-mariadb-com-v1alpha1-maxscale
+    failurePolicy: Fail
+    name: vmaxscale.kb.io
+    rules:
+    - apiGroups:
+      - k8s.mariadb.com
+      apiVersions:
+      - v1alpha1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - maxscales
+    sideEffects: None
+  - admissionReviewVersions:
       - v1
     clientConfig:
       service:
         name: {{ $fullName }}-webhook
         namespace: {{ .Release.Namespace }}
-        path: /validate-mariadb-mmontes-io-v1alpha1-restore
+        path: /validate-k8s-mariadb-com-v1alpha1-restore
     failurePolicy: Fail
     name: vrestore.kb.io
     rules:
       - apiGroups:
-          - mariadb.mmontes.io
+          - k8s.mariadb.com
         apiVersions:
           - v1alpha1
         operations:
@@ -178,12 +198,12 @@ webhooks:
       service:
         name: {{ $fullName }}-webhook
         namespace: {{ .Release.Namespace }}
-        path: /validate-mariadb-mmontes-io-v1alpha1-sqljob
+        path: /validate-k8s-mariadb-com-v1alpha1-sqljob
     failurePolicy: Fail
     name: vsqljob.kb.io
     rules:
       - apiGroups:
-          - mariadb.mmontes.io
+          - k8s.mariadb.com
         apiVersions:
           - v1alpha1
         operations:
@@ -198,12 +218,12 @@ webhooks:
       service:
         name: {{ $fullName }}-webhook
         namespace: {{ .Release.Namespace }}
-        path: /validate-mariadb-mmontes-io-v1alpha1-user
+        path: /validate-k8s-mariadb-com-v1alpha1-user
     failurePolicy: Fail
     name: vuser.kb.io
     rules:
       - apiGroups:
-          - mariadb.mmontes.io
+          - k8s.mariadb.com
         apiVersions:
           - v1alpha1
         operations:

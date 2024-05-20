@@ -1,9 +1,9 @@
 annotations:
   artifacthub.io/changes: |
-    - kind: changed
-      description: "Updated Fluent Bit OCI image to v2.2.0."
+    - kind: added
+      description: "Create unqiue uid for grafana fluent-bit dashboard."
 apiVersion: v1
-appVersion: 2.2.0
+appVersion: 3.0.3
 description: Fast and lightweight log processor and forwarder or Linux, OSX and BSD
   family operating systems.
 home: https://fluentbit.io/
@@ -24,4 +24,4 @@ maintainers:
 name: fluent-bit
 sources:
 - https://github.com/fluent/fluent-bit/
-version: 0.40.0
+version: 0.46.6

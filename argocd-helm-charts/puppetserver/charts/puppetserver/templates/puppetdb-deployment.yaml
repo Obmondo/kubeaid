@@ -352,11 +352,6 @@ spec:
           configMap:
             name: {{ include "puppetdb.fullname" . }}-custom-configs
         {{- end }}
-        {{- if .Values.puppetdb.customconfigs.enabled }}
-        - name: puppetdb-custom-configs
-          configMap:
-            name: puppetdb-custom-configs
-        {{- end }}
       {{- if .Values.nodeSelector }}
       nodeSelector:
         {{ toYaml .Values.nodeSelector | nindent 10 }}

@@ -19,7 +19,7 @@ Before installing the chart, you must first install the cert-manager CustomResou
 This is performed in a separate step to allow you to easily uninstall and reinstall cert-manager without deleting your installed custom resources.
 
 ```bash
-$ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.3/cert-manager.crds.yaml
+$ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.5/cert-manager.crds.yaml
 ```
 
 To install the chart with the release name `my-release`:
@@ -29,7 +29,7 @@ To install the chart with the release name `my-release`:
 $ helm repo add jetstack https://charts.jetstack.io
 
 ## Install the cert-manager helm chart
-$ helm install my-release --namespace cert-manager --version v1.14.3 jetstack/cert-manager
+$ helm install my-release --namespace cert-manager --version v1.14.5 jetstack/cert-manager
 ```
 
 In order to begin issuing certificates, you will need to set up a ClusterIssuer
@@ -65,7 +65,7 @@ If you want to completely uninstall cert-manager from your cluster, you will als
 delete the previously installed CustomResourceDefinition resources:
 
 ```console
-$ kubectl delete -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.3/cert-manager.crds.yaml
+$ kubectl delete -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.5/cert-manager.crds.yaml
 ```
 
 ## Configuration

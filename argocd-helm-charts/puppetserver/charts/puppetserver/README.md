@@ -10,7 +10,7 @@ This chart bootstraps Puppet Server and its components on a Kubernetes cluster u
 
 * You must specify your Puppet Control Repo using `puppetserver.puppeturl` variable in the `values.yaml` file or include `--set puppetserver.puppeturl=<your_public_repo>` in the command line of `helm install`. You can specify your separate Hieradata Repo as well using the `hiera.hieradataurl` variable.
 
-* You can also use private repos. Just remember to specify your credentials using `r10k.code.viaSsh.credentials.ssh.value`. You can set similar credentials for your Hieradata Repo.
+* You can also use private repos. Just remember to specify your credentials using `r10k.code.viaSsh.credentials.ssh.value` or `r10k.code.viaHttps.credentials.netrc.value`. You can set similar credentials for your Hieradata Repo.
 
 ### Load-Balancing Puppet Server
 
@@ -38,7 +38,7 @@ If you prefer not to auto-sign or manually sign the Puppet Agents' CSRs - you ca
 
 ## Using Single CA
 
-If you prefer, you can use a single externally issued CA - <https://puppet.com/docs/puppet/7/config_ssl_external_ca.html>.  
+If you prefer, you can use a single externally issued CA - <https://puppet.com/docs/puppet/7/config_ssl_external_ca.html>.
 Enable it with `.Values.singleCA.enable`, add the crl.pem url with `.Values.singleCA.crl.url`.
 
 Generate puppet & puppetdb secret (must be name `puppet.pem` & `puppetdb.pem`):
@@ -50,7 +50,7 @@ finally set `.Values.singleCA.certificates.existingSecret.puppetserver` and `.Va
 
 Additionnaly, if you use a public certificate authority, you can't use private SAN name, so you have to override puppetdb name with `.Values.singleCA.puppetdb.overrideHostname` (with the full name ie: puppetdb.my.domain)
 
-If you prefer, you can use crl update as cronjob instead of sidecar, it reduce resources utilization because only 1 pod is running.  
+If you prefer, you can use crl update as cronjob instead of sidecar, it reduce resources utilization because only 1 pod is running.
 :warning: it may not work on multi zone cluster. that why it's not enable by default
 
 ## Horizontal Scaling
@@ -67,8 +67,8 @@ To achieve better throughput of Puppet Infrastructure, you can enable and scale 
 
 ### Multiple PostgreSQL Read Replicas
 
-For now it's not available anymore, since bitnami cleanned their old release. for multiple Postgresql we have to use postgresql-ha.  
-Read replica return an error on puppetdb:  
+For now it's not available anymore, since bitnami cleanned their old release. for multiple Postgresql we have to use postgresql-ha.
+Read replica return an error on puppetdb:
 `ERROR [p.p.c.services] Will retry database connection after temporary failure: java.sql.SQLTransientConnectionException: PDBMigrationsPool: default - Connection is not available, request timed out after 3002ms.`
 
 ## Deploy R10K as deployment
@@ -205,8 +205,9 @@ The following table lists the configurable parameters of the Puppetserver chart 
 | `global.extraEnvSecret`| add extra environment variables to all containers from pre-existing secret |``|
 | `puppetserver.name` | puppetserver component label | `puppetserver`|
 | `puppetserver.image` | puppetserver image | `voxpupuli/container-puppetserver`|
-| `puppetserver.tag` | puppetserver img tag | `7.13.0`|
+| `puppetserver.tag` | puppetserver img tag | `7.17.0-v1.5.0`|
 | `puppetserver.pullPolicy` | puppetserver img pull policy | `IfNotPresent`|
+| `puppetserver.persistence.data.enabled`| Persists /opt/puppetlabs/server/data/puppetserver/ in a PVC |`true`|
 | `puppetserver.persistence.data.existingClaim`| If non-empty, use a pre-defined PVC for puppet data |``|
 | `puppetserver.persistence.data.accessModes`| If existingClaim is empty, the accessModes of the PVC created by the chart | the value of `storage.accessModes` |
 | `puppetserver.persistence.data.storageClass`| If existingClaim is empty, the storageClass of the PVC created by the chart | the value of `storage.accessModes` |
@@ -227,6 +228,7 @@ The following table lists the configurable parameters of the Puppetserver chart 
 | `puppetserver.persistence.ca.storageClass`| If existingClaim is empty, the storageClass of the PVC created by the chart | the value of `storage.accessModes` |
 | `puppetserver.persistence.ca.annotations`| If existingClaim is empty, the annotations of the PVC created by the chart | the value of `storage.annotations` |
 | `puppetserver.persistence.ca.size`| If existingClaim is empty, the size of the PVC created by the chart | the value of `storage.size` |
+| `puppetserver.persistence.confd.enabled`| Persists /etc/puppetlabs/puppetserver/conf.d/ in a PVC |`true`|
 | `puppetserver.persistence.confd.existingClaim`| If non-empty, use a pre-defined PVC for the puppet conf.d directory |``|
 | `puppetserver.persistence.confd.accessModes`| If existingClaim is empty, the accessModes of the PVC created by the chart | the value of `storage.accessModes` |
 | `puppetserver.persistence.confd.storageClass`| If existingClaim is empty, the storageClass of the PVC created by the chart | the value of `storage.accessModes` |
@@ -342,6 +344,7 @@ The following table lists the configurable parameters of the Puppetserver chart 
 | `puppetserver.compilers.ingress.hosts`| puppetserver compilers ingress hostnames |``|
 | `puppetserver.compilers.ingress.tls`| puppetserver compilers ingress tls configuration |``|
 | `puppetserver.preGeneratedCertsJob.enabled` | puppetserver pre-generated certs |`false`|
+| `puppetserver.preGeneratedCertsJob.importPuppetdb` | import puppetdb pre-generated certs |`true`|
 | `puppetserver.preGeneratedCertsJob.jobDeadline` | puppetserver pre-generated certs job deadline in seconds |`60`|
 | `puppetserver.puppeturl`| puppetserver control repo url |``|
 | `puppetserver.serviceAccount.enabled`| Enable service account (Note: Service Account will only be automatically created if `puppetserver.serviceAccount.create` is not set.  |`false`|
@@ -375,6 +378,10 @@ The following table lists the configurable parameters of the Puppetserver chart 
 | `r10k.code.viaSsh.credentials.ssh.value`| r10k control repo ssh key file |``|
 | `r10k.code.viaSsh.credentials.known_hosts.value`| r10k control repo ssh known hosts file |``|
 | `r10k.code.viaSsh.credentials.existingSecret`| r10k control repo ssh secret that holds ssh key and known hosts files |``|
+| `r10k.code.viaHttps.credentials.netrc.value`| r10k control repo https .netrc file |``|
+| `r10k.code.viaHttps.credentials.existingSecret`| r10k control repo https secret that holds .netrc file contents in `netrc` key |``|
+| `r10k.code.viaHttps.customCa.cert.value`| r10k control repo https custom CA file in PEM format |``|
+| `r10k.code.viaHttps.customCa.existingSecret`| r10k control repo https secret that holds custom CA file in PEM format in `cert` key |``|
 | `r10k.hiera.resources` | r10k hiera data resource limits |``|
 | `r10k.hiera.cronJob.enabled` | enable or disable r10k hiera data cron job schedule policy | `true`|
 | `r10k.hiera.cronJob.schedule` | r10k hiera data cron job schedule policy | `*/2 * * * *`|
@@ -389,7 +396,9 @@ The following table lists the configurable parameters of the Puppetserver chart 
 | `r10k.hiera.viaSsh.credentials.ssh.value`| r10k hiera data ssh key file |``|
 | `r10k.hiera.viaSsh.credentials.known_hosts.value`| r10k hiera data ssh known hosts file |``|
 | `r10k.hiera.viaSsh.credentials.existingSecret`| r10k hiera data ssh secret that holds ssh key and known hosts files |``|
-| `postgresql.*`| please refer to https://github.com/bitnami/charts/tree/main/bitnami/postgresql#parameters |``|
+| `r10k.hiera.viaHttps.credentials.netrc.value`| r10k hiera data https .netrc file |``|
+| `r10k.hiera.viaHttps.credentials.existingSecret`| r10k hiera data https secret that holds .netrc file contents in `netrc` key |``|
+| `postgresql.*`| please refer to <https://github.com/bitnami/charts/tree/main/bitnami/postgresql#parameters> |``|
 | `postgresql.primary.initdb.scriptsConfigMap` | postgres initdb scripts run at first boot |`postgresql-custom-extensions`|
 | `postgresql.primary.persistence.enabled` | postgres database persistence |`true`|
 | `postgresql.primary.persistence.existingClaim` | postgres manually managed pvc |``|
@@ -399,7 +408,7 @@ The following table lists the configurable parameters of the Puppetserver chart 
 | `puppetdb.enabled` | puppetdb component enabled |`true`|
 | `puppetdb.name` | puppetdb component label | `puppetdb`|
 | `puppetdb.image` | puppetdb img | `voxpupuli/container-puppetdb`|
-| `puppetdb.tag` | puppetdb img tag | `7.14.0`|
+| `puppetdb.tag` | puppetdb img tag | `7.18.0-v1.5.0`|
 | `puppetdb.pullPolicy` | puppetdb img pull policy | `IfNotPresent`|
 | `puppetdb.resources` | puppetdb resource limits |``|
 | `puppetdb.extraEnv` | puppetdb additional container env vars |``|
@@ -572,6 +581,7 @@ kill %[job_numbers_above]
 * [Niels Højen](https://github.com/nielshojen), Maintainer
 * [Scott Cressi](https://www.linkedin.com/in/scottcressi/), Co-Author
 * [Linas Daneliukas](https://github.com/ldaneliukas), Maintainer
+* [Anthony Somerset](https://github.com/anthonysomerset), Maintainer
 * [Kai Sisterhenn](https://www.sistason.de/), Contributor
 * [chwehrli](https://github.com/chwehrli), Contributor
 * [Hryhorii Didenko](https://github.com/HryhoriiDidenko), Contributor

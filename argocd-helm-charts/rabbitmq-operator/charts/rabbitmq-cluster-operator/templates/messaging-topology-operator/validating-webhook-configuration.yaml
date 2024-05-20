@@ -1,5 +1,5 @@
 {{- /*
-Copyright VMware, Inc.
+Copyright Broadcom, Inc. All Rights Reserved.
 SPDX-License-Identifier: APACHE-2.0
 */}}
 
@@ -115,6 +115,27 @@ webhooks:
           - UPDATE
         resources:
           - federations
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: {{ template "rmqco.msgTopologyOperator.webhook.fullname" . }}
+        namespace: {{ include "common.names.namespace" . | quote }}
+        path: /validate-rabbitmq-com-v1beta1-operatorpolicy
+        port: {{ .Values.msgTopologyOperator.service.ports.webhook }}
+    failurePolicy: Fail
+    name: voperatorpolicy.kb.io
+    rules:
+    - apiGroups:
+      - rabbitmq.com
+      apiVersions:
+      - v1beta1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - operatorpolicies
     sideEffects: None
   - admissionReviewVersions:
       - v1

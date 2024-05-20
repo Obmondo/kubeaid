@@ -19,7 +19,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
-      tag: "v3.6.2-eks-1-28-9"
+      tag: "v4.0.1-eks-1-30-4"
     logLevel: 2
     # Additional parameters provided by external-provisioner.
     additionalArgs: []
@@ -44,7 +44,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/external-attacher
-      tag: "v4.4.2-eks-1-28-9"
+      tag: "v4.5.1-eks-1-30-4"
     # Tune leader lease election for csi-attacher.
     # Leader election is on by default.
     leaderElection:
@@ -71,7 +71,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/external-snapshotter/csi-snapshotter
-      tag: "v6.3.2-eks-1-28-9"
+      tag: "v7.0.2-eks-1-30-4"
     logLevel: 2
     # Additional parameters provided by csi-snapshotter.
     additionalArgs: []
@@ -85,7 +85,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/livenessprobe
-      tag: "v2.11.0-eks-1-28-9"
+      tag: "v2.12.0-eks-1-30-4"
     # Additional parameters provided by livenessprobe.
     additionalArgs: []
     resources: {}
@@ -97,7 +97,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/external-resizer
-      tag: "v1.9.2-eks-1-28-9"
+      tag: "v1.10.1-eks-1-30-4"
     # Tune leader lease election for csi-resizer.
     # Leader election is on by default.
     leaderElection:
@@ -122,7 +122,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar
-      tag: "v2.9.1-eks-1-28-9"
+      tag: "v2.10.1-eks-1-30-4"
     logLevel: 2
     # Additional parameters provided by node-driver-registrar.
     additionalArgs: []
@@ -144,7 +144,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/ebs-csi-driver/volume-modifier-for-k8s
-      tag: "v0.1.3"
+      tag: "v0.3.0"
     leaderElection:
       enabled: true
       # Optional values to tune lease behavior.
@@ -229,6 +229,7 @@ controller:
     # Additional labels for ServiceMonitor object
     labels:
       release: prometheus
+    interval: "15s"
   # If set to true, AWS API call metrics will be exported to the following
   # TCP endpoint: "0.0.0.0:3301"
   # ---
@@ -237,6 +238,7 @@ controller:
   logLevel: 2
   userAgentExtra: "helm"
   nodeSelector: {}
+  deploymentAnnotations: {}
   podAnnotations: {}
   podLabels: {}
   priorityClassName: system-cluster-critical
@@ -246,6 +248,9 @@ controller:
   # region: us-east-1
   region:
   replicaCount: 2
+  revisionHistoryLimit: 10
+  socketDirVolume:
+    emptyDir: {}
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
@@ -320,6 +325,9 @@ controller:
   otelTracing: {}
   #  otelServiceName: ebs-csi-controller
   #  otelExporterEndpoint: "http://localhost:4317"
+  
+  # Enable dnsConfig for the controller and node pods
+  dnsConfig: {}
 
 node:
   env: []
@@ -328,6 +336,7 @@ node:
   loggingFormat: text
   logLevel: 2
   priorityClassName:
+  additionalArgs: []
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -346,6 +355,7 @@ node:
             - a1.2xlarge
             - a1.4xlarge
   nodeSelector: {}
+  daemonSetAnnotations: {}
   podAnnotations: {}
   podLabels: {}
   tolerateAllTaints: true
@@ -359,6 +369,9 @@ node:
       memory: 40Mi
     limits:
       memory: 256Mi
+  revisionHistoryLimit: 10
+  probeDirVolume:
+    emptyDir: {}
   serviceAccount:
     create: true
     name: ebs-csi-node-sa
@@ -369,7 +382,12 @@ node:
   # Enable the linux daemonset creation
   enableLinux: true
   enableWindows: false
+  # The number of attachment slots to reserve for system use (and not to be used for CSI volumes)
+  # When this parameter is not specified (or set to -1), the EBS CSI Driver will attempt to determine the number of reserved slots via heuristic
+  # Cannot be specified at the same time as `node.volumeAttachLimit`
+  reservedVolumeAttachments:
   # The "maximum number of attachable volumes" per node
+  # Cannot be specified at the same time as `node.reservedVolumeAttachments`
   volumeAttachLimit:
   updateStrategy:
     type: RollingUpdate
@@ -432,6 +450,9 @@ storageClasses: []
 #   parameters:
 #     encrypted: "true"
 
+defaultStorageClass:
+  enabled: false
+
 volumeSnapshotClasses: []
 # Add VolumeSnapshotClass resources like:
 # - name: ebs-vsc
@@ -449,3 +470,8 @@ volumeSnapshotClasses: []
 # Intended for use with older clusters that cannot easily replace the CSIDriver object
 # This parameter should always be false for new installations
 useOldCSIDriver: false
+
+helmTester:
+  enabled: true
+  # Supply a custom image to the ebs-csi-driver-test pod in helm-tester.yaml
+  image: "gcr.io/k8s-staging-test-infra/kubekins-e2e:v20240311-b09cdeb92c-master"

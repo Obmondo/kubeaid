@@ -56,10 +56,15 @@ securityContext:
   readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 1000
+  seccompProfile:
+    type: RuntimeDefault
+  capabilities:
+    drop:
+      - ALL
 
 priorityClassName: system-cluster-critical
 
-containerPort: 4443
+containerPort: 10250
 
 hostNetwork:
   # Specifies if metrics-server should be started in hostNetwork mode.
@@ -70,6 +75,8 @@ hostNetwork:
   enabled: false
 
 replicas: 1
+
+revisionHistoryLimit:
 
 updateStrategy: {}
 #   type: RollingUpdate
@@ -118,6 +125,37 @@ service:
   #  kubernetes.io/cluster-service: "true"
   #  kubernetes.io/name: "Metrics-server"
 
+addonResizer:
+  enabled: false
+  image:
+    repository: registry.k8s.io/autoscaling/addon-resizer
+    tag: 1.8.20
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      drop:
+        - ALL
+  resources:
+    requests:
+      cpu: 40m
+      memory: 25Mi
+    limits:
+      cpu: 40m
+      memory: 25Mi
+  nanny:
+    cpu: 0m
+    extraCpu: 1m
+    memory: 0Mi
+    extraMemory: 2Mi
+    minClusterSize: 100
+    pollPeriod: 300000
+    threshold: 5
+
 metrics:
   enabled: false
 
@@ -130,7 +168,13 @@ serviceMonitor:
   relabelings: []
 
 # See https://github.com/kubernetes-sigs/metrics-server#scaling
-resources: {}
+resources:
+  requests:
+    cpu: 100m
+    memory: 200Mi
+  # limits:
+  #   cpu:
+  #   memory:
 
 extraVolumeMounts: []
 
@@ -144,7 +188,12 @@ affinity: {}
 
 topologySpreadConstraints: []
 
+dnsConfig: {}
+
 # Annotations to add to the deployment
 deploymentAnnotations: {}
 
 schedulerName: ""
+
+tmpVolume:
+  emptyDir: {}
