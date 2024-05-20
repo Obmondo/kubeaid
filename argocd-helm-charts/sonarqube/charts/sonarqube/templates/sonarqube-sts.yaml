@@ -16,6 +16,7 @@ metadata:
     app.kubernetes.io/version: {{ tpl .Values.image.tag . | quote }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
   serviceName: {{ template "sonarqube.fullname" . }}
   selector:
     matchLabels:
@@ -45,6 +46,7 @@ spec:
       {{- end }}
 {{- end }}
     spec:
+      automountServiceAccountToken: false
     {{- if .Values.schedulerName }}
       schedulerName: {{ .Values.schedulerName }}
     {{- end }}      
@@ -94,10 +96,8 @@ spec:
               subPath: certs
             - mountPath: /tmp/secrets/ca-certs
               name: ca-certs
-          {{- with .Values.env }}
           env:
-            {{- . | toYaml | trim | nindent 12 }}
-          {{- end }}
+          {{- (include "sonarqube.combined_env" . | fromJsonArray) | toYaml | trim | nindent 12 }}
       {{- end }}
       {{- if or .Values.initSysctl.enabled .Values.elasticsearch.configureNode }}
         - name: init-sysctl
@@ -115,10 +115,8 @@ spec:
           volumeMounts:
             - name: init-sysctl
               mountPath: /tmp/scripts/
-          {{- with .Values.env }}
           env:
-            {{- . | toYaml | trim | nindent 12 }}
-          {{- end }}
+          {{- (include "sonarqube.combined_env" . | fromJsonArray) | toYaml | trim | nindent 12 }}
       {{- end }}
 
       {{- if or .Values.sonarProperties .Values.sonarSecretProperties .Values.sonarSecretKey (not .Values.elasticsearch.bootstrapChecks) }}
@@ -158,10 +156,8 @@ spec:
           {{- end }}
           resources:
 {{ toYaml .Values.initContainers.resources | indent 12 }}
-          {{- with .Values.env }}
           env:
-            {{- . | toYaml | trim | nindent 12 }}
-          {{- end }}
+          {{- (include "sonarqube.combined_env" . | fromJsonArray) | toYaml | trim | nindent 12 }}
       {{- end }}
 
       {{- if .Values.prometheusExporter.enabled }}
@@ -187,9 +183,7 @@ spec:
               value: {{ default "" .Values.prometheusExporter.httpsProxy }}
             - name: no_proxy
               value: {{ default "" .Values.prometheusExporter.noProxy }}
-          {{- with .Values.env }}
-            {{- . | toYaml | trim | nindent 12 }}
-          {{- end }}
+          {{- (include "sonarqube.combined_env" . | fromJsonArray) | toYaml | trim | nindent 12 }}
       {{- end }}
       {{- if and .Values.persistence.enabled .Values.initFs.enabled }}
         - name: init-fs
@@ -266,9 +260,7 @@ spec:
               value: {{ default "" .Values.plugins.httpsProxy }}
             - name: no_proxy
               value: {{ default "" .Values.plugins.noProxy }}
-          {{- with .Values.env }}
-            {{- . | toYaml | trim | nindent 12 }}
-          {{- end }}
+          {{- (include "sonarqube.combined_env" . | fromJsonArray) | toYaml | trim | nindent 12 }}
       {{- end }}
       containers:
       {{- if .Values.extraContainers }}
@@ -292,17 +284,9 @@ spec:
           resources:
 {{ toYaml (default .Values.resources .Values.resource) | indent 12 }}
           env:
-            {{- with .Values.env }}
-            {{- . | toYaml | trim | nindent 12 }}
-            {{- end }}
+          {{- (include "sonarqube.combined_env" . | fromJsonArray) | toYaml | trim | nindent 12 }}
             - name: SONAR_HELM_CHART_VERSION
               value: {{ .Chart.Version | replace "+" "_" }}
-            - name: SONAR_WEB_JAVAOPTS
-              value: {{ template "sonarqube.jvmOpts" . }}
-            - name: SONAR_WEB_CONTEXT
-              value: {{ include "sonarqube.webcontext" . }}
-            - name: SONAR_CE_JAVAOPTS
-              value: {{ template "sonarqube.jvmCEOpts" . }}
             - name: SONAR_JDBC_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -335,8 +319,7 @@ spec:
               - sh
               - -c
               - |
-                host="$(hostname -i || echo '127.0.0.1')"
-                wget --no-proxy --quiet -O /dev/null --timeout={{ .Values.livenessProbe.timeoutSeconds }} --header="X-Sonar-Passcode: $SONAR_WEB_SYSTEMPASSCODE" "http://${host}:{{ .Values.service.internalPort }}{{ .Values.livenessProbe.sonarWebContext | default (include "sonarqube.webcontext" .) }}api/system/liveness"
+                wget --no-proxy --quiet -O /dev/null --timeout={{ .Values.livenessProbe.timeoutSeconds }} --header="X-Sonar-Passcode: $SONAR_WEB_SYSTEMPASSCODE" "http://localhost:{{ .Values.service.internalPort }}{{ .Values.livenessProbe.sonarWebContext | default (include "sonarqube.webcontext" .) }}api/system/liveness"
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
             failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
@@ -350,8 +333,7 @@ spec:
                 #!/bin/bash
                 # A Sonarqube container is considered ready if the status is UP, DB_MIGRATION_NEEDED or DB_MIGRATION_RUNNING
                 # status about migration are added to prevent the node to be kill while sonarqube is upgrading the database.
-                host="$(hostname -i || echo '127.0.0.1')"
-                if wget --no-proxy -qO- http://${host}:{{ .Values.service.internalPort }}{{ .Values.readinessProbe.sonarWebContext | default (include "sonarqube.webcontext" .) }}api/system/status | grep -q -e '"status":"UP"' -e '"status":"DB_MIGRATION_NEEDED"' -e '"status":"DB_MIGRATION_RUNNING"'; then
+                if wget --no-proxy -qO- http://localhost:{{ .Values.service.internalPort }}{{ .Values.readinessProbe.sonarWebContext | default (include "sonarqube.webcontext" .) }}api/system/status | grep -q -e '"status":"UP"' -e '"status":"DB_MIGRATION_NEEDED"' -e '"status":"DB_MIGRATION_RUNNING"'; then
                 	exit 0
                 fi
                 exit 1

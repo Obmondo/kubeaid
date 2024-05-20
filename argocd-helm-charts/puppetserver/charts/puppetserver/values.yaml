@@ -12,7 +12,7 @@ global:
 
   curl:
     image: curlimages/curl
-    tag: 7.87.0
+    tag: 8.7.1
     imagePullPolicy: IfNotPresent
 
   r10k:
@@ -31,7 +31,7 @@ global:
 
   jmxexporter:
     image: bitnami/jmx-exporter
-    tag: 0.20.0-debian-11-r1
+    tag: 0.20.0-debian-12-r13
     imagePullPolicy: IfNotPresent
 
   ## Credentials for PuppetDB and PostgreSQL
@@ -51,6 +51,7 @@ global:
   securityContext:
     runAsUser: 999  # "puppet" UID
     runAsGroup: 999  # "puppet" GID
+    fsGroup: 999  # "puppet" GID
 
   extraEnv: {}
   extraEnvSecret: ""
@@ -62,7 +63,7 @@ global:
 puppetserver:
   name: puppetserver
   image: ghcr.io/voxpupuli/container-puppetserver
-  tag: 7.13.0
+  tag: 7.17.0-v1.5.0
   pullPolicy: IfNotPresent
 
   ## Configure persistence for Puppet Server
@@ -106,6 +107,9 @@ puppetserver:
       size: ""
 
     data:
+      ## The data of this volume is overwritten on each start, so persistence can be disabled marking
+      ## this variable to false
+      enabled: true
       ## If an existing Persistent Volume Claim needs to be used, specify the name here.
       ## If not specified the PVC is created by this chart using the informations below or the `storage` values.
       existingClaim: ''
@@ -125,6 +129,9 @@ puppetserver:
       size: ""
 
     confd:
+      ## The data of this volume is overwritten on each start, so persistence can be disabled marking
+      ## this variable to false
+      enabled: true
       ## If an existing Persistent Volume Claim needs to be used, specify the name here.
       ## If not specified the PVC is created by this chart using the informations below or the `storage` values.
       existingClaim: ''
@@ -545,6 +552,8 @@ puppetserver:
   ##
   preGeneratedCertsJob:
     enabled: false
+    # Defaults to true to remain backwards compatible
+    importPuppetdb: true
     jobDeadline: 300
 
   ## Custom puppetserver conf.d configs
@@ -671,6 +680,12 @@ r10k:
         ## from a pre-existing K8s secret
         ## NOTE: Using this secret supercedes all other credentials settings.
         existingSecret: ""
+      customCa:
+        cert:
+          ## A multi-line string
+          value:  # |
+            # PEM-encoded custom CA certificates
+        existingSecret: ""
     viaSsh:
       credentials:
         ssh:
@@ -743,7 +758,7 @@ puppetdb:
   enabled: true
   name: puppetdb
   image: ghcr.io/voxpupuli/container-puppetdb
-  tag: 7.14.0
+  tag: 7.18.0-v1.5.0
   pullPolicy: IfNotPresent
   resources: {}
   #  requests:
@@ -902,7 +917,7 @@ puppetboard:
   enabled: false
   name: puppetboard
   image: ghcr.io/voxpupuli/puppetboard
-  tag: 4.2.5
+  tag: 5.4.0
   port: 9090
   pullPolicy: IfNotPresent
   service:

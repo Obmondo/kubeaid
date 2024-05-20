@@ -9,7 +9,7 @@ If all pods are OK, then look in ceph-tools with
 
 ```shell
     kubectl -n rook-ceph exec -it rook-ceph-tools-<pod-name> -- bash
-    # This would give the status of the cluster  
+    # This would give the status of the cluster
     ceph status
 ```
 

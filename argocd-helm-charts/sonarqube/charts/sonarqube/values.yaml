@@ -8,6 +8,9 @@ deploymentType: "StatefulSet"
 # There should not be more than 1 sonarqube instance connected to the same database. Please set this value to 1 or 0 (in case you need to scale down programmatically).
 replicaCount: 1
 
+# How many revisions to retain (Deployment ReplicaSets or StatefulSets)
+revisionHistoryLimit: 10
+
 # This will use the default deployment strategy unless it is overriden
 deploymentStrategy: {}
 # Uncomment this to scheduler pods on priority
@@ -27,7 +30,7 @@ edition: "community"
 
 image:
   repository: sonarqube
-  tag: 10.3.0-{{ .Values.edition }}
+  tag: 10.5.1-{{ .Values.edition }}
   pullPolicy: IfNotPresent
   # If using a private repository, the imagePullSecrets to use
   # pullSecrets:
@@ -35,16 +38,16 @@ image:
 
 # Set security context for sonarqube pod
 securityContext:
-  fsGroup: 1000
+  fsGroup: 0
 
 # Set security context for sonarqube container
 containerSecurityContext:
-  # Sonarqube dockerfile creates sonarqube user as UID and GID 1000
+  # Sonarqube dockerfile creates sonarqube user as UID and GID 0
   # Those default are used to match pod security standard restricted as least privileged approach
   allowPrivilegeEscalation: false
   runAsNonRoot: true
   runAsUser: 1000
-  runAsGroup: 1000
+  runAsGroup: 0
   seccompProfile:
     type: RuntimeDefault
   capabilities:
@@ -84,9 +87,17 @@ networkPolicy:
 # if .Values.env.SONAR_WEB_CONTEXT is set, this value will be ignored
 sonarWebContext: ""
 
-# also install the nginx ingress helm chart
-nginx:
+# (DEPRECATED) please use ingress-nginx instead
+# nginx:
+#   enabled: false
+
+# Install the nginx ingress helm chart
+ingress-nginx:
   enabled: false
+
+  # You can add here any values from the official nginx ingress chart
+  # controller:
+  #   replicaCount: 3
 
 ingress:
   enabled: false
@@ -100,7 +111,7 @@ ingress:
       # servicePort: somePort
       # the pathType can be one of the following values: Exact|Prefix|ImplementationSpecific(default)
       # pathType: ImplementationSpecific
-  annotations:
+  annotations: {}
   # kubernetes.io/tls-acme: "true"
 
   # Set the ingressClassName on the ingress record
@@ -204,7 +215,7 @@ initContainers:
     allowPrivilegeEscalation: false
     runAsNonRoot: true
     runAsUser: 1000
-    runAsGroup: 1000
+    runAsGroup: 0
     seccompProfile:
       type: RuntimeDefault
     capabilities:
@@ -243,6 +254,8 @@ initSysctl:
   securityContext:
     # Compatible with podSecurity standard privileged
     privileged: true
+    # if run without root permissions, error "sysctl: permission denied on key xxx, ignoring"
+    runAsUser: 0
   # resources: {}
 
 # This should not be required anymore, used to chown/chmod folder created by faulty CSI driver that are not applying properly POSIX fsgroup.
@@ -295,8 +308,9 @@ prometheusMonitoring:
   podMonitor:
     # Create PodMonitor Resource for Prometheus scraping
     enabled: false
-    # Specify a custom namespace where the PodMonitor will be created
-    namespace: "default"
+    # (DEPRECATED) Specify a custom namespace where the PodMonitor will be created.
+    # This value should not be set, as the PodMonitor's namespace has to match the Release Namespace.
+    # namespace: "default"
     # Specify the interval how often metrics should be scraped
     interval: 30s
     # Specify the timeout after a scrape is ended
@@ -330,12 +344,10 @@ plugins:
   # Reuse default initcontainers.securityContext that match restricted pod security standard
   # securityContext: {}
 
-## (DEPRECATED) Please use SONAR_WEB_JAVAOPTS or sonar.web.javaOpts
-##
-# jvmOpts: "-Djava.net.preferIPv4Stack=true"
+## (DEPRECATED) The following value sets SONAR_WEB_JAVAOPTS (e.g., jvmOpts: "-Djava.net.preferIPv4Stack=true"). However, this is deprecated, please set SONAR_WEB_JAVAOPTS or sonar.web.javaOpts directly instead.
 jvmOpts: ""
 
-## (DEPRECATED) Please use SONAR_CE_JAVAOPTS or sonar.ce.javaOpts
+## (DEPRECATED) The following value sets SONAR_CE_JAVAOPTS. However, this is deprecated, please set SONAR_CE_JAVAOPTS or sonar.ce.javaOpts directly instead.
 jvmCeOpts: ""
 
 ## a monitoring passcode needs to be defined in order to get reasonable probe results
@@ -357,16 +369,19 @@ monitoringPasscode: "define_it"
 # Set annotations for pods
 annotations: {}
 
-## We usually don't make specific ressource recommandations, as they are heavily dependend on
-## The usage of SonarQube and the surrounding infrastructure.
-## Adjust these values to your needs, but make sure that the memory limit is never under 4 GB
+## We usually don't make specific resource recommendations, as they are heavily dependend on
+## the usage of SonarQube and the surrounding infrastructure.
+## Those default are based on the default Web -Xmx1G -Xms128m and CE -Xmx2G -Xms128m and Search -Xmx2G -Xms2G settings of SQ sub processes
+## Adjust these values to your needs, you can find more details on the main README of the chart.
 resources:
   limits:
     cpu: 800m
-    memory: 4Gi
+    memory: 6144M
+    ephemeral-storage: 512000M
   requests:
     cpu: 400m
-    memory: 2Gi
+    memory: 2048M
+    ephemeral-storage: 1536M
 
 persistence:
   enabled: false
@@ -387,7 +402,7 @@ persistence:
   accessMode: ReadWriteOnce
   size: 5Gi
   uid: 1000
-  guid: 1000
+  guid: 0
 
   ## Specify extra volumes. Refer to ".spec.volumes" specification : https://kubernetes.io/fr/docs/concepts/storage/volumes/
   volumes: []
@@ -516,7 +531,10 @@ sonarqubeFolder: /opt/sonarqube
 tests:
   image: ""
   enabled: true
-  resources: {}
+  resources:
+    limits:
+      cpu: 500m
+      memory: 200M
 
 # For OpenShift set create=true to ensure service account is created.
 serviceAccount:

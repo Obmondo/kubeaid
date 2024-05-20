@@ -16,13 +16,16 @@ metadata:
     {{- toYaml .Values.deploymentAnnotations | nindent 4 }}
   {{- end }}
 spec:
-  {{- if not .Values.hpa}}
-  replicas: {{ default 1 .Values.replicas }}
+  {{- if and (not .Values.hpa) (not (eq nil .Values.replicas)) }}
+  replicas: {{ .Values.replicas }}
   {{- end}}
   revisionHistoryLimit: {{ default 10 .Values.revisionHistoryLimit }}
   selector:
     matchLabels:
       app: {{ include "gitlab-runner.fullname" . }}
+  {{- with .Values.strategy }}
+  strategy: {{ toYaml . | nindent 4 }}
+  {{- end }}
   template:
     metadata:
       labels:
@@ -57,7 +60,7 @@ spec:
       {{- if .Values.priorityClassName }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
       {{- end }}
-      serviceAccountName: {{ if .Values.rbac.create }}{{ include "gitlab-runner.fullname" . }}{{ else }}"{{ .Values.rbac.serviceAccountName }}"{{ end }}
+      serviceAccountName: {{ include "gitlab-runner.serviceAccount" . }}
       containers:
       - name: {{ include "gitlab-runner.fullname" . }}
         image: {{ include "gitlab-runner.image" . }}
@@ -70,7 +73,7 @@ spec:
         command: ["/usr/bin/dumb-init", "--", "/bin/bash", "/configmaps/entrypoint"]
         {{- end }}
         env:
-        {{ include "gitlab-runner.runner-env-vars" . | indent 8 }}
+        {{- include "gitlab-runner.runner-env-vars" . | indent 8 }}
         livenessProbe:
           exec:
             command: ["/bin/bash", "/configmaps/check-live"]
@@ -90,7 +93,7 @@ spec:
         ports:
         - name: {{ .Values.metrics.portName | quote }}
           containerPort: {{ .Values.metrics.port }}
-        {{- if and (eq (default 1.0 .Values.replicas) 1.0) .Values.sessionServer .Values.sessionServer.enabled }}
+        {{- if eq (include "gitlab-runner.isSessionServerAllowed" . ) "true" }}
         - name: session-server
           containerPort: {{ include "gitlab-runner.server-session-internal-port" . }}
           protocol: TCP
@@ -177,4 +180,7 @@ spec:
     {{- if .Values.hostAliases }}
       hostAliases:
 {{ toYaml .Values.hostAliases | indent 8 }}
+    {{- end }}
+    {{- if .Values.hostname }}
+      hostname: {{ toYaml .Values.hostname }}
     {{- end }}

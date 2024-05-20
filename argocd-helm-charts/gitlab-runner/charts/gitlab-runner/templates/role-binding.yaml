@@ -17,6 +17,6 @@ roleRef:
   name: {{ include "gitlab-runner.fullname" . }}
 subjects:
 - kind: ServiceAccount
-  name: {{ include "gitlab-runner.fullname" . }}
+  name: {{ include "gitlab-runner.serviceAccount" . }}
   namespace: "{{ .Release.Namespace }}"
 {{- end -}}

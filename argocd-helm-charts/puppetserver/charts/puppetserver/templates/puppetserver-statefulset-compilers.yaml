@@ -339,6 +339,13 @@ spec:
             subPath: .netrc
           {{- end }}
           {{- end }}
+          {{- with .Values.r10k.code.viaHttps.customCa }}
+          {{- if or .existingSecret .cert.value }}
+          - name: r10k-code-cert
+            mountPath: /home/puppet/code-certs/ca.pem
+            subPath: ca.pem
+          {{- end }}
+          {{- end }}
           - name: puppet-code-volume
             mountPath: /etc/puppetlabs/code/
           - name: puppet-puppet-volume
@@ -594,6 +601,15 @@ spec:
             items:
               - key: netrc
                 path: .netrc
+        {{- end }}
+        {{- if or .Values.r10k.code.viaHttps.customCa.existingSecret .Values.r10k.code.viaHttps.customCa.cert.value }}
+        - name: r10k-code-cert
+          secret:
+            secretName: {{ template "r10k.code.viaHttps.customCa.secret" . }}
+            defaultMode: 288 # = mode 0440
+            items:
+              - key: cert
+                path: ca.pem
         {{- end }}
         {{- if .Values.puppetserver.puppeturl }}
         - name: r10k-code-volume

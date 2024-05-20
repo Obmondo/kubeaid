@@ -1,4 +1,4 @@
-{{- if and (.Values.puppetserver.preGeneratedCertsJob.enabled) (not .Values.singleCA.enabled) }}
+{{- if and (.Values.puppetserver.preGeneratedCertsJob.enabled) (.Values.puppetserver.preGeneratedCertsJob.importPuppetdb) (not .Values.singleCA.enabled) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

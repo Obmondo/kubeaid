@@ -1,4 +1,4 @@
-{{- if and (not .Values.puppetserver.persistence.confd.existingClaim) (not .Values.global.runAsNonRoot) }}
+{{- if and (not .Values.puppetserver.persistence.confd.existingClaim) (not .Values.global.runAsNonRoot) (eq .Values.puppetserver.persistence.confd.enabled true)}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

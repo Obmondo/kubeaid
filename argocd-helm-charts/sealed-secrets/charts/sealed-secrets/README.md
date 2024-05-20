@@ -78,6 +78,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `namespace`         | Namespace where to deploy the Sealed Secrets controller | `""`  |
 | `extraDeploy`       | Array of extra objects to deploy with the release       | `[]`  |
 | `commonAnnotations` | Annotations to add to all deployed resources            | `{}`  |
+| `commonLabels`      | Labels to add to all deployed resources                 | `{}`  |
 
 ### Sealed Secrets Parameters
 
@@ -85,7 +86,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------- |
 | `image.registry`                                  | Sealed Secrets image registry                                                                         | `docker.io`                         |
 | `image.repository`                                | Sealed Secrets image repository                                                                       | `bitnami/sealed-secrets-controller` |
-| `image.tag`                                       | Sealed Secrets image tag (immutable tags are recommended)                                             | `v0.24.4`                           |
+| `image.tag`                                       | Sealed Secrets image tag (immutable tags are recommended)                                             | `0.26.2`                            |
 | `image.pullPolicy`                                | Sealed Secrets image pull policy                                                                      | `IfNotPresent`                      |
 | `image.pullSecrets`                               | Sealed Secrets image pull secrets                                                                     | `[]`                                |
 | `revisionHistoryLimit`                            | Number of old history to retain to allow rollback (If not set, default Kubernetes value is set to 10) | `""`                                |
@@ -100,6 +101,8 @@ The command removes all the Kubernetes components associated with the chart and 
 | `privateKeyAnnotations`                           | Map of annotations to be set on the sealing keypairs                                                  | `{}`                                |
 | `privateKeyLabels`                                | Map of labels to be set on the sealing keypairs                                                       | `{}`                                |
 | `logInfoStdout`                                   | Specifies whether the Sealed Secrets controller will log info to stdout                               | `false`                             |
+| `logLevel`                                        | Specifies log level of controller (INFO,ERROR)                                                        | `""`                                |
+| `logFormat`                                       | Specifies log format (text,json)                                                                      | `""`                                |
 | `command`                                         | Override default container command                                                                    | `[]`                                |
 | `args`                                            | Override default container args                                                                       | `[]`                                |
 | `livenessProbe.enabled`                           | Enable livenessProbe on Sealed Secret containers                                                      | `true`                              |
@@ -172,37 +175,47 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Other Parameters
 
-| Name                         | Description                                                                                              | Value              |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------ |
-| `serviceAccount.annotations` | Annotations for Sealed Secret service account                                                            | `{}`               |
-| `serviceAccount.create`      | Specifies whether a ServiceAccount should be created                                                     | `true`             |
-| `serviceAccount.labels`      | Extra labels to be added to the ServiceAccount                                                           | `{}`               |
-| `serviceAccount.name`        | The name of the ServiceAccount to use.                                                                   | `""`               |
-| `rbac.create`                | Specifies whether RBAC resources should be created                                                       | `true`             |
-| `rbac.clusterRole`           | Specifies whether the Cluster Role resource should be created                                            | `true`             |
-| `rbac.clusterRoleName`       | Specifies the name for the Cluster Role resource                                                         | `secrets-unsealer` |
-| `rbac.namespacedRoles`       | Specifies whether the namespaced Roles should be created (in each of the specified additionalNamespaces) | `false`            |
-| `rbac.namespacedRolesName`   | Specifies the name for the namesapced Role resource                                                      | `secrets-unsealer` |
-| `rbac.labels`                | Extra labels to be added to RBAC resources                                                               | `{}`               |
-| `rbac.pspEnabled`            | PodSecurityPolicy                                                                                        | `false`            |
+| Name                           | Description                                                                                              | Value                                                                               |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `serviceAccount.annotations`   | Annotations for Sealed Secret service account                                                            | `{}`                                                                                |
+| `serviceAccount.create`        | Specifies whether a ServiceAccount should be created                                                     | `true`                                                                              |
+| `serviceAccount.labels`        | Extra labels to be added to the ServiceAccount                                                           | `{}`                                                                                |
+| `serviceAccount.name`          | The name of the ServiceAccount to use.                                                                   | `""`                                                                                |
+| `rbac.create`                  | Specifies whether RBAC resources should be created                                                       | `true`                                                                              |
+| `rbac.clusterRole`             | Specifies whether the Cluster Role resource should be created                                            | `true`                                                                              |
+| `rbac.clusterRoleName`         | Specifies the name for the Cluster Role resource                                                         | `secrets-unsealer`                                                                  |
+| `rbac.namespacedRoles`         | Specifies whether the namespaced Roles should be created (in each of the specified additionalNamespaces) | `false`                                                                             |
+| `rbac.namespacedRolesName`     | Specifies the name for the namesapced Role resource                                                      | `secrets-unsealer`                                                                  |
+| `rbac.labels`                  | Extra labels to be added to RBAC resources                                                               | `{}`                                                                                |
+| `rbac.pspEnabled`              | PodSecurityPolicy                                                                                        | `false`                                                                             |
+| `rbac.serviceProxier.create`   | Specifies whether to create the "proxier" role, to allow external users to access the SealedSecret API   | `true`                                                                              |
+| `rbac.serviceProxier.bind`     | Specifies whether to create a RoleBinding for the "proxier" role                                         | `true`                                                                              |
+| `rbac.serviceProxier.subjects` | Specifies the RBAC subjects to grant the "proxier" role to, in the created RoleBinding                   | `- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: system:authenticated
+` |
 
 ### Metrics parameters
 
-| Name                                       | Description                                                                            | Value   |
-| ------------------------------------------ | -------------------------------------------------------------------------------------- | ------- |
-| `metrics.serviceMonitor.enabled`           | Specify if a ServiceMonitor will be deployed for Prometheus Operator                   | `false` |
-| `metrics.serviceMonitor.namespace`         | Namespace where Prometheus Operator is running in                                      | `""`    |
-| `metrics.serviceMonitor.labels`            | Extra labels for the ServiceMonitor                                                    | `{}`    |
-| `metrics.serviceMonitor.annotations`       | Extra annotations for the ServiceMonitor                                               | `{}`    |
-| `metrics.serviceMonitor.interval`          | How frequently to scrape metrics                                                       | `""`    |
-| `metrics.serviceMonitor.scrapeTimeout`     | Timeout after which the scrape is ended                                                | `""`    |
-| `metrics.serviceMonitor.honorLabels`       | Specify if ServiceMonitor endPoints will honor labels                                  | `true`  |
-| `metrics.serviceMonitor.metricRelabelings` | Specify additional relabeling of metrics                                               | `[]`    |
-| `metrics.serviceMonitor.relabelings`       | Specify general relabeling                                                             | `[]`    |
-| `metrics.dashboards.create`                | Specifies whether a ConfigMap with a Grafana dashboard configuration should be created | `false` |
-| `metrics.dashboards.labels`                | Extra labels to be added to the Grafana dashboard ConfigMap                            | `{}`    |
-| `metrics.dashboards.annotations`           | Annotations to be added to the Grafana dashboard ConfigMap                             | `{}`    |
-| `metrics.dashboards.namespace`             | Namespace where Grafana dashboard ConfigMap is deployed                                | `""`    |
+| Name                                       | Description                                                                            | Value       |
+| ------------------------------------------ | -------------------------------------------------------------------------------------- | ----------- |
+| `metrics.serviceMonitor.enabled`           | Specify if a ServiceMonitor will be deployed for Prometheus Operator                   | `false`     |
+| `metrics.serviceMonitor.namespace`         | Namespace where Prometheus Operator is running in                                      | `""`        |
+| `metrics.serviceMonitor.labels`            | Extra labels for the ServiceMonitor                                                    | `{}`        |
+| `metrics.serviceMonitor.annotations`       | Extra annotations for the ServiceMonitor                                               | `{}`        |
+| `metrics.serviceMonitor.interval`          | How frequently to scrape metrics                                                       | `""`        |
+| `metrics.serviceMonitor.scrapeTimeout`     | Timeout after which the scrape is ended                                                | `""`        |
+| `metrics.serviceMonitor.honorLabels`       | Specify if ServiceMonitor endPoints will honor labels                                  | `true`      |
+| `metrics.serviceMonitor.metricRelabelings` | Specify additional relabeling of metrics                                               | `[]`        |
+| `metrics.serviceMonitor.relabelings`       | Specify general relabeling                                                             | `[]`        |
+| `metrics.dashboards.create`                | Specifies whether a ConfigMap with a Grafana dashboard configuration should be created | `false`     |
+| `metrics.dashboards.labels`                | Extra labels to be added to the Grafana dashboard ConfigMap                            | `{}`        |
+| `metrics.dashboards.annotations`           | Annotations to be added to the Grafana dashboard ConfigMap                             | `{}`        |
+| `metrics.dashboards.namespace`             | Namespace where Grafana dashboard ConfigMap is deployed                                | `""`        |
+| `metrics.service.type`                     | Sealed Secret Metrics service type                                                     | `ClusterIP` |
+| `metrics.service.port`                     | Sealed Secret service Metrics HTTP port                                                | `8081`      |
+| `metrics.service.nodePort`                 | Node port for HTTP                                                                     | `""`        |
+| `metrics.service.annotations`              | Additional custom annotations for Sealed Secret Metrics service                        | `{}`        |
 
 ### PodDisruptionBudget Parameters
 

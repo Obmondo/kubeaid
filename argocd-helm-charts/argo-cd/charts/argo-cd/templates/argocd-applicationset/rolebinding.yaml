@@ -1,17 +1,15 @@
-{{- if .Values.applicationSet.enabled }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ template "argo-cd.applicationSet.fullname" . }}
-  namespace: {{ .Release.Namespace | quote }}
+  name: {{ include "argo-cd.applicationSet.fullname" . }}
+  namespace: {{ include  "argo-cd.namespace" . }}
   labels:
     {{- include "argo-cd.labels" (dict "context" . "component" .Values.applicationSet.name "name" .Values.applicationSet.name) | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ template "argo-cd.applicationSet.fullname" . }}
+  name: {{ include "argo-cd.applicationSet.fullname" . }}
 subjects:
   - kind: ServiceAccount
-    name: {{ template "argo-cd.applicationSetServiceAccountName" . }}
-    namespace: {{ .Release.Namespace }}
-{{- end }}
+    name: {{ include "argo-cd.applicationSet.serviceAccountName" . }}
+    namespace: {{ include "argo-cd.namespace" . }}

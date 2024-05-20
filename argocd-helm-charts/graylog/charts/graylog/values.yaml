@@ -55,7 +55,7 @@ graylog:
   ##
   image:
     repository: "graylog/graylog"
-    tag: "5.0.3"
+    tag: "5.2.6"
     pullPolicy: "IfNotPresent"
 
   ## Graylog default Java option
@@ -115,15 +115,19 @@ graylog:
   ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   ##
   podSecurityContext:
-    {}
-    # runAsUser: 10001
-    # fsGroup: 65534
-
+    fsGroup: 1100
+    fsGroupChangePolicy: Always
   ## Set security context for defining privilege and accessing control settings for Graylog container
   ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   ##
   securityContext:
-    privileged: false
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+    runAsUser: 1100
+    runAsGroup: 1100
     # capabilities:
     #   drop:
     #   - ALL
@@ -216,12 +220,20 @@ graylog:
       ##
       type: ClusterIP
 
+  ## Override startupProbe config (path not allowed).
+  ## In a typical Graylog deployment, it can take up to 60 seconds for OpenSearch and MongoDB to become fully available.
+  ## This wait time can be reduced if your system has faster startup times.
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-startup-probes
+  ##
   startupProbe:
     periodSeconds: 60
     failureThreshold: 3
     successThreshold: 1
     timeoutSeconds: 5
 
+  ## Override livenessProbe config (path not allowed)
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-a-liveness-http-request
+  ##
   livenessProbe:
     initialDelaySeconds: 0
     periodSeconds: 30
@@ -229,6 +241,9 @@ graylog:
     successThreshold: 1
     timeoutSeconds: 5
 
+  ## Override readinessProbe config (path not allowed)
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-a-liveness-http-request
+  ##
   readinessProbe:
     initialDelaySeconds: 0
     periodSeconds: 10
@@ -361,6 +376,13 @@ graylog:
   ##
   # maxUnavailable: 10%
 
+  ## See `kubectl explain poddisruptionbudget.spec` for more
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  podDisruptionBudget:
+    create: false
+    minAvailable: 1
+    # maxUnavailable: 1
+
   ## Graylog server pod termination grace period
   ##
   terminationGracePeriodSeconds: 120
@@ -480,10 +502,10 @@ graylog:
       repository: "alpine"
       pullPolicy: "IfNotPresent"
 
-    ## Set kubectl location to download and use on init-container. If the value is not set, the https://storage.googleapis.com/kubernetes-release/ will be used.
+    ## Set kubectl location to download and use on init-container. If the value is not set, the https://dl.k8s.io/release/ will be used.
     ##
     kubectlLocation: ""
-    ## Set kubectl command version to download from https://storage.googleapis.com/kubernetes-release/. If the value is not set, default value is .Capabilities.KubeVersion.Version
+    ## Set kubectl command version to download from https://dl.k8s.io/release/. If the value is not set, default value is .Capabilities.KubeVersion.Version
     ##
     # kubectlVersion: "v1.20"
 
@@ -575,21 +597,15 @@ opensearch:
       value: "false"
     - name: plugins.security.disabled
       value: "true"
-  # - name: OPENSEARCH_JAVA_OPTS
-  #   value: "-Xms512m -Xmx512m"
-
-  # - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-  # - "discovery.seed_hosts=opensearch2,opensearch3"
-  # - "cluster.initial_master_nodes=opensearch1,opensearch2,opensearch3"
-  # - "bootstrap.memory_lock=true"
-  # - "action.auto_create_index=false"
-  # resources:
-  #   requests:
-  #     cpu: "100m"
-  #     memory: "512M"
+  ## Set default resource very low. This help reduce resources usage on GitHub Action when performing chart-testing.
+  opensearchJavaOpts: "-Xmx128M -Xms128M"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "100Mi"
   #   limits:
   #     cpu: "1000m"
-  #     memory: "512M"
+  #     memory: "512Mi"
   # volumeClaimTemplate:
   #   resources:
   #     requests:

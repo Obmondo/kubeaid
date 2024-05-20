@@ -51,6 +51,9 @@ data:
     tail -Fq ~/.r10k_code_cronjob.out &
     {{- end }}
     touch {{ .Values.r10k.code.cronJob.successFile }} > /dev/null 2>&1
+    {{- if or .Values.r10k.code.viaHttps.customCa.existingSecret .Values.r10k.code.viaHttps.customCa.cert.value }}
+    git config --global http."{{ template "r10k.code.viaHttps.customCa.repoUrl" .}}".sslCAInfo ~/code-certs/ca.pem
+    {{- end }}
     {{- if .Values.r10k.code.cronJob.enabled }}
     exec supercronic ~/.r10k_code_crontab
     {{- else}}

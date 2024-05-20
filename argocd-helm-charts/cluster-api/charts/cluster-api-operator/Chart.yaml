@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: 0.9.1
+appVersion: 0.10.1
 dependencies:
 - condition: cert-manager.enabled
   name: cert-manager
@@ -8,4 +8,4 @@ dependencies:
 description: Cluster API Operator
 name: cluster-api-operator
 type: application
-version: 0.9.1
+version: 0.10.1
