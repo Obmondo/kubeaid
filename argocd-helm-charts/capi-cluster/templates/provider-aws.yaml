@@ -12,8 +12,7 @@ spec:
   manager:
     metrics:
       bindAddress: ":8181"
-    syncPeriod: "500s"
+    syncPeriod: 10m0s
   fetchConfig:
     url: https://github.com/kubernetes-sigs/cluster-api-provider-aws/releases/{{ .Values.aws.capaVersion }}/infrastructure-components.yaml
-
 {{- end }}
