@@ -8,7 +8,7 @@ spec:
   region: {{ .Values.region }}
   sshKeyName: {{ .Values.sshKeyName }}
   bastion: {{ toYaml .Values.bastion | nindent 4 }}
-  networkSpec:
+  network:
     vpc:
       cidrBlock: {{ .Values.vpc.cidrBlock }}
   controlPlaneLoadBalancer:
