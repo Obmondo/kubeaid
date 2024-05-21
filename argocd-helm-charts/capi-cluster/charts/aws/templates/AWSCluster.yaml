@@ -7,7 +7,7 @@ metadata:
 spec:
   region: {{ .Values.region }}
   sshKeyName: {{ .Values.sshKeyName }}
-  bastion: {{ .Values.bastion }}
+  bastion: {{ toYaml .Values.bastion | nindent 4 }}
   networkSpec:
     vpc:
       cidrBlock: {{ .Values.vpc.cidrBlock }}
