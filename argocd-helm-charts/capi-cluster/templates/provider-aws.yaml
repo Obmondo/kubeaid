@@ -14,5 +14,5 @@ spec:
       bindAddress: ":8181"
     syncPeriod: "500s"
   fetchConfig:
-    url: https://github.com/kubernetes-sigs/cluster-api-provider-aws/releases
+    url: https://github.com/kubernetes-sigs/cluster-api-provider-aws/releases/{{ .Values.aws.capaVersion }}
 {{- end }}
