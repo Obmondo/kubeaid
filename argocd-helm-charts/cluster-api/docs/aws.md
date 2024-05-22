@@ -1,5 +1,16 @@
 # AWS Setup
 
+## Notes
+
+1. Latest version depends on [AMI release](https://cluster-api-aws.sigs.k8s.io/topics/images/built-amis.html)
+
+```sh
+clusterawsadm ami list --kubernetes-version v1.28.3 --region eu-west-1 --os ubuntu-20.04
+KUBERNETES VERSION   REGION      OS             NAME                                       AMI ID
+v1.28.3              eu-west-1   ubuntu-20.04   capa-ami-ubuntu-20.04-v1.28.3-1698915010   ami-03cd26c84ae9a587c
+```
+
+
 ## Prequisites
 
 * Download the cli binary to manage cluster on aws
