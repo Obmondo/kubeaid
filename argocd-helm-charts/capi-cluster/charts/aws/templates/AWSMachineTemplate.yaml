@@ -8,6 +8,7 @@ spec:
       iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
       instanceType: {{ .Values.controlPlane.instanceType }}
       sshKeyName: {{ .Values.controlPlane.sshKeyName }}
+      imageLookupBaseOS: ubuntu-20.04
 
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
@@ -20,3 +21,4 @@ spec:
       iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
       instanceType: {{ .Values.workerNodes.instanceType }}
       sshKeyName: {{ .Values.workerNodes.sshKeyName }}
+      imageLookupBaseOS: ubuntu-20.04
