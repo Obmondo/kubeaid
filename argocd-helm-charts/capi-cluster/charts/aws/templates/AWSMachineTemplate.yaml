@@ -9,6 +9,9 @@ spec:
       instanceType: {{ .Values.controlPlane.instanceType }}
       sshKeyName: {{ .Values.controlPlane.sshKeyName }}
       imageLookupBaseOS: ubuntu-20.04
+      publicIP: false
+      ami:
+        id: ami-03cd26c84ae9a587c
 
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
@@ -22,3 +25,6 @@ spec:
       instanceType: {{ .Values.workerNodes.instanceType }}
       sshKeyName: {{ .Values.workerNodes.sshKeyName }}
       imageLookupBaseOS: ubuntu-20.04
+      publicIP: false
+      ami:
+        id: ami-03cd26c84ae9a587c
