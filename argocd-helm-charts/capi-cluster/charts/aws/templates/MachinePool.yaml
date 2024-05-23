@@ -1,13 +1,11 @@
-{{- if (not (.Values.workerNodes).autoScaler) }}
+{{- if (.Values.workerNodes).autoScaler }}
 apiVersion: cluster.x-k8s.io/v1beta1
-kind: MachineDeployment
+kind: MachinePool
 metadata:
-  name: {{ .Values.global.clusterName }}-md-0
+  name: {{ .Values.global.clusterName }}-mp-0
 spec:
   clusterName: {{ .Values.global.clusterName }}
   replicas: {{ .Values.workerNodes.replicas }}
-  selector:
-    matchLabels: null
   template:
     spec:
       bootstrap:
@@ -18,7 +16,7 @@ spec:
       clusterName: {{ .Values.global.clusterName }}
       infrastructureRef:
         apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
-        kind: AWSMachineTemplate
-        name: {{ .Values.global.clusterName }}-md-0
+        kind: AWSMachinePool
+        name: {{ .Values.global.clusterName }}-mp-0
       version: {{ .Values.global.kubernetes.version }}
 {{- end }}
