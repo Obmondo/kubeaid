@@ -1,0 +1,24 @@
+{{- if (.Values.provider).aws }}
+apiVersion: addons.cluster.x-k8s.io/v1alpha1
+kind: HelmChartProxy
+metadata:
+  name: ccm-aws-{{ .Values.global.clusterName }}
+spec:
+  clusterSelector:
+    matchLabels:
+      cluster.x-k8s.io/name: {{ .Values.global.clusterName }}
+  repoURL: https://kubernetes.github.io/cloud-provider-aws
+  chartName: aws-cloud-controller-manager
+  namespace: aws
+  releaseName: aws-cloud-controller-manager
+  version: 0.0.8
+  options:
+    waitForJobs: true
+    wait: true
+    timeout: 5m0s
+    install:
+      createNamespace: true
+  valuesTemplate: |
+    image:
+        tag: v1.30.0
+{{- end }}
