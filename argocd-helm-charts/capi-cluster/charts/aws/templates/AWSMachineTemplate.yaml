@@ -9,7 +9,7 @@ spec:
       instanceType: {{ .Values.controlPlane.instanceType }}
       sshKeyName: {{ .Values.controlPlane.sshKeyName }}
       imageLookupBaseOS: ubuntu-20.04
-      publicIP: false
+      publicIP: {{ .Values.controlPlane.publicIP }}
       ami: {{ toYaml .Values.controlPlane.ami | nindent 6 }}
 
 {{- if (not (.Values.workerNodes).autoScaler) }}
@@ -25,6 +25,6 @@ spec:
       instanceType: {{ .Values.workerNodes.instanceType }}
       sshKeyName: {{ .Values.workerNodes.sshKeyName }}
       imageLookupBaseOS: ubuntu-20.04
-      publicIP: false
+      publicIP: {{ .Values.workerNodes.publicIP }}
       ami: {{ toYaml .Values.workerNodes.ami | nindent 6 }}
 {{- end }}

@@ -11,7 +11,7 @@ spec:
   unhealthyConditions:
     - type: Ready
       status: Unknown
-      timeout: 300s
+      timeout: 5m0s
     - type: Ready
       status: "False"
-      timeout: 300s
+      timeout: 5m0s
