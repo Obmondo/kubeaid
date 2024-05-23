@@ -8,7 +8,7 @@ spec:
   replicas: {{ .Values.workerNodes.replicas }}
   selector:
     matchLabels:
-      cluster.x-k8s.io/name: {{ .Values.global.clusterName }}
+      cluster.x-k8s.io/cluster-name: {{ .Values.global.clusterName }}
   template:
     spec:
       bootstrap:
