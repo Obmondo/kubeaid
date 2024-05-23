@@ -8,13 +8,13 @@ spec:
   configSecret:
     name: capi-cluster-token
     namespace: capi-cluster-{{ .Values.global.customerid }}
-  version: {{ .Values.aws.capaVersion }}
+  version: {{ .Values.global.capa.version }}
   manager:
     metrics:
       bindAddress: ":8181"
     syncPeriod: 10m0s
   fetchConfig:
-    url: https://github.com/kubernetes-sigs/cluster-api-provider-aws/releases/{{ .Values.aws.capaVersion }}/infrastructure-components.yaml
+    url: https://github.com/kubernetes-sigs/cluster-api-provider-aws/releases/{{ .Values.global.capa.version }}/infrastructure-components.yaml
   manager:
     featureGates:
       MachinePool: {{ .Values.global.capa.autoScaler }}
