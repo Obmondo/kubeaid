@@ -22,4 +22,8 @@ spec:
     bootstrap: kubeadm:{{ .Values.global.clusterAPI.version }}
     controlPlane: kubeadm:{{ .Values.global.clusterAPI.version }}
     core: cluster-api:{{ .Values.global.clusterAPI.version }}
-    infrastructure: {{ .Values.global.capa.version }}
+    {{- if (.Values.global.capa).version }}
+    infrastructure: aws:{{ .Values.global.capa.version }}
+    {{- else if (.Values.global.caph).version }}
+    infrastructure: hetzner:{{ .Values.global.caph.version }}
+    {{- end }}
