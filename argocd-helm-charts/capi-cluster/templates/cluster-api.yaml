@@ -10,7 +10,7 @@ spec:
   chartName: cluster-api-operator
   namespace: cluster-api
   releaseName: cluster-api
-  version: 0.9.1
+  version: 0.10.1
   options:
     waitForJobs: true
     wait: true
@@ -19,7 +19,7 @@ spec:
       createNamespace: true
   valuesTemplate: |
     addon: helm
-    bootstrap: kubeadm:{{ .Values.cluster.api.version }}
-    controlPlane: kubeadm:{{ .Values.cluster.api.version }}
-    core: cluster-api:{{ .Values.cluster.api.version }}
-    infrastructure: {{ .Values.cluster.api.infrastructure }}
+    bootstrap: kubeadm:{{ .Values.global.clusterAPI.version }}
+    controlPlane: kubeadm:{{ .Values.global.clusterAPI.version }}
+    core: cluster-api:{{ .Values.global.clusterAPI.version }}
+    infrastructure: {{ .Values.global.capa.version }}

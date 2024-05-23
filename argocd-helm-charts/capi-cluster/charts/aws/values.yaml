@@ -1,5 +1,4 @@
 workerNodes:
-  autoScaler: true
   maxSize: 3
   minSize: 1
   ami:

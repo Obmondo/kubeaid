@@ -1,18 +1,18 @@
-provider:
-  aws: false
-  hetzner: false
-
 global:
+  clusterName: staging.enableit.dev
+  customerid: enableit
   kubernetes:
-    version: v1.28.9
-
-cluster:
-  api:
-    version: v1.6.3
+    version: v1.28.3
+  clusterAPI:
+    version: v1.7.2
+  capa:
+    version: v2.5.0
+    autoScaler: true
   kubeaid:
     repo: https://github.com/Obmondo/kubeaid.git
-    type: git
-  monitoring:
-    provider: kubeadm
-    connectObmondo: false
-    version: "v0.13.0"
+  kubeaidConfig:
+    repo: https://github.com/Obmondo/kubeaid-config.git
+
+provider:
+  hetzner: false
+  aws: false

@@ -12,7 +12,7 @@ spec:
       publicIP: {{ .Values.controlPlane.publicIP }}
       ami: {{ toYaml .Values.controlPlane.ami | nindent 8 }}
 
-{{- if (not (.Values.workerNodes).autoScaler) }}
+{{- if (not (.Values.global.capa).autoScaler) }}
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
 kind: AWSMachineTemplate
