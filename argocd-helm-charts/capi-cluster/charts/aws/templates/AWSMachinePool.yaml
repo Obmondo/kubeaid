@@ -7,7 +7,7 @@ spec:
   minSize: {{ .Values.workerNodes.minSize | default 1 }}
   maxSize: {{ .Values.workerNodes.maxSize | default 3 }}
   awsLaunchTemplate:
-    ami: {{ toYaml .Values.workerNodes.ami | nindent 8 }}
+    ami: {{ toYaml .Values.workerNodes.ami | nindent 6 }}
     iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
     instanceType: {{ .Values.workerNodes.instanceType }}
     sshKeyName: {{ .Values.workerNodes.sshKeyName }}
