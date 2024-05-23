@@ -6,6 +6,8 @@ metadata:
 spec:
   clusterName: {{ .Values.global.clusterName }}
   replicas: {{ .Values.workerNodes.replicas }}
+  selector:
+    matchLabels: null
   template:
     spec:
       bootstrap:
