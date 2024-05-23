@@ -6,9 +6,6 @@ metadata:
 spec:
   clusterName: {{ .Values.global.clusterName }}
   replicas: {{ .Values.workerNodes.replicas }}
-  selector:
-    matchLabels:
-      cluster.x-k8s.io/cluster-name: {{ .Values.global.clusterName }}
   template:
     spec:
       bootstrap:
