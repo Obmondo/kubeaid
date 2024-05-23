@@ -1,0 +1,13 @@
+{{- if (.Values.workerNodes).autoScaler }}
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+kind: AWSMachinePool
+metadata:
+  name: {{ .Values.global.clusterName }}-mp-0
+spec:
+  minSize: {{ .Values.workerNodes.minSize | default 1 }}
+  maxSize: {{ .Values.workerNodes.maxSize | default 3 }}
+  awsLaunchTemplate:
+    iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
+    instanceType: {{ .Values.workerNodes.instanceType }}
+    sshKeyName: {{ .Values.workerNodes.sshKeyName }}
+{{- end }}

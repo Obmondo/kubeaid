@@ -1,0 +1,7 @@
+workerNodes:
+  autoScaler: true
+  ami:
+    id: ami-03cd26c84ae9a587c
+controlPlane:
+  ami:
+    id: ami-03cd26c84ae9a587c
