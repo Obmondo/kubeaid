@@ -1,4 +1,3 @@
-{{- if (not (.Values.global.capa).autoScaler) }}
 apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
 kind: KubeadmConfigTemplate
 metadata:
@@ -11,4 +10,3 @@ spec:
           kubeletExtraArgs:
             cloud-provider: aws
           name: '{{"{{"}} ds.meta_data.local_hostname {{"}}"}}'
-{{- end }}
