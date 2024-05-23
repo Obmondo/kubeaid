@@ -15,4 +15,7 @@ spec:
     syncPeriod: 10m0s
   fetchConfig:
     url: https://github.com/kubernetes-sigs/cluster-api-provider-aws/releases/{{ .Values.aws.capaVersion }}/infrastructure-components.yaml
+  manager:
+    featureGates:
+      MachinePool: {{ .Values.workerNodes.autoScaler }}
 {{- end }}
