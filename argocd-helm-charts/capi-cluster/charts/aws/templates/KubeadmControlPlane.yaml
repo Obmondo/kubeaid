@@ -7,19 +7,19 @@ spec:
     clusterConfiguration:
       apiServer:
         extraArgs:
-          cloud-provider: aws
+          cloud-provider: external
       controllerManager:
         extraArgs:
-          cloud-provider: aws
+          cloud-provider: external
     initConfiguration:
       nodeRegistration:
         kubeletExtraArgs:
-          cloud-provider: aws
+          cloud-provider: external
         name: '{{"{{"}} ds.meta_data.local_hostname {{"}}"}}'
     joinConfiguration:
       nodeRegistration:
         kubeletExtraArgs:
-          cloud-provider: aws
+          cloud-provider: external
         name: '{{"{{"}} ds.meta_data.local_hostname {{"}}"}}'
   machineTemplate:
     infrastructureRef:
