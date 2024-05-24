@@ -19,6 +19,7 @@ spec:
     install:
       createNamespace: true
   valuesTemplate: |
+    namespace: aws
     image:
       tag: v1.30.0
     args:
