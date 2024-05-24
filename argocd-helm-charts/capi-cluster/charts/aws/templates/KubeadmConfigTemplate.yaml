@@ -8,5 +8,5 @@ spec:
       joinConfiguration:
         nodeRegistration:
           kubeletExtraArgs:
-            cloud-provider: aws
+            cloud-provider: external
           name: '{{"{{"}} ds.meta_data.local_hostname {{"}}"}}'
