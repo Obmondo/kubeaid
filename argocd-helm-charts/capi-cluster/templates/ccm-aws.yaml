@@ -20,5 +20,10 @@ spec:
       createNamespace: true
   valuesTemplate: |
     image:
-        tag: v1.30.0
+      tag: v1.30.0
+    args:
+      - --v=2
+      - --cloud-provider=aws
+      - --use-service-account-credentials=true
+      - --configure-cloud-routes=false
 {{- end }}
