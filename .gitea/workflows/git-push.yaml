@@ -3,7 +3,7 @@ name: Build and Create Pull Request
 "on":
   push:
     branches:
-      - main
+      - master
     paths:
       - "build/**/*"
 
