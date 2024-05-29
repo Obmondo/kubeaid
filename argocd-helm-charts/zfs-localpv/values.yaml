@@ -33,7 +33,7 @@ zfs-localpv:
         memory: 200Mi
       requests:
         cpu: 50m
-        memory: 100Mi 
+        memory: 100Mi
   # zfsController contains the configurables for
   # the zfs controller statefulset
   zfsController:
