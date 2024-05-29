@@ -10,9 +10,6 @@ spec:
   selector:
     matchLabels:
       {{- include "zfslocalpv.zfsNode.matchLabels" . | nindent 6 }}
-    namespaceSelector:
-      matchNames:
-      - {{ .Release.Namespace }}
   endpoints:
   - port: {{ .Values.zfsExporter.portDefination.name | quote }}
     interval: {{ .Values.zfsExporter.serviceMonitor.interval }}
