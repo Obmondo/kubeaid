@@ -124,6 +124,8 @@ spec:
             requests:
               {{- toYaml .requests | nindent 14 }}
             {{- end }}
+          securityContext:
+            privileged: true
         {{- end }}
       volumes:
         - name: device-dir
