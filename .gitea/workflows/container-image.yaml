@@ -3,7 +3,7 @@ name: kubeaid CI image
 "on":
   push:
     branches:
-      - main
+      - master
     paths:
       - '.gitea/Dockerfile'
 
@@ -16,6 +16,7 @@ env:
 
 jobs:
   docker-image-build-pull-request:
+    runs-on: ubuntu-22.04-bantha
     uses: Obmondo/gitea-actions/.gitea/workflows/build-image.yaml@main
     with:
       push: true
@@ -23,6 +24,7 @@ jobs:
       image_name: ${{ env.KUBEAID_CI_IMAGE }}
       tags: ${{ env.KUBEAID_CI_TAG }}
       registry: ${{ secrets.HARBOR_REGISTRY }}
+      should-run: true
     secrets:
       username: ${{ secrets.HARBOR_USERNAME }}
       password: ${{ secrets.HARBOR_PASSWORD }}
