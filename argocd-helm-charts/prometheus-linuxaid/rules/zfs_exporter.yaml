@@ -1,0 +1,12 @@
+groups:
+  - name: ZFSStorageAlerts
+    rules:
+    - alert: HighStorageUsage
+      expr: |
+        (zfs_pool_size_bytes{pool="mypool"} - zfs_pool_free_bytes{pool="mypool"}) / zfs_pool_size_bytes{pool="mypool"} * 100 >= 85
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High storage usage on pool 'mypool'"
+        description: "The storage usage on pool 'mypool' is above 85%. Current usage is {{ $value }}%."
