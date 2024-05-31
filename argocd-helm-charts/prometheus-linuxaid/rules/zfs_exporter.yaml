@@ -8,5 +8,5 @@ groups:
       labels:
         severity: warning
       annotations:
-        summary: "High storage usage on zfs storage pool"
-        description: "The storage usage on zfs storage pool is above 85%. Current usage is {{ $value }}%."
+        summary: "High storage usage on zfs storage pool {{ $labels.pool }}"
+        description: "The storage usage on zfs storage {{ $labels.pool }} pool is above 85%. Current usage is {{ $value }}%."
