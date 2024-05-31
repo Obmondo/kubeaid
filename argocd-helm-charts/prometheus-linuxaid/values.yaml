@@ -42,6 +42,7 @@ prometheusRule:
   services: true
   smart: true
   ssacli: true
+  zfsExporter: true
 alertmanager:
   config:
     global:
