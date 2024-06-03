@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: 0.15.1
+appVersion: 0.17.0
 dependencies:
 - alias: certmanager
   condition: certmanager.enabled
@@ -22,4 +22,4 @@ maintainers:
 name: redis-operator
 sources:
 - https://github.com/OT-CONTAINER-KIT/redis-operator
-version: 0.15.9
+version: 0.16.1
