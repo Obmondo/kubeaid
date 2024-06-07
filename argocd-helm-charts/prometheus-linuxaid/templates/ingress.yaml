@@ -10,20 +10,32 @@ metadata:
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.tls.domains.0.main: {{ .Values.prometheus.server }}
     traefik.ingress.kubernetes.io/router.tls.options: traefik-prometheus-puppet-agent-tls-auth@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: monitoring-{{ .Values.customerid }}-ipwhitelist-{{ .Values.customerid }}@kubernetescrd
 spec:
   rules:
-  - host: {{ .Values.prometheus_server }}
-    http:
-      paths:
-      - pathType: Prefix
-        path: /{{ .Values.customerid }}/api/v1/write
-        backend:
-          service:
-            name: prometheus-main
-            port:
-              name: web
+    - host: {{ .Values.prometheus.server }}
+      http:
+        paths:
+          - pathType: Prefix
+            path: /{{ .Values.customerid }}/api/v1/write
+            backend:
+              service:
+                name: prometheus-main
+                port:
+                  name: web
+    - host: prometheus.{{ .Values.customerid }}.kbm.obmondo.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: prometheus-main
+                port:
+                  name: web
   tls:
-  - hosts:
-    - {{ .Values.prometheus_server }}
-    secretName: prometheus-{{ .Values.customerid }}-tls
-{{- end -}}
+    - hosts:
+        - {{ .Values.prometheus.server }}
+        - prometheus.{{ .Values.customerid }}.kbm.obmondo.com
+      secretName: prometheus-{{ .Values.customerid }}-tls
+  {{- end -}}
