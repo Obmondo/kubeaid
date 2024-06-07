@@ -5,7 +5,6 @@ metadata:
   namespace: monitoring-{{ .Values.customerid }}
 spec:
   ipWhiteList:
-    ipStrategy:
-      sourceRange: {{- range .Values.prometheus.ingress.allowedSourceRanges}}
+    sourceRange: {{- range .Values.prometheus.ingress.allowedSourceRanges}}
         - {{ . }}
         {{- end}}
