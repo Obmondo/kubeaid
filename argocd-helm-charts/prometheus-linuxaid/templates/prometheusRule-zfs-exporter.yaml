@@ -2,7 +2,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: zfsExporter-rules
+  name: zfs-exporter-rules
   namespace: monitoring-{{ .Values.customerid }}
 spec:
   {{- $.Files.Get "rules/zfs_exporter.yaml" | nindent 4 }}
