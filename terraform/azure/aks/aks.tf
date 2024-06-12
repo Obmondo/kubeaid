@@ -57,7 +57,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "link_private_dns" {
   name                  = "private-endpoint-link"
   resource_group_name   = var.ext_dns_subs_resource_group
   private_dns_zone_name = "privatelink.blob.core.windows.net"
-  virtual_network_id    = azurerm_virtual_network.aksvnet.id
+  virtual_network_id    = var.ext_vnet_name != null && var.ext_vnet_resource_group != null ? data.azurerm_virtual_network.ext_vnet[0].id : azurerm_virtual_network.aksvnet.id
   registration_enabled = true
   provider = azurerm.externalsubs
 }
