@@ -13,7 +13,7 @@ keycloakx:
     - "--spi-events-listener-jboss-logging-error-level=warn"
   database:
     vendor: postgres
-    hostname: keycloakx-pgsql
+    hostname: keycloak-pgsql-rw
     port: 5432
     database: keycloak
   extraEnv: |
