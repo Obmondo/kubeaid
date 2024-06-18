@@ -1,5 +1,5 @@
 {{/*
-Copyright Broadcom, Inc. All Rights Reserved.
+Copyright VMware, Inc.
 SPDX-License-Identifier: APACHE-2.0
 */}}
 
@@ -10,7 +10,13 @@ Return  the proper Storage Class
 */}}
 {{- define "common.storage.class" -}}
 
-{{- $storageClass := default .persistence.storageClass ((.global).storageClass) -}}
+{{- $storageClass := .persistence.storageClass -}}
+{{- if .global -}}
+    {{- if .global.storageClass -}}
+        {{- $storageClass = .global.storageClass -}}
+    {{- end -}}
+{{- end -}}
+
 {{- if $storageClass -}}
   {{- if (eq "-" $storageClass) -}}
       {{- printf "storageClassName: \"\"" -}}
