@@ -13,3 +13,9 @@
 
 NB. Do NOT share this token across multple clusters - instead issue one per cluster.
 so you can revoke per cluster and also see which cluster is doing what in cloudflare.
+
+## Upgrading external-dns chart
+
+At the time of writing upgrading to the latest version, 0.14.2 posed some issues regarding syncing of CRD's
+   Ref - https://github.com/kubernetes-sigs/external-dns/pull/4488 so we are sticking to 0.14.0 for now utill
+   the fix is released.
