@@ -1,21 +1,18 @@
 {{- if (.Values.provider).hetzner }}
-# Need to work on this, not completed
 apiVersion: operator.cluster.x-k8s.io/v1alpha2
 kind: InfrastructureProvider
 metadata:
-  name: aws-{{ .Values.global.customerid }}
+  name: hetzner-{{ .Values.global.customerid }}
   namespace: capi-cluster-{{ .Values.global.customerid }}
 spec:
   configSecret:
-    name: capi-cluster-token
+    name: capi-cluster-hetzner
     namespace: capi-cluster-{{ .Values.global.customerid }}
-  version: {{ .Values.global.capa.version }}
+  version: {{ .Values.global.caph.version }}
   fetchConfig:
-    url: https://github.com/kubernetes-sigs/cluster-api-provider-aws/releases/{{ .Values.global.capa.version }}/infrastructure-components.yaml
+    url: https://github.com/syself/cluster-api-provider-hetzner/releases/download/{{ .Values.global.caph.version }}/infrastructure-components.yaml
   manager:
     metrics:
       bindAddress: ":8181"
     syncPeriod: 10m0s
-    featureGates:
-      MachinePool: {{ .Values.global.capa.autoScaler }}
 {{- end }}

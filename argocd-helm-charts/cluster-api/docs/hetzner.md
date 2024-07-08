@@ -2,19 +2,13 @@
 
 ## Background
 
-* CCM (Cloud Controller Manager) from syself which talks to Hetzner api
-
-* CAPH (Cluster API Provider Hetzner) which will takecare of node lifecycle (which it does via above CCM)
+* CAPH (Cluster API Provider Hetzner) which will takecare of node lifecycle
 
 * Syself has developed CAPH which works with hetzner robot, the official only supported the cloud.
   But good news is that syself changes are merged into official
   [here is the PR](https://github.com/hetznercloud/hcloud-cloud-controller-manager/pull/561/)
 
-  **NOTE** The official ccm didn't worked for me, so currently we are using ccm from syself (v1.18.0-0.0.5)
-
-* This ccm-hetzner helm chart will setup both for you in same NS
-
-  **NOTE** charts/cluster-api-provider-hetzner is manually maintained based on this [file](https://github.com/syself/cluster-api-provider-hetzner/releases/download/v1.0.0-beta.33/infrastructure-components.yaml)
+  **NOTE** The official ccm didn't worked for me, so currently we are using ccm from syself.
 
 ## Pre-Requisites
 
@@ -37,7 +31,8 @@
   ```sh
   #!/bin/bash
 
-  export CLUSTER_NAME=kcm \
+  export CLUSTER_NAME=k8s03.obmondo.com \
+  export CUSTOMER_ID=lkaeu2839 \
   export HCLOUD_SSH_KEY="cluster" \
   export HCLOUD_TOKEN="xxx" \
   export HETZNER_ROBOT_USER="xxx" \
@@ -54,14 +49,10 @@
 * Create required secrets
 
   ```sh
-  kubectl -n capi-cluster create secret generic hetzner --dry-run=client --from-literal=hcloud=$HCLOUD_TOKEN --from-literal=robot-user=$HETZNER_ROBOT_USER --from-literal=robot-password=$HETZNER_ROBOT_PASSWORD -o yaml | kubeseal --controller-name sealed-secrets --controller-namespace system -o yaml > hetzner.yaml
+  kubectl -n capi-cluster-$CUSTOMER_ID create secret generic capi-cluster-hetzner --dry-run=client --from-literal=hcloud=$HCLOUD_TOKEN --from-literal=robot-user=$HETZNER_ROBOT_USER --from-literal=robot-password=$HETZNER_ROBOT_PASSWORD -o yaml | kubeseal --controller-name sealed-secrets --controller-namespace system -o yaml > capi-cluster-hetzner.yaml
 
-   kubectl create secret generic robot-ssh --dry-run=client -n capi-cluster --from-literal=sshkey-name=cluster --from-file=ssh-privatekey=$HETZNER_SSH_PRIV_PATH --from-file=ssh-publickey=$HETZNER_SSH_PUB_PATH -o yaml | kubeseal --controller-name sealed-secrets --controller-namespace system -o yaml > robot-ssh.yaml
+   kubectl -n capi-cluster-$CUSTOMER_ID create secret generic capi-cluster-robot-ssh --dry-run=client -n capi-cluster --from-literal=sshkey-name=cluster --from-file=ssh-privatekey=$HETZNER_SSH_PRIV_PATH --from-file=ssh-publickey=$HETZNER_SSH_PUB_PATH -o yaml | kubeseal --controller-name sealed-secrets --controller-namespace system -o yaml > capi-cluster-robot-ssh.yaml
   ```
-
-* Sync in root app and then cluster-api app
-
-* The cluster-api is completed, now you can create k8s cluster using [this chart](../../capi-cluster)
 
 * Sync the cluster app on argo-cd
 

@@ -9,9 +9,10 @@ spec:
       cluster.x-k8s.io/name: {{ .Values.global.clusterName }}
   repoURL: https://charts.syself.com
   chartName: ccm-hetzner
-  namespace: ccm-hetzner
+  namespace: kube-system
   releaseName: ccm-hetzner
-  version: 1.1.10
+  # helm search repo ccm-hetzner --output yaml
+  version: 1.1.15
   options:
     waitForJobs: true
     wait: true
