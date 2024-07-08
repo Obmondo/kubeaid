@@ -691,6 +691,17 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
+Define puppetdb alternate SAN
+*/}}
+{{- define "puppetdb.san" -}}
+{{- $san := printf "puppetdb,%s" ( include "puppetdb.fullname" . ) -}}
+{{- if .Values.puppetdb.fqdns.alternateServerNames -}}
+{{- $san = print $san "," .Values.puppetdb.fqdns.alternateServerNames -}}
+{{- end -}}
+{{- printf "%s" $san -}}
+{{- end -}}
+
+{{/*
 Define puppetdb service Account name
 */}}
 {{- define "puppetdb.serviceAccountName" -}}

@@ -1,10 +1,10 @@
 apiVersion: v2
-appVersion: 0.9.0
+appVersion: 0.10.0
 dependencies:
 - condition: community-operator-crds.enabled
   name: community-operator-crds
   repository: https://mongodb.github.io/helm-charts
-  version: 0.9.0
+  version: 0.10.0
 description: MongoDB Kubernetes Community Operator
 home: https://github.com/mongodb/mongodb-kubernetes-operator
 icon: https://mongodb-images-new.s3.eu-west-1.amazonaws.com/leaf-green-dark.png
@@ -18,4 +18,4 @@ maintainers:
   name: MongoDB
 name: community-operator
 type: application
-version: 0.9.0
+version: 0.10.0

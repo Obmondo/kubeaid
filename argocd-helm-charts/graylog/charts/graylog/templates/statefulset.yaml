@@ -74,14 +74,6 @@ spec:
               rm -rf /usr/share/graylog/data/journal/messagejournal-0
               rm -rf /usr/share/graylog/data/journal/recovery-point-offset-checkpoint
             {{- end }}
-              {{- if .Values.graylog.init.kubectlLocation }}
-              wget {{ .Values.graylog.init.kubectlLocation }} -O /k8s/kubectl
-              {{- else }}
-              {{.Capabilities.KubeVersion}}
-              wget https://dl.k8s.io/release/{{ .Values.graylog.init.kubectlVersion | default (regexReplaceAll "-.+" .Capabilities.KubeVersion.Version "") }}/bin/linux/amd64/kubectl -O /k8s/kubectl
-              {{- end }}
-              chmod +x /k8s/kubectl
-
               GRAYLOG_HOME=/usr/share/graylog
               chown -R 1100:1100 ${GRAYLOG_HOME}/data/
           securityContext:
@@ -94,8 +86,6 @@ spec:
           volumeMounts:
             - name: journal
               mountPath: /usr/share/graylog/data/journal
-            - name: kubectl
-              mountPath: /k8s
 {{- if .Values.graylog.init.resources }}
           resources:
 {{ toYaml .Values.graylog.init.resources | indent 12 }}
@@ -110,6 +100,12 @@ spec:
           command:
             - /entrypoint.sh
           env:
+            # Kubernetes Auto Master Selection
+            # https://go2docs.graylog.org/5-0/downloading_and_installing_graylog/docker_installation.htm#KubernetesAutomaticMasterSelection
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
             - name: GRAYLOG_SERVER_JAVA_OPTS
               {{- $javaOpts := .Values.graylog.javaOpts }}
               {{- if .Values.graylog.heapSize }}
@@ -231,25 +227,9 @@ spec:
             - name: files
               mountPath: /etc/graylog/server
           {{- end }}
-            - name: kubectl
-              mountPath: /k8s
+
           {{- if .Values.graylog.extraVolumeMounts }}
           {{ toYaml .Values.graylog.extraVolumeMounts | nindent 12 }}
-          {{- end }}
-          {{ $graylogVersion := .Values.graylog.image.tag | default .Chart.AppVersion }}
-          {{- if semverCompare "< 4.2.0-0" ( $graylogVersion ) }}
-          lifecycle:
-            preStop:
-              exec:
-                command:
-                  - bash
-                  - -ec
-                  - |
-                    ROOT_PASSWORD=`/k8s/kubectl get secret {{ template "graylog.fullname" . }} -o "jsonpath={.data['graylog-password-secret']}" | base64 -d`
-                    curl {{ if .Values.graylog.tls.enabled }}-k{{ end }} -XPOST -sS \
-                      -u "{{ .Values.graylog.rootUsername }}:${ROOT_PASSWORD}" \
-                      -H "X-Requested-By: {{ template "graylog.fullname" . }}" \
-                      {{ template "graylog.formatUrl" (list . "localhost:9000/api/system/shutdown/shutdown") }}
           {{- end }}
       {{- if .Values.graylog.sidecarContainers }}
         {{ toYaml .Values.graylog.sidecarContainers | nindent 8 }}
@@ -278,8 +258,6 @@ spec:
           configMap:
             name: {{ template "graylog.fullname" . }}-files
         {{- end }}
-        - name: kubectl
-          emptyDir: {}
         {{- if .Values.graylog.extraVolumes }}
         {{ toYaml .Values.graylog.extraVolumes | nindent 8 }}
         {{- end }}

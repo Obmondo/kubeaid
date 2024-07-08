@@ -4,6 +4,8 @@ This file documents all notable changes to Puppet Server Helm Chart. The release
 numbering uses [semantic versioning](http://semver.org).
 
 NOTE: The change log until version `v0.2.4` is auto-generated.
+## [v9.5.2](https://github.com/puppetlabs/puppetserver-helm-chart/tree/v9.5.2) (2024-06-18)
+- Fix: #233 - Allow puppetdb.fqdns.alternateServerNames to be configured
 
 ## [v9.5.1](https://github.com/puppetlabs/puppetserver-helm-chart/tree/v9.5.1) (2024-05-09)
 - Fix: #228 - fixed check for puppet certs in a multimaster setup

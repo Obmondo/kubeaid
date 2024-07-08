@@ -14,7 +14,7 @@ Trademarks: This software listing is packaged by Bitnami. The respective tradema
 helm install my-release oci://registry-1.docker.io/bitnamicharts/redmine
 ```
 
-Looking to use Redmine in production? Try [VMware Tanzu Application Catalog](https://bitnami.com/enterprise), the enterprise edition of Bitnami Application Catalog.
+Looking to use Redmine in production? Try [VMware Tanzu Application Catalog](https://bitnami.com/enterprise), the commercial edition of the Bitnami catalog.
 
 ## Introduction
 
@@ -416,16 +416,16 @@ helm install test --set persistence.existingClaim=PVC_REDMINE,mariadb.persistenc
 
 ### Other Parameters
 
-| Name                       | Description                                                    | Value   |
-| -------------------------- | -------------------------------------------------------------- | ------- |
-| `pdb.create`               | Enable a Pod Disruption Budget creation                        | `false` |
-| `pdb.minAvailable`         | Minimum number/percentage of pods that should remain scheduled | `""`    |
-| `pdb.maxUnavailable`       | Maximum number/percentage of pods that may be made unavailable | `""`    |
-| `autoscaling.enabled`      | Enable Horizontal POD autoscaling for Redmine                  | `false` |
-| `autoscaling.minReplicas`  | Minimum number of Redmine replicas                             | `1`     |
-| `autoscaling.maxReplicas`  | Maximum number of Redmine replicas                             | `11`    |
-| `autoscaling.targetCPU`    | Target CPU utilization percentage                              | `50`    |
-| `autoscaling.targetMemory` | Target Memory utilization percentage                           | `50`    |
+| Name                       | Description                                                                                                                                                  | Value   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| `pdb.create`               | Enable a Pod Disruption Budget creation                                                                                                                      | `true`  |
+| `pdb.minAvailable`         | Minimum number/percentage of pods that should remain scheduled                                                                                               | `""`    |
+| `pdb.maxUnavailable`       | Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `server.pdb.minAvailable` and `server.pdb.maxUnavailable` are empty. | `""`    |
+| `autoscaling.enabled`      | Enable Horizontal POD autoscaling for Redmine                                                                                                                | `false` |
+| `autoscaling.minReplicas`  | Minimum number of Redmine replicas                                                                                                                           | `1`     |
+| `autoscaling.maxReplicas`  | Maximum number of Redmine replicas                                                                                                                           | `11`    |
+| `autoscaling.targetCPU`    | Target CPU utilization percentage                                                                                                                            | `50`    |
+| `autoscaling.targetMemory` | Target Memory utilization percentage                                                                                                                         | `50`    |
 
 ### Database Parameters
 

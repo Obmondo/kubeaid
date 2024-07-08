@@ -16,11 +16,15 @@ Kubernetes v1.16+, because this helm chart uses CustomResourceDefinition `apiext
 
 ### Velero version
 
-This helm chart installs Velero version v1.13 https://velero.io/docs/v1.13/. See the [#Upgrading](#upgrading) section for information on how to upgrade from other versions.
+This helm chart installs Velero version v1.14 https://velero.io/docs/v1.14/. See the [#Upgrading](#upgrading) section for information on how to upgrade from other versions.
 
 ### Provider credentials
 
 When installing using the Helm chart, the provider's credential information will need to be appended into your values. The easiest way to do this is with the `--set-file` argument, available in Helm 2.10 and higher. See your cloud provider's documentation for the contents and creation of the `credentials-velero` file.
+
+### Azure resources
+
+When using the Azure plug-in, requests and limits must be set. See https://github.com/vmware-tanzu/velero/issues/3234 and https://github.com/vmware-tanzu/helm-charts/issues/469 for details.
 
 ### Installing
 
@@ -89,11 +93,20 @@ helm upgrade vmware-tanzu/velero <RELEASE NAME> --reuse-values --set configurati
 ```
 ## Upgrading Chart
 
+### Upgrading to 7.0.0
+
+Delete the CSI plugin. Because the Velero CSI plugin is already merged into the Velero, need to remove the existing CSI plugin InitContainer. Otherwise, the Velero server plugin would fail to start due to same plugin registered twice.
+CSI plugin has been merged into velero repo in v1.14 release. It will be installed by default as an internal plugin.
+
 ### Upgrading to 6.0.0
 
 This version removes the `nodeAgent.privileged` field, you should use `nodeAgent.containerSecurityContext.privileged` instead
 
 ## Upgrading Velero
+
+### Upgrading to v1.14
+
+The [instructions found here](https://velero.io/docs/v1.14/upgrade-to-1.14/) will assist you in upgrading from version v1.13.x to v1.14.
 
 ### Upgrading to v1.13
 

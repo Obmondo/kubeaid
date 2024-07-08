@@ -1,6 +1,7 @@
-{{- $ingressNamespaces := default (include "traefik.namespace" . | list) .Values.providers.kubernetesIngress.namespaces -}}
-{{- $CRDNamespaces := default (include "traefik.namespace" . | list) .Values.providers.kubernetesCRD.namespaces -}}
-{{- $allNamespaces := uniq (concat $ingressNamespaces $CRDNamespaces) -}}
+{{- $ingressNamespaces := concat (include "traefik.namespace" . | list) .Values.providers.kubernetesIngress.namespaces -}}
+{{- $CRDNamespaces := concat (include "traefik.namespace" . | list) .Values.providers.kubernetesCRD.namespaces -}}
+{{- $gatewayNamespaces := concat (include "traefik.namespace" . | list) ((.Values.providers.kubernetesGateway).namespaces) -}}
+{{- $allNamespaces := sortAlpha (uniq (concat $ingressNamespaces $CRDNamespaces $gatewayNamespaces)) -}}
 
 {{- if and .Values.rbac.enabled .Values.rbac.namespaced -}}
 {{- range $allNamespaces }}
@@ -13,15 +14,36 @@ metadata:
   labels:
     {{- include "traefik.labels" $ | nindent 4 }}
 rules:
+  {{- if (semverCompare "<v3.1.0-0" ($.Values.image.tag | default $.Chart.AppVersion)) }}
   - apiGroups:
       - ""
     resources:
-      - services
       - endpoints
+      - services
     verbs:
       - get
       - list
       - watch
+  {{- else }}
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - discovery.k8s.io
+    resources:
+      - endpointslices
+    verbs:
+    {{- if $.Values.hub.token }}
+      - get
+    {{- end }}
+      - list
+      - watch
+  {{- end }}
   # Required while https://github.com/traefik/traefik/issues/7097#issuecomment-1983581843
   - apiGroups:
       - ""
@@ -87,14 +109,28 @@ rules:
     verbs:
       - use
 {{- end -}}
-{{- if $.Values.experimental.kubernetesGateway.enabled }}
+{{- if (and (has . $gatewayNamespaces) ($.Values.providers.kubernetesGateway).enabled) }}
   - apiGroups:
       - ""
     resources:
-      - namespaces
+      - services
+{{- if (semverCompare "<v3.1.0-0" ($.Values.image.tag | default $.Chart.AppVersion)) }}
+      - endpoints
+{{- end }}
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+{{- if (semverCompare ">=v3.1.0-0" ($.Values.image.tag | default $.Chart.AppVersion)) }}
+  - apiGroups:
+      - discovery.k8s.io
+    resources:
+      - endpointslices
     verbs:
       - list
       - watch
+{{- end }}
   - apiGroups:
       - gateway.networking.k8s.io
     resources:
@@ -118,6 +154,82 @@ rules:
       - tlsroutes/status
     verbs:
       - update
+{{- end -}}
+{{- if $.Values.hub.token }}
+  - apiGroups:
+      - hub.traefik.io
+    resources:
+      - accesscontrolpolicies
+      - apiaccesses
+      - apiportals
+      - apiratelimits
+      - apis
+      - apiversions
+    verbs:
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - create
+      - delete
+      - deletecollection
+  - apiGroups:
+      - apps
+    resources:
+      - replicasets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - extensions
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
 {{- end -}}
 {{- end -}}
 {{- end -}}

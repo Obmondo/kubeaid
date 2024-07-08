@@ -119,17 +119,6 @@ unit_tests:
   tags:
   - gitlab-org-docker
 
-# Registration token is deprecated and will be removed in GitLab 18.0
-# This integration test also will be removed in GitLab 18.0
-integration test registration token:
-  extends:
-  - .integration_test
-  variables:
-    INTEGRATION_RUNNER_NAME: integration-test-$CI_COMMIT_SHORT_SHA-registration-token
-    TOKEN_TYPE: "registration"
-    TOKEN: $REGISTRATION_TOKEN
-    VALUE_YAML_FILE: "./values.yaml"
-
 integration test authentication token:
   extends:
   - .integration_test

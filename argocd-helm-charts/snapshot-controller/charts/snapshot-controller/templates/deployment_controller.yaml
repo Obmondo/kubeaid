@@ -44,6 +44,16 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+          readinessProbe:
+            httpGet:
+              port: http
+              path: /healthz/leader-election
+              scheme: HTTP
+          livenessProbe:
+            httpGet:
+              port: http
+              path: /healthz/leader-election
+              scheme: HTTP
           env:
             - name: NAMESPACE
               valueFrom:

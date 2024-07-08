@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 release:
-  version: "2.5.1"
+  version: "2.6.0"
 
 imagePullSecrets:
 # - name: "image-pull-secret"
@@ -35,16 +35,16 @@ zfsNode:
   annotations: {}
   podAnnotations: {}
   resources: {}
-  # This can be configured to run on various different k8s distributions like
-  # microk8s where kubelet dir is different
-  kubeletDir: "/var/lib/kubelet/"
-  encrKeysDir: "/home/keys"
   # limits:
   #   cpu: 10m
   #   memory: 32Mi
   # requests:
   #   cpu: 10m
   #   memory: 32Mi
+  # This can be configured to run on various different k8s distributions like
+  # microk8s where kubelet dir is different
+  kubeletDir: "/var/lib/kubelet/"
+  encrKeysDir: "/home/keys"
   ## Labels to be added to openebs-zfs node pods
   podLabels: {}
   nodeSelector: {}
@@ -135,7 +135,6 @@ zfsController:
     create: true
     name: zfs-csi-controller-critical
 
-
 # zfsPlugin is the common csi container used by the
 # controller deployment and node daemonset
 zfsPlugin:
@@ -147,7 +146,7 @@ zfsPlugin:
     repository: openebs/zfs-driver
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 2.5.0
+    tag: 2.6.0
 
 role: openebs-zfs
 

@@ -141,7 +141,9 @@ data:
     transport_email_web_interface_url = {{ $externalUri }}
   {{- end }}
     content_packs_dir = /usr/share/graylog/data/contentpacks
+  {{- if semverCompare "~5" ( $graylogVersion ) }}
     content_packs_auto_load = grok-patterns.json
+  {{- end}}
     proxied_requests_thread_pool_size = 32
   {{- if .Values.graylog.metrics.enabled }}
     prometheus_exporter_enabled = true
@@ -149,6 +151,7 @@ data:
   {{- end }}
   {{- if .Values.graylog.trustedProxies }}
     trusted_proxies = {{.Values.graylog.trustedProxies}}
+    data_dir = /usr/share/graylog/data
   {{- end }}
   {{- if .Values.graylog.config }}
 {{ .Values.graylog.config | indent 4 }}
@@ -160,38 +163,6 @@ data:
     export GRAYLOG_PLUGIN_DIR=${GRAYLOG_HOME}/plugin
     # Graylog 4.0.2 images move plugin dir to `plugins-default`
     find ${GRAYLOG_HOME}/plugins-default/ -type f -exec cp {} ${GRAYLOG_PLUGIN_DIR} \;
-    # Looking for Master IP
-    retry=1
-    for i in {0..2}
-    do
-      MASTER_IP=`/k8s/kubectl --namespace {{ .Release.Namespace }} get pod -o jsonpath='{range .items[*]}{.metadata.name} {.status.podIP}{"\n"}{end}' -l graylog-role=master --field-selector=status.phase=Running|awk '{print $2}'`
-      SELF_IP=`/k8s/kubectl --namespace {{ .Release.Namespace }} get pod $HOSTNAME -o jsonpath='{.status.podIP}'`
-      echo "Current master is $MASTER_IP"
-      echo "Self IP is $SELF_IP"
-      retry=$((retry+1))
-      [[ ! -z "$MASTER_IP" ]] && break
-      echo "[Try ${retry}/3] Waiting for master node..."
-      sleep 2
-    done
-    if [[ -z "$MASTER_IP" ]]; then
-      echo "Launching $HOSTNAME as master"
-      export GRAYLOG_IS_MASTER="true"
-      export GRAYLOG_IS_LEADER="true"
-      /k8s/kubectl --namespace {{ .Release.Namespace }} label --overwrite pod $HOSTNAME graylog-role="master"
-    else
-      # When container was recreated or restart, MASTER_IP == SELF_IP, running as master and no need to change label graylog-role="master"
-      if [ "$SELF_IP" == "$MASTER_IP" ];then
-        echo "Launching $HOSTNAME as master"
-        export GRAYLOG_IS_MASTER="true"
-        export GRAYLOG_IS_LEADER="true"
-      else
-        # MASTER_IP != SELF_IP, running as coordinating
-        echo "Launching $HOSTNAME as coordinating"
-        export GRAYLOG_IS_MASTER="false"
-        export GRAYLOG_IS_LEADER="false"
-        /k8s/kubectl --namespace {{ .Release.Namespace }} label --overwrite pod $HOSTNAME graylog-role="coordinating"
-      fi
-    fi
     # Download plugins
   {{- if .Values.graylog.plugins.proxy.enabled }}
     export https_proxy={{ .Values.graylog.plugins.proxy.host }}
@@ -228,6 +199,15 @@ data:
   {{- end }}
     # Start Graylog
     echo "Starting graylog"
+    if [[ ! -z "${POD_NAME}" ]]
+    then
+      if echo "${POD_NAME}" | grep "\\-0$" >/dev/null
+      then
+        export GRAYLOG_IS_LEADER="true"
+      else
+        export GRAYLOG_IS_LEADER="false"
+      fi
+    fi
     # Original docker-entrypoint.sh in Graylog Docker will error while executing since you can't chown readonly files in `config`
     # exec /docker-entrypoint.sh graylog
   {{- if or (.Values.graylog.opensearch.uriSecretKey) (.Values.graylog.mongodb.uriSecretKey) }}
@@ -238,6 +218,7 @@ data:
     export GRAYLOG_ELASTICSEARCH_VERSION={{ .Values.graylog.opensearch.version }}
   {{- end }}
     echo "Graylog Home ${GRAYLOG_HOME}"
+    echo "Graylog Leader ${GRAYLOG_IS_LEADER}"
     echo "Graylog Plugin Dir ${GRAYLOG_PLUGIN_DIR}"
     echo "Graylog Elasticsearch Version ${GRAYLOG_ELASTICSEARCH_VERSION}"
     "${JAVA_HOME}/bin/java" \

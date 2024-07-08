@@ -34,3 +34,32 @@ Runner namespace {{ $runnerNamespace }} was found in runners.config template.
 #############################################################################################
 {{- end }}
 {{- end }}
+{{- if and .Values.rbac.create (kindIs "invalid" .Values.serviceAccount.create) }}
+
+#############################################################################################
+## WARNING: You enabled `rbac` without specifying if a service account should be created.  ##
+## Please set `serviceAccount.create` to either `true` or `false`.                         ##
+## For backwards compatibility a service account will be created.                          ##
+#############################################################################################
+{{- end }}
+{{- if .Values.rbac.serviceAccountName }}
+
+#############################################################################################
+## WARNING: You have set the deprecated field `rbac.serviceAccountName`.                   ##
+## Please use `serviceAccount.name` instead.                                               ##
+#############################################################################################
+{{- end }}
+{{- if .Values.rbac.serviceAccountAnnotations }}
+
+#############################################################################################
+## WARNING: You have set the deprecated field `rbac.serviceAccountAnnotations`.            ##
+## Please use `serviceAccount.annotations` instead.                                        ##
+#############################################################################################
+{{- end }}
+{{- if .Values.rbac.imagePullSecrets }}
+
+#############################################################################################
+## WARNING: You have set the deprecated field `rbac.imagePullSecrets`.                     ##
+## Please use `serviceAccount.imagePullSecrets` instead.                                   ##
+#############################################################################################
+{{- end }}

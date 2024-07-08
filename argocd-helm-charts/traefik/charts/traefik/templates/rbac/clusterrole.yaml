@@ -1,5 +1,9 @@
-{{- if and .Values.rbac.enabled (or .Values.providers.kubernetesIngress.enabled (not .Values.rbac.namespaced)) -}}
-{{- if not (and .Values.rbac.namespaced .Values.providers.kubernetesIngress.disableIngressClassLookup) -}}
+{{- if .Values.rbac.enabled }}
+{{- if or
+       (semverCompare ">=v3.1.0-0" (.Values.image.tag | default .Chart.AppVersion))
+       (not .Values.rbac.namespaced)
+       (and .Values.rbac.namespaced .Values.providers.kubernetesIngress.enabled (not .Values.providers.kubernetesIngress.disableIngressClassLookup))
+}}
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
@@ -11,6 +15,16 @@ metadata:
     rbac.authorization.k8s.io/aggregate-to-{{ . }}: "true"
     {{- end }}
 rules:
+  {{- if semverCompare ">=v3.1.0-0" (.Values.image.tag | default .Chart.AppVersion) }}
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+  {{- end }}
   - apiGroups:
       - extensions
       - networking.k8s.io
@@ -23,22 +37,67 @@ rules:
       - get
       - list
       - watch
-{{- if not .Values.rbac.namespaced }}
+{{- if (.Values.providers.kubernetesGateway).enabled }}
   - apiGroups:
       - ""
     resources:
-      - services
-      - endpoints
+      - namespaces
+    verbs:
+      - list
+      - watch
+  - apiGroups:
+      - gateway.networking.k8s.io
+    resources:
+      - gatewayclasses
     verbs:
       - get
       - list
       - watch
   - apiGroups:
+      - gateway.networking.k8s.io
+    resources:
+      - gatewayclasses/status
+    verbs:
+      - update
+{{- end }}
+{{- if not .Values.rbac.namespaced }}
+  {{- if (semverCompare "<v3.1.0-0" (.Values.image.tag | default .Chart.AppVersion)) }}
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+      - services
+    verbs:
+      - get
+      - list
+      - watch
+  {{- else }}
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+      - services
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - discovery.k8s.io
+    resources:
+      - endpointslices
+    verbs:
+    {{- if $.Values.hub.token }}
+      - get
+    {{- end }}
+      - list
+      - watch
+  {{- end }}
+  - apiGroups:
       - ""
     resources:
       - secrets
-    {{- if gt (len .Values.rbac.secretResourceNames) 0 }}
-    resourceNames: {{ .Values.rbac.secretResourceNames }}
+    {{- with .Values.rbac.secretResourceNames }}
+    resourceNames: {{ toYaml . |nindent 6 }}
     {{- end }}
     verbs:
       - get
@@ -62,11 +121,11 @@ rules:
       - ingressrouteudps
       - middlewares
       - middlewaretcps
+      - serverstransports
+      - serverstransporttcps
       - tlsoptions
       - tlsstores
       - traefikservices
-      - serverstransports
-      - serverstransporttcps
     verbs:
       - get
       - list
@@ -82,18 +141,31 @@ rules:
     verbs:
       - use
 {{- end -}}
-{{- if .Values.experimental.kubernetesGateway.enabled }}
+{{- if .Values.providers.kubernetesGateway.enabled }}
   - apiGroups:
       - ""
     resources:
-      - namespaces
+      - services
+{{- if (semverCompare "<v3.1.0-0" ($.Values.image.tag | default $.Chart.AppVersion)) }}
+      - endpoints
+{{- end }}
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+{{- if (semverCompare ">=v3.1.0-0" ($.Values.image.tag | default $.Chart.AppVersion)) }}
+  - apiGroups:
+      - discovery.k8s.io
+    resources:
+      - endpointslices
     verbs:
       - list
       - watch
+{{- end }}
   - apiGroups:
       - gateway.networking.k8s.io
     resources:
-      - gatewayclasses
       - gateways
       - httproutes
       - referencegrants
@@ -106,7 +178,6 @@ rules:
   - apiGroups:
       - gateway.networking.k8s.io
     resources:
-      - gatewayclasses/status
       - gateways/status
       - httproutes/status
       - tcproutes/status
@@ -115,5 +186,89 @@ rules:
       - update
 {{- end -}}
 {{- end -}}
-{{- end -}}
-{{- end -}}
+{{- if .Values.hub.token }}
+  - apiGroups:
+      - hub.traefik.io
+    resources:
+      - accesscontrolpolicies
+      - apiaccesses
+      - apiportals
+      - apiratelimits
+      - apis
+      - apiversions
+    verbs:
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+      - pods
+    verbs:
+      - list
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+      - pods
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - create
+      - delete
+      - deletecollection
+  - apiGroups:
+      - apps
+    resources:
+      - replicasets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - extensions
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+{{- end }}
+{{- end }}
+{{- end }}

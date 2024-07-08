@@ -1,10 +1,13 @@
 # SonarQube Chart Changelog
 All changes to this chart will be documented in this file.
 
-## [10.5.1]
-* Update Chart's version to 10.5.1
-* Update SonarQube's version to 10.5.1
+## [10.6.0]
+* Update SonarQube to 10.6.0
+* Update Chart's version to 10.6.0
 * Fix the env-var templating when sourcing from secrets
+* Fix the postgresql chart's repository link
+* Add support for overriding liveness/readiness probe logic
+* Use a common template for Deployment and StatefulSet
 
 ## [10.5.0]
 * Upgrade SonarQube to 10.5.0

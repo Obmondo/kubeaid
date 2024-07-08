@@ -63,14 +63,11 @@ webhooks:
         - snapshot.storage.k8s.io
         apiVersions:
         - v1
-        - v1beta1
         operations:
         - CREATE
         - UPDATE
         resources:
-        - volumesnapshots
         - volumesnapshotclasses
-        - volumesnapshotcontents
         scope: "*"
     clientConfig:
       service:
@@ -96,8 +93,6 @@ webhooks:
           - CREATE
           - UPDATE
         resources:
-          - volumegroupsnapshots
-          - volumegroupsnapshotcontents
           - volumegroupsnapshotclasses
         scope: "*"
     clientConfig:

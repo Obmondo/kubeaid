@@ -1,12 +1,19 @@
 annotations:
-  artifacthub.io/changes: "- \"style: \U0001F3A8 consistent capitalization on `--entryPoints`
-    CLI flag\"\n- \"fix: \U0001F41B only expose http3 port on service when TCP variant
-    is exposed\"\n- \"fix: \U0001F41B logs filters on status codes\"\n- \"feat: ✨
-    add support of `experimental-v3.0` unstable version\"\n- \"feat: ability to override
-    liveness and readiness probe paths\"\n- \"feat(ports): add transport options\"\n-
-    \"chore(release): publish v28.0.0\"\n"
+  artifacthub.io/changes: "- \"fix: \U0001F41B improve error message on additional
+    service without ports\"\n- \"fix:  allow multiples values in the `secretResourceNames`
+    slice\"\n- \"fix(rbac)!: nodes API permissions for Traefik v3.1+\"\n- \"fix(dashboard):
+    Only set ingressClass annotation when kubernetesCRD provider is listening for
+    it\"\n- \"fix!: prometheus operator settings\"\n- \"feat: ✨ update CRDs & RBAC
+    for Traefik Proxy\"\n- \"feat: ✨ migrate to endpointslices rbac\"\n- \"feat: allow
+    to set hostAliases for traefik pod\"\n- \"feat(providers): add nativeLBByDefault
+    support\"\n- \"feat(providers)!: improve kubernetesGateway and Gateway API support\"\n-
+    \"feat(dashboard)!: dashboard `IngressRoute` should be disabled by default\"\n-
+    \"docs: fix typos and broken link\"\n- \"chore: update CRDs to v1.5.0\"\n- \"chore:
+    update CRDs to v1.4.0\"\n- \"chore(release): publish v29.0.0\"\n- \"chore(deps):
+    update traefik docker tag to v3.0.4\"\n- \"chore(deps): update traefik docker
+    tag to v3.0.3\"\n"
 apiVersion: v2
-appVersion: v3.0.0
+appVersion: v3.0.4
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
 icon: https://raw.githubusercontent.com/traefik/traefik/v2.3/docs/content/assets/img/traefik.logo.png
@@ -28,4 +35,4 @@ sources:
 - https://github.com/traefik/traefik
 - https://github.com/traefik/traefik-helm-chart
 type: application
-version: 28.0.0
+version: 29.0.0

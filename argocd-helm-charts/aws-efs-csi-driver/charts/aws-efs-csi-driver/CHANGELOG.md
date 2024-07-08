@@ -1,4 +1,30 @@
 # Helm chart
+# v3.0.6
+* Bump app/driver version to `v2.0.5`
+# v3.0.5
+* Bump app/driver version to `v2.0.4`
+# v3.0.4
+* Bump app/driver version to `v2.0.3`
+# v3.0.3
+* Bump app/driver version to `v2.0.2`
+# v3.0.2
+* Update Helm to use the image from Public ECR rather than DockerHub
+# v3.0.1
+* Bump app/driver version to `v2.0.1`
+# v3.0.0
+* Bump app/driver version to `v2.0.0`
+# v2.5.7
+* Bump app/driver version to `v1.7.7`
+# v2.5.6
+* Bump app/driver version to `v1.7.6`
+# v2.5.5
+* Bump app/driver version to `v1.7.5`
+# v2.5.4
+* Bump app/driver version to `v1.7.4`
+# v2.5.3
+* Bump app/driver version to `v1.7.3`
+# v2.5.2
+* Bump app/driver version to `v1.7.2`
 # v2.5.1
 * Bump app/driver version to `v1.7.1`
 # v2.5.0

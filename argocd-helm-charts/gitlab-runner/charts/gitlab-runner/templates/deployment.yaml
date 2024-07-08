@@ -16,7 +16,7 @@ metadata:
     {{- toYaml .Values.deploymentAnnotations | nindent 4 }}
   {{- end }}
 spec:
-  {{- if and (not .Values.hpa) (not (eq nil .Values.replicas)) }}
+  {{- if and (not .Values.hpa) (not (quote .Values.replicas | empty)) }}
   replicas: {{ .Values.replicas }}
   {{- end}}
   revisionHistoryLimit: {{ default 10 .Values.revisionHistoryLimit }}
@@ -60,7 +60,7 @@ spec:
       {{- if .Values.priorityClassName }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
       {{- end }}
-      serviceAccountName: {{ include "gitlab-runner.serviceAccount" . }}
+      serviceAccountName: {{ include "gitlab-runner.serviceAccountName" . }}
       containers:
       - name: {{ include "gitlab-runner.fullname" . }}
         image: {{ include "gitlab-runner.image" . }}
@@ -71,6 +71,9 @@ spec:
         command: ["/usr/local/bin/tini", "--", "/bin/bash", "/configmaps/entrypoint"]
         {{- else }}
         command: ["/usr/bin/dumb-init", "--", "/bin/bash", "/configmaps/entrypoint"]
+        {{- end }}
+        {{- if .Values.deploymentLifecycle }}
+        lifecycle: {{ toYaml .Values.deploymentLifecycle | nindent 10 }}
         {{- end }}
         env:
         {{- include "gitlab-runner.runner-env-vars" . | indent 8 }}

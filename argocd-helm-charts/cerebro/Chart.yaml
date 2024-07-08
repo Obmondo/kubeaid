@@ -3,5 +3,5 @@ name: cerebro
 version: 1.0.0
 dependencies:
   - name: cerebro
-    version: 2.0.4
+    version: 2.0.5
     repository: https://wiremind.github.io/wiremind-helm-charts

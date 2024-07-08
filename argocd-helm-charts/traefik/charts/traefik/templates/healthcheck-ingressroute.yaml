@@ -5,6 +5,9 @@ metadata:
   name: {{ template "traefik.fullname" . }}-healthcheck
   namespace: {{ template "traefik.namespace" . }}
   annotations:
+    {{- if and .Values.ingressClass.enabled .Values.providers.kubernetesCRD.enabled .Values.providers.kubernetesCRD.ingressClass }}
+    kubernetes.io/ingress.class: {{ .Values.providers.kubernetesCRD.ingressClass }}
+    {{- end }}
     {{- with .Values.ingressRoute.healthcheck.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}

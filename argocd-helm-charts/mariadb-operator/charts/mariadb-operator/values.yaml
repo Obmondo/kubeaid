@@ -2,7 +2,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 image:
-  repository: ghcr.io/mariadb-operator/mariadb-operator
+  repository: docker-registry3.mariadb.com/mariadb-operator/mariadb-operator
   pullPolicy: IfNotPresent
   # -- Image tag to use. By default the chart appVersion is used
   tag: ""
@@ -89,7 +89,7 @@ affinity: {}
 
 webhook:
   image:
-    repository: ghcr.io/mariadb-operator/mariadb-operator
+    repository: docker-registry3.mariadb.com/mariadb-operator/mariadb-operator
     pullPolicy: IfNotPresent
     # -- Image tag to use. By default the chart appVersion is used
     tag: ""
@@ -113,9 +113,12 @@ webhook:
     secretAnnotations: {}
     # -- Labels to be added to webhook TLS secret.
     secretLabels: {}
-    # -- Path where the CA certificate will be mounted.
-    caPath: /tmp/k8s-webhook-server/certificate-authority
-    # -- Path where the certificate will be mounted.
+    ca:
+      # -- Path that contains the full CA trust chain.
+      path: ""
+      # -- File under 'ca.path' that contains the full CA trust chain.
+      key: ""
+    # -- Path where the certificate will be mounted. 'tls.crt' and 'tls.key' certificates files should be under this path.
     path: /tmp/k8s-webhook-server/serving-certs
   # -- Port to be used by the webhook server
   port: 9443
@@ -173,7 +176,7 @@ certController:
   # -- Specifies whether the cert-controller should be created.
   enabled: true
   image:
-    repository: ghcr.io/mariadb-operator/mariadb-operator
+    repository: docker-registry3.mariadb.com/mariadb-operator/mariadb-operator
     pullPolicy: IfNotPresent
     # -- Image tag to use. By default the chart appVersion is used
     tag: ""

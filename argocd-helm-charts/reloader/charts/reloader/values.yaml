@@ -18,6 +18,7 @@ reloader:
   ignoreSecrets: false
   ignoreConfigMaps: false
   reloadOnCreate: false
+  reloadOnDelete: false
   syncAfterRestart: false
   reloadStrategy: default # Set to default, env-vars or annotations
   ignoreNamespaces: "" # Comma separated list of namespaces to ignore
@@ -32,6 +33,8 @@ reloader:
   legacy:
     rbac: false
   matchLabels: {}
+  # Set to true to expose a prometheus counter of reloads by namespace (this metric may have high cardinality in clusters with many namespaces)
+  enableMetricsByNamespace: false
   deployment:
     # If you wish to run multiple replicas set reloader.enableHA = true
     replicas: 1
@@ -89,10 +92,10 @@ reloader:
     labels:
       provider: stakater
       group: com.stakater.platform
-      version: v1.0.97
+      version: v1.0.116
     image:
       name: ghcr.io/stakater/reloader
-      tag: v1.0.97
+      tag: v1.0.116
       pullPolicy: IfNotPresent
     # Support for extra environment variables.
     env:
