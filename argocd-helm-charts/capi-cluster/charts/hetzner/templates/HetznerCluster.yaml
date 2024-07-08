@@ -31,7 +31,7 @@ spec:
       hcloudToken: hcloud
       hetznerRobotPassword: robot-password
       hetznerRobotUser: robot-user
-    name: hetzner
+    name: capi-cluster-hetzner
   sshKeys:
     hcloud:
     - name: cluster
