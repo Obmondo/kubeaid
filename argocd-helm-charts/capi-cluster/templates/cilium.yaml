@@ -2,6 +2,7 @@ apiVersion: addons.cluster.x-k8s.io/v1alpha1
 kind: HelmChartProxy
 metadata:
   name: cilium-{{ .Values.global.clusterName }}
+  namespace: capi-cluster-{{ .Values.global.customerid }}
 spec:
   clusterSelector:
     matchLabels:
