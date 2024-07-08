@@ -21,6 +21,9 @@ spec:
         app: efs-csi-node
         app.kubernetes.io/name: {{ include "aws-efs-csi-driver.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
+        {{- with .Values.node.podLabels }}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
       {{- if .Values.node.podAnnotations }}
       annotations: {{ toYaml .Values.node.podAnnotations | nindent 8 }}
       {{- end }}
@@ -53,7 +56,7 @@ spec:
       dnsConfig: {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ .Values.node.serviceAccount.name }}
-      priorityClassName: system-node-critical
+      priorityClassName: {{ .Values.node.priorityClassName}}
       {{- with .Values.node.tolerations }}
       tolerations: {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -85,6 +88,9 @@ spec:
             - name: AWS_USE_FIPS_ENDPOINT
               value: "true"
             {{- end }}
+            {{- with .Values.node.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           volumeMounts:
             - name: kubelet-dir
               mountPath: /var/lib/kubelet
@@ -97,6 +103,9 @@ spec:
               mountPath: /var/amazon/efs
             - name: efs-utils-config-legacy
               mountPath: /etc/amazon/efs-legacy
+            {{- with .Values.node.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           ports:
             - name: healthz
               containerPort: {{ .Values.node.healthPort }}
@@ -182,3 +191,6 @@ spec:
           hostPath:
             path: /etc/amazon/efs
             type: DirectoryOrCreate
+        {{- with .Values.node.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}

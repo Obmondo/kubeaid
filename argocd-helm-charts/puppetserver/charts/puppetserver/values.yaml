@@ -883,6 +883,11 @@ puppetdb:
   psp:
     create: false
     annotations:
+  ## Additional fully qualified domain names (FQDN's) to add
+  ## to the PuppetDB certificates.
+  fqdns:
+    alternateServerNames: ""   # Comma-separated
+
 
 ## PostgreSQL Sub-Chart Configuration
 ## Please check: https://github.com/bitnami/charts/tree/master/bitnami/postgresql

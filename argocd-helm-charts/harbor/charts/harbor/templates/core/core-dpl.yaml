@@ -5,6 +5,7 @@ metadata:
   labels:
 {{ include "harbor.labels" . | indent 4 }}
     component: core
+    app.kubernetes.io/component: core
 spec:
   replicas: {{ .Values.core.replicas }}
   revisionHistoryLimit: {{ .Values.core.revisionHistoryLimit }}
@@ -15,8 +16,9 @@ spec:
   template:
     metadata:
       labels:
-{{ include "harbor.matchLabels" . | indent 8 }}
+{{ include "harbor.labels" . | indent 8 }}
         component: core
+        app.kubernetes.io/component: core
 {{- if .Values.core.podLabels }}
 {{ toYaml .Values.core.podLabels | indent 8 }}
 {{- end }}
@@ -55,6 +57,10 @@ spec:
             component: core
 {{- end }}
 {{- end }}
+      {{- with .Values.core.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - name: core
         image: {{ .Values.core.image.repository }}:{{ .Values.core.image.tag }}
@@ -144,6 +150,9 @@ spec:
 {{- with .Values.core.extraEnvVars }}
 {{- toYaml . | nindent 10 }}
 {{- end }}
+        {{- if not (empty .Values.containerSecurityContext) }}
+        securityContext: {{ .Values.containerSecurityContext | toYaml | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: {{ template "harbor.core.containerPort" . }}
         volumeMounts:

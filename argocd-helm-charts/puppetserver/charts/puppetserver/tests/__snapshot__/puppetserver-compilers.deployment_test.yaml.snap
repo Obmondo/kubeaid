@@ -9,7 +9,7 @@ manifest should match snapshot:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: puppetserver
         app.kubernetes.io/version: 7.17.0
-        helm.sh/chart: puppetserver-9.5.1
+        helm.sh/chart: puppetserver-9.5.2
       name: puppetserver-puppetserver-compiler
     spec:
       replicas: 1
@@ -31,7 +31,7 @@ manifest should match snapshot:
             app.kubernetes.io/managed-by: Helm
             app.kubernetes.io/name: puppetserver
             app.kubernetes.io/version: 7.17.0
-            helm.sh/chart: puppetserver-9.5.1
+            helm.sh/chart: puppetserver-9.5.2
         spec:
           containers:
             - env:

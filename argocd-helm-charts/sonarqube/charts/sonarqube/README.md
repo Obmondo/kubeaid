@@ -14,7 +14,7 @@ Please note that this chart only supports SonarQube Community, Developer, and En
 
 ## Compatibility
 
-Compatible SonarQube Version: `10.5.1`
+Compatible SonarQube Version: `10.6.0`
 
 Supported Kubernetes Versions: From `1.24` to `1.29`
 
@@ -238,7 +238,7 @@ The following table lists the configurable parameters of the SonarQube chart and
 | Parameter           | Description                                                | Default                        |
 | ------------------- | ---------------------------------------------------------- | ------------------------------ |
 | `image.repository`  | image repository                                           | `sonarqube`                    |
-| `image.tag`         | `sonarqube` image tag.                                     | `10.5.1-{{ .Values.edition }}` |
+| `image.tag`         | `sonarqube` image tag.                                     | `10.6.0-{{ .Values.edition }}` |
 | `image.pullPolicy`  | Image pull policy                                          | `IfNotPresent`                 |
 | `image.pullSecret`  | (DEPRECATED) imagePullSecret to use for private repository | `None`                         |
 | `image.pullSecrets` | imagePullSecrets to use for private repository             | `None`                         |
@@ -296,23 +296,17 @@ The following table lists the configurable parameters of the SonarQube chart and
 
 ### Probes
 
-| Parameter                            | Description                                                                                                      | Default |
-| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- | ------- |
-| `readinessProbe.initialDelaySeconds` | ReadinessProbe initial delay for SonarQube checking                                                              | `60`    |
-| `readinessProbe.periodSeconds`       | ReadinessProbe period between checking SonarQube                                                                 | `30`    |
-| `readinessProbe.failureThreshold`    | ReadinessProbe threshold for marking as failed                                                                   | `6`     |
-| `readinessProbe.timeoutSeconds`      | ReadinessProbe timeout delay                                                                                     | `1`     |
-| `readinessProbe.sonarWebContext`     | (DEPRECATED) SonarQube web context for readinessProbe, please use sonarWebContext at the value top level instead | `/`     |
-| `livenessProbe.initialDelaySeconds`  | LivenessProbe initial delay for SonarQube checking                                                               | `60`    |
-| `livenessProbe.periodSeconds`        | LivenessProbe period between checking SonarQube                                                                  | `30`    |
-| `livenessProbe.sonarWebContext`      | (DEPRECATED) SonarQube web context for LivenessProbe, please use sonarWebContext at the value top level instead  | `/`     |
-| `livenessProbe.failureThreshold`     | LivenessProbe threshold for marking as dead                                                                      | `6`     |
-| `livenessProbe.timeoutSeconds`       | LivenessProbe timeout delay                                                                                      | `1`     |
-| `startupProbe.initialDelaySeconds`   | StartupProbe initial delay for SonarQube checking                                                                | `30`    |
-| `startupProbe.periodSeconds`         | StartupProbe period between checking SonarQube                                                                   | `10`    |
-| `startupProbe.sonarWebContext`       | (DEPRECATED) SonarQube web context for StartupProbe, please use sonarWebContext at the value top level instead   | `/`     |
-| `startupProbe.failureThreshold`      | StartupProbe threshold for marking as failed                                                                     | `24`    |
-| `startupProbe.timeoutSeconds`        | StartupProbe timeout delay                                                                                       | `1`     |
+| Parameter                            | Description                                                                                                      | Default           |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- | ----------------- |
+| `readinessProbe`                     | ReadinessProbe for SonarQube                                                                                     | see `values.yaml` |
+| `readinessProbe.sonarWebContext`     | (DEPRECATED) SonarQube web context for readinessProbe, please use sonarWebContext at the value top level instead | `/`               |
+| `livenessProbe`                      | LivenessProbe for SonarQube                                                                                      | see `values.yaml` |
+| `livenessProbe.sonarWebContext`      | (DEPRECATED) SonarQube web context for LivenessProbe, please use sonarWebContext at the value top level instead  | `/`               |
+| `startupProbe.initialDelaySeconds`   | StartupProbe initial delay for SonarQube checking                                                                | `30`              |
+| `startupProbe.periodSeconds`         | StartupProbe period between checking SonarQube                                                                   | `10`              |
+| `startupProbe.sonarWebContext`       | (DEPRECATED) SonarQube web context for StartupProbe, please use sonarWebContext at the value top level instead   | `/`               |
+| `startupProbe.failureThreshold`      | StartupProbe threshold for marking as failed                                                                     | `24`              |
+| `startupProbe.timeoutSeconds`        | StartupProbe timeout delay                                                                                       | `1`               |
 
 ### InitContainers
 

@@ -1,3 +1,34 @@
+## v0.66.0 (2024-06-20)
+
+### New features
+
+- Update GitLab Runner version to v17.1.0
+- Make lifecycle options configurable in the deployment !473 (Marcel Eichler @marcel1802)
+- Add dedicated ServiceAccount configuration !415 (Fabian Schneider @fabsrc)
+
+### Bug fixes
+
+- Fix replicas value check for nil to work also with Terraform !478 (Sabyrzhan Tynybayev @sabyrzhan)
+- Update list of rules to be added to the rbac role permissions as per documentation !471 (Ismael Posada Trobo @iposadat)
+
+### Maintenance
+
+- Remove registration token integration test !477
+
+## v0.65.0 (2024-05-23)
+
+### New features
+
+- Update GitLab Runner version to v17.0.0
+
+### Maintenance
+
+- Default to https in values.yaml !470
+
+### Other changes
+
+- chore: set the checkInterval value the same as in the main documents. !472 (Michel Santello @michel.santello)
+
 ## v0.64.1 (2024-05-03)
 
 ### New features

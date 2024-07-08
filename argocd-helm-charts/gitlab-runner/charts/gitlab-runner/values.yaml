@@ -49,7 +49,7 @@ imagePullPolicy: IfNotPresent
 ## The GitLab Server URL (with protocol) that want to register the runner against
 ## ref: https://docs.gitlab.com/runner/commands/index.html#gitlab-runner-register
 ##
-# gitlabUrl: http://gitlab.your-domain.com/
+# gitlabUrl: https://gitlab.your-domain.com/
 
 ## DEPRECATED: The Registration Token for adding new Runners to the GitLab Server.
 ##
@@ -101,7 +101,7 @@ shutdown_timeout: 0
 ## Defines in seconds how often to check GitLab for new builds
 ## ref: https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-global-section
 ##
-checkInterval: 30
+checkInterval: 3
 
 ## Configure GitLab Runner's logging level. Available values are: debug, info, warn, error, fatal, panic
 ## ref: https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-global-section
@@ -149,9 +149,13 @@ sessionServer:
 
 ## For RBAC support:
 rbac:
+  ## Specifies whether a Role and RoleBinding should be created
+  ## If this value is set to `true`, `serviceAccount.create` should also be set to either `true` or `false`
+  ##
   create: false
   ## Define the generated serviceAccountName when create is set to true
   ## It defaults to "gitlab-runner.fullname" if not provided
+  ## DEPRECATED: Please use `serviceAccount.name` instead
   generatedServiceAccountName: ""
 
   ## Define list of rules to be added to the rbac role permissions.
@@ -162,23 +166,34 @@ rbac:
   ##
   ## Read more about the recommended rules on the following link
   ##
-  ## ref: https://docs.gitlab.com/runner/executors/kubernetes.html#configure-runner-api-permissions
+  ## ref: https://docs.gitlab.com/runner/executors/kubernetes/index.html#configure-runner-api-permissions
   ##
   rules: []
-  # - resources: ["configmaps", "events", "pods", "pods/attach", "pods/exec", "secrets", "services"]
-  #   verbs: ["get", "list", "watch", "create", "patch", "update", "delete"]
-  # - apiGroups: [""]
-  #   resources: ["pods/exec"]
-  #   verbs: ["create", "patch", "delete"]
-  # - apiGroups: [""]
-  #   resources: ["pods/log"]
-  #   verbs: ["get"]
+    # - resources: ["events"]
+    #   verbs: ["list", "watch"]
+    # - resources: ["namespaces"]
+    #   verbs: ["create", "delete"]
+    # - resources: ["pods"]
+    #   verbs: ["create","delete","get"]
+    # - apiGroups: [""]
+    #   resources: ["pods/attach","pods/exec"]
+    #   verbs: ["get","create","patch","delete"]
+    # - apiGroups: [""]
+    #   resources: ["pods/log"]
+    #   verbs: ["get","list"]
+    # - resources: ["secrets"]
+    #   verbs: ["create","delete","get","update"]
+    # - resources: ["serviceaccounts"]
+    #   verbs: ["get"]
+    # - resources: ["services"]
+    #   verbs: ["create","get"]
 
   ## Run the gitlab-bastion container with the ability to deploy/manage containers of jobs
   ## cluster-wide or only within namespace
   clusterWideAccess: false
 
   ## Use the following Kubernetes Service Account name if RBAC is disabled in this Helm chart (see rbac.create)
+  ## DEPRECATED: Please use `serviceAccount.name` instead
   ##
   # serviceAccountName: default
 
@@ -189,7 +204,9 @@ rbac:
   ##
   ## ref: https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html
   ##
-  # serviceAccountAnnotations: {}
+  ## DEPRECATED: Please use `serviceAccount.annotations` instead
+  ##
+  serviceAccountAnnotations: {}
 
   ## Use podSecurity Policy
   ## ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/
@@ -202,7 +219,34 @@ rbac:
   ##
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#add-imagepullsecrets-to-a-service-account
   ##
-  # imagePullSecrets: []
+  ## DEPRECATED: Please use `serviceAccount.imagePullSecrets` instead
+  ##
+  imagePullSecrets: []
+
+## Configure ServiceAccount
+##
+serviceAccount:
+  ## Specifies whether a ServiceAccount should be created
+  ##
+  ## TODO: Set default to `false`
+  # create: false
+  ## The name of the ServiceAccount to use.
+  ## If not set and create is `true`, a name is generated using the `gitlab-runner.fullname`` template
+  ##
+  name: ""
+  ## Additional custom annotations for the ServiceAccount, useful for annotations such as eks.amazonaws.com/role-arn.
+  ## Values may refer other values as the _tpl_ function is implicitly applied. Mind the quotes when using this, e.g.
+  ## serviceAccountAnnotations:
+  ##   eks.amazonaws.com/role-arn: "arn:aws:iam::{{ .Values.global.accountId }}:role/{{ .Values.global.iamRoleName }}"
+  ##
+  ## ref: https://docs.aws.amazon.com/eks/latest/userguide/specify-service-account-role.html
+  ##
+  annotations: {}
+  ## Specify one or more imagePullSecrets used for pulling the runner image
+  ##
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#add-imagepullsecrets-to-a-service-account
+  ##
+  imagePullSecrets: []
 
 ## Configure integrated Prometheus metrics exporter
 ##
@@ -576,7 +620,15 @@ deploymentAnnotations: {}
 deploymentLabels: {}
   # Example:
   # owner.team: <my_cool_team>
-  
+
+## Lifecycle options to be added to deployment
+##  
+deploymentLifecycle: {}
+  # Example
+  # preStop:
+  #   exec:
+  #     command: ["/bin/sh", "-c", "echo 'shutting down'"] 
+
 ## Set hostname for runner pods
 #hostname: my-gitlab-runner
 

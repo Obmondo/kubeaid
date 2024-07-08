@@ -33,7 +33,7 @@ namespace:
 # enabling node-agent). Required.
 image:
   repository: velero/velero
-  tag: v1.13.2
+  tag: v1.14.0
   # Digest value example: sha256:d238835e151cec91c6a811fe3a89a66d3231d9f64d09e5f3c49552672d271f38.
   # If used, it will take precedence over the image.tag.
   # digest:
@@ -73,13 +73,13 @@ podLabels: {}
 
 # Resource requests/limits to specify for the Velero deployment.
 # https://velero.io/docs/v1.6/customize-installation/#customize-resource-requests-and-limits
-resources:
-  requests:
-    cpu: 500m
-    memory: 128Mi
-  limits:
-    cpu: 1000m
-    memory: 512Mi
+resources: {}
+  # requests:
+  #   cpu: 500m
+  #   memory: 128Mi
+  # limits:
+  #   cpu: 1000m
+  #   memory: 512Mi
 
 # Resource requests/limits to specify for the upgradeCRDs job pod. Need to be adjusted by user accordingly.
 upgradeJobResources: {}
@@ -105,14 +105,8 @@ dnsPolicy: ClusterFirst
 # Init containers to add to the Velero deployment's pod spec. At least one plugin provider image is required.
 # If the value is a string then it is evaluated as a template.
 initContainers:
-  # - name: velero-plugin-for-csi
-  #   image: velero/velero-plugin-for-csi:v0.7.0
-  #   imagePullPolicy: IfNotPresent
-  #   volumeMounts:
-  #     - mountPath: /target
-  #       name: plugins
   # - name: velero-plugin-for-aws
-  #   image: velero/velero-plugin-for-aws:v1.9.0
+  #   image: velero/velero-plugin-for-aws:v1.10.0
   #   imagePullPolicy: IfNotPresent
   #   volumeMounts:
   #     - mountPath: /target
@@ -362,6 +356,9 @@ configuration:
     #  flag. For Velero client Command like velero backup describe, velero backup logs needs to add the flag --insecure-skip-tls-verify
     #  insecureSkipTLSVerify:
 
+    # annotations allows adding arbitrary annotations to this BackupStorageLocation resource. Optional.
+    annotations: {}
+
   # Parameters for the VolumeSnapshotLocation(s). Configure multiple by adding other element(s) to the volumeSnapshotLocation slice.
   # See https://velero.io/docs/v1.6/api-types/volumesnapshotlocation/
   volumeSnapshotLocation:
@@ -385,6 +382,9 @@ configuration:
   #    incremental:
   #    snapshotLocation:
   #    project:
+
+    # annotations allows adding arbitrary annotations to this VolumeSnapshotLocation resource. Optional.
+    annotations: {}
 
   # These are server-level settings passed as CLI flags to the `velero server` command. Velero
   # uses default values if they're not passed in, so they only need to be explicitly specified
@@ -479,6 +479,8 @@ serviceAccount:
     name:
     annotations:
     labels:
+    imagePullSecrets: []
+    # - registrySecretName
 
 # Info about the secret to be used by the Velero deployment, which
 # should contain credentials for the cloud provider IAM account you've
@@ -527,13 +529,13 @@ nodeAgent:
   priorityClassName: ""
   # Resource requests/limits to specify for the node-agent daemonset deployment. Optional.
   # https://velero.io/docs/v1.6/customize-installation/#customize-resource-requests-and-limits
-  resources:
-    requests:
-      cpu: 500m
-      memory: 512Mi
-    limits:
-      cpu: 1000m
-      memory: 1024Mi
+  resources: {}
+    # requests:
+    #   cpu: 500m
+    #   memory: 512Mi
+    # limits:
+    #   cpu: 1000m
+    #   memory: 1024Mi
 
   # Tolerations to use for the node-agent daemonset. Optional.
   tolerations: []
@@ -557,6 +559,10 @@ nodeAgent:
 
   # Key/value pairs to be used as environment variables for the node-agent daemonset. Optional.
   extraEnvVars: {}
+
+  # Additional command-line arguments that will be passed to the node-agent. Optional.
+  # e.g.: extraArgs: ["--foo=bar"]
+  extraArgs: []
 
   # Configure the dnsPolicy of the node-agent daemonset
   # See: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy

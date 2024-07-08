@@ -39,7 +39,7 @@ commonLabels: {}
 image:
   registry: docker.io
   repository: bitnami/sealed-secrets-controller
-  tag: 0.26.2
+  tag: 0.27.0
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -241,6 +241,9 @@ service:
   ## @param service.type Sealed Secret service type
   ##
   type: ClusterIP
+  ## @param service.loadBalancerClass Sealed Secret service loadBalancerClass
+  ##
+  loadBalancerClass: ""
   ## @param service.port Sealed Secret service HTTP port
   ##
   port: 8080
@@ -482,6 +485,9 @@ metrics:
     ## @param metrics.service.type Sealed Secret Metrics service type
     ##
     type: ClusterIP
+    ## @param metrics.service.loadBalancerClass Sealed Secret Metrics service loadBalancerClass
+    ##
+    loadBalancerClass: ""
     ## @param metrics.service.port Sealed Secret service Metrics HTTP port
     ##
     port: 8081

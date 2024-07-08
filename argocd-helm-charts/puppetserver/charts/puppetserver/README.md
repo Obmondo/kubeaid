@@ -414,6 +414,7 @@ The following table lists the configurable parameters of the Puppetserver chart 
 | `puppetdb.extraEnv` | puppetdb additional container env vars |``|
 | `puppetdb.extraEnvSecret` | puppetdb additional container env vars from pre-existing secret |``|
 | `puppetdb.extraLabels` | puppetdb additional labels |``|
+| `puppetdb.fqdns.alternateServerNames` | puppetdb alternate fqdns |``|
 | `puppetdb.service.type` | define `spec.type` for the puppetdb service |`ClusterIP`|
 | `puppetdb.service.annotations` | puppetdb service annotations |``|
 | `puppetdb.service.labels` | puppetdb service labels |``|
@@ -598,3 +599,4 @@ kill %[job_numbers_above]
 * [Ben Feld](https://github.com/rootshellz), Contributor
 * [Julien Godin](https://github.com/JGodin-C2C), Contributor
 * [Diego Abelenda](https://github.com/dabelenda), Contributor
+* [Johann Agnarsson](https://github.com/johannagnarsson), Contributor

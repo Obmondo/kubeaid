@@ -11,10 +11,8 @@ $ cat << EOF > values.yaml
 command:
   - "/opt/keycloak/bin/kc.sh"
   - "start"
-  - "--http-enabled=true"
   - "--http-port=8080"
   - "--hostname-strict=false"
-  - "--hostname-strict-https=false"
 extraEnv: |
   - name: KEYCLOAK_ADMIN
     value: admin
@@ -259,7 +257,7 @@ See example for Google Cloud Proxy or default affinity configuration in `values.
 ### JVM Settings
 
 Keycloak sets the following system properties by default:
-`-Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true`
+`-Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m`
 
 You can override these by setting the `JAVA_OPTS` environment variable.
 Make sure you configure container support.
@@ -269,13 +267,16 @@ This allows you to only configure memory using Kubernetes resources and the JVM 
 extraEnv: |
   - name: JAVA_OPTS
     value: >-
-      -XX:+UseContainerSupport
       -XX:MaxRAMPercentage=50.0
-      -Djava.net.preferIPv4Stack=true
-      -Djava.awt.headless=true
 ```
 
 Alternatively one can append custom JVM options by setting the `JAVA_OPTS_APPEND` environment variable.
+
+The parameter `-Djava.net.preferIPv4Stack=true` is [optional](https://github.com/keycloak/keycloak/commit/ee205c8fbc1846f679bd604fa8d25310c117c87e) for [Keycloak >= v22](https://www.keycloak.org/server/configuration-production#_configure_keycloak_server_with_ipv4_or_ipv6).
+
+The parameter `-XX:+UseContainerSupport` is no longer required for [Keycloak >= v21 based on JDK v17](https://github.com/keycloak/keycloak/blob/release/21.0/quarkus/container/Dockerfile#L20).
+
+The parameter `-Djava.awt.headless=true` is no longer required for Quarkus based Keycloak as it is set by [default](https://quarkus.io/guides/building-native-image).
 
 #### Using an External Database
 

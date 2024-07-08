@@ -1,6 +1,6 @@
 dependencies:
 - name: community-operator-crds
   repository: https://mongodb.github.io/helm-charts
-  version: 0.9.0
-digest: sha256:02e79baf6cea1dc4d174bd3d0f92be020bcf610ed1bcfdb663ca879846bbd99a
-generated: "2023-12-13T12:09:21.529169936Z"
+  version: 0.10.0
+digest: sha256:46588004c5af7c40347f4506115677cb63b280befed5fab8207a6d4762bb70b8
+generated: "2024-06-27T11:07:51.750950464Z"

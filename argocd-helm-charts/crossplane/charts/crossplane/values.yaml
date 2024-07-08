@@ -51,14 +51,22 @@ configuration:
   # -- A list of Configuration packages to install.
   packages: []
 
+function:
+  # -- A list of Function packages to install
+  packages: []
+
 # -- The imagePullSecret names to add to the Crossplane ServiceAccount.
-imagePullSecrets: {}
+imagePullSecrets: []
 
 registryCaBundleConfig:
   # -- The ConfigMap name containing a custom CA bundle to enable fetching packages from registries with unknown or untrusted certificates.
   name: ""
   # -- The ConfigMap key containing a custom CA bundle to enable fetching packages from registries with unknown or untrusted certificates.
   key: ""
+
+service:
+  # -- Configure annotations on the service object. Only enabled when webhooks.enabled = true
+  customAnnotations: {}
 
 webhooks:
   # -- Enable webhooks for Crossplane and installed Provider packages.
