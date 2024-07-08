@@ -12,7 +12,9 @@ spec:
   fetchConfig:
     url: https://github.com/syself/cluster-api-provider-hetzner/releases/download/{{ .Values.global.caph.version }}/infrastructure-components.yaml
   manager:
-    metrics:
-      bindAddress: ":8181"
-    syncPeriod: 10m0s
+    # bug: cluster-api renders it as
+    # --metrics-bind-addr and CAPH wants --metrics-bind-address
+    # metrics:
+    #   bindAddress: ":8181"
+    # syncPeriod: 10m0s
 {{- end }}
