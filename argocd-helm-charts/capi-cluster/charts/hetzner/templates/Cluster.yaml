@@ -5,6 +5,7 @@ metadata:
   namespace: capi-cluster-{{ .Values.global.customerid }}
   labels:
     cluster.x-k8s.io/name: {{ .Values.global.clusterName }}
+    capi.syself.com/constant-bare-metal-hostname: "true"
 spec:
   clusterNetwork:
     pods:
