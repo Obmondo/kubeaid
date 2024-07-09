@@ -2,6 +2,8 @@ apiVersion: controlplane.cluster.x-k8s.io/v1beta1
 kind: KubeadmControlPlane
 metadata:
   name: {{ .Values.global.clusterName }}-control-plane
+  annotations:
+    controlplane.cluster.x-k8s.io/skip-kube-proxy: ""
 spec:
   kubeadmConfigSpec:
     clusterConfiguration:
@@ -12,6 +14,8 @@ spec:
         extraArgs:
           cloud-provider: external
     initConfiguration:
+      skipPhases:
+        - addon/kube-proxy
       nodeRegistration:
         kubeletExtraArgs:
           cloud-provider: external

@@ -18,6 +18,14 @@ spec:
     install:
       createNamespace: true
   valuesTemplate: |
+    operator:
+      rollOutPods: true
+      priorityClassName: "system-node-critical"
+    kubeProxyReplacement: "true"
+    k8sServiceHost: {{`{{ .Cluster.spec.controlPlaneEndpoint.host }}`}}
+    k8sServicePort: {{`{{ .Cluster.spec.controlPlaneEndpoint.port }}`}}
+    ipam:
+      mode: "kubernetes"
     rollOutCiliumPods: true
     priorityClassName: "system-node-critical"
     hubble:
@@ -35,9 +43,3 @@ spec:
       ui:
         enabled: true
         rollOutPods: true
-    ipam:
-      mode: "kubernetes"
-    kubeProxyReplacement: "partial"
-    operator:
-      rollOutPods: true
-      priorityClassName: "system-node-critical"
