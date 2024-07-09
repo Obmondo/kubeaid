@@ -1,0 +1,12 @@
+{{- if (.Values.global.capa).autoScaler }}
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: KubeadmConfig
+metadata:
+  name: {{ .Values.global.clusterName }}
+spec:
+  joinConfiguration:
+    nodeRegistration:
+      kubeletExtraArgs:
+        cloud-provider: external
+      name: '{{"{{"}} ds.meta_data.local_hostname {{"}}"}}'
+{{- end }}

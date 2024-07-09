@@ -11,7 +11,7 @@ spec:
       bootstrap:
         configRef:
           apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
-          kind: KubeadmConfigTemplate
+          kind: KubeadmConfig
           name: {{ .Values.global.clusterName }}
       clusterName: {{ .Values.global.clusterName }}
       infrastructureRef:
