@@ -149,11 +149,13 @@ function update_helm_chart {
             helm dependencies update "$HELM_CHART_PATH"
 
             # Deleting old helm before untar
-            echo "Deleing old $HELM_CHART_NAME before untar"
+            echo "Deleting old $HELM_CHART_NAME before untar"
             rm -rf "${HELM_CHART_DEP_PATH:?}/${HELM_CHART_NAME}"
 
             # Untar the tgz file
             tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_UPSTREAM_CHART_VERSION.tgz"
+
+            echo "[$(date +"%Y-%m-%d %H:%M:%S")] Updated $HELM_CHART_NAME from version $HELM_CHART_VERSION to $HELM_UPSTREAM_CHART_VERSION" >> changelog.md
           else
             echo "Helm chart $HELM_REPO_NAME is already on latest version $HELM_CHART_VERSION"
           fi
@@ -168,6 +170,8 @@ function update_helm_chart {
 
           # Untar the tgz file
           tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz"
+
+          echo "[$(date +"%Y-%m-%d %H:%M:%S")] Added $HELM_CHART_NAME version $HELM_CHART_VERSION" >> changelog.md
         fi
     done
   fi
@@ -186,6 +190,7 @@ function pull_request() {
     title="[CI] Helm Chart Update ${chart_name}"
 
     git add "$ARGOCD_CHART_PATH/${chart_name}"
+    git add changelog.md
 
     git -C "${config_repo_path}" commit -m "${title}"
 
