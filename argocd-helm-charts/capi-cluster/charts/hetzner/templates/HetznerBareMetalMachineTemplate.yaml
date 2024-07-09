@@ -30,6 +30,7 @@ spec:
           size: 20G
         postInstallScript: |
           #!/bin/bash
+          hostnamectl --static hostname $(hostname -f)
           mkdir -p /etc/cloud/cloud.cfg.d && touch /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
           echo "network: { config: disabled }" > /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
           apt-get update && apt-get install -y cloud-init apparmor apparmor-utils
