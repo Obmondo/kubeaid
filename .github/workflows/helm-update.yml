@@ -24,4 +24,4 @@ jobs:
     - name: Run Helm Repo Update
       if: ${{ github.event_name == 'schedule' }}
       run: |
-        ./bin/helm-repo-update.sh --update-all --pull-request --gitea-actions --skip-charts argo-cd
+        ./bin/helm-repo-update.sh --update-all --pull-request
