@@ -173,9 +173,9 @@ spec:
           tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256
     preKubeadmCommands:
     - set -x
-    - export CONTAINERD=1.7.14
-    - export KUBERNETES_VERSION=$(echo v1.28.4 | sed 's/^v//')
-    - export TRIMMED_KUBERNETES_VERSION=$(echo v1.28.4 | sed 's/^v//' | awk -F . '{print
+    - export CONTAINERD=1.7.19
+    - export KUBERNETES_VERSION=$(echo {{ .Values.global.kubernetes.version }} | sed 's/^v//')
+    - export TRIMMED_KUBERNETES_VERSION=$(echo {{ .Values.global.kubernetes.version }} | sed 's/^v//' | awk -F . '{print
       $1 "." $2}')
     - localectl set-locale LANG=en_US.UTF-8
     - localectl set-locale LANGUAGE=en_US.UTF-8

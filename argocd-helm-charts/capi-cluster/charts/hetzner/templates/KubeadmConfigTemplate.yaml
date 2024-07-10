@@ -57,9 +57,9 @@ spec:
       preKubeadmCommands:
       - set -x
       - grep VERSION= /etc/os-release; uname -a
-      - export CONTAINERD=1.7.14
-      - export KUBERNETES_VERSION=$(echo v1.28.4 | sed 's/^v//')
-      - export TRIMMED_KUBERNETES_VERSION=$(echo v1.28.4 | sed 's/^v//' | awk -F .
+      - export CONTAINERD=1.7.19
+      - export KUBERNETES_VERSION=$(echo {{ .Values.global.kubernetes.version }} | sed 's/^v//')
+      - export TRIMMED_KUBERNETES_VERSION=$(echo {{ .Values.global.kubernetes.version }} | sed 's/^v//' | awk -F .
         '{print $1 "." $2}')
       - ARCH=amd64
       - if [ "$(uname -m)" = "aarch64" ]; then ARCH=arm64; fi
