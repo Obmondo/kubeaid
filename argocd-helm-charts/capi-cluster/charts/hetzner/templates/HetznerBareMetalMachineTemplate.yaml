@@ -30,8 +30,7 @@ spec:
           size: 20G
         postInstallScript: |
           #!/bin/bash
-          ROBOT_FLOATING={{ .Values.robot.floating }}
-          if $ROBOT_FLOATING; then
+          if {{ .Values.robot.floating }}; then
             wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
             chmod a+x /usr/local/bin/yq
             touch /etc/netplan/60-floating-ip.yaml && chmod 600 /etc/netplan/60-floating-ip.yaml
