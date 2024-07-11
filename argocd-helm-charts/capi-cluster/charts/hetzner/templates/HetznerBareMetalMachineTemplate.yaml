@@ -34,6 +34,7 @@ spec:
           # but lets handle it later
           interface_name=$(ip link show | grep 'UP mode' | awk '{print $2}' | cut -d ':' -f1 )
           touch /etc/netplan/60-floating-ip.yaml
+          chmod 600 /etc/netplan/60-floating-ip.yaml
           cat << EOT > /etc/netplan/60-floating-ip.yaml
           # Floating IP from Hetzner
           network:
