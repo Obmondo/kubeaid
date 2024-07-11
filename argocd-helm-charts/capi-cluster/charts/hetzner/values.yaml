@@ -1,2 +1,4 @@
 controlPlaneLoadBalancer:
   enabled: true
+robot:
+  floating: false
