@@ -20,12 +20,6 @@
 
 ## Setup
 
-* Install cluster-api
-
-  ```sh
-  Generate argocd application using one of the [examples](./examples/argocd-application.yaml)
-  ```
-
 * Setup required envs
 
   ```sh
@@ -54,9 +48,9 @@
    kubectl -n capi-cluster-$CUSTOMER_ID create secret generic capi-cluster-robot-ssh --dry-run=client --from-literal=sshkey-name=cluster --from-file=ssh-privatekey=$HETZNER_SSH_PRIV_PATH --from-file=ssh-publickey=$HETZNER_SSH_PUB_PATH -o yaml | kubeseal --controller-name sealed-secrets --controller-namespace system -o yaml > capi-cluster-robot-ssh.yaml
   ```
 
-* Sync the cluster app on argo-cd
+* Sync the capi-cluster-<cluster-name> app on argo-cd
 
-* Make sure the floating IP is pointing to correct node on robot UI
+* Make sure the floating IP is pointing to correct node on robot UI [look at the node which cluster-api picked up to provision on mgmt cluster]
 
 * Get the new cluster kubeconfig
 
@@ -76,11 +70,12 @@
 
 * Node will be restart again and again, simply delete the machine from cluster, for forcefull, remove the finalizers
 
-* SSH failed even after successfull installation, it seems it reboot twice (haven't confirmed)
-  but it comes up eventually, if manual ssh works.
-
-* Some more detail that I faced [here](https://github.com/syself/cluster-api-provider-hetzner/issues/252)
+* CCM needs to be running on end cluster and **only** after that the rest of the node will be provisioned by the cluster-api [here](https://github.com/syself/cluster-api-provider-hetzner/issues/252)
 
 ## Guide
 
 [Quickstart](https://github.com/syself/cluster-api-provider-hetzner/blob/main/docs/topics/quickstart.md)
+
+## TODO
+
+* Make sure the floating IP is pointing to correct node on robot UI [Needs to be via CAPH provider, or via a deployment, currently hclodu is support https://github.com/costela/hcloud-ip-floater]
