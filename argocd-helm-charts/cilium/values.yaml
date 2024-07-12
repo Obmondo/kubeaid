@@ -1,0 +1,24 @@
+cilium:
+  operator:
+    rollOutPods: true
+    priorityClassName: "system-node-critical"
+  kubeProxyReplacement: "true"
+  ipam:
+    mode: "kubernetes"
+  rollOutCiliumPods: true
+  priorityClassName: "system-node-critical"
+  hubble:
+    metrics:
+      enabled:
+        - dns:query;ignoreAAAA
+        - drop
+        - tcp
+        - flow
+        - icmp
+        - http
+    relay:
+      enabled: true
+      rollOutPods: true
+    ui:
+      enabled: true
+      rollOutPods: true
