@@ -2,3 +2,4 @@ cluster-autoscaler:
   image:
     repository: registry.k8s.io/autoscaling/cluster-autoscaler
     tag: v1.26.3
+  revisionHistoryLimit: 0

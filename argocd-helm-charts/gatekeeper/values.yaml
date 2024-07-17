@@ -5,3 +5,6 @@ policy:
   RequireRequestCpuMemAndLimitMem: true
   # ExcludedNamespaces:
   #   - argocd
+
+gatekeeper:
+  revisionHistoryLimit: 0

@@ -4,6 +4,7 @@ schedule:
   weekly: false
   sixhourly: false
 velero:
+  revisionHistoryLimit: "0"
   configuration:
     logLevel: info
     features: EnableCSI

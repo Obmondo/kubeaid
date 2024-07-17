@@ -1,4 +1,5 @@
 sonarqube:
+  revisionHistoryLimit: 0
   nginx:
     enabled: false
   postgresql:

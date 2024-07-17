@@ -1,4 +1,5 @@
 gitlab-runner:
+  revisionHistoryLimit: "0"
   rbac:
     create: true
 

@@ -1,0 +1,7 @@
+keda:
+  operator:
+    revisionHistoryLimit: 0
+  metricsServer:
+    revisionHistoryLimit: 0
+  webhooks:
+    revisionHistoryLimit: 0

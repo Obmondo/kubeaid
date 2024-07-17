@@ -1,4 +1,5 @@
 mattermost-team-edition:
+  revisionHistoryLimit: 0
   mysql:
     enabled: false
   externalDB:

@@ -1,4 +1,5 @@
 metrics-server:
+  revisionHistoryLimit: 0
   args:
   - --kubelet-preferred-address-types=InternalIP
   - --kubelet-insecure-tls

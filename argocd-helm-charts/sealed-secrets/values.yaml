@@ -1,5 +1,6 @@
 ---
 sealed-secrets:
+  revisionHistoryLimit: "0"
   namespace: system
   resources:
     limits:

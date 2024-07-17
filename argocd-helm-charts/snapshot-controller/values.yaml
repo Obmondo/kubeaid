@@ -1,8 +1,11 @@
 networkpolicies: true
 snapshot-controller:
   webhook:
+    revisionHistoryLimit: 0
     tls:
       certManagerIssuerRef:
         group: cert-manager.io
         kind: ClusterIssuer
         name: selfsigned
+  controller:
+    revisionHistoryLimit: 0

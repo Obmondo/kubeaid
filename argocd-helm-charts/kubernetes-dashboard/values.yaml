@@ -1,0 +1,13 @@
+kubernetes-dashboard:
+  metricsScraper:
+    scaling:
+      revisionHistoryLimit: 0
+  api:
+    scaling:
+      revisionHistoryLimit: 0
+  web:
+    scaling:
+      revisionHistoryLimit: 0
+  auth:
+    scaling:
+      revisionHistoryLimit: 0
