@@ -5,3 +5,11 @@ harbor:
     persistentVolumeClaim:
       registry:
         size: 20Gi
+  core:
+    revisionHistoryLimit: 0
+  jobservice:
+    revisionHistoryLimit: 0
+  portal:
+    revisionHistoryLimit: 0
+  registry:
+    revisionHistoryLimit: 0

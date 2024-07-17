@@ -6,6 +6,7 @@ cert-manager:
   global:
     leaderElection:
       namespace: cert-manager
+    revisionHistoryLimit: 0
   prometheus:
     enabled: true
     servicemonitor:

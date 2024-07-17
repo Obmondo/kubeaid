@@ -1,1 +1,3 @@
 networkpolicies: false
+cerebro:
+  revisionHistoryLimit: 0
