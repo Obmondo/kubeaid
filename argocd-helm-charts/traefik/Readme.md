@@ -70,5 +70,10 @@ tlsOptions:
 
 ## Troubleshooting
 
-Traefik has a default limit on Request Body that can affect file uploads. To re-configure it
+- Traefik has a default limit on Request Body that can affect file uploads. To re-configure it
 using a middleware, [see this example.](./examples/request-body-middleware.yaml)
+
+- If you want to run multiple traefik instances, ensure that each traefik deployment has the additional argument
+which binds it to a specific ingress class `--providers.kubernetesingress.ingressclass=<ingress-class>`.
+This ensures that multiple instances of Traefik don't try to update ingress resources at the same time leading
+to the hostname of the ingress switching from one ingress class to another. 
