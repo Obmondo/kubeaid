@@ -8,14 +8,46 @@ Instead of granting access to your team using separate Grafana user account cred
 which is an Open Source OIDC provider. Your team can login to Grafana using existing OAuth configurations and you can
 maintain the RBAC policies per team too.
 
-* [Steps to configure grafana client on keycloak](https://github.com/Obmondo/Note-integrate-SSO-grafana)
+## steps to configure grafana client with keycloak.
 
+  1. Create client ID of grafana
+
+      ![](./img/create-client1.png)
+      - Enable Client authentication
+      ![](./img/create-client2.png)
+
+  2. Create client secret
+
+      ![](./img/create-secret.png)
+      - Use the token in grafana client secret
+  
+  3. Create role for the grafana users
+    
+      ![](./img/create-role.png)
+      - Create three roles `Admin`, `Editor`, `Viewer` it will be used by grafana for permission.
+      ![](./img/all-roles.png)
+      ![](./img/create-role-admin.png)
+
+  4. Add Mapper which will be used for roles for grafana users
+      
+      ![](./img/add-mapper.png)
+      - there will be a scope called `grafana-dedicated`, create the mapper in that.
+      ![](./img/new-mapper.png)
+      - Select Configure a new mapper and select `User Client Role`
+      ![](./img/mapper-config.png)
+      - set Client ID as `grafana`
+
+  5. Create a user and assign the role to the user
+  
+      ![](./img/roles.png)
+      - Filter by clients and select the client `grafana<Role>`
 * Create secret with the token you get from the grafana client on keycloak
 
 ```console
 kubectl create secret generic kube-prometheus-stack-grafana -n monitoring --dry-run=client --from-literal=grafana-keycloak-secret=i_love_k8s -o json | kubeseal --controller-name sealed-secrets --controller-namespace system - > sealed-secrets/cluster_name/monitoring/kube-prometheus-stack-grafana.json
 ```
 
+  
 ## Activate support from K8id Support team
 
 ```bash

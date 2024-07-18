@@ -237,6 +237,10 @@ Run this command to seal the secret and pass your slack channel's url:
 ```console
 kubectl create secret generic alertmanager-main --dry-run=client  --namespace monitoring  --from-literal=slack-url='https://your-slack-channel-url' -o yaml | kubeseal --controller-namespace system --controller-name sealed-secrets --namespace monitoring -o yaml --merge-into alertmanager-main.yaml
 ```
+# Integrate Keycloak with Grafana
+
+## Refer - [Steps to configure grafana client on keycloak](./NOTES.md#integrate-keycloak-with-grafana)
+
 # Reset Admin Password for Grafana in Kubernetes
 
 ![Grafana Logo](https://grafana.com/static/assets/img/grafana_logo.svg)
