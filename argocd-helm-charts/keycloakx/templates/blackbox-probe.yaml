@@ -1,0 +1,17 @@
+{{- if (.Values.blackbox).probe }}
+kind: Probe
+apiVersion: monitoring.coreos.com/v1
+metadata:
+  name: blackbox-probe-keycloakx
+spec:
+  interval: 6h
+  module: http_2xx
+  prober:
+    url: blackbox-exporter.monitoring.svc.cluster.local:19115
+  targets:
+    staticConfig:
+      static:
+        {{- range (((.Values).keycloakx).ingress).rules }}
+        - {{ tpl .host $ | quote }}
+        {{- end }}
+{{- end}}

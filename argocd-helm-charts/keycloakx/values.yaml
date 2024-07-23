@@ -58,3 +58,6 @@ postgresql:
   enabled: false
   size: 4Gi
   enableLogicalBackup: true
+
+blackbox:
+  probe: true
