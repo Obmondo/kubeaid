@@ -8,3 +8,6 @@ teleport-kube-agent:
     requests:
       cpu: 10m
       memory: 128Mi
+  joinTokenSecret:
+    create: false
+    name: teleport-kube-agent-join-token
