@@ -32,8 +32,20 @@ cert-manager:
         cpu: 1m
         memory: 16Mi
 issuer:
+  name: letsencrypt
   enabled: false
   production: false
   preferredChain: null
 networkpolicies: false
 enableCertificateOwnerRef: true
+
+certificate:
+  name: wildcard-kbm
+  secretName: wildcard-kbm
+  issuer:
+    kind: ClusterIssuer
+    name: letsencrypt
+  commonName: "*.kbm.obmondo.com"
+  dnsNames:
+    - "*.kbm.obmondo.com"
+    - "kbm.obmondo.com"
