@@ -47,15 +47,6 @@ spec:
             {{- toYaml .Values.env | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-
-  volumeClaimTemplates:
-    - metadata:
-        name: {{ .Values.appName }}
-      spec:
-        # ReadWriteOnce means that multiple pods running in only one Node could connect
-        # to the storage and carry out read and write operation.
-        # However, we will only have 1 pod at a time.
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 1Gi
+      volumes:
+        - name: {{ .Values.appName }}
+          emptyDir: {}
