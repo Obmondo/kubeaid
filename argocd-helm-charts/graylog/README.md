@@ -164,6 +164,17 @@ https://go2docs.graylog.org/5-0/planning_your_deployment/planning_your_upgrade_t
   b. If you are doing the above for multiple indices, just wait for 1 indices to finish (look at graylog to see)
      and do another one (not compulsory, but hold the horses)
 
+## Enable login via keycloak using traefik-forward-auth
+
+* Go to System -> Authenticators
+
+  ![auth](./static/auth.png)
+
+* Enable Trusted Header Authentication and set the header name to `X-Forwarded-User`
+* Create the user on graylog using the same email id as in the keycloak
+  ![user](./static/user.png)
+* Now you can login to graylog using the keycloak user
+
 ## Troubleshooting
 
 * if you have upgraded mongodb to 5.x and downgraded to mongodb 4.x you would end up with
