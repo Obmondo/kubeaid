@@ -5,3 +5,4 @@ All releases and the changes included in them (pulled from git commits added sin
 
 ## 20240731
 - Updated: argo-cd from version 7.3.4 to 7.3.11
+- Updated: aws-ebs-csi-driver from version 2.32.0 to 2.33.0
