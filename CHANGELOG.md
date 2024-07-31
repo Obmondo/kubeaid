@@ -28,3 +28,4 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated: sealed-secrets from version 2.16.0 to 2.16.1
 - Updated: sonarqube from version 10.6.0+3033 to 10.6.1+3163
 - Updated: tigera-operator from version v3.28.0 to v3.28.1
+- Updated: traefik from version 29.0.0 to 30.0.2
