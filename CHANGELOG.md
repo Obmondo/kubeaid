@@ -9,3 +9,4 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated: aws-efs-csi-driver from version 3.0.6 to 3.0.7
 - Updated: cert-manager from version v1.15.1 to v1.15.2
 - Updated: cilium from version 1.15.6 to 1.16.0
+- Updated: cloudnative-pg from version 0.21.5 to 0.21.6
