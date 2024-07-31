@@ -23,3 +23,5 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated: rabbitmq-cluster-operator from version 4.3.13 to 4.3.16
 - Updated: redmine from version 28.2.7 to 29.0.3
 - Updated: reloader from version 1.0.116 to 1.0.119
+- Updated: rook-ceph from version v1.14.8 to v1.14.9
+- Updated: rook-ceph-cluster from version v1.14.4 to v1.14.9
