@@ -18,3 +18,4 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated: mattermost-team-edition from version 6.6.58 to 6.6.60
 - Updated: metallb from version 6.3.7 to 6.3.9
 - Updated: oncall from version 1.8.1 to 1.8.8
+- Updated: opencost from version 1.40.0 to 1.41.0
