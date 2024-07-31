@@ -13,3 +13,4 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated: dokuwiki from version 16.2.6 to 16.2.10
 - Updated: external-dns from version 8.1.0 to 8.3.3
 - Updated: fluent-bit from version 0.46.11 to 0.47.5
+- Updated: gitlab-runner from version 0.66.0 to 0.67.1
