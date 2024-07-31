@@ -27,6 +27,10 @@ data:
     sh /configmaps/set-session-server-address &
     child=$!
     wait "$child"
+
+    sh /configmaps/set-session-server-port &
+    child=$!
+    wait "$child"
     {{- end }}
 
     # Set up environment variables for cache
@@ -98,7 +102,7 @@ data:
     [session_server]
       session_timeout = {{ include "gitlab-runner.server-session-timeout" . }}
       listen_address = "0.0.0.0:{{ include "gitlab-runner.server-session-internal-port" . }}"
-      advertise_address = "SESSION_SERVER_IP:{{ include "gitlab-runner.server-session-external-port" . }}"
+      advertise_address = "SESSION_SERVER_ADDRESS:SESSION_SERVER_PORT"
     {{- end }}
 
   {{ if .Values.runners.config }}
@@ -106,15 +110,14 @@ data:
   {{ end }}
 
   register-the-runner: |
-    #!/bin/bash
+    #!/bin/sh
     signal_handler() {
       if [ ! -d "/proc/$register_pid" ]; then
         wait $register_pid
       fi
       exit
     }
-    trap 'signal_handler' SIGQUIT
-    trap 'signal_handler' SIGINT
+    trap 'signal_handler' QUIT INT
 
     MAX_REGISTER_ATTEMPTS=30
 
@@ -162,25 +165,80 @@ data:
       sleep 5
     done
 
-    exit 0
-
   check-live: |
     #!/bin/bash
     set -eou pipefail
 
-    export CONFIG_PATH_FOR_INIT="{{ ternary "/etc/gitlab-runner/" "/home/gitlab-runner/.gitlab-runner/" (and (hasKey .Values.podSecurityContext "runAsUser") (eq 0 (.Values.podSecurityContext.runAsUser | int64))) }}"
+    # default timeout is 3 seconds, can be overriden
+    VERIFY_TIMEOUT=${1:-${VERIFY_TIMEOUT:-3}}
 
     if ! /usr/bin/pgrep -f ".*register-the-runner"  > /dev/null && ! /usr/bin/pgrep -f "gitlab.*runner"  > /dev/null ; then
       exit 1
     fi
 
-    awk -F'"' '/^  name = ".*"/ { print $2 }' "${CONFIG_PATH_FOR_INIT}/config.toml" | xargs -I{} gitlab-runner verify -n {} 2>&1 | grep -E "is alive|is valid"
+    status=0
+    # empty --url= helps `gitlab-runner verify` select all configured runners (otherwise filters for $CI_SERVER_URL)
+    verify_output=$(timeout "${VERIFY_TIMEOUT}" gitlab-runner verify --url= 2>&1) || status=$?
+
+    # timeout exit code is 143 with busybox, and 124 with coreutils
+    if (( status == 143 )) || (( status == 124 )) ; then
+      echo "'gitlab-runner verify' terminated by timeout, not a conclusive failure" >&2
+      exit 0
+    elif (( status > 0 )) ; then
+      exit ${status}
+    fi
+
+    grep -qE "is (alive|valid)" <<<"${verify_output}"
 
   {{- if eq (include "gitlab-runner.isSessionServerAllowed" . ) "true" }}
   set-session-server-address: |
     #!/bin/bash
 
-    {{- if (not .Values.sessionServer.publicIP) }}
+    if [[ -n "${SESSION_SERVER_ADDRESS}" ]]; then
+      sed -i -e "s/SESSION_SERVER_ADDRESS/$SESSION_SERVER_ADDRESS/g" ${CONFIG_PATH_FOR_INIT}/config.toml
+    else
+      APISERVER=https://kubernetes.default.svc \
+        && SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount \
+        && NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace) \
+        && TOKEN=$(cat ${SERVICEACCOUNT}/token) \
+        && CACERT=${SERVICEACCOUNT}/ca.crt \
+        && header="Authorization: Bearer ${TOKEN}"
+
+      SERVICEURL=${APISERVER}/api/v1/namespaces/${NAMESPACE}/services/{{ include "gitlab-runner.server-session-service-name" . }}
+
+      has_address=false
+      while [ "${has_address}" = false ]; do
+        SERVICEIP=$(curl —-silent \
+          --cacert ${CACERT} \
+          --header "${header}" \
+          -X GET ${SERVICEURL} 2>/dev/null \
+          | grep '"ip":' | cut -d ":" -f2 | xargs)
+
+        # for aws, the hostname is available but not the external IP
+        SERVICEHOSTNAME=$(curl —-silent \
+          --cacert ${CACERT} \
+          --header "${header}" \
+          -X GET ${SERVICEURL} 2>/dev/null \
+          | grep '"hostname":' | cut -d ":" -f2 | xargs)
+
+        ADDRESS="${SERVICEHOSTNAME:-$SERVICEIP}"
+
+        if [ -z "${ADDRESS}" ]
+        then
+          echo "Service LoadBalancer External Address not yet available"
+          has_address=false
+          sleep 5
+        else
+          has_address=true
+          sed -i -e "s/SESSION_SERVER_ADDRESS/$ADDRESS/g" ${CONFIG_PATH_FOR_INIT}/config.toml
+        fi
+      done
+    fi
+
+  set-session-server-port: |
+    #!/bin/bash
+
+    {{- if and (eq (include "gitlab-runner.server-session-service-type" .) "NodePort") (not .Values.sessionServer.nodePort)}}
     APISERVER=https://kubernetes.default.svc \
       && SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount \
       && NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace) \
@@ -188,38 +246,32 @@ data:
       && CACERT=${SERVICEACCOUNT}/ca.crt \
       && header="Authorization: Bearer ${TOKEN}"
 
-    SERVICEURL=${APISERVER}/api/v1/namespaces/${NAMESPACE}/services/{{ include "gitlab-runner.fullname" . }}-session-server
+    SERVICEURL=${APISERVER}/api/v1/namespaces/${NAMESPACE}/services/{{ include "gitlab-runner.server-session-service-name" . }}
 
-    has_address=false
-    while [ "${has_address}" = false ]; do
-      SERVICEIP=$(curl —-silent \
-        --cacert ${CACERT} \
-        --header "${header}" \
-        -X GET ${SERVICEURL} 2>/dev/null \
-        | grep '"ip":' | cut -d ":" -f2 | xargs)
-
-      # for aws, the hostname is available but not the external IP
-      SERVICEHOSTNAME=$(curl —-silent \
-        --cacert ${CACERT} \
-        --header "${header}" \
-        -X GET ${SERVICEURL} 2>/dev/null \
-        | grep '"hostname":' | cut -d ":" -f2 | xargs)
-
-      ADDRESS="${SERVICEHOSTNAME:-$SERVICEIP}"
-
-      if [ -z "${ADDRESS}" ]
-      then
-        echo "Service LoadBalancer External Address not yet available"
-        has_address=false
+    has_port=false
+    while [ "${has_port}" = false ]; do
+      SERVICEPORT=$(curl —-silent \
+          --cacert ${CACERT} \
+          --header "${header}" \
+          -X GET ${SERVICEURL} 2>/dev/null \
+          | grep '"nodePort":' | cut -d ":" -f2 | xargs)
+      if [ -z "${SERVICEPORT}" ]; then
+        echo "Service nodePort not yet available"
         sleep 5
       else
-        has_address=true
-        sed -i -e "s/SESSION_SERVER_IP/${ADDRESS}/g" ${CONFIG_PATH_FOR_INIT}/config.toml
+        has_port=true
+        sed -i -e "s/SESSION_SERVER_PORT/${SERVICEPORT}/g" ${CONFIG_PATH_FOR_INIT}/config.toml
       fi
     done
+
+    {{- else if .Values.sessionServer.nodePort}}
+    sed -i -e "s/SESSION_SERVER_PORT/{{.Values.sessionServer.nodePort}}/g" ${CONFIG_PATH_FOR_INIT}/config.toml
+
     {{- else }}
-    sed -i -e "s/SESSION_SERVER_IP/{{ .Values.sessionServer.publicIP }}/g" ${CONFIG_PATH_FOR_INIT}/config.toml
-    {{- end}}
+    sed -i -e "s/SESSION_SERVER_PORT/{{include "gitlab-runner.server-session-external-port" .}}/g" ${CONFIG_PATH_FOR_INIT}/config.toml
+
+    {{- end }}
+
   {{ end }}
 
   pre-entrypoint-script: |
