@@ -17,3 +17,4 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated: matomo from version 7.3.7 to 8.0.5
 - Updated: mattermost-team-edition from version 6.6.58 to 6.6.60
 - Updated: metallb from version 6.3.7 to 6.3.9
+- Updated: oncall from version 1.8.1 to 1.8.8
