@@ -20,3 +20,4 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated: oncall from version 1.8.1 to 1.8.8
 - Updated: opencost from version 1.40.0 to 1.41.0
 - Updated: opensearch-dashboards from version 2.19.0 to 2.19.1
+- Updated: rabbitmq-cluster-operator from version 4.3.13 to 4.3.16
