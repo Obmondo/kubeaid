@@ -26,3 +26,4 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated: rook-ceph from version v1.14.8 to v1.14.9
 - Updated: rook-ceph-cluster from version v1.14.4 to v1.14.9
 - Updated: sealed-secrets from version 2.16.0 to 2.16.1
+- Updated: sonarqube from version 10.6.0+3033 to 10.6.1+3163
