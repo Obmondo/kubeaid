@@ -92,6 +92,65 @@ done
 # Build an array based on the input
 IFS=',' read -ra SKIP_HELM_CHARTS <<< "$SKIP_CHARTS"
 
+# Function to get the current version from CHANGELOG.md
+get_current_version() {
+  local changelog_file="CHANGELOG.md"
+  local version
+  if [ -f "$changelog_file" ]; then
+    version=$(grep -oP '^## \K[0-9]+\.[0-9]+\.[0-9]+' "$changelog_file" | head -n1)
+    if [ -z "$version" ]; then
+      echo "1.0.0"
+    else
+      echo "$version"
+    fi
+  else
+    echo "1.0.0"
+  fi
+}
+
+# Function to bump version
+bump_version() {
+  local current_version=$1
+  local bump_type=$2
+
+  IFS='.' read -r major minor patch <<< "$current_version"
+
+  case "$bump_type" in
+    major)
+      echo "$((major + 1)).0.0"
+      ;;
+    minor)
+      echo "${major}.$((minor + 1)).0"
+      ;;
+    patch)
+      echo "${major}.${minor}.$((patch + 1))"
+      ;;
+  esac
+}
+
+# Global variables to track change types
+major_change_detected=false
+minor_change_detected=false
+
+date="$(date +"%Y-%m-%d")"
+
+# Function to determine change type and store change
+determine_change_type() {
+  local action=$1
+  local chart_name=$2
+  local old_version=$3
+  local new_version=$4
+
+  IFS='.' read -r old_major old_minor _ <<< "$old_version"
+  IFS='.' read -r new_major new_minor _ <<< "$new_version"
+
+  if [ "$new_major" -ne "$old_major" ]; then
+    major_change_detected=true
+  elif [ "$new_minor" -ne "$old_minor" ]; then
+    minor_change_detected=true
+  fi
+}
+
 function update_helm_chart {
   HELM_CHART_PATH="$1"
   HELM_CHART_YAML="$1/Chart.yaml"
@@ -125,14 +184,20 @@ function update_helm_chart {
 
         # Add the repo
         if ! helm repo list -o yaml | yq eval -e ".[].name == \"$HELM_CHART_NAME\"" >/dev/null 2>/dev/null; then
-          echo "ADD HELM CHARTS"
-          helm repo add "$HELM_CHART_NAME" "$HELM_REPOSITORY_URL" >/dev/null
+          echo "ADD HELM CHARTS $HELM_REPO_NAME"
+          helm repo add "$HELM_CHART_NAME" "$HELM_REPOSITORY_URL" >/dev/null || {
+            echo "Failed to add repository $HELM_REPOSITORY_URL for chart $HELM_CHART_NAME. Skipping."
+            continue
+          }
         fi
 
         # Check if we have an upstream chart already present or not
         if test -f "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME/Chart.yaml"; then
           if [ -z "$CHART_VERSION" ]; then
-            HELM_UPSTREAM_CHART_VERSION=$(helm search repo --regexp "${HELM_CHART_NAME}/${HELM_CHART_NAME}[^-]" --version ">=$HELM_CHART_VERSION" --output yaml | yq eval '.[].version' -)
+            HELM_UPSTREAM_CHART_VERSION=$(helm search repo --regexp "${HELM_CHART_NAME}/${HELM_CHART_NAME}[^-]" --version ">=$HELM_CHART_VERSION" --output yaml | yq eval '.[].version' -) || {
+              echo "Failed to search for $HELM_CHART_NAME. Skipping."
+              continue
+            }
           else
             HELM_UPSTREAM_CHART_VERSION=$CHART_VERSION
           fi
@@ -150,38 +215,110 @@ function update_helm_chart {
 
             # Deleting old helm before untar
             echo "Deleting old $HELM_CHART_NAME before untar"
-            rm -rf "${HELM_CHART_DEP_PATH:?}/${HELM_CHART_NAME}"
+            rm -rf "${HELM_CHART_DEP_PATH:?}/${HELM_CHART_NAME}" || {
+              echo "Failed to update dependencies for $HELM_CHART_NAME. Skipping."
+              continue
+            }
 
             # Untar the tgz file
-            tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_UPSTREAM_CHART_VERSION.tgz"
+            tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_UPSTREAM_CHART_VERSION.tgz" || {
+              echo "Failed to extract $HELM_CHART_NAME-$HELM_UPSTREAM_CHART_VERSION.tgz. Skipping."
+              continue
+            }
 
-            echo "[$(date +"%Y-%m-%d %H:%M:%S")] Updated $HELM_CHART_NAME from version $HELM_CHART_VERSION to $HELM_UPSTREAM_CHART_VERSION" >> changelog.md
+            update_changelog "Updated" "$HELM_CHART_NAME" "$HELM_CHART_VERSION" "$HELM_UPSTREAM_CHART_VERSION"
+            determine_change_type "Updated" "$HELM_CHART_NAME" "$HELM_CHART_VERSION" "$HELM_UPSTREAM_CHART_VERSION"
           else
             echo "Helm chart $HELM_REPO_NAME is already on latest version $HELM_CHART_VERSION"
           fi
         else
           echo "HELMING $HELM_CHART_NAME"
           # Go to helm chart, 1st layer
-          helm dependencies update "$HELM_CHART_PATH"
+          helm dependencies update "$HELM_CHART_PATH" || {
+            echo "Failed to update dependencies for $HELM_CHART_NAME. Skipping."
+            continue
+          }
 
           # Deleting old helm before untar
           echo "Deleting old $HELM_CHART_NAME before untar"
           rm -rf "${HELM_CHART_DEP_PATH:?}/${HELM_CHART_NAME}"
 
           # Untar the tgz file
-          tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz"
+          tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz" || {
+            echo "Failed to extract $HELM_CHART_NAME-$HELM_CHART_VERSION.tgz. Skipping."
+            continue
+          }
 
-          echo "[$(date +"%Y-%m-%d %H:%M:%S")] Added $HELM_CHART_NAME version $HELM_CHART_VERSION" >> changelog.md
+          update_changelog "Added" "$HELM_CHART_NAME" "$HELM_CHART_VERSION" "$HELM_UPSTREAM_CHART_VERSION"
+          determine_change_type "Added" "$HELM_CHART_NAME" "$HELM_CHART_VERSION" "$HELM_UPSTREAM_CHART_VERSION"
         fi
     done
   fi
+}
+
+# Function to update CHANGELOG.md
+function update_changelog() {
+  local action=$1
+  local chart_name=$2
+  local old_version=$3
+  local new_version=$4
+  local changelog_file="CHANGELOG.md"
+  local message="$action $chart_name from version $old_version to $new_version"
+
+  # Create CHANGELOG.md if it doesn't exist
+  if [ ! -f "$changelog_file" ]; then
+    cat << EOF > "$changelog_file"
+# Changelog
+
+All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
+
+EOF
+  fi
+
+  # Extract version components
+  IFS='.' read -r old_major old_minor _ <<< "$old_version"
+  IFS='.' read -r new_major new_minor _ <<< "$new_version"
+
+  # Determine the change type
+  local change_type=""
+  if [ "$new_major" -ne "$old_major" ]; then
+    change_type="major"
+  elif [ "$new_minor" -ne "$old_minor" ]; then
+    change_type="minor"
+  else
+    change_type="patch"
+  fi
+
+  # Check if the current date section exists
+  if ! grep -q "^## $date" "$changelog_file"; then
+    sed -i "/All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file./a\\\n## $date" CHANGELOG.md
+    sed -i "/$date/a\\### Patch Changes %%^^\n" CHANGELOG.md
+    sed -i "/$date/a\\### Minor Changes %%^^\n" CHANGELOG.md
+    sed -i "/$date/a\\### Major Changes %%^^\n" CHANGELOG.md
+  fi
+
+  # Add the new entry under the appropriate section under the current date
+  case "$change_type" in
+    major)
+      sed -i "/### Major Changes %%^^/a\\- $message" "$changelog_file"
+      ;;
+    minor)
+      sed -i "/### Minor Changes %%^^/a\\- $message" "$changelog_file"
+      ;;
+    patch)
+      sed -i "/### Patch Changes %%^^/a\\- $message" "$changelog_file"
+      ;;
+    *)
+      echo "Invalid change type: $change_type"
+      return 1
+      ;;
+  esac
 }
 
 function pull_request() {
   chart_name=$1
 
   config_repo_path=$(pwd)
-  deploy_target_branch="master"
 
   # Check if we have modifications to commit
   CHANGES=$(git -C "${config_repo_path}" status --porcelain | wc -l)
@@ -190,110 +327,73 @@ function pull_request() {
     title="[CI] Helm Chart Update ${chart_name}"
 
     git add "$ARGOCD_CHART_PATH/${chart_name}"
-    git add changelog.md
+    git add CHANGELOG.md
 
     git -C "${config_repo_path}" commit -m "${title}"
-
-    # Push changes to the remote repository
-    git -C "${config_repo_path}" push origin HEAD
-
-    export GITEA_TOKEN
-    export GITHUB_TOKEN
-
-    case "${KUBERNETES_CONFIG_REPO_URL}" in
-      *gitea*)
-        token=${GITEA_TOKEN}
-        URL="gitea.obmondo.com"
-        owner="EnableIT"
-        repo="KubeAid"
-        ;;
-      *github*)
-        token=${GITHUB_TOKEN}
-        URL="api.github.com"
-        owner="Obmondo"
-        repo="kubeaid"
-    esac
-
-    # Create a pull request using the Gitea or GitHub API
-    output=$(curl -X POST \
-      -H "Authorization: token $token" \
-      -d '{
-        "title": "'"${title}"'",
-        "head": "your_branch_with_changes",
-        "base": "'"${deploy_target_branch}"'",
-        "body": "Auto-generated pull request from Obmondo, created from changes by '"${USER_NAME}"' ('"${USER_EMAIL}"')."
-      }' \
-      "https://${URL}/repos/$owner/$repo/pulls")
-
-    # Check for warnings or errors in the output and handle as needed
-    if grep -q WARNINGS <<< "${output}"; then
-      exit 1
-    fi
-
-    # Extract the pull request number from the output
-    pull_request_number=$(echo "$output" | jq -r '.number')
-
-    # Check the status of an Action workflow associated with the pull request
-    workflow_status=$(curl -s -H "Authorization: token $token" \
-      "https://${URL}/repos/$owner/$repo/actions/runs?event=workflow_dispatch" | \
-      jq --arg pr "$pull_request_number" '.workflow_runs[] | select(.head_repository.owner.login == "'"$owner"'" and .head_repository.name == "'"$repo"'" and .pull_requests[0].number == $pr)')
-
-    workflow_conclusion=$(echo "$workflow_status" | jq -r '.conclusion')
-
-    # If the workflow has succeeded, pull the pull request
-    if [ "$workflow_conclusion" == "success" ]; then
-      pull_response=$(curl -s -X PUT -H "Authorization: token $token" \
-        "https://${URL}/repos/$owner/$repo/pulls/$pull_request_number/pull")
-      echo "Pull response: $pull_response"
-    else
-      echo "Workflow has not succeeded, skipping pull."
-    fi
-
-    # Delete the source branch after merging
-    delete_branch_response=$(curl -X DELETE \
-      -H "Authorization: token $token" \
-      "https://${URL}/repos/OWNER/REPO_NAME/git/refs/heads/BRANCH_NAME")
-
-    echo "$delete_branch_response"
   fi
 }
 
+# Generate a unique branch name
+branch_name="Helm_Update"_$(date +"%Y%m%d")_$(echo $RANDOM | base64 | tr -d '/+' | head -c 8)
+
 if [ -n "$UPDATE_HELM_CHART" ]; then
+  if [ "$ACTIONS" = false ]; then
+    git switch -c "$branch_name" --track origin/master
+  fi
   update_helm_chart "$ARGOCD_CHART_PATH/$UPDATE_HELM_CHART" "$CHART_VERSION"
 fi
 
-if "${ACTIONS}" ; then
-  TEMPDIR=$(mktemp -d)
-
-  case "${KUBERNETES_CONFIG_REPO_URL}" in
-  *gitea*)
-    token=${GITEA_TOKEN}
-    git clone --depth 20 "https://oauth2:${token}@${URL}/${owner}/${repo}" "${TEMPDIR}"
-    ;;
-  *github*)
-    git clone --depth 20 "https://${URL}/${owner}/${repo}" "${TEMPDIR}"
-  esac
-
-  git config --global user.email "${USER_EMAIL}"
-  git config --global user.name "${USER_NAME}"
-
-  cd "${TEMPDIR}"
-fi
-
 if "$UPDATE_ALL"; then
-  find ./"$ARGOCD_CHART_PATH" -maxdepth 1 -mindepth 1 -type d | sort | while read -r path; do
+  if [ "$ACTIONS" = false ]; then
+    git switch -c "$branch_name" --track origin/master
+  fi
+  while read -r path; do
+  # find ./"$ARGOCD_CHART_PATH" -maxdepth 1 -mindepth 1 -type d | sort | while read -r path; do
     chart_name=$(basename "$path")
-
-    unique_branch_id=$(echo $RANDOM | base64)
-    git switch --create "${chart_name}_${unique_branch_id}" --track "origin/master"
 
     update_helm_chart "$path" "$CHART_VERSION"
 
-    # Raise MR for each individual helm chart
+    # Commit for each individual helm chart
     if $PULL_REQUEST; then
       pull_request "$chart_name"
     fi
-  done
+  done < <(find ./"$ARGOCD_CHART_PATH" -maxdepth 1 -mindepth 1 -type d | sort)
+
+  # Check if the current date entry exists in the file
+  if grep -q "$date" CHANGELOG.md; then
+    bump_type="patch"
+    current_ver="$(get_current_version)"
+
+    # Determine the most significant change type
+    if [ "$major_change_detected" = true ]; then
+      bump_type="major"
+    elif [ "$minor_change_detected" = true ]; then
+      bump_type="minor"
+    fi
+
+    new_ver="$(bump_version "$current_ver" "$bump_type")"
+
+    sed -i "s/$date/$new_ver/" CHANGELOG.md
+    echo "Updated the changelog entry from '$date' to '$new_ver'"
+
+    # Remove Chnages heading markers
+    sed -i 's/ %%\^\^//g' CHANGELOG.md
+    # Remove empty sections
+    sed -i '/### Major Changes/{N;/### Major Changes\n$/d;}' CHANGELOG.md
+    sed -i '/### Minor Changes/{N;/### Minor Changes\n$/d;}' CHANGELOG.md
+    sed -i '/### Patch Changes/{N;/### Patch Changes\n$/d;}' CHANGELOG.md
+
+    if $PULL_REQUEST; then
+      git add CHANGELOG.md
+      git commit -m "Update to new tag for Kubeaid"
+    fi
+  else
+    echo "The current date entry '$date' is not found in CHANGELOG.md"
+  fi
+fi
+
+if $PULL_REQUEST; then
+  git push origin "$branch_name"
 fi
 
 find . -name '*.tgz' -delete
