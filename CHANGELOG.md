@@ -25,3 +25,4 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated: reloader from version 1.0.116 to 1.0.119
 - Updated: rook-ceph from version v1.14.8 to v1.14.9
 - Updated: rook-ceph-cluster from version v1.14.4 to v1.14.9
+- Updated: sealed-secrets from version 2.16.0 to 2.16.1
