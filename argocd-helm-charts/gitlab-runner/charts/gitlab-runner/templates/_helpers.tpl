@@ -140,3 +140,18 @@ if the number of replicas is eq to 1
 {{- define "gitlab-runner.isSessionServerAllowed" -}}
 {{- and (eq (default 1 (.Values.replicas | int64)) 1) .Values.sessionServer .Values.sessionServer.enabled -}}
 {{- end -}}
+
+{{/*
+Define session server's service name.
+*/}}
+{{- define "gitlab-runner.server-session-service-name" }}
+{{- printf "%s-%s" (include "gitlab-runner.fullname" .) "session-server"}}
+{{- end -}}
+
+{{/*}}
+Define the session server service type.
+It's LoadBalancer by default.
+*/}}
+{{- define "gitlab-runner.server-session-service-type" }}
+{{- default "LoadBalancer" .Values.sessionServer.serviceType}}
+{{- end -}}

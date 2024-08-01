@@ -6,8 +6,8 @@ image:
   # -- Image
   repository: rook/ceph
   # -- Image tag
-  # @default -- `v1.14.8`
-  tag: v1.14.8
+  # @default -- `v1.14.9`
+  tag: v1.14.9
   # -- Image pull policy
   pullPolicy: IfNotPresent
 
@@ -185,6 +185,12 @@ csi:
 
   # -- Allow starting an unsupported ceph-csi image
   allowUnsupportedVersion: false
+
+  # -- Burst to use while communicating with the kubernetes apiserver.
+  kubeApiBurst:
+
+  # -- QPS to use while communicating with the kubernetes apiserver.
+  kubeApiQPS:
 
   # -- The volume of the CephCSI RBD plugin DaemonSet
   csiRBDPluginVolume:

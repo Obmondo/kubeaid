@@ -24,7 +24,7 @@ deployment:
 ```
 ## Extending DNS config
 
-In order to configure additional DNS servers for your traefik pod, you can use `dnsConfig` option: 
+In order to configure additional DNS servers for your traefik pod, you can use `dnsConfig` option:
 
 ```yaml
 deployment:
@@ -78,15 +78,29 @@ autoscaling:
 
 # Access Traefik dashboard without exposing it
 
-This HelmChart does not expose the Traefik dashboard by default, for security concerns.
-Thus, there are multiple ways to expose the dashboard.
-For instance, the dashboard access could be achieved through a port-forward :
+This Chart does not expose the Traefik local dashboard by default. It's explained in upstream [documentation](https://doc.traefik.io/traefik/operations/api/) why:
+
+> Enabling the API in production is not recommended, because it will expose all configuration elements, including sensitive data.
+
+It says also:
+
+> In production, it should be at least secured by authentication and authorizations.
+
+Thus, there are multiple ways to expose the dashboard. For instance, after enabling the creation of dashboard `IngressRoute` in the values:
+
+```yaml
+ingressRoute:
+  dashboard:
+    enabled: true
+```
+
+The traefik admin port can be forwarded locally:
 
 ```bash
 kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
 ```
 
-Accessible with the url: http://127.0.0.1:9000/dashboard/
+This command makes the dashboard accessible on the url: http://127.0.0.1:9000/dashboard/
 
 # Publish and protect Traefik Dashboard with basic Auth
 
@@ -874,5 +888,107 @@ spec:
 ```
 
 Once it's applied, whoami should be accessible on http://whoami.docker.localhost/
+
+</details>
+
+# Use Kubernetes Gateway API with cert-manager
+
+One can use the new stable kubernetes gateway API provider with automatic TLS certificates delivery (with cert-manager) setting the following _values_:
+
+```yaml
+providers:
+  kubernetesGateway:
+    enabled: true
+gateway:
+  enabled: true
+  annotations:
+    cert-manager.io/issuer: selfsigned-issuer
+  listeners:
+    websecure:
+      hostname: whoami.docker.localhost
+      certificateRefs:
+        - name: whoami-tls
+```
+
+Install cert-manager:
+
+```bash
+helm repo add jetstack https://charts.jetstack.io --force-update
+helm upgrade --install \
+cert-manager jetstack/cert-manager \
+--namespace cert-manager \
+--create-namespace \
+--version v1.15.1 \
+--set crds.enabled=true \
+--set "extraArgs={--enable-gateway-api}"
+```
+
+<details>
+
+<summary>With those values, a whoami service can be exposed with HTTPRoute on both HTTP and HTTPS</summary>
+
+```yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whoami
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: whoami
+  template:
+    metadata:
+      labels:
+        app: whoami
+    spec:
+      containers:
+        - name: whoami
+          image: traefik/whoami
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whoami
+spec:
+  selector:
+    app: whoami
+  ports:
+    - protocol: TCP
+      port: 80
+
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: whoami
+spec:
+  parentRefs:
+    - name: traefik-gateway
+  hostnames:
+    - whoami.docker.localhost
+  rules:
+    - matches:
+        - path:
+            type: Exact
+            value: /
+
+      backendRefs:
+        - name: whoami
+          port: 80
+          weight: 1
+
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}
+```
+
+Once it's applied, whoami should be accessible on https://whoami.docker.localhost/
 
 </details>

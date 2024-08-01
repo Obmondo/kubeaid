@@ -9,4 +9,4 @@ maintainers:
 - name: TheAlgo
 name: opensearch-dashboards
 type: application
-version: 2.19.0
+version: 2.19.1

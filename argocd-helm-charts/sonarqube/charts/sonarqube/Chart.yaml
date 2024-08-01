@@ -1,17 +1,11 @@
 annotations:
   artifacthub.io/changes: |
     - kind: changed
-      description: "Update SonarQube's version to 10.6.0"
-    - kind: changed
-      description: "Update Chart's version to 10.6.0"
+      description: "Update Chart's version to 10.6.1"
     - kind: fixed
-      description: "Fix the env-var templating when sourcing from secrets"
+      description: "Fix typo in the new STS template"
     - kind: fixed
-      description: "Fix the postgresql chart's repository link"
-    - kind: changed
-      description: "Add support for overriding liveness/readiness probe logic"
-    - kind: changed
-      description: "Use a common template for Deployment and StatefulSet"
+      description: "Fix regression on env valuesFrom in the new STS template"
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/images: |
     - name: sonarqube
@@ -61,4 +55,4 @@ sources:
 - https://github.com/SonarSource/docker-sonarqube
 - https://github.com/SonarSource/sonarqube
 type: application
-version: 10.6.0+3033
+version: 10.6.1+3163
