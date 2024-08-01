@@ -1,19 +1,8 @@
 annotations:
-  artifacthub.io/changes: "- \"fix: \U0001F41B improve error message on additional
-    service without ports\"\n- \"fix:  allow multiples values in the `secretResourceNames`
-    slice\"\n- \"fix(rbac)!: nodes API permissions for Traefik v3.1+\"\n- \"fix(dashboard):
-    Only set ingressClass annotation when kubernetesCRD provider is listening for
-    it\"\n- \"fix!: prometheus operator settings\"\n- \"feat: ✨ update CRDs & RBAC
-    for Traefik Proxy\"\n- \"feat: ✨ migrate to endpointslices rbac\"\n- \"feat: allow
-    to set hostAliases for traefik pod\"\n- \"feat(providers): add nativeLBByDefault
-    support\"\n- \"feat(providers)!: improve kubernetesGateway and Gateway API support\"\n-
-    \"feat(dashboard)!: dashboard `IngressRoute` should be disabled by default\"\n-
-    \"docs: fix typos and broken link\"\n- \"chore: update CRDs to v1.5.0\"\n- \"chore:
-    update CRDs to v1.4.0\"\n- \"chore(release): publish v29.0.0\"\n- \"chore(deps):
-    update traefik docker tag to v3.0.4\"\n- \"chore(deps): update traefik docker
-    tag to v3.0.3\"\n"
+  artifacthub.io/changes: "- \"fix(Traefik Hub): missing RBACs for Traefik Hub\"\n-
+    \"chore(release): \U0001F680 publish v30.0.2\"\n"
 apiVersion: v2
-appVersion: v3.0.4
+appVersion: v3.1.0
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
 icon: https://raw.githubusercontent.com/traefik/traefik/v2.3/docs/content/assets/img/traefik.logo.png
@@ -35,4 +24,4 @@ sources:
 - https://github.com/traefik/traefik
 - https://github.com/traefik/traefik-helm-chart
 type: application
-version: 29.0.0
+version: 30.0.2

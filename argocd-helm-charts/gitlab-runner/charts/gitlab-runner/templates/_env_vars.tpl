@@ -34,4 +34,24 @@
   valueFrom: 
     {{- toYaml $value | nindent 4 }}
 {{- end }}
+{{- if (include "gitlab-runner.isSessionServerAllowed" .)}}
+- name: SESSION_SERVER_ADDRESS
+  {{- if .Values.sessionServer.publicIP }}
+  value: {{ .Values.sessionServer.publicIP }}
+  {{- else if eq (include "gitlab-runner.server-session-service-type" .) "ClusterIP" }}
+  value: {{ printf "%s.%s.svc.cluster.local" (include "gitlab-runner.server-session-service-name" .) .Release.Namespace }}
+  {{- else if eq (include "gitlab-runner.server-session-service-type" .) "NodePort" }}
+  valueFrom:
+    fieldRef:
+      apiVersion: v1
+      fieldPath: status.hostIP
+  {{- else if eq (include "gitlab-runner.server-session-service-type" .) "Headless" }}
+  valueFrom:
+    fieldRef:
+      apiVersion: v1
+      fieldPath: status.podIP
+  {{- else }}
+  value:
+  {{- end }}
+{{- end }}
 {{- end }}

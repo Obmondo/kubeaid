@@ -1,33 +1,41 @@
-## v0.66.0 (2024-06-20)
+## v0.67.1 (2024-07-26)
 
 ### New features
 
-- Update GitLab Runner version to v17.1.0
-- Make lifecycle options configurable in the deployment !473 (Marcel Eichler @marcel1802)
-- Add dedicated ServiceAccount configuration !415 (Fabian Schneider @fabsrc)
+- Update GitLab Runner version to v17.2.1
+
+## v0.67.0 (2024-07-18)
+
+### New features
+
+- Update GitLab Runner version to v17.2.0
+- Make livenessProbe and readinessProbe configurable !483
+- Add support for different service types for session-server !476 (Ummet Civi @ummetcivi)
+- Ignore timeout on verify command for the livenessProbe !457 (Thomas de Grenier de Latour @thomasgl-orange)
 
 ### Bug fixes
 
-- Fix replicas value check for nil to work also with Terraform !478 (Sabyrzhan Tynybayev @sabyrzhan)
-- Update list of rules to be added to the rbac role permissions as per documentation !471 (Ismael Posada Trobo @iposadat)
+- Fix the register-the-runner script !479 (Jeremy Huntwork @jhuntwork)
 
 ### Maintenance
 
 - Remove registration token integration test !477
 
+## v0.65.1 (2024-07-06)
+
+### New features
+
+- Update GitLab Runner version to v17.0.1
+
 ## v0.65.0 (2024-05-23)
 
 ### New features
 
-- Update GitLab Runner version to v17.0.0
+- Update GitLab Runner version to v16.11.2
 
 ### Maintenance
 
-- Default to https in values.yaml !470
-
-### Other changes
-
-- chore: set the checkInterval value the same as in the main documents. !472 (Michel Santello @michel.santello)
+- Remove registration token integration test !477
 
 ## v0.64.1 (2024-05-03)
 
