@@ -1,4 +1,6 @@
 matomo:
+  image:
+    tag: latest
   mariadb:
     enabled: false
   externalDatabase:
@@ -6,20 +8,35 @@ matomo:
     port: 3306
     user: matomo
     database: matomo
-    existingSecret: mariadb-secret
+    existingSecret: matomo-user
+  persistence:
+    size: 1Gi
+  cronjobs:
+    archive:
+      persistence:
+        enabled: false
+    taskScheduler:
+      persistence:
+        enabled: false
+  service:
+    type: ClusterIP
 
 #  This are configs for external mariadb deployment
 mariadb:
-  image:
-    tag: "11.0.3"
-  volumeClaimTemplate:
-    resources:
-      requests:
-        storage: 1Gi
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 300m
-      memory: 512Mi
+  rootPasswordSecretKeyRef: #cannot remove this when using zfs-localpv, the pod remains in pending state due to pvc issue
+    name: matomo-secrets
+    key: MARIADB_ROOT_PASSWORD
+    generate: true
+  storage:
+    size: 1Gi
+    storageClassName: zfs-localpv # using zfs instead of rook-ceph because with rook ceph liveness and readiness probes fail as root password doesnt get set properly
+    resizeInUseVolumes: true
+    waitForVolumeResize: true
+  image: "mariadb:latest"
+  imagePullPolicy: IfNotPresent
+  username: matomo
+  passwordSecretKeyRef:
+    name: matomo-user
+    key: db-password # this should be set to db-password as when we pass externalDatabase.existingSecret in values file, it checks for this key
+    generate: true
+  database: matomo-mariadb

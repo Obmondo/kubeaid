@@ -1,37 +1,42 @@
-apiVersion: mariadb.mmontes.io/v1alpha1
+apiVersion: k8s.mariadb.com/v1alpha1
 kind: MariaDB
 metadata:
   name: matomo-mariadb
 spec:
   rootPasswordSecretKeyRef:
-    name: mariadb-secret
-    key: root-password
+    name: {{ .Values.mariadb.rootPasswordSecretKeyRef.name }}
+    key: {{ .Values.mariadb.rootPasswordSecretKeyRef.key }}
+    generate: {{ .Values.mariadb.rootPasswordSecretKeyRef.generate }}
 
-  image:
-    repository: mariadb
-    tag: {{ .Values.mariadb.image.tag | default "11.0.3" }}
-    pullPolicy: IfNotPresent
+  storage:
+    size: {{ .Values.mariadb.storage.size }}
+    storageClassName: {{ .Values.mariadb.storage.storageClassName }}
+    resizeInUseVolumes: {{ .Values.mariadb.storage.resizeInUseVolumes }}
+    waitForVolumeResize: {{ .Values.mariadb.storage.waitForVolumeResize }}
 
-  port: 3306
+  securityContext:
+    allowPrivilegeEscalation: false
 
-  volumeClaimTemplate:
-    resources:
-      requests:
-        storage: {{ .Values.mariadb.volumeClaimTemplate.resources.requests.storage | default "1Gi" }}
-    accessModes:
-      - ReadWriteOnce
+  podDisruptionBudget:
+    maxUnavailable: 50%
 
   myCnf: |
     [mariadb]
-    bind-address=0.0.0.0
+    bind-address=*
     default_storage_engine=InnoDB
     binlog_format=row
     innodb_autoinc_lock_mode=2
+    innodb_buffer_pool_size=1024M
     max_allowed_packet=256M
-  resources:
-    requests:
-      cpu: {{ .Values.mariadb.resources.requests.cpu | default "100m" }}
-      memory: {{ .Values.mariadb.resources.requests.memory | default "128Mi" }}
-    limits:
-      cpu: {{ .Values.mariadb.resources.limits.cpu | default "300m" }}
-      memory: {{ .Values.mariadb.resources.limits.memory | default "512Mi" }}
+
+  username: {{ .Values.mariadb.username }}
+  passwordSecretKeyRef:
+    name: {{ .Values.mariadb.passwordSecretKeyRef.name }}
+    key: {{ .Values.mariadb.passwordSecretKeyRef.key }}
+    generate: {{ .Values.mariadb.passwordSecretKeyRef.generate }}
+  database: {{ .Values.mariadb.database }}
+
+  image: {{ .Values.mariadb.image }}
+  imagePullPolicy: {{ .Values.mariadb.imagePullPolicy }}
+  imagePullSecrets:
+    - name: registry
