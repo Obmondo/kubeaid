@@ -9,7 +9,10 @@ global:
     repo: https://github.com/Obmondo/kubeaid.git
   kubeaidConfig:
     repo: https://github.com/Obmondo/kubeaid-config.git
+  capz:
+    version: v1.16.0
 
 provider:
   hetzner: false
   aws: false
+  azure: true
