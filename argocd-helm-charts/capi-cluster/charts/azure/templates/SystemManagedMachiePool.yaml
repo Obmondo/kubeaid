@@ -1,0 +1,10 @@
+{{- if .Values.managedCluster }}
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureManagedMachinePool
+metadata:
+  name: mspool01
+spec:
+  mode: System
+  osDiskSizeGB: {{ .Values.systemPool.osDiskSizeGB }}
+  sku: {{ .Values.systemPool.sku }}
+{{- end }}

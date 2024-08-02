@@ -1,0 +1,16 @@
+{{- if (.Values.provider).azure }}
+# Need to work on this, not completed
+apiVersion: operator.cluster.x-k8s.io/v1alpha2
+kind: InfrastructureProvider
+metadata:
+  name: azure-{{ .Values.global.customerid }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  version: {{ .Values.global.capz.version }}
+  fetchConfig:
+    url: https://github.com/kubernetes-sigs/cluster-api-provider-azure/releases/download/{{ .Values.global.capz.version }}/infrastructure-components.yaml
+  manager:
+    metrics:
+      bindAddress: ":8443"
+    syncPeriod: 10m0s
+{{- end }}

@@ -1,0 +1,7 @@
+{{- if .Values.managedCluster }}
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureManagedCluster
+metadata:
+  name: {{ .Values.global.clusterName }}
+  namespace: {{ .Release.Namespace }}
+{{- end }}

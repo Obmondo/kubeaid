@@ -1,0 +1,22 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: {{ .Values.global.clusterName }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  clusterNetwork:
+    services:
+      cidrBlocks:
+      - {{ .Values.global.clusterNetwork.services.cidrBlocks }}
+  controlPlaneRef:
+{{- if .Values.managedCluster }}
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: AzureManagedControlPlane
+    name: {{ .Values.global.clusterName }}-control-plane
+{{- end }}
+  infrastructureRef:
+{{- if .Values.managedCluster }}
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: AzureManagedCluster
+    name: {{ .Values.global.clusterName }}
+{{- end }}
