@@ -1,0 +1,44 @@
+global:
+  clusterName: my-cluster
+  kubernetes:
+    version: "1.29.2"
+  networkPolicy: azure # or calico
+  networkPlugin: azure # or kubenet
+  skuTier: Free
+  clientSecret: mysecret
+  clientID: 158ac5a8-c34d-4d35-81ff-90677ce31b5d
+  tenantID: 3964984e-eaaf-4ac4-b3ff-b3cda81256ff
+  addonProfiles:
+    - name: azureKeyvaultSecretsProvider
+      enabled: true
+    - name: azurepolicy
+      enabled: true
+  clusterNetwork:
+    services:
+      cidrBlocks: "192.168.0.0/16"
+  virtualNetwork: 
+    name: controlplan-vnet
+    cidrBlock: "10.1.0.0/16"
+    subnet:
+      name: controlplan-subnet
+      cidrBlock: "10.1.1.0/24"
+
+managedCluster: true
+selfManagedCluster: false
+
+systemPool:
+  osDiskSizeGB: 30
+  sku: Standard_D2s_v3
+  replica: 1
+
+userPool:
+  osDiskSizeGB: 30
+  sku: Standard_D2s_v3
+  replica: 1
+
+location: centralindia
+resourceGroupName: cluster-api
+sshPublicKey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCrRKqLY7bihiRdr8uJnTMcfDMeQ9HOUxYHp7jBbl+Paae2nJ8tzbSGbMk9+Wqw8i5C38rlUolq6Sc1xUUDzWCXB8LCVSsIUrpWUsy5tjlq6U9r8NpypSIon48tNrLdEwtYEf1/5bYA0Y2PFTxtkZcvWtqcor7q9hiejQWrNU3CCVAt8kBGzsieT00YwCrI6AvT+Ko8xjJyDFuunIpliYjyotgXXFF2BohxKEdkuIVpS7iUGQxF993tKQNaMtkKnuU9ijLFhdp41Rk8lSCc1x+oavUbR+ACtbZwlYnc7lcOAJUP3HEQ6ewR5W1zuASlRyR5Mr9sJ0vGf7zbkTAk3VGRlGRVXyU+rZUkqGm71LyKBkptxv32MD/HGbnE81KeJXm7tvLJvr96ssOn3AuBiPEppNAhtqN7Xo/7aYOfkaBxYpddJQ9uhAXdmVTRNnQuRIJK4vWI1o5urJ+1VJ1WawX6QdFOc+3Wbi2JGeyxtweYGIFjcwqkD3gbWtoSb4XLKHE= davesh.sharma@LM2RTXP4K9"
+subscriptionID: cce2e9ac-1580-4d82-b79f-a637f5f3e443
+additionalTags:
+  environment: dev
