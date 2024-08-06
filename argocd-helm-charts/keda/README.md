@@ -1,7 +1,7 @@
 # Pod Autoscaling with KEDA Project
 
 **NOTE: Do not combine KEDA Project's autoscaling (described in this guide) with Kubernetes HPA + Prom Adapter
-for the same deployment. They will compete with each other and break things.**
+for the same pod deployment. They will compete with each other and break things.**
 
 **NOTE2: This assumes your cluster is setup with K8id because it provides sane defaults, although its possible to setup
 this on non K8id clusters too.**
