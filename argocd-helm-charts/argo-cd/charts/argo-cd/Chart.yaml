@@ -1,12 +1,12 @@
 annotations:
   artifacthub.io/changes: |
-    - kind: changed
-      description: Bump argo-cd to v2.11.7
+    - kind: fixed
+      description: added ttlsecondsafterfinished in redis-secret-init job to prevent a stuck in waiting for completion of hook batch/Job/argocd-redis-secret-init
   artifacthub.io/signKey: |
     fingerprint: 2B8F22F57260EFA67BE1C5824B11F800CD9D2252
     url: https://argoproj.github.io/argo-helm/pgp_keys.asc
 apiVersion: v2
-appVersion: v2.11.7
+appVersion: v2.12.0
 dependencies:
 - condition: redis-ha.enabled
   name: redis-ha
@@ -20,7 +20,7 @@ keywords:
 - argoproj
 - argocd
 - gitops
-kubeVersion: '>=1.23.0-0'
+kubeVersion: '>=1.25.0-0'
 maintainers:
 - name: argoproj
   url: https://argoproj.github.io/
@@ -28,4 +28,4 @@ name: argo-cd
 sources:
 - https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
 - https://github.com/argoproj/argo-cd
-version: 7.3.11
+version: 7.4.1
