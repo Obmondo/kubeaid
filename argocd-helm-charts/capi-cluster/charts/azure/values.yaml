@@ -23,9 +23,6 @@ global:
       name: controlplan-subnet
       cidrBlock: "10.1.1.0/24"
 
-managedCluster: true
-selfManagedCluster: false
-
 systemPool:
   osDiskSizeGB: 30
   sku: Standard_D2s_v3

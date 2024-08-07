@@ -1,4 +1,3 @@
-{{- if .Values.managedCluster }}
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: AzureManagedControlPlane
 metadata:
@@ -33,4 +32,3 @@ spec:
   identityRef:
     name: {{ .Values.global.clusterName }}-cluster-identity
     kind: AzureClusterIdentity
-{{- end }}
