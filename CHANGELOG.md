@@ -33,6 +33,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cluster-api-operator from version 0.11.0 to 0.12.0
 - Updated argo-cd from version 7.3.11 to 7.4.1
 ### Patch Changes
+- Updated reloader from version 1.0.119 to 1.0.121
 - Updated rabbitmq-cluster-operator from version 4.3.16 to 4.3.17
 - Updated oncall from version 1.8.8 to 1.8.9
 - Updated keycloakx from version 2.4.3 to 2.4.4
