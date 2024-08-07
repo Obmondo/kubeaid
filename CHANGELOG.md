@@ -31,3 +31,5 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Minor Changes
 - Updated cluster-api-operator from version 0.11.0 to 0.12.0
 - Updated argo-cd from version 7.3.11 to 7.4.1
+### Patch Changes
+- Updated dokuwiki from version 16.2.10 to 16.2.11

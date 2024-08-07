@@ -4,6 +4,6 @@ version: 12.2.10
 # see latest chart here: https://artifacthub.io/packages/helm/bitnami/dokuwiki
 dependencies:
   - name: dokuwiki
-    version: 16.2.10
+    version: 16.2.11
     repository: https://charts.bitnami.com/bitnami
     #repository: "oci://ghcr.io/Obmondo"
