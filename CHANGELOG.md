@@ -1,8 +1,5 @@
 # Helm Charts Changelog
-
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
-
-
 ## 20240731
 - Updated: argo-cd from version 7.3.4 to 7.3.11
 - Updated: aws-ebs-csi-driver from version 2.32.0 to 2.33.0
@@ -30,3 +27,6 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated: tigera-operator from version v3.28.0 to v3.28.1
 - Updated: traefik from version 29.0.0 to 30.0.2
 - Updated: velero from version 7.1.0 to 7.1.4
+## 2024-08-07
+### Minor Changes
+- Updated argo-cd from version 7.3.11 to 7.4.1
