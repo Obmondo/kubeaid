@@ -27,7 +27,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated: tigera-operator from version v3.28.0 to v3.28.1
 - Updated: traefik from version 29.0.0 to 30.0.2
 - Updated: velero from version 7.1.0 to 7.1.4
-## 2024-08-07
+## 1.1.0
 ### Minor Changes
 - Updated keda from version 2.14.2 to 2.15.0
 - Updated cluster-api-operator from version 0.11.0 to 0.12.0
