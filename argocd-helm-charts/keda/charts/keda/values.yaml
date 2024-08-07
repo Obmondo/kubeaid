@@ -10,23 +10,23 @@ global:
 image:
   keda:
     # -- Image registry of KEDA operator
-    registry: null
+    registry: ghcr.io
     # -- Image name of KEDA operator
-    repository: ghcr.io/kedacore/keda
+    repository: kedacore/keda
     # -- Image tag of KEDA operator. Optional, given app version of Helm chart is used by default
     tag: ""
   metricsApiServer:
     # -- Image registry of KEDA Metrics API Server
-    registry: null
+    registry: ghcr.io
     # -- Image name of KEDA Metrics API Server
-    repository: ghcr.io/kedacore/keda-metrics-apiserver
+    repository: kedacore/keda-metrics-apiserver
     # -- Image tag of KEDA Metrics API Server. Optional, given app version of Helm chart is used by default
     tag: ""
   webhooks:
     # -- Image registry of KEDA admission-webhooks
-    registry: null
+    registry: ghcr.io
     # -- Image name of KEDA admission-webhooks
-    repository: ghcr.io/kedacore/keda-admission-webhooks
+    repository: kedacore/keda-admission-webhooks
     # -- Image tag of KEDA admission-webhooks . Optional, given app version of Helm chart is used by default
     tag: ""
   # -- Image pullPolicy for all KEDA components
@@ -200,7 +200,7 @@ webhooks:
     #       - key: app
     #         operator: In
     #         values:
-    #         - keda-operator
+    #         - keda-admission-webhooks
     #     topologyKey: "kubernetes.io/hostname"
 
   # -- [Failure policy](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy) to use with KEDA admission webhooks
@@ -317,12 +317,6 @@ serviceAccount:
     annotations: {}
 
 podIdentity:
-  activeDirectory:
-    # Set to the value of the Azure Active Directory Pod Identity
-    # See https://keda.sh/docs/concepts/authentication/#azure-pod-identity
-    # This will be set as a label on the KEDA Pod(s)
-    # -- Identity in Azure Active Directory to use for Azure pod identity
-    identity: ""
   azureWorkload:
     # -- Set to true to enable Azure Workload Identity usage.
     # See https://keda.sh/docs/concepts/authentication/#azure-workload-identity
@@ -518,7 +512,7 @@ topologySpreadConstraints:
   # -- [Pod Topology Constraints] of KEDA admission webhooks pod
   webhooks: []
 
-# -- [Affinity] for pod scheduling for both KEDA operator and Metrics API Server
+# -- [Affinity] for pod scheduling for KEDA operator, Metrics API Server and KEDA admission webhooks.
 affinity: {}
   # podAntiAffinity:
   #   requiredDuringSchedulingIgnoredDuringExecution:
@@ -529,6 +523,7 @@ affinity: {}
   #         values:
   #         - keda-operator
   #         - keda-operator-metrics-apiserver
+  #         - keda-admission-webhooks
   #     topologyKey: "kubernetes.io/hostname"
 
 # -- priorityClassName for all KEDA components
@@ -820,6 +815,10 @@ certificates:
       kind: ClusterIssuer
       # -- Custom Issuer group. Required when generate: false
       group: cert-manager.io
+  operator:
+    # -- Location(s) of CA files for authentication of external TLS connections such as TLS-enabled metrics sources
+    # caDirs:
+    # - /custom/ca
 
 permissions:
   metricServer:

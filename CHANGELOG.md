@@ -29,6 +29,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated: velero from version 7.1.0 to 7.1.4
 ## 2024-08-07
 ### Minor Changes
+- Updated keda from version 2.14.2 to 2.15.0
 - Updated cluster-api-operator from version 0.11.0 to 0.12.0
 - Updated argo-cd from version 7.3.11 to 7.4.1
 ### Patch Changes
