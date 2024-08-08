@@ -155,3 +155,46 @@ After running this command you would be able to get a list of all the Harbor use
 
 This issue generally persists because of bad caches that leads to troubles. In order to fix this issue you simply need to delete all the existing Harbor deployment and statefulsets and resync them using Argo CD that will lead to a complete clean-up of all the previous session cache and will help you get rid of this issue.
 
+## Clean Up of Harbour
+
+When you delete images from Harbor, the space isn't automatically reclaimed. To free up space, you need to perform garbage collection, which removes unreferenced blobs from the file system.
+
+**Note**: You need admin privileges for running Garbage Collection. 
+
+### Running Garbage Collection
+
+1. **Log** in: Access the Harbor interface with a system administrator account.
+2. **Navigate**: Go to `Administration` > `Garbage Collection` > `Garbage Collection` tab.
+3. **Options**:
+   - To remove untagged artifacts, check the `Delete Untagged Artifacts` box.
+   - To start garbage collection, click `GC Now`.
+
+**Note**: During garbage collection, Harbor enters read-only mode, preventing any modifications to the registry. The `GC Now` button is limited to being used once per minute to prevent frequent triggering.
+
+### Scheduling Garbage Collection
+
+1. **Navigate**: Go to `Administration` > `Garbage Collection` > `Garbage Collection` tab.
+2. **Schedule**: Click Edit and choose the frequency from the drop-down menu:
+    - `None`: No scheduled garbage collection.
+    - `Hourly`: Every hour at the beginning.
+    - `Daily`: Every day at midnight.
+    - `Weekly`: Every Saturday at midnight.
+    - `Custom`: Set a custom schedule using a cron job.
+3. **Options**: To remove untagged artifacts, check the Delete Untagged Artifacts box.
+4. **Save**: Click `Save`.
+
+### Viewing Garbage Collection History
+
+1. **History**: Go to the `History` tab to see the records of the 10 most recent garbage collection runs.
+2. **Logs**: Click the icon in the `Logs` column to view the logs for a specific garbage collection job.
+
+### Log Deletion
+
+1. **Log Retention**: By default, Harbor retains garbage collection logs. However, you may need to delete old logs to free up space.
+2. **Navigate**: Go to `Administration` > `Garbage Collection` > `History` tab.
+3. **Delete Logs**: Select the logs you wish to delete and click the `Delete` button.
+4. **Confirm**: Confirm the deletion to remove the selected logs from the system.
+
+By managing garbage collection and log deletion, you can maintain optimal storage space and system performance in Harbor.
+
+For more Detailed information you can also checkout - [Harbor Doc](https://goharbor.io/docs/2.0.0/administration/garbage-collection/)
