@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Changes %%^^
 
 ### Minor Changes %%^^
+- Updated opensearch-dashboards from version 2.19.1 to 2.20.0
 - Updated opensearch from version 2.21.0 to 2.22.0
 - Updated community-operator from version 0.10.0 to 0.11.0
 
