@@ -6,6 +6,7 @@ metadata:
   {{ else }}
   name: puppetserver-pgsql
   {{ end }}
+  namespace: {{ .Release.Namespace }}
 spec:
   instances: {{ ((.Values.postgresql).instance) | default 1 }}
   {{ if .Values.postgresql.recover }}
