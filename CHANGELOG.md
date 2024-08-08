@@ -7,6 +7,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Minor Changes %%^^
 
 ### Patch Changes %%^^
+- Updated aws-efs-csi-driver from version 3.0.7 to 3.0.8
 - Updated argo-cd from version 7.4.1 to 7.4.2
 
 
