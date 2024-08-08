@@ -1,0 +1,19 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachinePool
+metadata:
+  name: {{ .Values.global.clusterName}}-userpool
+  namespace: {{ .Release.Namespace }}
+spec:
+  clusterName: {{ .Values.global.clusterName }}
+  replicas: {{ .Values.userPool.replicas }}
+  template:
+    spec:
+      clusterName: {{ .Values.global.clusterName }}
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AzureManagedMachinePool
+        name: mupool01
+        namespace: {{ .Release.Namespace }}
+      version: {{ .Values.global.kubernetes.version }}
+      bootstrap:
+        dataSecretName: {{ .Values.global.clientSecret}}
