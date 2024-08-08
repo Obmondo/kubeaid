@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Changes %%^^
 
 ### Minor Changes %%^^
+- Updated community-operator from version 0.10.0 to 0.11.0
 
 ### Patch Changes %%^^
 - Updated metallb from version 6.3.9 to 6.3.10
