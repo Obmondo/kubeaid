@@ -1,6 +1,15 @@
 # Helm Charts Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-08-09
+### Major Changes %%^^
+
+### Minor Changes %%^^
+
+### Patch Changes %%^^
+- Updated argo-cd from version 7.4.1 to 7.4.2
+
+
 ## 1.1.0
 ### Minor Changes
 - Updated keda from version 2.14.2 to 2.15.0
