@@ -4,8 +4,9 @@ puppetserver:
     image: ghcr.io/voxpupuli/container-puppetserver
     tag: 7.13.0
     puppeturl: ""
-    ingress:
-      enabled: true
+    masters:
+      ingress:
+        enabled: true
 
   postgresql:
     enabled: false
@@ -22,7 +23,7 @@ puppetserver:
     enabled: true
     name: puppetboard
     image: ghcr.io/voxpupuli/puppetboard
-    tag: 4.2.5
+    tag: 5.4.0
 
   metrics:
     prometheus:
