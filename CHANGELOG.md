@@ -1,15 +1,13 @@
-# Helm Charts Changelog
+# Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 2024-08-09
-### Major Changes %%^^
-
-### Minor Changes %%^^
+## 1.2.0
+### Minor Changes
 - Updated opensearch-dashboards from version 2.19.1 to 2.20.0
 - Updated opensearch from version 2.21.0 to 2.22.0
 - Updated community-operator from version 0.10.0 to 0.11.0
 
-### Patch Changes %%^^
+### Patch Changes
 - Updated teleport-kube-agent from version 16.1.3 to 16.1.4
 - Updated teleport-cluster from version 16.1.3 to 16.1.4
 - Updated rabbitmq-cluster-operator from version 4.3.17 to 4.3.18
