@@ -10,6 +10,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated community-operator from version 0.10.0 to 0.11.0
 
 ### Patch Changes %%^^
+- Updated teleport-kube-agent from version 16.1.3 to 16.1.4
 - Updated teleport-cluster from version 16.1.3 to 16.1.4
 - Updated rabbitmq-cluster-operator from version 4.3.17 to 4.3.18
 - Updated metallb from version 6.3.9 to 6.3.10
