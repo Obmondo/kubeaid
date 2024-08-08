@@ -1,13 +1,11 @@
 puppetserver:
-  fullnameOverride: puppetstack
-  nameOverride: puppetstack
-
   puppetserver:
     name: puppetserver
     image: ghcr.io/voxpupuli/container-puppetserver
     tag: 7.13.0
+    puppeturl: ""
     ingress:
-      enabled: false
+      enabled: true
 
   postgresql:
     enabled: false
@@ -21,10 +19,22 @@ puppetserver:
       PUPPETDB_POSTGRES_HOSTNAME: puppet-pgsql-rw
 
   puppetboard:
-    enabled: false
+    enabled: true
     name: puppetboard
     image: ghcr.io/voxpupuli/puppetboard
     tag: 4.2.5
+
+  metrics:
+    prometheus:
+      disableAPICheck: true
+      puppetdb:
+        enabled: true
+      jmx:
+        enabled: false
+
+  hiera:
+    name: hiera
+    hieradataurl: ""
 
   global:
     postgresql:
