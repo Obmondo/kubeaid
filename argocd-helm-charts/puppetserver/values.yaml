@@ -1,6 +1,5 @@
 puppetserver:
   puppetserver:
-    puppeturl:
     name: puppetserver
     image: ghcr.io/voxpupuli/container-puppetserver
     tag: 7.13.0
@@ -11,7 +10,8 @@ puppetserver:
 
   r10k:
     viaSsh:
-      existingSecret:
+      existingSecret: puppet-git-secret
+
   postgresql:
     enabled: false
 
