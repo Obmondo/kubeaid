@@ -38,14 +38,3 @@ issuer:
   preferredChain: null
 networkpolicies: false
 enableCertificateOwnerRef: true
-
-certificate:
-  name: wildcard-kbm
-  secretName: wildcard-kbm
-  issuer:
-    kind: ClusterIssuer
-    name: letsencrypt
-  commonName: "*.kbm.obmondo.com"
-  dnsNames:
-    - "*.kbm.obmondo.com"
-    - "kbm.obmondo.com"
