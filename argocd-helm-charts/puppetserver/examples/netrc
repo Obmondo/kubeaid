@@ -1,0 +1,3 @@
+machine github.com
+  login <paste-your-token>
+  password x-outh-basic
