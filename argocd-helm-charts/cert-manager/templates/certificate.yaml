@@ -1,16 +1,19 @@
+{{- if .Values.wildcardCertificates.enabled -}}
+{{- range .Values.wildcardCertificates.domains }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: {{ .Values.certificate.name }}
-  namespace: {{ .Values.certificate.namespace }}
+  name: {{ include "cert-manager.namefix" . }}
 spec:
-  secretName: {{ .Values.certificate.secretName }}
+  secretName: {{ include "cert-manager.namefix" . }}
   issuerRef:
     group: cert-manager.io
-    kind: {{ .Values.certificate.issuer.kind }}
-    name: {{ .Values.certificate.issuer.name }}
-  commonName: {{ .Values.certificate.commonName }}
+    kind: ClusterIssuer
+    name: {{ $.Values.issuer.name | quote }}
+  commonName: "{{ . }}"
   dnsNames:
-    {{- range .Values.certificate.dnsNames }}
-    - {{ . }}
-    {{- end }}
+  - "{{ . }}"
+
+---
+{{- end -}}
+{{- end -}}
