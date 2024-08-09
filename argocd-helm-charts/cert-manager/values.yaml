@@ -32,6 +32,7 @@ cert-manager:
         cpu: 1m
         memory: 16Mi
 issuer:
+  name: letsencrypt
   enabled: false
   production: false
   preferredChain: null
