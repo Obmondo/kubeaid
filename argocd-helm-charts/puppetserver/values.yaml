@@ -9,8 +9,11 @@ puppetserver:
         enabled: true
 
   r10k:
-    viaSsh:
-      existingSecret: puppet-git-secret
+    asSidecar: false
+    code:
+      viaHttps:
+        credentials:
+          existingSecret: puppet-git-secret
 
   postgresql:
     enabled: false
