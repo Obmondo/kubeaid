@@ -1,5 +1,6 @@
 puppetserver:
   puppetserver:
+    puppeturl:
     name: puppetserver
     image: ghcr.io/voxpupuli/container-puppetserver
     tag: 7.13.0
@@ -8,6 +9,9 @@ puppetserver:
       ingress:
         enabled: true
 
+  r10k:
+    viaSsh:
+      existingSecret:
   postgresql:
     enabled: false
 
