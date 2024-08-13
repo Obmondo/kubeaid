@@ -7,7 +7,7 @@ terraform {
 }
 
 # Indicate what region to deploy the resources into
-generate "provider" {
+generate "provider_cluster" {
   path = "kops.tf"
   if_exists = "overwrite_terragrunt"
   contents = <<EOF
