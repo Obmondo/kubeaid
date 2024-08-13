@@ -46,7 +46,7 @@ puppetserver:
 
   global:
     extraEnv:
-      AUTOSIGN: /etc/puppetlabs/code/master/puppet_autosign.rb
+      AUTOSIGN: /etc/puppetlabs/code/environments/master/puppet_autosign.rb
     postgresql:
       auth:
         existingSecret: puppetserver-pgsql-app
