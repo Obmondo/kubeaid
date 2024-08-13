@@ -11,8 +11,5 @@ spec:
     services:
     - name: puppetserver-{{ .Values.customerid }}-puppet
       port: puppetserver
-      nativeLB: true
   tls:
     passthrough: true
-    domains:
-    - main: {{ .Values.customerid }}.puppet.obmondo.com
