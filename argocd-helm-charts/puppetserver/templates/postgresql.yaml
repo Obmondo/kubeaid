@@ -2,10 +2,11 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   {{ if .Values.postgresql.recover }}
-  name: puppet-pgsql-recover
+  name: puppetserver-pgsql-recover
   {{ else }}
-  name: puppet-pgsql
+  name: puppetserver-pgsql
   {{ end }}
+  namespace: {{ .Release.Namespace }}
 spec:
   instances: {{ ((.Values.postgresql).instance) | default 1 }}
   {{ if .Values.postgresql.recover }}
@@ -33,7 +34,7 @@ spec:
     {{- end }}
   {{- if .Values.postgresql.recover }}
   externalClusters:
-    name: postgresql-pgsql
+    name: puppetserver-pgsql
     barmanObjectStore:
       destinationPath: {{ .Values.postgresql.backup.destinationPath }}
       endpointURL: {{ .Values.postgresql.backup.endpointURL }}
