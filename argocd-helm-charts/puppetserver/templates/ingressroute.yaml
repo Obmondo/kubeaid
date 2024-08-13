@@ -1,0 +1,25 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: puppetserver-{{ .Values.customerid }}
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - kind: Rule
+    match: Host(`{{ .Values.customerid }}.puppet.obmondo.com`)
+    priority: 10
+    services:
+    - kind: Service
+      name: puppetserver-{{ .Values.customerid }}-puppet
+      namespace: puppetserver-{{ .Values.customerid }}
+      passHostHeader: true
+      port: puppetserver
+      healthCheck:
+        path: /status/v1/simple
+        interval: 15s
+      nativeLB: true
+  tls:
+    certResolver: puppetserver-{{ .Values.customerid }}
+    domains:
+    - main: {{ .Values.customerid }}.puppet.obmondo.com
