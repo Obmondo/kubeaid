@@ -45,6 +45,8 @@ puppetserver:
     hieradataurl: ""
 
   global:
+    extraEnv:
+      AUTOSIGN: /etc/puppetlabs/code/master/puppet_autosign.rb
     postgresql:
       auth:
         existingSecret: puppetserver-pgsql-app
