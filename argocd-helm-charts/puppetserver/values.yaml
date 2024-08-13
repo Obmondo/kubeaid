@@ -7,13 +7,13 @@ puppetserver:
     masters:
       ingress:
         enabled: false
-      customentrypoints:
-        enabled: true
-        configmaps: |-
+    customentrypoints:
+      enabled: true
+      configmaps:
+        configure_external_nodes.sh: |-
           #!/bin/bash
 
           set -e
-
           # Configure puppet to use a certificate autosign script (if it exists)
           # AUTOSIGN=true|false|path_to_autosign.conf
           if test -n "${PUPPETSERVER_ENC_PATH}" ; then
