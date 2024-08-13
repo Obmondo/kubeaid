@@ -31,10 +31,12 @@ variable "argocd_repos" {
 variable "repo_url"{
   type = string
   description = "URL to the repository (Git or Helm) that contains the application manifests."
+  default = ""
 }
 variable "path"{
   type = string
   description = "Directory path within the repository. Only valid for applications sourced from Git."
+  default = ""
 }
 
 variable "secrets_file" {
