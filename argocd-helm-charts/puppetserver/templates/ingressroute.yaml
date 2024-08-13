@@ -20,6 +20,6 @@ spec:
         interval: 15s
       nativeLB: true
   tls:
-    certResolver: puppetserver-{{ .Values.customerid }}
+    passthrough: true
     domains:
     - main: {{ .Values.customerid }}.puppet.obmondo.com
