@@ -6,18 +6,11 @@ spec:
   entryPoints:
     - websecure
   routes:
-  - kind: Rule
-    match: HostSNI(`{{ .Values.customerid }}.puppet.obmondo.com`)
+  - match: HostSNI(`{{ .Values.customerid }}.puppet.obmondo.com`)
     priority: 10
     services:
-    - kind: Service
-      name: puppetserver-{{ .Values.customerid }}-puppet
-      namespace: puppetserver-{{ .Values.customerid }}
-      passHostHeader: true
+    - name: puppetserver-{{ .Values.customerid }}-puppet
       port: puppetserver
-      healthCheck:
-        path: /status/v1/simple
-        interval: 15s
       nativeLB: true
   tls:
     passthrough: true
