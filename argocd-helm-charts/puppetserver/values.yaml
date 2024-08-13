@@ -7,6 +7,18 @@ puppetserver:
     masters:
       ingress:
         enabled: false
+      customentrypoints:
+        enabled: true
+        configmaps: |-
+          #!/bin/bash
+
+          set -e
+
+          # Configure puppet to use a certificate autosign script (if it exists)
+          # AUTOSIGN=true|false|path_to_autosign.conf
+          if test -n "${PUPPETSERVER_ENC_PATH}" ; then
+            puppet config set external_nodes "$PUPPETSERVER_ENC_PATH" --section server
+          fi
 
   r10k:
     asSidecar: false
@@ -14,6 +26,10 @@ puppetserver:
       viaHttps:
         credentials:
           existingSecret: puppet-git-secret
+
+  hiera:
+    name: hiera
+    hieradataurl: ""
 
   postgresql:
     enabled: false
@@ -40,13 +56,11 @@ puppetserver:
       jmx:
         enabled: false
 
-  hiera:
-    name: hiera
-    hieradataurl: ""
-
   global:
     extraEnv:
       AUTOSIGN: /etc/puppetlabs/code/environments/master/puppet_autosign.rb
+      PUPPET_REPORTS: puppetdb,prometheus
+      PUPPETSERVER_ENC_PATH: /etc/puppetlabs/code/environments/master/puppet_enc.rb
     postgresql:
       auth:
         existingSecret: puppetserver-pgsql-app
