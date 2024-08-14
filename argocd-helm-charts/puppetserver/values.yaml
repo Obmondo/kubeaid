@@ -62,7 +62,8 @@ puppetserver:
   global:
     extraEnv:
       AUTOSIGN: /etc/puppetlabs/code/environments/master/puppet_autosign.rb
-      PUPPET_REPORTS: puppetdb,prometheus
+      # TODO: add prometheus support
+      PUPPET_REPORTS: puppetdb
       PUPPETSERVER_ENC_PATH: /etc/puppetlabs/code/environments/master/puppet_enc.rb
     postgresql:
       auth:
