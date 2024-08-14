@@ -18,6 +18,7 @@ puppetserver:
           # AUTOSIGN=true|false|path_to_autosign.conf
           if test -n "${PUPPETSERVER_ENC_PATH}" ; then
             puppet config set external_nodes "$PUPPETSERVER_ENC_PATH" --section server
+            puppet config set node_terminus "exec" --section server
           fi
 
   r10k:
