@@ -20,3 +20,11 @@ kubectl create secret generic hiera-git-secret --dry-run=client --from-file=netr
 ```sh
 kubectl create secret generic puppet-git-secret --dry-run=client --from-file=netrc=./netrc.enableit -o yaml | kubeseal --controller-namespace system --controller-name sealed-secrets --format yaml
 ```
+
+## Environment name
+
+* Env name gets changed, when using hyphen, so watch out for that
+
+```
+Environment "adding-users-in-computer10" contained non-word characters, correcting name to adding_users_in_computer10
+```
