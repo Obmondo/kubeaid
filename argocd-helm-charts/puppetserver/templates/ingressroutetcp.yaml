@@ -11,5 +11,12 @@ spec:
     services:
     - name: puppetserver-{{ .Values.customerid }}-puppet
       port: puppetserver
+  {{- range .Values.ingressroutes.mastersFor }}
+  - match: HostSNI(`{{ . }}.puppet.obmondo.com`)
+    priority: 10
+    services:
+    - name: puppetserver-{{ $.Values.customerid }}-puppet
+      port: puppetserver
+  {{- end }}
   tls:
     passthrough: true
