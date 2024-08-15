@@ -278,7 +278,7 @@ spec:
             httpGet:
               path: /status/v1/simple
               port: {{ template "puppetserver.puppetserver-masters.port" .}}
-              scheme: {{ .Values.puppetserver.masters.readinessProbeScheme }} 
+              scheme: {{ .Values.puppetserver.masters.readinessProbeScheme }}
             periodSeconds: {{ .Values.puppetserver.masters.readinessProbePeriodSeconds }}
             timeoutSeconds: {{ .Values.puppetserver.masters.readinessProbeTimeout }}
             failureThreshold: {{ .Values.puppetserver.masters.readinessProbeFailureThreshold }}
@@ -332,10 +332,10 @@ spec:
             - name: hiera-volume
               mountPath: /etc/puppetlabs/puppet/hiera.yaml
               subPath: hiera.yaml
+            {{- end }}
             {{- if and (or (.Values.hiera.eyaml.existingMap) (.Values.hiera.eyaml.existingSecret)) (not .Values.hiera.eyaml.public_key) (not .Values.hiera.eyaml.private_key)  }}
             - name: eyaml-volume
               mountPath: /etc/puppetlabs/puppet/eyaml/keys
-            {{- end }}
             {{- end }}
             {{- end }}
           securityContext:
