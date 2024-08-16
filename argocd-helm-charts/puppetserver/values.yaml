@@ -26,6 +26,8 @@ puppetserver:
   r10k:
     asSidecar: false
     code:
+      cronJob:
+        schedule: "*/2 * * * *"
       viaHttps:
         credentials:
           existingSecret: puppet-git-secret
