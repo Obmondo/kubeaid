@@ -22,6 +22,7 @@ puppetserver:
           fi
 
           puppetserver gem install fugit -v 1.9.0
+          puppetserver gem install tzinfo-data
 
   r10k:
     asSidecar: false
