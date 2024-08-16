@@ -3,39 +3,17 @@ puppetserver:
     name: puppetserver
     image: ghcr.io/voxpupuli/container-puppetserver
     tag: 7.13.0
-    puppeturl: ""
+    puppeturl: "https://github.com/Obmondo/LinuxAid.git"
     masters:
       ingress:
         enabled: false
-    customentrypoints:
-      enabled: true
-      configmaps:
-        configure_external_nodes.sh: |-
-          #!/bin/bash
-
-          set -e
-          # Configure puppet to use a certificate autosign script (if it exists)
-          # AUTOSIGN=true|false|path_to_autosign.conf
-          if test -n "${PUPPETSERVER_ENC_PATH}" ; then
-            puppet config set external_nodes "$PUPPETSERVER_ENC_PATH" --section server
-            puppet config set node_terminus "exec" --section server
-          fi
-
-          puppetserver gem install fugit -v 1.9.0
-          puppetserver gem install tzinfo-data
 
   r10k:
     asSidecar: false
-    code:
-      cronJob:
-        schedule: "*/2 * * * *"
-      viaHttps:
-        credentials:
-          existingSecret: puppet-git-secret
 
   hiera:
     name: hiera
-    hieradataurl: ""
+    hieradataurl: "https://github.com/Obmondo/linuxaid-config-template.git"
 
   postgresql:
     enabled: false
@@ -63,11 +41,6 @@ puppetserver:
         enabled: false
 
   global:
-    extraEnv:
-      AUTOSIGN: /etc/puppetlabs/code/environments/master/puppet_autosign.rb
-      # TODO: add prometheus support
-      PUPPET_REPORTS: puppetdb
-      PUPPETSERVER_ENC_PATH: /etc/puppetlabs/code/environments/master/puppet_enc.rb
     postgresql:
       auth:
         existingSecret: puppetserver-pgsql-app
