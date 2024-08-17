@@ -1,8 +1,6 @@
 puppetserver:
   puppetserver:
     name: puppetserver
-    image: ghcr.io/voxpupuli/container-puppetserver
-    tag: 7.13.0
     puppeturl: "https://github.com/Obmondo/LinuxAid.git"
     masters:
       ingress:
@@ -21,16 +19,12 @@ puppetserver:
   puppetdb:
     enabled: true
     name: puppetdb
-    image: ghcr.io/voxpupuli/container-puppetdb
-    tag: 7.14.0
     extraEnv:
       PUPPETDB_POSTGRES_HOSTNAME: puppetserver-pgsql-rw
 
   puppetboard:
     enabled: true
     name: puppetboard
-    image: ghcr.io/voxpupuli/puppetboard
-    tag: 5.4.0
 
   metrics:
     prometheus:
