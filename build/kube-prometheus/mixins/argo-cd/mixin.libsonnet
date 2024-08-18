@@ -37,11 +37,11 @@
           // Inspiration from here https://github.com/adinhodovic/argo-cd-mixin/blob/main/alerts/alerts.libsonnet
           {
             alert: 'ArgoCdAppOutOfSync',
-            expr: 'sum by (job, dest_server, project, sync_status) (argocd_app_info{job=~".*",sync_status!="Synced"}) >= 1',
+            expr: 'count by (project, sync_status) ((sum by (name, job, dest_server, project, sync_status) (argocd_app_info{job=~".*",sync_status!="Synced"}) >= 1) + on (name) group_left kubeaidManagedApps)',
             labels: {
               severity: 'warning',
             },
-            'for': '15m',
+            'for': '2h',
             annotations: {
               summary: 'ArgoCD Application is Out Of Sync.',
               description: 'Multiple application under {{ .Labels.project }} is out of sync with the sync status {{ .Labels.sync_status }} for the past 15m',
@@ -49,11 +49,11 @@
           },
           {
             alert: 'ArgoCdAppUnhealthy',
-            expr: 'sum by (job, project, dest_server, health_status) (argocd_app_info{health_status!~"Healthy|Progressing"}) >= 1',
+            expr: 'count by (health_status,project) ((sum by (name, job, dest_server, project, health_status) (argocd_app_info{health_status!~"Healthy|Progressing"}) >= 1) + on (name) group_left kubeaidManagedApps)',
             labels: {
               severity: 'warning',
             },
-            'for': '15m',
+            'for': '2h',
             annotations: {
               summary: 'ArgoCD Application is not healthy.',
               description: 'Multiple application under {{ .Labels.project }} is not healthy with the health status {{ .Labels.health_status }} for the past 15m',
