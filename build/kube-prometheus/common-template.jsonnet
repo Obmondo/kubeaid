@@ -16,7 +16,76 @@ local default_vars = {
     'cert-manager',
     'traefik',
   ],
-
+  kubeaid_users_apps+: [],
+  kubeaid_apps+: [
+    'argo-cd',
+    'argocd-image-updater',
+    'aws-ebs-csi-driver',
+    'aws-efs-csi-driver',
+    'capi-cluster',
+    'ccm-hetzner',
+    'cerebro',
+    'cert-manager',
+    'cilium',
+    'circleci-runner',
+    'cloudnative-pg',
+    'cluster-api',
+    'cluster-autoscaler',
+    'crossplane',
+    'dokuwiki',
+    'errbot',
+    'external-dns',
+    'filebeat',
+    'fluent-bit',
+    'gatekeeper',
+    'gitea-runner',
+    'gitlab-runner',
+    'grafana-operator',
+    'graylog',
+    'haproxy',
+    'harbor',
+    'k8id-custom-azure',
+    'k8s-event-logger',
+    'keda',
+    'keycloakx',
+    'kube2iam',
+    'kubernetes-dashboard',
+    'mail',
+    'mariadb-operator',
+    'matomo',
+    'mattermost-team-edition',
+    'metallb',
+    'metrics-server',
+    'mongodb-operator',
+    'obmondo-k8s-agent',
+    'oncall',
+    'opencost',
+    'opensearch',
+    'opensearch-dashboards',
+    'postgres-operator',
+    'prometheus-adapter',
+    'prometheus-linuxaid',
+    'puppetserver',
+    'rabbitmq-operator',
+    'redis-operator',
+    'redmine',
+    'relate',
+    'reloader',
+    'rook-ceph',
+    'sealed-secrets',
+    'snapshot-controller',
+    'sonarqube',
+    'strimzi-kafka-operator',
+    'teleport-cluster',
+    'teleport-kube-agent',
+    'tigera-operator',
+    'traefik',
+    'traefik-forward-auth',
+    'velero',
+    'whoami',
+    'yetibot',
+    'zfs-localpv',
+  ],
   prometheus_operator_resources: {
     limits: { memory: '80Mi' },
     requests: { cpu: '20m', memory: '80Mi' },
@@ -207,7 +276,37 @@ local kp =
       import 'kube-prometheus/addons/custom-metrics.libsonnet'
     ) else {}
   ) +
-
+  {
+    argocdApplications+: {
+      prometheusRuleExample+: {
+        apiVersion: 'monitoring.coreos.com/v1',
+        kind: 'PrometheusRule',
+        metadata: {
+          name: 'kubeaid-managed-apps',
+          namespace: $.values.common.namespace,
+        },
+        spec: {
+          groups: [
+            {
+              name: 'kubeaidManagedApps',
+              rules: [
+                {
+                  record: 'kubeaidManagedApps',
+                  expr: 0,
+                  labels: {
+                    name: argocdApps,
+                    // TODO: maybe add support for other projects
+                    project: 'default',
+                  },
+                }
+                for argocdApps in vars.kubeaid_apps + vars.kubeaid_users_apps
+              ],
+            },
+          ],
+        },
+      },
+    },
+  } +
   {
     grafana+: {
       networkPolicy+: {
@@ -679,6 +778,7 @@ local kp =
 } } +
 { ['node-exporter-' + name]: kp.nodeExporter[name] for name in std.objectFields(kp.nodeExporter) } +
 { ['prometheus-' + name]: kp.prometheus[name] for name in std.objectFields(kp.prometheus) } +
+{ ['argocd-application-prometheus-rules' + name]: kp.argocdApplications[name] for name in std.objectFields(kp.argocdApplications) } +
 (
   // Need to figure out elseif
   // if vars != 'gke' || vars != 'azure' didnt worked
