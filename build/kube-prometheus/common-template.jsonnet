@@ -39,7 +39,6 @@ local default_vars = {
     'fluent-bit',
     'gatekeeper',
     'gitea-runner',
-    '.gitignore',
     'gitlab-runner',
     'grafana-operator',
     'graylog',
@@ -283,7 +282,7 @@ local kp =
         apiVersion: 'monitoring.coreos.com/v1',
         kind: 'PrometheusRule',
         metadata: {
-          name: 'kubeaidManagedApps',
+          name: 'kubeaid-managed-apps',
           namespace: $.values.common.namespace,
         },
         spec: {
@@ -296,6 +295,8 @@ local kp =
                   expr: 0,
                   labels: {
                     name: argocdApps,
+                    // TODO: maybe add support for other projects
+                    project: 'default',
                   },
                 }
                 for argocdApps in vars.kubeaid_apps + vars.kubeaid_users_apps
