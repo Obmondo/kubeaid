@@ -1,0 +1,36 @@
+{{ if .Values.networkpolicies }}
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: default.fluentbit
+  namespace: logging
+spec:
+  order: 100
+  selector:
+    app.kubernetes.io/name == 'fluent-bit'
+  types:
+  - Egress
+  egress:
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 5555
+  # Connect to kube2iam, and allow filebeat to get k8s node metadata
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 8181
+      - 443
+      selector: kubernetes.io/role in { 'node', 'master' }
+      namespaceSelector: global()
+  # Allow access to EC2 metadata endpoint
+  - action: Allow
+    protocol: TCP
+    destination:
+      ports:
+      - 443
+      nets:
+      - 169.254.169.254/32
+{{ end }}
