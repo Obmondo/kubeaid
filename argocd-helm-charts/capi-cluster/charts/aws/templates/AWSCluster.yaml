@@ -11,5 +11,19 @@ spec:
   network:
     vpc:
       cidrBlock: {{ .Values.vpc.cidrBlock }}
+    cni:
+      cniIngressRules:
+        - description: Cilium
+          protocol: "tcp"
+          fromPort: 4240
+          toPort: 4240
+        - description: Cilium VXLAN overlay
+          protocol: "udp"
+          fromPort: 8472
+          toPort: 8472
+        - description: Cilium health checks
+          protocol: "icmp"
+          fromPort: 8
+          toPort: 8
   controlPlaneLoadBalancer:
     loadBalancerType: {{ .Values.controlPlane.loadBalancerType }}
