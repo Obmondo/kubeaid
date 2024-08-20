@@ -30,6 +30,17 @@ spec:
       mode: "kubernetes"
     rollOutCiliumPods: true
     priorityClassName: "system-node-critical"
+
+    # Uncomment to enable Cilium NetKit feature.
+    # NOTE : Works for Linux Kernel version 6.7 and above.
+    # routingMode: native
+    # bpf:
+    #   masquerade: true
+    #   datapathMode: netkit
+    # autoDirectNodeRoutes: true
+    # ipv4NativeRoutingCIDR: {{`{{ .AWSCluster.spec.network.vpc.cidrBlock }}`}}
+    # directRoutingSkipUnreachable: true
+
     hubble:
       metrics:
         enabled:
