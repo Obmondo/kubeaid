@@ -47,5 +47,5 @@ spec:
           requests:
             storage: {{ .Values.prometheus.storage.size }}
         storageClassName: {{ .Values.prometheus.storage.className }}
-  version: v2.48.1
+  version: {{ .Values.prometheus.version }}
   enableRemoteWriteReceiver: true
