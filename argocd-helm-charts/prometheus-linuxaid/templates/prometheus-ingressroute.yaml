@@ -7,10 +7,12 @@ spec:
   entryPoints:
     - websecure
   routes:
-  - match: Host(`{{ .Values.prometheus.server }}`) && PathPrefix(`/{{ .Values.customerid }}`)
+  - kind: Rule
+    match: Host(`{{ .Values.prometheus.server }}`) && PathPrefix(`/{{ .Values.customerid }}`)
     priority: 10
     services:
-    - name: prometheus-main
+    - kind: Service
+      name: prometheus-main
       namespace: monitoring-{{ .Values.customerid }}
       passHostHeader: true
       port: web
