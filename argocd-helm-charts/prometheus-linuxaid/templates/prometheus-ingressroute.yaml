@@ -3,18 +3,14 @@ kind: IngressRoute
 metadata:
   name: prometheus-{{ .Values.customerid }}
   namespace: monitoring-{{ .Values.customerid }}
-  annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: monitoring-{{ .Values.customerid }}-ipwhitelist-{{ .Values.customerid }}@kubernetescrd
 spec:
   entryPoints:
     - websecure
   routes:
-  - kind: Rule
-    match: Host(`{{ .Values.prometheus.server }}`) && PathPrefix(`/{{ .Values.customerid }}`)
+  - match: Host(`{{ .Values.prometheus.server }}`) && PathPrefix(`/{{ .Values.customerid }}`)
     priority: 10
     services:
-    - kind: Service
-      name: prometheus-main
+    - name: prometheus-main
       namespace: monitoring-{{ .Values.customerid }}
       passHostHeader: true
       port: web
