@@ -11,10 +11,13 @@ spec:
   chartName: cert-manager
   namespace: cert-manager
   releaseName: cert-manager
-  version: v1.14.3
+  version: v1.15.2
   options:
     waitForJobs: true
     wait: true
     timeout: 5m0s
     install:
       createNamespace: true
+  valuesTemplate: |
+    crds:
+      enabled: true
