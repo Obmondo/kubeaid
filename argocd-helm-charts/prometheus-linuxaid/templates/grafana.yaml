@@ -38,7 +38,7 @@ spec:
         spec:
           containers:
             - name: grafana
-              image: grafana/grafana:9.5.3
+              image: grafana/grafana:{{ .Values.grafana.version }}
   persistentVolumeClaim:
     spec:
       accessModes:
