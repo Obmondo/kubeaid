@@ -17,7 +17,7 @@ spec:
     runAsUser: 1000
   serviceAccountName: alertmanager-main
   portName: web
-  version: v0.26.0
+  version: {{ .Values.alertmanager.version }}
   configSecret: alertmanager-config-{{ .Values.customerid }}
   secrets:
   - puppet-agent-tls-auth
