@@ -1,6 +1,6 @@
 matomo:
   image:
-    tag: latest
+    tag: 5.1.1
   mariadb:
     enabled: false
   externalDatabase:
