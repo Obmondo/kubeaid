@@ -15,6 +15,21 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated aws-efs-csi-driver from version 3.0.7 to 3.0.8
 - Updated argo-cd from version 7.4.1 to 7.4.2
 
+### KubeAid Improvements
+- ca279e10 Update changelog format
+- a553cce0 fixed the ingress alignment
+- c78a3a5b small spelling fix and add log delition and garbage collection history
+- 52b24a6d harbor clean up doc
+- ca004f96 Fixed cilium template condition
+- 044ed1b6 Added a readme file for azure cluster api
+- 2e5db425 fix: fixed the env and secret name as per new object name for puppetserver
+- 86a3774a fix: added namespace support to postgresql puppetserver
+- 334bfb84 fixes:
+- 62e841a7 Added a helm chart for azure cluster api
+- 98f94caa Fixed Yaml linting
+- d6f40a65 Added capz version
+- edf3a588 Added Azure capz helm chart
+- 5c93bc15 setup matomo in k8s
 
 ## 1.1.0
 ### Minor Changes
