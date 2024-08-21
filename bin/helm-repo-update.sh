@@ -25,6 +25,7 @@ Usage $0 [OPTIONS]:
   --actions           	    Run inside a GitHub or Gitea Action   [Default: false] (Only in CI)
   --skip-charts             Skip updating certain charts 	  [Default: none]
   --chart-version           Helm chart version          	  [Default: latest]
+  --add-commits             Add commits since last tag in changelog   [Default: false]
   -h|--help
 
 Example:
@@ -40,6 +41,7 @@ declare UPDATE_HELM_CHART=
 declare SKIP_CHARTS=
 declare ARGOCD_CHART_PATH="argocd-helm-charts"
 declare CHART_VERSION=
+declare ADD_COMMITS=false
 
 [ $# -eq 0 ] && { ARGFAIL; exit 1; }
 
@@ -76,6 +78,9 @@ while [[ $# -gt 0 ]]; do
       CHART_VERSION=$1
 
       shift
+      ;;
+    --add-commits)
+      ADD_COMMITS=true
       ;;
     -h|--help)
       ARGFAIL
@@ -292,7 +297,7 @@ EOF
   # Check if the current date section exists
   if ! grep -q "^## $date" "$changelog_file"; then
     sed -i "/All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file./a\\\n## $date" CHANGELOG.md
-    sed -i "/$date/a\\### Patch Changes %%^^\n" CHANGELOG.md
+    sed -i "/$date/a\\### Patch Changes %%^^" CHANGELOG.md
     sed -i "/$date/a\\### Minor Changes %%^^\n" CHANGELOG.md
     sed -i "/$date/a\\### Major Changes %%^^\n" CHANGELOG.md
   fi
@@ -347,6 +352,11 @@ if "$UPDATE_ALL"; then
   if [ "$ACTIONS" = false ]; then
     git switch -c "$branch_name" --track origin/master
   fi
+
+  if $ADD_COMMITS; then
+    bash ./bin/add-commits.sh
+  fi
+
   while read -r path; do
   # find ./"$ARGOCD_CHART_PATH" -maxdepth 1 -mindepth 1 -type d | sort | while read -r path; do
     chart_name=$(basename "$path")
