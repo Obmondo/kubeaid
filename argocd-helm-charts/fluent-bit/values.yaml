@@ -1,3 +1,4 @@
+networkpolicies: false
 fluent-bit:
   image:
     pullPolicy: IfNotPresent
