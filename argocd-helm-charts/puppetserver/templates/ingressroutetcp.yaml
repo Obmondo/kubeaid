@@ -11,5 +11,12 @@ spec:
     services:
     - name: puppetserver-{{ .Values.customerid }}-puppet
       port: puppetserver
+  - match: HostSNI(`{{ .Values.customerid }}.puppetdb.obmondo.com`)
+    priority: 10
+    services:
+    - name: puppetserver-{{ .Values.customerid }}-puppetdb
+      port: pdb-https
+    middlewares:
+      - name: middleware-{{ .Values.customerid }}
   tls:
     passthrough: true
