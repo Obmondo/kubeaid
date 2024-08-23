@@ -1,6 +1,14 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-08-23
+### Major Changes %%^^
+
+### Minor Changes %%^^
+
+### Patch Changes %%^^
+- Updated argo-cd from version 7.4.2 to 7.4.5
+
 ### KubeAid Improvements
 - f931fffe updated the prometheus metrics alert to handle boot time as well
 - 44a0e0ec Add add-commit bash script and call it in helm-repo-update script and update CHANGELOG with commits as per new standard
