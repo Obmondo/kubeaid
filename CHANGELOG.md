@@ -20,6 +20,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cerebro from version 2.0.5 to 2.1.0
 
 ### Patch Changes %%^^
+- Updated teleport-cluster from version 16.1.4 to 16.1.7
 - Updated redmine from version 29.0.3 to 29.0.4
 - Updated rabbitmq-cluster-operator from version 4.3.18 to 4.3.19
 - Updated mattermost-team-edition from version 6.6.60 to 6.6.61
