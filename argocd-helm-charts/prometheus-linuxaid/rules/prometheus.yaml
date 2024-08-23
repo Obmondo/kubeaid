@@ -3,8 +3,9 @@ groups:
     rules:
     - alert: monitor::metrics::missing::pushprox
       expr: |
-        (up{job="pushprox"} == 0) * on (certname) group_left(job) (node_time_seconds - node_boot_time_seconds > 600)
-        and on(certname) obmondo_monitoring{alert_id="monitor::metrics::missing::pushprox"} > 0
+        (100 * (count(up == 0) BY (certname, job) / count(up) BY (certname, job)) > 10)
+        * on (certname) group_right(job) (node_time_seconds - node_boot_time_seconds > 600)
+        and on(certname) obmondo_monitoring{alert_id="monitor::prometheus::metrics"} > 0
       for: 30m
       labels:
         severity: critical
