@@ -11,6 +11,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cerebro from version 2.0.5 to 2.1.0
 
 ### Patch Changes %%^^
+- Updated keda from version 2.15.0 to 2.15.1
 - Updated graylog from version 2.3.8 to 2.3.9
 - Updated fluent-bit from version 0.47.5 to 0.47.7
 - Updated external-dns from version 8.3.4 to 8.3.5
