@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Changes %%^^
 
 ### Minor Changes %%^^
+- Updated opensearch-dashboards from version 2.20.0 to 2.21.0
 - Updated opensearch from version 2.22.0 to 2.23.0
 - Updated opencost from version 1.41.0 to 1.42.0
 - Updated oncall from version 1.8.9 to 1.9.12
