@@ -192,6 +192,10 @@ graylog:
   ##
   extraVolumes: []
 
+  ## Additional volume claim templates
+  ##
+  extraVolumeClaimTemplates: []
+
   ## A service for Graylog web interface
   ##
   service:
