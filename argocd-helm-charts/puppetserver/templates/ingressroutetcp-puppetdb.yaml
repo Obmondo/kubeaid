@@ -6,7 +6,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-  - match: HostSNI(`{{ .Values.customerid }}.puppetdb.enableit.dk`)
+  - match: HostSNI(`{{ .Values.customerid }}.puppetdb.obmondo.com`)
     priority: 10
     services:
     - name: puppetserver-{{ .Values.customerid }}-puppetdb
