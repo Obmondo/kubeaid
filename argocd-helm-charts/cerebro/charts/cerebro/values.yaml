@@ -78,8 +78,13 @@ config:
   basePath: '/'
   restHistorySize: 50
   hosts: []
-  #  - host:
-  #    name:
+    # - host: https://es-cluster-es-http
+    #   name: 'Elastic Cluster Name'
+    #   headersWhitelist:
+    #     - "X-Forwarded-For"
+    #   auth:
+    #     username: "test"
+    #     password: "password"
 
   # Secret used to sign session cookies. If empty it will be replaced with a
   # random 64 length string

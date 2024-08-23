@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Changes %%^^
 
 ### Minor Changes %%^^
+- Updated cerebro from version 2.0.5 to 2.1.0
 
 ### Patch Changes %%^^
 - Updated argo-cd from version 7.4.2 to 7.4.5
