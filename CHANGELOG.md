@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Changes %%^^
 
 ### Minor Changes %%^^
+- Updated cloudnative-pg from version 0.21.6 to 0.22.0
 - Updated cerebro from version 2.0.5 to 2.1.0
 
 ### Patch Changes %%^^
