@@ -1,10 +1,8 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 2024-08-23
-### Major Changes %%^^
-
-### Minor Changes %%^^
+## 1.3.0
+### Minor Changes
 - Updated traefik from version 30.0.2 to 30.1.0
 - Updated rook-ceph-cluster from version v1.14.9 to v1.15.0
 - Updated rook-ceph from version v1.14.9 to v1.15.0
@@ -20,7 +18,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cloudnative-pg from version 0.21.6 to 0.22.0
 - Updated cerebro from version 2.0.5 to 2.1.0
 
-### Patch Changes %%^^
+### Patch Changes
 - Updated velero from version 7.1.4 to 7.1.5
 - Updated teleport-kube-agent from version 16.1.4 to 16.1.7
 - Updated teleport-cluster from version 16.1.4 to 16.1.7
