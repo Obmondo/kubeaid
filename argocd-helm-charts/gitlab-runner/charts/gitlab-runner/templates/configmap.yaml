@@ -212,7 +212,7 @@ data:
           --cacert ${CACERT} \
           --header "${header}" \
           -X GET ${SERVICEURL} 2>/dev/null \
-          | grep '"ip":' | cut -d ":" -f2 | xargs)
+          | grep '"ip":' | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' | head -1)
 
         # for aws, the hostname is available but not the external IP
         SERVICEHOSTNAME=$(curl —-silent \
