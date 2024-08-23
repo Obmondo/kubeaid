@@ -21,6 +21,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cerebro from version 2.0.5 to 2.1.0
 
 ### Patch Changes %%^^
+- Updated velero from version 7.1.4 to 7.1.5
 - Updated teleport-kube-agent from version 16.1.4 to 16.1.7
 - Updated teleport-cluster from version 16.1.4 to 16.1.7
 - Updated redmine from version 29.0.3 to 29.0.4
