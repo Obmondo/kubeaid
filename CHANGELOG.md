@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Changes %%^^
 
 ### Minor Changes %%^^
+- Updated keycloakx from version 2.4.4 to 2.5.0
 - Updated gitlab-runner from version 0.67.1 to 0.68.1
 - Updated gatekeeper from version 3.16.3 to 3.17.0
 - Updated cloudnative-pg from version 0.21.6 to 0.22.0
