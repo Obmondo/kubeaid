@@ -1,6 +1,6 @@
 # traefik
 
-![Version: 30.0.2](https://img.shields.io/badge/Version-30.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v3.1.0](https://img.shields.io/badge/AppVersion-v3.1.0-informational?style=flat-square)
+![Version: 30.1.0](https://img.shields.io/badge/Version-30.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v3.1.2](https://img.shields.io/badge/AppVersion-v3.1.2-informational?style=flat-square)
 
 A Traefik based Kubernetes ingress controller
 
@@ -60,15 +60,10 @@ Kubernetes: `>=1.22.0-0`
 | extraObjects | list | `[]` | Extra objects to deploy (value evaluated as a template)  In some cases, it can avoid the need for additional, extended or adhoc deployments. See #595 for more details and traefik/tests/values/extra.yaml for example. |
 | gateway.annotations | string | `nil` | Additional gateway annotations (e.g. for cert-manager.io/issuer) |
 | gateway.enabled | bool | `true` | When providers.kubernetesGateway.enabled, deploy a default gateway |
-| gateway.listeners | object | `{"web":{"hostname":null,"namespacePolicy":null,"port":8000,"protocol":"HTTP"},"websecure":{"certificateRefs":null,"hostname":null,"mode":null,"namespacePolicy":null,"port":8443,"protocol":"HTTPS"}}` | Define listeners |
+| gateway.listeners | object | `{"web":{"hostname":null,"namespacePolicy":null,"port":8000,"protocol":"HTTP"}}` | Define listeners |
 | gateway.listeners.web.hostname | string | `nil` | Optional hostname. See [Hostname](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.Hostname) |
 | gateway.listeners.web.namespacePolicy | string | `nil` | Routes are restricted to namespace of the gateway [by default](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.FromNamespaces |
 | gateway.listeners.web.port | int | `8000` | Port is the network port. Multiple listeners may use the same port, subject to the Listener compatibility rules. The port must match a port declared in ports section. |
-| gateway.listeners.websecure.certificateRefs | string | `nil` | Add certificates for TLS or HTTPS protocols. See [GatewayTLSConfig](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io%2fv1.GatewayTLSConfig) |
-| gateway.listeners.websecure.hostname | string | `nil` | Optional hostname. See [Hostname](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.Hostname) |
-| gateway.listeners.websecure.mode | string | `nil` | TLS behavior for the TLS session initiated by the client. See [TLSModeType](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.TLSModeType). |
-| gateway.listeners.websecure.namespacePolicy | string | `nil` | Routes are restricted to namespace of the gateway [by default](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.FromNamespaces) |
-| gateway.listeners.websecure.port | int | `8443` | Port is the network port. Multiple listeners may use the same port, subject to the Listener compatibility rules. The port must match a port declared in ports section. |
 | gateway.name | string | `nil` | Set a custom name to gateway |
 | gateway.namespace | string | `nil` | By default, Gateway is created in the same `Namespace` than Traefik. |
 | gatewayClass.enabled | bool | `true` | When providers.kubernetesGateway.enabled and gateway.enabled, deploy a default gatewayClass |
@@ -226,7 +221,6 @@ Kubernetes: `>=1.22.0-0`
 | providers.kubernetesGateway.namespaces | list | `[]` | Array of namespaces to watch. If left empty, Traefik watches all namespaces. |
 | providers.kubernetesIngress.allowEmptyServices | bool | `false` | Allows to return 503 when there is no endpoints available |
 | providers.kubernetesIngress.allowExternalNameServices | bool | `false` | Allows to reference ExternalName services in Ingress |
-| providers.kubernetesIngress.disableIngressClassLookup | bool | `false` |  |
 | providers.kubernetesIngress.enabled | bool | `true` | Load Kubernetes Ingress provider |
 | providers.kubernetesIngress.ingressClass | string | `nil` | When ingressClass is set, only Ingresses containing an annotation with the same value are processed. Otherwise, Ingresses missing the annotation, having an empty value, or the value traefik are processed. |
 | providers.kubernetesIngress.namespaces | list | `[]` | Array of namespaces to watch. If left empty, Traefik watches all namespaces. |

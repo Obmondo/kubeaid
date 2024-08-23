@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Changes %%^^
 
 ### Minor Changes %%^^
+- Updated traefik from version 30.0.2 to 30.1.0
 - Updated rook-ceph-cluster from version v1.14.9 to v1.15.0
 - Updated rook-ceph from version v1.14.9 to v1.15.0
 - Updated prometheus-adapter from version 4.10.0 to 4.11.0

@@ -1,8 +1,11 @@
 annotations:
-  artifacthub.io/changes: "- \"fix(Traefik Hub): missing RBACs for Traefik Hub\"\n-
-    \"chore(release): \U0001F680 publish v30.0.2\"\n"
+  artifacthub.io/changes: "- \"fix: disable default HTTPS listener for gateway\"\n-
+    \"fix(Gateway API): wildcard support in hostname\"\n- \"fix(Gateway API): use
+    Standard channel by default\"\n- \"feat: ✨ rework namespaced RBAC with `disableClusterScopeResources`\"\n-
+    \"chore(release): \U0001F680 publish v30.1.0\"\n- \"chore(deps): update traefik
+    docker tag to v3.1.2\"\n- \"chore(deps): update traefik docker tag to v3.1.1\"\n"
 apiVersion: v2
-appVersion: v3.1.0
+appVersion: v3.1.2
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
 icon: https://raw.githubusercontent.com/traefik/traefik/v2.3/docs/content/assets/img/traefik.logo.png
@@ -24,4 +27,4 @@ sources:
 - https://github.com/traefik/traefik
 - https://github.com/traefik/traefik-helm-chart
 type: application
-version: 30.0.2
+version: 30.1.0
