@@ -1,20 +1,19 @@
 groups:
   - name: prometheus
     rules:
-    - alert: monitor::metrics::missing::pushprox
+    - alert: TargetDown
       expr: |
-        (100 * (count(up == 0) BY (certname, job) / count(up) BY (certname, job)) > 10)
-        * on (certname) group_right(job) (node_time_seconds - node_boot_time_seconds > 600)
-        and on(certname) obmondo_monitoring{alert_id="monitor::prometheus::metrics"} > 0
+        sum by (certname) (node_time_seconds - node_boot_time_seconds > 600) + ignoring (job) group_right() (100 * (count(up == 0) BY (certname, job) / count(up) BY (certname, job)) > 10)
+        and on (certname) obmondo_monitoring{alert_id="monitor::prometheus::metrics"} > 0
       for: 30m
       labels:
         severity: critical
-        alert_id: monitor::metrics::missing::pushprox
+        alert_id: prometheus
       annotations:
         summary: |
-          Missing Pushprox metrics for target {{ $labels.pushprox_target }} on **{{ $labels.instance }}**
+          Missing Prometheus metrics for {{ $labels.job }}-exporter on **{{ $labels.certname }}**
         description: |
-          Prometheus is missing Pushprox metrics for target {{ $labels.pushprox_target }} from instance **{{ $labels.instance }}**
+          Prometheus is missing metrics for {{ $labels.job }}-exporter from instance **{{ $labels.certname }}**
 
     - alert: PrometheusTsdbWalCorruptions
       expr: |

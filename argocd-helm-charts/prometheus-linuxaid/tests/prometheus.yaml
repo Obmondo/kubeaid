@@ -6,56 +6,86 @@ rule_files:
 
 tests:
   # node down
-  - interval: 1s
+  - interval: 1m
     input_series:
-      - series: obmondo_monitoring{certname="example.jfk", alert_id="monitor::metrics::missing::pushprox"}
-        values: 1+0x1800  # or 1x1800 in shorthand
-      - series: up{certname="example.jfk", instance="example.jfk:63395", job="pushprox", pushprox_target="dns_exporter"}
+      - series: obmondo_monitoring{certname="example.jfk", alert_id="monitor::prometheus::metrics"}
+        values: 1+0x1800
+      - series: obmondo_monitoring{certname="example.abc", alert_id="monitor::prometheus::metrics"}
+        values: 1+0x1800
+      - series: up{certname="example.jfk", instance="example.jfk:63390", job="iptables"}
         values: 0+0x1800
-      - series: node_time_seconds{certname="example.jfk", instance="example.jfk:63395", job="pushprox", pushprox_target="dns_exporter"}
-        values: 1668423358+1x1800  # system time should increase every time it's measured
-      - series: node_boot_time_seconds{certname="example.jfk", instance="example.jfk:63395", job="pushprox", pushprox_target="dns_exporter"}
-        values: 1661942053+0x1800
-
+      - series: up{certname="example.jfk", instance="example.jfk:63391", job="cadvisor"}
+        values: 0+0x1800
+      - series: up{certname="example.jfk", instance="example.jfk:63392", job="node"}
+        values: 0+0x1800
+      - series: up{certname="example.abc", instance="example.abc:63393", job="cadvisor"}
+        values: 0+0x1800
+      - series: up{certname="example.abc", instance="example.abc:63394", job="haproxy"}
+        values: 0+0x1800
+      - series: node_time_seconds{certname="example.jfk", instance="example.jfk:63395", job="node"}
+        values: 1668423358x1800
+      - series: node_boot_time_seconds{certname="example.jfk", instance="example.jfk:63395", job="node"}
+        values: 1661942053x1800
+      - series: node_time_seconds{certname="example.abc", instance="example.abc:63395", job="node"}
+        values: 1668423358x1800
+      - series: node_boot_time_seconds{certname="example.abc", instance="example.abc:63395", job="node"}
+        values: 1661942053x1800
     alert_rule_test:
-      - alertname: 'monitor::metrics::missing::pushprox'
+      - alertname: TargetDown
         eval_time: 30m
         exp_alerts:
           - exp_labels:
               severity: critical
-              instance: 'example.jfk:63395'
-              certname: 'example.jfk'
-              job: pushprox
-              alert_id: monitor::metrics::missing::pushprox
-              pushprox_target: dns_exporter
+              certname: 'example.abc'
+              job: cadvisor
+              alert_id: prometheus
+              alertname: TargetDown
             exp_annotations:
               summary: |
-                Missing Pushprox metrics for target dns_exporter on **example.jfk:63395**
+                Missing Prometheus metrics for cadvisor-exporter on **example.abc**
               description: |
-                Prometheus is missing Pushprox metrics for target dns_exporter from instance **example.jfk:63395**
-
-  # node down
-  - interval: 1m
-    input_series:
-      - series: obmondo_monitoring{certname="example.efg", alert_id="monitor::metrics::missing::pushprox"}
-        values: 1x1000
-      - series: up{certname="example.efg", instance="example.efg:63395", job="pushprox", pushprox_target="dns_exporter"}
-        values: 1x30 0x30
-
-    alert_rule_test:
-      - alertname: 'monitor::metrics::missing::pushprox'
-        eval_time: 1h
-        exp_alerts: []
-
-  # flapping
-  - interval: 1m
-    input_series:
-      - series: obmondo_monitoring{certname="example.xyz", alert_id="monitor::metrics::missing::pushprox"}
-        values: 1x1000
-      - series: up{certname="example.xyz", instance="example.xyz:63395", job="pushprox", pushprox_target="dns_exporter"}
-        values: 1x10 0x3 1x10 0x4 1x10
-
-    alert_rule_test:
-      - alertname: 'monitor::metrics::missing::pushprox'
-        eval_time: 30m
-        exp_alerts: []
+                Prometheus is missing metrics for cadvisor-exporter from instance **example.abc**
+          - exp_labels:
+              severity: critical
+              certname: 'example.abc'
+              job: haproxy
+              alert_id: prometheus
+              alertname: TargetDown
+            exp_annotations:
+              summary: |
+                Missing Prometheus metrics for haproxy-exporter on **example.abc**
+              description: |
+                Prometheus is missing metrics for haproxy-exporter from instance **example.abc**
+          - exp_labels:
+              severity: critical
+              certname: 'example.jfk'
+              job: cadvisor
+              alert_id: prometheus
+              alertname: TargetDown
+            exp_annotations:
+              summary: |
+                Missing Prometheus metrics for cadvisor-exporter on **example.jfk**
+              description: |
+                Prometheus is missing metrics for cadvisor-exporter from instance **example.jfk**
+          - exp_labels:
+              severity: critical
+              certname: 'example.jfk'
+              job: iptables
+              alert_id: prometheus
+              alertname: TargetDown
+            exp_annotations:
+              summary: |
+                Missing Prometheus metrics for iptables-exporter on **example.jfk**
+              description: |
+                Prometheus is missing metrics for iptables-exporter from instance **example.jfk**
+          - exp_labels:
+              severity: critical
+              certname: 'example.jfk'
+              job: node
+              alert_id: prometheus
+              alertname: TargetDown
+            exp_annotations:
+              summary: |
+                Missing Prometheus metrics for node-exporter on **example.jfk**
+              description: |
+                Prometheus is missing metrics for node-exporter from instance **example.jfk**
