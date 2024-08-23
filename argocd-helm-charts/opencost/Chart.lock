@@ -1,6 +1,6 @@
 dependencies:
 - name: opencost
   repository: https://opencost.github.io/opencost-helm-chart
-  version: 1.41.0
-digest: sha256:c48a2d4b55a0b7f6bfb1583d1937ddb06a23fdf77343b0bc75fbc0bf1d04f0ce
-generated: "2024-07-31T20:47:38.087285717+05:30"
+  version: 1.42.0
+digest: sha256:1ce67eedd094ceba1692d3f11c8b496d697382d72f41bcd1325d7fb0ae78e96a
+generated: "2024-08-23T23:56:20.785303262+05:30"

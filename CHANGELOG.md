@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Changes %%^^
 
 ### Minor Changes %%^^
+- Updated opencost from version 1.41.0 to 1.42.0
 - Updated oncall from version 1.8.9 to 1.9.12
 - Updated keycloakx from version 2.4.4 to 2.5.0
 - Updated gitlab-runner from version 0.67.1 to 0.68.1
