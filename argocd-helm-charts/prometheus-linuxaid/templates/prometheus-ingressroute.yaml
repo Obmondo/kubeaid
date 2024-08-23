@@ -3,8 +3,6 @@ kind: IngressRoute
 metadata:
   name: prometheus-{{ .Values.customerid }}
   namespace: monitoring-{{ .Values.customerid }}
-  annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: monitoring-{{ .Values.customerid }}-ipwhitelist-{{ .Values.customerid }}@kubernetescrd
 spec:
   entryPoints:
     - websecure

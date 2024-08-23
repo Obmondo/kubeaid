@@ -1,5 +1,5 @@
 {
-_config+:: {
+  _config+:: {
     selector: '',
   },
   prometheusAlerts+:: {
@@ -9,7 +9,7 @@ _config+:: {
         rules: [
           {
             alert: 'monitor::monitoring_stack::watchdog_missing',
-            expr: 'increase(watchdog_alerts_total{job="goopsmondo"}[35m]) < 1',
+            expr: 'changes(watchdog_alerts_total[65m]) == 0',
             'for': '10m',
             labels: {
               severity: 'critical',

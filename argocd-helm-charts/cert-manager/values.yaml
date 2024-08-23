@@ -38,3 +38,6 @@ issuer:
   preferredChain: null
 networkpolicies: false
 enableCertificateOwnerRef: true
+
+wildcardCertificates:
+  enabled: false

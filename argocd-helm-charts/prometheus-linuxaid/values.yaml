@@ -1,4 +1,5 @@
 prometheus:
+  version: v2.53.2
   server: prometheus.obmondo.com
   ingress:
     enable: false
@@ -13,6 +14,7 @@ prometheus:
       memory: 2Gi
 grafana:
   server: graphs.obmondo.com
+  version: 11.1.4
 prometheusRule:
   backup: true
   btrfs: true
@@ -44,6 +46,7 @@ prometheusRule:
   ssacli: true
   zfsExporter: true
 alertmanager:
+  version: v0.27.0
   config:
     global:
       resolve_timeout: 5m
