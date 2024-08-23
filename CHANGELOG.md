@@ -1,6 +1,57 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### KubeAid Improvements
+- f931fffe updated the prometheus metrics alert to handle boot time as well
+- 44a0e0ec Add add-commit bash script and call it in helm-repo-update script and update CHANGELOG with commits as per new standard
+- a3293137 refactor: Update TCP ingress route for puppetdb to use new domain name
+- e40cfb96 fixed the alert expression for node which are not sending metrics within the timefram
+- a74fb76d feat: Add TCP ingress route for puppetdb
+- 5be86fec refactor: Update IP allowlist in puppetserver middleware.yaml
+- 6ad2a8ae feat: Add middleware for IP allowlist in puppetserver ingress route
+- d706ddce fixed the watchdog alert to alert if alertmanager are not sending the watchdog alert within a time-frame
+- 2780a6f2 fix: job name of opsmondo
+- 1c8c9ab0 [FEAT] add default value for networkpolicies
+- 0baf17c1 change matomo version to 5.1.1
+- cb080daf wildcard certificates should be set to disabled as a default
+- 35adfd74 need kind in ingressroute object
+- 4019afc4 removed middleware from ingressroute, it was never working, and its moved to client cert auth
+- dcf43853 upgrade prom/alertmanager and grafana version in prom-linuxaid helm chart
+- e6c69984 [FEAT] add netpol template to fluentbit
+- 730161c0 changed the alert expr for arogcd-app which are unhealthy and outofsync
+- f1e1a7d6 removed .gitignore from the kubeaid list and fixed metadata.name for promrule and added a default project
+- 2973d15b added support for monitoring oosync apps of argocd, for now only kubeaid apps
+- 16945fb8 removed puppetserver image and tag and let it come from upstream default values file
+- 0f3414e4 removed mastersfor ingressroute for puppetserver, since we cant generate new CA cert, if new customer/users comes up. otherwise we will have re-gen all the cert of the puppet agent, which is not feasible
+- 70d0b5c3 fixed puppetserver values file to be more generic
+- 70c04e7c changed the cron time for puppet git pull
+- dd69e2ca Installing tzinfo-data to puppet server
+- cc87bbec fixed the puppetserver helm chart bug when mounting eyaml
+- 3711dd68 added an empty value for ingressrotue for puppetserver
+- 468c7076 fix: handle puppet agent for user which has few puppet agent
+- 2b6dee6d removed prometheus report setting, since its not setup entirely
+- c6a9b090 added a custom gem to be installed, need by one of the puppet function on linuxaid
+- 0207de09 added node_terminus setting in puppet server section
+- 43ef8c98 fixed the customentrypoints bug in values file for puppetserver
+- 3a1d5010 added enc support and updated readme as well
+- 7f02e48e removed options from ingressroutetcp as its not wanted
+- fda279cd fixed the autosign path for puppetserver
+- 8ed24a46 added autosign script puppetserver
+- 3d92261b migrated the ingressroute to ingressroutetcp and removed options as per the tcp spec
+- af1ff6c7 changed the object name from ingressroute to ingressroutetcp
+- 16a606ea added passthrough and remove certresolver, since we dont need it
+- fde8302d added ingressroute and disabled ingress
+- 7d742f78 Fix providers and upgrad vpc module
+- 76b51ba3 update helm-repo-update script with logging in changelog, auto tag bumping according to helm charts being updated and update commit structure
+- 0edee695 doc: updated readme and an example netrc file
+- f8f23501 lets not run r10k as sidecar, to avoid multiple container for it and fixed the r10k spec issue, entered in the wrong place
+- 967e92d8 added puppeturl and secret to access the puppet git repo
+- a0bf9874 wip
+- a553cce0 fixed the ingress alignment
+- 2e5db425 fix: fixed the env and secret name as per new object name for puppetserver
+- 86a3774a fix: added namespace support to postgresql puppetserver
+- 334bfb84 fixes:
+
 ## 1.2.0
 ### Minor Changes
 - Updated opensearch-dashboards from version 2.19.1 to 2.20.0
