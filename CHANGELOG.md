@@ -18,6 +18,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cerebro from version 2.0.5 to 2.1.0
 
 ### Patch Changes %%^^
+- Updated redmine from version 29.0.3 to 29.0.4
 - Updated rabbitmq-cluster-operator from version 4.3.18 to 4.3.19
 - Updated mattermost-team-edition from version 6.6.60 to 6.6.61
 - Updated keda from version 2.15.0 to 2.15.1
