@@ -9,6 +9,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cerebro from version 2.0.5 to 2.1.0
 
 ### Patch Changes %%^^
+- Updated external-dns from version 8.3.4 to 8.3.5
 - Updated cilium from version 1.16.0 to 1.16.1
 - Updated cert-manager from version v1.15.2 to v1.15.3
 - Updated argo-cd from version 7.4.2 to 7.4.5
