@@ -8,6 +8,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cerebro from version 2.0.5 to 2.1.0
 
 ### Patch Changes %%^^
+- Updated cert-manager from version v1.15.2 to v1.15.3
 - Updated argo-cd from version 7.4.2 to 7.4.5
 
 ### KubeAid Improvements
