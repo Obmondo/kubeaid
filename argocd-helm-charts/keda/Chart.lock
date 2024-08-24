@@ -1,6 +1,6 @@
 dependencies:
 - name: keda
   repository: https://kedacore.github.io/charts
-  version: 2.15.0
-digest: sha256:71177d31fe8ce96fd58980f0a68d55118cc7a87d076a284cb8de8229438d2f15
-generated: "2024-08-07T23:48:59.793520658+05:30"
+  version: 2.15.1
+digest: sha256:9ed7383ee6c030460812d2426de242a900c1080015455e8de52100c63624524f
+generated: "2024-08-23T23:52:59.861115242+05:30"

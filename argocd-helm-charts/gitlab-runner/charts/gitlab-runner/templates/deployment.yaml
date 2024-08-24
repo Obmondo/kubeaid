@@ -85,6 +85,9 @@ spec:
           periodSeconds: {{ default 10 .Values.livenessProbe.periodSeconds }}
           successThreshold: {{ default 1 .Values.livenessProbe.successThreshold }}
           failureThreshold: {{ default 3 .Values.livenessProbe.failureThreshold }}
+          {{- if .Values.livenessProbe.terminationGracePeriodSeconds }}
+          terminationGracePeriodSeconds: {{ .Values.livenessProbe.terminationGracePeriodSeconds }}
+          {{- end }}
         readinessProbe:
           exec:
             command: ["/usr/bin/pgrep","gitlab.*runner"]
