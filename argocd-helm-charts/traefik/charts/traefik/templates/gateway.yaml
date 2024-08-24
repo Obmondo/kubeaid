@@ -19,6 +19,9 @@ spec:
   listeners:
     {{- range $name, $config := .Values.gateway.listeners }}
     - name: {{ $name }}
+      {{ if not .port }}
+        {{- fail "ERROR: port needs to be specified" }}
+      {{- end -}}
       {{ $found := false }}
       {{- range $portName, $portConfig := $.Values.ports -}}
         {{- if eq $portConfig.port $config.port -}}
@@ -31,12 +34,15 @@ spec:
       port: {{ .port }}
       protocol: {{ .protocol }}
       {{- with .hostname }}
-      hostname: {{ . }}
+      hostname: {{ . | toYaml }}
       {{- end }}
       {{- with .namespacePolicy }}
       allowedRoutes:
         namespaces:
           from: {{ . }}
+      {{- end }}
+      {{ if and (eq .protocol  "HTTPS") (not .certificateRefs) }}
+        {{- fail "ERROR: certificateRefs needs to be specified using HTTPS" }}
       {{- end }}
       {{ if or .certificateRefs .mode }}
       tls:

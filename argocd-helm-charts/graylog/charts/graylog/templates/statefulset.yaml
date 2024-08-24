@@ -264,8 +264,10 @@ spec:
 {{- if not .Values.graylog.persistence.enabled }}
         - name: journal
           emptyDir: {}
-{{- else }}
+{{- end }}
+{{- if or .Values.graylog.persistence.enabled .Values.graylog.extraVolumeClaimTemplates }}
   volumeClaimTemplates:
+    {{- if .Values.graylog.persistence.enabled }}
     - metadata:
         name: journal
       spec:
@@ -281,4 +283,8 @@ spec:
         resources:
           requests:
             storage: "{{ .Values.graylog.persistence.size }}"
+    {{- end }}
+    {{- if .Values.graylog.extraVolumeClaimTemplates }}
+    {{ toYaml .Values.graylog.extraVolumeClaimTemplates | nindent 4 }}
+    {{- end }}
 {{- end }}
