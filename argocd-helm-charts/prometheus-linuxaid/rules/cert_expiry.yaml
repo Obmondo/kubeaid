@@ -3,11 +3,11 @@ groups:
     rules:
     - alert: monitor::domains::cert_expiry
       expr: |
-        probe_ssl_earliest_cert_expiry - time() < ignoring(instance, job, pushprox_target) 86400 * threshold::monitor::domains::cert_expiry_days
+        probe_ssl_earliest_cert_expiry - time() < on (certname, domain) 86400 * threshold::monitor::domains::cert_expiry_days
         and on(certname) obmondo_monitoring{alert_id="monitor::domains::cert_expiry"} > 0
       labels:
         severity: critical
         alert_id: monitor::domains::cert_expiry
       annotations:
         summary: "SSL certificate will expire soon for domain **{{ $labels.domain }}**"
-        description: SSL Certificate which is on {{ $labels.certname }} expires in {{ .Value | humanizeDuration }}
+        description: Blackbox exporter on {{ $labels.certname }}, domain {{ $labels.domain }} certificate expires in {{ .Value | humanizeDuration }}
