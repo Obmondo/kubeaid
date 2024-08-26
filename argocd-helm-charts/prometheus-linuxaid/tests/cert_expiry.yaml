@@ -7,17 +7,17 @@ rule_files:
 tests:
   - interval: 1d
     input_series:
-      - series: obmondo_monitoring{certname="jaina.enableit", alert_id="monitor::domains::cert_expiry"}
+      - series: obmondo_monitoring{certname="dev01.example", alert_id="monitor::domains::cert_expiry"}
         values: 1x1000
-      - series: probe_ssl_earliest_cert_expiry{domain="obmondo.com",certname="jaina.enableit"}
+      - series: probe_ssl_earliest_cert_expiry{domain="example.com",certname="dev01.example"}
         values: 1036800x100       # Tuesday, January 13, 1970 12:00:00 AM
-      - series: threshold::monitor::domains::cert_expiry_days{domain="obmondo.com",certname="jaina.enableit"}
+      - series: threshold::monitor::domains::cert_expiry_days{domain="example.com",certname="dev01.example"}
         values: 10x100            # Alert before 10 days
-      - series: obmondo_monitoring{certname="jacen.enableit", alert_id="monitor::domains::cert_expiry"}
+      - series: obmondo_monitoring{certname="dev02.example", alert_id="monitor::domains::cert_expiry"}
         values: 0x1000
-      - series: probe_ssl_earliest_cert_expiry{domain="obmondo.com",certname="jacen.enableit"}
+      - series: probe_ssl_earliest_cert_expiry{domain="example.com",certname="dev02.example"}
         values: 1036800x100       # Tuesday, January 13, 1970 12:00:00 AM
-      - series: threshold::monitor::domains::cert_expiry_days{domain="obmondo.com",certname="jacen.enableit"}
+      - series: threshold::monitor::domains::cert_expiry_days{domain="example.com",certname="dev02.example"}
         values: 10x100            # Alert before 10 days
 
     alert_rule_test:
@@ -26,12 +26,12 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: critical
-              certname: jaina.enableit
+              certname: dev01.example
               alert_id: monitor::domains::cert_expiry
-              domain: obmondo.com
+              domain: example.com
             exp_annotations:
-              summary: "SSL certificate will expire soon for domain **obmondo.com**"
-              description: SSL Certificate which is on jaina.enableit expires in 4d 0h 0m 0s
+              summary: "SSL certificate will expire soon for domain **example.com**"
+              description: Blackbox exporter on dev01.example, domain example.com certificate expires in 4d 0h 0m 0s
       # certificate still has more then 11 days to expire, and we alert if its
       # less then 10 days (given by threshold)
       - alertname: monitor::domains::cert_expiry
