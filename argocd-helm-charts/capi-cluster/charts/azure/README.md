@@ -55,6 +55,14 @@ global:
     subnet:
       name: controlplan-subnet
       cidrBlock: "10.1.1.0/24"
+managedCluster: false
+selfManagedCluster:
+  enabled: true
+  clientSecret:
+    ControlplanSecret: test-control-plane-azure-json
+    workerNodeAzure: test-md-0-azure-json
+    localHostname: '{{ ds.meta_data["local_hostname"] }}'
+  apiLoadbalancer: Public
 
 systemPool:
   osDiskSizeGB: 30
