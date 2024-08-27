@@ -23,6 +23,17 @@ az ad sp create-for-rbac --role Contributor --scopes="/subscriptions/${AZURE_SUB
 ```sh
 kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
 ```
+### Create Kubernetes Secret for controlplan
+
+```sh
+kubectl create secret generic "${CONTROL_NAME_JSON}" --from-file sp.json -n capz-system
+```
+
+### Create Kubernetes Secret for workernode
+
+```sh
+kubectl create secret generic "${WORKER_NAME_JSON}" --from-file sp.json -n capz-system
+```
 
 ### Values Configuration
 
