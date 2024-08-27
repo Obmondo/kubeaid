@@ -1,4 +1,5 @@
-{{- if .Values.managedCluster }}
+# for testing
+{{- if .Values.selfManagedCluster.enabled }}
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: Cluster
 metadata:
@@ -6,15 +7,15 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   clusterNetwork:
-    services:
+    pods:
       cidrBlocks:
-      - {{ .Values.global.clusterNetwork.services.cidrBlocks }}
+        - {{ .Values.global.clusterNetwork.pod.cidrBlocks }}
   controlPlaneRef:
-    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
-    kind: AzureManagedControlPlane
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: KubeadmControlPlane
     name: {{ .Values.global.clusterName }}-control-plane
   infrastructureRef:
     apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
-    kind: AzureManagedCluster
+    kind: AzureCluster
     name: {{ .Values.global.clusterName }}
 {{- end }}

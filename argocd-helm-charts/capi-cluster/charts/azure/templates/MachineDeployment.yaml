@@ -1,0 +1,80 @@
+{{- if .Values.selfManagedCluster.enabled }}
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: {{ .Values.global.clusterName }}-md-0
+  namespace: {{ .Release.Namespace }}
+spec:
+  clusterName: {{ .Values.global.clusterName }}
+  replicas: 1
+  selector:
+    matchLabels: null
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KubeadmConfigTemplate
+          name: {{ .Values.global.clusterName }}-md-0
+      clusterName: {{ .Values.global.clusterName }}
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AzureMachineTemplate
+        name: {{ .Values.global.clusterName }}-system
+      version: {{ .Values.global.kubernetes.version }}
+      failureDomain: "1"
+{{- end }}
+---
+{{- if .Values.selfManagedCluster.enabled }}
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: {{ .Values.global.clusterName }}-md-1
+  namespace: {{ .Release.Namespace }}
+spec:
+  clusterName: {{ .Values.global.clusterName }}
+  replicas: 1
+  selector:
+    matchLabels: null
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KubeadmConfigTemplate
+          name: {{ .Values.global.clusterName }}-md-0
+      clusterName: {{ .Values.global.clusterName }}
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AzureMachineTemplate
+        name: {{ .Values.global.clusterName }}-system
+      version: {{ .Values.global.kubernetes.version }}
+      failureDomain: "2"
+{{- end }}
+---
+{{- if .Values.selfManagedCluster.enabled }}
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: {{ .Values.global.clusterName }}-md-2
+  namespace: {{ .Release.Namespace }}
+spec:
+  clusterName: {{ .Values.global.clusterName }}
+  replicas: 1
+  selector:
+    matchLabels: null
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KubeadmConfigTemplate
+          name: {{ .Values.global.clusterName }}-md-0
+      clusterName: {{ .Values.global.clusterName }}
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AzureMachineTemplate
+        name: {{ .Values.global.clusterName }}-system
+      version: {{ .Values.global.kubernetes.version }}
+      failureDomain: "3"
+{{- end }}
