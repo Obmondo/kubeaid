@@ -12,3 +12,7 @@ dependencies:
     version: 1.0.0
     repository: 'file://charts/aws'
     condition: provider.aws
+  - name: azure
+    version: 1.0.0
+    repository: 'file://charts/azure'
+    condition: provider.azure
