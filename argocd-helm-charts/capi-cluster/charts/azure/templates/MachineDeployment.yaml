@@ -1,0 +1,29 @@
+{{- if .Values.selfManagedCluster.enabled }}
+{{- $global := . }}
+{{- range $index, $element := until 3 }}
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: {{ $global.Values.global.clusterName }}-md-{{ $index }}
+  namespace: {{ $global.Release.Namespace }}
+spec:
+  clusterName: {{ $global.Values.global.clusterName }}
+  replicas: 1
+  selector:
+    matchLabels: null
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KubeadmConfigTemplate
+          name: {{ $global.Values.global.clusterName }}-md-0
+      clusterName: {{ $global.Values.global.clusterName }}
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AzureMachineTemplate
+        name: {{ $global.Values.global.clusterName }}-system
+      version: {{ $global.Values.global.kubernetes.version }}
+      failureDomain: "{{ add $index 1 }}"
+{{- end }}
+{{- end }}

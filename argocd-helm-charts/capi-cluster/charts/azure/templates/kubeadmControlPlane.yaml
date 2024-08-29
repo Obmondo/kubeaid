@@ -1,0 +1,70 @@
+{{- if .Values.selfManagedCluster.enabled }}
+# for testing need to update
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: KubeadmControlPlane
+metadata:
+  name: {{ .Values.global.clusterName }}-control-plane
+  namespace: {{ .Release.Namespace }}
+spec:
+  kubeadmConfigSpec:
+    clusterConfiguration:
+      apiServer:
+        extraArgs:
+          cloud-provider: external
+        timeoutForControlPlane: 20m
+      controllerManager:
+        extraArgs:
+          allocate-node-cidrs: "true"
+          cloud-provider: external
+          cluster-name: {{ .Values.global.clusterName }}
+      etcd:
+        local:
+          dataDir: /var/lib/etcddisk/etcd
+          extraArgs:
+            quota-backend-bytes: "8589934592"
+    diskSetup:
+      filesystems:
+      - device: /dev/disk/azure/scsi1/lun0
+        extraOpts:
+        - -E
+        - lazy_itable_init=1,lazy_journal_init=1
+        filesystem: ext4
+        label: etcd_disk
+      - device: ephemeral0.1
+        filesystem: ext4
+        label: ephemeral0
+        replaceFS: ntfs
+      partitions:
+      - device: /dev/disk/azure/scsi1/lun0
+        layout: true
+        overwrite: false
+        tableType: gpt
+    files:
+    - contentFrom:
+        secret:
+          key: sp.json
+          name: {{ .Values.selfManagedCluster.clientSecret.ControlplanSecret }}
+      owner: root:root
+      path: /etc/kubernetes/azure.json
+      permissions: "0644"
+    initConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          cloud-provider: external
+        name: {{ .Values.selfManagedCluster.localHostname }}
+    joinConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          cloud-provider: external
+        name: {{ .Values.selfManagedCluster.localHostname }}
+    mounts:
+    - - LABEL=etcd_disk
+      - /var/lib/etcddisk
+  machineTemplate:
+    infrastructureRef:
+      apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+      kind: AzureMachineTemplate
+      name: {{ .Values.global.clusterName }}-system
+  replicas: 1
+  version: {{ .Values.global.kubernetes.version }}
+{{- end }}
