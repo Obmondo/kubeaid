@@ -1,12 +1,13 @@
 {{- if .Values.selfManagedCluster.enabled }}
+{{- $global := . }}  # Capture the global context
 {{- range $index, $element := until 3 }}
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachineDeployment
 metadata:
-  name: {{ .Values.global.clusterName }}-md-{{ $index }}
-  namespace: {{ .Release.Namespace }}
+  name: {{ $global.Values.global.clusterName }}-md-{{ $index }}
+  namespace: {{ $global.Release.Namespace }}
 spec:
-  clusterName: {{ .Values.global.clusterName }}
+  clusterName: {{ $global.Values.global.clusterName }}
   replicas: 1
   selector:
     matchLabels: null
@@ -16,13 +17,13 @@ spec:
         configRef:
           apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
           kind: KubeadmConfigTemplate
-          name: {{ .Values.global.clusterName }}-md-0
-      clusterName: {{ .Values.global.clusterName }}
+          name: {{ $global.Values.global.clusterName }}-md-0
+      clusterName: {{ $global.Values.global.clusterName }}
       infrastructureRef:
         apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
         kind: AzureMachineTemplate
-        name: {{ .Values.global.clusterName }}-system
-      version: {{ .Values.global.kubernetes.version }}
+        name: {{ $global.Values.global.clusterName }}-system
+      version: {{ $global.Values.global.kubernetes.version }}
       failureDomain: "{{ add $index 1 }}"
 {{- end }}
 {{- end }}
