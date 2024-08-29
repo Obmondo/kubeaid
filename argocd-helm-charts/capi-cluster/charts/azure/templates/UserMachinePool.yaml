@@ -1,3 +1,4 @@
+{{- if .Values.managedCluster }}
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachinePool
 metadata:
@@ -17,3 +18,4 @@ spec:
       version: {{ .Values.global.kubernetes.version }}
       bootstrap:
         dataSecretName: {{ .Values.global.clientSecret}}
+{{- end }}

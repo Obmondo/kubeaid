@@ -23,6 +23,17 @@ az ad sp create-for-rbac --role Contributor --scopes="/subscriptions/${AZURE_SUB
 ```sh
 kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
 ```
+### Create Kubernetes Secret for controlplan
+
+```sh
+kubectl create secret generic "${CONTROL_NAME_JSON}" --from-file sp.json -n capz-system
+```
+
+### Create Kubernetes Secret for workernode
+
+```sh
+kubectl create secret generic "${WORKER_NAME_JSON}" --from-file sp.json -n capz-system
+```
 
 ### Values Configuration
 
@@ -55,6 +66,14 @@ global:
     subnet:
       name: controlplan-subnet
       cidrBlock: "10.1.1.0/24"
+managedCluster: false
+selfManagedCluster:
+  enabled: true
+  clientSecret:
+    ControlplanSecret: test-control-plane-azure-json
+    workerNodeAzure: test-md-0-azure-json
+    localHostname: '{{ ds.meta_data["local_hostname"] }}'
+  apiLoadbalancer: Public
 
 systemPool:
   osDiskSizeGB: 30

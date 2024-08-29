@@ -1,0 +1,32 @@
+{{- if .Values.selfManagedCluster.enabled }}
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureMachineTemplate
+metadata:
+  name: {{ .Values.global.clusterName }}-system
+  namespace: {{ .Release.Namespace }}
+spec:
+  template:
+    spec:
+      vmSize: {{ .Values.systemPool.sku }}
+      osDisk:
+        diskSizeGB: {{ .Values.systemPool.osDiskSizeGB }}
+        osType: Linux
+      sshPublicKey: {{ .Values.sshPublicKey | b64enc }}
+{{- end }}
+---
+{{- if .Values.selfManagedCluster.enabled }}
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureMachineTemplate
+metadata:
+  name: {{ .Values.global.clusterName }}-user
+  namespace: {{ .Release.Namespace }}
+spec:
+  template:
+    spec:
+      vmSize: {{ .Values.userPool.sku }}
+      osDisk:
+        diskSizeGB: {{ .Values.userPool.osDiskSizeGB }}
+        osType: Linux
+      sshPublicKey: {{ .Values.sshPublicKey | b64enc }}
+{{- end }}
+---

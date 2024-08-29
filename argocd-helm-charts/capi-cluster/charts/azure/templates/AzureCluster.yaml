@@ -1,0 +1,41 @@
+{{- if .Values.selfManagedCluster.enabled }}
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureCluster
+metadata:
+  name: {{ .Values.global.clusterName }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  location: {{ .Values.location }}
+  resourceGroup: {{ .Values.resourceGroup }}
+  subscriptionID: {{ .Values.subscriptionID }}
+  identityRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: AzureClusterIdentity
+    name: {{ .Values.global.clusterName }}-cluster-identity
+  bastionSpec:
+    azureBastion:
+      enableTunneling: true
+      name: bastion
+      publicIP:
+        name: bastion
+      sku: Standard
+      subnet: 
+        name: AzureBastionSubnet
+
+  networkSpec:
+    apiServerLB:
+      type: {{ .Values.selfManagedCluster.apiLoadbalancer }}
+    vnet:
+      name: {{ .Values.global.virtualNetwork.name }}
+      {{- if ne .Values.global.virtualNetwork.cidrBlock "" }}
+      cidrBlocks:
+        - {{ .Values.global.virtualNetwork.cidrBlock | toString }}
+      {{- end }}
+    subnets:
+      - name: {{ .Values.global.virtualNetwork.subnet.name }}
+        role: node
+        {{- if ne .Values.global.virtualNetwork.subnet.cidrBlock "" }}
+        cidrBlocks:
+          - {{ .Values.global.virtualNetwork.subnet.cidrBlock | toString }}
+        {{- end }}
+{{- end }}
