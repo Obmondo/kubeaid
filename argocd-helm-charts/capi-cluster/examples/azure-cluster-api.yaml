@@ -1,0 +1,49 @@
+global:
+  networkPolicy: azure # or calico
+  networkPlugin: azure # or kubenet
+  skuTier: Free
+  clientSecret: mysecret
+  clientID: 25978a8c-3db8-4481-9d0c-b516e6e0cf4c
+  tenantID: 3964984e-eaaf-4ac4-b3ff-b3cda81256ff
+  addonProfiles:
+    - name: azureKeyvaultSecretsProvider
+      enabled: true
+    - name: azurepolicy
+      enabled: true
+  clusterNetwork:
+    pod: 
+      cidrBlocks: 192.168.0.0/16
+    services:
+      cidrBlocks: "10.96.0.0/12"
+  virtualNetwork: 
+    name: controlplan-vnet
+    cidrBlock: "10.1.0.0/16"
+    subnet:
+      name: controlplan-subnet
+      cidrBlock: "10.1.1.0/24"
+
+managedCluster: false
+selfManagedCluster:
+  enabled: true
+  clientSecret:
+    ControlplanSecret: test-control-plane-azure-json
+    workerNodeAzure: test-md-0-azure-json
+    localHostname: '{{ ds.meta_data["local_hostname"] }}'
+  apiLoadbalancer: Public
+
+systemPool:
+  osDiskSizeGB: 30
+  sku: Standard_D2_v3
+  replica: 1
+
+userPool:
+  osDiskSizeGB: 30
+  sku: Standard_D2_v3
+  replica: 1
+
+location: centralindia
+resourceGroupName: cluster-api
+sshPublicKey: "ssh-rsa "
+subscriptionID: cce2e9ac-1580-4d82-b79f-a637f5f3e443
+additionalTags:
+  environment: dev
