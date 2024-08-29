@@ -1,6 +1,6 @@
 global:
-  networkPolicy: azure # or calico
-  networkPlugin: azure # or kubenet
+  networkPolicy: azure  # or calico
+  networkPlugin: azure  # or kubenet
   skuTier: Free
   clientSecret: mysecret
   clientID: 25978a8c-3db8-4481-9d0c-b516e6e0cf4c
@@ -11,11 +11,11 @@ global:
     - name: azurepolicy
       enabled: true
   clusterNetwork:
-    pod: 
+    pod:
       cidrBlocks: 192.168.0.0/16
     services:
       cidrBlocks: "10.96.0.0/12"
-  virtualNetwork: 
+  virtualNetwork:
     name: controlplan-vnet
     cidrBlock: "10.1.0.0/16"
     subnet:
