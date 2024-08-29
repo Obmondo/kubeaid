@@ -1,5 +1,5 @@
 {{- if .Values.selfManagedCluster.enabled }}
-{{- $global := . }}  # Capture the global context
+{{- $global := . }}
 {{- range $index, $element := until 3 }}
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachineDeployment
