@@ -2,9 +2,11 @@ global:
   clusterName: staging.enableit.dev
   customerid: enableit
   kubernetes:
-    version: v1.28.3
+    version: v1.30.4
   clusterAPI:
     version: v1.7.2
+  caph:
+    version: v1.0.0-beta.42
   kubeaid:
     repo: https://github.com/Obmondo/kubeaid.git
   kubeaidConfig:
