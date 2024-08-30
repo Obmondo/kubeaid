@@ -6,7 +6,7 @@ global:
   clusterAPI:
     version: v1.7.2
   caph:
-    version: v1.0.0-beta.42
+    version: v1.0.0-beta.43
   kubeaid:
     repo: https://github.com/Obmondo/kubeaid.git
   kubeaidConfig:
