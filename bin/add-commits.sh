@@ -16,7 +16,7 @@ formatted_commit_log=$(echo "$commit_log" | awk '{print "- " $0}') # to keep sha
 # Create a temporary file for the formatted commit log
 temp_file="temp.md"
 {
-  echo "### KubeAid Improvements"
+  echo "### Improvements"
   echo "$formatted_commit_log"
   echo ""
 } > "$temp_file"
