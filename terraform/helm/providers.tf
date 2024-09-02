@@ -2,29 +2,23 @@ terraform {
   required_providers {
     argocd = {
       source = "oboukili/argocd"
-      version = "6.0.3"
+      version = "6.1.1"
     }
     kubernetes = {
       source = "hashicorp/kubernetes"
-      version = "2.23.0"
+      version = "2.32.0"
     }
   }
 }
 
 provider "helm" {
   kubernetes {
-    host                   = var.k8s_host
-    client_certificate     = base64decode(var.k8s_client_certificate)
-    client_key             = base64decode(var.k8s_client_key)
-    cluster_ca_certificate = base64decode(var.k8s_cluster_ca_certificate)
+    config_path = "~/.kube/config"
   }
 }
 
 provider kubernetes {
-  host                   = var.k8s_host
-  client_certificate     = base64decode(var.k8s_client_certificate)
-  client_key             = base64decode(var.k8s_client_key)
-  cluster_ca_certificate = base64decode(var.k8s_cluster_ca_certificate)
+  config_path    = "~/.kube/config"
 }
 
 data "kubernetes_secret" "argocd_admin_password" {
@@ -43,9 +37,6 @@ provider "argocd" {
   port_forward_with_namespace = "argocd"
 
   kubernetes {
-    host                   = var.k8s_host
-    client_certificate     = base64decode(var.k8s_client_certificate)
-    client_key             = base64decode(var.k8s_client_key)
-    cluster_ca_certificate = base64decode(var.k8s_cluster_ca_certificate)
+    config_context = var.cluster_name
   }
 }
