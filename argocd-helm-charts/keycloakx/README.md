@@ -328,6 +328,42 @@ we can make the login flow faster, by setting it as default:
   NOTE: `admin` role is quite powerful, so be cautious about this when assigning this role and
   its only available in `master` realm
 
+## Keycloak custom login page
+
+* Create a new folder, named login, inside the `themes/custom` directory. To keep things simple, we’ll first copy all
+  the contents of the
+    [themes/keycloak/login](https://github.com/keycloak/keycloak/tree/main/themes/src/main/resources/theme/keycloak/login)
+     directory.
+* Change `login/resources/img/keycloak-logo-text.png` to your own logo.
+* For more customizations refer [here](https://www.keycloak.org/docs/latest/server_development/index.html#creating-a-theme)
+* Build and push the image to any image registry.
+* In the value files add the following
+  
+  ```yaml
+          extraInitContainers: |
+            - name: custom-theme-provider
+              image: <image>
+              imagePullPolicy: IfNotPresent
+              command:
+                - sh
+              args:
+                - -c
+                - |
+                  echo "Copying theme..."
+                  cp -R /custom/* /theme
+              volumeMounts:
+                - name: theme
+                  mountPath: /theme        
+          extraVolumeMounts: |
+            - name: theme
+              mountPath: /opt/keycloak/themes/bw7    
+          extraVolumes: |
+            - name: theme
+              emptyDir: {} 
+  ```
+
+* Apply the changes and you should see the custom login page.
+
 ## Troubleshooting
 
 * Remove all cache session and run all the steps in the Setup the client.
