@@ -2,7 +2,7 @@
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
 ## 1.3.0
-### Minor Changes
+### Minor Version Upgrades
 - Updated traefik from version 30.0.2 to 30.1.0
 - Updated rook-ceph-cluster from version v1.14.9 to v1.15.0
 - Updated rook-ceph from version v1.14.9 to v1.15.0
@@ -18,7 +18,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cloudnative-pg from version 0.21.6 to 0.22.0
 - Updated cerebro from version 2.0.5 to 2.1.0
 
-### Patch Changes
+### Patch Version Upgrades
 - Updated velero from version 7.1.4 to 7.1.5
 - Updated teleport-kube-agent from version 16.1.4 to 16.1.7
 - Updated teleport-cluster from version 16.1.4 to 16.1.7
@@ -33,7 +33,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cert-manager from version v1.15.2 to v1.15.3
 - Updated argo-cd from version 7.4.2 to 7.4.5
 
-### KubeAid Improvements
+### Improvements
 - f931fffe updated the prometheus metrics alert to handle boot time as well
 - 44a0e0ec Add add-commit bash script and call it in helm-repo-update script and update CHANGELOG with commits as per new standard
 - a3293137 refactor: Update TCP ingress route for puppetdb to use new domain name
@@ -85,12 +85,12 @@ All releases and the changes included in them (pulled from git commits added sin
 - 334bfb84 fixes:
 
 ## 1.2.0
-### Minor Changes
+### Minor Version Upgrades
 - Updated opensearch-dashboards from version 2.19.1 to 2.20.0
 - Updated opensearch from version 2.21.0 to 2.22.0
 - Updated community-operator from version 0.10.0 to 0.11.0
 
-### Patch Changes
+### Patch Version Upgrades
 - Updated teleport-kube-agent from version 16.1.3 to 16.1.4
 - Updated teleport-cluster from version 16.1.3 to 16.1.4
 - Updated rabbitmq-cluster-operator from version 4.3.17 to 4.3.18
@@ -98,7 +98,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated aws-efs-csi-driver from version 3.0.7 to 3.0.8
 - Updated argo-cd from version 7.4.1 to 7.4.2
 
-### KubeAid Improvements
+### Improvements
 - ca279e10 Update changelog format
 - a553cce0 fixed the ingress alignment
 - c78a3a5b small spelling fix and add log delition and garbage collection history
@@ -115,12 +115,12 @@ All releases and the changes included in them (pulled from git commits added sin
 - 5c93bc15 setup matomo in k8s
 
 ## 1.1.0
-### Minor Changes
+### Minor Version Upgrades
 - Updated keda from version 2.14.2 to 2.15.0
 - Updated cluster-api-operator from version 0.11.0 to 0.12.0
 - Updated argo-cd from version 7.3.11 to 7.4.1
 
-### Patch Changes
+### Patch Version Upgrades
 - Updated teleport-kube-agent from version 16.1.0 to 16.1.3
 - Updated teleport-cluster from version 16.1.0 to 16.1.3
 - Updated reloader from version 1.0.119 to 1.0.121
@@ -131,12 +131,12 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated dokuwiki from version 16.2.10 to 16.2.11
 
 ## 1.0.0
-### Major Changes
+### Major Version Upgrades
 - Updated: matomo from version 7.3.7 to 8.0.5
 - Updated: redmine from version 28.2.7 to 29.0.3
 - Updated: traefik from version 29.0.0 to 30.0.2
 
-### Minor Changes
+### Minor Version Upgrades
 - Updated: aws-ebs-csi-driver from version 2.32.0 to 2.33.0
 - Updated: cilium from version 1.15.6 to 1.16.0
 - Updated: external-dns from version 8.1.0 to 8.3.3
@@ -144,7 +144,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated: gitlab-runner from version 0.66.0 to 0.67.1
 - Updated: opencost from version 1.40.0 to 1.41.0
 
-### Patch Changes
+### Patch Version Upgrades
 - Updated: argo-cd from version 7.3.4 to 7.3.11
 - Updated: aws-efs-csi-driver from version 3.0.6 to 3.0.7
 - Updated: cert-manager from version v1.15.1 to v1.15.2
