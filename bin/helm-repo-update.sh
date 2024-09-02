@@ -297,21 +297,21 @@ EOF
   # Check if the current date section exists
   if ! grep -q "^## $date" "$changelog_file"; then
     sed -i "/All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file./a\\\n## $date" CHANGELOG.md
-    sed -i "/$date/a\\### Patch Changes %%^^" CHANGELOG.md
-    sed -i "/$date/a\\### Minor Changes %%^^\n" CHANGELOG.md
-    sed -i "/$date/a\\### Major Changes %%^^\n" CHANGELOG.md
+    sed -i "/$date/a\\### Patch Version Upgrades %%^^" CHANGELOG.md
+    sed -i "/$date/a\\### Minor Version Upgrades %%^^\n" CHANGELOG.md
+    sed -i "/$date/a\\### Major Version Upgrades %%^^\n" CHANGELOG.md
   fi
 
   # Add the new entry under the appropriate section under the current date
   case "$change_type" in
     major)
-      sed -i "/### Major Changes %%^^/a\\- $message" "$changelog_file"
+      sed -i "/### Major Version Upgrades %%^^/a\\- $message" "$changelog_file"
       ;;
     minor)
-      sed -i "/### Minor Changes %%^^/a\\- $message" "$changelog_file"
+      sed -i "/### Minor Version Upgrades %%^^/a\\- $message" "$changelog_file"
       ;;
     patch)
-      sed -i "/### Patch Changes %%^^/a\\- $message" "$changelog_file"
+      sed -i "/### Patch Version Upgrades %%^^/a\\- $message" "$changelog_file"
       ;;
     *)
       echo "Invalid change type: $change_type"
@@ -389,16 +389,20 @@ if "$UPDATE_ALL"; then
     # Remove Chnages heading markers
     sed -i 's/ %%\^\^//g' CHANGELOG.md
     # Remove empty sections
-    sed -i '/### Major Changes/{N;/### Major Changes\n$/d;}' CHANGELOG.md
-    sed -i '/### Minor Changes/{N;/### Minor Changes\n$/d;}' CHANGELOG.md
-    sed -i '/### Patch Changes/{N;/### Patch Changes\n$/d;}' CHANGELOG.md
+    sed -i '/### Major Version Upgrades/{N;/### Major Version Upgrades\n$/d;}' CHANGELOG.md
+    sed -i '/### Minor Version Upgrades/{N;/### Minor Version Upgrades\n$/d;}' CHANGELOG.md
+    sed -i '/### Patch Version Upgrades/{N;/### Patch Version Upgrades\n$/d;}' CHANGELOG.md
 
     if $PULL_REQUEST; then
       git add CHANGELOG.md
       git commit -m "Update to new tag for Kubeaid"
     fi
   else
-    echo "The current date entry '$date' is not found in CHANGELOG.md"
+    bump_type="patch"
+    current_ver="$(get_current_version)"
+
+    new_ver="$(bump_version "$current_ver" "$bump_type")"
+    sed -i "0,/### Improvements/{s/### Improvements/## $new_ver\n### Improvements/}" CHANGELOG.md
   fi
 fi
 
