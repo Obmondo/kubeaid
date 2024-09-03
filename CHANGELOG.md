@@ -1,10 +1,8 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 2024-09-03
-### Major Version Upgrades %%^^
-
-### Minor Version Upgrades %%^^
+## 1.4.0
+### Minor Version Upgrades
 - Updated teleport-kube-agent from version 16.1.7 to 16.2.0
 - Updated teleport-cluster from version 16.1.7 to 16.2.0
 - Updated reloader from version 1.0.121 to 1.1.0
@@ -13,7 +11,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated aws-ebs-csi-driver from version 2.33.0 to 2.34.0
 - Updated argo-cd from version 7.4.5 to 7.5.2
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
 - Updated whoami from version 5.1.1 to 5.1.2
 - Updated rabbitmq-cluster-operator from version 4.3.19 to 4.3.21
 - Updated opensearch-dashboards from version 2.21.0 to 2.21.1
