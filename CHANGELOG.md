@@ -1,6 +1,55 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 1.4.0
+### Minor Version Upgrades
+- Updated teleport-kube-agent from version 16.1.7 to 16.2.0
+- Updated teleport-cluster from version 16.1.7 to 16.2.0
+- Updated reloader from version 1.0.121 to 1.1.0
+- Updated mariadb-operator from version 0.29.0 to 0.30.0
+- Updated crossplane from version 1.16.0 to 1.17.0
+- Updated aws-ebs-csi-driver from version 2.33.0 to 2.34.0
+- Updated argo-cd from version 7.4.5 to 7.5.2
+
+### Patch Version Upgrades
+- Updated whoami from version 5.1.1 to 5.1.2
+- Updated rabbitmq-cluster-operator from version 4.3.19 to 4.3.21
+- Updated opensearch-dashboards from version 2.21.0 to 2.21.1
+- Updated opensearch from version 2.23.0 to 2.23.1
+- Updated oncall from version 1.9.12 to 1.9.20
+- Updated mattermost-team-edition from version 6.6.61 to 6.6.62
+- Updated harbor from version 1.15.0 to 1.15.1
+
+### Improvements
+- a6d60f64 Update titles in CHANGELOG, script and add patch dump codition when no helm updates are available since last update
+- 5afabefd wiki for keycloak custom theme
+- ed933e77 install cni and ccm as a part of post kubadm commands since its needed for the other nodes to be provisioned
+- 9d5cf60c Update caph version
+- be13744c use ubuntu 24.04
+- ca8e8c8f :no-diff Add procedure for Traefik chart upgrade
+- 84dc17f2 Revert "Fixed the template to read the correct value for nodes"
+- 9476b6f5 Fixed the template to read the correct value for nodes
+- 85f033dd Update the version of k8s and caph
+- 3c192d85 fix: bumped the prometheus version in prom-linuxaid
+- 7146d88c Fixed lint
+- 5a1ce66e fixed machineDeployment SystemManagedMachiePool
+- ea3df458 fixed machineDeployment
+- c492a438 Added example value file
+- 81cdd6e8 Make default value of azure provider as false
+- 099ab8db Added loop for machinePool
+- a113f5cb Added loop for machineDeployment
+- 03274d7c Fixing value file
+- 85326b52 Updated readmefile
+- 3875c4b1 Updated readmefile
+- 16ae93c3 Added subchart info in chart.yaml
+- 9b9dedf2 Added SelfManaged azureClusterAPi
+- 6406970e fix: cert_expiry prom rule fixed in prom-linuxaid, since pushprox is depcrecated now
+- 9c22d854 Adding commented out code for Cilium NetKit support
+- 3ec5e9c3 Removing unnecessary ClusterAPI HelmChartProxy
+- 31bc6afa Updating CertManager version and enabling CertManager CRDs to be installed - in HelmChartProxy for ClusterAPI
+- d924b26c Adding Cilium specific CNI ingress rules in AWSCluster for ClusterAPI
+- a15d1f66 Updating Cilium version to 1.16.0 in ClusterAPI HelmChartProxy
+
 ## 1.3.0
 ### Minor Version Upgrades
 - Updated traefik from version 30.0.2 to 30.1.0

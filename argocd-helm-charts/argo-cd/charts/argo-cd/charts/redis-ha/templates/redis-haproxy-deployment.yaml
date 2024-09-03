@@ -49,6 +49,7 @@ spec:
       {{- else }}
       serviceAccountName: {{ .Values.haproxy.serviceAccountName }}
       {{- end }}
+      automountServiceAccountToken: {{ .Values.haproxy.serviceAccount.automountToken }}
       securityContext: {{ toYaml .Values.haproxy.securityContext | nindent 8 }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
@@ -178,9 +179,9 @@ spec:
 {{- end }}
         lifecycle:
 {{ toYaml .Values.haproxy.lifecycle | indent 10 }}
-{{- if .Values.haproxy.priorityClassName }}
-      priorityClassName: {{ .Values.haproxy.priorityClassName }}
-{{- end }}
+      {{- with .Values.haproxy.priorityClassName | default .Values.global.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       volumes:
 {{- if .Values.haproxy.tls.enabled }}
       - name: pemfile

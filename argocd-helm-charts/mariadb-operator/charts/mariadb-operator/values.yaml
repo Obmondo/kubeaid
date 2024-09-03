@@ -51,11 +51,19 @@ rbac:
   # -- Specifies whether RBAC resources should be created
   enabled: true
 
+  aggregation:
+
+    # -- Specifies whether the cluster roles aggrate to view and edit predefinied roles
+    enabled: true
+
 # -- Extra arguments to be passed to the controller entrypoint
 extrArgs: []
 
 # -- Extra environment variables to be passed to the controller
 extraEnv: []
+
+# -- Extra environment variables from preexiting ConfigMap / Secret objects used by the controller using envFrom
+extraEnvFrom: []
 
 # -- Extra volumes to pass to pod.
 extraVolumes: []
@@ -105,10 +113,12 @@ webhook:
       enabled: false
       # -- Issuer reference to be used in the Certificate resource. If not provided, a self-signed issuer will be used.
       issuerRef: {}
-       # -- Duration to be used in the Certificate resource,
+      # -- Duration to be used in the Certificate resource,
       duration: ""
-       # -- Renew before duration to be used in the Certificate resource.
+      # -- Renew before duration to be used in the Certificate resource.
       renewBefore: ""
+      # -- The maximum number of CertificateRequest revisions that are maintained in the Certificate’s history.
+      revisionHistoryLimit: 3
     # -- Annotatioms to be added to webhook TLS secret.
     secretAnnotations: {}
     # -- Labels to be added to webhook TLS secret.
