@@ -1,6 +1,36 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- a6d60f64 Update titles in CHANGELOG, script and add patch dump codition when no helm updates are available since last update
+- 5afabefd wiki for keycloak custom theme
+- ed933e77 install cni and ccm as a part of post kubadm commands since its needed for the other nodes to be provisioned
+- 9d5cf60c Update caph version
+- be13744c use ubuntu 24.04
+- ca8e8c8f :no-diff Add procedure for Traefik chart upgrade
+- 84dc17f2 Revert "Fixed the template to read the correct value for nodes"
+- 9476b6f5 Fixed the template to read the correct value for nodes
+- 85f033dd Update the version of k8s and caph
+- 3c192d85 fix: bumped the prometheus version in prom-linuxaid
+- 7146d88c Fixed lint
+- 5a1ce66e fixed machineDeployment SystemManagedMachiePool
+- ea3df458 fixed machineDeployment
+- c492a438 Added example value file
+- 81cdd6e8 Make default value of azure provider as false
+- 099ab8db Added loop for machinePool
+- a113f5cb Added loop for machineDeployment
+- 03274d7c Fixing value file
+- 85326b52 Updated readmefile
+- 3875c4b1 Updated readmefile
+- 16ae93c3 Added subchart info in chart.yaml
+- 9b9dedf2 Added SelfManaged azureClusterAPi
+- 6406970e fix: cert_expiry prom rule fixed in prom-linuxaid, since pushprox is depcrecated now
+- 9c22d854 Adding commented out code for Cilium NetKit support
+- 3ec5e9c3 Removing unnecessary ClusterAPI HelmChartProxy
+- 31bc6afa Updating CertManager version and enabling CertManager CRDs to be installed - in HelmChartProxy for ClusterAPI
+- d924b26c Adding Cilium specific CNI ingress rules in AWSCluster for ClusterAPI
+- a15d1f66 Updating Cilium version to 1.16.0 in ClusterAPI HelmChartProxy
+
 ## 1.3.0
 ### Minor Version Upgrades
 - Updated traefik from version 30.0.2 to 30.1.0
