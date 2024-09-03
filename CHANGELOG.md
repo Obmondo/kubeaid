@@ -11,6 +11,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated argo-cd from version 7.4.5 to 7.5.2
 
 ### Patch Version Upgrades %%^^
+- Updated mattermost-team-edition from version 6.6.61 to 6.6.62
 - Updated harbor from version 1.15.0 to 1.15.1
 
 ### Improvements
