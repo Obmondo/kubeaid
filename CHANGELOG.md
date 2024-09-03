@@ -11,6 +11,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated argo-cd from version 7.4.5 to 7.5.2
 
 ### Patch Version Upgrades %%^^
+- Updated opensearch-dashboards from version 2.21.0 to 2.21.1
 - Updated opensearch from version 2.23.0 to 2.23.1
 - Updated oncall from version 1.9.12 to 1.9.20
 - Updated mattermost-team-edition from version 6.6.61 to 6.6.62
