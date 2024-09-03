@@ -1,6 +1,14 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-09-03
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+- Updated argo-cd from version 7.4.5 to 7.5.2
+
+### Patch Version Upgrades %%^^
+
 ### Improvements
 - a6d60f64 Update titles in CHANGELOG, script and add patch dump codition when no helm updates are available since last update
 - 5afabefd wiki for keycloak custom theme

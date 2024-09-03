@@ -251,9 +251,17 @@ spec:
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command:
-        - redis-server
+        {{- if .Values.redis.customCommand }}
+{{ toYaml .Values.redis.customCommand | indent 10 }}
+        {{- else }}
+          - redis-server
+        {{- end }}
         args:
-        - /data/conf/redis.conf
+        {{- if .Values.redis.customArgs }}
+{{ toYaml .Values.redis.customArgs | indent 10 }}
+        {{- else }}
+          - /data/conf/redis.conf
+        {{- end }}
         securityContext: {{ toYaml .Values.containerSecurityContext | nindent 10 }}        
         {{- if .Values.auth }}
         env:
@@ -266,6 +274,10 @@ spec:
               name: {{ template "redis-ha.fullname" . }}
             {{- end }}
               key: {{ .Values.authKey }}
+        {{- end }}
+        {{- if .Values.redis.envFrom }}
+        envFrom:
+{{ toYaml .Values.redis.envFrom | indent 10 }}
         {{- end }}
         livenessProbe:
           initialDelaySeconds: {{ .Values.redis.livenessProbe.initialDelaySeconds }}
@@ -321,9 +333,17 @@ spec:
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command:
+        {{- if .Values.sentinel.customCommand }}
+{{ toYaml .Values.sentinel.customCommand | indent 10 }}
+        {{- else }}
           - redis-sentinel
+        {{- end }}
         args:
+        {{- if .Values.sentinel.customArgs }}
+{{ toYaml .Values.sentinel.customArgs | indent 10 }}
+        {{- else }}
           - /data/conf/sentinel.conf
+        {{- end }}
         securityContext: {{ toYaml .Values.containerSecurityContext | nindent 10 }}        
 {{- if or .Values.auth .Values.sentinel.auth}}
         env:
@@ -487,19 +507,9 @@ spec:
             value: /tls-certs/{{ .Values.tls.caCertFile }}
         {{- end }}
         livenessProbe:
-          httpGet:
-            path: {{ .Values.exporter.scrapePath }}
-            port: {{ .Values.exporter.port }}
-          initialDelaySeconds: {{ .Values.exporter.livenessProbe.initialDelaySeconds }}
-          timeoutSeconds: {{ .Values.exporter.livenessProbe.timeoutSeconds }}
-          periodSeconds: {{ .Values.exporter.livenessProbe.periodSeconds }}
+{{ toYaml .Values.exporter.livenessProbe | indent 10 }}
         readinessProbe:
-          httpGet:
-            path: {{ .Values.exporter.scrapePath }}
-            port: {{ .Values.exporter.port }}
-          initialDelaySeconds: {{ .Values.exporter.readinessProbe.initialDelaySeconds }}
-          timeoutSeconds: {{ .Values.exporter.readinessProbe.timeoutSeconds }}
-          periodSeconds: {{ .Values.exporter.readinessProbe.periodSeconds }}
+{{ toYaml .Values.exporter.readinessProbe | indent 10 }}
         resources:
 {{ toYaml .Values.exporter.resources | indent 10 }}
         ports:
@@ -518,9 +528,9 @@ spec:
 {{- if .Values.extraContainers }}
 {{- toYaml .Values.extraContainers | nindent 6 }}
 {{- end -}}
-{{- if .Values.priorityClassName }}
-      priorityClassName: {{ .Values.priorityClassName }}
-{{- end }}
+      {{- with .Values.priorityClassName | default .Values.global.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       volumes:
       - name: config
         configMap:
@@ -556,7 +566,9 @@ spec:
 {{- end -}}
 {{- if .Values.persistentVolume.enabled }}
   volumeClaimTemplates:
-  - metadata:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
       name: data
       annotations:
       {{- range $key, $value := .Values.persistentVolume.annotations }}
