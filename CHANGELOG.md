@@ -11,6 +11,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated argo-cd from version 7.4.5 to 7.5.2
 
 ### Patch Version Upgrades %%^^
+- Updated rabbitmq-cluster-operator from version 4.3.19 to 4.3.21
 - Updated opensearch-dashboards from version 2.21.0 to 2.21.1
 - Updated opensearch from version 2.23.0 to 2.23.1
 - Updated oncall from version 1.9.12 to 1.9.20
