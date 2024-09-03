@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated teleport-cluster from version 16.1.7 to 16.2.0
 - Updated reloader from version 1.0.121 to 1.1.0
 - Updated mariadb-operator from version 0.29.0 to 0.30.0
 - Updated crossplane from version 1.16.0 to 1.17.0
