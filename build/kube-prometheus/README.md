@@ -87,6 +87,9 @@ For upgrading to a new version of kube-prometheus, for example to `v0.12.0` - ch
 `kube_prometheus_version` variable in the jsonnet vars file of your kubernetes cluster config
 (example: `k8s/kbm.obmondo.com/kbm.obmondo.com-vars.jsonnet`) and run the build script again.
 
+If you want the latest version '74e445ae4a2582f978bae2e0e9b63024d7f759d6' commit changes, simply remove
+`kube_prometheus_version` variable from the jsonnet vars file. It'll automatically fetch all the updates.
+
 ```sh
 ./build/kube-prometheus/build.sh ../kubernetes-config-enableit/k8s/kbm.obmondo.com
 ```
