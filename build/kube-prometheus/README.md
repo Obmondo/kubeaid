@@ -77,7 +77,7 @@ INFO: compiling jsonnet files into '../kubernetes-config-enableit/k8s/kam.obmond
 
 ## Upgrading
 
-For upgrading vendor directories of existing versions (for example main),
+For upgrading vendor directories of existing versions, `update.sh` iterates over the versions present in `./build/kube-prometheus/libraries/`, and updates all other dependecies as per the `kubernetes-prometheus` tag/version.
 
 ```sh
 ./build/kube-prometheus/update.sh
@@ -87,21 +87,22 @@ For upgrading to a new version of kube-prometheus, for example to `v0.12.0` - ch
 `kube_prometheus_version` variable in the jsonnet vars file of your kubernetes cluster config
 (example: `k8s/kbm.obmondo.com/kbm.obmondo.com-vars.jsonnet`) and run the build script again.
 
-If you want the latest version '74e445ae4a2582f978bae2e0e9b63024d7f759d6' commit changes, simply remove
-`kube_prometheus_version` variable from the jsonnet vars file. It'll automatically fetch all the updates.
-
 ```sh
 ./build/kube-prometheus/build.sh ../kubernetes-config-enableit/k8s/kbm.obmondo.com
 ```
 
-Note that you have to clone kubernetes-config-enableit (or your equivalent repository) seperately.
+This script looks for the `kubernetes-prometheus` version/release tag in your kubernetes cluster config, and checks if the same version/release dir exists in KubeAid repo. If found, it builds manifests for your kubernetes cluster using those files.
 
-If a version is broken or its vendor dirs are messed up you can just delete the entire version folder and follow this process to add it again.
+If `kube_prometheus_version` variable isn't present in the jsonnet vars file, it'll set it to `74e445ae4a2582f978bae2e0e9b63024d7f759d6` commit by default. 
+
+Note that you have to clone `kubernetes-config-enableit` (or your equivalent repository) seperately.
 
 ## Cleaning up
 
+During the [Upgrading process](#upgrading) if you encounter error related to broken version dependencies, or the version/release vendor dirs are messed up, you can just delete the entire version dir and follow the [Upgrading process](#upgrading) again. This freshly fetches the version and its dependencies, and builds manifests in `kubernetes-config-enableit` (or your equivalent repository).
+
 ```sh
-rm -rf libraries/release-0.10/
+rm -rf ./build/kube-prometheus/libraries/v0.12.0/
 ```
 
 ## Prometheus operator options, set in common-template.jsonnet options
