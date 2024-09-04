@@ -14,7 +14,6 @@ global:
   capz:
     version: v1.16.0
 
-
 selfManged: false
 
 provider:
