@@ -111,10 +111,10 @@ fi
 outdir="${cluster_dir}/kube-prometheus"
 
 # NOTE: If 'kube_prometheus_version' isn't specified in the customer values file ($cluster_jsonnet),
-# then we're setting '74e445ae4a2582f978bae2e0e9b63024d7f759d6' as the default tag for it.
+# then we're setting 'main' as the default tag for it.
 # You can always specify it to get the specific version/tag build by specifying `kube_prometheus_version`
 # in the customer values file.
-kube_prometheus_release=$(jsonnet "${cluster_jsonnet}" | jq -e -r '.kube_prometheus_version // "74e445ae4a2582f978bae2e0e9b63024d7f759d6"')
+kube_prometheus_release=$(jsonnet "${cluster_jsonnet}" | jq -e -r '.kube_prometheus_version // "main"')
 if [[ -z "${kube_prometheus_release}" ]]; then
   echo "Unable to parse kube-prometheus version, please verify '${cluster_jsonnet}'"
   exit 3

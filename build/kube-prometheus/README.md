@@ -95,7 +95,7 @@ This script looks for the `kubernetes-prometheus` version/release tag in your ku
 
 If the mentioned version/release dir doesn't exists already (for eg: `main`), the script downloads it first, and then proceeds with the manifest building process. This way you can upgrade/downgrade with ease.
 
-If `kube_prometheus_version` variable isn't present in the jsonnet vars file, it'll set it to `74e445ae4a2582f978bae2e0e9b63024d7f759d6` commit by default. 
+If `kube_prometheus_version` variable isn't present in the jsonnet vars file, it'll set it to `main` by default. 
 
 Note that you have to clone your kubeaid-config git repository seperately.
 
