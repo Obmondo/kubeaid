@@ -1,5 +1,5 @@
 apiVersion: traefik.io/v1alpha1
-kind: Middleware
+kind: MiddlewareTCP
 metadata:
   name: middleware-{{ .Values.customerid }}
 spec:
