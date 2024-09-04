@@ -108,7 +108,7 @@
           "subdir": "common-lib"
         }
       },
-      "version": "f4f72ec792de41019e817b3d48840c622fc28951",
+      "version": "52be87fb93edc439b69b550acb893abb51a079c5",
       "sum": "tfvNQmtjIkqbgy7FU3FDy34OYoZhWskDCQanbiScaHU="
     },
     {
@@ -118,7 +118,7 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "f4f72ec792de41019e817b3d48840c622fc28951",
+      "version": "52be87fb93edc439b69b550acb893abb51a079c5",
       "sum": "yxqWcq/N3E/a/XreeU6EuE6X7kYPnG0AspAQFKOjASo="
     },
     {
@@ -128,7 +128,7 @@
           "subdir": "opensearch-mixin"
         }
       },
-      "version": "f4f72ec792de41019e817b3d48840c622fc28951",
+      "version": "52be87fb93edc439b69b550acb893abb51a079c5",
       "sum": "AK83KBy5roMxhT0taG54ERV20oG9mhaCJA+EHRzuPO4="
     },
     {
@@ -188,7 +188,7 @@
           "subdir": "jsonnet/kube-prometheus"
         }
       },
-      "version": "74e445ae4a2582f978bae2e0e9b63024d7f759d6",
+      "version": "97368beb47e520fef937d25b8efe45461ea9ac4f",
       "sum": "roigNXE23iQFFU6G8t7/SF+UKqG6zV9yQotiClXnkoM="
     },
     {
