@@ -97,7 +97,7 @@ If the mentioned version/release dir doesn't exists already (for eg: `main`), th
 
 If `kube_prometheus_version` variable isn't present in the jsonnet vars file, it'll set it to `74e445ae4a2582f978bae2e0e9b63024d7f759d6` commit by default. 
 
-Note that you have to clone your kubeaid-config git repository seperately. Normally it has `kubernetes-config-` prefix. For eg: `kubernetes-config-enableit`.
+Note that you have to clone your kubeaid-config git repository seperately.
 
 ## Cleaning up
 
