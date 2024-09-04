@@ -93,9 +93,11 @@ For upgrading to a new version of kube-prometheus, for example to `v0.12.0` - ch
 
 This script looks for the `kubernetes-prometheus` version/release tag in your kubernetes cluster config, and checks if the same version/release dir exists in KubeAid repo. If found, it builds manifests for your kubernetes cluster using those files.
 
+If the mentioned version/release dir doesn't exists already (for eg: `main`), the script downloads it first, and then proceeds with the manifest building process. This way you can upgrade/downgrade with ease.
+
 If `kube_prometheus_version` variable isn't present in the jsonnet vars file, it'll set it to `74e445ae4a2582f978bae2e0e9b63024d7f759d6` commit by default. 
 
-Note that you have to clone `kubernetes-config-enableit` (or your equivalent repository) seperately.
+Note that you have to clone your kubeaid-config git repository seperately. Normally it has `kubernetes-config-` prefix. For eg: `kubernetes-config-enableit`.
 
 ## Cleaning up
 
