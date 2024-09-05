@@ -48,13 +48,13 @@ Setup the jsonnet file as per the requirement
 Run this in the root of this repo, with the k8s config repo cloned next to it
 
 ```sh
-./build/kube-prometheus/build.sh ../kubernetes-config-enableit/k8s/kam.obmondo.com
+./build/kube-prometheus/build.sh ../<your-kubeaid-config>/k8s/<cluster-name>
 ```
 
 Example:
 
 ```log
-$ ./build/kube-prometheus/build.sh ../kubernetes-config-enableit/k8s/kam.obmondo.com
+$ ./build/kube-prometheus/build.sh ../<your-kubeaid-config>/k8s/<cluster-name>
 INFO: 'build/kube-prometheus/libraries/main/vendor' doesn't exist; executing jsonnet-bundler
 GET https://github.com/prometheus-operator/kube-prometheus/archive/64b19b69d5a6d82af8bbfb3a67538b0feca31042.tar.gz 200
 GET https://github.com/prometheus/alertmanager/archive/a6d10bd5bc3f651e0ca04d47b981ed66e85a09a6.tar.gz 200
@@ -72,7 +72,7 @@ GET https://github.com/prometheus/node_exporter/archive/9aae303a46c3153b75e4d32b
 GET https://github.com/kubernetes-monitoring/kubernetes-mixin/archive/a2196d1b3493c15117550df2fd35dbdf54e4fa0e.tar.gz 200
 GET https://github.com/grafana/grafonnet-lib/archive/6db00c292d3a1c71661fc875f90e0ec7caa538c2.tar.gz 200
 GET https://github.com/grafana/jsonnet-libs/archive/98c3060877aa178f6bdfc6ac618fbe0043fc3de7.tar.gz 200
-INFO: compiling jsonnet files into '../kubernetes-config-enableit/k8s/kam.obmondo.com/kube-prometheus'
+INFO: compiling jsonnet files into '../<your-kubeaid-config>/k8s/<cluster-name>/kube-prometheus'
 ```
 
 ## Upgrading
@@ -85,10 +85,10 @@ For upgrading vendor directories of existing versions, `update.sh` iterates over
 
 For upgrading to a new version of kube-prometheus, for example to `v0.12.0` - change the
 `kube_prometheus_version` variable in the jsonnet vars file of your kubernetes cluster config
-(example: `k8s/kbm.obmondo.com/kbm.obmondo.com-vars.jsonnet`) and run the build script again.
+(example: `k8s/<cluster-name>/<cluster-name>-vars.jsonnet`) and run the build script again.
 
 ```sh
-./build/kube-prometheus/build.sh ../kubernetes-config-enableit/k8s/kbm.obmondo.com
+./build/kube-prometheus/build.sh ../<your-kubeaid-config>/k8s/<cluster-name>
 ```
 
 This script looks for the `kubernetes-prometheus` version/release tag in your kubernetes cluster config, and checks if the same version/release dir exists in KubeAid repo. If found, it builds manifests for your kubernetes cluster using those files.
@@ -101,7 +101,7 @@ Note that you have to clone your kubeaid-config git repository seperately.
 
 ## Cleaning up
 
-During the [Upgrading process](#upgrading) if you encounter error related to broken version dependencies, or the version/release vendor dirs are messed up, you can just delete the entire version dir and follow the [Upgrading process](#upgrading) again. This freshly fetches the version and its dependencies, and builds manifests in your kubernetes-config repository.
+During the [Upgrading process](#upgrading) if you encounter error related to broken version dependencies, or the version/release vendor dirs are messed up, you can just delete the entire version dir and follow the [Upgrading process](#upgrading) again. This freshly fetches the version and its dependencies, and builds manifests in your kubeaid-config repository.
 
 ```sh
 rm -rf ./build/kube-prometheus/libraries/v0.12.0/
