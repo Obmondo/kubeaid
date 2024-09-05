@@ -110,7 +110,11 @@ fi
 # Make sure to use project tooling
 outdir="${cluster_dir}/kube-prometheus"
 
-kube_prometheus_release=$(jsonnet "${cluster_jsonnet}" | jq -r .kube_prometheus_version)
+# NOTE: If 'kube_prometheus_version' isn't specified in the customer values file ($cluster_jsonnet),
+# then we're setting 'main' as the default tag for it.
+# You can always specify it to get the specific version/tag build by specifying `kube_prometheus_version`
+# in the customer values file.
+kube_prometheus_release=$(jsonnet "${cluster_jsonnet}" | jq -e -r '.kube_prometheus_version // "main"')
 if [[ -z "${kube_prometheus_release}" ]]; then
   echo "Unable to parse kube-prometheus version, please verify '${cluster_jsonnet}'"
   exit 3
