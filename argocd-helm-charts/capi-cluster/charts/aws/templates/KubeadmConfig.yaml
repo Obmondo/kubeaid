@@ -1,12 +1,15 @@
 {{- if (.Values.global.capa).autoScaler }}
+{{- range $index, $machinePool := $.Values.machinePools }}
+---
 apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
 kind: KubeadmConfig
 metadata:
-  name: {{ .Values.global.clusterName }}
+  name: {{ printf "%s-%s" $.Values.global.clusterName $machinePool.name }}
 spec:
   joinConfiguration:
     nodeRegistration:
       kubeletExtraArgs:
         cloud-provider: external
       name: '{{"{{"}} ds.meta_data.local_hostname {{"}}"}}'
+{{- end }}
 {{- end }}
