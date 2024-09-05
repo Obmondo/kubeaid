@@ -1,0 +1,8 @@
+apiVersion: v1
+appVersion: v1.27.1
+description: Installs Cloud Controller Manager for AWS Cloud Provider
+maintainers:
+- email: nic@amazon.com
+  name: Nick Turner
+name: aws-cloud-controller-manager
+version: 0.0.8
