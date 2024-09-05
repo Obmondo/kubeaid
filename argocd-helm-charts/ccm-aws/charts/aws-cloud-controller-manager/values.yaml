@@ -1,0 +1,140 @@
+namespace: "kube-system"
+
+args:
+  - --v=2
+  - --cloud-provider=aws
+
+image:
+    repository: registry.k8s.io/provider-aws/cloud-controller-manager
+    tag: v1.27.1
+
+# nameOverride overrides `cloud-controller-manager.fullname`
+nameOverride: "aws-cloud-controller-manager"
+
+# nodeSelector -- Node labels for pod assignment. Ref: https://kubernetes.io/docs/user-guide/node-selection/.
+nodeSelector:
+  node-role.kubernetes.io/control-plane: ""
+
+clusterRoleRules:
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - nodes/status
+  verbs:
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services/status
+  verbs:
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumes
+  verbs:
+  - get
+  - list
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - update
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts/token
+  verbs:
+  - create
+
+# resources -- Pod resource requests and limits.
+resources:
+  # limits:
+  #   cpu: 100m
+  #   memory: 300Mi
+  requests:
+    cpu: 200m
+  #   memory: 300Mi
+
+# env -- Pod environment variables
+env: []
+# securityContext -- Container Security Context.
+securityContext: {}
+# podSecurityContext -- Pods Security Context.
+podSecurityContext: {}
+
+# podAnnotations -- Pods Annotations.
+podAnnotations: {}
+
+# tolerations -- List of node taints to tolerate (requires Kubernetes >= 1.6).
+tolerations:
+- key: node.cloudprovider.kubernetes.io/uninitialized
+  value: "true"
+  effect: NoSchedule
+- key: node-role.kubernetes.io/master
+  effect: NoSchedule
+- key: node-role.kubernetes.io/control-plane
+  effect: NoSchedule
+
+# dnsPolicy -- dnsPolicy of deamonset pods. Should be set to Default if deployed as a deamonset on control-plane nodes to resolve properly
+dnsPolicy: Default
+
+clusterRoleName : system:cloud-controller-manager
+
+roleBindingName: cloud-controller-manager:apiserver-authentication-reader
+
+serviceAccountName: cloud-controller-manager
+
+roleName: extension-apiserver-authentication-reader
+
+extraVolumes: []
+extraVolumeMounts: []
