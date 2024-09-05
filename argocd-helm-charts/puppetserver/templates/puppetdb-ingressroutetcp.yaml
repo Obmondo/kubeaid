@@ -12,7 +12,7 @@ spec:
     - name: puppetserver-{{ .Values.customerid }}-puppetdb
       port: pdb-https
     middlewares:
-      - name: middleware-{{ .Values.customerid }}
+      - name: middlewaretcp-{{ .Values.customerid }}
   tls:
     passthrough: true
     options:
