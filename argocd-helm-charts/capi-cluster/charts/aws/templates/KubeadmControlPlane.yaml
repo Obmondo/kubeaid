@@ -25,6 +25,23 @@ spec:
         kubeletExtraArgs:
           cloud-provider: external
         name: '{{"{{"}} ds.meta_data.local_hostname {{"}}"}}'
+    postKubeadmCommands:
+      # Install Helm.
+      - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+      # Clone KubeAid.
+      - git clone https://github.com/Obmondo/kubeaid.git
+      # Copy kubeconfig to ~/.kube/config
+      - mkdir -p $HOME/.kube
+      - sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+      - sudo chown $(id -u):$(id -g) $HOME/.kube/config
+      # Install Cilium.
+      - kubectl create namespace cilium
+      - API_SERVER_URL=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+      - API_SERVER_HOST=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $4}')
+      - API_SERVER_PORT=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $5}')
+      - helm template kubeaid/argocd-helm-charts/cilium --values kubeaid/argocd-helm-charts/cilium/values.yaml --set cilium.k8sServiceHost=${API_SERVER_HOST} --set cilium.k8sServicePort=${API_SERVER_PORT} --namespace cilium | kubectl apply -f -
+      # Install AWS Cloud Controller Manager.
+      - helm template kubeaid/argocd-helm-charts/ccm-aws --values kubeaid/argocd-helm-charts/ccm-aws/values.yaml --namespace kube-system | kubectl apply -f -
   machineTemplate:
     infrastructureRef:
       apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
