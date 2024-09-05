@@ -101,7 +101,7 @@ Note that you have to clone your kubeaid-config git repository seperately.
 
 ## Cleaning up
 
-During the [Upgrading process](#upgrading) if you encounter error related to broken version dependencies, or the version/release vendor dirs are messed up, you can just delete the entire version dir and follow the [Upgrading process](#upgrading) again. This freshly fetches the version and its dependencies, and builds manifests in `kubernetes-config-enableit` (or your equivalent repository).
+During the [Upgrading process](#upgrading) if you encounter error related to broken version dependencies, or the version/release vendor dirs are messed up, you can just delete the entire version dir and follow the [Upgrading process](#upgrading) again. This freshly fetches the version and its dependencies, and builds manifests in your kubernetes-config repository.
 
 ```sh
 rm -rf ./build/kube-prometheus/libraries/v0.12.0/
