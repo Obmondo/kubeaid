@@ -1,20 +1,19 @@
 apiVersion: traefik.io/v1alpha1
-kind: IngressRouteTCP
+kind: IngressRoute
 metadata:
   name: puppetdb-{{ .Values.customerid }}
 spec:
   entryPoints:
     - websecure
   routes:
-  - match: HostSNI(`{{ .Values.customerid }}.puppetdb.obmondo.com`)
+  - kind: Rule
+    match: Host(`{{ .Values.customerid }}.puppetdb.obmondo.com`)
     priority: 10
     services:
-    - name: puppetserver-{{ .Values.customerid }}-puppetdb
-      port: pdb-https
-    middlewares:
-      - name: middlewaretcp-{{ .Values.customerid }}
+    - kind: Service
+      name: puppetserver-{{ .Values.customerid }}-puppetdb
+      port: pdb-http
   tls:
-    passthrough: true
     options:
       name: prometheus-puppet-agent-tls-auth
       namespace: traefik
