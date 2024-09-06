@@ -1,22 +1,31 @@
 {{- if (.Values.global.capa).autoScaler }}
+{{- range $index, $machinePool := $.Values.machinePools }}
+---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachinePool
 metadata:
-  name: {{ .Values.global.clusterName }}-mp-0
+  name: {{ printf "%s-%s" $.Values.global.clusterName $machinePool.name }}
 spec:
-  clusterName: {{ .Values.global.clusterName }}
-  replicas: {{ .Values.workerNodes.replicas }}
+  clusterName: {{ $.Values.global.clusterName }}
+  replicas: {{ $machinePool.replicas }}
   template:
+    metadata:
+      labels:
+        machine-pool: {{ printf "%s-%s" $.Values.global.clusterName $machinePool.name }}
+        {{- if $machinePool.labels }}
+        {{- toYaml $machinePool.labels | nindent 8 }}
+        {{- end }}
     spec:
       bootstrap:
         configRef:
           apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
           kind: KubeadmConfig
-          name: {{ .Values.global.clusterName }}
-      clusterName: {{ .Values.global.clusterName }}
+          name: {{ printf "%s-%s" $.Values.global.clusterName $machinePool.name }}
+      clusterName: {{ $.Values.global.clusterName }}
       infrastructureRef:
         apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
         kind: AWSMachinePool
-        name: {{ .Values.global.clusterName }}-mp-0
-      version: {{ .Values.global.kubernetes.version }}
+        name: {{ printf "%s-%s" $.Values.global.clusterName $machinePool.name }}
+      version: {{ $.Values.global.kubernetes.version }}
+{{- end }}
 {{- end }}

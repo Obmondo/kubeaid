@@ -1,15 +1,18 @@
 {{- if (.Values.global.capa).autoScaler }}
+{{- range $index, $machinePool := $.Values.machinePools }}
+---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
 kind: AWSMachinePool
 metadata:
-  name: {{ .Values.global.clusterName }}-mp-0
+  name: {{ printf "%s-%s" $.Values.global.clusterName $machinePool.name }}
 spec:
-  minSize: {{ .Values.workerNodes.minSize | default 1 }}
-  maxSize: {{ .Values.workerNodes.maxSize | default 3 }}
+  minSize: {{ $machinePool.minSize | default 1 }}
+  maxSize: {{ $machinePool.maxSize | default 3 }}
   awsLaunchTemplate:
-    ami: {{ toYaml .Values.workerNodes.ami | nindent 6 }}
+    ami: {{ toYaml $machinePool.ami | nindent 6 }}
     iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
-    instanceType: {{ .Values.workerNodes.instanceType }}
-    sshKeyName: {{ .Values.workerNodes.sshKeyName }}
+    instanceType: {{ $machinePool.instanceType }}
+    sshKeyName: {{ $machinePool.sshKeyName }}
     imageLookupBaseOS: ubuntu-20.04
+{{- end }}
 {{- end }}
