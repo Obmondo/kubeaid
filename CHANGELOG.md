@@ -1,6 +1,14 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-09-09
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+- Updated cluster-api-operator from version 0.12.0 to 0.13.0
+
+### Patch Version Upgrades %%^^
+
 ### Improvements
 - 350661b0 chore: Remove Middleware and Use Ingress Route
 - ace356f0 (fix/multiple-machinepool-support) Having multiple KubeadmConfigs - one for each MachinePool
