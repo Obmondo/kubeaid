@@ -8,6 +8,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cluster-api-operator from version 0.12.0 to 0.13.0
 
 ### Patch Version Upgrades %%^^
+- Updated teleport-cluster from version 16.2.0 to 16.2.1
 - Updated snapshot-controller from version 3.0.5 to 3.0.6
 - Updated rook-ceph-cluster from version v1.15.0 to v1.15.1
 - Updated rook-ceph from version v1.15.0 to v1.15.1
