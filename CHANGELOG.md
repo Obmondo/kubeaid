@@ -1,6 +1,29 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- 350661b0 chore: Remove Middleware and Use Ingress Route
+- ace356f0 (fix/multiple-machinepool-support) Having multiple KubeadmConfigs - one for each MachinePool
+- f9d42b03 Adding AWS CCM as a KubeAid managed app | Removing AWS CCM, Hetzner CCM and Cilium HelmChartProxies | Removing Helm ClusterAPI addon | Installing Cilium and AWS CCM using postKubeadm commands
+- 729be650 chore: Update middleware name to puppetdb-middlewaretcp.yaml (#398)
+- cf63dc37 (fix) : kubeaid-config in example commands
+- 85f13bea (fix) : kubernetes-config-enableit to kubeaid-config
+- a07d8448 (clean + update) : remove 7e.. commit and add main vendor files
+- b550d973 (clean) : keeping the generic kubeaid-config repo name
+- fcc52055 (add) : the latest kube-prom deps https://github.com/prometheus-operator/kube-prometheus/commit/74e445ae4a2582f978bae2e0e9b63024d7f759d6
+- 589fe91f (docs) : addressing to comment
+- 63d71261 (update) : readme with more info
+- 04557af4 (docs) : default version
+- 3f35ac66 (clean) : main stuff
+- fc236715 (fix) : build script with default commit/tag
+- 88bce270 (add) : kube-prom main
+- 36529fc6 Adding support for user specified labels for a MachinePool
+- 409aa7d7 chore: Rename middleware.yaml to puppetdb-middlewaretcp.yaml
+- a934cf33 chore: Rename middleware.yaml to puppetdb-middlewaretcp.yaml
+- 8e027ee9 Adding support for multiple MachinePools
+- 1a55b3ea Removing CertManager, ArgoCD, SealedSecrets and AWS EBS HelmChartProxies (they'll be installed using KubeAid)
+- 84694ba7 upgrade argocd
+
 ## 1.4.0
 ### Minor Version Upgrades
 - Updated teleport-kube-agent from version 16.1.7 to 16.2.0
