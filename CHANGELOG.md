@@ -8,6 +8,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cluster-api-operator from version 0.12.0 to 0.13.0
 
 ### Patch Version Upgrades %%^^
+- Updated external-dns from version 8.3.5 to 8.3.7
 
 ### Improvements
 - 350661b0 chore: Remove Middleware and Use Ingress Route
