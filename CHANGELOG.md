@@ -1,15 +1,15 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 2024-09-09
-### Major Version Upgrades %%^^
+## 2.0.0
+### Major Version Upgrades
 - Updated traefik from version 30.1.0 to 31.0.0
 
-### Minor Version Upgrades %%^^
+### Minor Version Upgrades
 - Updated velero from version 7.1.5 to 7.2.1
 - Updated cluster-api-operator from version 0.12.0 to 0.13.0
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
 - Updated teleport-kube-agent from version 16.2.0 to 16.2.1
 - Updated teleport-cluster from version 16.2.0 to 16.2.1
 - Updated snapshot-controller from version 3.0.5 to 3.0.6
