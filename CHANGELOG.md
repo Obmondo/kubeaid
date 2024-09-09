@@ -3,6 +3,7 @@ All releases and the changes included in them (pulled from git commits added sin
 
 ## 2024-09-09
 ### Major Version Upgrades %%^^
+- Updated traefik from version 30.1.0 to 31.0.0
 
 ### Minor Version Upgrades %%^^
 - Updated cluster-api-operator from version 0.12.0 to 0.13.0
