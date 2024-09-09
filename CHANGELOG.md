@@ -8,6 +8,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cluster-api-operator from version 0.12.0 to 0.13.0
 
 ### Patch Version Upgrades %%^^
+- Updated rabbitmq-cluster-operator from version 4.3.21 to 4.3.22
 - Updated opensearch-dashboards from version 2.21.1 to 2.21.2
 - Updated opensearch from version 2.23.1 to 2.23.2
 - Updated oncall from version 1.9.20 to 1.9.22
