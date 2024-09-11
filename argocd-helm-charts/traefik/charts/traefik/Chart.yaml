@@ -1,9 +1,8 @@
 annotations:
-  artifacthub.io/changes: "- \"fix: disable default HTTPS listener for gateway\"\n-
-    \"fix(Gateway API): wildcard support in hostname\"\n- \"fix(Gateway API): use
-    Standard channel by default\"\n- \"feat: ✨ rework namespaced RBAC with `disableClusterScopeResources`\"\n-
-    \"chore(release): \U0001F680 publish v30.1.0\"\n- \"chore(deps): update traefik
-    docker tag to v3.1.2\"\n- \"chore(deps): update traefik docker tag to v3.1.1\"\n"
+  artifacthub.io/changes: "- \"fix(Traefik Hub): update CRDs to v1.5.0\"\n- \"fix(HTTP3):
+    split udp and tcp Service when service.single is false\"\n- \"fix!: \U0001F41B
+    set allowEmptyServices to true by default\"\n- \"feat(Traefik Hub): update CRDs
+    to v1.7.0\"\n- \"chore(release): \U0001F680 publish v31.0.0\"\n"
 apiVersion: v2
 appVersion: v3.1.2
 description: A Traefik based Kubernetes ingress controller
@@ -27,4 +26,4 @@ sources:
 - https://github.com/traefik/traefik
 - https://github.com/traefik/traefik-helm-chart
 type: application
-version: 30.1.0
+version: 31.0.0
