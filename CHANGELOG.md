@@ -1,6 +1,52 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2.0.0
+### Major Version Upgrades
+- Updated traefik from version 30.1.0 to 31.0.0
+
+### Minor Version Upgrades
+- Updated velero from version 7.1.5 to 7.2.1
+- Updated cluster-api-operator from version 0.12.0 to 0.13.0
+
+### Patch Version Upgrades
+- Updated teleport-kube-agent from version 16.2.0 to 16.2.1
+- Updated teleport-cluster from version 16.2.0 to 16.2.1
+- Updated snapshot-controller from version 3.0.5 to 3.0.6
+- Updated rook-ceph-cluster from version v1.15.0 to v1.15.1
+- Updated rook-ceph from version v1.15.0 to v1.15.1
+- Updated rabbitmq-cluster-operator from version 4.3.21 to 4.3.22
+- Updated opensearch-dashboards from version 2.21.1 to 2.21.2
+- Updated opensearch from version 2.23.1 to 2.23.2
+- Updated oncall from version 1.9.20 to 1.9.22
+- Updated metallb from version 6.3.10 to 6.3.11
+- Updated keycloakx from version 2.5.0 to 2.5.1
+- Updated fluent-bit from version 0.47.7 to 0.47.9
+- Updated external-dns from version 8.3.5 to 8.3.7
+
+### Improvements
+- 350661b0 chore: Remove Middleware and Use Ingress Route
+- ace356f0 (fix/multiple-machinepool-support) Having multiple KubeadmConfigs - one for each MachinePool
+- f9d42b03 Adding AWS CCM as a KubeAid managed app | Removing AWS CCM, Hetzner CCM and Cilium HelmChartProxies | Removing Helm ClusterAPI addon | Installing Cilium and AWS CCM using postKubeadm commands
+- 729be650 chore: Update middleware name to puppetdb-middlewaretcp.yaml (#398)
+- cf63dc37 (fix) : kubeaid-config in example commands
+- 85f13bea (fix) : kubernetes-config-enableit to kubeaid-config
+- a07d8448 (clean + update) : remove 7e.. commit and add main vendor files
+- b550d973 (clean) : keeping the generic kubeaid-config repo name
+- fcc52055 (add) : the latest kube-prom deps https://github.com/prometheus-operator/kube-prometheus/commit/74e445ae4a2582f978bae2e0e9b63024d7f759d6
+- 589fe91f (docs) : addressing to comment
+- 63d71261 (update) : readme with more info
+- 04557af4 (docs) : default version
+- 3f35ac66 (clean) : main stuff
+- fc236715 (fix) : build script with default commit/tag
+- 88bce270 (add) : kube-prom main
+- 36529fc6 Adding support for user specified labels for a MachinePool
+- 409aa7d7 chore: Rename middleware.yaml to puppetdb-middlewaretcp.yaml
+- a934cf33 chore: Rename middleware.yaml to puppetdb-middlewaretcp.yaml
+- 8e027ee9 Adding support for multiple MachinePools
+- 1a55b3ea Removing CertManager, ArgoCD, SealedSecrets and AWS EBS HelmChartProxies (they'll be installed using KubeAid)
+- 84694ba7 upgrade argocd
+
 ## 1.4.0
 ### Minor Version Upgrades
 - Updated teleport-kube-agent from version 16.1.7 to 16.2.0
