@@ -13,6 +13,7 @@
 
 1. **Check Compatibility Matrix**: Review the compatibility matrix of Graylog and MongoDB from the official documentation:
 ![Graylog MongoDB Compatibility Matrix](grayLogCompatibiltyMatrix.png)
+[Reference Link](https://go2docs.graylog.org/current/upgrading_graylog/upgrading_graylog.html?tocpath=Upgrading%20Graylog%7C_____0)
 
 1. **Upgrade MongoDB Operator**: Upgrade the MongoDB operator to the latest version **0.11.0**. Ensure the Helm charts are up to date with the upstream repository.
 
