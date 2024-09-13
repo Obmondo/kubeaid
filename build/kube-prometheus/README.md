@@ -99,6 +99,14 @@ If `kube_prometheus_version` variable isn't present in the jsonnet vars file, it
 
 Note that you have to clone your kubeaid-config git repository seperately.
 
+## Adding versions
+
+If there's a kube-prometheus version which isn't already added in KubeAid, run the `add-version.sh` script to add it. All you need is to specify the version/tag, and no customer jsonnet file is required.
+
+```sh
+./build/kube-prometheus/add-version.sh <version-tag>
+```
+
 ## Cleaning up
 
 During the [Upgrading process](#upgrading) if you encounter error related to broken version dependencies, or the version/release vendor dirs are messed up, you can just delete the entire version dir and follow the [Upgrading process](#upgrading) again. This freshly fetches the version and its dependencies, and builds manifests in your kubeaid-config repository.
