@@ -6,7 +6,7 @@ metadata:
   namespace: capi-cluster-{{ .Values.global.customerid }}
 spec:
   configSecret:
-    name: capi-cluster-token
+    name: {{ .Values.provider.aws.secretName }}
     namespace: capi-cluster-{{ .Values.global.customerid }}
   version: {{ .Values.global.capa.version }}
   fetchConfig:
