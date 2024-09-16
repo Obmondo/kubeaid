@@ -1,10 +1,8 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 2024-09-16
-### Major Version Upgrades %%^^
-
-### Minor Version Upgrades %%^^
+## 2.1.0
+### Minor Version Upgrades
 - Updated teleport-kube-agent from version 16.2.1 to 16.3.0
 - Updated teleport-cluster from version 16.2.1 to 16.3.0
 - Updated opensearch-dashboards from version 2.21.2 to 2.22.0
@@ -13,7 +11,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated kubernetes-dashboard from version 7.5.0 to 7.6.1
 - Updated aws-ebs-csi-driver from version 2.34.0 to 2.35.0
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
 - Updated redmine from version 29.0.4 to 29.0.5
 - Updated oncall from version 1.9.22 to 1.9.25
 - Updated mattermost-team-edition from version 6.6.62 to 6.6.63
