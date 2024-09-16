@@ -12,6 +12,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated aws-ebs-csi-driver from version 2.34.0 to 2.35.0
 
 ### Patch Version Upgrades %%^^
+- Updated redmine from version 29.0.4 to 29.0.5
 - Updated oncall from version 1.9.22 to 1.9.25
 - Updated mattermost-team-edition from version 6.6.62 to 6.6.63
 - Updated gatekeeper from version 3.17.0 to 3.17.1
