@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated teleport-cluster from version 16.2.1 to 16.3.0
 - Updated opensearch-dashboards from version 2.21.2 to 2.22.0
 - Updated opensearch from version 2.23.2 to 2.24.0
 - Updated mariadb-operator from version 0.30.0 to 0.31.0
