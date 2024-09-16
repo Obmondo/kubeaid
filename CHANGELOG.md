@@ -1,6 +1,14 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-09-16
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+- Updated aws-ebs-csi-driver from version 2.34.0 to 2.35.0
+
+### Patch Version Upgrades %%^^
+
 ### Improvements
 - 976335cd (add) : kube-prometheus version 0.14.0 and add-version script
 - a4b6de55 Using user specified secret name instead of capi-cluster-token in AWS InfrastructureProvider
