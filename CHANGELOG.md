@@ -10,6 +10,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated aws-ebs-csi-driver from version 2.34.0 to 2.35.0
 
 ### Patch Version Upgrades %%^^
+- Updated mattermost-team-edition from version 6.6.62 to 6.6.63
 - Updated gatekeeper from version 3.17.0 to 3.17.1
 - Updated external-dns from version 8.3.7 to 8.3.8
 
