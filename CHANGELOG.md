@@ -1,6 +1,15 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- 976335cd (add) : kube-prometheus version 0.14.0 and add-version script
+- a4b6de55 Using user specified secret name instead of capi-cluster-token in AWS InfrastructureProvider
+- 9cb20e84 Using user specified secret name instead of capi-cluster-token in AWS InfrastructureProvider
+- 75a1144a Upgrade keycloak and remove discarded param
+- 14bad7f9 Update graylog/upgrading.md with compatibility matrix and reference link
+- 8d6c7028 Rename graylog6.0.5.md to upgrading.md and update instructions for Graylog and MongoDB upgrade
+- 6784ef4e Add readme to Upgrade Graylog and MongoDB to version 6.0.5 and 6.0.16 respectively
+
 ## 2.0.0
 ### Major Version Upgrades
 - Updated traefik from version 30.1.0 to 31.0.0
