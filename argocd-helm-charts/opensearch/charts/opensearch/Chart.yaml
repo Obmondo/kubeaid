@@ -13,4 +13,4 @@ sources:
 - https://github.com/opensearch-project/opensearch
 - https://github.com/opensearch-project/helm-charts
 type: application
-version: 2.23.2
+version: 2.24.0
