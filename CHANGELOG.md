@@ -8,6 +8,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated aws-ebs-csi-driver from version 2.34.0 to 2.35.0
 
 ### Patch Version Upgrades %%^^
+- Updated external-dns from version 8.3.7 to 8.3.8
 
 ### Improvements
 - 976335cd (add) : kube-prometheus version 0.14.0 and add-version script
