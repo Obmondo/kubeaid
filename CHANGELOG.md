@@ -1,6 +1,32 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2.1.0
+### Minor Version Upgrades
+- Updated teleport-kube-agent from version 16.2.1 to 16.3.0
+- Updated teleport-cluster from version 16.2.1 to 16.3.0
+- Updated opensearch-dashboards from version 2.21.2 to 2.22.0
+- Updated opensearch from version 2.23.2 to 2.24.0
+- Updated mariadb-operator from version 0.30.0 to 0.31.0
+- Updated kubernetes-dashboard from version 7.5.0 to 7.6.1
+- Updated aws-ebs-csi-driver from version 2.34.0 to 2.35.0
+
+### Patch Version Upgrades
+- Updated redmine from version 29.0.4 to 29.0.5
+- Updated oncall from version 1.9.22 to 1.9.25
+- Updated mattermost-team-edition from version 6.6.62 to 6.6.63
+- Updated gatekeeper from version 3.17.0 to 3.17.1
+- Updated external-dns from version 8.3.7 to 8.3.8
+
+### Improvements
+- 976335cd (add) : kube-prometheus version 0.14.0 and add-version script
+- a4b6de55 Using user specified secret name instead of capi-cluster-token in AWS InfrastructureProvider
+- 9cb20e84 Using user specified secret name instead of capi-cluster-token in AWS InfrastructureProvider
+- 75a1144a Upgrade keycloak and remove discarded param
+- 14bad7f9 Update graylog/upgrading.md with compatibility matrix and reference link
+- 8d6c7028 Rename graylog6.0.5.md to upgrading.md and update instructions for Graylog and MongoDB upgrade
+- 6784ef4e Add readme to Upgrade Graylog and MongoDB to version 6.0.5 and 6.0.16 respectively
+
 ## 2.0.0
 ### Major Version Upgrades
 - Updated traefik from version 30.1.0 to 31.0.0
