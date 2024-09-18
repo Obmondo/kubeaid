@@ -10,7 +10,7 @@ additionalLabels:
   # l2: val2
 
 image:
-  repository: registry.obmondo.com/obmondo/dockerfiles/errbot
+  repository: harbor.obmondo.com/obmondo/errbot
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "6.1.10"
@@ -63,3 +63,9 @@ env:
     value: "test-team"
   - name: BOT_ADMINS
     value: "@admin,@anotheradmin"
+
+serviceMonitor:
+  enabled: false
+  # additionalLabels: {}
+  # interval: ""
+  # scrapeTimeout: ""
