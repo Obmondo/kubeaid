@@ -1,0 +1,12 @@
+{{- range $rgname, $resourceGroup := .Values.resourceGroup }}
+---
+apiVersion: azure.upbound.io/v1beta1
+kind: ResourceGroup
+metadata:
+  name: {{ $rgname }}
+spec:
+  forProvider:
+    location: {{ $resourceGroup.location | default $.Values.location }}
+  providerConfigRef:
+      name: {{ ($resourceGroup.providerConfigRef).name | default $.Values.subscription }}
+{{- end }}
