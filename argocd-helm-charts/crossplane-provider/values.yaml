@@ -1,0 +1,10 @@
+provider:
+  aws: false
+  azure: false
+
+# Example of Azure provider configuration
+# azure:
+#   default_subscription:
+#     secretName: azure-secret
+#     secretkey: creds
+#     namespace: crossplane-system
