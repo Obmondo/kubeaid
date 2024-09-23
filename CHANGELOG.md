@@ -1,6 +1,11 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- f7e69e6c Remove CPU Limits from CrossPlane KubeAid app
+- def0201d Support for specifying taints for a MachinePool | Adding a NOTE about MachinePool labels
+- 101fadc5 add service monitoring to errbot and update image link
+
 ## 2.1.0
 ### Minor Version Upgrades
 - Updated teleport-kube-agent from version 16.2.1 to 16.3.0
