@@ -108,7 +108,7 @@ Define the server session external port, using 8093 as a default value
 Unregister runners on pod stop
 */}}
 {{- define "gitlab-runner.unregisterRunners" -}}
-{{- if or (and (hasKey .Values "unregisterRunners") .Values.unregisterRunners) (and (not (hasKey .Values "unregisterRunners")) .Values.runnerRegistrationToken) -}}
+{{- if and (hasKey .Values "unregisterRunners") .Values.unregisterRunners (empty .Values.deploymentLifecycle) -}}
 lifecycle:
   preStop:
     exec:
