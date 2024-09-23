@@ -1,6 +1,14 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-09-23
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+- Updated argo-cd from version 7.5.2 to 7.6.1
+
+### Patch Version Upgrades %%^^
+
 ### Improvements
 - f7e69e6c Remove CPU Limits from CrossPlane KubeAid app
 - def0201d Support for specifying taints for a MachinePool | Adding a NOTE about MachinePool labels
