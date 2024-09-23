@@ -1,6 +1,6 @@
 dependencies:
 - name: aws-ebs-csi-driver
   repository: https://kubernetes-sigs.github.io/aws-ebs-csi-driver
-  version: 2.35.0
-digest: sha256:37ce95026bc55ecc4027041515bd6e963a0f1f2930e8871f96bd478a2779f826
-generated: "2024-09-16T19:04:18.393667995+05:30"
+  version: 2.35.1
+digest: sha256:77fd5e8a584980ce172a2e979e998965d2a7acea8b847c04f6a9256b219de5dc
+generated: "2024-09-23T13:11:00.774761399+05:30"
