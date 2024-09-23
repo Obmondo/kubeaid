@@ -12,6 +12,8 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated argo-cd from version 7.5.2 to 7.6.1
 
 ### Patch Version Upgrades %%^^
+- Updated rook-ceph-cluster from version v1.15.1 to v1.15.2
+- Updated rook-ceph from version v1.15.1 to v1.15.2
 - Updated redmine from version 29.0.5 to 29.0.6
 - Updated metallb from version 6.3.11 to 6.3.12
 - Updated crossplane from version 1.17.0 to 1.17.1
