@@ -25,6 +25,11 @@ spec:
       - 443
       selector: kubernetes.io/role in { 'node', 'master' }
       namespaceSelector: global()
+  - action: Allow
+    protocol: UDP
+    destination:
+      ports:
+      - 53
   # Allow access to EC2 metadata endpoint
   - action: Allow
     protocol: TCP
