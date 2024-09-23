@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated traefik from version 31.0.0 to 31.1.1
 - Updated teleport-kube-agent from version 16.3.0 to 16.4.0
 - Updated teleport-cluster from version 16.3.0 to 16.4.0
 - Updated opensearch-dashboards from version 2.22.0 to 2.23.0
