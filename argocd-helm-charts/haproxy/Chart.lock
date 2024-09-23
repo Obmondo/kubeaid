@@ -1,6 +1,6 @@
 dependencies:
 - name: haproxy
   repository: https://haproxytech.github.io/helm-charts
-  version: 1.22.0
-digest: sha256:b50ae906b62b929e89240bf1ab014e66106f3ffac6583e3da350ac9bcc35bf20
-generated: "2024-05-17T13:33:24.42741257+02:00"
+  version: 1.23.0
+digest: sha256:7f43e0612778a749cdb5c8ea70d8f85df29607fdd84dbce807f837c0046007c7
+generated: "2024-09-23T13:15:25.531409938+05:30"
