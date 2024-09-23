@@ -22,10 +22,6 @@ metadata:
   namespace: {{ include "haproxy.namespace" . }}
   labels:
     {{- include "haproxy.labels" . | nindent 4 }}
-  {{- if .Values.podAnnotations }}
-  annotations:
-{{ toYaml .Values.podAnnotations | indent 4 }}
-  {{- end }}
 spec:
   minReadySeconds: {{ .Values.minReadySeconds }}
   {{- if and (not .Values.autoscaling.enabled) (not .Values.keda.enabled) }}
@@ -106,7 +102,7 @@ spec:
           {{- if .Values.securityContext.enabled }}
           securityContext: {{- omit .Values.securityContext "enabled" | toYaml  | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.image.repository }}:{{ tpl .Values.image.tag . }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.args.enabled }}
           args:
@@ -137,6 +133,10 @@ spec:
           {{- end }}
           {{- with .Values.extraEnvs }}
           env:
+            {{- toYaml . | trim | nindent 12 }}
+          {{- end }}
+          {{- with .Values.extraEnvFrom }}
+          envFrom:
             {{- toYaml . | trim | nindent 12 }}
           {{- end }}
           resources:

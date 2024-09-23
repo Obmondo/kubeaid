@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated haproxy from version 1.22.0 to 1.23.0
 - Updated gitlab-runner from version 0.68.1 to 0.69.0
 - Updated argo-cd from version 7.5.2 to 7.6.1
 
