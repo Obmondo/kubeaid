@@ -197,7 +197,7 @@ data:
     if [[ -n "${SESSION_SERVER_ADDRESS}" ]]; then
       sed -i -e "s/SESSION_SERVER_ADDRESS/$SESSION_SERVER_ADDRESS/g" ${CONFIG_PATH_FOR_INIT}/config.toml
     else
-      APISERVER=https://kubernetes.default.svc \
+      APISERVER=https://${KUBERNETES_SERVICE_HOST:-kubernetes.default.svc}:${KUBERNETES_SERVICE_PORT:-443} \
         && SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount \
         && NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace) \
         && TOKEN=$(cat ${SERVICEACCOUNT}/token) \
@@ -239,7 +239,7 @@ data:
     #!/bin/bash
 
     {{- if and (eq (include "gitlab-runner.server-session-service-type" .) "NodePort") (not .Values.sessionServer.nodePort)}}
-    APISERVER=https://kubernetes.default.svc \
+    APISERVER=https://${KUBERNETES_SERVICE_HOST:-kubernetes.default.svc}:${KUBERNETES_SERVICE_PORT:-443} \
       && SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount \
       && NAMESPACE=$(cat ${SERVICEACCOUNT}/namespace) \
       && TOKEN=$(cat ${SERVICEACCOUNT}/token) \
