@@ -10,6 +10,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated argo-cd from version 7.5.2 to 7.6.1
 
 ### Patch Version Upgrades %%^^
+- Updated metallb from version 6.3.11 to 6.3.12
 - Updated crossplane from version 1.17.0 to 1.17.1
 - Updated aws-ebs-csi-driver from version 2.35.0 to 2.35.1
 
