@@ -55,7 +55,7 @@ spec:
             - name: ADDRESS
               value: /plugin/csi.sock
             - name: DRIVER_REG_SOCK_PATH
-              value: {{ printf "%s%s" (include "zfslocalpv.zfsNode.kubeletDir" .) "plugins/zfs-localpv/csi.sock" | quote }}
+              value: {{ .Values.zfsNode.kubeletDir }}plugins/zfs-localpv/csi.sock
             - name: KUBE_NODE_NAME
               valueFrom:
                 fieldRef:
@@ -107,7 +107,7 @@ spec:
               mountPropagation: "HostToContainer"
               readOnly: true
             - name: pods-mount-dir
-              mountPath: {{ include "zfslocalpv.zfsNode.kubeletDir" . | quote }}
+              mountPath: {{ .Values.zfsNode.kubeletDir }}
               # needed so that any mounts setup inside this container are
               # propagated back to the host machine.
               mountPropagation: "Bidirectional"
@@ -130,15 +130,15 @@ spec:
             type: Directory
         - name: registration-dir
           hostPath:
-            path: {{ printf "%s%s" (include "zfslocalpv.zfsNode.kubeletDir" .) "plugins_registry/" | quote }}
+            path: {{ .Values.zfsNode.kubeletDir }}plugins_registry/
             type: DirectoryOrCreate
         - name: plugin-dir
           hostPath:
-            path: {{ printf "%s%s" (include "zfslocalpv.zfsNode.kubeletDir" .) "plugins/zfs-localpv/" | quote }}
+            path: {{ .Values.zfsNode.kubeletDir }}plugins/zfs-localpv/
             type: DirectoryOrCreate
         - name: pods-mount-dir
           hostPath:
-            path: {{ include "zfslocalpv.zfsNode.kubeletDir" . | quote }}
+            path: {{ .Values.zfsNode.kubeletDir }}
             type: Directory
 {{- if .Values.zfsNode.additionalVolumes }}
 {{- range $name, $config := .Values.zfsNode.additionalVolumes }}

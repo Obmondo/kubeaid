@@ -63,3 +63,17 @@ Runner namespace {{ $runnerNamespace }} was found in runners.config template.
 ## Please use `serviceAccount.imagePullSecrets` instead.                                   ##
 #############################################################################################
 {{- end }}
+
+
+{{- if and (hasKey .Values "unregisterRunners") .Values.unregisterRunners (not (empty .Values.deploymentLifecycle)) }}
+
+#############################################################################################
+## WARNING: You have a custom lifecycle set on the container.                              ##
+## The custom lifecycle setting will take precedence over the unregistrRunner settings     ##
+## Consider adding the following command as a preStop hook                                 ##
+## e.g.                                                                                    ##
+## preStop:                                                                                ##
+##   exec:                                                                                 ##
+##     command: ["/entrypoint", "unregister", "--all-runners"]                             ##
+#############################################################################################
+{{- end }}

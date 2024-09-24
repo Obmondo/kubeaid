@@ -14,6 +14,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Security
 ---
+## [2.25.0]
+### Added
+- Updated OpenSearch Dashboards appVersion to 2.17.0
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
+## [2.24.1]
+### Added
+- Allow user-defined labels on persistent volume claim
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+=======
 ## [2.24.0]
 ### Added
 - Ability to add additional `labels` to `serviceMonitor`
@@ -476,7 +494,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Security
 
-[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.24.0...HEAD
+[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.25.0...HEAD
+[2.25.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.24.1...opensearch-2.25.0
+[2.24.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.24.0...opensearch-2.24.1
 [2.24.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.23.1...opensearch-2.24.0
 [2.23.2]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.23.1...opensearch-2.23.2
 [2.23.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.23.0...opensearch-2.23.1
