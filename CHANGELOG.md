@@ -1,6 +1,32 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2.2.0
+### Minor Version Upgrades
+- Updated traefik from version 31.0.0 to 31.1.1
+- Updated teleport-kube-agent from version 16.3.0 to 16.4.0
+- Updated teleport-cluster from version 16.3.0 to 16.4.0
+- Updated opensearch-dashboards from version 2.22.0 to 2.23.0
+- Updated opensearch from version 2.24.0 to 2.25.0
+- Updated haproxy from version 1.22.0 to 1.23.0
+- Updated gitlab-runner from version 0.68.1 to 0.69.0
+- Updated argo-cd from version 7.5.2 to 7.6.1
+
+### Patch Version Upgrades
+- Updated zfs-localpv from version 2.6.0 to 2.6.1
+- Updated tigera-operator from version v3.28.1 to v3.28.2
+- Updated rook-ceph-cluster from version v1.15.1 to v1.15.2
+- Updated rook-ceph from version v1.15.1 to v1.15.2
+- Updated redmine from version 29.0.5 to 29.0.6
+- Updated metallb from version 6.3.11 to 6.3.12
+- Updated crossplane from version 1.17.0 to 1.17.1
+- Updated aws-ebs-csi-driver from version 2.35.0 to 2.35.1
+
+### Improvements
+- f7e69e6c Remove CPU Limits from CrossPlane KubeAid app
+- def0201d Support for specifying taints for a MachinePool | Adding a NOTE about MachinePool labels
+- 101fadc5 add service monitoring to errbot and update image link
+
 ## 2.1.0
 ### Minor Version Upgrades
 - Updated teleport-kube-agent from version 16.2.1 to 16.3.0

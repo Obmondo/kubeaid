@@ -86,7 +86,12 @@ readinessProbe: {}
 ## non-existant runners. Un-registering the runner before termination mitigates this issue.
 ## ref: https://docs.gitlab.com/runner/commands/index.html#gitlab-runner-unregister
 ##
-# unregisterRunners: true
+## This property ensures that all the Runners present in the local config.toml are unregistered when the chart is uninstalled
+## - If the token is prefixed with `glrt-` (meaning the runner was created in the UI or API),
+##   the unregisterRunners property deletes the runner manager, not the runner.
+##   The runner manager is identified by the runner and the machine that contains the config.toml.
+## - If the runner was registered with a registration token (deprecated), the runner is deleted.
+unregisterRunners: true
 
 ## When stopping the runner, give it time to wait for its jobs to terminate.
 ##
@@ -235,7 +240,7 @@ rbac:
   podSecurityPolicy:
     enabled: false
     resourceNames:
-    - gitlab-runner
+      - gitlab-runner
 
   ## Specify one or more imagePullSecrets used for pulling the runner image
   ##
@@ -378,12 +383,12 @@ service:
   ##
   # metrics:
 
-    ## Specify the node port under which the prometheus metrics of the runner are made
-    ## available.
-    ##
-    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#nodeport
-    ##
-    # nodePort: ""
+  ## Specify the node port under which the prometheus metrics of the runner are made
+  ## available.
+  ##
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#nodeport
+  ##
+  # nodePort: ""
 
   ## Provide a list of additional ports to be exposed by this service
   ##
@@ -575,6 +580,13 @@ topologySpreadConstraints: {}
   #     matchLabels:
   #       foo: bar
 
+## RuntimeClass name for pod assignment
+## ref: https://kubernetes.io/docs/concepts/containers/runtime-class/
+##
+runtimeClassName: ""
+  # Example: Once RuntimeClasses are configured for the cluster, you can specify it.
+  # runtimeClassName: myclass
+
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
 ##
@@ -672,14 +684,14 @@ podLabels: {}
 ## implementing "custom.metrics.k8s.io" using supported third party adapter
 ## Example: https://github.com/directxman12/k8s-prometheus-adapter
 ##
-#hpa: {}
-  # minReplicas: 1
-  # maxReplicas: 10
-  # metrics:
-  # - type: Pods
-  #   pods:
-  #     metricName: gitlab_runner_jobs
-  #     targetAverageValue: 400m
+# hpa: {}
+#   minReplicas: 1
+#   maxReplicas: 10
+#   metrics:
+#   - type: Pods
+#     pods:
+#       metricName: gitlab_runner_jobs
+#       targetAverageValue: 400m
 
 ## Configure priorityClassName for manager pod. See k8s docs for more info on how pod priority works:
 ##  https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/

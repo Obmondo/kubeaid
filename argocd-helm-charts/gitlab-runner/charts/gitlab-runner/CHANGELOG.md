@@ -1,3 +1,23 @@
+## v0.69.0 (2024-09-19)
+
+### New features
+
+- Update GitLab Runner version to v17.4.0
+
+### Bug fixes
+
+- Add env vars if secret is provided [!489](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/merge_requests/489)
+- Revert the system_id generation [!488](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/merge_requests/488)
+- Use a more generic approach to APISERVER calls [!487](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/merge_requests/487) (Zadjad Rezai @zadjadr)
+
+### Maintenance
+
+- Enable by default the `unregisterRunners` property and document its behavior [!441](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/merge_requests/441)
+
+### Other changes
+
+- runtimeClassName for deployments [!485](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/merge_requests/485) (Piotr Roszatycki @dex4er-user)
+
 ## v0.68.1 (2024-08-21)
 
 ### New features

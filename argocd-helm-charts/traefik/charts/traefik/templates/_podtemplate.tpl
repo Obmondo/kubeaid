@@ -538,9 +538,6 @@
           {{- range $entrypoint, $config := $.Values.ports }}
           {{- if $config }}
             {{- if $config.redirectTo }}
-             {{- if eq (typeOf $config.redirectTo) "string" }}
-               {{- fail "ERROR: Syntax of `ports.web.redirectTo` has changed to `ports.web.redirectTo.port`. Details in PR #934." }}
-             {{- end }}
              {{- $toPort := index $.Values.ports $config.redirectTo.port }}
           - "--entryPoints.{{ $entrypoint }}.http.redirections.entryPoint.to=:{{ $toPort.exposedPort }}"
           - "--entryPoints.{{ $entrypoint }}.http.redirections.entryPoint.scheme=https"
@@ -582,6 +579,12 @@
                   {{- end }}
                 {{- end }}
               {{- end }}
+            {{- end }}
+            {{- if $config.allowACMEByPass }}
+              {{- if (semverCompare "<3.1.3-0" $version) }}
+                {{- fail "ERROR: allowACMEByPass has been introduced with Traefik v3.1.3+" -}}
+              {{- end }}
+          - "--entryPoints.name.allowACMEByPass=true"
             {{- end }}
             {{- if $config.forwardedHeaders }}
               {{- if $config.forwardedHeaders.trustedIPs }}
@@ -632,20 +635,17 @@
             {{- if and .general.format (not (has .general.format (list "common" "json"))) }}
               {{- fail "ERROR: .Values.logs.general.format must be either common or json"  }}
             {{- end }}
-            {{- if .general.format }}
-          - "--log.format={{ .general.format }}"
+            {{- with .general.format }}
+          - "--log.format={{ . }}"
             {{- end }}
-            {{- if .general.filePath }}
-          - "--log.filePath={{ .general.filePath }}"
+            {{- with .general.filePath }}
+          - "--log.filePath={{ . }}"
             {{- end }}
             {{- if and (or (eq .general.format "common") (not .general.format)) (eq .general.noColor true) }}
           - "--log.noColor={{ .general.noColor }}"
             {{- end }}
-            {{- if and .general.level (not (has (.general.level | upper) (list "DEBUG" "PANIC" "FATAL" "ERROR" "WARN" "INFO"))) }}
-              {{- fail "ERROR: .Values.logs.level must be DEBUG, PANIC, FATAL, ERROR, WARN, and INFO"  }}
-            {{- end }}
-            {{- if .general.level }}
-          - "--log.level={{ .general.level | upper }}"
+            {{- with .general.level }}
+          - "--log.level={{ . | upper }}"
             {{- end }}
             {{- if .access.enabled }}
           - "--accesslog=true"
