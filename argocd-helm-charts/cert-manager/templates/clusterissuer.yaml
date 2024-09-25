@@ -54,7 +54,7 @@ spec:
     {{- else if eq (toString $v.type) "http"}}
     - http01:
         ingress:
-          class: traefik-cert-manager
+          class: {{ $v.http01.ingress.ingressClassName }}
     {{- end -}}
     {{- end }}
 {{- else -}}
