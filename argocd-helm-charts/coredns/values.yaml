@@ -1,0 +1,16 @@
+customDNS:
+  enabled: false
+  # Set the DNS cache duration
+  # cache: 30
+  #
+  # List of DNS Servers, ensure that each are in a separate line to allow templating.
+  # The list is ordered by priority.
+  # dnsServers: >-
+  #   1.1.1.1
+  #   8.8.8.8
+  #
+  # List of domains for which the DNS queries should go to the above DNS servers.
+  # domainList:
+  #   - example.com
+  #   - example.io
+  #   - example.org
