@@ -1,0 +1,22 @@
+{{- if .Values.customDNS.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "coredns.name" . }}
+    {{- include "coredns.labels" . | nindent 4 }}
+data:
+  custom-dns.server: |
+  {{- range .Values.customDNS.domainList }}
+    {{ . }} {
+      errors
+      {{- if $.Values.customDNS.cache }}
+      cache {{ $.Values.customDNS.cache }}
+      {{- end }}
+      forward . {{ $.Values.customDNS.dnsServers }}
+      log
+    }
+  {{- end -}}
+{{- end -}}
