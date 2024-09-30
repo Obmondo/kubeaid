@@ -1,15 +1,15 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 2024-09-30
-### Major Version Upgrades %%^^
+## 3.0.0
+### Major Version Upgrades
 - Updated traefik from version 31.1.1 to 32.0.0
 
-### Minor Version Upgrades %%^^
+### Minor Version Upgrades
 - Updated mariadb-operator from version 0.31.0 to 0.33.0
 - Updated cluster-autoscaler from version 9.37.0 to 9.41.0
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
 - Updated zfs-localpv from version 2.6.1 to 2.6.2
 - Updated teleport-kube-agent from version 16.4.0 to 16.4.2
 - Updated teleport-cluster from version 16.4.0 to 16.4.2
