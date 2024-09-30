@@ -48,6 +48,7 @@ resource "azurerm_subnet" "endpoint-subnet" {
   resource_group_name  = var.resource_group
   address_prefixes     = [var.endpoint_subnet_prefixes]
   enforce_private_link_endpoint_network_policies = true
+  service_endpoints = var.service_endpoints
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "link_private_dns" {
@@ -95,8 +96,12 @@ resource "azurerm_storage_account" "cluster_backup" {
   network_rules {
     default_action             = "Deny"
     ip_rules                   = []
-
+    private_link_access {
+        endpoint_resource_id = var.cluster_backup_endpoint_resource_id
+        endpoint_tenant_id   = var.cluster_backup_endpoint_tenant_id
+      }
   }
+  
 }
 
 # Create AKS cluster
