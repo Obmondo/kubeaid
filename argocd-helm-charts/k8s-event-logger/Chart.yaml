@@ -3,5 +3,5 @@ name: k8s-event-logger
 version: 1.0.0
 dependencies:
   - name: k8s-event-logger
-    version: "1.1.6"
+    version: "1.1.7"
     repository: https://charts.deliveryhero.io/
