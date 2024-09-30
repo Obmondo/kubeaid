@@ -9,6 +9,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cluster-autoscaler from version 9.37.0 to 9.41.0
 
 ### Patch Version Upgrades %%^^
+- Updated rabbitmq-cluster-operator from version 4.3.22 to 4.3.23
 - Updated oncall from version 1.9.25 to 1.9.30
 - Updated k8s-event-logger from version 1.1.6 to 1.1.7
 - Updated graylog from version 2.3.9 to 2.3.10
