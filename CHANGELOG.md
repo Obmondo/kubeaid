@@ -1,6 +1,14 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-09-30
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+
+### Patch Version Upgrades %%^^
+- Updated argo-cd from version 7.6.1 to 7.6.5
+
 ### Improvements
 - c0dc582b Add network rules for private link access
 - 5854e551 Add coredns chart for custom DNS servers (#424)
