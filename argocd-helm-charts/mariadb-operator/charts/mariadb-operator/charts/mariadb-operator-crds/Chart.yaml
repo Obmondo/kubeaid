@@ -1,11 +1,6 @@
 apiVersion: v2
-appVersion: v0.0.33
-dependencies:
-- condition: crds.enabled
-  name: mariadb-operator-crds
-  repository: file://../mariadb-operator-crds
-  version: 0.0.33
-description: Run and operate MariaDB in a cloud native way
+appVersion: 0.0.0
+description: mariadb-operator CRDs
 home: https://github.com/mariadb-operator/mariadb-operator
 icon: https://mariadb-operator.github.io/mariadb-operator/assets/mariadb_profile.svg
 keywords:
@@ -21,6 +16,6 @@ maintainers:
   name: mmontes11
 - email: pieter.humphrey@mariadb.com
   name: mariadb-pieterhumphrey
-name: mariadb-operator
+name: mariadb-operator-crds
 type: application
-version: 0.33.0
+version: 0.0.33
