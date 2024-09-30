@@ -276,3 +276,16 @@ variable "temporary_name_for_rotation" {
   type        = string
   default     = "tempnodepool"
 }
+
+variable "cluster_backup_endpoint_resource_id" {
+  description = "Resource ID of the cluster backup endpoint"
+  type        = string
+  default     = null 
+}
+
+variable "cluster_backup_endpoint_tenant_id" {
+  description = "Tenant ID of the cluster backup endpoint"
+  type        = string
+  default     = null
+  
+}
