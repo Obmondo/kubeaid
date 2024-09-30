@@ -1,8 +1,3 @@
-{{/*
-Copyright Broadcom, Inc. All Rights Reserved.
-SPDX-License-Identifier: APACHE-2.0
-*/}}
-
 {{/* vim: set filetype=mustache: */}}
 {{/*
 Expand the name of the chart.
@@ -60,7 +55,11 @@ Usage:
 Allow the release namespace to be overridden for multi-namespace deployments in combined charts.
 */}}
 {{- define "common.names.namespace" -}}
-{{- default .Release.Namespace .Values.namespaceOverride | trunc 63 | trimSuffix "-" -}}
+{{- if .Values.namespaceOverride -}}
+{{- .Values.namespaceOverride -}}
+{{- else -}}
+{{- .Release.Namespace -}}
+{{- end -}}
 {{- end -}}
 
 {{/*

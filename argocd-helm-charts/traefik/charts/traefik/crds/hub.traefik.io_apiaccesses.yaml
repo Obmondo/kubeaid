@@ -39,6 +39,35 @@ spec:
           spec:
             description: The desired behavior of this APIAccess.
             properties:
+              apiBundles:
+                description: |-
+                  APIBundles defines a set of APIBundle that will be accessible to the configured audience.
+                  Multiple APIAccesses can select the same APIBundles.
+                items:
+                  description: APIBundleReference references an APIBundle.
+                  properties:
+                    name:
+                      description: Name of the APIBundle.
+                      maxLength: 253
+                      type: string
+                  required:
+                  - name
+                  type: object
+                maxItems: 100
+                type: array
+                x-kubernetes-validations:
+                - message: duplicated apiBundles
+                  rule: self.all(x, self.exists_one(y, x.name == y.name))
+              apiPlan:
+                description: APIPlan defines which APIPlan will be used.
+                properties:
+                  name:
+                    description: Name of the APIPlan.
+                    maxLength: 253
+                    type: string
+                required:
+                - name
+                type: object
               apiSelector:
                 description: |-
                   APISelector selects the APIs that will be accessible to the configured audience.
@@ -131,6 +160,12 @@ spec:
                     maxItems: 100
                     type: array
                 type: object
+              weight:
+                description: Weight specifies the evaluation order of the plan.
+                type: integer
+                x-kubernetes-validations:
+                - message: must be a positive number
+                  rule: self >= 0
             type: object
             x-kubernetes-validations:
             - message: groups and everyone are mutually exclusive
