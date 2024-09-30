@@ -3,6 +3,7 @@ All releases and the changes included in them (pulled from git commits added sin
 
 ## 2024-09-30
 ### Major Version Upgrades %%^^
+- Updated traefik from version 31.1.1 to 32.0.0
 
 ### Minor Version Upgrades %%^^
 - Updated mariadb-operator from version 0.31.0 to 0.33.0
