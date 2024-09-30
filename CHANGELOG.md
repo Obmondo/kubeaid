@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated mariadb-operator from version 0.31.0 to 0.33.0
 - Updated cluster-autoscaler from version 9.37.0 to 9.41.0
 
 ### Patch Version Upgrades %%^^
