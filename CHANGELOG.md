@@ -10,6 +10,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cluster-autoscaler from version 9.37.0 to 9.41.0
 
 ### Patch Version Upgrades %%^^
+- Updated zfs-localpv from version 2.6.1 to 2.6.2
 - Updated teleport-kube-agent from version 16.4.0 to 16.4.2
 - Updated teleport-cluster from version 16.4.0 to 16.4.2
 - Updated rabbitmq-cluster-operator from version 4.3.22 to 4.3.23
