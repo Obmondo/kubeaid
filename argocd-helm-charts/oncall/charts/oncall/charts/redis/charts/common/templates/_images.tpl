@@ -1,33 +1,21 @@
-{{/*
-Copyright Broadcom, Inc. All Rights Reserved.
-SPDX-License-Identifier: APACHE-2.0
-*/}}
-
 {{/* vim: set filetype=mustache: */}}
 {{/*
-Return the proper image name.
-If image tag and digest are not defined, termination fallbacks to chart appVersion.
-{{ include "common.images.image" ( dict "imageRoot" .Values.path.to.the.image "global" .Values.global "chart" .Chart ) }}
+Return the proper image name
+{{ include "common.images.image" ( dict "imageRoot" .Values.path.to.the.image "global" $) }}
 */}}
 {{- define "common.images.image" -}}
-{{- $registryName := default .imageRoot.registry ((.global).imageRegistry) -}}
+{{- $registryName := .imageRoot.registry -}}
 {{- $repositoryName := .imageRoot.repository -}}
-{{- $separator := ":" -}}
-{{- $termination := .imageRoot.tag | toString -}}
-
-{{- if not .imageRoot.tag }}
-  {{- if .chart }}
-    {{- $termination = .chart.AppVersion | toString -}}
-  {{- end -}}
-{{- end -}}
-{{- if .imageRoot.digest }}
-    {{- $separator = "@" -}}
-    {{- $termination = .imageRoot.digest | toString -}}
+{{- $tag := .imageRoot.tag | toString -}}
+{{- if .global }}
+    {{- if .global.imageRegistry }}
+     {{- $registryName = .global.imageRegistry -}}
+    {{- end -}}
 {{- end -}}
 {{- if $registryName }}
-    {{- printf "%s/%s%s%s" $registryName $repositoryName $separator $termination -}}
+{{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
 {{- else -}}
-    {{- printf "%s%s%s"  $repositoryName $separator $termination -}}
+{{- printf "%s:%s" $repositoryName $tag -}}
 {{- end -}}
 {{- end -}}
 
@@ -38,27 +26,21 @@ Return the proper Docker Image Registry Secret Names (deprecated: use common.ima
 {{- define "common.images.pullSecrets" -}}
   {{- $pullSecrets := list }}
 
-  {{- range ((.global).imagePullSecrets) -}}
-    {{- if kindIs "map" . -}}
-      {{- $pullSecrets = append $pullSecrets .name -}}
-    {{- else -}}
+  {{- if .global }}
+    {{- range .global.imagePullSecrets -}}
       {{- $pullSecrets = append $pullSecrets . -}}
-    {{- end }}
+    {{- end -}}
   {{- end -}}
 
   {{- range .images -}}
     {{- range .pullSecrets -}}
-      {{- if kindIs "map" . -}}
-        {{- $pullSecrets = append $pullSecrets .name -}}
-      {{- else -}}
-        {{- $pullSecrets = append $pullSecrets . -}}
-      {{- end -}}
+      {{- $pullSecrets = append $pullSecrets . -}}
     {{- end -}}
   {{- end -}}
 
-  {{- if (not (empty $pullSecrets)) -}}
+  {{- if (not (empty $pullSecrets)) }}
 imagePullSecrets:
-    {{- range $pullSecrets | uniq }}
+    {{- range $pullSecrets }}
   - name: {{ . }}
     {{- end }}
   {{- end }}
@@ -72,44 +54,22 @@ Return the proper Docker Image Registry Secret Names evaluating values as templa
   {{- $pullSecrets := list }}
   {{- $context := .context }}
 
-  {{- range (($context.Values.global).imagePullSecrets) -}}
-    {{- if kindIs "map" . -}}
-      {{- $pullSecrets = append $pullSecrets (include "common.tplvalues.render" (dict "value" .name "context" $context)) -}}
-    {{- else -}}
+  {{- if $context.Values.global }}
+    {{- range $context.Values.global.imagePullSecrets -}}
       {{- $pullSecrets = append $pullSecrets (include "common.tplvalues.render" (dict "value" . "context" $context)) -}}
     {{- end -}}
   {{- end -}}
 
   {{- range .images -}}
     {{- range .pullSecrets -}}
-      {{- if kindIs "map" . -}}
-        {{- $pullSecrets = append $pullSecrets (include "common.tplvalues.render" (dict "value" .name "context" $context)) -}}
-      {{- else -}}
-        {{- $pullSecrets = append $pullSecrets (include "common.tplvalues.render" (dict "value" . "context" $context)) -}}
-      {{- end -}}
+      {{- $pullSecrets = append $pullSecrets (include "common.tplvalues.render" (dict "value" . "context" $context)) -}}
     {{- end -}}
   {{- end -}}
 
-  {{- if (not (empty $pullSecrets)) -}}
+  {{- if (not (empty $pullSecrets)) }}
 imagePullSecrets:
-    {{- range $pullSecrets | uniq }}
+    {{- range $pullSecrets }}
   - name: {{ . }}
     {{- end }}
   {{- end }}
 {{- end -}}
-
-{{/*
-Return the proper image version (ingores image revision/prerelease info & fallbacks to chart appVersion)
-{{ include "common.images.version" ( dict "imageRoot" .Values.path.to.the.image "chart" .Chart ) }}
-*/}}
-{{- define "common.images.version" -}}
-{{- $imageTag := .imageRoot.tag | toString -}}
-{{/* regexp from https://github.com/Masterminds/semver/blob/23f51de38a0866c5ef0bfc42b3f735c73107b700/version.go#L41-L44 */}}
-{{- if regexMatch `^([0-9]+)(\.[0-9]+)?(\.[0-9]+)?(-([0-9A-Za-z\-]+(\.[0-9A-Za-z\-]+)*))?(\+([0-9A-Za-z\-]+(\.[0-9A-Za-z\-]+)*))?$` $imageTag -}}
-    {{- $version := semver $imageTag -}}
-    {{- printf "%d.%d.%d" $version.Major $version.Minor $version.Patch -}}
-{{- else -}}
-    {{- print .chart.AppVersion -}}
-{{- end -}}
-{{- end -}}
-
