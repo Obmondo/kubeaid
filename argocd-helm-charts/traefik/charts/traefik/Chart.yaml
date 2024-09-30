@@ -1,7 +1,8 @@
 annotations:
-  artifacthub.io/changes: "- \"fix: \U0001F41B updateStrategy behavior\"\n- \"feat(deps):
-    update traefik docker tag to v3.1.4\"\n- \"chore(release): \U0001F680 publish
-    v31.1.1\"\n"
+  artifacthub.io/changes: |
+    - "chore(release): :rocket: publish 32.0.0"
+    - "fix: replace `CLF` with `common` in `values.yaml`"
+    - "feat(Traefik Hub): add APIPlans and APIBundles CRDs"
 apiVersion: v2
 appVersion: v3.1.4
 description: A Traefik based Kubernetes ingress controller
@@ -25,4 +26,4 @@ sources:
 - https://github.com/traefik/traefik
 - https://github.com/traefik/traefik-helm-chart
 type: application
-version: 31.1.1
+version: 32.0.0

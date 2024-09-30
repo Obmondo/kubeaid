@@ -1,8 +1,3 @@
-{{/*
-Copyright Broadcom, Inc. All Rights Reserved.
-SPDX-License-Identifier: APACHE-2.0
-*/}}
-
 {{/* vim: set filetype=mustache: */}}
 
 {{/*
@@ -34,13 +29,6 @@ Return the proper image name (for the init container volume-permissions image)
 {{- end -}}
 
 {{/*
-Return kubectl image
-*/}}
-{{- define "redis.kubectl.image" -}}
-{{ include "common.images.image" (dict "imageRoot" .Values.kubectl.image "global" .Values.global) }}
-{{- end -}}
-
-{{/*
 Return sysctl image
 */}}
 {{- define "redis.sysctl.image" -}}
@@ -51,7 +39,7 @@ Return sysctl image
 Return the proper Docker Image Registry Secret Names
 */}}
 {{- define "redis.imagePullSecrets" -}}
-{{- include "common.images.renderPullSecrets" (dict "images" (list .Values.image .Values.sentinel.image .Values.metrics.image .Values.volumePermissions.image .Values.sysctl.image) "context" $) -}}
+{{- include "common.images.pullSecrets" (dict "images" (list .Values.image .Values.sentinel.image .Values.metrics.image .Values.volumePermissions.image .Values.sysctl.image) "global" .Values.global) -}}
 {{- end -}}
 
 {{/*
@@ -140,43 +128,13 @@ Return the path to the DH params file.
 {{- end -}}
 
 {{/*
-Create the name of the shared service account to use
+Create the name of the service account to use
 */}}
 {{- define "redis.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create -}}
     {{ default (include "common.names.fullname" .) .Values.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.serviceAccount.name }}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Create the name of the master service account to use
-*/}}
-{{- define "redis.masterServiceAccountName" -}}
-{{- if .Values.master.serviceAccount.create -}}
-    {{ default (printf "%s-master" (include "common.names.fullname" .)) .Values.master.serviceAccount.name }}
-{{- else -}}
-    {{- if .Values.serviceAccount.create -}}
-        {{ template "redis.serviceAccountName" . }}
-    {{- else -}}
-        {{ default "default" .Values.master.serviceAccount.name }}
-    {{- end -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Create the name of the replicas service account to use
-*/}}
-{{- define "redis.replicaServiceAccountName" -}}
-{{- if .Values.replica.serviceAccount.create -}}
-    {{ default (printf "%s-replica" (include "common.names.fullname" .)) .Values.replica.serviceAccount.name }}
-{{- else -}}
-    {{- if .Values.serviceAccount.create -}}
-        {{ template "redis.serviceAccountName" . }}
-    {{- else -}}
-        {{ default "default" .Values.replica.serviceAccount.name }}
-    {{- end -}}
 {{- end -}}
 {{- end -}}
 
@@ -205,7 +163,7 @@ Get the password secret.
 */}}
 {{- define "redis.secretName" -}}
 {{- if .Values.auth.existingSecret -}}
-{{- printf "%s" (tpl .Values.auth.existingSecret $) -}}
+{{- printf "%s" .Values.auth.existingSecret -}}
 {{- else -}}
 {{- printf "%s" (include "common.names.fullname" .) -}}
 {{- end -}}
@@ -216,7 +174,7 @@ Get the password key to be retrieved from Redis&reg; secret.
 */}}
 {{- define "redis.secretPasswordKey" -}}
 {{- if and .Values.auth.existingSecret .Values.auth.existingSecretPasswordKey -}}
-{{- printf "%s" (tpl .Values.auth.existingSecretPasswordKey $) -}}
+{{- printf "%s" .Values.auth.existingSecretPasswordKey -}}
 {{- else -}}
 {{- printf "redis-password" -}}
 {{- end -}}
@@ -241,16 +199,14 @@ otherwise it generates a random value.
 Return Redis&reg; password
 */}}
 {{- define "redis.password" -}}
-{{- if or .Values.auth.enabled .Values.global.redis.password }}
-    {{- if not (empty .Values.global.redis.password) }}
-        {{- .Values.global.redis.password -}}
-    {{- else if not (empty .Values.auth.password) -}}
-        {{- .Values.auth.password -}}
-    {{- else -}}
-        {{- include "getValueFromSecret" (dict "Namespace" (include "common.names.namespace" .) "Name" (include "redis.secretName" .) "Length" 10 "Key" (include "redis.secretPasswordKey" .))  -}}
-    {{- end -}}
+{{- if not (empty .Values.global.redis.password) }}
+    {{- .Values.global.redis.password -}}
+{{- else if not (empty .Values.auth.password) -}}
+    {{- .Values.auth.password -}}
+{{- else -}}
+    {{- include "getValueFromSecret" (dict "Namespace" .Release.Namespace "Name" (include "common.names.fullname" .) "Length" 10 "Key" "redis-password")  -}}
 {{- end -}}
-{{- end }}
+{{- end -}}
 
 {{/* Check if there are rolling tags in the images */}}
 {{- define "redis.checkRollingTags" -}}
@@ -268,7 +224,6 @@ Compile all warnings into a single message, and call fail.
 {{- $messages := append $messages (include "redis.validateValues.architecture" .) -}}
 {{- $messages := append $messages (include "redis.validateValues.podSecurityPolicy.create" .) -}}
 {{- $messages := append $messages (include "redis.validateValues.tls" .) -}}
-{{- $messages := append $messages (include "redis.validateValues.createMaster" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
 
@@ -320,16 +275,6 @@ redis: tls.enabled
 {{- end -}}
 {{- end -}}
 
-{{/* Validate values of Redis&reg; - master service enabled */}}
-{{- define "redis.validateValues.createMaster" -}}
-{{- if and (or .Values.sentinel.masterService.enabled .Values.sentinel.service.createMaster) (or (not .Values.rbac.create) (not .Values.replica.automountServiceAccountToken) (not .Values.serviceAccount.create)) }}
-redis: sentinel.masterService.enabled
-    In order to redirect requests only to the master pod via the service, you also need to
-    create rbac and serviceAccount. In addition, you need to enable
-    replica.automountServiceAccountToken.
-{{- end -}}
-{{- end -}}
-
 {{/* Define the suffix utilized for external-dns */}}
 {{- define "redis.externalDNS.suffix" -}}
 {{ printf "%s.%s" (include "common.names.fullname" .) .Values.useExternalDNS.suffix }}
@@ -337,7 +282,7 @@ redis: sentinel.masterService.enabled
 
 {{/* Compile all annotations utilized for external-dns */}}
 {{- define "redis.externalDNS.annotations" -}}
-{{- if and .Values.useExternalDNS.enabled .Values.useExternalDNS.annotationKey }}
+{{- if .Values.useExternalDNS.enabled }}
 {{ .Values.useExternalDNS.annotationKey }}hostname: {{ include "redis.externalDNS.suffix" . }}
 {{- range $key, $val := .Values.useExternalDNS.additionalAnnotations }}
 {{ $.Values.useExternalDNS.annotationKey }}{{ $key }}: {{ $val | quote }}

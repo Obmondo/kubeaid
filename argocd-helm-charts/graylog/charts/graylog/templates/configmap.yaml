@@ -151,8 +151,8 @@ data:
   {{- end }}
   {{- if .Values.graylog.trustedProxies }}
     trusted_proxies = {{.Values.graylog.trustedProxies}}
-    data_dir = /usr/share/graylog/data
   {{- end }}
+    data_dir = /usr/share/graylog/data
   {{- if .Values.graylog.config }}
 {{ .Values.graylog.config | indent 4 }}
   {{- end }}

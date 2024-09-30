@@ -1,6 +1,30 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 3.0.0
+### Major Version Upgrades
+- Updated traefik from version 31.1.1 to 32.0.0
+
+### Minor Version Upgrades
+- Updated mariadb-operator from version 0.31.0 to 0.33.0
+- Updated cluster-autoscaler from version 9.37.0 to 9.41.0
+
+### Patch Version Upgrades
+- Updated zfs-localpv from version 2.6.1 to 2.6.2
+- Updated teleport-kube-agent from version 16.4.0 to 16.4.2
+- Updated teleport-cluster from version 16.4.0 to 16.4.2
+- Updated rabbitmq-cluster-operator from version 4.3.22 to 4.3.23
+- Updated oncall from version 1.9.25 to 1.9.30
+- Updated k8s-event-logger from version 1.1.6 to 1.1.7
+- Updated graylog from version 2.3.9 to 2.3.10
+- Updated cilium from version 1.16.1 to 1.16.2
+- Updated argo-cd from version 7.6.1 to 7.6.5
+
+### Improvements
+- c0dc582b Add network rules for private link access
+- 5854e551 Add coredns chart for custom DNS servers (#424)
+- 20683255 Fix template to allow custom ingressClass for http solver in cert-manager https://gitea.obmondo.com/EnableIT/qd2xcggwag/issues/449
+
 ## 2.2.0
 ### Minor Version Upgrades
 - Updated traefik from version 31.0.0 to 31.1.1
