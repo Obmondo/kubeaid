@@ -7,6 +7,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Minor Version Upgrades %%^^
 
 ### Patch Version Upgrades %%^^
+- Updated cilium from version 1.16.1 to 1.16.2
 - Updated argo-cd from version 7.6.1 to 7.6.5
 
 ### Improvements
