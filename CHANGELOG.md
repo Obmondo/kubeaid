@@ -1,6 +1,11 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- c0dc582b Add network rules for private link access
+- 5854e551 Add coredns chart for custom DNS servers (#424)
+- 20683255 Fix template to allow custom ingressClass for http solver in cert-manager https://gitea.obmondo.com/EnableIT/qd2xcggwag/issues/449
+
 ## 2.2.0
 ### Minor Version Upgrades
 - Updated traefik from version 31.0.0 to 31.1.1
