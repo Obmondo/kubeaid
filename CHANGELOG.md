@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated cluster-autoscaler from version 9.37.0 to 9.41.0
 
 ### Patch Version Upgrades %%^^
 - Updated cilium from version 1.16.1 to 1.16.2
