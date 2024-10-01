@@ -1,0 +1,13 @@
+{{- if .Values.provider.azure }}
+apiVersion: azure.upbound.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: default
+spec:
+  credentials:
+    source: Secret
+    secretRef:
+      namespace: {{ .Values.azure.default_subscription.namespace }}
+      name: {{ .Values.azure.default_subscription.secretName }}
+      key: {{ .Values.azure.default_subscription.secretkey }}
+{{- end }}
