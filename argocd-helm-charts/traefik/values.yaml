@@ -17,7 +17,7 @@ traefik:
   globalArguments: []
   deployment:
     replicas: 2
-    revisionHistoryLimit: "0"
+    revisionHistoryLimit: 0
   logs:
     access:
       enabled: true
