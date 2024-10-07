@@ -1,6 +1,11 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- 85759c07 MachinePool annotation required for the AWS native autoscaler to autoscale it
+- f43f1e77 bootstrap crossplane
+- 84054ce6 Change deployment.revisionHistoryLimit type to int from string for Traefik KubeAid app
+
 ## 3.0.0
 ### Major Version Upgrades
 - Updated traefik from version 31.1.1 to 32.0.0
