@@ -9,6 +9,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cert-manager from version v1.15.3 to v1.16.0
 
 ### Patch Version Upgrades %%^^
+- Updated external-dns from version 8.3.8 to 8.3.9
 - Updated argo-cd from version 7.6.5 to 7.6.8
 
 ### Improvements
