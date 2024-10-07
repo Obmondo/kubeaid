@@ -1,6 +1,14 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-10-07
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+
+### Patch Version Upgrades %%^^
+- Updated argo-cd from version 7.6.5 to 7.6.8
+
 ### Improvements
 - 85759c07 MachinePool annotation required for the AWS native autoscaler to autoscale it
 - f43f1e77 bootstrap crossplane
