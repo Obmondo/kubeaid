@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated cert-manager from version v1.15.3 to v1.16.0
 
 ### Patch Version Upgrades %%^^
 - Updated argo-cd from version 7.6.5 to 7.6.8
