@@ -13,6 +13,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cert-manager from version v1.15.3 to v1.16.0
 
 ### Patch Version Upgrades %%^^
+- Updated rabbitmq-cluster-operator from version 4.3.23 to 4.3.24
 - Updated metallb from version 6.3.12 to 6.3.13
 - Updated fluent-bit from version 0.47.9 to 0.47.10
 - Updated external-dns from version 8.3.8 to 8.3.9
