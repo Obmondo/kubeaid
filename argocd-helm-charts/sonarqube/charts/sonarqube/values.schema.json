@@ -4,6 +4,52 @@
         "replicaCount"
     ],
     "properties": {
+        "persistence": {
+            "type": "object",
+            "properties": {
+                "volumes": {
+                    "type": "array",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) Please use `extraVolumes` instead"
+                },
+                "mounts": {
+                    "type": "array",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) Please use `extraVolumeMounts` instead"
+                }
+            }
+        },
+        "networkPolicy": {
+            "type": "object",
+            "properties": {
+                "additionalNetworkPolicys": {
+                    "type": "object",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) Please use `networkPolicy.additionalNetworkPolicies` instead"
+                }
+            }
+        },
+        "OpenShift":
+        {
+            "type": "object",
+            "properties": {
+                "createSCC": {
+                    "type": "boolean",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) custom SCC are no longer required, the chart is compatible with default restricted SCCv2"
+                }
+            }
+        },
+        "jdbcOverwrite": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "type": "boolean",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) Please use `jdbcOverwrite.enabled` instead"
+                }
+            }
+        },
         "prometheusMonitoring": {
             "type": "object",
             "properties": {

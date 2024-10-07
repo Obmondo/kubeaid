@@ -1,10 +1,34 @@
 # SonarQube Chart Changelog
 All changes to this chart will be documented in this file.
 
-## [10.6.1]
-* Update Chart's version to 10.6.1
-* Fix a typo in the new common STS template
+## [10.7.0]
+* Update Chart's version to 10.7.0
+* Upgrade SonarQube to 10.7.0
+* Support Kubernetes v1.30
+* Upgrade ingress-nginx dependency to 4.10.1
+* Deprecate `jdbcOverwrite.enable` in favor of `jdbcOverwrite.enabled`
 * Fix regression on env valuesFrom in the new STS template
+* Fix a typo in the new common STS template
+* Enable the setup of ReadOnlyRootFilesystem in the security contexts
+* Support basic chart installation on Openshift
+* Include remaining Route settings
+* Fix networkPolicy.additionalPolicys typo
+* Support install-plugin and prometheusExporter proxy variables in secret
+* Support GatewayAPI HttpRoute
+* Support additional labels in the PodMonitor
+* Support Openshift SCCv2 by default when Openshift.enabled=true
+* Deprecate Openshift.createSCC
+* Support additional CA Certificate as ConfigMap instead of Secret only
+* Changed default value for caCerts.image
+* Fix openshift change-admin-password-hook Job SecurityContext failure
+* Support SONAR_OPENSHIFT telemetry env_var
+* Update helm chart repo path in sources
+* Changed SONAR_OPENSHIFT to IS_HELM_OPENSHIFT_ENABLED
+* Remove socketTimeout from jdbcOverwrite.jdbcUrl's default value
+* Refactor Route to be subparameter of OpenShift
+* Make OpenShift.createSCC false by default
+* Deprecate peristence.volumes and persistence.mounts in favor or extraVolumes and extraVolumeMounts
+* Ensure kubernetes.io/version label is smaller than 63 chars
 
 ## [10.6.0]
 * Update SonarQube to 10.6.0
