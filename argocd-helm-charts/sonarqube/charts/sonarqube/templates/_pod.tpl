@@ -2,8 +2,12 @@
 metadata:
   annotations:
     checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
+    {{- if and .Values.persistence.enabled .Values.initFs.enabled (not .Values.OpenShift.enabled) }}
     checksum/init-fs: {{ include (print $.Template.BasePath "/init-fs.yaml") . | sha256sum }}
+    {{- end }}
+    {{- if and .Values.initSysctl.enabled (not .Values.OpenShift.enabled) }}
     checksum/init-sysctl: {{ include (print $.Template.BasePath "/init-sysctl.yaml") . | sha256sum }}
+    {{- end }}
     checksum/plugins: {{ include (print $.Template.BasePath "/install-plugins.yaml") . | sha256sum }}
     checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
     {{- if .Values.prometheusExporter.enabled }}
@@ -23,7 +27,9 @@ spec:
   {{- with .Values.schedulerName }}
   schedulerName: {{ . }}
   {{- end }}
-  securityContext: {{- toYaml .Values.securityContext | nindent 4 }}
+  {{- with (include "sonarqube.securityContext" .) }}
+  securityContext: {{- . | nindent 4 }}
+  {{- end }}
   {{- if or .Values.image.pullSecrets .Values.image.pullSecret }}
   imagePullSecrets:
     {{- if .Values.image.pullSecret }}
@@ -41,8 +47,8 @@ spec:
     - name: "wait-for-db"
       image: {{ default (include "sonarqube.image" $) .Values.initContainers.image }}
       imagePullPolicy: {{ .Values.image.pullPolicy  }}
-      {{- with .Values.initContainers.securityContext }}
-      securityContext: {{- toYaml . | nindent 8 }}
+      {{- with (include "sonarqube.initContainerSecurityContext" .) }}
+      securityContext: {{- . | nindent 8 }}
       {{- end }}
       {{- with .Values.initContainers.resources }}
       resources: {{- toYaml . | nindent 8 }}
@@ -56,8 +62,8 @@ spec:
       imagePullPolicy: {{ .Values.image.pullPolicy  }}
       command: ["sh"]
       args: ["-c", "cp -f \"${JAVA_HOME}/lib/security/cacerts\" /tmp/certs/cacerts; if [ \"$(ls /tmp/secrets/ca-certs)\" ]; then for f in /tmp/secrets/ca-certs/*; do keytool -importcert -file \"${f}\" -alias \"$(basename \"${f}\")\" -keystore /tmp/certs/cacerts -storepass changeit -trustcacerts -noprompt; done; fi;"]
-      {{- with .Values.initContainers.securityContext }}
-      securityContext: {{- toYaml . | nindent 8 }}
+      {{- with (include "sonarqube.initContainerSecurityContext" .) }}
+      securityContext: {{- . | nindent 8 }}
       {{- end }}
       {{- with .Values.initContainers.resources }}
       resources: {{- toYaml . | nindent 8 }}
@@ -71,11 +77,11 @@ spec:
       env:
         {{- (include "sonarqube.combined_env" . | fromJsonArray) | toYaml | trim | nindent 8 }}
     {{- end }}
-    {{- if or .Values.initSysctl.enabled .Values.elasticsearch.configureNode }}
+    {{- if and (or .Values.initSysctl.enabled .Values.elasticsearch.configureNode) (not .Values.OpenShift.enabled) }}
     - name: init-sysctl
       image: {{ default (include "sonarqube.image" $) .Values.initSysctl.image }}
       imagePullPolicy: {{ .Values.image.pullPolicy  }}
-      {{- with (default .Values.initContainers.securityContext .Values.initSysctl.securityContext) }}
+      {{- with (default (fromYaml (include "sonarqube.initContainerSecurityContext" .)) (.Values.initSysctl.securityContext )) }}
       securityContext: {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with (default .Values.initContainers.resources .Values.initSysctl.resources) }}
@@ -119,8 +125,8 @@ spec:
           name: secret-config
           subPath: secret.properties
         {{- end }}
-      {{- with .Values.initContainers.securityContext }}
-      securityContext: {{- toYaml . | nindent 8 }}
+      {{- with (include "sonarqube.initContainerSecurityContext" .) }}
+      securityContext: {{- . | nindent 8 }}
       {{- end }}
       {{- with .Values.initContainers.resources }}
       resources: {{- toYaml . | nindent 8 }}
@@ -132,7 +138,7 @@ spec:
     - name: inject-prometheus-exporter
       image: {{ default (include "sonarqube.image" $) .Values.prometheusExporter.image }}
       imagePullPolicy: {{ .Values.image.pullPolicy  }}
-      {{- with (default .Values.initContainers.securityContext .Values.prometheusExporter.securityContext) }}
+      {{- with (default (fromYaml (include "sonarqube.initContainerSecurityContext" .)) .Values.prometheusExporter.securityContext) }}
       securityContext: {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with (default .Values.initContainers.resources .Values.prometheusExporter.resources)}}
@@ -145,19 +151,16 @@ spec:
           name: sonarqube
           subPath: data
       env:
-        - name: http_proxy
-          value: {{ default "" .Values.prometheusExporter.httpProxy }}
-        - name: https_proxy
-          value: {{ default "" .Values.prometheusExporter.httpsProxy }}
-        - name: no_proxy
-          value: {{ default "" .Values.prometheusExporter.noProxy }}
+        {{- with (include "sonarqube.prometheusExporterProxy.env" .) }}
+        {{- . | nindent 8 }}
+        {{- end }}
         {{- (include "sonarqube.combined_env" . | fromJsonArray) | toYaml | trim | nindent 8 }}
     {{- end }}
-    {{- if and .Values.persistence.enabled .Values.initFs.enabled }}
+    {{- if and .Values.persistence.enabled .Values.initFs.enabled (not .Values.OpenShift.enabled) }}
     - name: init-fs
       image: {{ default (include "sonarqube.image" $) .Values.initFs.image }}
       imagePullPolicy: {{ .Values.image.pullPolicy  }}
-      {{- with (default .Values.initContainers.securityContext .Values.initFs.securityContext) }}
+      {{- with (default (fromYaml (include "sonarqube.initContainerSecurityContext" .)) .Values.initFs.securityContext) }}
       securityContext: {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with (default .Values.initContainers.resources .Values.initFs.resources) }}
@@ -183,15 +186,9 @@ spec:
           name: sonarqube
           subPath: certs
         {{- end }}
-        {{- if .Values.persistence.enabled }}
         - mountPath: {{ .Values.sonarqubeFolder }}/extensions
           name: sonarqube
           subPath: extensions
-        {{- else if .Values.plugins.install }}
-        - mountPath: {{ .Values.sonarqubeFolder }}/extensions/plugins
-          name: sonarqube
-          subPath: extensions/plugins
-        {{- end }}
         {{- with .Values.persistence.mounts }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -201,7 +198,7 @@ spec:
       image: {{ default (include "sonarqube.image" $) .Values.plugins.image }}
       imagePullPolicy: {{ .Values.image.pullPolicy  }}
       command: ["sh", "-e", "/tmp/scripts/install_plugins.sh"]
-      {{- with (default .Values.initContainers.securityContext .Values.plugins.securityContext) }}
+      {{- with (default (fromYaml (include "sonarqube.initContainerSecurityContext" .)) .Values.plugins.securityContext) }}
       securityContext: {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with (default .Values.initContainers.resources .Values.plugins.resource) }}
@@ -218,12 +215,9 @@ spec:
           mountPath: /root
         {{- end }}
       env:
-        - name: http_proxy
-          value: {{ default "" .Values.plugins.httpProxy }}
-        - name: https_proxy
-          value: {{ default "" .Values.plugins.httpsProxy }}
-        - name: no_proxy
-          value: {{ default "" .Values.plugins.noProxy }}
+        {{- with (include "sonarqube.install-plugins-proxy.env" .) }}
+        {{- . | nindent 8 }}
+        {{- end }}
         {{- (include "sonarqube.combined_env" . | fromJsonArray) | toYaml | trim | nindent 8 }}
     {{- end }}
   containers:
@@ -249,6 +243,10 @@ spec:
       env:
         - name: SONAR_HELM_CHART_VERSION
           value: {{ .Chart.Version | replace "+" "_" }}
+        {{- if .Values.OpenShift.enabled }}
+        - name: IS_HELM_OPENSHIFT_ENABLED
+          value: "true"
+        {{- end }}
         - name: SONAR_JDBC_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -289,8 +287,8 @@ spec:
         periodSeconds: {{ .Values.startupProbe.periodSeconds }}
         failureThreshold: {{ .Values.startupProbe.failureThreshold }}
         timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
-      {{- with .Values.containerSecurityContext }}
-      securityContext: {{- toYaml . | nindent 8 }}
+      {{- with (include "sonarqube.containerSecurityContext" .) }}
+      securityContext: {{- . | nindent 8 }}
       {{- end }}
       volumeMounts:
         - mountPath: {{ .Values.sonarqubeFolder }}/data
@@ -317,15 +315,9 @@ spec:
           name: sonarqube
           subPath: certs
         {{- end }}
-        {{- if .Values.persistence.enabled }}
         - mountPath: {{ .Values.sonarqubeFolder }}/extensions
           name: sonarqube
           subPath: extensions
-        {{- else if .Values.plugins.install }}
-        - mountPath: {{ .Values.sonarqubeFolder }}/extensions/plugins
-          name: sonarqube
-          subPath: extensions/plugins
-        {{- end }}
         {{- if .Values.prometheusExporter.enabled }}
         - mountPath: {{ .Values.sonarqubeFolder }}/conf/prometheus-config.yaml
           subPath: prometheus-config.yaml
@@ -387,11 +379,7 @@ spec:
         - key: sonar-secret.txt
           path: sonar-secret.txt
     {{- end }}
-    {{- if .Values.caCerts.enabled }}
-    - name: ca-certs
-      secret:
-        secretName: {{ .Values.caCerts.secret }}
-    {{- end }}
+    {{- include "sonarqube.volumes.caCerts" . | nindent 4 }}
     {{- if .Values.plugins.netrcCreds }}
     - name: plugins-netrc-file
       secret:
@@ -400,7 +388,7 @@ spec:
         - key: netrc
           path: .netrc
     {{- end }}
-    {{- if .Values.initSysctl.enabled }}
+    {{- if and .Values.initSysctl.enabled (not .Values.OpenShift.enabled) }}
     - name: init-sysctl
       configMap:
         name: {{ include "sonarqube.fullname" . }}-init-sysctl
@@ -408,7 +396,7 @@ spec:
           - key: init_sysctl.sh
             path: init_sysctl.sh
     {{- end }}
-    {{- if .Values.initFs.enabled }}
+    {{- if and .Values.persistence.enabled .Values.initFs.enabled (not .Values.OpenShift.enabled) }}
     - name: init-fs
       configMap:
         name: {{ include "sonarqube.fullname" . }}-init-fs
@@ -451,4 +439,5 @@ spec:
     - name : concat-dir
       emptyDir: {{- toYaml .Values.emptyDir | nindent 8 }}
       {{- end }}
+
 {{- end -}}
