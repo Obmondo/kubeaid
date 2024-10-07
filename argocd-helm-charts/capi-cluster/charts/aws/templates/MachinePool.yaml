@@ -5,6 +5,8 @@ apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachinePool
 metadata:
   name: {{ printf "%s-%s" $.Values.global.clusterName $machinePool.name }}
+  annotations:
+    cluster.x-k8s.io/replicas-managed-by: external-autoscaler
 spec:
   clusterName: {{ $.Values.global.clusterName }}
   replicas: {{ $machinePool.replicas }}
