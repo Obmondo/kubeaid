@@ -1,6 +1,34 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 4.0.0
+### Major Version Upgrades
+- Updated redmine from version 29.0.6 to 30.0.0
+
+### Minor Version Upgrades
+- Updated traefik from version 32.0.0 to 32.1.0
+- Updated sonarqube from version 10.6.1+3163 to 10.7.0+3598
+- Updated opensearch-dashboards from version 2.23.0 to 2.24.0
+- Updated opensearch from version 2.25.0 to 2.26.0
+- Updated oncall from version 1.9.30 to 1.10.2
+- Updated kubernetes-dashboard from version 7.6.1 to 7.7.0
+- Updated cluster-autoscaler from version 9.41.0 to 9.43.0
+- Updated cert-manager from version v1.15.3 to v1.16.0
+
+### Patch Version Upgrades
+- Updated rook-ceph-cluster from version v1.15.2 to v1.15.3
+- Updated rook-ceph from version v1.15.2 to v1.15.3
+- Updated rabbitmq-cluster-operator from version 4.3.23 to 4.3.24
+- Updated metallb from version 6.3.12 to 6.3.13
+- Updated fluent-bit from version 0.47.9 to 0.47.10
+- Updated external-dns from version 8.3.8 to 8.3.9
+- Updated argo-cd from version 7.6.5 to 7.6.8
+
+### Improvements
+- 85759c07 MachinePool annotation required for the AWS native autoscaler to autoscale it
+- f43f1e77 bootstrap crossplane
+- 84054ce6 Change deployment.revisionHistoryLimit type to int from string for Traefik KubeAid app
+
 ## 3.0.0
 ### Major Version Upgrades
 - Updated traefik from version 31.1.1 to 32.0.0

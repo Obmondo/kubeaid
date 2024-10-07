@@ -4,5 +4,5 @@ type: application
 version: 1.2.3
 dependencies:
   - name: opensearch
-    version: 2.25.0
+    version: 2.26.0
     repository: https://opensearch-project.github.io/helm-charts
