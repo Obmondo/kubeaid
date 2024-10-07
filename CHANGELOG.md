@@ -3,6 +3,7 @@ All releases and the changes included in them (pulled from git commits added sin
 
 ## 2024-10-07
 ### Major Version Upgrades %%^^
+- Updated redmine from version 29.0.6 to 30.0.0
 
 ### Minor Version Upgrades %%^^
 - Updated opensearch-dashboards from version 2.23.0 to 2.24.0
