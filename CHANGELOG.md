@@ -6,6 +6,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated redmine from version 29.0.6 to 30.0.0
 
 ### Minor Version Upgrades %%^^
+- Updated traefik from version 32.0.0 to 32.1.0
 - Updated sonarqube from version 10.6.1+3163 to 10.7.0+3598
 - Updated opensearch-dashboards from version 2.23.0 to 2.24.0
 - Updated opensearch from version 2.25.0 to 2.26.0
