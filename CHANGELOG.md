@@ -14,6 +14,8 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cert-manager from version v1.15.3 to v1.16.0
 
 ### Patch Version Upgrades %%^^
+- Updated rook-ceph-cluster from version v1.15.2 to v1.15.3
+- Updated rook-ceph from version v1.15.2 to v1.15.3
 - Updated rabbitmq-cluster-operator from version 4.3.23 to 4.3.24
 - Updated metallb from version 6.3.12 to 6.3.13
 - Updated fluent-bit from version 0.47.9 to 0.47.10
