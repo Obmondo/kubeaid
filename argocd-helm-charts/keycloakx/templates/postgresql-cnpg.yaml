@@ -19,6 +19,7 @@ spec:
       database: keycloak
       owner: keycloak
   {{ end }}
+  enablePDB: {{ ((.Values.cnpg).enablePDB) | default false }}
   resources:
     limits:
       memory: {{ (((.Values.cnpg).resources).limits).memory | default "800Mi" }}
