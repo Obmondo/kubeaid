@@ -1,13 +1,24 @@
 {{- if (.Values.provider).aws }}
+
+# For non Obmondo users, no customerid is needed.
+{{- $name := "aws" }}
+{{- $namespace := "capi-cluster" }}
+
+# For obmondo customers.
+{{- if .Values.global.customerid }}
+{{- $name = printf "%s-%s" $name .Values.global.customerid }}
+{{- $namespace = printf "%s-%s" $namespace .Values.global.customerid }}
+{{- end }}
+
 apiVersion: operator.cluster.x-k8s.io/v1alpha2
 kind: InfrastructureProvider
 metadata:
-  name: aws-{{ .Values.global.customerid }}
-  namespace: capi-cluster-{{ .Values.global.customerid }}
+  name: {{ $name }}
+  namespace: {{ $namespace }}
 spec:
   configSecret:
     name: {{ .Values.aws.secretName }}
-    namespace: capi-cluster-{{ .Values.global.customerid }}
+    namespace: {{ $namespace }}
   version: {{ .Values.global.capa.version }}
   fetchConfig:
     url: https://github.com/kubernetes-sigs/cluster-api-provider-aws/releases/{{ .Values.global.capa.version }}/infrastructure-components.yaml
