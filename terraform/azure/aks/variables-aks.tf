@@ -289,3 +289,9 @@ variable "cluster_backup_endpoint_tenant_id" {
   default     = null
   
 }
+
+variable "azure_policy_enabled" {
+  description = "value to enable or disable azure policy"
+  type        = bool
+  default     = false
+}
