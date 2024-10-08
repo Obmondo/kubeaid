@@ -94,12 +94,15 @@ resource "azurerm_storage_account" "cluster_backup" {
   account_replication_type = "LRS"
   min_tls_version = "TLS1_2"
   network_rules {
-    default_action             = "Deny"
+    default_action             = var.network_rules_default_action
     ip_rules                   = []
-    private_link_access {
+    dynamic "private_link_access" {
+      for_each = var.cluster_backup_endpoint_resource_id != null ? [1] : []
+      content {
         endpoint_resource_id = var.cluster_backup_endpoint_resource_id
         endpoint_tenant_id   = var.cluster_backup_endpoint_tenant_id
       }
+    }
   }
   
 }
