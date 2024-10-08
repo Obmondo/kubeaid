@@ -146,7 +146,7 @@ else
 fi
 
 KUBERNETES_CONFIG_DIR="../kubernetes-config-${CUSTOMER_ID}/${CLUSTER_NAME}/hiera"
-_EYAML_PUBLIC_KEY="../../../k8id/cluster-setup-files/puppet/${EYAML_PUBLIC_KEY}"
+_EYAML_PUBLIC_KEY="../../../kubeaid/cluster-setup-files/puppet/${EYAML_PUBLIC_KEY}"
 
 # Create the required directory
 mkdir -p "${KUBERNETES_CONFIG_DIR}"

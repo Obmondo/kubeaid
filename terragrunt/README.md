@@ -29,8 +29,8 @@
    ```
 
 2. Git repository
-   a. clone the k8id git repo from obmondo
-   b. Create a fresh git repo (for better naming, we usually call it k8id-config)
+   a. clone the kubeaid git repo from obmondo
+   b. Create a fresh git repo (for better naming, we usually call it kubeaid-config)
 
 ### Setup AKS cluster on Azure
 
@@ -65,7 +65,7 @@
    ext_vnet_name: "vnetProd"
    ext_vnet_resource_group: "alz-network-prod"
    remote_subs_id: "xxxxxxxxxxxxxxx"
-   repo_url: "https://github.com/obmondo/k8id-config"
+   repo_url: "https://github.com/obmondo/kubeaid-config"
    path: "k8s/obmondo/argocd-apps"
    vnet_address_space: "10.250.0.0/16"
    subnet_prefixes: "10.250.128.0/18"
@@ -77,14 +77,14 @@
    argocd_admin_bcrypt_password: $2a$12$sdfdsfdsfs234353tf3e4sd12.tGewzImV5Hi05x7.9/3WbfS
    environment: "prod"
    argocd_repos:
-     k8id:
-       url: "git@github.com:obmondo/k8id.git"
+     kubeaid:
+       url: "git@github.com:obmondo/kubeaid.git"
        username: git
-       ssh_private_key: "/Users/ubuntu/obmondo/k8id-config/keys/k8id.priv"
-     k8id-config:
-       url: "git@github.com:obmondo/k8id-config.git"
+       ssh_private_key: "/Users/ubuntu/obmondo/kubeaid-config/keys/kubeaid.priv"
+     kubeaid-config:
+       url: "git@github.com:obmondo/kubeaid-config.git"
        username: git
-       ssh_private_key: "/Users/ubuntu/obmondo/k8id-config/keys/k8id-config.priv"
+       ssh_private_key: "/Users/ubuntu/obmondo/kubeaid-config/keys/kubeaid-config.priv"
    routetable_name: "aks-agentpool-3243434-routetable"
    routes:
      "10.10.210.0_wg":

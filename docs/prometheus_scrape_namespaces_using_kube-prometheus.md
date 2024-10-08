@@ -16,11 +16,11 @@ kube-prometheus. Modify it according to your requirements.
 ## Configuration Steps
 
 1. Open the `vars.jsonnet` file:
-   - Locate the `k8id-config/k8s/<clustername>/<clustername>-vars.jsonnet` file for your Kubernetes cluster.
+   - Locate the `kubeaid-config/k8s/<clustername>/<clustername>-vars.jsonnet` file for your Kubernetes cluster.
    - Open the file in a text editor.
 
 2. Set the Prometheus Scrape Namespaces:
-   - In the `k8id-config/k8s/<clustername>/<clustername>-vars.jsonnet` file, locate the `prometheus_scrape_namespaces`
+   - In the `kubeaid-config/k8s/<clustername>/<clustername>-vars.jsonnet` file, locate the `prometheus_scrape_namespaces`
    field.
    - Modify the field to include the namespaces you want Prometheus to scrape.
    - For example, if you want Prometheus to scrape the `rook-ceph` and `logging` namespaces, update the field as follows:
@@ -33,21 +33,21 @@ kube-prometheus. Modify it according to your requirements.
      ```
 
 3. Save the changes:
-   - Save the `k8id-config/k8s/<clustername>/<clustername>-vars.jsonnet` file after making the necessary modifications.
+   - Save the `kubeaid-config/k8s/<clustername>/<clustername>-vars.jsonnet` file after making the necessary modifications.
 
 4. Regenerate kube-prometheus YAML:
    - Run the script to regenerate the kube-prometheus YAML files using the
-   `k8id-config/k8s/<clustername>/<clustername-vars>.jsonnet` file.
+   `kubeaid-config/k8s/<clustername>/<clustername-vars>.jsonnet` file.
    - Use the following command:
 
      ```bash
-     k8id/build/kube-prometheus/build.sh /path/to/kubernetes-config-company/k8s/production.company.io/production.company.io-vars.jsonnet
+     kubeaid/build/kube-prometheus/build.sh /path/to/kubernetes-config-company/k8s/production.company.io/production.company.io-vars.jsonnet
      ```
 
    - Replace the paths with the appropriate locations for your setup.
 
 5. Commit and Sync:
-   - Commit the changes made to the `k8id-config/k8s/<clustername>/<clustername>-vars.jsonnet` file to your cluster
+   - Commit the changes made to the `kubeaid-config/k8s/<clustername>/<clustername>-vars.jsonnet` file to your cluster
    configuration repository.
    - Sync the changes to apply the new configurations.
 

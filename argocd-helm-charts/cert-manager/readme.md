@@ -8,10 +8,10 @@ Look at `values-multiple-solvers.yaml` for example.
 NB. Depending on cloud provider (for dns solvers), values might differ,
 currently only `route53` & `cloudflare` are supported by chart.
 [Full list of DNS](https://cert-manager.io/docs/configuration/acme/dns01/)
-2. Place values file in your `k8id-config` repository under 'k8s/{clustername}/argocd-apps/values-cert-manager.yaml'
+2. Place values file in your `kubeaid-config` repository under 'k8s/{clustername}/argocd-apps/values-cert-manager.yaml'
 3. Place [examples/cert-manager.yaml](examples/cert-manager.yaml)
-in your `k8id-config` repository under 'k8s/{clustername}/argocd-apps/templates' -
-be sure to adjust paths to match your k8id and k8id-config repositories.
+in your `kubeaid-config` repository under 'k8s/{clustername}/argocd-apps/templates' -
+be sure to adjust paths to match your kubeaid and kubeaid-config repositories.
 
 ## Details to help fill out values file correctly
 

@@ -54,7 +54,7 @@ spec:
   project: default
   source:
     path: argocd-helm-charts/obmondo-k8s-agent
-    repoURL: https://gitlab.enableit.dk/kubernetes/k8id.git
+    repoURL: https://gitlab.enableit.dk/kubernetes/kubeaid.git
     targetRevision: HEAD
     helm:
       valueFiles:

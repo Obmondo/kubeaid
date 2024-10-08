@@ -101,7 +101,7 @@ Details about setup if you are interested:
 * Set the `Authorization Url` as `https://keycloakx.kam.obmondo.com/auth/realms/Obmondo/protocol/openid-account/auth`
 * Set the `Token Url` as `https://keycloakx.kam.obmondo.com/auth/realms/Obmondo/protocol/openid-account/token`
 * Set the `Client Authentication` as `Client secret sent as basic auth`
-* Set the `Client ID` as `k8id-employee`
+* Set the `Client ID` as `kubeaid-employee`
 * Set the `Client Secret` as `secret-from-obmondo`
 * Toggle the `pass login hint`
 * Save

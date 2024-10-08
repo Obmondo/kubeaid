@@ -5,7 +5,7 @@ which pods has role defined in annotation for AWS services. If so, then kube2iam
 generate an temporary credential and assign to the pod. Therefore, pod able to access S3
 bucket.
 
-## How kube2iam is used in k8id ?
+## How kube2iam is used in kubeaid?
 
 Basically we use PostgreSQL to create logical backups for an application. And Cronjobs
 are scheduled to run everyday at particular time to upload those backups in S3 bucket
