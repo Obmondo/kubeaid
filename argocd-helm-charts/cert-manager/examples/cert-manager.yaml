@@ -11,7 +11,7 @@ spec:
   source:
     # for e.g. argocd-helm-charts/cert-manager
     path: <relative path to cert-manager helm chart>
-    # for e.g. https://gitlab.enableit.dk/kubernetes/k8id.git
+    # for e.g. https://gitlab.enableit.dk/kubernetes/kubeaid.git
     repoURL: <repo url>
     targetRevision: HEAD  # repo branch or commit SHA or HEAD
     helm:

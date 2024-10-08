@@ -48,17 +48,17 @@ kubectl create secret generic kube-prometheus-stack-grafana -n monitoring --dry-
 ```
 
   
-## Activate support from K8id Support team
+## Activate support from KubeAid Support team
 
 ```bash
-# You will get the private key and cert from K8id Support team.
+# You will get the private key and cert from KubeAid Support team.
 
 kubectl create secret tls obmondo-clientcert --namespace monitoring --dry-run=client --key=./private.key --cert=./cert.pem --output=yaml | kubeseal --controller-namespace system --controller-name sealed-secrets --format yaml -
 ```
 
 ```bash
 # copy the existing template from the example-alertmanager-config dir, the filename is alertmanager-main
-cp alertmanager-main-slack.yaml /to/your/k8id-config/k8s/your-cluster/sealed-secret/monitoring/alertmanager-main.yaml
+cp alertmanager-main-slack.yaml /to/your/kubeaid-config/k8s/your-cluster/sealed-secret/monitoring/alertmanager-main.yaml
 
 # add your slack url with this command.
 kubectl create secret generic alertmanager-main --dry-run=client --from-literal=slack-url="https://hooks.slack.com/services/lol/my/token" -o yaml | kubeseal --controller-namespace system --controller-name sealed-secrets --format yaml --merge-into alertmanager-main.yaml

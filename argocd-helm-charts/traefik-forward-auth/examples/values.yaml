@@ -7,7 +7,7 @@ traefik-forward-auth:
         secretKeyRef:
           key: client-secret
           name: traefik-forward-auth-keycloak
-    oidcUri: https://keycloak.k8id.io/auth/realms/K8id
+    oidcUri: https://keycloak.kubeaid.io/auth/realms/KubeAid
     enableRBAC: true
   replicaCount: 1
   env:

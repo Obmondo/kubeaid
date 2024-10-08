@@ -1,6 +1,6 @@
 # Updating helm repository
 
-- Go to k8id repo and check for the script `/bin/helm-repo-update.sh`.
+- Go to kubeaid repo and check for the script `/bin/helm-repo-update.sh`.
 - This script will help to update the latest code from the github repository.
 
 ```txt

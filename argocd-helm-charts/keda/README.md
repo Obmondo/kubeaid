@@ -3,8 +3,8 @@
 **NOTE: Do not combine KEDA Project's autoscaling (described in this guide) with Kubernetes HPA + Prom Adapter
 for the same pod deployment. They will compete with each other and break things.**
 
-**NOTE2: This assumes your cluster is setup with K8id because it provides sane defaults, although its possible to setup
-this on non K8id clusters too.**
+**NOTE2: This assumes your cluster is setup with KubeAid because it provides sane defaults, although its possible to setup
+this on non KubeAid clusters too.**
 
 For new setups, we recommend using KEDA Project for Pod Autoscaling instead of Prometheus Adapter because
 it is much easier to wrap your head around it compared to Prometheus Adapter where you have to define
@@ -19,15 +19,15 @@ rules, metric to resource association, etc.
 
 ## Setup Prerequisites
 
-Set `connect_keda: true` in your k8id managed cluster's prometheus build jsonnet vars file
-`(k8id-config/k8s/<clustername>/<clustername>-vars.jsonnet)`.
+Set `connect_keda: true` in your kubeaid managed cluster's prometheus build jsonnet vars file
+`(kubeaid-config/k8s/<clustername>/<clustername>-vars.jsonnet)`.
 
 Regenerate kube prometheus YAML with
-`k8id/build/kube-prometheus/build.sh /path/to/k8id-config/k8s/<clustername>/<clustername>-vars.jsonnet`
+`kubeaid/build/kube-prometheus/build.sh /path/to/kubeaid-config/k8s/<clustername>/<clustername>-vars.jsonnet`
 
 This will generate a few YAML files which define the network policy which allows Keda to connect to prometheus.
 
-Create `k8id-config/k8s/<clustername>/argocd-apps/templates/keda.yaml`.
+Create `kubeaid-config/k8s/<clustername>/argocd-apps/templates/keda.yaml`.
 Replace the repo URLs with your own.
 
 ```yaml
@@ -42,7 +42,7 @@ spec:
     namespace: monitoring
   project: default
   sources:
-    - repoURL: https://gitlab.enableit.dk/kubernetes/k8id.git
+    - repoURL: https://gitlab.enableit.dk/kubernetes/kubeaid.git
       path: argocd-helm-charts/keda
       targetRevision: HEAD
       helm:
@@ -58,7 +58,7 @@ spec:
       - ApplyOutOfSyncOnly=true
 ```
 
-Create a values file `k8id-config/k8s/<clustername>/argocd-apps/values-keda.yaml`. Leave it empty for now.
+Create a values file `kubeaid-config/k8s/<clustername>/argocd-apps/values-keda.yaml`. Leave it empty for now.
 
 Commit the changes to your cluster config repo and sync.
 
