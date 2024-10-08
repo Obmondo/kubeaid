@@ -115,6 +115,7 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     private_cluster_public_fqdn_enabled = true
     sku_tier                = var.sku_tier
     oidc_issuer_enabled     = var.oidc_issuer_enabled
+    azure_policy_enabled    = var.azure_policy_enabled
     default_node_pool {
         name                = var.nodepool_name
         node_count          = var.default_agent_count
