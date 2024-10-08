@@ -295,3 +295,9 @@ variable "azure_policy_enabled" {
   type        = bool
   default     = false
 }
+
+variable "network_rules_default_action" {
+  description = "Default action for network rules"
+  type        = string
+  default     = "Deny"
+}
