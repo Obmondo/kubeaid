@@ -31,7 +31,7 @@ An operations team, typicly has 2 hugely important tasks:
 Even with Kubernetes, there is a lot of work to be done, to pick the right solutions for each feature you need - and it
 is our experience that 95% of what one team needs, is the EXACT same most of the other teams need.
 
-**K8id** aims to be a constantly evolving solution for 1. - enabling the collaboration of operations teams across the
+**KubeAid** aims to be a constantly evolving solution for 1. - enabling the collaboration of operations teams across the
 world, to increase the velocity of every operations team, so they can focus on 2. - while everyone gets to enjoy a
 highly available and secure operations setup.
 
@@ -39,7 +39,7 @@ Quite often its very difficult to find enough who can to do this work, and espec
 building a replica of what you are building to solve 1. This is even WHY Kubernetes was started, to help enable
 collaboration between companies on a shared goal.
 
-**K8id** is being developed by [Obmondo.com](https://obmondo.com) - where we build the solutions our customers need, and
+**KubeAid** is being developed by [Obmondo.com](https://obmondo.com) - where we build the solutions our customers need, and
 share the work with everyone, via this project. We feel this is the only way, We ever have a chance of actually
 delivering the features that every operations team should have - without needing to have a subject matter expert at hand
 for everything.
@@ -55,14 +55,14 @@ they need it.
 
 ## Setup of Kubernetes clusters
 
-Mirror this repo and the [k8id-config](https://github.com/Obmondo/k8id-config) repo into a Git platform of your choice,
-and follow the `README` file in the `k8id-config` repository on how to write the config for your Kubernetes cluster.
+Mirror this repo and the [kubeaid-config](https://github.com/Obmondo/kubeaid-config) repo into a Git platform of your choice,
+and follow the `README` file in the `kubeaid-config` repository on how to write the config for your Kubernetes cluster.
 
-You must NEVER make any changes on the master/main branch of you mirror of the k8id repository, as we use this to
+You must NEVER make any changes on the master/main branch of you mirror of the kubeaid repository, as we use this to
 deliver updates to you. This means that your cluster can be updated simply by running `git pull` on your copy of
 this repository.
 
-All customizations happens in your `k8id-config` repo.
+All customizations happens in your `kubeaid-config` repo.
 
 ## support
 
@@ -74,18 +74,18 @@ There are ZERO vendor lockin - so any subscription you sign - can be cancelled a
 a time.
 
 With a subscription we will be there, to ensure your smooth operations, in times of sickness and employee shortages -
-and able to scale your development efforts on k8id if needed.
+and able to scale your development efforts on kubeaid if needed.
 
 ## Secrets
 
 We use [sealed-secrets](https://github.com/bitnami-labs/sealed-secrets/) which means secrets are encrypted locally (by
-the developer who knows them) and committed to your K8id config repo under the path
+the developer who knows them) and committed to your kubeaid config repo under the path
 `k8s/<cluster-name>/sealed-secrets/<namespace>/<name-of-secret>.json`. See documentation in
 [./argocd-helm-charts/sealed-secrets/README.md](./argocd-helm-charts/sealed-secrets/README.md)
 
 ## License
 
-**K8id** is licensed under the Affero GPLv3 license, as we believe this is the best way to protect against the patent
+**KubeAid** is licensed under the Affero GPLv3 license, as we believe this is the best way to protect against the patent
 attacks we see hurting the industry; where companies submit code that uses technology they have patented, and then turn
 and litigate companies that use the software.
 
@@ -95,11 +95,11 @@ project, namely to allow everyone to work on a level playing ground.
 
 ## Technical details on the features
 
-Read here for current status on all features of k8id
+Read here for current status on all features of kubeaid
 
 ### Setup of k8s clusters on physical servers and in cloud providers
 
-K8id support both physical server (on-premise or at e.g. [Hetzner.com](https://hetzner.com)) and cloud providers like
+KubeAid support both physical server (on-premise or at e.g. [Hetzner.com](https://hetzner.com)) and cloud providers like
 Azure AKS, Amazon AWS or Google GCE.
 
 We currently integrate Terraform, for setting up AKS cluster in Azure, and use kOPS for k8s in AWS and GCP
@@ -241,15 +241,15 @@ To get all the available locations run
 az account list-locations -o table
 ```
 
-The config file is present in your respective `k8id-config` repo. So, you must clone and provide that file. If I am
-standing in the `k8id` repo then my commands will be
+The config file is present in your respective `kubeaid-config` repo. So, you must clone and provide that file. If I am
+standing in the `kubeaid` repo then my commands will be
 
 ```sh
-terraform -chdir=cluster-setup-files/terraform/gitlab-ci-server plan -var-file=../k8id-config/vms/gitlab.tfvars
+terraform -chdir=cluster-setup-files/terraform/gitlab-ci-server plan -var-file=../kubeaid-config/vms/gitlab.tfvars
 ```
 
 ```sh
-terraform -chdir=cluster-setup-files/terraform/gitlab-ci-server apply -var-file=../k8id-config/vms/gitlab.tfvars -auto-approve
+terraform -chdir=cluster-setup-files/terraform/gitlab-ci-server apply -var-file=../kubeaid-config/vms/gitlab.tfvars -auto-approve
 ```
 
 ## Create an Azure AKS (Kubernetes) cluster
@@ -279,18 +279,18 @@ az aks get-versions --location $location
 ```
 
 ```sh
-terraform -chdir=cluster-setup-files/terraform/aks plan -var-file=../k8id-config/k8s/kube.tfvars
+terraform -chdir=cluster-setup-files/terraform/aks plan -var-file=../kubeaid-config/k8s/kube.tfvars
 ```
 
 ```sh
-terraform -chdir=cluster-setup-files/terraform/aks apply -var-file=../k8id-config/k8s/kube.tfvars -auto-approve
+terraform -chdir=cluster-setup-files/terraform/aks apply -var-file=../kubeaid-config/k8s/kube.tfvars -auto-approve
 ```
 
 ## CI build and automatic pull requests
 
 **TODO:** Add documentation describing what is actually going on here
 
-To automatically build K8id in CI and create a pull request against your own config repository additional configuration
+To automatically build kubeaid in CI and create a pull request against your own config repository additional configuration
 may be required.
 
 ### Secrets Required
@@ -308,12 +308,12 @@ The `kube-prometheus` needs two secrets thats needs to be present
 
 **TODO:** Start by documenting what these pull requests are actually all about....
 
-K8id implements a GitHub Action that is used to automatically create pull requests. For this to work the following
+kubeaid implements a GitHub Action that is used to automatically create pull requests. For this to work the following
 variables should be set:
 
 - `API_TOKEN_GITHUB`: GitHub PAT with permission `repo` (Full control of private repositories).
-- `OBMONDO_DEPLOY_REPO_TARGET`: Target repository short name, e.g. `awesomecorp/k8id-config-awesomecorp`
-- `OBMONDO_DEPLOY_REPO_TARGET_BRANCH`: Branch name of k8id-config against which you want to build, often `main` or `master`
+- `OBMONDO_DEPLOY_REPO_TARGET`: Target repository short name, e.g. `awesomecorp/kubeaid-config-awesomecorp`
+- `OBMONDO_DEPLOY_REPO_TARGET_BRANCH`: Branch name of kubeaid-config against which you want to build, often `main` or `master`
 - `OBMONDO_DEPLOY_PULL_REQUEST_REVIEWERS` (optional): A comma-separated list of usernames of the users that are added as
   reviewers for PRs
 
@@ -329,9 +329,9 @@ result in the CI job not creating new PRs as long as a branch named `obmondo-dep
 
 **TODO:** Start by documenting what these pull requests are actually all about....
 
-K8id requires two CI/CD secrets to be configured in order for GitLab CI to be able to create merge requests against a
+kubeaid requires two CI/CD secrets to be configured in order for GitLab CI to be able to create merge requests against a
 config repository:
 
 - `KUBERNETES_CONFIG_REPO_TOKEN`: GitLab access token with permissions `api` and `read_repository`
 - `KUBERNETES_CONFIG_REPO_URL`: Complete URL to target git repo, e.g.
-  `https://gitlab.example.org/it/k8id-config-awesomecorp.git`
+  `https://gitlab.example.org/it/kubeaid-config-awesomecorp.git`

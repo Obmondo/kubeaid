@@ -5,10 +5,11 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"log"
 	"os"
 	"os/exec"
+
+	"gopkg.in/yaml.v3"
 )
 
 var sealedSecretJSONFile = "credentials-velero.json"
@@ -127,7 +128,7 @@ func main() {
 		return
 	}
 
-	log.Println("DONE! Please apply the sealed secret resource to the cluster located at k8id/build/velero-secret-gen/credentials-velero.json")
+	log.Println("DONE! Please apply the sealed secret resource to the cluster located at kubeaid/build/velero-secret-gen/credentials-velero.json")
 }
 
 func generateSecretResource(azureCfg *azureConfig, kubesealExecPath string) error {

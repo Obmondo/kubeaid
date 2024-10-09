@@ -28,9 +28,9 @@ https://github.com/mesosphere/traefik-forward-auth
     - /dashboard
     - /admin
     # Regex pattern will work when `ENABLE_V3_URL_PATTERN_MATCHING:` is enabled in values file
-    - ~^https?://whoami-auth\.k8id\.io/
-    - ~^https?://traefik\.k8id\.io/
-    - ~^https?://queue\.job\.k8id\.io/
+    - ~^https?://whoami-auth\.kubeaid\.io/
+    - ~^https?://traefik\.kubeaid\.io/
+    - ~^https?://queue\.job\.kubeaid\.io/
     verbs:
     - get
 
@@ -57,7 +57,7 @@ https://github.com/mesosphere/traefik-forward-auth
     name: foo-whoami-binding
   subjects:
   - kind: User
-    name: foo@k8id.io
+    name: foo@kubeaid.io
     apiGroup: rbac.authorization.k8s.io
   roleRef:
     apiGroup: rbac.authorization.k8s.io

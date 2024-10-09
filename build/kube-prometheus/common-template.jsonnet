@@ -44,7 +44,7 @@ local default_vars = {
     'graylog',
     'haproxy',
     'harbor',
-    'k8id-custom-azure',
+    'kubeaid-custom-azure',
     'k8s-event-logger',
     'keda',
     'keycloakx',
@@ -382,7 +382,7 @@ local kp =
                 },
                 podSelector: {
                   matchLabels: {
-                    'k8id.io/permissions': 'allow-prometheus',
+                    'kubeaid.io/permissions': 'allow-prometheus',
                   },
                 },
               }],

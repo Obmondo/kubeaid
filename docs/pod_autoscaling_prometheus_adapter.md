@@ -3,8 +3,8 @@
 **NOTE: Do not combine Kubernetes HPA + Prom Adapter (described in this guide) with Keda Project's autoscaling for the
 same deployment. They will compete with each other and break things.**
 
-**NOTE2: This assumes your cluster is setup with K8id because it provides sane defaults, although its possible to setup
-this on non K8id clusters too.**
+**NOTE2: This assumes your cluster is setup with KubeAid because it provides sane defaults, although its possible to setup
+this on non KubeAid clusters too.**
 
 ## Introduction & Situation
 
@@ -18,12 +18,12 @@ this on non K8id clusters too.**
 
 _This needs to be done only once._
 
-- Set `enable_custom_metrics_apiservice: true` in your k8id managed cluster's prometheus build jsonnet vars file
-  `(k8id-config/k8s/<clustername>/<clustername>-vars.jsonnet)`.
+- Set `enable_custom_metrics_apiservice: true` in your kubeaid managed cluster's prometheus build jsonnet vars file
+  `(kubeaid-config/k8s/<clustername>/<clustername>-vars.jsonnet)`.
 - Ensure `kube_prometheus_version` is newer than `v0.12.0`.
 
 Regenerate kube prometheus YAML with
-`k8id/build/kube-prometheus/build.sh /path/to/kubernetes-config-company/k8s/production.company.io/production.company.io-vars.jsonnet`
+`kubeaid/build/kube-prometheus/build.sh /path/to/kubernetes-config-company/k8s/production.company.io/production.company.io-vars.jsonnet`
 
 This will generate a few YAML files which define (setup or re-configure) prometheus, grafana, alertmanager,
 prometheus-adapter, and other resources and configs needed by them.
@@ -50,7 +50,7 @@ In addition to scaling based on custom metrics you can scale based on CPU/Memory
 
 ### Method A
 
-You do not need to set Prometheus Adapter rules yourself as the default rules in K8id already expose your custom
+You do not need to set Prometheus Adapter rules yourself as the default rules in kubeaid already expose your custom
 metrics to K8s as long as they have the `pod="pod-name"` and `namespace="namespace-name"` labels.
 
 You can list all metrics available to K8s with `kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1 | jq`.

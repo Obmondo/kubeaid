@@ -1,5 +1,5 @@
 cluster_name: k8s.enableittest.example.com
-terraform_bucket: bw7-terraform-k8id
+terraform_bucket: bw7-terraform-kubeaid
 setup_peering: false
 setup_kops_bucket: false
 domain_name: example.com

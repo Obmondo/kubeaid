@@ -3,7 +3,7 @@
 ## Setup root argocd application
 
 * After your kube cluster is created - you will need to deploy the root application
-  Assuming you have already created the `k8s/<clustername>/argocd-apps` in your k8id-config repo
+  Assuming you have already created the `k8s/<clustername>/argocd-apps` in your kubeaid-config repo
 
   ```sh
   helm template k8s/<clustername>/argocd-apps --show-only templates/root.yaml | kubectl apply -f -
@@ -205,7 +205,7 @@ kubectl apply -f argocdrepo-myreponame.yaml -n argocd
     -> Users
     -> Select User
     -> Under `groups` tab
-    -> Select the required group (See values for argocd https://<k8id-config-repo-url>/-/blob/main/k8s/<clustername>/argocd-apps/values-argo-cd.yaml under policy.csv)
+    -> Select the required group (See values for argocd https://<kubeaid-config-repo-url>/-/blob/main/k8s/<clustername>/argocd-apps/values-argo-cd.yaml under policy.csv)
     -> done
   ```
 
@@ -215,20 +215,20 @@ kubectl apply -f argocdrepo-myreponame.yaml -n argocd
 * The `argocd-secret` should have a key `oidc.keycloak.clientSecret`.
 * Verify your keycloak user roles and group memberships for your username by logging into the keycloak server from UI.
 * The URL for keycloak server would be https://keycloak.your.domain.com. Refer [Keycloak readme](../keycloak/README.md).
-* Check the `values-argo-cd.yaml` in the k8id-config repo for the k8s cluster. Match policy.csv with the roles in Keycloak
+* Check the `values-argo-cd.yaml` in the kubeaid-config repo for the k8s cluster. Match policy.csv with the roles in Keycloak
 
 ## Development with ArgoCD and Helm chart
 
 To create a new application in ArgoCD using a Helm chart, we need to go through the following
 
-* Checkout a new feature branch from main branch of k8id repo
-* Create a folder inside `argocd-helm-charts` folder in the k8id repo (or the kubernetes-config-enableit repo)
+* Checkout a new feature branch from main branch of kubeaid repo
+* Create a folder inside `argocd-helm-charts` folder in the kubeaid repo (or the kubernetes-config-enableit repo)
 * Add your helm chart files inside the folder - e.g. Chart.yaml, values.yaml, etc
 * Using `helm template` command, verify the objects that would be created in the cluster
-* Execute `bin/helm-repo-update.sh` from the k8id repo to update the dependencies for the Helm chart.
+* Execute `bin/helm-repo-update.sh` from the kubeaid repo to update the dependencies for the Helm chart.
 * If the objects are being generated correctly, then push the changes to the feature branch and create a Merge Request
 * To create a new application in ArgoCD (till v2.3), create a values-appName.yaml and templates/appName.yaml
-in the respective customer's k8id-config repo.
+in the respective customer's kubeaid-config repo.
 * Add the above config related changes to a new branch and do an MR on the config repo.
 * Sync the root app in ArgoCD. AgroCD will create the application and it would show up as `Out of Sync`.
 * Sync the app so that ArgoCD fetches the files from the Helm chart and runs `helm template`. The yaml output of
@@ -237,7 +237,7 @@ the command is sent to the k8s api to create the objects accordingly in the clus
 * To make and test further changes, change the values in the Helm chart. Test using `helm template` as mentioned
 earlier and push the changes to feature branch. Sync the app again from ArgoCD to apply the changes.
 
-Link to detailed workflow : https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/readme.md
+Link to detailed workflow : https://gitlab.enableit.dk/kubernetes/kubeaid/-/blob/master/argocd-helm-charts/readme.md
 
 ## Links
 

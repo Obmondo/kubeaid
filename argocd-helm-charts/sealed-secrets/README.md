@@ -108,7 +108,7 @@ spec:
     access-token: AgDE==
   template:
     data:
-      k8id-pushupdate.yaml: |
+      kubeaid-pushupdate.yaml: |
         repo-url: https://gitlab.com/example/repo.git
         username: smart_user
         password: "{{ index . "password" }}"

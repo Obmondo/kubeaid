@@ -2,7 +2,7 @@
 
 To add an upstream chart :
 
-- create a new folder under k8id/argocd-helm-charts/
+- create a new folder under kubeaid/argocd-helm-charts/
 
 ```bash
   mkdir <chart name>

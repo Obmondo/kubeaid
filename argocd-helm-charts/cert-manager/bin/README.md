@@ -9,7 +9,7 @@ https://github.com/richstokes/k8s-scripts/
 * You will sometimes encounter error messages such as these in the logs for cert-manager's `cainjector` pod:
 
 ```text
-E1124 08:09:45.831036       1 indexers.go:61] "cert-manager: unable to fetch certificate that owns the secret" err="Certificate.cert-manager.io \"k8id-obmondo-web-app-317-tls\" not found" kind="customresourcedefinition" type="customresourcedefinition" secret="obmondo-ci/k8id-obmondo-web-app-317-tls" certificate="obmondo-ci/k8id-obmondo-web-app-317-tls"
+E1124 08:09:45.831036       1 indexers.go:61] "cert-manager: unable to fetch certificate that owns the secret" err="Certificate.cert-manager.io \"kubeaid-obmondo-web-app-317-tls\" not found" kind="customresourcedefinition" type="customresourcedefinition" secret="obmondo-ci/kubeaid-obmondo-web-app-317-tls" certificate="obmondo-ci/kubeaid-obmondo-web-app-317-tls"
 ```
 
 ## Why it happens

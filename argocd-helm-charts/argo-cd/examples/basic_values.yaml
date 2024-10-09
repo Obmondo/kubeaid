@@ -26,20 +26,20 @@ argo-cd:
         requestedScopes: ["openid", "profile", "email", "groups"]
       repositories:
         - type: git
-          url: https://gitlab.com/kubernetes/k8id.git
+          url: https://gitlab.com/kubernetes/kubeaid.git
           usernameSecret:
-            name: k8id-argocd
+            name: kubeaid-argocd
             key: username
           passwordSecret:
-            name: k8id-argocd
+            name: kubeaid-argocd
             key: password
         - type: git
           url: https://gitlab.com/kubernetes/kubernetes-config-enableit.git
           usernameSecret:
-            name: k8id-config-argocd
+            name: kubeaid-config-argocd
             key: username
           passwordSecret:
-            name: k8id-config-argocd
+            name: kubeaid-config-argocd
             key: password
     ingress:
       enabled: true
