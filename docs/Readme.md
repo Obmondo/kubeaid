@@ -1,4 +1,4 @@
-# K8id Documentation
+# KubeAid Documentation
 
 ## Overview
 
@@ -24,8 +24,8 @@
 
 2. Git repository
 
-   a. clone the k8id git repo from obmondo
-   b. Create a fresh git repo (for better naming, we usually call it k8id-config)
+   a. clone the kubeaid git repo from obmondo
+   b. Create a fresh git repo (for better naming, we usually call it kubeaid-config)
 
 ## Installations
 
@@ -42,7 +42,7 @@
 ## Feature and Security Updates
 
 We regularly update our Helm charts from upstream repositories and ensure that you don't miss out on
-important security updates. To simplify updates, you can grant write access to your `k8id` and `k8id-config` repo
+important security updates. To simplify updates, you can grant write access to your `kubeaid` and `kubeaid-config` repo
 created in step 2 above - to the github user `obmondo-pushupdate-user`.
 
 This will enable us to automatically push the latest updates to your repo and allow us to adjust your

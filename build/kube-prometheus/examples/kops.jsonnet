@@ -3,7 +3,7 @@
   platform: 'kops',
   extra_configs: true,
   'blackbox-exporter': false,
-  // If you want k8id Supprt, set it to true
+  // If you want kubeaid Supprt, set it to true
   connect_obmondo: true,
   prometheus_operator_resources+: {
     limits: { memory: '200Mi' },
@@ -27,12 +27,12 @@
     velero: true,
   },
   grafana_keycloak_enable: true,
-  grafana_root_url: 'https://grafana.k8id.io',
-  grafana_signout_redirect_url: 'https://keycloak.k8id.io/auth/realms/master/protocol/openid-connect/logout?redirect_uri=https://grafana.k8id.io',
-  grafana_auth_url: 'https://keycloak.k8id.io/auth/realms/master/protocol/openid-connect/auth',
-  grafana_token_url: 'https://keycloak.k8id.io/auth/realms/master/protocol/openid-connect/token',
-  grafana_api_url: 'https://keycloak.k8id.io/auth/realms/master/protocol/openid-connect/userinfo',
-  grafana_ingress_host: 'grafana.k8id.io',
+  grafana_root_url: 'https://grafana.kubeaid.io',
+  grafana_signout_redirect_url: 'https://keycloak.kubeaid.io/auth/realms/master/protocol/openid-connect/logout?redirect_uri=https://grafana.kubeaid.io',
+  grafana_auth_url: 'https://keycloak.kubeaid.io/auth/realms/master/protocol/openid-connect/auth',
+  grafana_token_url: 'https://keycloak.kubeaid.io/auth/realms/master/protocol/openid-connect/token',
+  grafana_api_url: 'https://keycloak.kubeaid.io/auth/realms/master/protocol/openid-connect/userinfo',
+  grafana_ingress_host: 'grafana.kubeaid.io',
   kube_prometheus_version: 'v0.11.0',
   prometheus+: {
     storage: {

@@ -1,7 +1,7 @@
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
-  name: k8id-azurefile-ext4
+  name: kubeaid-azurefile-ext4
 provisioner: file.csi.azure.com
 reclaimPolicy: Delete
 volumeBindingMode: Immediate

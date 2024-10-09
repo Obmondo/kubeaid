@@ -13,4 +13,4 @@ External snapshotter is used to create Volume Snapshots of the Persistent Volume
 Sometimes, VolumeSnapshots remain on the cluster long after a backup from Velero or a similar
 application has been deleted. We need to check the snapshots on our cloud provider periodically
 to avoid spending on cloud costs for unused snapshots. Check more details on the
-[Velero Helm chart readme](https://gitlab.enableit.dk/kubernetes/k8id/-/blob/master/argocd-helm-charts/velero/README.md#troubleshooting)
+[Velero Helm chart readme](https://gitlab.enableit.dk/kubernetes/kubeaid/-/blob/master/argocd-helm-charts/velero/README.md#troubleshooting)

@@ -30,19 +30,19 @@
 
     terragrunt run-all plan  --terragrunt-exclude-dir helm
     terragrunt run-all apply --terragrunt-exclude-dir helm
-    INFO[0000] The stack at /home/ashish/k8id-all/k8id/terragrunt/kops will be processed in the following order for command apply:
+    INFO[0000] The stack at /home/ashish/kubeaid-all/kubeaid/terragrunt/kops will be processed in the following order for command apply:
     Group 1
-    - Module /home/ashish/k8id-all/k8id/terragrunt/kops/kops_bucket
-    - Module /home/ashish/k8id-all/k8id/terragrunt/kops/vpc
+    - Module /home/ashish/kubeaid-all/kubeaid/terragrunt/kops/kops_bucket
+    - Module /home/ashish/kubeaid-all/kubeaid/terragrunt/kops/vpc
 
     Group 2
-    - Module /home/ashish/k8id-all/k8id/terragrunt/kops/peering
+    - Module /home/ashish/kubeaid-all/kubeaid/terragrunt/kops/peering
 
     Group 3
-    - Module /home/ashish/k8id-all/k8id/terragrunt/kops/cluster
+    - Module /home/ashish/kubeaid-all/kubeaid/terragrunt/kops/cluster
 
     Group 4
-    - Module /home/ashish/k8id-all/k8id/terragrunt/kops/iam
+    - Module /home/ashish/kubeaid-all/kubeaid/terragrunt/kops/iam
 
     Are you sure you want to run 'terragrunt apply' in each folder of the stack described above? (y/n) y
     ```
@@ -54,7 +54,7 @@
     kops export kubeconfig --name <cluster-name> --admin
     ```
 
-  * cd to k8id/terragrunt/kops/cluster/helm
+  * cd to kubeaid/terragrunt/kops/cluster/helm
   * Run the following command to deploy argocd
 
     ```sh

@@ -5,7 +5,7 @@
 cluster_name: "k8s.enableittest.example.com"
 
 # Terraform Bucket name
-terraform_bucket: bw7-terraform-k8id
+terraform_bucket: bw7-terraform-kubeaid
 
 # Do you want peering
 skip_peering: true
