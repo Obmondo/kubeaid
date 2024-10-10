@@ -1,20 +1,17 @@
 global:
-  clusterName: staging.enableit.dev
-  customerid: enableit
   kubernetes:
-    version: v1.30.4
+    version: v1.31.0
   clusterAPI:
     version: v1.7.2
+  capa:
+    version: v2.6.1
+    autoScaler: true
   caph:
     version: v1.0.0-beta.43
-  kubeaid:
-    repo: https://github.com/Obmondo/kubeaid.git
-  kubeaidConfig:
-    repo: https://github.com/Obmondo/kubeaid-config.git
   capz:
-    version: v1.16.0
-
-selfManged: false
+    version: v1.17.0
+  kubeaid:
+    repo: https://github.com/Obmondo/KubeAid.git
 
 provider:
   hetzner: false
