@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated kubernetes-dashboard from version 7.7.0 to 7.8.0
 - Updated cluster-api-operator from version 0.13.0 to 0.14.0
 
 ### Patch Version Upgrades %%^^
