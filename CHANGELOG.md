@@ -1,6 +1,13 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- d289c927 Making CAPI Cluster App's default values file compatible with the optional customerid feature
+- 64f72b7b Make customerid optional in CAPI Cluster Helm values
+- 9d18cb83 add/renamed the references and links to kubeaid
+- 618f0bf3 Add support for storage blob network rules
+- 261f66a1 enable azure policy
+
 ## 4.0.0
 ### Major Version Upgrades
 - Updated redmine from version 29.0.6 to 30.0.0
