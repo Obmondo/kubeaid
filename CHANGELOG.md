@@ -1,16 +1,14 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 2024-10-14
-### Major Version Upgrades %%^^
-
-### Minor Version Upgrades %%^^
+## 4.1.0
+### Minor Version Upgrades
 - Updated oncall from version 1.10.2 to 1.11.0
 - Updated mariadb-operator from version 0.33.0 to 0.34.0
 - Updated kubernetes-dashboard from version 7.7.0 to 7.8.0
 - Updated cluster-api-operator from version 0.13.0 to 0.14.0
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
 - Updated traefik from version 32.1.0 to 32.1.1
 - Updated metrics-server from version 3.12.1 to 3.12.2
 - Updated k8s-event-logger from version 1.1.7 to 1.1.8
