@@ -1,10 +1,9 @@
 annotations:
-  artifacthub.io/changes: "- \"fix: :bug: set disableIngressClassLookup until 3.1.4\"\n-
-    \"feat(deps): update traefik docker tag to v3.1.5\"\n- \"feat(Traefik Proxy):
-    update rbac following v3.2 migration guide\"\n- \"chore(release): \U0001F680 publish
-    v32.1.0\"\n"
+  artifacthub.io/changes: "- \"fix(schema): \U0001F41B targetPort can also be a string\"\n-
+    \"feat(deps): update traefik docker tag to v3.1.6\"\n- \"chore(release): \U0001F680
+    publish v32.1.1\"\n- \"Update topology spread constraints comments\"\n"
 apiVersion: v2
-appVersion: v3.1.5
+appVersion: v3.1.6
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
 icon: https://raw.githubusercontent.com/traefik/traefik/v2.3/docs/content/assets/img/traefik.logo.png
@@ -26,4 +25,4 @@ sources:
 - https://github.com/traefik/traefik
 - https://github.com/traefik/traefik-helm-chart
 type: application
-version: 32.1.0
+version: 32.1.1
