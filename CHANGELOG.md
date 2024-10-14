@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated cluster-api-operator from version 0.13.0 to 0.14.0
 
 ### Patch Version Upgrades %%^^
 - Updated cert-manager from version v1.16.0 to v1.16.1
