@@ -1,6 +1,14 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-10-14
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+
+### Patch Version Upgrades %%^^
+- Updated cert-manager from version v1.16.0 to v1.16.1
+
 ### Improvements
 - d289c927 Making CAPI Cluster App's default values file compatible with the optional customerid feature
 - 64f72b7b Make customerid optional in CAPI Cluster Helm values
