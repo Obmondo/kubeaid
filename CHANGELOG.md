@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated oncall from version 1.10.2 to 1.11.0
 - Updated mariadb-operator from version 0.33.0 to 0.34.0
 - Updated kubernetes-dashboard from version 7.7.0 to 7.8.0
 - Updated cluster-api-operator from version 0.13.0 to 0.14.0
