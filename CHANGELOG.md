@@ -8,6 +8,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cluster-api-operator from version 0.13.0 to 0.14.0
 
 ### Patch Version Upgrades %%^^
+- Updated k8s-event-logger from version 1.1.7 to 1.1.8
 - Updated cert-manager from version v1.16.0 to v1.16.1
 
 ### Improvements

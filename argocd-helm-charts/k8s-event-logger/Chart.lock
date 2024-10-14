@@ -1,6 +1,6 @@
 dependencies:
 - name: k8s-event-logger
   repository: https://charts.deliveryhero.io/
-  version: 1.1.7
-digest: sha256:7e4a88244ec3e5fe68fe79769f8cbd6c98ee4a20517b4ccbb9af5ccd96acf5a6
-generated: "2024-09-30T20:29:51.961764611+05:30"
+  version: 1.1.8
+digest: sha256:53608860c3bdc96ba60b0e7ea1743b1d0a8fb135c310a29ca23255e16609a986
+generated: "2024-10-14T12:01:38.294741736+05:30"
