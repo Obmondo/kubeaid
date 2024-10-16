@@ -32,6 +32,7 @@
 * Clusters
 
   * [AWS Kops Cluster Setup](./aws/kops/cluster.md)
+  * [AWS self-managed CAPI Cluster Setup](./aws/capi/cluster.md)
   * [Hetzner Bare Metal Setup](./hetzner/server-setup.md)
   * [AKS Cluster Setup](./azure/aks/cluster.md)
 
