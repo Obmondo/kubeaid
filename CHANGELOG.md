@@ -9,6 +9,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated aws-ebs-csi-driver from version 2.35.1 to 2.36.0
 
 ### Patch Version Upgrades %%^^
+- Updated oncall from version 1.11.0 to 1.11.3
 - Updated mattermost-team-edition from version 6.6.63 to 6.6.64
 - Updated keda from version 2.15.1 to 2.15.2
 - Updated cluster-autoscaler from version 9.43.0 to 9.43.1
