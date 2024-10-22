@@ -1,6 +1,9 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- 2c76119b Adding KubeAid demo blog (Part 1)
+
 ## 4.1.0
 ### Minor Version Upgrades
 - Updated oncall from version 1.10.2 to 1.11.0
