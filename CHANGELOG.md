@@ -9,6 +9,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated aws-ebs-csi-driver from version 2.35.1 to 2.36.0
 
 ### Patch Version Upgrades %%^^
+- Updated keda from version 2.15.1 to 2.15.2
 - Updated cluster-autoscaler from version 9.43.0 to 9.43.1
 - Updated cloudnative-pg from version 0.22.0 to 0.22.1
 - Updated cilium from version 1.16.2 to 1.16.3
