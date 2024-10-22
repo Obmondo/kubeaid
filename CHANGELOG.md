@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated aws-ebs-csi-driver from version 2.35.1 to 2.36.0
 
 ### Patch Version Upgrades %%^^
 - Updated argo-cd from version 7.6.8 to 7.6.12
