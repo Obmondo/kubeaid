@@ -1,14 +1,12 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 2024-10-22
-### Major Version Upgrades %%^^
-
-### Minor Version Upgrades %%^^
+## 4.2.0
+### Minor Version Upgrades
 - Updated gitlab-runner from version 0.69.0 to 0.70.1
 - Updated aws-ebs-csi-driver from version 2.35.1 to 2.36.0
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
 - Updated teleport-kube-agent from version 16.4.2 to 16.4.3
 - Updated teleport-cluster from version 16.4.2 to 16.4.3
 - Updated rook-ceph-cluster from version v1.15.3 to v1.15.4
