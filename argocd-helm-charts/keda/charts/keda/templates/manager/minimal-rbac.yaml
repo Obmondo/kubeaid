@@ -34,6 +34,11 @@ rules:
   verbs:
   - create
   - update
+{{- if .Values.permissions.operator.restrict.secret }}
+  - get
+  - list
+  - watch
+{{- end }}
 {{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1

@@ -33,8 +33,8 @@ spec:
         chart: {{ include "gitlab-runner.chart" . }}
         release: "{{ .Release.Name }}"
         heritage: "{{ .Release.Service }}"
-        {{- range $key, $value := .Values.podLabels }}
-        {{   $key }}: {{ $value | quote }}
+        {{- if .Values.podLabels }}
+        {{- tpl (toYaml .Values.podLabels) . | nindent 8 }}
         {{- end }}
       annotations:
         checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}

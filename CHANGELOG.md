@@ -1,6 +1,28 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 4.2.0
+### Minor Version Upgrades
+- Updated gitlab-runner from version 0.69.0 to 0.70.1
+- Updated aws-ebs-csi-driver from version 2.35.1 to 2.36.0
+
+### Patch Version Upgrades
+- Updated teleport-kube-agent from version 16.4.2 to 16.4.3
+- Updated teleport-cluster from version 16.4.2 to 16.4.3
+- Updated rook-ceph-cluster from version v1.15.3 to v1.15.4
+- Updated rook-ceph from version v1.15.3 to v1.15.4
+- Updated rabbitmq-cluster-operator from version 4.3.24 to 4.3.25
+- Updated oncall from version 1.11.0 to 1.11.3
+- Updated mattermost-team-edition from version 6.6.63 to 6.6.64
+- Updated keda from version 2.15.1 to 2.15.2
+- Updated cluster-autoscaler from version 9.43.0 to 9.43.1
+- Updated cloudnative-pg from version 0.22.0 to 0.22.1
+- Updated cilium from version 1.16.2 to 1.16.3
+- Updated argo-cd from version 7.6.8 to 7.6.12
+
+### Improvements
+- 2c76119b Adding KubeAid demo blog (Part 1)
+
 ## 4.1.0
 ### Minor Version Upgrades
 - Updated oncall from version 1.10.2 to 1.11.0
