@@ -47,5 +47,13 @@ spec:
           requests:
             storage: {{ .Values.prometheus.storage.size }}
         storageClassName: {{ .Values.prometheus.storage.className }}
+  containers:
+  - name: prometheus
+    startupProbe:
+      failureThreshold: {{ .Values.prometheus.startupProbe.failureThreshold }}
+    livenessProbe:
+      failureThreshold: {{ .Values.prometheus.livenessProbe.failureThreshold }}
+    readinessProbe:
+      failureThreshold: {{ .Values.prometheus.readinessProbe.failureThreshold }}
   version: {{ .Values.prometheus.version }}
   enableRemoteWriteReceiver: true
