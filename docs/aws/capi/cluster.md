@@ -45,6 +45,13 @@ Open the sample YAML configuration file generated at `./outputs/kubeaid-bootstra
 - git.username and git.password
 - forks.kubeaidConfig
 - cloud.aws.accessKey, cloud.aws.secretKey and cloud.aws.sessionToken (if you're using SSO)
+- cloud.aws.sshKeyName and machinePools.*.sshKeyName
+
+	If you don't have an existing SSH KeyPair in the corresponding AWS region, you can generate one using this command :
+	```sh
+	aws ec2 create-key-pair --key-name kubeaid-demo --query 'KeyMaterial' --output text --region <aws-region> \
+		> ./outputs/kubeaid-demo.pem
+	```
 
 Now to bootstrap the Kubernetes (v1.30.0) cluster with 1 control plane node and worker nodes `autoscaled` between 2 to 5 replicas, you can simply run :
 ```sh
