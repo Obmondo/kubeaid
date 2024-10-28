@@ -22,9 +22,6 @@ spec:
   resources:
     limits:
       memory: {{ (((.Values.cnpg).resources).limits).memory | default "800Mi" }}
-      # As its required to add the cpu limit, have added the issue here
-      # https://github.com/cloudnative-pg/cloudnative-pg/issues/2586
-      cpu: "2"
     requests:
       memory: {{ (((.Values.cnpg).resources).requests).memory | default "500Mi" }}
       cpu: {{ (((.Values.cnpg).resources).requests).cpu | default "100m" }}
