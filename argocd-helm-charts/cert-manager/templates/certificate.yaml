@@ -10,7 +10,6 @@ spec:
     group: cert-manager.io
     kind: ClusterIssuer
     name: {{ $.Values.issuer.name | quote }}
-  commonName: "{{ . }}"
   dnsNames:
   - "{{ . }}"
 
