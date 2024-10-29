@@ -1,6 +1,30 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 4.3.0
+### Minor Version Upgrades
+- Updated mariadb-operator from version 0.34.0 to 0.35.1
+- Updated kubernetes-dashboard from version 7.8.0 to 7.9.0
+
+### Patch Version Upgrades
+- Updated yetibot from version 1.0.106 to 1.0.107
+- Updated teleport-kube-agent from version 16.4.3 to 16.4.6
+- Updated teleport-cluster from version 16.4.3 to 16.4.6
+- Updated opensearch-dashboards from version 2.24.0 to 2.24.1
+- Updated opensearch from version 2.26.0 to 2.26.1
+- Updated oncall from version 1.11.3 to 1.11.5
+- Updated mattermost-team-edition from version 6.6.64 to 6.6.65
+- Updated gitlab-runner from version 0.70.1 to 0.70.2
+- Updated external-dns from version 8.3.9 to 8.3.11
+- Updated crossplane from version 1.17.1 to 1.17.2
+
+### Improvements
+- 8f8b179f Support for changing memory requests and limits for PostgreSQL in KeycloakX Helm Chart
+- 0acaed4d Removed CPU limit for CNPG cluster in KeycloakX helm chart
+- 733f95dc fixing hbk prometheus
+- 4fb88b73 (cert-manager) : Simplifying the ClusterIssuer template | Fixes for making the wildcard certificates feature work
+- 1fca8b8c Specifying AWS CLI command to create SSH KeyPair
+
 ## 4.2.0
 ### Minor Version Upgrades
 - Updated gitlab-runner from version 0.69.0 to 0.70.1
