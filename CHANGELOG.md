@@ -1,6 +1,13 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- 8f8b179f Support for changing memory requests and limits for PostgreSQL in KeycloakX Helm Chart
+- 0acaed4d Removed CPU limit for CNPG cluster in KeycloakX helm chart
+- 733f95dc fixing hbk prometheus
+- 4fb88b73 (cert-manager) : Simplifying the ClusterIssuer template | Fixes for making the wildcard certificates feature work
+- 1fca8b8c Specifying AWS CLI command to create SSH KeyPair
+
 ## 4.2.0
 ### Minor Version Upgrades
 - Updated gitlab-runner from version 0.69.0 to 0.70.1
