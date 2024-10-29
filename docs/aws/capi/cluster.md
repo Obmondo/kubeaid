@@ -12,7 +12,7 @@ In this blog post, we’ll walk through the process of setting up a self-managed
 
 Doing all this manually, is a tedious and complex process! To make life simpler, we've developed a GoLang script, named `KubeAid Bootstrap Script`, which automates the necessary steps for you.
 
-The KubeAid Bootstrap Script currently **only supports Linux** and requires quite a few prerequisite tools (like clusterawsadm, gojsontoyaml, kubeseal, clusterctl etc.) installed in your system. This is why we'll be using it's [containerized version](ghcr.io/Obmondo/kubeaid-bootstrap-script) in this tutorial. The container image has all the pre-requisite tools already installed.
+The KubeAid Bootstrap Script currently **only supports Linux** and requires quite a few prerequisite tools (like clusterawsadm, gojsontoyaml, kubeseal, clusterctl etc.) installed in your system. This is why we'll be using it's [containerized version](https://github.com/Obmondo/kubeaid-bootstrap-script/pkgs/container/kubeaid-bootstrap-script) in this tutorial. The container image has all the pre-requisite tools already installed.
 
 Run this command to pull the container image to your local machine :
 ```sh
