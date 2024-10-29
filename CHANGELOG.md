@@ -9,6 +9,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated kubernetes-dashboard from version 7.8.0 to 7.9.0
 
 ### Patch Version Upgrades %%^^
+- Updated mattermost-team-edition from version 6.6.64 to 6.6.65
 - Updated gitlab-runner from version 0.70.1 to 0.70.2
 - Updated external-dns from version 8.3.9 to 8.3.11
 - Updated crossplane from version 1.17.1 to 1.17.2
