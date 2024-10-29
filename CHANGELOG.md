@@ -7,6 +7,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Minor Version Upgrades %%^^
 
 ### Patch Version Upgrades %%^^
+- Updated external-dns from version 8.3.9 to 8.3.11
 - Updated crossplane from version 1.17.1 to 1.17.2
 
 ### Improvements
