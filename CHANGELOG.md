@@ -1,6 +1,14 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-10-29
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+
+### Patch Version Upgrades %%^^
+- Updated crossplane from version 1.17.1 to 1.17.2
+
 ### Improvements
 - 8f8b179f Support for changing memory requests and limits for PostgreSQL in KeycloakX Helm Chart
 - 0acaed4d Removed CPU limit for CNPG cluster in KeycloakX helm chart
