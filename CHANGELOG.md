@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated mariadb-operator from version 0.34.0 to 0.35.1
 - Updated kubernetes-dashboard from version 7.8.0 to 7.9.0
 
 ### Patch Version Upgrades %%^^
