@@ -1,14 +1,12 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 2024-10-29
-### Major Version Upgrades %%^^
-
-### Minor Version Upgrades %%^^
+## 4.3.0
+### Minor Version Upgrades
 - Updated mariadb-operator from version 0.34.0 to 0.35.1
 - Updated kubernetes-dashboard from version 7.8.0 to 7.9.0
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
 - Updated yetibot from version 1.0.106 to 1.0.107
 - Updated teleport-kube-agent from version 16.4.3 to 16.4.6
 - Updated teleport-cluster from version 16.4.3 to 16.4.6
