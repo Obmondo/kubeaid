@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated kubernetes-dashboard from version 7.8.0 to 7.9.0
 
 ### Patch Version Upgrades %%^^
 - Updated gitlab-runner from version 0.70.1 to 0.70.2
