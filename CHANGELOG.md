@@ -9,6 +9,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated kubernetes-dashboard from version 7.8.0 to 7.9.0
 
 ### Patch Version Upgrades %%^^
+- Updated teleport-kube-agent from version 16.4.3 to 16.4.6
 - Updated teleport-cluster from version 16.4.3 to 16.4.6
 - Updated opensearch-dashboards from version 2.24.0 to 2.24.1
 - Updated opensearch from version 2.26.0 to 2.26.1
