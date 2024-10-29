@@ -9,6 +9,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated kubernetes-dashboard from version 7.8.0 to 7.9.0
 
 ### Patch Version Upgrades %%^^
+- Updated opensearch from version 2.26.0 to 2.26.1
 - Updated oncall from version 1.11.3 to 1.11.5
 - Updated mattermost-team-edition from version 6.6.64 to 6.6.65
 - Updated gitlab-runner from version 0.70.1 to 0.70.2
