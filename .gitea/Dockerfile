@@ -14,7 +14,7 @@ RUN apt-get update                                          \
     && apt-get install -y                                   \
         shellcheck                                          \
         prometheus                                          \
-        golang-1.19
+        golang
 
 # jsonnet
 RUN go install github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@v0.5.1
