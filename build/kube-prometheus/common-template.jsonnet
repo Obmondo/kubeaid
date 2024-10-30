@@ -16,6 +16,7 @@ local default_vars = {
     'cert-manager',
     'traefik',
   ],
+  // Custom kubeaid or non kubeaid apps that need AutoSync
   kubeaid_users_apps+: [],
   kubeaid_apps+: [
     'argo-cd',
@@ -68,7 +69,6 @@ local default_vars = {
     'puppetserver',
     'rabbitmq-operator',
     'redis-operator',
-    'redmine',
     'relate',
     'reloader',
     'rook-ceph',
@@ -81,9 +81,9 @@ local default_vars = {
     'tigera-operator',
     'traefik',
     'traefik-forward-auth',
+    'traefik-forward-auth-rbac',
     'velero',
     'whoami',
-    'yetibot',
     'zfs-localpv',
   ],
   prometheus_operator_resources: {
