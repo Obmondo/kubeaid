@@ -6,6 +6,7 @@ name: kubeaid CI image
       - master
     paths:
       - '.gitea/Dockerfile'
+      - '.gitea/workflows/container-image.yaml'
 
 permissions:
   contents: read
