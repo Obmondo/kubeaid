@@ -64,7 +64,7 @@ this repository.
 
 All customizations happens in your `kubeaid-config` repo.
 
-## support
+## Support
 
 Besides the community support, the primary developers of this project offers support via services on
 [Obmondo.com](https://obmondo.com) - where you can opt to have us observe your world - and react to your alerts, and/or
