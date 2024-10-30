@@ -22,7 +22,7 @@ jobs:
       push: true
       context: .gitea
       image_name: ${{ env.KUBEAID_CI_IMAGE }}
-      tags: ${{ env.KUBEAID_CI_TAG }}
+      tags: ${{ secrets.HARBOR_REGISTRY }}/${{ vars.KUBEAID_CI_IMAGE }}:${{ vars.KUBEAID_CI_TAG }}
       registry: ${{ secrets.HARBOR_REGISTRY }}
       should-run: true
     secrets:
