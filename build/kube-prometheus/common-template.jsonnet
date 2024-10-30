@@ -16,6 +16,7 @@ local default_vars = {
     'cert-manager',
     'traefik',
   ],
+  // Custom kubeaid or non kubeaid apps that need AutoSync
   kubeaid_users_apps+: [],
   kubeaid_apps+: [
     'argo-cd',
