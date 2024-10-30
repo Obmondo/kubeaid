@@ -31,11 +31,18 @@ cert-manager:
       requests:
         cpu: 1m
         memory: 16Mi
+
 issuer:
   name: letsencrypt
   enabled: false
   production: false
   preferredChain: null
+  solvers:
+    - type: http
+      http01:
+        ingress:
+          ingressClassName: traefik-cert-manager
+
 networkpolicies: false
 enableCertificateOwnerRef: true
 

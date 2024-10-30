@@ -1,3 +1,26 @@
+## v0.70.2 (2024-10-23)
+
+### New features
+
+- Update GitLab Runner version to v17.5.2
+
+## v0.70.1 (2024-10-18)
+
+### New features
+
+- Update GitLab Runner version to v17.5.1
+
+## v0.70.0 (2024-10-17)
+
+### New features
+
+- Update GitLab Runner version to v17.5.0
+- Add podlabels interpolation [!492](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/merge_requests/492) (Ivan Katliarchuk @Ikatliarchuk)
+
+### Other changes
+
+- Add Ingress support for Session Server [!490](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/merge_requests/490) (Ummet Civi @ummetcivi)
+
 ## v0.69.0 (2024-09-19)
 
 ### New features

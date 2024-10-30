@@ -12,6 +12,11 @@ spec:
   enableMasterLoadBalancer: false
   enableLogicalBackup: {{ .Values.postgresql.enableLogicalBackup }}
   numberOfInstances: {{ ((.Values.postgresql).instance) | default 1 }}
+  resources:
+    requests:
+      memory: {{ ((((.Values.postgresql).resources).requests).memory) | default "100Mi" }}
+    limits:
+      memory: {{ ((((.Values.postgresql).resources).requests).memory) | default "500Mi" }}
   postgresql:
     version: "12"
   teamId: keycloakx

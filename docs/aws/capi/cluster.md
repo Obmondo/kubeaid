@@ -12,7 +12,7 @@ In this blog post, we’ll walk through the process of setting up a self-managed
 
 Doing all this manually, is a tedious and complex process! To make life simpler, we've developed a GoLang script, named `KubeAid Bootstrap Script`, which automates the necessary steps for you.
 
-The KubeAid Bootstrap Script currently **only supports Linux** and requires quite a few prerequisite tools (like clusterawsadm, gojsontoyaml, kubeseal, clusterctl etc.) installed in your system. This is why we'll be using it's [containerized version](ghcr.io/Obmondo/kubeaid-bootstrap-script) in this tutorial. The container image has all the pre-requisite tools already installed.
+The KubeAid Bootstrap Script currently **only supports Linux** and requires quite a few prerequisite tools (like clusterawsadm, gojsontoyaml, kubeseal, clusterctl etc.) installed in your system. This is why we'll be using it's [containerized version](https://github.com/Obmondo/kubeaid-bootstrap-script/pkgs/container/kubeaid-bootstrap-script) in this tutorial. The container image has all the pre-requisite tools already installed.
 
 Run this command to pull the container image to your local machine :
 ```sh
@@ -45,6 +45,13 @@ Open the sample YAML configuration file generated at `./outputs/kubeaid-bootstra
 - git.username and git.password
 - forks.kubeaidConfig
 - cloud.aws.accessKey, cloud.aws.secretKey and cloud.aws.sessionToken (if you're using SSO)
+- cloud.aws.sshKeyName and machinePools.*.sshKeyName
+
+	If you don't have an existing SSH KeyPair in the corresponding AWS region, you can generate one using this command :
+	```sh
+	aws ec2 create-key-pair --key-name kubeaid-demo --query 'KeyMaterial' --output text --region <aws-region> \
+		> ./outputs/kubeaid-demo.pem
+	```
 
 Now to bootstrap the Kubernetes (v1.30.0) cluster with 1 control plane node and worker nodes `autoscaled` between 2 to 5 replicas, you can simply run :
 ```sh

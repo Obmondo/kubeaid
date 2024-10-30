@@ -16,23 +16,16 @@ spec:
     {{- end -}}
 {{- if kindIs "slice" .Values.issuer.solvers }}
     solvers:
-    {{- range $k, $v := .Values.issuer.solvers -}}
+    {{- range $k, $v := .Values.issuer.solvers }}
     {{- if eq (toString $v.type) "dns"}}
-    {{- if not $v.dnsNames }}
-    {{- fail (printf "Value dnsNames is required for cloudProvider: %s" $v.cloudProvider) }}
-    {{- end }}
-    {{- range $d, $dnsName := $v.dnsNames -}}
-    {{- if not $dnsName}}
-    {{- fail (printf "Value of dnsName can't be empty for cloudProvider: %s" $v.cloudProvider) }}
-    {{- end }}
+    {{- if or (not $v.dnsNames) (has "" $v.dnsNames) }}
+    {{- fail (printf "DNS names are required and cannot be empty for cloudProvider: %s" $v.cloudProvider) }}
     {{- end }}
     {{- if eq (toString $v.cloudProvider) "cloudflare" }}
     - dns01:
         {{ $v.cloudProvider }}:
           email: {{ $v.issuerEmail }}
-          apiTokenSecretRef:
-            name: {{ $v.cloudProviderSecret }}
-            key: api-token
+          apiTokenSecretRef: {{ $v.cloudProviderSecretRef }}
       selector:
         dnsNames:
           {{- range $v.dnsNames }}
@@ -57,33 +50,7 @@ spec:
           class: {{ $v.http01.ingress.ingressClassName }}
     {{- end -}}
     {{- end }}
-{{- else -}}
-    {{- if eq (toString .Values.issuer.cloudProvider) "cloudflare" }}
-    solvers:
-    - dns01:
-        {{ .Values.issuer.cloudProvider }}:
-          email: {{ .Values.issuer.issuerEmail }}
-          apiTokenSecretRef:
-            name: {{ .Values.issuer.cloudProviderSecret }}
-            key: api-token
-    {{- else if eq (toString .Values.issuer.cloudProvider) "route53" }}
-    solvers:
-    - dns01:
-        {{ .Values.issuer.cloudProvider }}:
-          region: {{ .Values.issuer.region }}
-          {{- if .Values.issuer.hostedZoneID }}
-          hostedZoneID: {{ .Values.issuer.hostedZoneID }}
-          {{- end }}
-      selector:
-        dnsZones:
-          {{- range.Values.issuer.dnsZones }}
-          - {{ . | quote }}
-          {{- end }}
-    {{- else }}
-    solvers:
-    - http01:
-        ingress:
-          class: traefik-cert-manager
-    {{- end -}}
-{{- end -}}
-{{- end -}}
+{{- else }}
+{{- fail "Error: .Values.issuer.solvers should be of type slice (list)." }}
+{{- end }}
+{{- end }}
