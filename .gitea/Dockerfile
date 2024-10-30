@@ -32,4 +32,3 @@ RUN ./get_helm.sh --version v3.9.1
 # OPA
 RUN wget https://github.com/open-policy-agent/opa/releases/download/v0.43.0/opa_linux_amd64_static -O /usr/local/bin/opa
 RUN chmod +x /usr/local/bin/opa
-
