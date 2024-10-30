@@ -1,4 +1,4 @@
-FROM harbor.obmondo.com/obmondo/jammy-generic-build@sha256:0d656390da967ca7e6cbcef3de1f9c1b560b3be5a269d988ab59f7d4d2270ce2
+FROM harbor.obmondo.com/obmondo/dockerfiles/noble-generic-build@sha256:7db3fa938fb169b94c60599665ba9f740a1c7a1223dd47092dcf082469d8c24b
 
 LABEL org.opencontainers.image.authors="Ashish Jaiswal <ashish@enableit.dk>"
 
