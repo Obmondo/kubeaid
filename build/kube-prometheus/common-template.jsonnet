@@ -81,9 +81,9 @@ local default_vars = {
     'tigera-operator',
     'traefik',
     'traefik-forward-auth',
+    'traefik-forward-auth-rbac',
     'velero',
     'whoami',
-    'yetibot',
     'zfs-localpv',
   ],
   prometheus_operator_resources: {
