@@ -21,11 +21,9 @@ jobs:
     uses: Obmondo/gitea-actions/.gitea/workflows/build-image.yaml@main
     with:
       push: true
-      context: .gitea
-      image_name: ${{ env.KUBEAID_CI_IMAGE }}
+      context: .
+      file: .gitea/Dockerfile
       tags: ${{ secrets.HARBOR_REGISTRY }}/${{ vars.KUBEAID_CI_IMAGE }}:${{ vars.KUBEAID_CI_TAG }}
-      registry: ${{ secrets.HARBOR_REGISTRY }}
-      should-run: true
     secrets:
       username: ${{ secrets.HARBOR_USERNAME }}
       password: ${{ secrets.HARBOR_PASSWORD }}
