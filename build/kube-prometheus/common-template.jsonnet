@@ -68,7 +68,6 @@ local default_vars = {
     'puppetserver',
     'rabbitmq-operator',
     'redis-operator',
-    'redmine',
     'relate',
     'reloader',
     'rook-ceph',
