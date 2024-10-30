@@ -3,7 +3,7 @@ name: kubeaid CI image
 "on":
   push:
     branches:
-      - add-config-tag-updatescript
+      - master
     paths:
       - '.gitea/Dockerfile'
 
