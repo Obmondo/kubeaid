@@ -1,19 +1,19 @@
 #!/bin/bash
 
-# Get the latest tag from the changelog file
 changelog_file="CHANGELOG.md"
 latest_tag=$(grep -oP '^## \K[0-9]+\.[0-9]+\.[0-9]+' "$changelog_file" | head -n1)
 
 echo "$latest_tag"
 
-# Get the commit log since the latest tag
 commit_log=$(git log "$latest_tag"..origin/master --oneline --no-merges)
 
-# Format the commit log into bullet points
-formatted_commit_log=$(echo "$commit_log" | awk '{print "- " $0}') # to keep sha in front
-# formatted_commit_log=$(echo "$commit_log" | awk '{sha=$1; $1=""; print "-" $0" "sha}') # to keep sha later
+formatted_commit_log=$(echo "$commit_log" | awk '{
+    sha=$1;
+    $1="";
+    sub(/^ /, "", $0);
+    print "- [`" sha "`](../../commit/" sha ") " $0
+}')
 
-# Create a temporary file for the formatted commit log
 temp_file="temp.md"
 {
   echo "### Improvements"
