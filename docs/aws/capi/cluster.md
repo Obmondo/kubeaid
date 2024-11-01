@@ -1,4 +1,4 @@
-# Demonstrating KubeAid (part 1) - Bootstrapping and upgrading a self-managed K8s cluster in AWS, effortlessly, using ClusterAPI
+# Demonstrating KubeAid (part 1) - Bootstrapping and upgrading a self-managed K8s cluster in AWS, effortlessly, using ClusterAPI and KubeAid
 
 KubeAid is a comprehensive Kubernetes management suite designed to simplify cluster setup, management and monitoring through GitOps and automation principles. Recently, we’ve introduced support for provisioning and managing the lifecycle of Kubernetes clusters efforlessly using [ClusterAPI](https://cluster-api.sigs.k8s.io).
 
@@ -27,6 +27,8 @@ These custom AMIs are built using the the [image-builder](https://github.com/kub
 
 To address this, we have [forked](https://github.com/Obmondo/image-builder) the image-builder project, added support for the above and published ARM based custom AMIs targetting Kubernetes [v1.30.0]() / [v1.31.0]() and Ubuntu 24.04.
 
+> If you wish to build the custom AMI yourself, you can refer to this [blog post](https://github.com/Obmondo/kubeaid/blob/master/docs/aws/capi/ami.md).
+
 ## Bootstrapping the cluster using ClusterAPI
 
 First, fork the [KubeAid Config](http://github.com/Obmondo/kubeaid-config) repo.
@@ -49,8 +51,9 @@ Open the sample YAML configuration file generated at `./outputs/kubeaid-bootstra
 
 	If you don't have an existing SSH KeyPair in the corresponding AWS region, you can generate one using this command :
 	```sh
-	aws ec2 create-key-pair --key-name kubeaid-demo --query 'KeyMaterial' --output text --region <aws-region> \
-		> ./outputs/kubeaid-demo.pem
+	aws ec2 create-key-pair \
+		--key-name kubeaid-demo \
+		--query 'KeyMaterial' --output text --region <aws-region> > ./outputs/kubeaid-demo.pem
 	```
 
 Now to bootstrap the Kubernetes (v1.30.0) cluster with 1 control plane node and worker nodes `autoscaled` between 2 to 5 replicas, you can simply run :
