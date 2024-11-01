@@ -25,10 +25,16 @@ spec:
     - dns01:
         {{ $v.cloudProvider }}:
           email: {{ $v.issuerEmail }}
-          apiTokenSecretRef: {{ $v.cloudProviderSecretRef }}
+          apiTokenSecretRef:
+            name: {{ $v.cloudProviderSecretRef.name }}
+            key: {{ $v.cloudProviderSecretRef.key }}
       selector:
         dnsNames:
           {{- range $v.dnsNames }}
+          - {{ . | quote }}
+          {{- end }}
+        dnsZones:
+          {{- range $v.dnsZones }}
           - {{ . | quote }}
           {{- end }}
     {{- else if eq (toString $v.cloudProvider) "route53" }}
@@ -41,6 +47,10 @@ spec:
       selector:
         dnsNames:
           {{- range $v.dnsNames }}
+          - {{ . | quote }}
+          {{- end }}
+        dnsZones:
+          {{- range $v.dnsZones }}
           - {{ . | quote }}
           {{- end }}
     {{- end }}
