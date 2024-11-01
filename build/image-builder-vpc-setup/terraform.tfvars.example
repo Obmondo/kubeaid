@@ -1,0 +1,8 @@
+args = {
+	region = ""
+
+  credentials = {
+    access_key = ""
+    secret_key = ""
+  }
+}
