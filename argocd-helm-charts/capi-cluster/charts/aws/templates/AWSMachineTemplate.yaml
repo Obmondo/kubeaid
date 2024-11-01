@@ -11,6 +11,8 @@ spec:
       imageLookupBaseOS: ubuntu-20.04
       publicIP: {{ .Values.controlPlane.publicIP }}
       ami: {{ toYaml .Values.controlPlane.ami | nindent 8 }}
+      rootVolume:
+        size: {{ .Values.controlPlane.rootVolumeSize | default 35 }}
 
 {{- if (not (.Values.global.capa).autoScaler) }}
 ---
@@ -27,4 +29,6 @@ spec:
       imageLookupBaseOS: ubuntu-20.04
       publicIP: {{ .Values.workerNodes.publicIP }}
       ami: {{ toYaml .Values.workerNodes.ami | nindent 8 }}
+      rootVolume:
+        size: {{ .Values.workerNodes.rootVolumeSize | default 35 }}
 {{- end }}

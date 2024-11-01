@@ -14,5 +14,7 @@ spec:
     instanceType: {{ $machinePool.instanceType }}
     sshKeyName: {{ $machinePool.sshKeyName }}
     imageLookupBaseOS: ubuntu-20.04
+    rootVolume:
+      size: {{ $machinePool.rootVolumeSize | default 35 }}
 {{- end }}
 {{- end }}
