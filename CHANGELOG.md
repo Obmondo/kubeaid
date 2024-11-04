@@ -1,6 +1,14 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-11-04
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+
+### Patch Version Upgrades %%^^
+- Updated argocd-image-updater from version 0.11.0 to 0.11.1
+
 ### Improvements
 - [`81ba9fea`](../../commit/81ba9fea) fix: cert-manager failed to get parsed, due to templating issue feat: added dnszone support
 - [`a40f15a6`](../../commit/a40f15a6) Adding support for specifying root EBS volume size
