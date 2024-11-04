@@ -1,6 +1,6 @@
 dependencies:
 - name: external-dns
   repository: https://charts.bitnami.com/bitnami
-  version: 8.3.11
-digest: sha256:befee84dad8812906ff2c5a8f75c190041b1e0e3c92ea4a1d8455cd0d277c8ba
-generated: "2024-10-29T14:26:15.898623971+05:30"
+  version: 8.3.12
+digest: sha256:6bef41267122e13af185d1c901daad46307d03b01bba06eaa7bc31fb37d10a3a
+generated: "2024-11-04T11:26:57.617338876+05:30"

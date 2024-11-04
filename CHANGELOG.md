@@ -7,6 +7,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Minor Version Upgrades %%^^
 
 ### Patch Version Upgrades %%^^
+- Updated external-dns from version 8.3.11 to 8.3.12
 - Updated argocd-image-updater from version 0.11.0 to 0.11.1
 
 ### Improvements
