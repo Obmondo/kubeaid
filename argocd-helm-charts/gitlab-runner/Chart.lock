@@ -1,6 +1,6 @@
 dependencies:
 - name: gitlab-runner
   repository: https://charts.gitlab.io
-  version: 0.70.2
-digest: sha256:5564bbe5b393d3891067757225001901f14e30155c0f7735c569572f9470ae64
-generated: "2024-10-29T14:28:35.627710268+05:30"
+  version: 0.70.3
+digest: sha256:8c7c001046667cdc412aa8c25972a1aa1aa5fa6d59f5aed8cc64f6d22fcdabbf
+generated: "2024-11-04T11:29:08.544753552+05:30"
