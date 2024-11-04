@@ -68,6 +68,28 @@ To login into argocd on pod use the following command:
 * If you dont know the admin password for argocd ask the appropriate authority or the reset
 it in case it is unretrievable.
 
+### Create argocd token
+
+ It is assumed you have created an user with apikey capabilities. [Link to docs]( https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/#:~:text=accounts.alice%3A%20apiKey%2C%20login)
+
+* Get a shell into argocd server pod
+* Run the commands
+
+  ```sh
+  # login using admin creds
+  argocd login <argocd ingress> --username admin --password <admin password>
+
+  # List all argocd accounts to make sure the user with apikey capabilities are there
+  argocd account list
+  
+  # Create a password for that user
+  argocd account update-password --account apiuser --current-password <existing admin user password> --new-password <newpassword>
+
+  # Generate the token using user
+  argocd account generate-token -a apiuser --server-name <argocd ingress>
+ 
+  ```
+
 ## Replace admin password
 
 * Run our script to do this:
