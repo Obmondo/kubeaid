@@ -1,15 +1,15 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 2024-11-04
-### Major Version Upgrades %%^^
+## 5.0.0
+### Major Version Upgrades
 - Updated traefik from version 32.1.1 to 33.0.0
 
-### Minor Version Upgrades %%^^
+### Minor Version Upgrades
 - Updated tigera-operator from version v3.28.2 to v3.29.0
 - Updated kubernetes-dashboard from version 7.9.0 to 7.10.0
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
 - Updated velero from version 7.2.1 to 7.2.2
 - Updated redmine from version 30.0.0 to 30.0.2
 - Updated opencost from version 1.42.0 to 1.42.2
