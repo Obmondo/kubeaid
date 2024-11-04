@@ -35,6 +35,9 @@ certs:
 # Resource requests and limits for the tigera/operator pod.
 resources: {}
 
+# Common labels for all resources created by this chart
+additionalLabels: {}
+
 # Tolerations for the tigera/operator pod.
 tolerations:
 - effect: NoExecute
@@ -61,11 +64,11 @@ podLabels: {}
 # Image and registry configuration for the tigera/operator pod.
 tigeraOperator:
   image: tigera/operator
-  version: v1.34.5
+  version: v1.36.0
   registry: quay.io
 calicoctl:
   image: docker.io/calico/ctl
-  tag: v3.28.2
+  tag: v3.29.0
 
 kubeletVolumePluginPath: /var/lib/kubelet
 

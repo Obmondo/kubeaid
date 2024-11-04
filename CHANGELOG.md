@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated tigera-operator from version v3.28.2 to v3.29.0
 - Updated kubernetes-dashboard from version 7.9.0 to 7.10.0
 
 ### Patch Version Upgrades %%^^
