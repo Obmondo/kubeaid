@@ -22,7 +22,7 @@
             },
             "type": "object"
         },
-        "certResolvers": {
+        "certificatesResolvers": {
             "properties": {},
             "type": "object"
         },
@@ -142,27 +142,6 @@
             "type": "object"
         },
         "env": {
-            "items": {
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "valueFrom": {
-                        "properties": {
-                            "fieldRef": {
-                                "properties": {
-                                    "fieldPath": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        },
-                        "type": "object"
-                    }
-                },
-                "type": "object"
-            },
             "type": "array"
         },
         "envFrom": {
@@ -196,6 +175,10 @@
                 },
                 "enabled": {
                     "type": "boolean"
+                },
+                "infrastructure": {
+                    "properties": {},
+                    "type": "object"
                 },
                 "listeners": {
                     "properties": {
@@ -562,7 +545,18 @@
                             "type": "object"
                         },
                         "filters": {
-                            "properties": {},
+                            "additionalProperties": false,
+                            "properties": {
+                                "minduration": {
+                                    "type": "string"
+                                },
+                                "retryattempts": {
+                                    "type": "boolean"
+                                },
+                                "statuscodes": {
+                                    "type": "string"
+                                }
+                            },
                             "type": "object"
                         },
                         "format": {
@@ -576,15 +570,6 @@
                                 "string",
                                 "null"
                             ]
-                        },
-                        "minduration": {
-                            "type": "string"
-                        },
-                        "retryattempts": {
-                            "type": "boolean"
-                        },
-                        "statuscodes": {
-                            "type": "string"
                         }
                     },
                     "type": "object"
@@ -609,12 +594,13 @@
                         "level": {
                             "default": "INFO",
                             "enum": [
+                                "TRACE",
+                                "DEBUG",
                                 "INFO",
                                 "WARN",
                                 "ERROR",
                                 "FATAL",
-                                "PANIC",
-                                "DEBUG"
+                                "PANIC"
                             ],
                             "type": "string"
                         },
@@ -1367,6 +1353,28 @@
                         },
                         "namespaces": {
                             "type": "array"
+                        },
+                        "statusAddress": {
+                            "properties": {
+                                "hostname": {
+                                    "type": "string"
+                                },
+                                "ip": {
+                                    "type": "string"
+                                },
+                                "service": {
+                                    "properties": {
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "namespace": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "type": "object"
                         }
                     },
                     "type": "object"
@@ -1398,6 +1406,9 @@
                             "properties": {
                                 "enabled": {
                                     "type": "boolean"
+                                },
+                                "pathOverride": {
+                                    "type": "string"
                                 }
                             },
                             "type": "object"

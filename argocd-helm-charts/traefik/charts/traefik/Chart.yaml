@@ -1,9 +1,20 @@
 annotations:
-  artifacthub.io/changes: "- \"fix(schema): \U0001F41B targetPort can also be a string\"\n-
-    \"feat(deps): update traefik docker tag to v3.1.6\"\n- \"chore(release): \U0001F680
-    publish v32.1.1\"\n- \"Update topology spread constraints comments\"\n"
+  artifacthub.io/changes: "- \"fix: \U0001F41B http3 with internal service\"\n- \"fix:
+    use correct children indentation for logs.access.filters\"\n- \"fix(schema): :bug:
+    targetPort can also be a string\"\n- \"fix(certificateResolvers)!: :boom: :bug:
+    use same syntax in Chart and in Traefik\"\n- \"fix(Traefik)!: :boom: set 8080
+    as default port for `traefik` entrypoint\"\n- \"fix(Traefik Hub): RBAC for distributedAcme\"\n-
+    \"fix(Kubernetes Ingress)!: :boom: :sparkles: enable publishedService by default\"\n-
+    \"fix(Gateway API): :bug: add missing required RBAC for v3.2 with experimental
+    Channel\"\n- \"fix(Env Variables)!: allow extending env without overwrite\"\n-
+    \"feat(deps): update traefik docker tag to v3.2.0\"\n- \"feat(deps): update traefik
+    docker tag to v3.1.6\"\n- \"feat(Traefik): ✨ support Gateway API statusAddress\"\n-
+    \"feat(Traefik Proxy): CRDs for v3.2+\"\n- \"feat(Gateway API): :sparkles: standard
+    install CRD v1.2.0\"\n- \"feat(Gateway API): :sparkles: add infrastructure in
+    the values\"\n- \"chore: allow TRACE log level\"\n- \"chore(release): \U0001F680
+    publish v33.0.0\"\n- \"Update topology spread constraints comments\"\n"
 apiVersion: v2
-appVersion: v3.1.6
+appVersion: v3.2.0
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
 icon: https://raw.githubusercontent.com/traefik/traefik/v2.3/docs/content/assets/img/traefik.logo.png
@@ -25,4 +36,4 @@ sources:
 - https://github.com/traefik/traefik
 - https://github.com/traefik/traefik-helm-chart
 type: application
-version: 32.1.1
+version: 33.0.0

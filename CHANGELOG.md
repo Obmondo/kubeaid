@@ -3,6 +3,7 @@ All releases and the changes included in them (pulled from git commits added sin
 
 ## 2024-11-04
 ### Major Version Upgrades %%^^
+- Updated traefik from version 32.1.1 to 33.0.0
 
 ### Minor Version Upgrades %%^^
 - Updated tigera-operator from version v3.28.2 to v3.29.0

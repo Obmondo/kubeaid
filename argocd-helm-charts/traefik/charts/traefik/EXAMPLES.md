@@ -97,10 +97,10 @@ ingressRoute:
 The traefik admin port can be forwarded locally:
 
 ```bash
-kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
+kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 8080:8080
 ```
 
-This command makes the dashboard accessible on the url: http://127.0.0.1:9000/dashboard/
+This command makes the dashboard accessible on the url: http://127.0.0.1:8080/dashboard/
 
 # Publish and protect Traefik Dashboard with basic Auth
 
@@ -173,7 +173,7 @@ extraObjects:
       ports:
       - port: 8080
         name: traefik
-        targetPort: 9000
+        targetPort: 8080
         protocol: TCP
 
   - apiVersion: v1
@@ -305,7 +305,7 @@ extraObjects:
       config:
         type: HTTP
         httpHealthCheck:
-          port: 9000
+          port: 8080
           requestPath: /ping
     targetRef:
       group: ""
@@ -331,14 +331,15 @@ Here is a more complete example, using also native Let's encrypt feature of Trae
 persistence:
   enabled: true
   size: 128Mi
-certResolvers:
+certificatesResolvers:
   letsencrypt:
-    email: "{{ letsencrypt_email }}"
-    #caServer: https://acme-v02.api.letsencrypt.org/directory # Production server
-    caServer: https://acme-staging-v02.api.letsencrypt.org/directory # Staging server
-    dnsChallenge:
-      provider: azuredns
-    storage: /data/acme.json
+    acme:
+      email: "{{ letsencrypt_email }}"
+      #caServer: https://acme-v02.api.letsencrypt.org/directory # Production server
+      caServer: https://acme-staging-v02.api.letsencrypt.org/directory # Staging server
+      dnsChallenge:
+        provider: azuredns
+      storage: /data/acme.json
 env:
   - name: AZURE_CLIENT_ID
     value: "{{ azure_dns_challenge_application_id }}"
@@ -529,11 +530,12 @@ stringData:
 persistence:
   enabled: true
   storageClass: xxx
-certResolvers:
+certificatesResolvers:
   letsencrypt:
-    dnsChallenge:
-      provider: cloudflare
-    storage: /data/acme.json
+    acme:
+      dnsChallenge:
+        provider: cloudflare
+      storage: /data/acme.json
 env:
   - name: CF_DNS_API_TOKEN
     valueFrom:
@@ -552,6 +554,9 @@ podSecurityContext:
   fsGroup: 65532
   fsGroupChangePolicy: "OnRootMismatch"
 ```
+
+>[!NOTE]
+> With [Traefik Hub](https://traefik.io/traefik-hub/), certificates can be stored as a `Secret` on Kubernetes with `distributedAcme` resolver.
 
 # Provide default certificate with cert-manager and CloudFlare DNS
 
@@ -696,7 +701,7 @@ spec:
     app.kubernetes.io/name: traefik
     app.kubernetes.io/instance: traefik-traefik
   ports:
-  - port: 9000
+  - port: 8080
     name: "traefik"
     targetPort: traefik
     protocol: TCP
@@ -901,6 +906,8 @@ spec:
 Once it's applied, whoami should be accessible on http://whoami.docker.localhost/
 
 </details>
+
+:information_source: In this example, `Deployment` and `HTTPRoute` should be deployed in the same namespace as the Traefik Gateway: Chart namespace.
 
 # Use Kubernetes Gateway API with cert-manager
 

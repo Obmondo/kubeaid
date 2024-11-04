@@ -514,6 +514,18 @@
           {{- with .Values.providers.kubernetesGateway }}
            {{- if .enabled }}
           - "--providers.kubernetesgateway"
+            {{- with .statusAddress }}
+             {{- with .ip }}
+          - "--providers.kubernetesgateway.statusaddress.ip={{ . }}"
+             {{- end }}
+             {{- with .hostname }}
+          - "--providers.kubernetesgateway.statusaddress.hostname={{ . }}"
+             {{- end }}
+             {{- with .service }}
+          - "--providers.kubernetesgateway.statusaddress.service.name={{ tpl .name $ }}"
+          - "--providers.kubernetesgateway.statusaddress.service.namespace={{ tpl .namespace $ }}"
+             {{- end }}
+            {{- end }}
             {{- if or .namespaces (and $.Values.rbac.enabled $.Values.rbac.namespaced) }}
           - "--providers.kubernetesgateway.namespaces={{ template "providers.kubernetesGateway.namespaces" $ }}"
             {{- end }}
@@ -685,17 +697,7 @@
               {{- end }}
             {{- end }}
           {{- end }}
-          {{- range $resolver, $config := $.Values.certResolvers }}
-          {{- range $option, $setting := $config }}
-          {{- if kindIs "map" $setting }}
-          {{- range $field, $value := $setting }}
-          - "--certificatesresolvers.{{ $resolver }}.acme.{{ $option }}.{{ $field }}={{ if kindIs "slice" $value }}{{ join "," $value }}{{ else }}{{ $value }}{{ end }}"
-          {{- end }}
-          {{- else }}
-          - "--certificatesresolvers.{{ $resolver }}.acme.{{ $option }}={{ $setting }}"
-          {{- end }}
-          {{- end }}
-          {{- end }}
+          {{- include "traefik.yaml2CommandLineArgs" (dict "path" "certificatesresolvers" "content" $.Values.certificatesResolvers) | nindent 10 }}
           {{- with .Values.additionalArguments }}
           {{- range . }}
           - {{ . | quote }}
@@ -747,6 +749,14 @@
           {{- end }}
          {{- end }}
         env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
           {{- if ($.Values.resources.limits).cpu }}
           - name: GOMAXPROCS
             valueFrom:
