@@ -8,6 +8,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated kubernetes-dashboard from version 7.9.0 to 7.10.0
 
 ### Patch Version Upgrades %%^^
+- Updated redmine from version 30.0.0 to 30.0.2
 - Updated opencost from version 1.42.0 to 1.42.2
 - Updated gitlab-runner from version 0.70.2 to 0.70.3
 - Updated external-dns from version 8.3.11 to 8.3.12
