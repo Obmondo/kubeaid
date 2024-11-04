@@ -1,6 +1,24 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`81ba9fea`](../../commit/81ba9fea) fix: cert-manager failed to get parsed, due to templating issue feat: added dnszone support
+- [`a40f15a6`](../../commit/a40f15a6) Adding support for specifying root EBS volume size
+- [`c9b77dd0`](../../commit/c9b77dd0) fixed the golang version in the dockerfile, after changing the base image
+- [`ab50d689`](../../commit/ab50d689) updated the dockerfile to use a noble base image
+- [`74a1636e`](../../commit/74a1636e) fix: the context for docker build and removed obsolete options for template workflow
+- [`3c0141b3`](../../commit/3c0141b3) fix: run the ci, when the workflow file is change for container image build
+- [`32ef499c`](../../commit/32ef499c) fix: the image tag for the kubeaid-ci container image
+- [`146230ad`](../../commit/146230ad) removed the bin/tag-update.sh script
+- [`fef4c5cb`](../../commit/fef4c5cb) feat: added a support for updating argocd template file with correct tag and added doc as well
+- [`38ba0c12`](../../commit/38ba0c12) Add config repo tag updater script and install yq
+- [`885d9982`](../../commit/885d9982) update add-commits script to support github commit hash link by adding relative link to commit hash
+- [`86107ac2`](../../commit/86107ac2) remove : and add local commit hash linking in changelog for github
+- [`7b703a29`](../../commit/7b703a29) Add comment for kubeaid managed apps from cluster specific jsonnet
+- [`0405d178`](../../commit/0405d178) Remove redmine app from list of kubeaid apps in Prometheus recording rule
+- [`d9e08469`](../../commit/d9e08469) Fix and rename kubeaid managed apps and recording rules for Prometheus
+- [`d9153b41`](../../commit/d9153b41) Fixing link to the KubeAid Bootstrap Script container image in KubeAid demo blog (Part 1)
+
 ## 4.3.0
 ### Minor Version Upgrades
 - Updated mariadb-operator from version 0.34.0 to 0.35.1
