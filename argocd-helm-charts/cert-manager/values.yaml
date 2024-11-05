@@ -45,6 +45,3 @@ issuer:
 
 networkpolicies: false
 enableCertificateOwnerRef: true
-
-wildcardCertificates:
-  enabled: false
