@@ -6,7 +6,9 @@ rule_files:
 tests:
   - interval: 1m
     input_series:
-      - series: node_dns_test_result{status="failed", host="enableit.dk", result="connection refused", node="localhost"}
+      - series: node_dns_test_result{status="failed", host="enableit.dk", result="connection refused", node="localhost", certname="test.abc"}
+        values: 1x10
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::dns::resolution"}
         values: 1x10
 
     alert_rule_test:
@@ -19,7 +21,8 @@ tests:
               status: failed
               host: enableit.dk
               result: connection refused
+              certname: test.abc
               node: localhost
             exp_annotations:
               summary: "DNS resolution failed"
-              description: "DNS resolution has failed for **enableit.dk** host because of **connection refused**"
+              description: "DNS resolution has failed for **enableit.dk** host because of **connection refused** for certname **test.abc**"
