@@ -322,7 +322,7 @@ local kp =
                   labels: {
                     name: argocdApps,
                     // TODO: maybe add support for other projects
-                    project: 'default',
+                    project: 'kubeaid',
                   },
                 }
                 for argocdApps in vars.kubeaid_apps + vars.kubeaid_users_apps

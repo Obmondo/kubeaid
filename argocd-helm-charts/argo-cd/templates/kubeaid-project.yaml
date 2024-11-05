@@ -1,0 +1,21 @@
+{{ if .Values.kubeaidAppProject.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: kubeaid
+  namespace: {{ include  "argo-cd.namespace" . }}
+spec:
+  description: A list of Kubeaid ArgoCD applications
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  destinations:
+  - name: '*'
+    namespace: '*'
+    server: '*'
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  sourceRepos:
+  - '*'
+{{ end }}

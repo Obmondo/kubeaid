@@ -91,5 +91,8 @@ argo-cd:
       serviceMonitor:
         enabled: true
 
+kubeaidAppProject:
+  enabled: true
+
 blackbox:
   probe: true
