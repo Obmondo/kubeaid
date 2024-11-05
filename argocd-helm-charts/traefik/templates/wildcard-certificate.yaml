@@ -1,5 +1,10 @@
 {{- if .Values.wildcardCertificates.enabled -}}
 {{- range .Values.wildcardCertificates.domains }}
+
+{{- if not (contains "*." .) }}
+{{- fail (printf "The domain %s must start with '*.'" .) }}
+{{- end }}
+
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -12,7 +17,7 @@ spec:
     name: {{ $.Values.wildcardCertificates.issuer | quote }}
   dnsNames:
   - "{{ . }}"
-  - {{ . | replace "*" "" | printf "%s" | trimPrefix "." }}
+  - "{{ . | replace "*" "" | printf "%s" | trimPrefix "." }}"
 
 ---
 {{- end -}}
