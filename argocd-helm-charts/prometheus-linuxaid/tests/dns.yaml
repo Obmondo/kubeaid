@@ -1,0 +1,25 @@
+evaluation_interval: 1m
+
+rule_files:
+  - "../rules/dns.yaml"
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: node_dns_test_result{status="failed", host="enableit.dk", result="connection refused", node="localhost"}
+        values: 1x10
+
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: monitor::system::dns::resolution
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              alert_id: monitor::system::dns::resolution
+              status: failed
+              host: enableit.dk
+              result: connection refused
+              node: localhost
+            exp_annotations:
+              summary: "DNS resolution failed"
+              description: "DNS resolution has failed for **enableit.dk** host because of **connection refused**"
