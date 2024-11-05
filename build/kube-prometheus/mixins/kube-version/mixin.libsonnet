@@ -10,7 +10,7 @@
         rules: [
           {
             alert: 'KubernetesVersionInfoEOS',
-            expr: 'kubernetes_version_info_eos <= 30 and kubernetes_version_info_eos > 0',
+            expr: 'count by (certname, current_version, end_of_support_date) (kubernetes_version_info_eos <= 30 and kubernetes_version_info_eos > 0)',
             'for': '15m',
             labels: {
               severity: 'warning',
@@ -23,7 +23,7 @@
           },
           {
             alert: 'KubernetesVersionInfoEOS',
-            expr: 'kubernetes_version_info_eos<0',
+            expr: 'count by (certname, current_version, end_of_support_date) (kubernetes_version_info_eos < 0 )',
             'for': '15m',
             labels: {
               severity: 'critical',
@@ -36,7 +36,7 @@
           },
           {
             alert: 'KubernetesVersionInfoEOL',
-            expr: 'kubernetes_version_info_eol <= 60 and kubernetes_version_info_eol > 0',
+            expr: 'count by (certname, current_version, end_of_life_date) (kubernetes_version_info_eol <= 60 and kubernetes_version_info_eol > 0)',
             'for': '15m',
             labels: {
               severity: 'warning',
@@ -49,7 +49,7 @@
           },
           {
             alert: 'KubernetesVersionInfoEOL',
-            expr: 'kubernetes_version_info_eol<0',
+            expr: 'count by (certname, current_version, end_of_life_date) (kubernetes_version_info_eol < 0)',
             'for': '15m',
             labels: {
               severity: 'critical',
