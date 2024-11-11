@@ -6,8 +6,8 @@ image:
   # -- Image
   repository: docker.io/rook/ceph
   # -- Image tag
-  # @default -- `v1.15.4`
-  tag: v1.15.4
+  # @default -- `v1.15.5`
+  tag: v1.15.5
   # -- Image pull policy
   pullPolicy: IfNotPresent
 
@@ -182,9 +182,6 @@ csi:
 
   # -- Set GRPC timeout for csi containers (in seconds). It should be >= 120. If this value is not set or is invalid, it defaults to 150
   grpcTimeoutInSeconds: 150
-
-  # -- Allow starting an unsupported ceph-csi image
-  allowUnsupportedVersion: false
 
   # -- Burst to use while communicating with the kubernetes apiserver.
   kubeApiBurst:
