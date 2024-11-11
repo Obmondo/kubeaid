@@ -40,10 +40,19 @@ mysql: https://github.com/percona/grafana-dashboards/blob/main/dashboards/MySQL/
 * grafana pvc is not supported https://github.com/grafana/grafana-operator/issues/296
 * grafana resource as well, the crd seems to be little broken when grafana guys migrated from v4 to v5
 
-
 ## How to test new rule
+
 ```sh
 cd argocd-helm-charts/prometheus-linuxaid
 
 docker run -ti --rm -v $(pwd):/etc/prometheus/:ro --entrypoint /bin/promtool prom/prometheus test rules /etc/prometheus/tests/${NEW_RULE}.yaml
 ```
+
+## Steps to create new alert for servers
+
+* add alert rule and test files in `rules` and `tests` directory in [`argocd-helm-charts/prometheus-linuxaid`](../prometheus-linuxaid/)
+* add `PrometheusRule` template in [`argocd-helm-charts/prometheus-linuxaid/templates`](./templates/)
+* enable the monitoring in LinuxAid in
+[`modules/enableit/monitor/manifests/system`](https://gitea.obmondo.com/EnableIT/LinuxAid/src/branch/master/modules/enableit/monitor/manifests/system) by creating a
+new file f.ex [dns.pp](https://gitea.obmondo.com/EnableIT/LinuxAid/src/branch/master/modules/enableit/monitor/manifests/system/dns.pp)(if it doesn't exist)
+* set prometheusRule value to true in value file, f.ex [for dns alerts](https://gitea.obmondo.com/EnableIT/KubeAid/src/branch/master/argocd-helm-charts/prometheus-linuxaid/values.yaml#L28)
