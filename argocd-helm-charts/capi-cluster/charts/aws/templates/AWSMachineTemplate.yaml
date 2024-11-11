@@ -14,21 +14,22 @@ spec:
       rootVolume:
         size: {{ .Values.controlPlane.rootVolumeSize | default 35 }}
 
-{{- if (not (.Values.global.capa).autoScaler) }}
+{{- if (.Values.global).enableClusterAutoscaler }}
+{{- range $index, $nodeGroup := $.Values.nodeGroups }}
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
 kind: AWSMachineTemplate
 metadata:
-  name: {{ .Values.global.clusterName }}-md-0
+  name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
 spec:
   template:
     spec:
+      ami: {{ toYaml $nodeGroup.ami | nindent 8 }}
       iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
-      instanceType: {{ .Values.workerNodes.instanceType }}
-      sshKeyName: {{ .Values.workerNodes.sshKeyName }}
+      instanceType: {{ $nodeGroup.instanceType }}
+      sshKeyName: {{ $nodeGroup.sshKeyName }}
       imageLookupBaseOS: ubuntu-20.04
-      publicIP: {{ .Values.workerNodes.publicIP }}
-      ami: {{ toYaml .Values.workerNodes.ami | nindent 8 }}
       rootVolume:
-        size: {{ .Values.workerNodes.rootVolumeSize | default 35 }}
+        size: {{ $nodeGroup.rootVolumeSize | default 35 }}
+{{- end }}
 {{- end }}

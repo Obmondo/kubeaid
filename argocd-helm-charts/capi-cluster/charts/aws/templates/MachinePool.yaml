@@ -1,17 +1,17 @@
-{{- if (.Values.global.capa).autoScaler }}
-{{- range $index, $machinePool := $.Values.machinePools }}
+{{- if (.Values.global.capa).enableMachinePools }}
+{{- range $index, $nodeGroup := $.Values.nodeGroups }}
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachinePool
 metadata:
-  name: {{ printf "%s-%s" $.Values.global.clusterName $machinePool.name }}
+  name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
   annotations:
     cluster.x-k8s.io/replicas-managed-by: external-autoscaler
 spec:
   clusterName: {{ $.Values.global.clusterName }}
-  replicas: {{ $machinePool.replicas }}
+  replicas: {{ $nodeGroup.replicas | default 2 }}
   template:
-    {{- if $machinePool.labels }}
+    {{- if $nodeGroup.labels }}
     metadata:
       # Label should meet one of the following criterias to propagate to Node :
       #
@@ -20,19 +20,22 @@ spec:
       # (3) Belongs to node.cluster.x-k8s.io domain.
       #
       # REFER : https://cluster-api.sigs.k8s.io/developer/architecture/controllers/metadata-propagation#machine
-      labels: {{- toYaml $machinePool.labels | nindent 8 }}
+      #
+      # NOTE : The 'MachinePool Machine' proposal implementation needs to get merged for this to
+      # work : https://github.com/kubernetes-sigs/cluster-api-provider-aws/pull/5174
+      labels: {{- toYaml $nodeGroup.labels | nindent 8 }}
     {{- end }}
     spec:
       bootstrap:
         configRef:
           apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
           kind: KubeadmConfig
-          name: {{ printf "%s-%s" $.Values.global.clusterName $machinePool.name }}
+          name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
       clusterName: {{ $.Values.global.clusterName }}
       infrastructureRef:
         apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
         kind: AWSMachinePool
-        name: {{ printf "%s-%s" $.Values.global.clusterName $machinePool.name }}
+        name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
       version: {{ $.Values.global.kubernetes.version }}
 {{- end }}
 {{- end }}

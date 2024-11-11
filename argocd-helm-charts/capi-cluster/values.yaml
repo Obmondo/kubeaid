@@ -3,9 +3,10 @@ global:
     version: v1.31.0
   clusterAPI:
     version: v1.8.4
+  enableClusterAutoscaler: true
   capa:
     version: v2.7.1
-    autoScaler: true
+    enableMachinePools: false
   caph:
     version: v1.0.0-beta.43
   capz:

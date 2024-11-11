@@ -1,20 +1,20 @@
-{{- if (.Values.global.capa).autoScaler }}
-{{- range $index, $machinePool := $.Values.machinePools }}
+{{- if (.Values.global.capa).enableMachinePools }}
+{{- range $index, $nodeGroup := $.Values.nodeGroups }}
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
 kind: AWSMachinePool
 metadata:
-  name: {{ printf "%s-%s" $.Values.global.clusterName $machinePool.name }}
+  name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
 spec:
-  minSize: {{ $machinePool.minSize | default 1 }}
-  maxSize: {{ $machinePool.maxSize | default 3 }}
+  minSize: {{ $nodeGroup.minSize | default 1 }}
+  maxSize: {{ $nodeGroup.maxSize | default 3 }}
   awsLaunchTemplate:
-    ami: {{ toYaml $machinePool.ami | nindent 6 }}
+    ami: {{ toYaml $nodeGroup.ami | nindent 6 }}
     iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
-    instanceType: {{ $machinePool.instanceType }}
-    sshKeyName: {{ $machinePool.sshKeyName }}
+    instanceType: {{ $nodeGroup.instanceType }}
+    sshKeyName: {{ $nodeGroup.sshKeyName }}
     imageLookupBaseOS: ubuntu-20.04
     rootVolume:
-      size: {{ $machinePool.rootVolumeSize | default 35 }}
+      size: {{ $nodeGroup.rootVolumeSize | default 35 }}
 {{- end }}
 {{- end }}

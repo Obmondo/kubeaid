@@ -1,6 +1,4 @@
-secretName: capi-cluster-token
-sshKeyName: kubeaid-demo
-region: us-east-2
+secretName: cloud-credentials
 bastion:
   enabled: true
 vpc:
@@ -10,23 +8,3 @@ pods:
 
 controlPlane:
   loadBalancerType: nlb
-  region: us-east-2
-  replicas: 1
-  instanceType: t2.medium
-  ami:
-    id: ami-05145146e3a9db6f3
-
-machinePools:
-  - name: primary
-    replicas: 1
-    region: us-east-2
-    instanceType: t2.medium
-    sshKeyName: kubeaid-demo
-    ami:
-      id: ami-05145146e3a9db6f3
-  - name: secondary
-    replicas: 1
-    instanceType: t2.medium
-    sshKeyName: kubeaid-demo
-    ami:
-      id: ami-05145146e3a9db6f3

@@ -1,0 +1,40 @@
+global:
+  clusterName: kubeaid-demo
+  kubeaidConfig:
+    repo: https://github.com/Archisman-Mridha/kubeaid-config
+
+provider:
+  aws: true
+
+aws:
+  secretName: cloud-credentials
+  sshKeyName: kubeaid-demo
+  region: us-east-1
+  bastion:
+    enabled: true
+  vpc:
+    cidrBlock: 10.14.0.0/22
+  pods:
+    cidrBlock: 10.244.0.0/16
+  controlPlane:
+    loadBalancer:
+      loadBalancerType: nlb
+    region: us-east-1
+    replicas: 1
+    instanceType: t4g.medium
+    ami:
+      id: ami-0fc044fa0d061d18d
+  nodeGroups:
+    - name: primary
+      # minSize: 1
+      # maxSize: 3
+      # replicas: 2
+      instanceType: t4g.medium
+      sshKeyName: kubeaid-demo
+      ami:
+        id: ami-0fc044fa0d061d18d
+      rootVolumeSize: 35
+      labels:
+        node.cluster.x-k8s.io/nodegroup: primary
+        node-role.kubernetes.io/bootstrapper: ""
+      taints: []

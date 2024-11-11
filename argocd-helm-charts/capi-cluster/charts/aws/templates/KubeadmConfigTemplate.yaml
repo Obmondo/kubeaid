@@ -1,8 +1,10 @@
-{{- if (not (.Values.global.capa).autoScaler) }}
+{{- if (.Values.global.capa).enableClusterAutoscaler }}
+{{- range $index, $nodeGroup := $.Values.nodeGroups }}
+---
 apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
 kind: KubeadmConfigTemplate
 metadata:
-  name: {{ .Values.global.clusterName }}
+  name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
 spec:
   template:
     spec:
@@ -11,4 +13,8 @@ spec:
           kubeletExtraArgs:
             cloud-provider: external
           name: '{{"{{"}} ds.meta_data.local_hostname {{"}}"}}'
+          {{- if $nodeGroup.taints }}
+          taints: {{- toYaml $nodeGroup.taints | nindent 8 }}
+          {{- end }}
+{{- end }}
 {{- end }}
