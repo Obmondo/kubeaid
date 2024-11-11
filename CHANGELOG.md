@@ -15,6 +15,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated argo-cd from version 7.6.12 to 7.7.0
 
 ### Patch Version Upgrades %%^^
+- Updated sealed-secrets from version 2.16.1 to 2.16.2
 - Updated rook-ceph-cluster from version v1.15.4 to v1.15.5
 - Updated rook-ceph from version v1.15.4 to v1.15.5
 - Updated redmine from version 30.0.2 to 30.0.4
