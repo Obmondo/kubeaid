@@ -12,6 +12,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated argo-cd from version 7.6.12 to 7.7.0
 
 ### Patch Version Upgrades %%^^
+- Updated metallb from version 6.3.13 to 6.3.15
 - Updated cluster-autoscaler from version 9.43.1 to 9.43.2
 
 ## 5.0.0
