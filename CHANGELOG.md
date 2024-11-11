@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated oncall from version 1.11.5 to 1.12.1
 - Updated mariadb-operator from version 0.35.1 to 0.36.0
 - Updated keda from version 2.15.2 to 2.16.0
 - Updated external-dns from version 8.3.12 to 8.5.1
