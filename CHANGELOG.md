@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated opensearch-dashboards from version 2.24.1 to 2.25.0
 - Updated opensearch from version 2.26.1 to 2.27.0
 - Updated oncall from version 1.11.5 to 1.12.1
 - Updated mariadb-operator from version 0.35.1 to 0.36.0
