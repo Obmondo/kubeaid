@@ -1,6 +1,14 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-11-11
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+- Updated argo-cd from version 7.6.12 to 7.7.0
+
+### Patch Version Upgrades %%^^
+
 ## 5.0.0
 ### Major Version Upgrades
 - Updated traefik from version 32.1.1 to 33.0.0
