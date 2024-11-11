@@ -1,10 +1,8 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 2024-11-11
-### Major Version Upgrades %%^^
-
-### Minor Version Upgrades %%^^
+## 5.1.0
+### Minor Version Upgrades
 - Updated opensearch-dashboards from version 2.24.1 to 2.25.0
 - Updated opensearch from version 2.26.1 to 2.27.0
 - Updated oncall from version 1.11.5 to 1.12.1
@@ -14,7 +12,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated crossplane from version 1.17.2 to 1.18.0
 - Updated argo-cd from version 7.6.12 to 7.7.0
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
 - Updated sealed-secrets from version 2.16.1 to 2.16.2
 - Updated rook-ceph-cluster from version v1.15.4 to v1.15.5
 - Updated rook-ceph from version v1.15.4 to v1.15.5
