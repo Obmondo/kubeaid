@@ -1,4 +1,4 @@
-{{- if (.Values.global.capa).enableClusterAutoscaler }}
+{{- if (.Values.global).enableClusterAutoscaler }}
 {{- range $index, $nodeGroup := $.Values.nodeGroups }}
 ---
 apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
@@ -14,7 +14,7 @@ spec:
             cloud-provider: external
           name: '{{"{{"}} ds.meta_data.local_hostname {{"}}"}}'
           {{- if $nodeGroup.taints }}
-          taints: {{- toYaml $nodeGroup.taints | nindent 12 }}
+          taints: {{- toYaml $nodeGroup.taints | nindent 10 }}
           {{- end }}
 {{- end }}
 {{- end }}
