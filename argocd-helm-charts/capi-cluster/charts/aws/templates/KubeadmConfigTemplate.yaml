@@ -14,7 +14,7 @@ spec:
             cloud-provider: external
           name: '{{"{{"}} ds.meta_data.local_hostname {{"}}"}}'
           {{- if $nodeGroup.taints }}
-          taints: {{- toYaml $nodeGroup.taints | nindent 8 }}
+          taints: {{- toYaml $nodeGroup.taints | nindent 12 }}
           {{- end }}
 {{- end }}
 {{- end }}
