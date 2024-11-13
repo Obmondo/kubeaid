@@ -52,3 +52,16 @@ postgresql:
     requests:
       memory: 256Mi
       cpu: 100m
+
+puppetAgentExporter:
+  image: harbor.obmondo.com/obmondo/dockerfiles/puppet-agent-exporter
+  tag: v0.0.1
+  imagePullPolicy: IfNotPresent
+  extraEnv:
+    METRICS_PATH: /etc/puppetlabs/code/prometheus-dropzone
+  resources:
+    limits:
+      memory: 50Mi
+    requests:
+      memory: 50Mi
+      cpu: 20m

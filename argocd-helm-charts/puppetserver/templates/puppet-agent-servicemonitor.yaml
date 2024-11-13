@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: puppet-agent-exporter
+spec:
+  endpoints:
+  - interval: 30s
+    path: /metrics
+    port: http-metrics
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace | quote }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: puppet-agent-exporter
+      app.kubernetes.io/name: puppetserver

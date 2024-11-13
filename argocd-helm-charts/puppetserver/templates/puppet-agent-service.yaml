@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: puppet-agent-exporter
+  namespace: {{ .Release.Namespace | quote }}  
+  labels:
+    app.kubernetes.io/component: puppet-agent-exporter
+    app.kubernetes.io/name: puppetserver
+spec:
+  ports:
+  - name: http-metrics
+    port: 8080  
+    targetPort: 8080  
+  selector:
+    app.kubernetes.io/component: puppet-agent-exporter
+    app.kubernetes.io/name: puppetserver
