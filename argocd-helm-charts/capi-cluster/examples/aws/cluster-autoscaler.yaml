@@ -38,3 +38,19 @@ aws:
         node.cluster.x-k8s.io/nodegroup: primary
         node-role.kubernetes.io/bootstrapper: ""
       taints: []
+    - name: secondary
+      # minSize: 1
+      # maxSize: 3
+      # replicas: 2
+      instanceType: t4g.medium
+      sshKeyName: kubeaid-demo
+      ami:
+        id: ami-0fc044fa0d061d18d
+      rootVolumeSize: 35
+      labels:
+        node.cluster.x-k8s.io/nodegroup: secondary
+      taints:
+        - key: dedicated
+          value: guilherme-taint
+          effect: NoSchedule
+          timeadded: null
