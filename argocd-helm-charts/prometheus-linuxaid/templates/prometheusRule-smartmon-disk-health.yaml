@@ -1,8 +1,8 @@
-{{- if .Values.prometheusRule.smart }}
+{{- if .Values.prometheusRule.smartmon_disk_health }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: smart-rules
+  name: smartmon-disk-health-rules
   namespace: monitoring-{{ .Values.customerid }}
 spec:
   {{- $.Files.Get "rules/smartmon_disk_health.yaml" | nindent 4 }}
