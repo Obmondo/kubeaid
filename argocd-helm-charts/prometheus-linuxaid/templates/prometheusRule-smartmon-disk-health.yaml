@@ -5,5 +5,5 @@ metadata:
   name: smart-rules
   namespace: monitoring-{{ .Values.customerid }}
 spec:
-  {{- $.Files.Get "rules/smart.yaml" | nindent 4 }}
+  {{- $.Files.Get "rules/smartmon_disk_health.yaml" | nindent 4 }}
 {{- end }}

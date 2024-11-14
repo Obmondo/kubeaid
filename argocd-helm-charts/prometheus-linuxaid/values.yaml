@@ -51,7 +51,7 @@ prometheusRule:
   service_sssd: true
   service_omsagent: true
   services: true
-  smart: true
+  smartmon_disk_health: true
   ssacli: true
   zfsExporter: true
   smartmon_sata: true

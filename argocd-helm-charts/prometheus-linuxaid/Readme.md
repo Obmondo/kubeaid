@@ -39,3 +39,11 @@ mysql: https://github.com/percona/grafana-dashboards/blob/main/dashboards/MySQL/
 * promtool rule validate
 * grafana pvc is not supported https://github.com/grafana/grafana-operator/issues/296
 * grafana resource as well, the crd seems to be little broken when grafana guys migrated from v4 to v5
+
+
+## How to test new rule
+```sh
+cd argocd-helm-charts/prometheus-linuxaid
+
+docker run -ti --rm -v $(pwd):/etc/prometheus/:ro --entrypoint /bin/promtool prom/prometheus test rules /etc/prometheus/tests/${NEW_RULE}.yaml
+```
