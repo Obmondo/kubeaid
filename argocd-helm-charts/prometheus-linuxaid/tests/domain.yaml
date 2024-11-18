@@ -1,0 +1,28 @@
+---
+evaluation_interval: 12h
+
+rule_files:
+  - ../rules/domain.yaml
+
+tests:
+  - interval: 12h
+    input_series:
+      - series: obmondo_monitoring{certname="dev01.example", alert_id="monitor::domains::status"}
+        values: 1x1000
+      - series: probe_http_status_code{domain="example.com",certname="dev01.example"}
+        values: 200x100
+      - series: probe_http_content_length{domain="example.com",certname="dev01.example"}
+        values: 150x100
+
+    alert_rule_test:
+      - alertname: monitor::domains::status
+        eval_time: 24h
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              certname: dev01.example
+              alert_id: monitor::domains::status
+              domain: example.com
+            exp_annotations:
+              summary: "For server **dev01.example**,this **example.com** domain is down"
+              description: Domain example.com is down for certname dev01.example. Please fix this.
