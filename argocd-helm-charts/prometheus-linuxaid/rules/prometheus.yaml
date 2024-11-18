@@ -41,9 +41,9 @@ groups:
 
     - alert: PrometheusTargetScrapingSlow
       expr: |
-        prometheus_target_interval_length_seconds{quantile="0.9"} > 61
-        and on(certname) obmondo_monitoring{alert_id="monitor::prometheus::scrapingslow"} > 0
-      for: 10m
+        prometheus_target_interval_length_seconds{quantile="0.9"} / on (interval, instance, job) prometheus_target_interval_length_seconds{quantile="0.5"} > 1.05
+            and on(certname) obmondo_monitoring{alert_id="monitor::prometheus::scrapingslow"} > 0
+      for: 5m
       labels:
         severity: warning
         alert_id: prometheus
