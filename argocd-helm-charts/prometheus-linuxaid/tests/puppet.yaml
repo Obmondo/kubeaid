@@ -7,59 +7,59 @@ rule_files:
 tests:
   - interval: 1m
     input_series:
-      - series: 'puppet_report{host="atat.enableit",environment="production"}'
+      - series: 'puppet_report{host="atat.enableit",environment="master"}'
         values: 0x3000
-      - series: 'puppet_status{state="failed",host="atat01.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat01.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat02.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat02.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat03.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat03.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat04.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat04.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat05.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat05.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat06.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat06.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat07.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat07.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat08.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat08.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat09.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat09.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat10.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat10.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat11.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat11.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat12.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat12.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat13.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat13.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat14.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat14.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat15.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat15.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat16.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat16.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat17.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat17.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat18.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat18.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat19.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat19.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat20.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat20.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat21.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat21.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat22.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat22.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat23.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat23.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat24.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat24.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat25.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat25.enableit",environment="master"}'
         values: 1x3000
-      - series: 'puppet_status{state="failed",host="atat26.enableit",environment="production"}'
+      - series: 'puppet_status{state="failed",host="atat26.enableit",environment="master"}'
         values: 1x3000  # 2 days
 
     alert_rule_test:
@@ -71,7 +71,7 @@ tests:
               severity: warning
               host: atat.enableit
               alert_id: 'monitor::system::puppet::last_run'
-              environment: production
+              environment: master
             exp_annotations:
               summary: 'Puppet has not run on **atat.enableit** for more than 2d 2h 0m 0s'
               description: |-2
@@ -91,7 +91,7 @@ tests:
 
                 You can get the list of nodes on prom dashboard by running this query
                 ```sh
-                sum by (host) (puppet_status{environment="production",state="failed"} == 1)
+                sum by (host) (puppet_status{environment="master",state="failed"} == 1)
                 ```
 
                 Puppetboard for the corresponding node should show that the past

@@ -2,7 +2,7 @@ groups:
   - name: monitor::system::puppet::last_run
     rules:
     - alert: monitor::system::puppet::last_run
-      expr: time() - puppet_report{environment="production", host!~".+.niwyocdmk2"} >= 86400 * 1
+      expr: time() - puppet_report{environment="master", host!~".+.niwyocdmk2"} >= 86400 * 1
       for: 24h
       labels:
         alert_id: 'monitor::system::puppet::last_run'
@@ -15,7 +15,7 @@ groups:
           This could be due to any number of things, e.g. Puppet crashing or hanging, or cron/systemd timers being broken.
 
     - alert: monitor::system::puppet::total_resources
-      expr: count(puppet_status{state="failed",environment="production"} == 1) > 5
+      expr: count(puppet_status{state="failed",environment="master"} == 1) > 5
       for: 48h
       labels:
         alert_id: 'monitor::system::puppet::total_resources'
@@ -27,7 +27,7 @@ groups:
 
           You can get the list of nodes on prom dashboard by running this query
           ```sh
-          sum by (host) (puppet_status{environment="production",state="failed"} == 1)
+          sum by (host) (puppet_status{environment="master",state="failed"} == 1)
           ```
 
           Puppetboard for the corresponding node should show that the past
