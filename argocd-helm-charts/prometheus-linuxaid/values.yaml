@@ -24,6 +24,7 @@ grafana:
   server: graphs.obmondo.com
   version: 11.1.4
 prometheusRule:
+  domain: true
   dns: true
   backup: true
   btrfs: true
