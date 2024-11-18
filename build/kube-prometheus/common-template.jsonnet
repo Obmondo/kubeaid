@@ -160,6 +160,7 @@ local default_vars = {
     sealedsecrets: true,
     etcd: true,
     velero: false,
+    zfs: false,
     opensearch: false,
     'cert-manager': true,
     'kubernetes-version-info': true,
@@ -248,8 +249,13 @@ local mixins = remove_nulls([
     vars,
   ),
   addMixin(
-    'smartmon',
-    (import 'mixins/smartmon/mixin.libsonnet'),
+    'monitoring',
+    (import 'mixins/monitoring/mixin.libsonnet'),
+    vars,
+  ),
+  addMixin(
+    'zfs',
+    (import 'mixins/zfs/mixin.libsonnet'),
     vars,
   ),
 ]);
