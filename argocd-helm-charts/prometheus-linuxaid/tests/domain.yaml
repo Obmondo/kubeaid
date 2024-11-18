@@ -10,9 +10,9 @@ tests:
       - series: obmondo_monitoring{certname="dev01.example", alert_id="monitor::domains::status"}
         values: 1x1000
       - series: probe_http_status_code{domain="example.com",certname="dev01.example"}
-        values: 200x100
+        values: 0x100
       - series: probe_http_content_length{domain="example.com",certname="dev01.example"}
-        values: 150x100
+        values: 0x100
 
     alert_rule_test:
       - alertname: monitor::domains::status
