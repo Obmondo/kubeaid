@@ -27,5 +27,5 @@ spec:
       bindAddress: ":8181"
     syncPeriod: 10m0s
     featureGates:
-      MachinePool: {{ .Values.global.capa.autoScaler }}
+      MachinePool: {{ .Values.global.capa.enableMachinePools }}
 {{- end }}
