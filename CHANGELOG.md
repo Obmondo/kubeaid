@@ -1,6 +1,24 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`ab5f35b2`](../../commit/ab5f35b2) Fixed the alert query for domains status
+- [`6a27021f`](../../commit/6a27021f) bug fix: fixed the env for puppet-agent status monitoring, since default env is master
+- [`f678f88f`](../../commit/f678f88f) Added the template file for domain rule
+- [`ed1216e8`](../../commit/ed1216e8) Enable domain monitoring
+- [`7c06efc9`](../../commit/7c06efc9) Added the alert for domain down
+- [`7812104a`](../../commit/7812104a) Fixing AWS InfrastructureProvider Helm template
+- [`ddeaa441`](../../commit/ddeaa441) Adding blog : Demonstrating KubeAid (part 0)
+- [`4979745e`](../../commit/4979745e) Adding Terraform code for creating a VPC setup for building custom AMIs
+- [`9cd9b8c3`](../../commit/9cd9b8c3) fix smartmon disk rule name
+- [`6d369aff`](../../commit/6d369aff) rename smart rule to smartmon_disk_health, add doc on how to test rule locally
+- [`9288b25c`](../../commit/9288b25c) add smartmon_sata rule to handle sata cable failures
+- [`485280ac`](../../commit/485280ac) Fixing KubeadmConfigTemplate not rendering
+- [`39e5082d`](../../commit/39e5082d) Fixing indentation for taints in KubeadmConfigTemplate in capi-cluster app
+- [`48a75a78`](../../commit/48a75a78) add puppet agent exporter deployment
+- [`8142b396`](../../commit/8142b396) add steps for setting up keycloak and giving super user access in matomo
+- [`726a1c64`](../../commit/726a1c64) Support Cluster API - Cluster AutoScaler integration
+
 ## 5.1.0
 ### Minor Version Upgrades
 - Updated opensearch-dashboards from version 2.24.1 to 2.25.0
