@@ -3,6 +3,7 @@ All releases and the changes included in them (pulled from git commits added sin
 
 ## 2024-11-19
 ### Major Version Upgrades %%^^
+- Updated redmine from version 30.0.4 to 32.0.1
 
 ### Minor Version Upgrades %%^^
 - Updated external-dns from version 8.5.1 to 8.6.0
