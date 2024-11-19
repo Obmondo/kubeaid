@@ -9,6 +9,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated redmine from version 30.0.4 to 32.0.1
 
 ### Minor Version Upgrades %%^^
+- Updated whoami from version 5.1.2 to 5.2.0
 - Updated external-dns from version 8.5.1 to 8.6.0
 - Updated aws-ebs-csi-driver from version 2.36.0 to 2.37.0
 

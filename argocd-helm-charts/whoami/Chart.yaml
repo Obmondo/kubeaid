@@ -3,5 +3,5 @@ name: whoami
 version: 1.0.0
 dependencies:
   - name: whoami
-    version: 5.1.2
+    version: 5.2.0
     repository: https://cowboysysop.github.io/charts/
