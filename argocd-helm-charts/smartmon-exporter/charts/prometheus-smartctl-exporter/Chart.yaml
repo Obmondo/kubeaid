@@ -1,0 +1,13 @@
+apiVersion: v2
+appVersion: v0.12.0
+description: A Helm chart for Kubernetes
+home: https://github.com/prometheus-community/smartctl_exporter
+maintainers:
+- name: kfox1111
+- email: rootsandtrees@posteo.de
+  name: zeritti
+name: prometheus-smartctl-exporter
+sources:
+- https://github.com/prometheus-community/smartctl_exporter
+type: application
+version: 0.11.0

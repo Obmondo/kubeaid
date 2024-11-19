@@ -1,0 +1,3 @@
+prometheus-smartctl-exporter:
+  serviceMonitor:
+    enabled: true

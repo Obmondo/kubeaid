@@ -1,0 +1,8 @@
+apiVersion: v2
+name: smartmon-exporter
+description: A Helm chart for SmartCTL Exporter
+version: 1.0.0
+dependencies:
+  - name: prometheus-smartctl-exporter
+    version: 0.11.0
+    repository: https://prometheus-community.github.io/helm-charts
