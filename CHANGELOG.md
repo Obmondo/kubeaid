@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated external-dns from version 8.5.1 to 8.6.0
 - Updated aws-ebs-csi-driver from version 2.36.0 to 2.37.0
 
 ### Patch Version Upgrades %%^^
