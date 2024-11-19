@@ -1,19 +1,19 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 2024-11-19
-### Major Version Upgrades %%^^
+## 6.0.0
+### Major Version Upgrades
 - Updated velero from version 7.2.2 to 8.0.0
 - Updated teleport-kube-agent from version 16.4.6 to 17.0.1
 - Updated teleport-cluster from version 16.4.6 to 17.0.1
 - Updated redmine from version 30.0.4 to 32.0.1
 
-### Minor Version Upgrades %%^^
+### Minor Version Upgrades
 - Updated whoami from version 5.1.2 to 5.2.0
 - Updated external-dns from version 8.5.1 to 8.6.0
 - Updated aws-ebs-csi-driver from version 2.36.0 to 2.37.0
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
 - Updated mattermost-team-edition from version 6.6.65 to 6.6.66
 - Updated argocd-image-updater from version 0.11.1 to 0.11.2
 - Updated argo-cd from version 7.7.0 to 7.7.3
