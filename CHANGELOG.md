@@ -7,6 +7,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Minor Version Upgrades %%^^
 
 ### Patch Version Upgrades %%^^
+- Updated argocd-image-updater from version 0.11.1 to 0.11.2
 - Updated argo-cd from version 7.7.0 to 7.7.3
 
 ### Improvements
