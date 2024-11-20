@@ -1,0 +1,66 @@
+gitea:
+  redis-cluster:
+    enabled: false
+  postgresql:
+    enabled: false
+  deployment:
+    env:
+      - name: "GITEA__database__DB_TYPE"
+        value: "postgres"
+      - name: "GITEA__database__HOST"
+        value: "gitea-staging-pgsql-rw"
+      - name: "GITEA__database__PORT"
+        value: "5432"
+      - name: "GITEA__database__NAME"
+        value: "giteadb"
+      - name: "GITEA__database__USER"
+        value: "giteadb"
+      - name: "GITEA__database__PASSWD"
+        valueFrom:
+          secretKeyRef:
+            name: gitea-staging-pgsql-app
+            key: password
+      - name: "GITEA__service__REQUIRE_SIGNIN_VIEW"
+        value: "false"
+      - name: "GITEA__cache__CONN_STR"
+        value: "redis://gitea-staging-redis-cluster-leader:6379"
+
+  giteadb:
+    enabled: true
+    name: giteadb
+    extraEnv:
+      GITEA_POSTGRES_HOSTNAME: gitea-staging-pgsql-rw
+
+  metrics:
+    prometheus:
+      disableAPICheck: true
+      giteadb:
+        enabled: true
+
+  global:
+    postgresql:
+      auth:
+        existingSecret: gitea-staging-pgsql-app
+        secretKeys:
+          usernameKey: username
+          userPasswordKey: password
+
+postgresql:
+  instance: 1
+  size: 2Gi
+  recover: false
+  bootstrap:
+    initdb:
+      database: giteadb
+      owner: giteadb
+  resources:
+    limits:
+      memory: 256Mi
+    requests:
+      memory: 256Mi
+      cpu: 100m
+
+redisCluster:
+  replicas: 1
+  name: api-redis
+  storage: 4Gi
