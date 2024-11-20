@@ -21,7 +21,13 @@ spec:
   ruleSelector: {}
   scrapeConfigNamespaceSelector: null
   scrapeConfigSelector: {}
-  serviceMonitorNamespaceSelector: null
+  serviceMonitorNamespaceSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: In
+        values:
+          - monitoring-{{ .Values.customerid }}
+          - puppetserver-{{ .Values.customerid }}
   serviceMonitorSelector: {}
   replicas: 1
   retention: {{ .Values.prometheus.retention | default "15d" | }}
