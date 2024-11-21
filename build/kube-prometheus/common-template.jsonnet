@@ -85,6 +85,7 @@ local default_vars = {
     'velero',
     'whoami',
     'zfs-localpv',
+    'smartmon',
   ],
   prometheus_operator_resources: {
     limits: { memory: '80Mi' },
@@ -169,6 +170,7 @@ local default_vars = {
     'argo-cd-sync-state': true,
     rabbitmq: false,
     'monitor-prometheus-stack': false,
+    smartmon: false,
   },
   mixin_configs: {
     // Example:
@@ -243,6 +245,11 @@ local mixins = remove_nulls([
   addMixin(
     'monitoring',
     (import 'mixins/monitoring/mixin.libsonnet'),
+    vars,
+  ),
+  addMixin(
+    'smartmon',
+    (import 'mixins/smartmon/mixin.libsonnet'),
     vars,
   ),
 ]);

@@ -162,11 +162,7 @@ available in https://github.com/prometheus/alertmanager/blob/main/doc/alertmanag
   }
   ```
 
-- To add a custom prometheus rule as a mixin, create a mixin.libsonnet file in the relevant folder under the `mixins` folder and generate the `prometheus.yaml` for it. One way to do generate a YAML file from a .libsonnet file is using a jsonnet command similar to this:
-
-```
-jsonnet -e '(import "mixin.libsonnet").prometheusAlerts' | gojsontoyaml > prometheus.yaml
-```
+- To add a custom prometheus rule as a mixin, create a mixin.libsonnet file in the relevant folder under the `mixins` folder.
 
 - In the case when your mixin is supposed to trigger a Prometheus alert and <b>all you want is to test</b> whether it works, do this:
 
