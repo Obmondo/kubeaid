@@ -1,0 +1,37 @@
+# Add ashish
+dn: uid=ashish,ou=users,dc=o2,dc=ai
+objectClass: inetOrgPerson
+uid: ashish
+cn: ashish k
+sn: ashish
+mail: ashish@o2.ai
+userPassword: ComplexSuperman1
+
+# Add prabhat
+dn: uid=prabhat,ou=users,dc=o2,dc=ai
+objectClass: inetOrgPerson
+uid: prabhat
+cn: prabhat
+sn: prabhat
+mail: prabhat@o2.ai
+userPassword: ComplexSuperman1
+
+
+# Add ankur
+dn: uid=ankur,ou=users,dc=o2,dc=ai
+objectClass: inetOrgPerson
+uid: ankur
+cn: ankur s
+sn: ankur
+mail: ankur@o2.ai
+userPassword: ComplexSuperman1
+
+
+# Add Hengfei
+dn: uid=hengfei,ou=users,dc=o2,dc=ai
+objectClass: inetOrgPerson
+uid: hengfei
+cn: hengfei 
+sn: hengfei
+mail: hengfei@o2.ai
+userPassword: ComplexSuperman1

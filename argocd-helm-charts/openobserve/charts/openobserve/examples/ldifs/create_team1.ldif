@@ -1,0 +1,17 @@
+# Create Admin group for Team1
+dn: cn=admin,ou=team1,ou=teams,dc=o2,dc=ai
+objectClass: groupOfUniqueNames
+cn: admin
+uniqueMember: uid=ashish,ou=users,dc=o2,dc=ai
+
+# Create Editor group for Team1
+dn: cn=editor,ou=team1,ou=teams,dc=o2,dc=ai
+objectClass: groupOfUniqueNames
+cn: editor
+uniqueMember: uid=prabhat,ou=users,dc=o2,dc=ai
+
+# Create Viewer group for Team1
+dn: cn=viewer,ou=team1,ou=teams,dc=o2,dc=ai
+objectClass: groupOfUniqueNames
+cn: viewer
+uniqueMember: uid=ankur,ou=users,dc=o2,dc=ai

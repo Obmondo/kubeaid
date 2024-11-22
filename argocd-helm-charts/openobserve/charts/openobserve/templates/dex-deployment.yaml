@@ -1,0 +1,88 @@
+{{- if and .Values.enterprise.enabled .Values.enterprise.dex.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "openobserve.fullname" . }}-dex
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "openobserve.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.dex.enabled }}
+  replicas: {{ .Values.replicaCount.dex }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "openobserve.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.enterprise.dex.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "openobserve.selectorLabels" . | nindent 8 }}
+        app: dex
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "openobserve.fullname" . }}-dex
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.enterprise.dex.image.repository }}:{{ .Values.enterprise.dex.image.tag }}"
+          imagePullPolicy: {{ .Values.enterprise.dex.image.pullPolicy }}
+          ports:
+            - containerPort: 5556
+              name: http
+          {{- if .Values.probes.dex.enabled }}
+          livenessProbe:
+           httpGet:
+             path: /healthz
+             port: 5556
+           initialDelaySeconds: {{ .Values.probes.dex.initialDelaySeconds | default 10 }}
+           failureThreshold: {{ .Values.probes.dex.failureThreshold | default 3 }}
+          readinessProbe:
+           httpGet:
+             path: /healthz
+             port: 5556
+           initialDelaySeconds: {{ .Values.probes.dex.initialDelaySeconds | default 10 }}
+           failureThreshold: {{ .Values.probes.dex.failureThreshold | default 3 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.enterprise.dex.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/dex
+              readOnly: true
+          envFrom:
+            - configMapRef:
+                name: {{ include "openobserve.fullname" . }}
+            - secretRef:
+                name: {{ include "openobserve.fullname" . }}
+          env:
+            {{- with .Values.enterprise.dex.extraEnv }}
+            {{- toYaml . |  nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "openobserve.fullname" . }}-dex
+            
+      {{- with .Values.enterprise.dex.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.enterprise.dex.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations.dex }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

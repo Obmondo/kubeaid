@@ -1,0 +1,14 @@
+
+If everything proceeded without errors then your cluster is now sending logs and metrics to OpenObserve. 
+
+You can add following to your pods/namespaces to auto instrument your applications to send traces:
+
+  1. Java: instrumentation.opentelemetry.io/inject-java: "openobserve-collector/openobserve-java"
+  2. NodeJS: instrumentation.opentelemetry.io/inject-nodejs: "openobserve-collector/openobserve-nodejs"
+  3. Python: instrumentation.opentelemetry.io/inject-python: "openobserve-collector/openobserve-python"
+  4. DotNet: instrumentation.opentelemetry.io/inject-dotnet: "openobserve-collector/openobserve-dotnet"
+  5. Go: instrumentation.opentelemetry.io/inject-go: "openobserve-collector/openobserve-go" , instrumentation.opentelemetry.io/otel-go-auto-target-exe: "/path/to/container/executable"
+  6. OpenTelemetry SDK environment variables only: instrumentation.opentelemetry.io/inject-sdk: "true"
+
+
+

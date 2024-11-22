@@ -1,0 +1,60 @@
+{{- if and .Values.enterprise.enabled .Values.enterprise.openfga.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "openobserve.fullname" . }}-openfga
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openfga
+  template:
+    metadata:
+      labels:
+        app: openfga
+    spec:
+      initContainers:
+        - name: openfga-migrate
+          image: {{ .Values.enterprise.openfga.image.repository }}:{{ .Values.enterprise.openfga.image.tag }}
+          imagePullPolicy: {{ .Values.enterprise.openfga.image.pullPolicy }}
+          command: ['/openfga', 'migrate']
+          env:
+            - name: OPENFGA_DATASTORE_ENGINE
+              value: postgres
+            - name: OPENFGA_DATASTORE_URI
+              {{- if .Values.postgres.enabled }}
+              value: "postgres://openobserve:{{ .Values.postgres.spec.password }}@{{ include "openobserve.fullname" . }}-postgres-rw.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:5432/app?sslmode=disable"
+              {{- else }}
+              value: "{{ .Values.auth.ZO_META_POSTGRES_DSN }}"
+              {{- end }}
+          resources:
+            limits:
+              cpu: 200m
+              memory: 200Mi
+      containers:
+        - name: openfga
+          image: {{ .Values.enterprise.openfga.image.repository }}:{{ .Values.enterprise.openfga.image.tag }}
+          imagePullPolicy: IfNotPresent
+          command: ['/openfga', 'run']
+          env:
+            - name: OPENFGA_DATASTORE_ENGINE
+              value: postgres
+            - name: OPENFGA_DATASTORE_URI
+              {{- if .Values.postgres.enabled }}
+              value: "postgres://openobserve:{{ .Values.postgres.spec.password }}@{{ include "openobserve.fullname" . }}-postgres-rw.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:5432/app?sslmode=disable"
+              {{- else }}
+              value: "{{ .Values.auth.ZO_META_POSTGRES_DSN }}"
+              {{- end }}
+            - name: OPENFGA_LOG_FORMAT
+              value: json
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 8081
+              name: grpc
+          resources:
+            limits:
+              cpu: 200m
+              memory: 200Mi
+{{- end }}

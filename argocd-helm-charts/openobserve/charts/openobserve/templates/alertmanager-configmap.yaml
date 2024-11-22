@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "openobserve.fullname" . }}-alertmanager
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "openobserve.labels" . | nindent 4 }}
+data:
+  # This condition is necessary to ensure backwards compatibility for users
+  {{- if .Values.alertmanager.config }}
+  ZO_META_CONNECTION_POOL_MIN_SIZE: "{{ .Values.alertmanager.config.ZO_META_CONNECTION_POOL_MIN_SIZE }}"
+  ZO_META_CONNECTION_POOL_MAX_SIZE: "{{ .Values.alertmanager.config.ZO_META_CONNECTION_POOL_MAX_SIZE }}"
+  {{- else }}
+  ZO_META_CONNECTION_POOL_MIN_SIZE: "{{ .Values.config.ZO_META_CONNECTION_POOL_MIN_SIZE }}"
+  ZO_META_CONNECTION_POOL_MAX_SIZE: "{{ .Values.config.ZO_META_CONNECTION_POOL_MAX_SIZE }}"
+  {{- end }}

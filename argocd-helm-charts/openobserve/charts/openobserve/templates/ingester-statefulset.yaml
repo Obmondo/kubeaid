@@ -1,0 +1,154 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "openobserve.fullname" . }}-ingester
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "openobserve.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.ingester.enabled }}
+  replicas: {{ .Values.replicaCount.ingester }}
+  {{- end }}
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0  # Set to 0 to allow all pods to update in parallel
+  selector:
+    matchLabels:
+      {{- include "openobserve.selectorLabels" . | nindent 6 }}
+      role: ingester
+  {{ if .Values.ingester.headless.enabled}}
+  serviceName: {{ include "openobserve.fullname" . }}-ingester-headless
+  {{- end }}
+  {{- if not .Values.ingester.headless.enabled}}
+  serviceName: {{ include "openobserve.fullname" . }}
+  {{- end }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        checksum/specific-config: {{ include (print $.Template.BasePath "/ingester-configmap.yaml") . | sha256sum }}
+        checksum/generic-config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      labels:
+        {{- include "openobserve.selectorLabels" . | nindent 8 }}
+        role: ingester
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "openobserve.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      
+      initContainers:
+        {{- if and .Values.ingester.persistence.volumePermissions.enabled .Values.ingester.persistence.enabled }}
+        - name: volume-permissions
+          image: {{ .Values.image.busybox.repository }}:{{ .Values.image.busybox.tag }}
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              chown -R {{ .Values.podSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }} /data
+          securityContext:
+            runAsUser: 0
+            runAsNonRoot: false
+          volumeMounts:
+            - name: data
+              mountPath: /data
+        {{- end }}
+        {{- if .Values.etcd.enabled }}
+        - name: check-etcd
+          image: {{ .Values.image.busybox.repository }}:{{ .Values.image.busybox.tag }}
+          command: ['sh', '-c', '
+            until nc -z {{ .Release.Name }}-etcd 2379; do
+              echo "Waiting for etcd to be ready";
+              sleep 5;
+            done;
+          ']
+        {{- end }} 
+        {{- if .Values.nats.enabled }}
+        - name: check-nats
+          image: {{ .Values.image.busybox.repository }}:{{ .Values.image.busybox.tag }}
+          command: ['sh', '-c', '
+            until nc -zv {{ .Release.Name }}-nats 4222; do
+              echo "Waiting for NATS to be ready...";
+              sleep 2;
+            done;
+          ']
+         {{- end }} 
+      containers:
+        - name: {{ .Chart.Name }}-ingester
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- if .Values.enterprise.enabled }}
+          image: "{{ .Values.image.enterprise.repository }}:{{ .Values.image.enterprise.tag | default .Chart.AppVersion }}"
+          {{- else }}
+          image: "{{ .Values.image.oss.repository }}:{{ .Values.image.oss.tag | default .Chart.AppVersion }}"
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.config.ZO_HTTP_PORT }}
+            - name: grpc
+              containerPort: {{ .Values.config.ZO_GRPC_PORT }}
+          {{- if .Values.probes.enabled }}
+          livenessProbe:
+           httpGet:
+             path: /healthz
+             port: {{ .Values.config.ZO_HTTP_PORT }}
+           initialDelaySeconds: {{ .Values.probes.initialDelaySeconds | default 10 }}
+           failureThreshold: {{ .Values.probes.failureThreshold | default 3 }}
+          readinessProbe:
+           httpGet:
+             path: /healthz
+             port: {{ .Values.config.ZO_HTTP_PORT }}
+           initialDelaySeconds: {{ .Values.probes.initialDelaySeconds | default 10 }}
+           failureThreshold: {{ .Values.probes.failureThreshold | default 3 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources.ingester | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "openobserve.fullname" . }}
+            - configMapRef:
+                name: {{ include "openobserve.fullname" . }}-ingester
+            - secretRef:
+                name: {{ if .Values.externalSecret.enabled }}{{ .Values.externalSecret.name }}{{ else }}{{ include "openobserve.fullname" . }}{{ end }}
+          env:
+            - name: ZO_NODE_ROLE
+              value: "ingester"
+            {{- with .Values.extraEnv }}
+            {{- toYaml . |  nindent 12 }}
+            {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      {{- with .Values.nodeSelector.ingester }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity.ingester }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations.ingester }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      {{- range .Values.ingester.persistence.accessModes }}
+        - {{ . | quote }}
+      {{- end }}
+      storageClassName: {{ .Values.ingester.persistence.storageClass }}
+      resources:
+        requests:
+          storage: {{ .Values.ingester.persistence.size | quote }}

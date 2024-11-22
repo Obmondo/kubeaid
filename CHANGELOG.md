@@ -1,6 +1,15 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-11-22
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+- Added openobserve-collector from version 0.3.14 to 0.13.4
+
+### Patch Version Upgrades %%^^
+- Added openobserve-standalone from version 0.13.4 to 0.13.4
+
 ## 6.0.0
 ### Major Version Upgrades
 - Updated velero from version 7.2.2 to 8.0.0

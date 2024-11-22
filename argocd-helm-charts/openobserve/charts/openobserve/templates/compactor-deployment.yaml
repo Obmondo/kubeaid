@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "openobserve.fullname" . }}-compactor
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "openobserve.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.compactor.enabled }}
+  replicas: {{ .Values.replicaCount.compactor }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "openobserve.selectorLabels" . | nindent 6 }}
+      role: compactor
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        checksum/specific-config: {{ include (print $.Template.BasePath "/compactor-configmap.yaml") . | sha256sum }}
+        checksum/generic-config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      labels:
+        {{- include "openobserve.selectorLabels" . | nindent 8 }}
+        role: compactor
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "openobserve.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        {{- if .Values.etcd.enabled }}
+        - name: check-etcd
+          image: {{ .Values.image.busybox.repository }}:{{ .Values.image.busybox.tag }}
+          command: ['sh', '-c', '
+            until nc -z {{ .Release.Name }}-etcd 2379; do
+              echo "Waiting for etcd to be ready";
+              sleep 5;
+            done;
+          ']
+        {{- end }} 
+        {{- if .Values.nats.enabled }}
+        - name: check-nats
+          image: {{ .Values.image.busybox.repository }}:{{ .Values.image.busybox.tag }}
+          command: ['sh', '-c', '
+            until nc -zv {{ .Release.Name }}-nats 4222; do
+              echo "Waiting for NATS to be ready...";
+              sleep 2;
+            done;
+          ']
+         {{- end }} 
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- if .Values.enterprise.enabled }}
+          image: "{{ .Values.image.enterprise.repository }}:{{ .Values.image.enterprise.tag | default .Chart.AppVersion }}"
+          {{- else }}
+          image: "{{ .Values.image.oss.repository }}:{{ .Values.image.oss.tag | default .Chart.AppVersion }}"
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.config.ZO_HTTP_PORT }}
+            - name: grpc
+              containerPort: {{ .Values.config.ZO_GRPC_PORT }}
+          {{- if .Values.probes.compactor.enabled }}
+          livenessProbe:
+           httpGet:
+             path: /healthz
+             port: {{ .Values.config.ZO_HTTP_PORT }}
+           initialDelaySeconds: {{ .Values.probes.compactor.initialDelaySeconds | default 10 }}
+           failureThreshold: {{ .Values.probes.compactor.failureThreshold | default 3 }}
+          readinessProbe:
+           httpGet:
+             path: /healthz
+             port: {{ .Values.config.ZO_HTTP_PORT }}
+           initialDelaySeconds: {{ .Values.probes.compactor.initialDelaySeconds | default 10 }}
+           failureThreshold: {{ .Values.probes.compactor.failureThreshold | default 3 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources.compactor | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "openobserve.fullname" . }}
+            - configMapRef:
+                name: {{ include "openobserve.fullname" . }}-compactor
+            - secretRef:
+                name: {{ if .Values.externalSecret.enabled }}{{ .Values.externalSecret.name }}{{ else }}{{ include "openobserve.fullname" . }}{{ end }}
+          env:
+            - name: ZO_NODE_ROLE
+              value: "compactor"
+            {{- with .Values.extraEnv }}
+            {{- toYaml . |  nindent 12 }}
+            {{- end }}
+
+      {{- with .Values.nodeSelector.compactor }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity.compactor }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations.compactor }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

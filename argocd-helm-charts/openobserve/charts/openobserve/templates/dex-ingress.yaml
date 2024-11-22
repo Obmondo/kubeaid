@@ -1,0 +1,63 @@
+{{- if and .Values.enterprise.enabled .Values.enterprise.dex.enabled .Values.enterprise.dex.ingress.enabled }}
+{{- $fullName := include "openobserve.fullname" . -}}
+{{- if and .Values.enterprise.dex.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.enterprise.dex.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.enterprise.dex.ingress.annotations "kubernetes.io/ingress.class" .Values.enterprise.dex.ingress.className}}
+  {{- end }}
+{{- end }}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-dex
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "openobserve.labels" . | nindent 4 }}
+  {{- with .Values.enterprise.dex.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if and .Values.enterprise.dex.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.enterprise.dex.ingress.className }}
+  {{- end }}
+
+  {{- if .Values.enterprise.dex.ingress.tls }}
+  tls:
+    {{- range .Values.enterprise.dex.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+
+  rules:
+    {{- range .Values.enterprise.dex.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
+            pathType: {{ .pathType }}
+            {{- end }}
+            backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+              service:
+                name: {{ $fullName }}-dex
+                port:
+                  number: 5556
+              {{- else }}
+              serviceName: {{ $fullName }}
+              servicePort: 5556
+              {{- end }}
+          {{- end }}
+    {{- end }}
+{{- end }}

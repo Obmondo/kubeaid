@@ -1,0 +1,27 @@
+{{- if and .Values.postgres.enabled }}
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ include "openobserve.fullname" . }}-postgres
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  enableSuperuserAccess: true
+  managed:
+    roles:
+    - name: openobserve  # this should match the username in secret
+      ensure: present
+      comment: OpenObserve and allies - OpenObserve, OpenOFGA, DexIDP
+      login: true
+      superuser: true
+      createrole: true
+      inRoles:
+        - pg_read_all_data
+        - pg_write_all_data
+      passwordSecret:
+        name: {{ include "openobserve.fullname" . }}-openobservepguser
+  instances: {{ .Values.postgres.spec.instances}}
+  storage: {{ .Values.postgres.spec.storage | toYaml | nindent 4 }}
+  postgresql: {{ .Values.postgres.spec.postgresql | toYaml | nindent 4 }}
+  monitoring: {{ .Values.postgres.spec.monitoring | toYaml | nindent 4 }}
+  backup: {{ .Values.postgres.spec.backup | toYaml | nindent 4 }}
+{{- end }}
