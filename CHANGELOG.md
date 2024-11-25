@@ -1,6 +1,14 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-11-25
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+
+### Patch Version Upgrades %%^^
+- Updated argo-cd from version 7.7.3 to 7.7.5
+
 ## 2024-11-22
 ### Major Version Upgrades %%^^
 
@@ -8,6 +16,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Added openobserve-collector from version 0.3.14 to 0.13.4
 
 ### Patch Version Upgrades %%^^
+- Updated argo-cd from version 7.7.3 to 7.7.5
 - Added openobserve-standalone from version 0.13.4 to 0.13.4
 
 ### Improvements
