@@ -12,6 +12,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated fluent-bit from version 0.47.10 to 0.48.1
 
 ### Patch Version Upgrades %%^^
+- Updated opensearch from version 2.27.0 to 2.27.1
 - Updated openobserve-standalone from version 0.13.4 to 0.13.5
 - Updated openobserve from version 0.13.4 to 0.13.5
 - Updated cilium from version 1.16.3 to 1.16.4
@@ -30,6 +31,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Added openobserve-collector from version 0.3.14 to 0.13.4
 
 ### Patch Version Upgrades %%^^
+- Updated opensearch from version 2.27.0 to 2.27.1
 - Updated openobserve-standalone from version 0.13.4 to 0.13.5
 - Updated openobserve from version 0.13.4 to 0.13.5
 - Updated cilium from version 1.16.3 to 1.16.4
