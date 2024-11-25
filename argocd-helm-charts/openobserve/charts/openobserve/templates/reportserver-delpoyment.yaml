@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "openobserve.fullname" . }}-reportserver
+  labels:
+    {{- include "openobserve.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount.reportserver }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "openobserve.selectorLabels" . | nindent 6 }}
+      role: reportserver
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        checksum/specific-config: {{ include (print $.Template.BasePath "/reportserver-configmap.yaml") . | sha256sum }}
+        checksum/generic-config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      labels:
+        {{- include "openobserve.selectorLabels" . | nindent 8 }}
+        role: reportserver
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "openobserve.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.reportserver.repository }}:{{ .Values.image.reportserver.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.config }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "openobserve.fullname" . }}
+            - configMapRef:
+                name: {{ include "openobserve.fullname" . }}-reportserver
+            - secretRef:
+                name: {{ if .Values.externalSecret.enabled }}{{ .Values.externalSecret.name }}{{ else }}{{ include "openobserve.fullname" . }}{{ end }}
+          {{- end }}
+          env:
+            - name: ZO_NODE_ROLE
+              value: "reportserver"
+            {{- with .Values.extraEnv }}
+            {{- toYaml . |  nindent 12 }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.config.ZO_HTTP_PORT }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /api/healthz
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /api/healthz
+              port: http
+          resources:
+            {{- toYaml .Values.resources.reportserver | nindent 12 }}
+          {{- with .Values.reportserver.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.reportserver.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector.reportserver }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity.reportserver }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations.reportserver }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -6,11 +6,14 @@ image:
   oss:
     repository: public.ecr.aws/zinclabs/openobserve
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.13.1"
+    tag: "v0.13.2-rc1"
   enterprise:
     repository: public.ecr.aws/zinclabs/openobserve-enterprise
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.13.1"
+    tag: "v0.13.2-rc1"
+  reportserver:
+    repository: public.ecr.aws/zinclabs/report-server
+    tag: "v0.0.9-6618bad"
   busybox:
     repository: public.ecr.aws/docker/library/busybox
     tag: 1.36.1
@@ -57,6 +60,7 @@ replicaCount:
   alertmanager: 1
   compactor: 1
   zplane: 1
+  reportserver: 1
 
 alertmanager:
   # Alertmanager specific configuration
@@ -109,6 +113,20 @@ querier:
     accessModes:
       - ReadWriteOnce
 
+reportserver:
+  # Additional volumes on the output Deployment definition.
+  volumes: []
+  # - name: foo
+  #   secret:
+  #     secretName: mysecret
+  #     optional: false
+
+  # Additional volumeMounts on the output Deployment definition.
+  volumeMounts: []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
+
 # Enable the following to use an external secret instead of placing credentials under the auth section in this values.yaml file
 externalSecret:
   enabled: false
@@ -131,9 +149,10 @@ auth:
   ZO_TRACING_HEADER_KEY: "Authorization"
   ZO_TRACING_HEADER_VALUE: "Basic cm9vdEBleGFtcGxlLmNvbTpDb21wbGV4cGFzcyMxMjM="
   ZO_RUM_CLIENT_TOKEN: ""
-  ZO_REPORT_USER_NAME: ""
+  ZO_REPORT_USER_EMAIL: "" # Check details at https://github.com/openobserve/o2_report_server
   ZO_REPORT_USER_PASSWORD: ""
-
+  ZO_SMTP_USER_NAME: "ABAAQQQQFFFFF" # Replace with your own SMTP username
+  ZO_SMTP_PASSWORD: "+fjlahsguykevfkajvjk#jsbj43$bjkjbkk" # Replace with your own SMTP password
 
 config:
   ZO_APP_NAME: "openobserve"
@@ -273,7 +292,7 @@ config:
   ZO_ETCD_CERT_FILE: ""
   ZO_ETCD_KEY_FILE: ""
   ZO_ETCD_DOMAIN_NAME: ""
-  ZO_ETCD_LOAD_PAGE_SIZE: "100" 
+  ZO_ETCD_LOAD_PAGE_SIZE: "100"
   ZO_NATS_ADDR: "nats://nats.openobserve.svc.cluster.local:4222"
   ZO_NATS_PREFIX: "o2_"
   ZO_NATS_USER: ""
@@ -334,10 +353,15 @@ config:
   ZO_SHOW_STREAM_DATES_DOCS_NUM: true
   ZO_INGEST_BLOCKED_STREAMS: ""
   ZO_INGEST_INFER_SCHEMA_PER_REQUEST: "true"
-  ZO_REPORT_SERVER_HTTP_PORT: "5082"
-  ZO_REPORT_SERVER_HTTP_ADDR: ""
-  ZO_REPORT_SERVER_URL: "localhost:5082"
   ZO_REPORT_SERVER_SKIP_TLS_VERIFY: "false"
+  ZO_REPORT_SERVER_HTTP_PORT: "5082"
+  ZO_CHROME_SLEEP_SECS: "50"
+  ZO_CHROME_NO_SANDBOX: "true"
+  ZO_SMTP_ENABLED: "false" # if true then smtp will be enabled. set SMTP creds in auth section. Set ZO_WEB_URL to the correct URL for reports to be sent
+  ZO_SMTP_HOST: "email-smtp.us-west-2.amazonaws.com"
+  ZO_SMTP_PORT: "465"
+  ZO_SMTP_FROM_EMAIL: "root@example.com"
+  ZO_SMTP_ENCRYPTION: "ssltls"
   ZO_CONCATENATED_SCHEMA_FIELD_NAME: "_all"
   ZO_SCHEMA_CACHE_COMPRESS_ENABLED: "false"
   ZO_SKIP_FORMAT_BULK_STREAM_NAME: false
@@ -402,6 +426,8 @@ resources:
   compactor: {}
   router: {}
   alertmanager: {}
+  dex: {}
+  reportserver: {}
 
 # autoscaling:
 #   enabled: false
@@ -435,6 +461,12 @@ autoscaling:
     maxReplicas: 100
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
+  reportserver:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
 
 nodeSelector:
   ingester: {}
@@ -443,6 +475,8 @@ nodeSelector:
   router: {}
   alertmanager: {}
   zplane: {}
+  dex: {}
+  reportserver: {}
 
 tolerations:
   ingester: []
@@ -452,6 +486,7 @@ tolerations:
   alertmanager: []
   zplane: []
   dex: []
+  reportserver: []
 
 affinity:
   ingester: {}
@@ -460,6 +495,8 @@ affinity:
   router: {}
   alertmanager: {}
   zplane: {}
+  dex: {}
+  reportserver: {}
 
 nats:
   enabled: true # if true then nats will be deployed as part of openobserve
@@ -753,7 +790,7 @@ enterprise:
       tls:
         - secretName: dex.example.com
           hosts:
-            - dex.example.com 
+            - dex.example.com
 
 probes:
   alertmanager:
@@ -767,4 +804,6 @@ probes:
   router:
     enabled: true
   dex:
+    enabled: false
+  reportserver:
     enabled: false

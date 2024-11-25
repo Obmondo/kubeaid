@@ -29,6 +29,10 @@ data:
   ZO_ETCD_KEY_FILE: "{{ .Values.config.ZO_ETCD_KEY_FILE }}"
   ZO_ETCD_DOMAIN_NAME: "{{ .Values.config.ZO_ETCD_DOMAIN_NAME }}"
   ZO_ETCD_LOAD_PAGE_SIZE: "{{ .Values.config.ZO_ETCD_LOAD_PAGE_SIZE }}"
+  ZO_REPORT_SERVER_SKIP_TLS_VERIFY: "{{ .Values.config.ZO_REPORT_SERVER_SKIP_TLS_VERIFY }}"
+  ZO_REPORT_SERVER_URL: "http://{{ include "openobserve.fullname" . }}-reportserver.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.config.ZO_HTTP_PORT }}"
+  ZO_CHROME_SLEEP_SECS: "{{ .Values.config.ZO_CHROME_SLEEP_SECS }}"
+  ZO_CHROME_NO_SANDBOX: "{{ .Values.config.ZO_CHROME_NO_SANDBOX }}"
   {{- if not .Values.nats.enabled }}
   ZO_NATS_ADDR: "{{ .Values.nats.externalUrl }}"
   {{- else }}
@@ -217,10 +221,6 @@ data:
   ZO_SHOW_STREAM_DATES_DOCS_NUM: "{{ .Values.config.ZO_SHOW_STREAM_DATES_DOCS_NUM }}"
   ZO_INGEST_BLOCKED_STREAMS: "{{ .Values.config.ZO_INGEST_BLOCKED_STREAMS }}"
   ZO_INGEST_INFER_SCHEMA_PER_REQUEST: "{{ .Values.config.ZO_INGEST_INFER_SCHEMA_PER_REQUEST }}"
-  ZO_REPORT_SERVER_HTTP_PORT: "{{ .Values.config.ZO_REPORT_SERVER_HTTP_PORT }}"
-  ZO_REPORT_SERVER_HTTP_ADDR: "{{ .Values.config.ZO_REPORT_SERVER_HTTP_ADDR }}"
-  ZO_REPORT_SERVER_URL: "{{ .Values.config.ZO_REPORT_SERVER_URL }}"
-  ZO_REPORT_SERVER_SKIP_TLS_VERIFY: "{{ .Values.config.ZO_REPORT_SERVER_SKIP_TLS_VERIFY }}"
   ZO_CONCATENATED_SCHEMA_FIELD_NAME: "{{ .Values.config.ZO_CONCATENATED_SCHEMA_FIELD_NAME }}"
   ZO_SCHEMA_CACHE_COMPRESS_ENABLED: "{{ .Values.config.ZO_SCHEMA_CACHE_COMPRESS_ENABLED }}"
   ZO_SKIP_FORMAT_BULK_STREAM_NAME: "{{ .Values.config.ZO_SKIP_FORMAT_BULK_STREAM_NAME }}"

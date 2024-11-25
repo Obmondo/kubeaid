@@ -17,10 +17,10 @@ spec:
       targetPort: grpc
       protocol: TCP
       name: grpc
-    - port: {{ .Values.service.report_server_port }}
-      targetPort: report-server
+    - port: {{ .Values.config.ZO_REPORT_SERVER_HTTP_PORT }}
+      targetPort: reportserver
       protocol: TCP
-      name: report-server
+      name: reportserver
   selector:
     {{- include "openobserve.selectorLabels" . | nindent 4 }}
     role: alertmanager
