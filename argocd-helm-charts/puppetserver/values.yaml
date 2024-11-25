@@ -3,10 +3,17 @@ puppetserver:
     name: puppetserver
     puppeturl: "https://github.com/Obmondo/LinuxAid.git"
     masters:
+      resources:
+        requests:
+          memory: 2048Mi
+          cpu: 500m
+        limits:
+          memory: 2048Mi
+
       ingress:
         enabled: false
       extraEnv:
-        PUPPETSERVER_JAVA_ARGS: "-XX:+HeapDumpOnOutOfMemoryError"
+        PUPPETDB_JAVA_ARGS: "-Xms256m -Xmx256m -XX:+HeapDumpOnOutOfMemoryError"
         PUPPETSERVER_MAX_ACTIVE_INSTANCES: 3
         PUPPETSERVER_MAX_REQUESTS_PER_INSTANCE: 10000
 
@@ -23,6 +30,12 @@ puppetserver:
   puppetdb:
     enabled: true
     name: puppetdb
+    resources:
+      requests:
+        memory: 1024Mi
+        cpu: 250m
+      limits:
+        memory: 1024Mi
     extraEnv:
       PUPPETDB_POSTGRES_HOSTNAME: puppetserver-pgsql-rw
       PUPPETDB_JAVA_ARGS: "-Xms256m -Xmx256m -XX:+HeapDumpOnOutOfMemoryError"
