@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated gitlab-runner from version 0.70.3 to 0.71.0
 - Updated fluent-bit from version 0.47.10 to 0.48.1
 
 ### Patch Version Upgrades %%^^
@@ -16,6 +17,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated gitlab-runner from version 0.70.3 to 0.71.0
 - Updated fluent-bit from version 0.47.10 to 0.48.1
 - Added openobserve-collector from version 0.3.14 to 0.13.4
 

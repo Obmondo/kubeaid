@@ -24,11 +24,11 @@ data:
 
     trap quit QUIT TERM
 
-    sh /configmaps/set-session-server-address &
+    bash /configmaps/set-session-server-address &
     child=$!
     wait "$child"
 
-    sh /configmaps/set-session-server-port &
+    bash /configmaps/set-session-server-port &
     child=$!
     wait "$child"
     {{- end }}

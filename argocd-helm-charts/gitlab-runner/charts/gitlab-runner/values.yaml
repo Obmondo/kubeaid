@@ -179,6 +179,8 @@ sessionServer:
     enabled: false
     className: ""
     annotations: {}
+    tls:
+      - secretName: gitlab-runner-session-server
 
 ## For RBAC support:
 rbac:

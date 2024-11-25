@@ -1,3 +1,20 @@
+## v0.71.0 (2024-11-15)
+
+### New features
+
+- Update GitLab Runner version to v17.6.0
+
+### Bug fixes
+
+- fix: Change interpreter of session-server scripts to bash [!495](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/merge_requests/495) (Lukas Rath @rusLukasRath)
+- Fix session server ingress annotations [!498](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/merge_requests/498) (Miguel Sacristán @tete17)
+
+### Maintenance
+
+- Update CHANGELOG after multiple patches [!500](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/merge_requests/500)
+- Remove gitlab chart deps.io update trigger [!497](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/merge_requests/497)
+- Update CONTRIBUTING.md and LICENSE [!501](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/merge_requests/501)
+
 ## v0.70.3 (2024-11-01)
 
 ### New features
@@ -9,6 +26,72 @@
 ### New features
 
 - Update GitLab Runner version to v17.5.2
+
+## v0.69.2 (2024-10-23)
+
+### New features
+
+- Update GitLab Runner version to v17.4.2
+
+## v0.69.1 (2024-10-23)
+
+### New features
+
+- Update GitLab Runner version to v17.4.1
+
+## v0.68.3 (2024-10-23)
+
+### New features
+
+- Update GitLab Runner version to v17.3.3
+
+## v0.68.2 (2024-10-23)
+
+### New features
+
+- Update GitLab Runner version to v17.3.2
+
+## v0.67.3 (2024-10-23)
+
+### New features
+
+- Update GitLab Runner version to v17.2.3
+
+## v0.67.2 (2024-10-23)
+
+### New features
+
+- Update GitLab Runner version to v17.2.2
+
+## v0.66.2 (2024-10-23)
+
+### New features
+
+- Update GitLab Runner version to v17.1.2
+
+## v0.65.3 (2024-10-23)
+
+### New features
+
+- Update GitLab Runner version to v17.0.3
+
+## v0.64.4 (2024-10-23)
+
+### New features
+
+- Update GitLab Runner version to v16.11.4
+
+## v0.63.1 (2024-10-23)
+
+### New features
+
+- Update GitLab Runner version to v16.10.1
+
+## v0.62.2 (2024-10-23)
+
+### New features
+
+- Update GitLab Runner version to v16.9.2
 
 ## v0.70.1 (2024-10-18)
 

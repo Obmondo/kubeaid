@@ -5,7 +5,7 @@ metadata:
   name: {{ include "gitlab-runner.server-session-service-name" . }}-ingress
   {{- if .Values.sessionServer.ingress.annotations }}
   annotations:
-    {{ .Values.sessionServer.ingress.annotations | nindent 4 }}
+    {{- toYaml .Values.sessionServer.ingress.annotations | nindent 4 }}
   {{- end }}
 spec:
   ingressClassName: {{ .Values.sessionServer.ingress.className }}
@@ -20,4 +20,15 @@ spec:
                 name: {{ include "gitlab-runner.server-session-service-name" . }}
                 port:
                   number: {{ include "gitlab-runner.server-session-external-port" .}}
+  {{- $valuesYAMLContext := . }}
+  {{- with .Values.sessionServer.ingress.tls }}
+  tls:
+    {{- range . }}
+    - hosts:
+        - {{ $valuesYAMLContext.Values.sessionServer.publicIP }}
+      {{- with .secretName }}
+      secretName: {{ . }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
