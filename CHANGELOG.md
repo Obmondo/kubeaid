@@ -1,10 +1,8 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 2024-11-25
-### Major Version Upgrades %%^^
-
-### Minor Version Upgrades %%^^
+## 6.1.0
+### Minor Version Upgrades
 - Updated reloader from version 1.1.0 to 1.2.0
 - Updated oncall from version 1.12.1 to 1.13.3
 - Updated keycloakx from version 2.5.1 to 2.6.0
@@ -12,7 +10,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated gitlab-runner from version 0.70.3 to 0.71.0
 - Updated fluent-bit from version 0.47.10 to 0.48.1
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
 - Updated tigera-operator from version v3.29.0 to v3.29.1
 - Updated rook-ceph-cluster from version v1.15.5 to v1.15.6
 - Updated rook-ceph from version v1.15.5 to v1.15.6
@@ -24,9 +22,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated argo-cd from version 7.7.3 to 7.7.5
 
 ## 2024-11-22
-### Major Version Upgrades %%^^
-
-### Minor Version Upgrades %%^^
+### Minor Version Upgrades
 - Updated reloader from version 1.1.0 to 1.2.0
 - Updated oncall from version 1.12.1 to 1.13.3
 - Updated keycloakx from version 2.5.1 to 2.6.0
@@ -35,7 +31,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated fluent-bit from version 0.47.10 to 0.48.1
 - Added openobserve-collector from version 0.3.14 to 0.13.4
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
 - Updated tigera-operator from version v3.29.0 to v3.29.1
 - Updated rook-ceph-cluster from version v1.15.5 to v1.15.6
 - Updated rook-ceph from version v1.15.5 to v1.15.6
