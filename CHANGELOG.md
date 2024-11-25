@@ -7,6 +7,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Minor Version Upgrades %%^^
 
 ### Patch Version Upgrades %%^^
+- Updated cert-manager from version v1.16.1 to v1.16.2
 - Updated argo-cd from version 7.7.3 to 7.7.5
 
 ## 2024-11-22
@@ -16,6 +17,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Added openobserve-collector from version 0.3.14 to 0.13.4
 
 ### Patch Version Upgrades %%^^
+- Updated cert-manager from version v1.16.1 to v1.16.2
 - Updated argo-cd from version 7.7.3 to 7.7.5
 - Added openobserve-standalone from version 0.13.4 to 0.13.4
 
