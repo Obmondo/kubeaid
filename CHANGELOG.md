@@ -21,28 +21,6 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cert-manager from version v1.16.1 to v1.16.2
 - Updated argo-cd from version 7.7.3 to 7.7.5
 
-## 2024-11-22
-### Minor Version Upgrades
-- Updated reloader from version 1.1.0 to 1.2.0
-- Updated oncall from version 1.12.1 to 1.13.3
-- Updated keycloakx from version 2.5.1 to 2.6.0
-- Updated harbor from version 1.15.1 to 1.16.0
-- Updated gitlab-runner from version 0.70.3 to 0.71.0
-- Updated fluent-bit from version 0.47.10 to 0.48.1
-- Added openobserve-collector from version 0.3.14 to 0.13.4
-
-### Patch Version Upgrades
-- Updated tigera-operator from version v3.29.0 to v3.29.1
-- Updated rook-ceph-cluster from version v1.15.5 to v1.15.6
-- Updated rook-ceph from version v1.15.5 to v1.15.6
-- Updated opensearch from version 2.27.0 to 2.27.1
-- Updated openobserve-standalone from version 0.13.4 to 0.13.5
-- Updated openobserve from version 0.13.4 to 0.13.5
-- Updated cilium from version 1.16.3 to 1.16.4
-- Updated cert-manager from version v1.16.1 to v1.16.2
-- Updated argo-cd from version 7.7.3 to 7.7.5
-- Added openobserve-standalone from version 0.13.4 to 0.13.4
-
 ### Improvements
 - [`f82edb4b`](../../commit/f82edb4b) fix: added some default resource for puppet-server/db
 - [`518ab125`](../../commit/518ab125) fix: tunned puppetserver and puppetdb, so it does not eat too much of memory
