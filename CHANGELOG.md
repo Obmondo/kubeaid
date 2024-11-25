@@ -10,6 +10,17 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Patch Version Upgrades %%^^
 - Added openobserve-standalone from version 0.13.4 to 0.13.4
 
+### Improvements
+- [`f82edb4b`](../../commit/f82edb4b) fix: added some default resource for puppet-server/db
+- [`518ab125`](../../commit/518ab125) fix: tunned puppetserver and puppetdb, so it does not eat too much of memory
+- [`3f2140b7`](../../commit/3f2140b7) Add openobserve helm chart
+- [`9d52c555`](../../commit/9d52c555) remove zfs exporter
+- [`1316dce1`](../../commit/1316dce1) feat: added zfs pool status monitoring
+- [`53dbbc78`](../../commit/53dbbc78) add smartmon_sata failure as a mixin in kube-prometheus
+- [`5af854dd`](../../commit/5af854dd) add relabeling in prometheus smartctl exporter servicemonitor
+- [`82041ba4`](../../commit/82041ba4) add role and rolebinding for prom to scrape it from a respective prometheus namespace
+- [`d7ee3cab`](../../commit/d7ee3cab) fix: look for servicemonitor under monitoring and puppetserver for customers
+
 ## 6.0.0
 ### Major Version Upgrades
 - Updated velero from version 7.2.2 to 8.0.0
