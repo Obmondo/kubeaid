@@ -86,6 +86,7 @@ local default_vars = {
     'whoami',
     'zfs-localpv',
     'smartmon',
+    'mdraid',
   ],
   prometheus_operator_resources: {
     limits: { memory: '80Mi' },
@@ -172,6 +173,7 @@ local default_vars = {
     rabbitmq: false,
     'monitor-prometheus-stack': false,
     smartmon: false,
+    mdraid: true,
   },
   mixin_configs: {
     // Example:
@@ -249,13 +251,18 @@ local mixins = remove_nulls([
     vars,
   ),
   addMixin(
-    'monitoring',
-    (import 'mixins/monitoring/mixin.libsonnet'),
+    'smartmon',
+    (import 'mixins/smartmon/mixin.libsonnet'),
     vars,
   ),
   addMixin(
     'zfs',
     (import 'mixins/zfs/mixin.libsonnet'),
+    vars,
+  ),
+  addMixin(
+    'mdraid',
+    (import 'mixins/mdraid/mixin.libsonnet'),
     vars,
   ),
 ]);
