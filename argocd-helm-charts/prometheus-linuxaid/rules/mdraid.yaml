@@ -9,8 +9,7 @@ groups:
             to fix issue automatically.
           summary: RAID Array is degraded
         expr: |
-          node_md_disks_required - ignoring (state) (node_md_disks{state="active"}) > 0
-          and on(certname) obmondo_monitoring{alert_id="monitor::raid::mdraid::degraded"} > 0
+          (node_md_state{state="inactive"} > 0) * on(instance) group_left (pod) node_uname_info{nodename=~".+"} and on(certname) obmondo_monitoring{alert_id="monitor::raid::mdraid::degraded"} > 0
         for: 15m
         labels:
           severity: critical
@@ -23,8 +22,8 @@ groups:
             Array '{{ .Labels.device }}' needs attention and possibly a disk swap.
           summary: Failed device in RAID array
         expr: |
-          (node_md_disks{state="failed"} > 0) * on(instance) group_left (nodename) node_uname_info{nodename=~".+"}
-          and on(certname) obmondo_monitoring{alert_id="monitor::raid::mdraid::failed"} > 0
+          (node_md_disks{state="failed"} > 0) * on(instance) group_left (nodename) node_uname_info{nodename=~".+"} and on(certname) obmondo_monitoring{alert_id="monitor::raid::mdraid::failed"} > 0
+        for: 15m
         labels:
-          severity: warning
+          severity: critical
           alert_id: monitor::raid::mdraid::failed

@@ -7,21 +7,27 @@ rule_files:
 tests:
   - interval: 1m
     input_series:
-      - series: obmondo_monitoring{certname="example.xyz", alert_id="monitor::raid::mdraid::degraded"}
+      - series: obmondo_monitoring{certname="example.xyz", alert_id="monitor::raid::mdraid::degraded",nodename="node1"}
         values: 1x2000
-      - series: node_md_disks_required{device="md0", certname="example.xyz"}
+      - series: node_uname_info{nodename="node1"}
+        values: 1x2000
+      - series: node_md_disks_required{device="md0", certname="example.xyz", nodename="node1"}
         values: 4x2000  # Means 4 disk is required.
-      - series: node_md_disks{state="active", device="md0", certname="example.xyz"}
+      - series: node_md_state{state="inactive", device="md0", certname="example.xyz",nodename="node1"}
         values: 3x2000
+      - series: node_md_state{state="active", device="md0", certname="example.xyz",nodename="node1"}
+        values: 1x2000
     alert_rule_test:
       - alertname: monitor::raid::mdraid::degraded
-        eval_time: 20m
+        eval_time: 15m
         exp_alerts:
           - exp_labels:
               severity: critical
               certname: example.xyz
               device: md0
               alert_id: monitor::raid::mdraid::degraded
+              nodename: node1
+              state: inactive
             exp_annotations:
               summary: RAID Array is degraded
               description: |
@@ -33,19 +39,22 @@ tests:
     input_series:
       - series: obmondo_monitoring{certname="example.xyz", alert_id="monitor::raid::mdraid::failed"}
         values: 1x2000
+      - series: node_uname_info{nodename="node1"}
+        values: 1x2000
       - series: node_md_disks_required{device="md0", certname="example.xyz"}
         values: 4x2000
       - series: node_md_disks{state="failed", device="md0", certname="example.xyz"}
         values: 3x2000
     alert_rule_test:
       - alertname: monitor::raid::mdraid::failed
-        eval_time: 20m
+        eval_time: 15m
         exp_alerts:
           - exp_labels:
-              severity: warning
+              severity: critical
               certname: example.xyz
               device: md0
               state: failed
+              nodename: node1
               alert_id: monitor::raid::mdraid::failed
             exp_annotations:
               summary: Failed device in RAID array
