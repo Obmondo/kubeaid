@@ -23,7 +23,7 @@ groups:
             Array '{{ .Labels.device }}' needs attention and possibly a disk swap.
           summary: Failed device in RAID array
         expr: |
-          node_md_disks{state="failed"} > 0
+          (node_md_disks{state="failed"} > 0) * on(instance) group_left (nodename) node_uname_info{nodename=~".+"}
           and on(certname) obmondo_monitoring{alert_id="monitor::raid::mdraid::failed"} > 0
         labels:
           severity: warning
