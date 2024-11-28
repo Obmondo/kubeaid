@@ -174,6 +174,7 @@ local default_vars = {
     'monitor-prometheus-stack': false,
     smartmon: false,
     mdraid: true,
+    opencost: false,
   },
   mixin_configs: {
     // Example:
@@ -263,6 +264,11 @@ local mixins = remove_nulls([
   addMixin(
     'mdraid',
     (import 'mixins/mdraid/mixin.libsonnet'),
+    vars,
+  ),
+  addMixin(
+    'opencost',
+    (import 'github.com/adinhodovic/opencost-mixin/mixin.libsonnet'),
     vars,
   ),
 ]);
