@@ -1,0 +1,12 @@
+groups:
+- name: zfs-pool-status
+  rules:
+  - alert: ZFSPoolStatus
+    annotations:
+      description: The zfs pool **{{ .Labels.zpool }}** is {{ .Labels.state }} on {{ .Labels.instance }}
+      summary: ZFS Pool is Degraded
+    expr: node_zfs_zpool_state{state!="online"} > 0
+    for: 30m
+    labels:
+      alert_id: ZFSPoolStatus
+      severity: critical

@@ -1,0 +1,21 @@
+groups:
+- name: NodesMemoryFillingUp
+  rules:
+  - alert: NodesMemoryFillingUp
+    annotations:
+      description: Average nodes memory utilization is {{ printf "%.2f" $value }}% and is filling up.
+      summary: Average nodes memory utilization is greater than 85%.
+    expr: |
+      ((sum(node_memory_MemTotal_bytes) - sum(node_memory_MemAvailable_bytes)) /sum(node_memory_MemTotal_bytes) * 100) > 85 and ((sum(node_memory_MemTotal_bytes) - sum(node_memory_MemAvailable_bytes)) /sum(node_memory_MemTotal_bytes) * 100) <= 90
+    for: 15m
+    labels:
+      severity: warning
+  - alert: NodesMemoryFillingUp
+    annotations:
+      description: Average nodes memory utilization is {{ printf "%.2f" $value }}% and is filling up.
+      summary: Average nodes memory utilization is greater than 90%.
+    expr: |
+      ((sum(node_memory_MemTotal_bytes) - sum(node_memory_MemAvailable_bytes)) / sum(node_memory_MemTotal_bytes) * 100) > 90
+    for: 15m
+    labels:
+      severity: critical
