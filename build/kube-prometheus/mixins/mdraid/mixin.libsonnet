@@ -18,20 +18,20 @@
             },
             annotations: {
               summary: 'RAID Array is degraded',
-              description: 'RAID array {{ $labels.device }} on {{ $labels.certname }} is in degraded state due to one or more disks failures. Number of spare drives is insufficient to fix issue automatically',
+              description: 'RAID array {{ $labels.device }} on {{ $labels.instance }} is in degraded state due to one or more disks failures. Number of spare drives is insufficient to fix issue automatically',
             },
           },
           {
             alert: 'HostRaidDiskFailure',
-            expr: 'node_md_disks{state="failed"} > 0) * on(instance) group_left (nodename) node_uname_info{nodename=~".+"}',
+            expr: '(node_md_disks{state="failed"} > 0) * on(instance) group_left (nodename) node_uname_info{nodename=~".+"}',
             'for': '15m',
             labels: {
               severity: 'critical',
               alert_id: 'HostRaidDiskFailure',
             },
             annotations: {
-              summary: 'Host RAID disk failure (instance {{ $labels.instance }})',
-              description: 'At least one device in RAID array on {{ $labels.instance }} failed. Array {{ $labels.md_device }} needs attention and possibly a disk swap\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}',
+              summary: 'Host RAID disk failure on instance {{ $labels.instance }}',
+              description: 'At least one disk in RAID array {{ $labels.device }} on {{ $labels.instance }} failed. Array {{ $labels.device }} needs attention and possibly a disk swap',
             },
           },
         ],
