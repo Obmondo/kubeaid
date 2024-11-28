@@ -19,3 +19,10 @@ jobs:
       - name: promtool
         working-directory: argocd-helm-charts/prometheus-linuxaid/tests
         run: promtool test rules *.yaml
+
+      - name: prometheus mixins
+        working-directory: build/kube-prometheus/mixins
+        run: for dir in */; do if [ -d "$dir" ]; then if [ -f "$dir""prometheus.yaml" ]; then echo "Found 'prometheus.yaml' in '$dir'"; else echo "Did not find 'prometheus.yaml' in '$dir'"; echo "Please generate prometheus.yaml for your new mixin"; exit 1; fi; fi; done
+
+      - name: promtool check
+        run: find build/kube-prometheus/mixins -name '*.yaml' -exec promtool check rules {} \;
