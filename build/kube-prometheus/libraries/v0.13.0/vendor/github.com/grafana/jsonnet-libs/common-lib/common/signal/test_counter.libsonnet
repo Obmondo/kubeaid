@@ -11,8 +11,16 @@ local m1 = signal.init(
   type='counter',
   unit='requests',
   description='API server calls.',
-  expr='apiserver_request_total{%(queriesSelector)s}'
-);
+  sourceMaps=[
+    {
+      expr: 'apiserver_request_total{%(queriesSelector)s}',
+      rangeFunction: 'rate',
+      aggKeepLabels: [],
+      legendCustomTemplate: null,
+    },
+  ],
+)
+;
 
 {
 
@@ -25,7 +33,7 @@ local m1 = signal.init(
       },
       testExpression: {
         actual: m1.asTarget().expr,
-        expect: 'max by (instance) (rate(apiserver_request_total{job="abc",job=~"$job",instance=~"$instance"}[5m]))',
+        expect: 'max by (job,instance) (\n  rate(apiserver_request_total{job="abc",job=~"$job",instance=~"$instance"}[5m])\n)',
       },
     }),
   },
@@ -38,7 +46,7 @@ local m1 = signal.init(
           expect: 'API server requests',
         },
         testUnit: {
-          actual: m1.asTimeSeries().fieldConfig.defaults.unit,
+          actual: m1.asTimeSeries().fieldConfig.overrides[0].properties[1].value,
           expect: 'rps',
         },
         testTStype: {
@@ -47,12 +55,12 @@ local m1 = signal.init(
         },
         testTSversion: {
           actual: m1.asTimeSeries().pluginVersion,
-          expect: 'v10.0.0',
+          expect: 'v11.0.0',
         },
         testTSUid: {
           actual: m1.asTimeSeries().datasource,
           expect: {
-            uid: 'DS_PROMETHEUS',
+            uid: '${datasource}',
             type: 'prometheus',
           },
         },

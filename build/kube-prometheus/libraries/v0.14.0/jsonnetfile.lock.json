@@ -8,7 +8,7 @@
           "subdir": "contrib/prometheus-mixin"
         }
       },
-      "version": "73023bfde88d9008bae7b3e7e61697bfbbbe1b77",
+      "version": "5d31d46c38304e78515fcb19421e13cec429b4a6",
       "sum": "uqhnRGEja2PfXTtsHkmbcrc8Wr0oox9xZKPP6zYXsJE="
     },
     {
@@ -28,7 +28,7 @@
           "subdir": "monitoring/ceph-mixin"
         }
       },
-      "version": "a2782315255a3e7d5f6cdc9eb35785187ff6ddf8",
+      "version": "63e69b8575ec47c8f19fbd560175064033fc5ee8",
       "sum": "ZnyCIu25NBI6Q3Ru7QK1DHf7DBMEURSMQdEJXzCyIgA="
     },
     {
@@ -38,7 +38,7 @@
           "subdir": "contrib/mixin"
         }
       },
-      "version": "f20bbadd404b57c776d1e8876cefd1ac29b03fb5",
+      "version": "8f6c30da0aad9502e276da9554107a408f80e7b1",
       "sum": "W/Azptf1PoqjyMwJON96UY69MFugDA4IAYiKURscryc="
     },
     {
@@ -78,8 +78,8 @@
           "subdir": "gen/grafonnet-latest"
         }
       },
-      "version": "733beadbc8dab55c5fe1bcdcf0d8a2d215759a55",
-      "sum": "eyuJ0jOXeA4MrobbNgU4/v5a7ASDHslHZ0eS6hDdWoI="
+      "version": "82a19822e54a0a12a51e24dbd48fcde717dc0864",
+      "sum": "64fMUPI3frXGj4X1FqFd1t7r04w3CUSmXaDcJ23EYbQ="
     },
     {
       "source": {
@@ -88,7 +88,7 @@
           "subdir": "gen/grafonnet-v10.0.0"
         }
       },
-      "version": "733beadbc8dab55c5fe1bcdcf0d8a2d215759a55",
+      "version": "82a19822e54a0a12a51e24dbd48fcde717dc0864",
       "sum": "xdcrJPJlpkq4+5LpGwN4tPAuheNNLXZjE6tDcyvFjr0="
     },
     {
@@ -98,8 +98,18 @@
           "subdir": "gen/grafonnet-v11.0.0"
         }
       },
-      "version": "733beadbc8dab55c5fe1bcdcf0d8a2d215759a55",
+      "version": "82a19822e54a0a12a51e24dbd48fcde717dc0864",
       "sum": "0BvzR0i4bS4hc2O3xDv6i9m52z7mPrjvqxtcPrGhynA="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/grafonnet.git",
+          "subdir": "gen/grafonnet-v11.1.0"
+        }
+      },
+      "version": "82a19822e54a0a12a51e24dbd48fcde717dc0864",
+      "sum": "41w7p/rwrNsITqNHMXtGSJAfAyKmnflg6rFhKBduUxM="
     },
     {
       "source": {
@@ -108,8 +118,8 @@
           "subdir": "common-lib"
         }
       },
-      "version": "f32a0d6e256bbf32edbea38878946dd57ed22f4f",
-      "sum": "tfvNQmtjIkqbgy7FU3FDy34OYoZhWskDCQanbiScaHU="
+      "version": "57b0b85dc1d7ed5e30c2e41f3bd26744b8aef519",
+      "sum": "Sc/itBm3y9DEuKzT1ZjvEB0ezB5sJ9apgLraQXuUfn0="
     },
     {
       "source": {
@@ -118,7 +128,7 @@
           "subdir": "grafana-builder"
         }
       },
-      "version": "f32a0d6e256bbf32edbea38878946dd57ed22f4f",
+      "version": "57b0b85dc1d7ed5e30c2e41f3bd26744b8aef519",
       "sum": "yxqWcq/N3E/a/XreeU6EuE6X7kYPnG0AspAQFKOjASo="
     },
     {
@@ -128,7 +138,7 @@
           "subdir": "opensearch-mixin"
         }
       },
-      "version": "f32a0d6e256bbf32edbea38878946dd57ed22f4f",
+      "version": "57b0b85dc1d7ed5e30c2e41f3bd26744b8aef519",
       "sum": "AK83KBy5roMxhT0taG54ERV20oG9mhaCJA+EHRzuPO4="
     },
     {

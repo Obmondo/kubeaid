@@ -1,5 +1,4 @@
 local g = import 'grafonnet/grafana.libsonnet';
-local u = import 'utils.libsonnet';
 
 (import 'utils.libsonnet') {
   'radosgw-sync-overview.json':
@@ -59,9 +58,7 @@ local u = import 'utils.libsonnet';
     .addTemplate(
       $.addClusterTemplate()
     )
-    .addTemplate(
-      $.addJobTemplate()
-    )
+
     .addTemplate(
       $.addTemplateSchema(
         'rgw_servers',
@@ -70,8 +67,8 @@ local u = import 'utils.libsonnet';
         1,
         true,
         1,
-        '',
-        'RGW Server'
+        null,
+        'rgw.(.*)'
       )
     )
     .addPanels([
@@ -114,6 +111,45 @@ local u = import 'utils.libsonnet';
         7,
         8,
         7
+      ),
+      $.timeSeriesPanel(
+        lineInterpolation='linear',
+        lineWidth=1,
+        drawStyle='line',
+        axisPlacement='auto',
+        title='Replication(Time) Delta per shard',
+        datasource='$datasource',
+        gridPosition={ h: 7, w: 16, x: 8, y: 7 },
+        fillOpacity=0,
+        pointSize=5,
+        showPoints='auto',
+        unit='s',
+        displayMode='table',
+        showLegend=true,
+        placement='right',
+        tooltip={ mode: 'multi', sort: 'desc' },
+        stackingMode='none',
+        spanNulls=false,
+        decimals=2,
+        thresholdsMode='absolute',
+        sortBy='Last *',
+        sortDesc=true
+      )
+      .addCalcs(['lastNotNull'])
+      .addThresholds([
+        { color: 'green', value: null },
+        { color: 'red', value: 80 },
+      ])
+      .addTargets(
+        [
+          $.addTargetSchema(
+            expr='rate(ceph_rgw_sync_delta_sync_delta[$__rate_interval])',
+            datasource='$datasource',
+            instant=false,
+            legendFormat='{{instance_id}} - {{shard_id}}',
+            range=true,
+          ),
+        ]
       ),
     ]),
   'radosgw-overview.json':
@@ -197,9 +233,6 @@ local u = import 'utils.libsonnet';
       $.addClusterTemplate()
     )
     .addTemplate(
-      $.addJobTemplate()
-    )
-    .addTemplate(
       $.addTemplateSchema(
         'rgw_servers',
         '$datasource',
@@ -208,7 +241,7 @@ local u = import 'utils.libsonnet';
         true,
         1,
         '',
-        'RGW Server'
+        '.*'
       )
     )
     .addTemplate(
@@ -714,9 +747,6 @@ local u = import 'utils.libsonnet';
       $.addClusterTemplate()
     )
     .addTemplate(
-      $.addJobTemplate()
-    )
-    .addTemplate(
       $.addTemplateSchema('rgw_servers',
                           '$datasource',
                           'label_values(ceph_rgw_metadata{%(matchers)s}, ceph_daemon)' % $.matchers(),
@@ -738,13 +768,13 @@ local u = import 'utils.libsonnet';
           sum by (instance_id) (
             rate(ceph_rgw_op_get_obj_lat_sum{%(matchers)s}[$__rate_interval]) /
               rate(ceph_rgw_op_get_obj_lat_count{%(matchers)s}[$__rate_interval])
-          ) * on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{%(matchers)s, ceph_daemon=~"$rgw_servers"}
+          ) * on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{ceph_daemon=~"$rgw_servers", %(matchers)s}
         ||| % $.matchers(),
         |||
           sum by (instance_id) (
             rate(ceph_rgw_op_put_obj_lat_sum{%(matchers)s}[$__rate_interval]) /
               rate(ceph_rgw_op_put_obj_lat_count{%(matchers)s}[$__rate_interval])
-          ) * on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{%(matchers)s, ceph_daemon=~"$rgw_servers"}
+          ) * on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{ceph_daemon=~"$rgw_servers", %(matchers)s}
         ||| % $.matchers(),
         'GET {{ceph_daemon}}',
         'PUT {{ceph_daemon}}',
@@ -761,12 +791,12 @@ local u = import 'utils.libsonnet';
         'short',
         |||
           rate(ceph_rgw_op_get_obj_bytes{%(matchers)s}[$__rate_interval]) *
-            on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{%(matchers)s, ceph_daemon=~"$rgw_servers"}
+            on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{ceph_daemon=~"$rgw_servers", %(matchers)s}
         ||| % $.matchers(),
         |||
           rate(ceph_rgw_op_put_obj_bytes{%(matchers)s}[$__rate_interval]) *
             on (instance_id) group_left (ceph_daemon)
-            ceph_rgw_metadata{%(matchers)s, ceph_daemon=~"$rgw_servers"}
+            ceph_rgw_metadata{ceph_daemon=~"$rgw_servers", %(matchers)s}
         ||| % $.matchers(),
         'GETs {{ceph_daemon}}',
         'PUTs {{ceph_daemon}}',
@@ -789,11 +819,11 @@ local u = import 'utils.libsonnet';
         'short',
         |||
           rate(ceph_rgw_failed_req{%(matchers)s}[$__rate_interval]) *
-            on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{%(matchers)s,ceph_daemon=~"$rgw_servers"}
+            on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{ceph_daemon=~"$rgw_servers", %(matchers)s}
         ||| % $.matchers(),
         |||
           rate(ceph_rgw_get{%(matchers)s}[$__rate_interval]) *
-            on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{%(matchers)s, ceph_daemon=~"$rgw_servers"}
+            on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{ceph_daemon=~"$rgw_servers", %(matchers)s}
         ||| % $.matchers(),
         'Requests Failed {{ceph_daemon}}',
         'GETs {{ceph_daemon}}',
@@ -807,7 +837,7 @@ local u = import 'utils.libsonnet';
           $.addTargetSchema(
             |||
               rate(ceph_rgw_put{%(matchers)s}[$__rate_interval]) *
-                on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{%(matchers)s, ceph_daemon=~"$rgw_servers"}
+                on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{ceph_daemon=~"$rgw_servers", %(matchers)s}
             ||| % $.matchers(),
             'PUTs {{ceph_daemon}}'
           ),
@@ -819,39 +849,76 @@ local u = import 'utils.libsonnet';
                     rate(ceph_rgw_get{%(matchers)s}[$__rate_interval]) +
                       rate(ceph_rgw_put{%(matchers)s}[$__rate_interval])
                   )
-              ) * on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{%(matchers)s, ceph_daemon=~"$rgw_servers"}
+              ) * on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{ceph_daemon=~"$rgw_servers", %(matchers)s}
             ||| % $.matchers(),
             'Other {{ceph_daemon}}'
           ),
         ]
       ),
-      $.simplePieChart(
-        {
-          GETs: '#7eb26d',
-          'Other (HEAD,POST,DELETE)': '#447ebc',
-          PUTs: '#eab839',
-          Requests: '#3f2b5b',
-          Failures: '#bf1b00',
-        }, '', 'Workload Breakdown'
-      )
+
+      $.pieChartPanel('Workload Breakdown',
+                      '',
+                      '$datasource',
+                      { x: 20, y: 1, w: 4, h: 8 },
+                      'table',
+                      'bottom',
+                      true,
+                      [],
+                      { mode: 'single', sort: 'none' },
+                      'pie',
+                      ['percent', 'value'],
+                      'palette-classic',
+                      overrides=[
+                        {
+                          matcher: { id: 'byName', options: 'Failures' },
+                          properties: [
+                            { id: 'color', value: { mode: 'fixed', fixedColor: '#bf1b00' } },
+                          ],
+                        },
+                        {
+                          matcher: { id: 'byName', options: 'GETs' },
+                          properties: [
+                            { id: 'color', value: { mode: 'fixed', fixedColor: '#7eb26d' } },
+                          ],
+                        },
+                        {
+                          matcher: { id: 'byName', options: 'Other (HEAD,POST,DELETE)' },
+                          properties: [
+                            { id: 'color', value: { mode: 'fixed', fixedColor: '#447ebc' } },
+                          ],
+                        },
+                        {
+                          matcher: { id: 'byName', options: 'PUTs' },
+                          properties: [
+                            { id: 'color', value: { mode: 'fixed', fixedColor: '#eab839' } },
+                          ],
+                        },
+                        {
+                          matcher: { id: 'byName', options: 'Requests' },
+                          properties: [
+                            { id: 'color', value: { mode: 'fixed', fixedColor: '#3f2b5b' } },
+                          ],
+                        },
+                      ],
+                      reduceOptions={ values: false, calcs: ['lastNotNull'], fields: '' })
       .addTarget($.addTargetSchema(
         |||
           rate(ceph_rgw_failed_req{%(matchers)s}[$__rate_interval]) *
-            on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{%(matchers)s, ceph_daemon=~"$rgw_servers"}
+            on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{ceph_daemon=~"$rgw_servers", %(matchers)s}
         ||| % $.matchers(),
         'Failures {{ceph_daemon}}'
       ))
       .addTarget($.addTargetSchema(
         |||
           rate(ceph_rgw_get{%(matchers)s}[$__rate_interval]) *
-            on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{%(matchers)s, ceph_daemon=~"$rgw_servers"}
+            on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{ceph_daemon=~"$rgw_servers", %(matchers)s}
         ||| % $.matchers(),
         'GETs {{ceph_daemon}}'
       ))
       .addTarget($.addTargetSchema(
         |||
           rate(ceph_rgw_put{%(matchers)s}[$__rate_interval]) *
-            on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{%(matchers)s, ceph_daemon=~"$rgw_servers"}
+            on (instance_id) group_left (ceph_daemon) ceph_rgw_metadata{ceph_daemon=~"$rgw_servers", %(matchers)s}
         ||| % $.matchers(),
         'PUTs {{ceph_daemon}}'
       ))
@@ -864,9 +931,9 @@ local u = import 'utils.libsonnet';
                   rate(ceph_rgw_put{%(matchers)s}[$__rate_interval])
               )
           ) * on (instance_id) group_left (ceph_daemon)
-            ceph_rgw_metadata{%(matchers)s, ceph_daemon=~"$rgw_servers"}
+            ceph_rgw_metadata{ceph_daemon=~"$rgw_servers", %(matchers)s}
         ||| % $.matchers(),
         'Other (DELETE,LIST) {{ceph_daemon}}'
-      )) + { gridPos: { x: 20, y: 1, w: 4, h: 8 } },
+      )),
     ]),
 }

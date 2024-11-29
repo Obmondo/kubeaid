@@ -7,9 +7,13 @@ local m1 = signal.init(
   name='Go version',
   type='info',
   description='Go version.',
-  expr='go_info{%(queriesSelector)s}',
-  infoLabel='version'
-
+  sourceMaps=[
+    {
+      expr: 'go_info{%(queriesSelector)s}',
+      infoLabel: 'version',
+      legendCustomTemplate: null,
+    },
+  ]
 );
 
 {
@@ -37,14 +41,18 @@ local m1 = signal.init(
         },
         testTSversion: {
           actual: m1.asStat().pluginVersion,
-          expect: 'v10.0.0',
+          expect: 'v11.0.0',
         },
         testTSUid: {
           actual: m1.asStat().datasource,
           expect: {
-            uid: 'DS_PROMETHEUS',
+            uid: '${datasource}',
             type: 'prometheus',
           },
+        },
+        testInfoLabel: {
+          actual: m1.asStat().options.reduceOptions.fields,
+          expect: '/^(' + 'version' + ')$/',
         },
       }),
     },

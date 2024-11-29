@@ -11,7 +11,15 @@ local m1 = signal.init(
   type='histogram',
   unit='seconds',
   description='API server call duration.',
-  expr='apiserver_request_duration_seconds_bucket{%(queriesSelector)s}',
+  sourceMaps=[
+    {
+      expr: 'apiserver_request_duration_seconds_bucket{%(queriesSelector)s}',
+      rangeFunction: 'rate',
+      aggKeepLabels: [],
+      legendCustomTemplate: null,
+    },
+  ],
+
 );
 
 {
@@ -20,11 +28,11 @@ local m1 = signal.init(
     testResult: test.suite({
       testLegend: {
         actual: m1.asTarget().legendFormat,
-        expect: '{{job}}/{{instance}}: API server duration',
+        expect: '{{job}}: API server duration',
       },
       testExpression: {
         actual: m1.asTarget().expr,
-        expect: 'avg by (job,instance) (histogram_quantile(0.95, sum(rate(apiserver_request_duration_seconds_bucket{job="abc",job=~"$job",instance=~"$instance"}[10m])) by (le,job,instance)))',
+        expect: 'avg by (job) (\n  histogram_quantile(0.95, sum(rate(apiserver_request_duration_seconds_bucket{job="abc",job=~"$job",instance=~"$instance"}[10m])) by (le,job))\n)',
       },
     }),
   },
@@ -37,7 +45,7 @@ local m1 = signal.init(
           expect: 'API server duration',
         },
         testUnit: {
-          actual: m1.asTimeSeries().fieldConfig.defaults.unit,
+          actual: m1.asTimeSeries().fieldConfig.overrides[0].properties[1].value,
           expect: 'seconds',
         },
         testTStype: {
@@ -46,12 +54,12 @@ local m1 = signal.init(
         },
         testTSversion: {
           actual: m1.asTimeSeries().pluginVersion,
-          expect: 'v10.0.0',
+          expect: 'v11.0.0',
         },
         testTSUid: {
           actual: m1.asTimeSeries().datasource,
           expect: {
-            uid: 'DS_PROMETHEUS',
+            uid: '${datasource}',
             type: 'prometheus',
           },
         },
