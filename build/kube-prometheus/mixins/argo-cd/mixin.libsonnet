@@ -18,7 +18,7 @@
             },
             annotations: {
               description: 'The application **{{ .Labels.argocd_application_name }}**/**{{ .Labels.application_namespace }}** has been out of sync for more than 30 minutes.',
-              summary: 'Kubernetes version is close to end of support',
+              summary: 'Kubernetes version is close to end of support.',
             },
           },
           {
@@ -31,7 +31,7 @@
             },
             annotations: {
               description: 'Argo CD WhiteListed Application **{{ .Labels.argocd_application_name }}**/**{{ .Labels.application_namespace }}** sync failed.',
-              summary: 'The application**{{ .Labels.argocd_application_name }}**/**{{ .Labels.application_namespace }}** has been out of sync for more than 15 minutes.',
+              summary: 'The application has been out of sync for more than 15 minutes.',
             },
           },
           // Inspiration from here https://github.com/adinhodovic/argo-cd-mixin/blob/main/alerts/alerts.libsonnet

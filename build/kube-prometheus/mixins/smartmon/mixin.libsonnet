@@ -19,7 +19,7 @@
             annotations: {
               description: 'Disk **{{ .Labels.device }}**  has disk sata failure on instance **{{ .Labels.instance }}**
           UDMA_CRC_Error_Count - The number of errors related to data transfer over the interface. A value of **{{ .Value }}** is concerning and indicates potential issues with the data cable or connections.',
-              summary: 'The device **{{ .Labels.device }}** has disk sata failures.'
+              summary: 'The device has disk sata failures.'
             },
           },
         ],

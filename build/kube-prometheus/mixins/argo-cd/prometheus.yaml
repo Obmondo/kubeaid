@@ -4,7 +4,7 @@ groups:
   - alert: WhiteListedApplicationOutOfSync
     annotations:
       description: The application **{{ .Labels.argocd_application_name }}**/**{{ .Labels.application_namespace }}** has been out of sync for more than 30 minutes.
-      summary: Kubernetes version is close to end of support
+      summary: Kubernetes version is close to end of support.
     expr: argocd_application_sync_state{argocd_application_name!="", application_namespace!="", whitelisted="true", result="waiting"} == 1
     for: 30m
     labels:
@@ -13,7 +13,7 @@ groups:
   - alert: CronSyncFailed
     annotations:
       description: Argo CD WhiteListed Application **{{ .Labels.argocd_application_name }}**/**{{ .Labels.application_namespace }}** sync failed.
-      summary: The application**{{ .Labels.argocd_application_name }}**/**{{ .Labels.application_namespace }}** has been out of sync for more than 15 minutes.
+      summary: The application has been out of sync for more than 15 minutes.
     expr: argocd_application_sync_state{argocd_application_name!="", application_namespace!="", whitelisted="true", result="failed"} == 1
     for: 15m
     labels:

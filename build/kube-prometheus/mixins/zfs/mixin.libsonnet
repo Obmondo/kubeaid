@@ -17,7 +17,7 @@
               alert_id: 'ZFSPoolStatus',
             },
             annotations: {
-              summary: 'ZFS Pool is Degraded',
+              summary: 'ZFS Pool is Degraded.',
               description: 'The zfs pool **{{ .Labels.zpool }}** is {{ .Labels.state }} on {{ .Labels.instance }}',
             },
           },

@@ -21,7 +21,7 @@
             },
             annotations: {
               description: 'Velero backup was not successful for {{ $labels.schedule }}.',
-              summary: 'Velero backup for schedule {{ $labels.schedule }} was unsuccessful.',
+              summary: 'Velero backup for schedule was unsuccessful.',
             },
           },
         ],

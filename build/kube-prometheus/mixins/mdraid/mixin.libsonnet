@@ -17,7 +17,7 @@
               alert_id: 'HostRaidDiskDegraded',
             },
             annotations: {
-              summary: 'RAID Array is degraded',
+              summary: 'RAID Array is degraded.',
               description: 'RAID array {{ $labels.device }} on {{ $labels.instance }} is in degraded state due to one or more disks failures. Number of spare drives is insufficient to fix issue automatically',
             },
           },
@@ -30,7 +30,7 @@
               alert_id: 'HostRaidDiskFailure',
             },
             annotations: {
-              summary: 'Host RAID disk failure on instance {{ $labels.instance }}',
+              summary: 'Host RAID disk failure on instance.',
               description: 'At least one disk in RAID array {{ $labels.device }} on {{ $labels.instance }} failed. Array {{ $labels.device }} needs attention and possibly a disk swap',
             },
           },
