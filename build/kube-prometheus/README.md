@@ -95,7 +95,7 @@ This script looks for the `kubernetes-prometheus` version/release tag in your ku
 
 If the mentioned version/release dir doesn't exists already (for eg: `main`), the script downloads it first, and then proceeds with the manifest building process. This way you can upgrade/downgrade with ease.
 
-If `kube_prometheus_version` variable isn't present in the jsonnet vars file, it'll set it to `main` by default. 
+If `kube_prometheus_version` variable isn't present in the jsonnet vars file, it'll set it to `main` by default.
 
 Note that you have to clone your kubeaid-config git repository seperately.
 
@@ -126,15 +126,14 @@ available in https://github.com/prometheus/alertmanager/blob/main/doc/alertmanag
 
 ## Adding new mixins
 
-- Install mixin into `kube-prometheus` release directories (currently manual). In the below we install it only into
-  `main`, but this should be repeated for all the versions in use.
+- Install mixin into `kube-prometheus` release directories (currently manual). In the below we install it only into `<version-of-kube-prometheus>`, but this should be repeated for all the versions in use.
 
   ```sh
-  cd build/kube-prometheus/libraries/main
+  cd build/kube-prometheus/libraries/<version-of-kube-prometheus>
   jb install github.com/bitnami-labs/sealed-secrets/contrib/prometheus-mixin@main
   ```
 
-- Add the mixin to `common-template.json`. For adding the Bitnami `sealed-secrets` mixin this diff was required:
+- Add the mixin to `common-template.json` and build.sh as well. For adding the Bitnami `sealed-secrets` mixin this diff was required:
 
   ```diff
   @@ -46,6 +46,7 @@ local kp =
@@ -210,7 +209,7 @@ Note that this does not delete the metrics instantly. You can check [here](https
 - Click on **JSON Model** on the left hand pane, and copy the JSON into a file on your kubeaid-config repo.
 - Add a _folder name_ and the path to the dashboard in your cluster specific jsonnet file.
   See [example jsonnet file](./examples/kubeaid_managed.jsonnet) for details.
-  
+
   ```jsonnet
   grafana_dashboards: {
     'Custom Grafana Folder': {
