@@ -4,6 +4,16 @@
     {
       "source": {
         "git": {
+          "remote": "https://github.com/adinhodovic/opencost-mixin.git",
+          "subdir": ""
+        }
+      },
+      "version": "1834a0578613f699170c6df4e0e833431eff40aa",
+      "sum": "fCGaGFOittXYD08VRZdXRqUQ5DP5hXbZYe1Dxrg3VXM="
+    },
+    {
+      "source": {
+        "git": {
           "remote": "https://github.com/bitnami-labs/sealed-secrets.git",
           "subdir": "contrib/prometheus-mixin"
         }
@@ -130,6 +140,16 @@
       },
       "version": "57b0b85dc1d7ed5e30c2e41f3bd26744b8aef519",
       "sum": "yxqWcq/N3E/a/XreeU6EuE6X7kYPnG0AspAQFKOjASo="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/jsonnet-libs.git",
+          "subdir": "mixin-utils"
+        }
+      },
+      "version": "57b0b85dc1d7ed5e30c2e41f3bd26744b8aef519",
+      "sum": "LoYq5QxJmUXEtqkEG8CFUBLBhhzDDaNANHc7Gz36ZdM="
     },
     {
       "source": {
