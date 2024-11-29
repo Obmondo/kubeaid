@@ -4,6 +4,15 @@
     {
       "source": {
         "git": {
+          "remote": "https://github.com/adinhodovic/opencost-mixin.git",
+          "subdir": ""
+        }
+      },
+      "version": "main"
+    },
+    {
+      "source": {
+        "git": {
           "remote": "https://github.com/adinhodovic/rabbitmq-mixin.git",
           "subdir": ""
         }
@@ -27,6 +36,15 @@
         }
       },
       "version": "main"
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/jsonnet-libs.git",
+          "subdir": "mixin-utils"
+        }
+      },
+      "version": "master"
     },
     {
       "source": {

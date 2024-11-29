@@ -152,14 +152,14 @@ function build_for_tag() {
 }
 
 if [ "$build_all" -eq 1 ]; then
-  for file_path in build/kube-prometheus/libraries/*; do
-  file_name=$(basename "$file_path")
-    echo "$file_name"
+  for file_path in "${basedir}"/libraries/*; do
+    file_name=$(basename "$file_path")
+
+    # Clean up and build again
     rm -rf "${basedir}/libraries/${file_name}"
+
     build_for_tag "$file_name"
   done
-
-  exit 0
 else
   if ! [ -e "${jsonnet_lib_path}" ]; then
     build_for_tag "$kube_prometheus_release"

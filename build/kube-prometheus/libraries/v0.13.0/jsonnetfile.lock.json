@@ -4,6 +4,16 @@
     {
       "source": {
         "git": {
+          "remote": "https://github.com/adinhodovic/opencost-mixin.git",
+          "subdir": ""
+        }
+      },
+      "version": "1834a0578613f699170c6df4e0e833431eff40aa",
+      "sum": "fCGaGFOittXYD08VRZdXRqUQ5DP5hXbZYe1Dxrg3VXM="
+    },
+    {
+      "source": {
+        "git": {
           "remote": "https://github.com/adinhodovic/rabbitmq-mixin.git",
           "subdir": ""
         }
@@ -85,6 +95,16 @@
       "source": {
         "git": {
           "remote": "https://github.com/grafana/grafonnet.git",
+          "subdir": "gen/grafonnet-latest"
+        }
+      },
+      "version": "82a19822e54a0a12a51e24dbd48fcde717dc0864",
+      "sum": "64fMUPI3frXGj4X1FqFd1t7r04w3CUSmXaDcJ23EYbQ="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/grafonnet.git",
           "subdir": "gen/grafonnet-v10.0.0"
         }
       },
@@ -100,6 +120,16 @@
       },
       "version": "82a19822e54a0a12a51e24dbd48fcde717dc0864",
       "sum": "0BvzR0i4bS4hc2O3xDv6i9m52z7mPrjvqxtcPrGhynA="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/grafonnet.git",
+          "subdir": "gen/grafonnet-v11.1.0"
+        }
+      },
+      "version": "82a19822e54a0a12a51e24dbd48fcde717dc0864",
+      "sum": "41w7p/rwrNsITqNHMXtGSJAfAyKmnflg6rFhKBduUxM="
     },
     {
       "source": {
@@ -120,6 +150,16 @@
       },
       "version": "57b0b85dc1d7ed5e30c2e41f3bd26744b8aef519",
       "sum": "yxqWcq/N3E/a/XreeU6EuE6X7kYPnG0AspAQFKOjASo="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/grafana/jsonnet-libs.git",
+          "subdir": "mixin-utils"
+        }
+      },
+      "version": "57b0b85dc1d7ed5e30c2e41f3bd26744b8aef519",
+      "sum": "LoYq5QxJmUXEtqkEG8CFUBLBhhzDDaNANHc7Gz36ZdM="
     },
     {
       "source": {
