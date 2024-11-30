@@ -38,8 +38,9 @@ function(name, obj, config)
         if std.objectHas(m._config, 'dashboardFolder') then {
           [m._config.dashboardFolder]+: mixin.grafanaDashboards,
         } else (mixin.grafanaDashboards)
-      ),
+      ) else null,
 
       prometheusRules: prometheusRules,
       grafanaDashboards: grafanaDashboards,
+      name: name,
     }
