@@ -1,6 +1,27 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`fdea4476`](../../commit/fdea4476) add mixtool in kubeai ci docker image
+- [`a6864eea`](../../commit/a6864eea) feat: build dashboard for all the mixins kubeaid supports
+- [`a055b063`](../../commit/a055b063) chore: added mixin-utils needed for grafonnet
+- [`8c2bd877`](../../commit/8c2bd877) doc: fix for adding new mixins
+- [`2ff09013`](../../commit/2ff09013) chore: added opencost-mixin and mixin-utils v0.14.0 for kube-prom
+- [`2d044d25`](../../commit/2d044d25) chore: updated grafananet under v0.13.0 for kube-prom
+- [`472b74b4`](../../commit/472b74b4) chore: updated kube-prom libaries
+- [`bbf03557`](../../commit/bbf03557) fix: changed the promtool check format in gitea workflow
+- [`a8ec4018`](../../commit/a8ec4018) add ci promtool checks for kube-prometheus mixins
+- [`d8d9da91`](../../commit/d8d9da91) add missing prometheus rule in mixins
+- [`20e85887`](../../commit/20e85887) Fix the spelling mistake
+- [`b5b34c84`](../../commit/b5b34c84) deleting main folder from build/kube-prometheus/libraries/main
+- [`95313f89`](../../commit/95313f89) fix: expr for mdraid promql rule
+- [`10ecae3b`](../../commit/10ecae3b) add mdraid mixin in kube prometheus
+- [`3bdc0fc7`](../../commit/3bdc0fc7) add new rule monitor::raid::mdraid::failed, update epr of monitor::raid::mdraid::degraded, and add tests
+- [`4f6bcb14`](../../commit/4f6bcb14) feat: mdraid monitoring
+- [`ef3de665`](../../commit/ef3de665) (add) : postgresql, redis, and gitea configurations https://gitea.obmondo.com/EnableIT/opsmondo/issues/261
+- [`cfa568bd`](../../commit/cfa568bd) (remove) : postgresql and redis dependencies from gitea chart https://gitea.obmondo.com/EnableIT/opsmondo/issues/261
+- [`c561f701`](../../commit/c561f701) (add) : gitea chart https://gitea.obmondo.com/EnableIT/opsmondo/issues/261
+
 ## 6.1.0
 ### Minor Version Upgrades
 - Updated reloader from version 1.1.0 to 1.2.0
