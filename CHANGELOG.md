@@ -7,6 +7,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Minor Version Upgrades %%^^
 
 ### Patch Version Upgrades %%^^
+- Updated teleport-kube-agent from version 17.0.1 to 17.0.2
 - Updated teleport-cluster from version 17.0.1 to 17.0.2
 
 ### Improvements
