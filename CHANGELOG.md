@@ -1,6 +1,14 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-12-02
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+
+### Patch Version Upgrades %%^^
+- Updated teleport-cluster from version 17.0.1 to 17.0.2
+
 ### Improvements
 - [`fdea4476`](../../commit/fdea4476) add mixtool in kubeai ci docker image
 - [`a6864eea`](../../commit/a6864eea) feat: build dashboard for all the mixins kubeaid supports
