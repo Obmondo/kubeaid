@@ -1,8 +1,8 @@
-{{- if and (((.Values).keycloakx).ingress).enabled ((.Values).blackbox).probe }}
+{{- if and (index .Values "argo-cd" "server" "ingress" "enabled") (index .Values "blackbox" "probe") }}
 kind: Probe
 apiVersion: monitoring.coreos.com/v1
 metadata:
-  name: blackbox-probe-keycloakx
+  name: blackbox-probe-argocd
 spec:
   interval: 6h
   module: http_2xx
@@ -11,7 +11,7 @@ spec:
   targets:
     staticConfig:
       static:
-        {{- range (((.Values).keycloakx).ingress).hosts }}
+        {{- range (index .Values "argo-cd" "server" "ingress" "hosts") }}
         - {{ . }}
         {{- end }}
 {{- end}}

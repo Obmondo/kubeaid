@@ -23,3 +23,6 @@ postgresql:
   size: 4Gi
 
 networkpolicies: false
+
+blackbox:
+  probe: true

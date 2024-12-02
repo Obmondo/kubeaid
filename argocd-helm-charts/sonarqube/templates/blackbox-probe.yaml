@@ -1,8 +1,8 @@
-{{- if and (((.Values).keycloakx).ingress).enabled ((.Values).blackbox).probe }}
+{{- if and (((.Values).sonarqube).ingress).enabled ((.Values).blackbox).probe }}
 kind: Probe
 apiVersion: monitoring.coreos.com/v1
 metadata:
-  name: blackbox-probe-keycloakx
+  name: blackbox-probe-sonarqube
 spec:
   interval: 6h
   module: http_2xx
@@ -11,7 +11,7 @@ spec:
   targets:
     staticConfig:
       static:
-        {{- range (((.Values).keycloakx).ingress).hosts }}
-        - {{ . }}
+        {{- range (((.Values).sonarqube).ingress).hosts }}
+        - {{ tpl .host $ | quote }}
         {{- end }}
 {{- end}}

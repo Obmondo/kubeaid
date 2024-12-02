@@ -83,3 +83,6 @@ puppetAgentExporter:
     requests:
       memory: 50Mi
       cpu: 20m
+
+blackbox:
+  probe: true
