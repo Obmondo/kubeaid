@@ -18,9 +18,6 @@ spec:
     solvers:
     {{- range $k, $v := .Values.issuer.solvers }}
     {{- if eq (toString $v.type) "dns"}}
-    {{- if or (not $v.dnsNames) (has "" $v.dnsNames) }}
-    {{- fail (printf "DNS names are required and cannot be empty for cloudProvider: %s" $v.cloudProvider) }}
-    {{- end }}
     {{- if eq (toString $v.cloudProvider) "cloudflare" }}
     - dns01:
         {{ $v.cloudProvider }}:
@@ -28,15 +25,21 @@ spec:
           apiTokenSecretRef:
             name: {{ $v.cloudProviderSecretRef.name }}
             key: {{ $v.cloudProviderSecretRef.key }}
-      selector:
-        dnsNames:
-          {{- range $v.dnsNames }}
-          - {{ . | quote }}
+        {{- if or $v.dnsNames $v.dnsZones }}
+        selector:
+          {{- if $v.dnsNames }}
+          dnsNames:
+            {{- range $v.dnsNames }}
+            - {{ . | quote }}
+            {{- end }}
           {{- end }}
-        dnsZones:
-          {{- range $v.dnsZones }}
-          - {{ . | quote }}
+          {{- if $v.dnsZones }}
+          dnsZones:
+            {{- range $v.dnsZones }}
+            - {{ . | quote }}
+            {{- end }}
           {{- end }}
+        {{- end }}
     {{- else if eq (toString $v.cloudProvider) "route53" }}
     - dns01:
         {{ $v.cloudProvider }}:
@@ -44,15 +47,21 @@ spec:
           {{- if $v.hostedZoneID }}
           hostedZoneID: {{ $v.hostedZoneID }}
           {{- end }}
-      selector:
-        dnsNames:
-          {{- range $v.dnsNames }}
-          - {{ . | quote }}
+        {{- if or $v.dnsNames $v.dnsZones }}
+        selector:
+          {{- if $v.dnsNames }}
+          dnsNames:
+            {{- range $v.dnsNames }}
+            - {{ . | quote }}
+            {{- end }}
           {{- end }}
-        dnsZones:
-          {{- range $v.dnsZones }}
-          - {{ . | quote }}
+          {{- if $v.dnsZones }}
+          dnsZones:
+            {{- range $v.dnsZones }}
+            - {{ . | quote }}
+            {{- end }}
           {{- end }}
+        {{- end }}
     {{- end }}
     {{- else if eq (toString $v.type) "http"}}
     - http01:
