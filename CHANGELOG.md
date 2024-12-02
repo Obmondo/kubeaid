@@ -1,13 +1,11 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 2024-12-02
-### Major Version Upgrades %%^^
-
-### Minor Version Upgrades %%^^
+## 6.2.0
+### Minor Version Upgrades
 - Updated velero from version 8.0.0 to 8.1.0
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
 - Updated teleport-kube-agent from version 17.0.1 to 17.0.2
 - Updated teleport-cluster from version 17.0.1 to 17.0.2
 
