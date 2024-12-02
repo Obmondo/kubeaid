@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated velero from version 8.0.0 to 8.1.0
 
 ### Patch Version Upgrades %%^^
 - Updated teleport-kube-agent from version 17.0.1 to 17.0.2
