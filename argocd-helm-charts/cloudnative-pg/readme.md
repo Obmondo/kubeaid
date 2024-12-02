@@ -167,3 +167,7 @@ bootstrap:
         wal:
           maxParallel: 8
 ```
+
+## Docs and External References
+
+- https://www.enterprisedb.com/blog/current-state-major-postgresql-upgrades-cloudnativepg-kubernetes
