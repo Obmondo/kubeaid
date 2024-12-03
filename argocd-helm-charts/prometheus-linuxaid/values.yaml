@@ -56,6 +56,7 @@ prometheusRule:
   ssacli: true
   zfsExporter: true
   smartmon_sata: true
+  zfs: true
 alertmanager:
   version: v0.27.0
   config:

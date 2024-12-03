@@ -1,9 +1,9 @@
-{{- if .Values.prometheusRule.zfsExporter }}
+{{- if .Values.prometheusRule.zfs }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: zfs-exporter-rules
+  name: zfs
   namespace: monitoring-{{ .Values.customerid }}
 spec:
-  {{- $.Files.Get "rules/zfs_exporter.yaml" | nindent 4 }}
+  {{- $.Files.Get "rules/zfs.yaml" | nindent 4 }}
 {{- end }}

@@ -1,0 +1,27 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/zfs.yaml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{alert_id="zfs::pool::status"}
+        values: 1x200
+      - series: node_zfs_zpool_state{state="degraded", instance="htzhel1-ax41a.enableit.dk",  zpool="mypool"}
+        values: 1x200
+
+    alert_rule_test:
+      - alertname: 'zfs::pool::status'
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              severity: 'critical'
+              instance: 'htzhel1-ax41a.enableit.dk'
+              alert_id: 'zfs::pool::status'
+              zpool: 'mypool'
+              state: 'degraded'
+            exp_annotations:
+              summary: 'ZFS Pool is Degraded.'
+              description: 'The zfs pool **mypool** is degraded on htzhel1-ax41a.enableit.dk'
