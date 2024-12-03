@@ -13,3 +13,5 @@ find . -not -path ./build/kube-prometheus/libraries/\* -name \*.jsonnet |
     fi
 
   done
+
+jsonnetfmt --test ./build/kube-prometheus/common-template.jsonnet

@@ -11,7 +11,7 @@ jobs:
     name: Prometheus rule test
     runs-on: ubuntu-latest
     container:
-      image: ${{ secrets.HARBOR_REGISTRY }}/${{ vars.KUBEAID_CI_IMAGE }}:${{ vars.KUBEAID_CI_TAG }}
+      image: ${{ secrets.HARBOR_REGISTRY }}/${{ vars.KUBEAID_CI_IMAGE }}:v1.2.1
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -20,15 +20,16 @@ jobs:
         working-directory: argocd-helm-charts/prometheus-linuxaid/tests
         run: promtool test rules *.yaml
 
-      - name: prometheus mixins
+      - name: prometheus mixins rules check and lint
         working-directory: build/kube-prometheus/mixins
         run: |
-          for dir in */; do
-            if [ -f "$dir""prometheus.yaml" ]; then
-              promtool check rules "$dir""prometheus.yaml"
-            else
-              echo "Did not find 'prometheus.yaml' in '$dir'"
-              echo "Please generate prometheus.yaml for your new mixin"
-              exit 1
-            fi
-          done
+          set -e
+            for dir in */; do
+              if [ -f "${dir}prometheus.yaml" ] && [ -f "${dir}mixin.libsonnet" ]; then
+                promtool check rules "${dir}prometheus.yaml"
+                mixtool lint --prometheus "${dir}mixin.libsonnet"
+              else
+                echo "Did not find either 'mixin.libsonnet' or 'prometheus.yaml' in '$dir'"
+                exit 1
+              fi
+            done
