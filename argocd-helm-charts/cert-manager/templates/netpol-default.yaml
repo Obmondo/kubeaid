@@ -14,7 +14,7 @@ spec:
     protocol: TCP
     source:
       namespaceSelector: projectcalico.org/name == 'monitoring'
-      selector: name == prometheus
+      selector: app.kubernetes.io/name == 'prometheus'
     destination:
       ports:
       - 9402
