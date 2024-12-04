@@ -8,5 +8,5 @@
 ## Update the tags for a cluster
 
 ```sh
-docker run --rm -it -v $(pwd):/workspace harbor.obmondo.com/obmondo/kubeaid:4.3.0 /bin/update-kubeaid-argocd-app.sh -c <cluster-name> -r <tag-for-the-current-window-cycle>
+docker run -it  -v $(pwd):/workspace -v <path-to-KubeAid>:/KubeAid  harbor.obmondo.com/obmondo/kubeaid-update-apps:1.0.0 /KubeAid/bin/update-kubeaid-argocd-app.sh -c <cluster-name> -r <tag-for-the-current-window-cycle>
 ```
