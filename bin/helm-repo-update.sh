@@ -225,6 +225,12 @@ function update_helm_chart {
               continue
             }
 
+            # rename the downloaded tar file so that it matches what we want during untar.
+            # For example for strimzi kafka operator downloaded tar file has name strimzi-kafka-operator-helm-3-chart-0.38.0.tgz 
+            # while we look for strimzi-kafka-operator-0.38.0.tgz
+            tar_file=$(find "$HELM_CHART_DEP_PATH" -maxdepth 1 -type f -name "*.tgz" -print -quit)
+            mv "$tar_file" "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz"
+
             # Untar the tgz file
             tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_UPSTREAM_CHART_VERSION.tgz" || {
               echo "Failed to extract $HELM_CHART_NAME-$HELM_UPSTREAM_CHART_VERSION.tgz. Skipping."
@@ -248,14 +254,24 @@ function update_helm_chart {
           echo "Deleting old $HELM_CHART_NAME before untar"
           rm -rf "${HELM_CHART_DEP_PATH:?}/${HELM_CHART_NAME}"
 
+          # rename the downloaded tar file so that it matches what we want during untar.
+          # For example for strimzi kafka operator downloaded tar file has name strimzi-kafka-operator-helm-3-chart-0.38.0.tgz 
+          # while we look for strimzi-kafka-operator-0.38.0.tgz
+          tar_file=$(find "$HELM_CHART_DEP_PATH" -maxdepth 1 -type f -name "*.tgz" -print -quit)
+          mv "$tar_file" "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz"
+
+
           # Untar the tgz file
           tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz" || {
             echo "Failed to extract $HELM_CHART_NAME-$HELM_CHART_VERSION.tgz. Skipping."
             continue
           }
-
-          update_changelog "Added" "$HELM_CHART_NAME" "$HELM_CHART_VERSION" "$HELM_UPSTREAM_CHART_VERSION"
-          determine_change_type "Added" "$HELM_CHART_NAME" "$HELM_CHART_VERSION" "$HELM_UPSTREAM_CHART_VERSION"
+          
+          # since there is no upstream chart already present passing HELM_CHART_VERSION in update_changelog 
+          # and determine_change_type instead of HELM_UPSTREAM_CHART_VERSION otherwise we get unbound variable
+          # error for HELM_UPSTREAM_CHART_VERSION
+          update_changelog "Added" "$HELM_CHART_NAME" "$HELM_CHART_VERSION" "$HELM_CHART_VERSION"
+          determine_change_type "Added" "$HELM_CHART_NAME" "$HELM_CHART_VERSION" "$HELM_CHART_VERSION"
         fi
     done
   fi
