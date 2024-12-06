@@ -13,7 +13,7 @@ add_label_to_high_priority_app() {
   local found=false
 
   # List of critical priority apps
-  critical_priority_apps=("sealed-secrets" "argo-cd" "cert-manager" "cilium" "cluster-autoscaler" "haproxy" "keycloakx" "traefik" "teleport-cluster" "kube-prometheus")
+  critical_priority_apps=("sealed-secrets" "argo-cd" "cert-manager" "cilium" "cluster-autoscaler" "haproxy" "keycloakx" "traefik" "teleport-cluster" "prometheus-adapter")
 
   # Loop through the list and check for the app
   for item in "${critical_priority_apps[@]}"; do
@@ -75,7 +75,7 @@ for label_name in "${LABELS_NAMES[@]}"; do
         yq eval -i "(.spec.sources[] | select(.repoURL | test(\"kubeaid\\.git|k8id\\.git|KubeAid\\.git\")) | .targetRevision) = \"$NEW_TARGET_REVISION\"" "$file_path"
         
         # Use yq to update project for kubeAid managed apps
-        yq eval -i "(.spec.project ) = \"kubeaid\"" "$file_path"
+       yq eval -i '( select(.kind | test("Application")) | .spec.project) = "kubeaid"' "$file_path"
         
         # Use yq to add custom labels
         yq eval -i ".metadata.labels.\"kubeaid.io/version\" = \"$NEW_TARGET_REVISION\" | .metadata.labels.\"kubeaid.io/managed-by\" = \"kubeaid\"" "$file_path"
