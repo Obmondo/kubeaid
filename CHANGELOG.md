@@ -1,6 +1,19 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`27bc985d`](../../commit/27bc985d) fix helm repo update script failing to untar newly downloaded chart tar files when naming is different and HELM_UPSTREAM_CHART_VERSION giving unbound variable error when there is no upstream chart already present
+- [`59cd0be3`](../../commit/59cd0be3) adding blackbox prober for important services
+- [`f906eef5`](../../commit/f906eef5) add steps to add new alerts for servers
+- [`c763329f`](../../commit/c763329f) feat: add dashboard if the upstream mixin support it
+- [`05ed13ba`](../../commit/05ed13ba) Fix netpol for cert-manager to allow prometheus scrapes
+- [`b3e5b381`](../../commit/b3e5b381) add zfs state degrade rule in prometheus linuxaid
+- [`0ef419fe`](../../commit/0ef419fe) add mixtool lint check in ci for jsonnet files
+- [`877edfda`](../../commit/877edfda) fix mixtool lint
+- [`5b1c6824`](../../commit/5b1c6824) Add keycloak Upgrade guide
+- [`01982f7d`](../../commit/01982f7d) Make dnszone and dns hostedzone optional for cloudflare
+- [`ad626322`](../../commit/ad626322) Add recovery doc for cnpg cluster
+
 ## 6.2.0
 ### Minor Version Upgrades
 - Updated velero from version 8.0.0 to 8.1.0
