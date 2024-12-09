@@ -1,63 +1,49 @@
 annotations:
   artifacthub.io/changes: |
     - kind: changed
-      description: "Update Chart's version to 10.7.0"
+      description: "Upgrade SonarQube Server to 10.8.0"
     - kind: changed
-      description: "Upgrade SonarQube to 10.7.0"
+      description: "Release SonarQube Community Build 24.12"
     - kind: changed
-      description: "Support Kubernetes v1.30"
+      description: "Update Chart's version to 10.8.0"
+    - kind: added
+      description: "Support the installation of the Oracle JDBC Driver"
     - kind: changed
-      description: "Upgrade ingress-nginx dependency to 4.10.1"
+      description: "Support Kubernetes v1.31"
+    - kind: deprecated
+      description: "Deprecate the 'community' value for the 'edition' parameter"
+    - kind: deprecated
+      description: "Deprecate the default value of 'image.tag' in favor of an empty string"
+    - kind: added
+      description: "Introduce the 'community.enabled' and 'community.buildNumber' parameters for SonarQube Community Build"
     - kind: changed
-      description: "Deprecate `jdbcOverwrite.enable` in favor of `jdbcOverwrite.enabled`"
+      description: "Update the Chart's icon with the SonarQube Server logo"
     - kind: fixed
-      description: "Fix regression on env valuesFrom in the new STS template"
+      description: "Set 'app.kubernetes.io/name' and 'app.kubernetes.io/version' as selector labels"
+    - kind: added
+      description: "Support Gateway on different namespace in HTTPRoute"
+    - kind: changed
+      description: "Change 'ingress.ingressClassName' default, set it to 'nginx' if 'nginx.enabled' or 'ingress-nginx.enabled'"
+    - kind: changed
+      description: "Ensure that ConfigMap resources are not created for 'initFS' and 'initSysctl' if not needed"
+    - kind: changed
+      description: "Ensure the Pod will stop at 'init' stage if init_sysctl.sh failed to modify kernel parameters"
+    - kind: changed
+      description: "Replace the example images in initContainers, initSysctl and initFs from 'busybox:1.36' to 'ubuntu:24.04', which are commented out by default"
     - kind: fixed
-      description: "Fix a typo in the new common STS template"
-    - kind: changed
-      description: "Enable the setup of ReadOnlyRootFilesystem in the security contexts"
-    - kind: added
-      description: "Support basic chart installation on Openshift"
-    - kind: changed
-      description: "Include remaining Route settings"
-    - kind: changed
-      description: "Fix networkPolicy.additionalPolicys typo"
-    - kind: added
-      description: "Support install-plugin and prometheusExporter proxy variables in secret"
-    - kind: added
-      description: "Support GatewayAPI HttpRoute"
-    - kind: added
-      description: "Support additional labels in the PodMonitor"
-    - kind: added
-      description: "Support Openshift SCCv2 by default when Openshift.enabled=true"
-    - kind: changed
-      description: "Deprecate Openshift.createSCC"
-    - kind: added
-      description: "Support additional CA Certificate as ConfigMap instead of Secret only"
-    - kind: changed
-      description: "Changed default value for caCerts.image"
-    - kind: fixed
-      description: "Fix openshift change-admin-password-hook Job SecurityContext failure"
-    - kind: added
-      description: "Support SONAR_OPENSHIFT telemetry env_var"
-    - kind: changed
-      description: "Update helm chart repo path in sources"
-    - kind: changed
-      description: "Changed SONAR_OPENSHIFT to IS_HELM_OPENSHIFT_ENABLED"
-    - kind: changed
-      description: "Remove socketTimeout from jdbcOverwrite.jdbcUrl's default value"
-    - kind: changed
-      description: "Refactor Route to be subparameter of OpenShift"
-    - kind: changed
-      description: "Make OpenShift.createSCC false by default"
-    - kind: changed
-      description: "Deprecate peristence.volumes and persistence.mounts in favor or extraVolumes and extraVolumeMounts"
-    - kind: added
-      description: "Ensure kubernetes.io/version label is smaller than 63 chars"
+      description: "Make the 'automountServiceAccountToken' configurable with 'serviceAccount.automountToken' in PodSpec"
+    - kind: deprecated
+      description: "Deprecate 'sonarqubeFolder', 'jdbcOverwrite.jdbcPassword' and 'terminationGracePeriodSeconds'"
+    - kind: deprecated
+      description: "Deprecate 'deploymentStrategy.type', which will be set to 'Recreate'"
+    - kind: deprecated
+      description: "Deprecate 'account', 'curlContainerImage', 'adminJobAnnotation'"
+    - kind: deprecated
+      description: "Deprecate the StatefulSet deployment type"
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/images: |
     - name: sonarqube
-      image: sonarqube:10.7.0-community
+      image: sonarqube:24.12.0.100206-community
   artifacthub.io/links: |
     - name: support
       url: https://community.sonarsource.com/
@@ -65,7 +51,7 @@ annotations:
       url: https://github.com/SonarSource/helm-chart-sonarqube/tree/master/charts/sonarqube
   charts.openshift.io/name: sonarqube
 apiVersion: v2
-appVersion: 10.7.0
+appVersion: 10.8.0
 dependencies:
 - condition: postgresql.enabled
   name: postgresql
@@ -74,7 +60,7 @@ dependencies:
 - condition: nginx.enabled,ingress-nginx.enabled
   name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
-  version: 4.10.1
+  version: 4.11.2
 description: SonarQube is a self-managed, automatic code review tool that systematically
   helps you deliver clean code. As a core element of our Sonar solution, SonarQube
   integrates into your existing workflow and detects issues in your code to help you
@@ -82,7 +68,7 @@ description: SonarQube is a self-managed, automatic code review tool that system
   programming languages and integrates into your CI pipeline and DevOps platform to
   ensure that your code meets high-quality standards.
 home: https://www.sonarqube.org/
-icon: https://raw.githubusercontent.com/SonarSource/sonarqube-static-resources/master/helm/SonarQubeLogo.svg
+icon: https://raw.githubusercontent.com/SonarSource/sonarqube-static-resources/master/helm/SonarQubeServerLogo.png
 keywords:
 - coverage
 - security
@@ -90,8 +76,6 @@ keywords:
 - quality
 kubeVersion: '>= 1.24.0-0'
 maintainers:
-- email: leo.geoffroy+helm@sonarsource.com
-  name: leo-geoffroy-sonarsource
 - email: carmine.vassallo@sonarsource.com
   name: carminevassallo
 - email: jeremy.cotineau@sonarsource.com
@@ -104,4 +88,4 @@ sources:
 - https://github.com/SonarSource/docker-sonarqube
 - https://github.com/SonarSource/sonarqube
 type: application
-version: 10.7.0+3598
+version: 10.8.0

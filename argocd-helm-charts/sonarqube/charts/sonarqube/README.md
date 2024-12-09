@@ -14,9 +14,10 @@ Please note that this chart only supports SonarQube Community, Developer, and En
 
 ## Compatibility
 
-Compatible SonarQube Version: `10.7.0`
+Compatible SonarQube Server Version: `10.8.0`
+Compatible SonarQube Community Build: `24.12.0.100206`
 
-Supported Kubernetes Versions: From `1.24` to `1.30`
+Supported Kubernetes Versions: From `1.24` to `1.31`
 Supported Openshift Versions: From `4.11` to `4.16`
 
 ## Installing the chart
@@ -36,6 +37,13 @@ If you are interested in deploying SonarQube on Openshift, please check the [ded
 The [configuration](#configuration) section lists the parameters that can be configured during installation.
 
 The default login is admin/admin.
+
+## Installing the SonarQube Community Build chart
+
+The SonarQube Community Edition has been replaced by the SonarQube Community Build.
+If you want to install the SonarQube Community Build chart, please set `community.enabled` to `true`.
+The `community.buildNumber` parameter will be set to the latest Community Build.
+The `community` value is deprecated and won't be supported for `edition` anymore.
 
 ## Installing the SonarQube 9.9 LTA chart
 
@@ -86,7 +94,7 @@ Here is the list of containers that are compatible with the [Pod Security levels
 
 This is achieved by setting this SecurityContext as default on **most** containers:
 
-```
+```yaml
 allowPrivilegeEscalation: false
 runAsNonRoot: true
 runAsUser: 1000
@@ -162,7 +170,7 @@ To get some guidance when setting the Xmx and Xms values, please refer to this [
 
 Please refer to the Helm upgrade section accessible [here](https://docs.sonarsource.com/sonarqube/latest/setup-and-upgrade/upgrade-the-server/upgrade/#upgrade-from-89x-lts-to-99x-lts).
 
-## Ingress
+## Ingress usage
 
 ### Path
 
@@ -202,7 +210,7 @@ If a Prometheus Operator is deployed in your cluster, you can enable a PodMonito
 
 If running on OpenShift, make sure your account has permissions to create PodMonitor resources under the monitoring.coreos.com/v1 apiVersion.
 
-## OpenShift
+## OpenShift installation
 
 The chart can be installed on OpenShift by setting `OpenShift.enabled=true`. Among the others, please note that this value will disable the initContainer that performs the settings required by Elasticsearch (see [here](#elasticsearch-prerequisites)). Furthermore, we strongly recommend following the [Production Use Case guidelines](#production-use-case).
 
@@ -219,7 +227,12 @@ helm upgrade --install -n sonarqube sonarqube sonarqube/sonarqube \
   --set postgresql.securityContext.enabled=false \
   --set postgresql.containerSecurityContext.enabled=false
 ```
+
 If you want to make your application publicly visible with Routes, you can set `OpenShift.route.enabled` to true. Please check the [configuration details](#openshift-1) to customize the Route base on your needs.
+
+## License
+
+SonarQube Community Build is released under the [GNU Lesser General Public License, Version 3.0⁠,](http://www.gnu.org/licenses/lgpl.txt) and packaged with [SSALv1](https://www.sonarsource.com/license/ssal/) analyzers. SonarQube Server Developer and Enterprise are licensed under [SonarQube Server Terms and Conditions](https://www.sonarsource.com/legal/sonarqube/terms-and-conditions/).
 
 ## Configuration
 
@@ -227,26 +240,29 @@ The following table lists the configurable parameters of the SonarQube chart and
 
 ### Global
 
-| Parameter            | Description                                                                                                           | Default       |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------- |
-| `deploymentType`     | Deployment Type (supported values are `StatefulSet` or `Deployment`)                                                  | `StatefulSet` |
-| `replicaCount`       | Number of replicas deployed (supported values are 0 and 1)                                                            | `1`           |
-| `deploymentStrategy` | Deployment strategy                                                                                                   | `{}`          |
-| `priorityClassName`  | Schedule pods on priority (e.g. `high-priority`)                                                                      | `None`        |
-| `schedulerName`      | Kubernetes scheduler name                                                                                             | `None`        |
-| `affinity`           | Node / Pod affinities                                                                                                 | `{}`          |
-| `tolerations`        | List of node taints to tolerate                                                                                       | `[]`          |
-| `nodeSelector`       | Node labels for pod assignment                                                                                        | `{}`          |
-| `hostAliases`        | Aliases for IPs in /etc/hosts                                                                                         | `[]`          |
-| `podLabels`          | Map of labels to add to the pods                                                                                      | `{}`          |
-| `env`                | Environment variables to attach to the pods                                                                           | `{}`          |
-| `annotations`        | SonarQube Pod annotations                                                                                             | `{}`          |
-| `edition`            | SonarQube Edition to use (e.g. `community`, `developer` or `enterprise`)                                              | `community`   |
-| `sonarWebContext`    | SonarQube web context, also serve as default value for `ingress.path`, `account.sonarWebContext` and probes path.     | ``            |
-| `httpProxySecret`    | Should contain `http_proxy`, `https_proxy` and `no_proxy` keys, will superseed every other proxy variables            | ``            |
-| `httpProxy`          | HTTP proxy for downloading JMX agent and install plugins, will superseed initContainer specific http proxy variables  | ``            |
-| `httpsProxy`         | HTTPS proxy for downloading JMX agent and install plugins, will superseed initContainer specific https proxy variable | ``            |
-| `noProxy`            | No proxy for downloading JMX agent and install plugins, will superseed initContainer specific no proxy variables      | ``            |
+| Parameter               | Description                                                                                                                             | Default            |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| `deploymentType`        | (DEPRECATED) Deployment Type (supported values are `StatefulSet` or `Deployment`)                                                       | `StatefulSet`      |
+| `replicaCount`          | Number of replicas deployed (supported values are 0 and 1)                                                                              | `1`                |
+| `deploymentStrategy`    | Deployment strategy. Setting the strategy type is deprecated and it will be hardcoded to `Recreate`                                     | `{type: Recreate}` |
+| `priorityClassName`     | Schedule pods on priority (e.g. `high-priority`)                                                                                        | `None`             |
+| `schedulerName`         | Kubernetes scheduler name                                                                                                               | `None`             |
+| `affinity`              | Node / Pod affinities                                                                                                                   | `{}`               |
+| `tolerations`           | List of node taints to tolerate                                                                                                         | `[]`               |
+| `nodeSelector`          | Node labels for pod assignment                                                                                                          | `{}`               |
+| `hostAliases`           | Aliases for IPs in /etc/hosts                                                                                                           | `[]`               |
+| `podLabels`             | Map of labels to add to the pods                                                                                                        | `{}`               |
+| `env`                   | Environment variables to attach to the pods                                                                                             | `{}`               |
+| `annotations`           | SonarQube Pod annotations                                                                                                               | `{}`               |
+| `edition`               | SonarQube Edition to use (e.g. `community`, `developer` or `enterprise`). Please note that the default `community` value is deprecated. | `community`        |
+| `community.enabled`     | Install SonarQube Community Build. When set to `true`, this parameter replaces `edition=community`                                      | `true`             |
+| `community.buildNumber` | The SonarQube Community Build number to install                                                                                         | `24.12.0.100206`   |
+| `sonarWebContext`       | SonarQube web context, also serve as default value for `ingress.path`, `account.sonarWebContext` and probes path.                       | ``                 |
+| `httpProxySecret`       | Should contain `http_proxy`, `https_proxy` and `no_proxy` keys, will superseed every other proxy variables                              | ``                 |
+| `httpProxy`             | HTTP proxy for downloading JMX agent and install plugins, will superseed initContainer specific http proxy variables                    | ``                 |
+| `httpsProxy`            | HTTPS proxy for downloading JMX agent and install plugins, will superseed initContainer specific https proxy variable                   | ``                 |
+| `noProxy`               | No proxy for downloading JMX agent and install plugins, will superseed initContainer specific no proxy variables                        | ``                 |
+| `ingress-nginx.enabled` | Install Nginx Ingress Helm                                                                                                              | `false`            |
 
 ### NetworkPolicies
 
@@ -255,7 +271,7 @@ The following table lists the configurable parameters of the SonarQube chart and
 | `networkPolicy.enabled`                   | Create NetworkPolicies                                                    | `false` |
 | `networkPolicy.prometheusNamespace`       | Allow incoming traffic to monitoring ports from this namespace            | `nil`   |
 | `networkPolicy.additionalNetworkPolicys`  | (DEPRECATED) Please use `networkPolicy.additionalNetworkPolicies` instead | `nil`   |
-| `networkPolicy.additionalNetworkPolicies` | User defined NetworkPolicies (usefull for external database)              | `nil`   |
+| `networkPolicy.additionalNetworkPolicies` | User defined NetworkPolicies (useful for external database)               | `nil`   |
 
 ### OpenShift
 
@@ -273,13 +289,13 @@ The following table lists the configurable parameters of the SonarQube chart and
 
 ### Image
 
-| Parameter           | Description                                                | Default                        |
-| ------------------- | ---------------------------------------------------------- | ------------------------------ |
-| `image.repository`  | image repository                                           | `sonarqube`                    |
-| `image.tag`         | `sonarqube` image tag.                                     | `10.7.0-{{ .Values.edition }}` |
-| `image.pullPolicy`  | Image pull policy                                          | `IfNotPresent`                 |
-| `image.pullSecret`  | (DEPRECATED) imagePullSecret to use for private repository | `None`                         |
-| `image.pullSecrets` | imagePullSecrets to use for private repository             | `None`                         |
+| Parameter           | Description                                                                                       | Default                        |
+| ------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `image.repository`  | image repository                                                                                  | `sonarqube`                    |
+| `image.tag`         | `sonarqube` image tag. Please note that the default `10.8.0-{{ .Values.edition }}` is deprecated. | `10.8.0-{{ .Values.edition }}` |
+| `image.pullPolicy`  | Image pull policy                                                                                 | `IfNotPresent`                 |
+| `image.pullSecret`  | (DEPRECATED) imagePullSecret to use for private repository                                        | `None`                         |
+| `image.pullSecrets` | imagePullSecrets to use for private repository                                                    | `None`                         |
 
 ### Security
 
@@ -311,7 +327,6 @@ The following table lists the configurable parameters of the SonarQube chart and
 
 | Parameter                      | Description                                                  | Default                                                                                                      |
 | ------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| `ingress-nginx.enabled`        | Install Nginx Ingress Helm                                   | `false`                                                                                                      |
 | `nginx.enabled`                | (DEPRECATED) please use `ingress-nginx.enabled`              | `false`                                                                                                      |
 | `ingress.labels`               | Ingress additional labels                                    | `{}`                                                                                                         |
 | `ingress.hosts[0].name`        | Hostname to your SonarQube installation                      | `sonarqube.your-org.com`                                                                                     |
@@ -319,32 +334,42 @@ The following table lists the configurable parameters of the SonarQube chart and
 | `ingress.hosts[0].serviceName` | Optional field to override the default serviceName of a path | `None`                                                                                                       |
 | `ingress.hosts[0].servicePort` | Optional field to override the default servicePort of a path | `None`                                                                                                       |
 | `ingress.tls`                  | Ingress secrets for TLS certificates                         | `[]`                                                                                                         |
-| `ingress.ingressClassName`     | Optional field to configure ingress class name               | `None`                                                                                                       |
+| `ingress.ingressClassName`     | Optional field to configure ingress class name               | `None` OR `nginx` if `nginx.enabled` or `ingress-nginx.enabled`                                              |
 | `ingress.annotations`          | Field to add extra annotations to the ingress                | {`nginx.ingress.kubernetes.io/proxy-body-size: "64m"`} if `ingress-nginx.enabled=true or nginx.enabled=true` |
 
 ### HttpRoute
 
-| Parameter             | Description                                                                                                   | Default |
-| --------------------- | ------------------------------------------------------------------------------------------------------------- | ------- |
-| `httproute.enabled`   | Flag to enable GatewayAPI HttpRoute                                                                           | `False` |
-| `httproute.gateway`   | Name of the gateway located in the same namespace                                                             | `None`  |
-| `httproute.hostnames` | List of hostnames to match the HttpRoute against                                                              | `None`  |
-| `httproute.labels`    | (Optional) List of extra labels to add to the HttpRoute                                                       | `None`  |
-| `httproute.rules`     | (Optional) Extra Rules block of the HttpRoute. A default one is created with SonarWebContext and service port | `None`  |
+| Parameter                    | Description                                                                                                   | Default |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------- | ------- |
+| `httproute.enabled`          | Flag to enable GatewayAPI HttpRoute                                                                           | `False` |
+| `httproute.gateway`          | Name of the gateway                                                                                           | `None`  |
+| `httproute.gatewayNamespace` | (Optional) Name of the gateway namespace when located in a different namespace                                | `None`  |
+| `httproute.hostnames`        | List of hostnames to match the HttpRoute against                                                              | `None`  |
+| `httproute.labels`           | (Optional) List of extra labels to add to the HttpRoute                                                       | `None`  |
+| `httproute.rules`            | (Optional) Extra Rules block of the HttpRoute. A default one is created with SonarWebContext and service port | `None`  |
 
 ### Probes
 
-| Parameter                          | Description                                                                                                      | Default           |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ----------------- |
-| `readinessProbe`                   | ReadinessProbe for SonarQube                                                                                     | see `values.yaml` |
-| `readinessProbe.sonarWebContext`   | (DEPRECATED) SonarQube web context for readinessProbe, please use sonarWebContext at the value top level instead | `/`               |
-| `livenessProbe`                    | LivenessProbe for SonarQube                                                                                      | see `values.yaml` |
-| `livenessProbe.sonarWebContext`    | (DEPRECATED) SonarQube web context for LivenessProbe, please use sonarWebContext at the value top level instead  | `/`               |
-| `startupProbe.initialDelaySeconds` | StartupProbe initial delay for SonarQube checking                                                                | `30`              |
-| `startupProbe.periodSeconds`       | StartupProbe period between checking SonarQube                                                                   | `10`              |
-| `startupProbe.sonarWebContext`     | (DEPRECATED) SonarQube web context for StartupProbe, please use sonarWebContext at the value top level instead   | `/`               |
-| `startupProbe.failureThreshold`    | StartupProbe threshold for marking as failed                                                                     | `24`              |
-| `startupProbe.timeoutSeconds`      | StartupProbe timeout delay                                                                                       | `1`               |
+| Parameter                            | Description                                                                                                      | Default                                                        |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `readinessProbe`                     | ReadinessProbe for SonarQube                                                                                     | `exec; curl api/system/status` see `values.yaml` for details   |
+| `readinessProbe.initialDelaySeconds` | ReadinessProbe initial delay for SonarQube checking                                                              | `60`                                                           |
+| `readinessProbe.periodSeconds`       | ReadinessProbe period between checking SonarQube                                                                 | `30`                                                           |
+| `readinessProbe.failureThreshold`    | ReadinessProbe threshold for marking as failed                                                                   | `6`                                                            |
+| `readinessProbe.timeoutSeconds`      | ReadinessProbe timeout delay                                                                                     | `1`                                                            |
+| `readinessProbe.sonarWebContext`     | (DEPRECATED) SonarQube web context for readinessProbe, please use sonarWebContext at the value top level instead | `/`                                                            |
+| `livenessProbe`                      | LivenessProbe for SonarQube                                                                                      | `exec: curl api/system/liveness` see `values.yaml` for details |
+| `livenessProbe.initialDelaySeconds`  | LivenessProbe initial delay for SonarQube checking                                                               | `60`                                                           |
+| `livenessProbe.periodSeconds`        | LivenessProbe period between checking SonarQube                                                                  | `30`                                                           |
+| `livenessProbe.failureThreshold`     | LivenessProbe threshold for marking as failed                                                                    | `6`                                                            |
+| `livenessProbe.timeoutSeconds`       | LivenessProbe timeout delay                                                                                      | `1`                                                            |
+| `livenessProbe.sonarWebContext`      | (DEPRECATED) SonarQube web context for LivenessProbe, please use sonarWebContext at the value top level instead  | `/`                                                            |
+| `startupProbe`                       | StartupProbe for SonarQube                                                                                       | `httpGet: api/system/status`                                   |
+| `startupProbe.initialDelaySeconds`   | StartupProbe initial delay for SonarQube checking                                                                | `30`                                                           |
+| `startupProbe.periodSeconds`         | StartupProbe period between checking SonarQube                                                                   | `10`                                                           |
+| `startupProbe.failureThreshold`      | StartupProbe threshold for marking as failed                                                                     | `24`                                                           |
+| `startupProbe.timeoutSeconds`        | StartupProbe timeout delay                                                                                       | `1`                                                            |
+| `startupProbe.sonarWebContext`       | (DEPRECATED) SonarQube web context for StartupProbe, please use sonarWebContext at the value top level instead   | `/`                                                            |
 
 ### InitContainers
 
@@ -409,7 +434,7 @@ The following table lists the configurable parameters of the SonarQube chart and
 | `plugins.httpProxy`          | For use behind a corporate proxy when downloading plugins                       | `""`                                                                   |
 | `plugins.httpsProxy`         | For use behind a corporate proxy when downloading plugins                       | `""`                                                                   |
 | `plugins.noProxy`            | For use behind a corporate proxy when downloading plugins                       | `""`                                                                   |
-| `plugins.image`              | Image for plugins container                                                     | `""`                                                                   |
+| `plugins.image`              | Image for plugins container                                                     | `"image.repository":"image.tag"`                                       |
 | `plugins.resources`          | Resources for plugins container                                                 | `{}`                                                                   |
 | `plugins.netrcCreds`         | Name of the secret containing .netrc file to use creds when downloading plugins | `""`                                                                   |
 | `plugins.noCheckCertificate` | Flag to not check server's certificate when downloading plugins                 | `false`                                                                |
@@ -417,20 +442,20 @@ The following table lists the configurable parameters of the SonarQube chart and
 
 ### SonarQube Specific
 
-| Parameter                      | Description                                                                                                          | Default          |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| `jvmOpts`                      | (DEPRECATED) Values to add to `SONAR_WEB_JAVAOPTS`. Please set directly `SONAR_WEB_JAVAOPTS` or `sonar.web.javaOpts` | `""`             |
-| `jvmCeOpts`                    | (DEPRECATED) Values to add to `SONAR_CE_JAVAOPTS`. Please set directly `SONAR_CE_JAVAOPTS` or `sonar.ce.javaOpts`    | `""`             |
-| `sonarqubeFolder`              | Directory name of SonarQube                                                                                          | `/opt/sonarqube` |
-| `sonarProperties`              | Custom `sonar.properties` key-value pairs (e.g., "sonarProperties.sonar.forceAuthentication=true")                   | `None`           |
-| `sonarSecretProperties`        | Additional `sonar.properties` key-value pairs to load from a secret                                                  | `None`           |
-| `sonarSecretKey`               | Name of existing secret used for settings encryption                                                                 | `None`           |
-| `monitoringPasscode`           | Value for sonar.web.systemPasscode needed for LivenessProbes (encoded to Base64 format)                              | `define_it`      |
-| `monitoringPasscodeSecretName` | Name of the secret where to load `monitoringPasscode`                                                                | `None`           |
-| `monitoringPasscodeSecretKey`  | Key of an existing secret containing `monitoringPasscode`                                                            | `None`           |
-| `extraContainers`              | Array of extra containers to run alongside the `sonarqube` container (aka. Sidecars)                                 | `[]`             |
-| `extraVolumes`                 | Array of extra volumes to add to the SonarQube deployment                                                            | `[]`             |
-| `extraVolumeMounts`            | Array of extra volume mounts to add to the SonarQube deployment                                                      | `[]`             |
+| Parameter                      | Description                                                                                                                              | Default          |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| `jvmOpts`                      | (DEPRECATED) Values to add to `SONAR_WEB_JAVAOPTS`. Please set directly `SONAR_WEB_JAVAOPTS` or `sonar.web.javaOpts`                     | `""`             |
+| `jvmCeOpts`                    | (DEPRECATED) Values to add to `SONAR_CE_JAVAOPTS`. Please set directly `SONAR_CE_JAVAOPTS` or `sonar.ce.javaOpts`                        | `""`             |
+| `sonarqubeFolder`              | (DEPRECATED) Directory name of SonarQube, Due to 1-1 mapping between helm version and docker version, there is no need for configuration | `/opt/sonarqube` |
+| `sonarProperties`              | Custom `sonar.properties` key-value pairs (e.g., "sonarProperties.sonar.forceAuthentication=true")                                       | `None`           |
+| `sonarSecretProperties`        | Additional `sonar.properties` key-value pairs to load from a secret                                                                      | `None`           |
+| `sonarSecretKey`               | Name of existing secret used for settings encryption                                                                                     | `None`           |
+| `monitoringPasscode`           | Value for sonar.web.systemPasscode needed for LivenessProbes (encoded to Base64 format)                                                  | `define_it`      |
+| `monitoringPasscodeSecretName` | Name of the secret where to load `monitoringPasscode`                                                                                    | `None`           |
+| `monitoringPasscodeSecretKey`  | Key of an existing secret containing `monitoringPasscode`                                                                                | `None`           |
+| `extraContainers`              | Array of extra containers to run alongside the `sonarqube` container (aka. Sidecars)                                                     | `[]`             |
+| `extraVolumes`                 | Array of extra volumes to add to the SonarQube deployment                                                                                | `[]`             |
+| `extraVolumeMounts`            | Array of extra volume mounts to add to the SonarQube deployment                                                                          | `[]`             |
 
 ### Resources
 
@@ -445,31 +470,33 @@ The following table lists the configurable parameters of the SonarQube chart and
 
 ### Persistence
 
-| Parameter                   | Description                                                                  | Default         |
-| --------------------------- | ---------------------------------------------------------------------------- | --------------- |
-| `persistence.enabled`       | Flag for enabling persistent storage                                         | `false`         |
-| `persistence.annotations`   | Kubernetes pvc annotations                                                   | `{}`            |
-| `persistence.existingClaim` | Do not create a new PVC but use this one                                     | `None`          |
-| `persistence.storageClass`  | Storage class to be used                                                     | `""`            |
-| `persistence.accessMode`    | Volumes access mode to be set                                                | `ReadWriteOnce` |
-| `persistence.size`          | Size of the volume                                                           | `5Gi`           |
-| `persistence.volumes`       | (DEPRECATED) Please use extraVolumes instead                                 | `[]`            |
-| `persistence.mounts`        | (DEPRECATED) Please use extraVolumeMounts instead                            | `[]`            |
-| `persistence.uid`           | UID used for init-fs container                                               | `1000`          |
-| `persistence.guid`          | GUID used for init-fs container                                              | `0`             |
-| `emptyDir`                  | Configuration of resources for `emptyDir`                                    | `{}`            |
+| Parameter                   | Description                                       | Default         |
+| --------------------------- | ------------------------------------------------- | --------------- |
+| `persistence.enabled`       | Flag for enabling persistent storage              | `false`         |
+| `persistence.annotations`   | Kubernetes pvc annotations                        | `{}`            |
+| `persistence.existingClaim` | Do not create a new PVC but use this one          | `None`          |
+| `persistence.storageClass`  | Storage class to be used                          | `""`            |
+| `persistence.accessMode`    | Volumes access mode to be set                     | `ReadWriteOnce` |
+| `persistence.size`          | Size of the volume                                | `5Gi`           |
+| `persistence.volumes`       | (DEPRECATED) Please use extraVolumes instead      | `[]`            |
+| `persistence.mounts`        | (DEPRECATED) Please use extraVolumeMounts instead | `[]`            |
+| `persistence.uid`           | UID used for init-fs container                    | `1000`          |
+| `persistence.guid`          | GUID used for init-fs container                   | `0`             |
+| `emptyDir`                  | Configuration of resources for `emptyDir`         | `{}`            |
 
 ### JDBC Overwrite
 
-| Parameter                             | Description                                                                                                                                                  | Default                                    |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
-| `jdbcOverwrite.enable`                | (DEPRECATED) Enable JDBC overwrites for external Databases (disables `postgresql.enabled`) ,Please use jdbcOverwrite.enabled instead                         | `false`                                    |
-| `jdbcOverwrite.enabled`               | Enable JDBC overwrites for external Databases (disables `postgresql.enabled`)                                                                                | `false`                                    |
-| `jdbcOverwrite.jdbcUrl`               | The JDBC url to connect the external DB                                                                                                                      | `jdbc:postgresql://myPostgress/myDatabase` |
-| `jdbcOverwrite.jdbcUsername`          | The DB user that should be used for the JDBC connection                                                                                                      | `sonarUser`                                |
-| `jdbcOverwrite.jdbcPassword`          | The DB password that should be used for the JDBC connection (Use this if you don't mind the DB password getting stored in plain text within the values file) | `sonarPass`                                |
-| `jdbcOverwrite.jdbcSecretName`        | Alternatively, use a pre-existing k8s secret containing the DB password                                                                                      | `None`                                     |
-| `jdbcOverwrite.jdbcSecretPasswordKey` | If the pre-existing k8s secret is used this allows the user to overwrite the 'key' of the password property in the secret                                    | `None`                                     |
+| Parameter                                   | Description                                                                                                                                                    | Default                                    |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| `jdbcOverwrite.enable`                      | (DEPRECATED) Enable JDBC overwrites for external Databases (disables `postgresql.enabled`) ,Please use jdbcOverwrite.enabled instead                           | `false`                                    |
+| `jdbcOverwrite.enabled`                     | Enable JDBC overwrites for external Databases (disables `postgresql.enabled`)                                                                                  | `false`                                    |
+| `jdbcOverwrite.jdbcUrl`                     | The JDBC url to connect the external DB                                                                                                                        | `jdbc:postgresql://myPostgress/myDatabase` |
+| `jdbcOverwrite.jdbcUsername`                | The DB user that should be used for the JDBC connection                                                                                                        | `sonarUser`                                |
+| `jdbcOverwrite.jdbcPassword`                | (DEPRECATED) The DB password that should be used for the JDBC connection, please use `jdbcOverwrite.jdbcSecretName`  and `jdbcOverwrite.jdbcSecretPasswordKey` | `sonarPass`                                |
+| `jdbcOverwrite.jdbcSecretName`              | Alternatively, use a pre-existing k8s secret containing the DB password                                                                                        | `None`                                     |
+| `jdbcOverwrite.jdbcSecretPasswordKey`       | If the pre-existing k8s secret is used this allows the user to overwrite the 'key' of the password property in the secret                                      | `None`                                     |
+| `jdbcOverwrite.oracleJdbcDriver.url`        | The URL of the Oracle JDBC driver to be downloaded                                                                                                             | `None`                                     |
+| `jdbcOverwrite.oracleJdbcDriver.netrcCreds` | Name of the secret containing .netrc file to use creds when downloading the Oracle JDBC driver                                                                 | `None`                                     |
 
 ### Bundled PostgreSQL Chart (DEPRECATED)
 
@@ -511,36 +538,51 @@ The bundled PostgreSQL Chart is deprecated. Please see <https://artifacthub.io/p
 
 ### ServiceAccount
 
-| Parameter                       | Description                                                                          | Default               |
-| ------------------------------- | ------------------------------------------------------------------------------------ | --------------------- |
-| `serviceAccount.create`         | If set to true, create a serviceAccount                                              | `false`               |
-| `serviceAccount.name`           | Name of the serviceAccount to create/use                                             | `sonarqube-sonarqube` |
-| `serviceAccount.automountToken` | Manage `automountServiceAccountToken` field for mounting service account credentials | `false`               |
-| `serviceAccount.annotations`    | Additional serviceAccount annotations                                                | `{}`                  |
+| Parameter                       | Description                                                                                                                                                                                           | Default               |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| `serviceAccount.create`         | If set to true, create a service account                                                                                                                                                              | `false`               |
+| `serviceAccount.name`           | Name of the service account to create/use                                                                                                                                                             | `sonarqube-sonarqube` |
+| `serviceAccount.automountToken` | Manage `automountServiceAccountToken` field for mounting service account credentials. Please note that this will set the default value used by SQ Pods, regardless of the service account being used. | `false`               |
+| `serviceAccount.annotations`    | Additional service account annotations                                                                                                                                                                | `{}`                  |
 
 ### ExtraConfig
 
-| Parameter                | Description                                                                                                               | Default |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `extraConfig.secrets`    | A list of `Secret`s (which must contain key/value pairs) which may be loaded into the Scanner as environment variables    | `[]`    |
-| `extraConfig.configmaps` | A list of `ConfigMap`s (which must contain key/value pairs) which may be loaded into the Scanner as environment variables | `[]`    |
+| Parameter                | Description                                                 | Default |
+| ------------------------ | ----------------------------------------------------------- | ------- |
+| `extraConfig.secrets`    | A list of `Secret`s (which must contain key/value pairs)    | `[]`    |
+| `extraConfig.configmaps` | A list of `ConfigMap`s (which must contain key/value pairs) | `[]`    |
+
+### SetAdminPassword
+
+| Parameter                                    | Description                                                                                            | Default                                                                |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| `setAdminPassword.newPassword`               | Custom admin password                                                                                  | `AdminAdmin_12$`                                                       |
+| `setAdminPassword.currentPassword`           | Current admin password                                                                                 | `admin`                                                                |
+| `setAdminPassword.passwordSecretName`        | Secret containing `password` (custom password) and `currentPassword` (current password) keys for admin | `None`                                                                 |
+| `setAdminPassword.resources.requests.memory` | Memory request for Admin hook                                                                          | `128Mi`                                                                |
+| `setAdminPassword.resources.requests.cpu`    | CPU request for Admin hook                                                                             | `100m`                                                                 |
+| `setAdminPassword.resources.limits.memory`   | Memory limit for Admin hook                                                                            | `128Mi`                                                                |
+| `setAdminPassword.resources.limits.cpu`      | CPU limit for Admin hook                                                                               | `100m`                                                                 |
+| `setAdminPassword.securityContext`           | SecurityContext for change-password-hook                                                               | [Restricted podSecurityStandard](#kubernetes---pod-security-standards) |
+| `setAdminPassword.image`                     | Curl container image                                                                                   | `"image.repository":"image.tag"`                                       |
+| `setAdminPassword.annotations`               | Custom annotations for admin hook Job                                                                  | `{}`                                                                   |
 
 ### Advanced Options
 
-| Parameter                           | Description                                                                                                  | Default                                                                |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| `account.adminPassword`             | Custom admin password                                                                                        | `admin`                                                                |
-| `account.currentAdminPassword`      | Current admin password                                                                                       | `admin`                                                                |
-| `account.adminPasswordSecretName`   | Secret containing `password` (custom password) and `currentPassword` (current password) keys for admin       | `None`                                                                 |
-| `account.resources.requests.memory` | Memory request for Admin hook                                                                                | `128Mi`                                                                |
-| `account.resources.requests.cpu`    | CPU request for Admin hook                                                                                   | `100m`                                                                 |
-| `account.resources.limits.memory`   | Memory limit for Admin hook                                                                                  | `128Mi`                                                                |
-| `account.resources.limits.cpu`      | CPU limit for Admin hook                                                                                     | `100m`                                                                 |
-| `account.sonarWebContext`           | (DEPRECATED) SonarQube web context for Admin hook. please use sonarWebContext at the value top level instead | `nil`                                                                  |
-| `account.securityContext`           | SecurityContext for change-password-hook                                                                     | [Restricted podSecurityStandard](#kubernetes---pod-security-standards) |
-| `curlContainerImage`                | Curl container image                                                                                         | `"image.repository":"image.tag"`                                       |
-| `adminJobAnnotations`               | Custom annotations for admin hook Job                                                                        | `{}`                                                                   |
-| `terminationGracePeriodSeconds`     | Configuration of `terminationGracePeriodSeconds`                                                             | `60`                                                                   |
+| Parameter                           | Description                                                                                                                                                                    | Default                                                                |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| `account.adminPassword`             | (DEPRECATED) Custom admin password. Please use `setAdminPassword.newPassword` instead.                                                                                         | `AdminAdmin_12$`                                                       |
+| `account.currentAdminPassword`      | (DEPRECATED) Current admin password. Please use `setAdminPassword.currentPassword` instead.                                                                                    | `admin`                                                                |
+| `account.adminPasswordSecretName`   | (DEPRECATED) Secret containing `password` (custom password) and `currentPassword` (current password) keys for admin. Please use `setAdminPassword.passwordSecretName` instead. | `None`                                                                 |
+| `account.resources.requests.memory` | (DEPRECATED) Memory request for Admin hook. Please use `setAdminPassword.resources.requests.memory` instead.                                                                   | `128Mi`                                                                |
+| `account.resources.requests.cpu`    | (DEPRECATED) CPU request for Admin hook. Please use `setAdminPassword.resources.requests.cpu` instead.                                                                         | `100m`                                                                 |
+| `account.resources.limits.memory`   | (DEPRECATED) Memory limit for Admin hook. Please use `setAdminPassword.resources.limits.memory` instead.                                                                       | `128Mi`                                                                |
+| `account.resources.limits.cpu`      | (DEPRECATED) CPU limit for Admin hook. Please use `setAdminPassword.resources.limits.cpu` instead.                                                                             | `100m`                                                                 |
+| `account.sonarWebContext`           | (DEPRECATED) SonarQube web context for Admin hook. Please use `sonarWebContext` at the value top level instead                                                                 | `nil`                                                                  |
+| `account.securityContext`           | (DEPRECATED) SecurityContext for change-password-hook. Please use `setAdminPassword.securityContext` instead.                                                                  | [Restricted podSecurityStandard](#kubernetes---pod-security-standards) |
+| `curlContainerImage`                | (DEPRECATED) Curl container image. Please use `setAdminPassword.image` instead.                                                                                                | `"image.repository":"image.tag"`                                       |
+| `adminJobAnnotations`               | (DEPRECATED) Custom annotations for admin hook Job. Please use `setAdminPassword.annotations` instead.                                                                         | `{}`                                                                   |
+| `terminationGracePeriodSeconds`     | Configuration of `terminationGracePeriodSeconds`                                                                                                                               | `60`                                                                   |
 
 You can also configure values for the PostgreSQL database via the PostgreSQL [Chart](https://hub.helm.sh/charts/bitnami/postgresql)
 
@@ -580,7 +622,7 @@ In environments with air-gapped setup, especially with internal tooling (repos) 
 
 Since SonarQube comes bundled with an Elasticsearch instance, some [bootstrap checks](https://www.elastic.co/guide/en/elasticsearch/reference/master/bootstrap-checks.html) of the host settings are done at start.
 
-This chart offers the option to use an initContainer in privilaged mode to automatically set certain kernel settings on the kube worker. While this can ensure proper functionality of Elasticsearch, modifying the underlying kernel settings on the Kubernetes node can impact other users. It may be best to work with your cluster administrator to either provide specific nodes with the proper kernel settings, or ensure they are set cluster wide.
+This chart offers the option to use an initContainer in privileged mode to automatically set certain kernel settings on the kube worker. While this can ensure proper functionality of Elasticsearch, modifying the underlying kernel settings on the Kubernetes node can impact other users. It may be best to work with your cluster administrator to either provide specific nodes with the proper kernel settings, or ensure they are set cluster wide.
 
 To enable auto-configuration of the kube worker node, set `elasticsearch.configureNode` to `true`. This is the default behavior, so you do not need to explicitly set this.
 

@@ -1,18 +1,20 @@
-# Default values for sonarqube.
+# Default values for SonarQube.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# If the deployment Type is set to Deployment sonarqube is deployed as a replica set.
+# (DEPRECATED) If the deployment Type is set to Deployment SonarQube is deployed as a replica set.
+# This will be removed in a future release.
 deploymentType: "StatefulSet"
 
-# There should not be more than 1 sonarqube instance connected to the same database. Please set this value to 1 or 0 (in case you need to scale down programmatically).
+# There should not be more than 1 SonarQube instance connected to the same database. Please set this value to 1 or 0 (in case you need to scale down programmatically).
 replicaCount: 1
 
 # How many revisions to retain (Deployment ReplicaSets or StatefulSets)
 revisionHistoryLimit: 10
 
-# This will use the default deployment strategy unless it is overriden
-deploymentStrategy: {}
+# (DEPRECATED) This will use the default deployment strategy unless it is overridden
+deploymentStrategy:
+  type: Recreate
 # Uncomment this to scheduler pods on priority
 # priorityClassName: "high-priority"
 
@@ -46,11 +48,18 @@ OpenShift:
     # labels:
     #  external: 'true'
 
+# (DEPRECATED) The "community" value as the default of "edition" is deprecated and will be removed in the next release (in favor of an empty value). Please set "community" to "true", if you want to use SonarQube Community Build.
 edition: "community"
+
+# Set the chart to use the latest released SonarQube Community Build
+community:
+  enabled: true
+  buildNumber: "24.12.0.100206"
 
 image:
   repository: sonarqube
-  tag: 10.7.0-{{ .Values.edition }}
+  # (DEPRECATED) The "image.tag" parameter will be set to be empty as default.
+  tag: 10.8.0-{{ .Values.edition }}
   pullPolicy: IfNotPresent
   # If using a private repository, the imagePullSecrets to use
   # pullSecrets:
@@ -78,7 +87,7 @@ containerSecurityContext:
 
 # Settings to configure elasticsearch host requirements
 elasticsearch:
-  # DEPRECATED: Use initSysctl.enabled instead
+  # (DEPRECATED) Use initSysctl.enabled instead
   configureNode: false
   bootstrapChecks: true
 
@@ -135,6 +144,7 @@ ingress-nginx:
 httproute:
   enabled: false
   # gateway: my-gateway
+  # gatewayNamespace: my-gateway-namespace # optional
   # labels:
   #   somelabel: somevalue
   # hostnames:
@@ -214,7 +224,7 @@ readinessProbe:
     - |
       #!/bin/bash
       # A Sonarqube container is considered ready if the status is UP, DB_MIGRATION_NEEDED or DB_MIGRATION_RUNNING
-      # status about migration are added to prevent the node to be kill while sonarqube is upgrading the database.
+      # status about migration are added to prevent the node to be kill while SonarQube is upgrading the database.
       if wget --no-proxy -qO- http://localhost:{{ .Values.service.internalPort }}{{ .Values.readinessProbe.sonarWebContext | default (include "sonarqube.webcontext" .) }}api/system/status | grep -q -e '"status":"UP"' -e '"status":"DB_MIGRATION_NEEDED"' -e '"status":"DB_MIGRATION_RUNNING"'; then
         exit 0
       fi
@@ -258,7 +268,8 @@ startupProbe:
   # sonarWebContext: /
 
 initContainers:
-  # image: busybox:1.36
+  # all initContainers use SonarQube image by default, but you can override it by setting the image field (ex image: ubuntu:24.04)
+  # image:
   # Set the security context for the init containers
   # The current section contains the default values set in a generic Kubernetes cluster. If you are using OpenShift, you should not set any specific UID or GID to be used for the execution.
   # We allow the init containers to have a separate security context declaration because
@@ -281,7 +292,7 @@ initContainers:
 # Extra init containers to e.g. download required artifacts
 extraInitContainers: {}
 
-## Array of extra containers to run alongside the sonarqube container
+## Array of extra containers to run alongside the SonarQube container
 ##
 ## Example:
 ## - name: myapp-container
@@ -312,7 +323,8 @@ initSysctl:
   fsFileMax: 131072
   nofile: 131072
   nproc: 8192
-  # image: busybox:1.36
+  # all initContainers use SonarQube image by default, but you can override it by setting the image field (ex image: ubuntu:24.04)
+  # image:
   securityContext:
     # Compatible with podSecurity standard privileged
     privileged: true
@@ -324,7 +336,8 @@ initSysctl:
 # This should not be required anymore, used to chown/chmod folder created by faulty CSI driver that are not applying properly POSIX fsgroup.
 initFs:
   enabled: true
-  # Image: busybox:1.36
+  # all initContainers use SonarQube image by default, but you can override it by setting the image field (ex image: ubuntu:24.04)
+  # image:
   # Compatible with podSecurity standard baseline.
   securityContext:
     privileged: false
@@ -435,7 +448,7 @@ monitoringPasscode: "define_it"
 # Set annotations for pods
 annotations: {}
 
-## We usually don't make specific resource recommendations, as they are heavily dependend on
+## We usually don't make specific resource recommendations, as they are heavily dependant on
 ## the usage of SonarQube and the surrounding infrastructure.
 ## Those default are based on the default Web -Xmx1G -Xms128m and CE -Xmx2G -Xms128m and Search -Xmx2G -Xms2G settings of SQ sub processes
 ## Adjust these values to your needs, you can find more details on the main README of the chart.
@@ -493,7 +506,7 @@ emptyDir: {}
 # Additional sonar properties to load from a secret with a key "secret.properties" (must be a string)
 # sonarSecretProperties:
 
-# Kubernetes secret that contains the encryption key for the sonarqube instance.
+# Kubernetes secret that contains the encryption key for the SonarQube instance.
 # The secret must contain the key 'sonar-secret.txt'.
 # The 'sonar.secretKeyPath' property will be set automatically.
 # sonarSecretKey: "settings-encryption-secret"
@@ -510,11 +523,17 @@ jdbcOverwrite:
   # The DB user that should be used for the JDBC connection
   jdbcUsername: "sonarUser"
   # Use this if you don't mind the DB password getting stored in plain text within the values file
+  # (DEPRECATED) Please use `jdbcOverwrite.jdbcSecretName` along with `jdbcOverwrite.jdbcSecretPasswordKey` instead
   jdbcPassword: "sonarPass"
   ## Alternatively, use a pre-existing k8s secret containing the DB password
   # jdbcSecretName: "sonarqube-jdbc"
   ## and the secretValueKey of the password found within that secret
   # jdbcSecretPasswordKey: "jdbc-password"
+  # To install the oracle JDBC driver, set the following URL (in this example, we set the URL for the Oracle 11 driver. Please update it to your target driver URL.).
+  # If downloading the driver requires authentication, please set the .netrc secret file with a key "netrc" to use basic auth.
+  # oracleJdbcDriver:
+  #   url: "https://download.oracle.com/otn-pub/otn_software/jdbc/2113/ojdbc11.jar"
+  #   netrcCreds: ""
 
 ## (DEPRECATED) Configuration values for postgresql dependency
 ## ref: https://github.com/bitnami/charts/blob/master/bitnami/postgresql/README.md
@@ -588,8 +607,7 @@ postgresql:
 # podLabels:
 #   key: value
 podLabels: {}
-# For compatibility with 8.0 replace by "/opt/sq"
-# For compatibility with 8.2, leave the default. They changed it back to /opt/sonarqube
+# (DEPRECATED) this field will be removed, as it needs to match the SonarQube image folder structure, considering we have one chart version per docker image version this field is not needed anymore.
 sonarqubeFolder: /opt/sonarqube
 
 tests:
@@ -609,7 +627,7 @@ tests:
 serviceAccount:
   create: false
   # name:
-  # automountToken: false # default
+  automountToken: false
   ## Annotations for the Service Account
   annotations: {}
 
@@ -636,9 +654,30 @@ extraConfig:
   secrets: []
   configmaps: []
 
+# setAdminPassword:
+# The values can be set to define the current and the (new) custom admin passwords at the startup (the username will remain "admin")
+#  newPassword: AdminAdmin_12$
+#  currentPassword: admin
+# The above values can be also provided by a secret that contains "password" and "currentPassword" as keys. You can generate such a secret in your cluster
+# using "kubectl create secret generic admin-password-secret-name --from-literal=password=admin --from-literal=currentPassword=admin"
+#  passwordSecretName: ""
+# Reuse default initcontainers.securityContext that match restricted pod security standard
+#  securityContext: {}
+#  resources:
+#    limits:
+#      cpu: 100m
+#      memory: 128Mi
+#    requests:
+#      cpu: 100m
+#      memory: 128Mi
+#  image:
+#  annotations: {}
+
+
+# (DEPRECATED) please use setAdminPassword instead
 # account:
 # The values can be set to define the current and the (new) custom admin passwords at the startup (the username will remain "admin")
-#   adminPassword: admin
+#   adminPassword: AdminAdmin_12$
 #   currentAdminPassword: admin
 # The above values can be also provided by a secret that contains "password" and "currentPassword" as keys. You can generate such a secret in your cluster
 # using "kubectl create secret generic admin-password-secret-name --from-literal=password=admin --from-literal=currentPassword=admin"
@@ -652,9 +691,12 @@ extraConfig:
 #     requests:
 #       cpu: 100m
 #       memory: 128Mi
+# (DEPRECATED) please use setAdminPassword.image instead
 # curlContainerImage: curlimages/curl:8.2.1
+# (DEPRECATED) please use setAdminPassword.annotations instead
 # adminJobAnnotations: {}
 # deprecated please use sonarWebContext at the value top level
 #   sonarWebContext: /
 
+# (DEPRECATED) This value is not used in the templates.
 terminationGracePeriodSeconds: 60

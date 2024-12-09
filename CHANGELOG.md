@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated sonarqube from version 10.7.0+3598 to 10.8.0
 - Updated sealed-secrets from version 2.16.2 to 2.17.0
 - Updated aws-efs-csi-driver from version 3.0.8 to 3.1.2
 

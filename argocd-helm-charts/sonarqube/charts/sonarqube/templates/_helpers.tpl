@@ -34,6 +34,8 @@ Selector labels
 {{- define "sonarqube.selectorLabels" -}}
 app: {{ include "sonarqube.name" . }}
 release: {{ .Release.Name }}
+app.kubernetes.io/name: {{ .Release.Name }}
+app.kubernetes.io/version: {{ (tpl .Values.image.tag .) | trunc 63 | trimSuffix "-" | quote }}
 {{- end -}}
 
 {{/*
@@ -41,19 +43,34 @@ Workload labels (Deployment or StatefulSet)
 */}}
 {{- define "sonarqube.workloadLabels" -}}
 {{- include "sonarqube.labels" . }}
-app.kubernetes.io/name: {{ include "sonarqube.name" . }}-{{ include "sonarqube.fullname" . }}
+app.kubernetes.io/name: {{ .Release.Name }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/part-of: sonarqube
 app.kubernetes.io/component: {{ include "sonarqube.fullname" . }}
-app.kubernetes.io/version: {{ (tpl .Values.image.tag .) | trunc 63 | trimSuffix "-" | quote }}
+app.kubernetes.io/version: {{ (tpl (include "image.tag" .) . ) | trunc 63 | trimSuffix "-" | quote }}
 {{- end -}}
 
 {{/*
 Expand the Application Image name.
 */}}
 {{- define "sonarqube.image" -}}
-{{- printf "%s:%s" .Values.image.repository (tpl .Values.image.tag .) }}
+{{- printf "%s:%s" .Values.image.repository (tpl (include "image.tag" .) .) }}
+{{- end -}}
+
+{{/*
+  Define the image.tag value that computes the right tag to be used as `sonarqube.image`
+*/}}
+{{- define "image.tag" -}}
+{{- if empty .Values.image.tag -}}
+{{- if and (not (empty .Values.edition)) (or (eq .Values.edition "developer") (eq .Values.edition "enterprise")) -}}
+{{- printf "%s-%s"  .Chart.AppVersion .Values.edition -}}
+{{- else if or (.Values.community.enabled) (and (not (empty .Values.edition)) (eq .Values.edition "community"))  -}}
+{{- printf "%s-%s" .Values.community.buildNumber "community" -}}
+{{- end -}}
+{{- else -}}
+{{- .Values.image.tag -}}
+{{- end -}}
 {{- end -}}
 
 {{/*
@@ -375,4 +392,45 @@ Remove incompatible user/group values that do not work in Openshift out of the b
         path: {{ .Values.caCerts.configMap.path }}
   {{- end -}}
 {{- end -}}
+{{- end -}}
+
+{{/*
+  This helper deeply merges two maps (structs). It recursively merges nested maps and takes the values from `map2` when keys overlap.
+*/}}
+{{- define "deepMerge" -}}
+{{- $map1 := .map1 -}}
+{{- $map2 := .map2 -}}
+
+{{- $result := dict -}}
+
+{{- /* Merge keys from map1 */}}
+{{- range $key, $value := $map1 -}}
+  {{- $_ := set $result $key $value -}}
+{{- end -}}
+
+{{- /* Merge keys from map2 (overriding map1 if the key exists) */}}
+{{- range $key, $value := $map2 -}}
+  {{- if hasKey $map1 $key -}}
+    {{- /* If both maps have the same key and the value is a map, we need to merge recursively */}}
+    {{- if and (kindIs "map" $value) (kindIs "map" (index $map1 $key)) -}}
+      {{- $_ := set $result $key (fromYaml (include "deepMerge" (dict "map1" (index $map1 $key) "map2" $value))) -}}
+    {{- else -}}
+      {{- /* Otherwise, just take the value from map2 */}}
+      {{- $_ := set $result $key $value -}}
+    {{- end -}}
+  {{- else -}}
+    {{- /* If map2 has a key not in map1, just add it to the result */}}
+    {{- $_ := set $result $key $value -}}
+  {{- end -}}
+{{- end -}}
+
+{{- toYaml $result -}}
+{{- end -}}
+
+{{- define "accountDeprecation" -}}
+{{- $map1 := .Values.setAdminPassword -}}
+{{- $map2 := .Values.account -}}
+
+{{- $accountDeprecation := (include "deepMerge" (dict "map1" $map1 "map2" $map2)) -}}
+{{- $accountDeprecation }}
 {{- end -}}

@@ -4,6 +4,17 @@
         "replicaCount"
     ],
     "properties": {
+        "edition": {
+            "type": "string",
+            "enum": ["community", "developer", "enterprise"],
+            "properties": {
+                "community": {
+                    "type": "string",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) Please use `community.enabled` instead"
+                }
+            }
+        },
         "persistence": {
             "type": "object",
             "properties": {
@@ -47,6 +58,11 @@
                     "type": "boolean",
                     "deprecated": true,
                     "$comment": "(DEPRECATED) Please use `jdbcOverwrite.enabled` instead"
+                },
+                "jdbcPassword": {
+                    "type": "string",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) Please use `jdbcOverwrite.jdbcSecretName` along with `jdbcOverwrite.jdbcSecretPasswordKey` instead"
                 }
             }
         },
@@ -126,11 +142,66 @@
         },
         "account": {
             "type": "object",
+            "deprecated": true,
+            "$comment": "(DEPRECATED) Please use `setAdminPassword` instead",
             "properties": {
+                "adminPassword": {
+                    "type": "string",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) please use `setAdminPassword.newPassword` at the value top level"
+                },
+                "currentAdminPassword": {
+                    "type": "string",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) please use `setAdminPassword.currentPassword` at the value top level"
+                },
+                "adminPasswordSecretName": {
+                    "type": "string",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) please use `setAdminPassword.passwordSecretName` at the value top level"
+                },
                 "sonarWebContext": {
                     "type": "string",
                     "deprecated": true,
                     "$comment": "(DEPRECATED) please use sonarWebContext at the value top level"
+                }
+            }
+        },
+        "deploymentType": {
+            "type": "string",
+            "deprecated": true,
+            "$comment": "(DEPRECATED) this option will be removed in the next major release"
+        },
+        "curlContainerImage":
+        {
+            "type": "string",
+            "deprecated": true,
+            "$comment": "(DEPRECATED) please use `setAdminPassword.image` at the value top level"
+        },
+        "adminJobAnnotations":
+        {
+            "type": "object",
+            "deprecated": true,
+            "$comment": "(DEPRECATED) please use `setAdminPassword.annotations` at the value top level"
+        },
+        "sonarqubeFolder":
+        {
+            "type": "string",
+            "deprecated": true,
+            "$comment": "(DEPRECATED) This value will is no longer required and will be dropped in future releases"
+        },
+        "terminationGracePeriodSeconds": {
+            "type": "integer",
+            "deprecated": true,
+            "$comment": "(DEPRECATED) This value is not used in the templates"
+        },
+        "deploymentStrategy": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "deprecated": true,
+                    "$comment": "(DEPRECATED) This will be removed in future releases and set to `Recreate`"
                 }
             }
         }
