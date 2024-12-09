@@ -232,8 +232,8 @@ function update_helm_chart {
             mv "$tar_file" "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz"
 
             # Untar the tgz file
-            tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_UPSTREAM_CHART_VERSION.tgz" || {
-              echo "Failed to extract $HELM_CHART_NAME-$HELM_UPSTREAM_CHART_VERSION.tgz. Skipping."
+            tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz" || {
+              echo "Failed to extract $HELM_CHART_NAME-$HELM_CHART_VERSION.tgz. Skipping."
               continue
             }
 
