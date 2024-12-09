@@ -120,6 +120,8 @@ core:  # @schema additionalProperties: false
 
 # Traefik experimental features
 experimental:
+  # -- Defines whether all plugins must be loaded successfully for Traefik to start
+  abortOnPluginFailure: false
   # -- Enable traefik experimental plugins
   plugins: {}
   # demo:
@@ -807,7 +809,7 @@ persistence:
 certificatesResolvers: {}
 
 # -- If hostNetwork is true, runs traefik in the host network namespace
-# To prevent unschedulabel pods due to port collisions, if hostNetwork=true
+# To prevent unschedulable pods due to port collisions, if hostNetwork=true
 # and replicas>1, a pod anti-affinity is recommended and will be set if the
 # affinity is left as default.
 hostNetwork: false

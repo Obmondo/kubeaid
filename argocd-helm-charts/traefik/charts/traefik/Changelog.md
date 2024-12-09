@@ -1,5 +1,90 @@
 # Change Log
 
+## 33.1.0  ![AppVersion: v3.2.1](https://img.shields.io/static/v1?label=AppVersion&message=v3.2.1&color=success&logo=) ![Kubernetes: >=1.22.0-0](https://img.shields.io/static/v1?label=Kubernetes&message=%3E%3D1.22.0-0&color=informational&logo=kubernetes) ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+**Release date:** 2024-11-26
+
+* fix: :bug: support specifying plugins storage
+* fix(Traefik): support for entrypoint option on allowACMEByPass
+* fix(Traefik Proxy): allowEmptyServices not disabled when set to false
+* fix(Traefik Hub): compatibility with Traefik Proxy v3.2
+* fix(KubernetesCRD): 🐛 IngressClass should be readable even when kubernetesIngress is disabled
+* feat(deps): update traefik docker tag to v3.2.1
+* feat(Traefik Proxy): add `abortOnPluginFailure` field
+* feat(Traefik Hub): add APICatalogItem and ManagedSubscription support
+* docs: 📚️ fix typos in values and readme
+* chore(release): 🚀 publish v33.1.0-rc1
+
+### Default value changes
+
+```diff
+diff --git a/traefik/values.yaml b/traefik/values.yaml
+index be89b00..9b4379c 100644
+--- a/traefik/values.yaml
++++ b/traefik/values.yaml
+@@ -120,6 +120,8 @@ core:  # @schema additionalProperties: false
+ 
+ # Traefik experimental features
+ experimental:
++  # -- Defines whether all plugins must be loaded successfully for Traefik to start
++  abortOnPluginFailure: false
+   # -- Enable traefik experimental plugins
+   plugins: {}
+   # demo:
+@@ -807,7 +809,7 @@ persistence:
+ certificatesResolvers: {}
+ 
+ # -- If hostNetwork is true, runs traefik in the host network namespace
+-# To prevent unschedulabel pods due to port collisions, if hostNetwork=true
++# To prevent unschedulable pods due to port collisions, if hostNetwork=true
+ # and replicas>1, a pod anti-affinity is recommended and will be set if the
+ # affinity is left as default.
+ hostNetwork: false
+```
+
+
+## 33.1.0-rc1  ![AppVersion: v3.2.1](https://img.shields.io/static/v1?label=AppVersion&message=v3.2.1&color=success&logo=) ![Kubernetes: >=1.22.0-0](https://img.shields.io/static/v1?label=Kubernetes&message=%3E%3D1.22.0-0&color=informational&logo=kubernetes) ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
+
+**Release date:** 2024-11-26
+
+* fix: :bug: support specifying plugins storage
+* fix(Traefik): support for entrypoint option on allowACMEByPass
+* fix(Traefik Proxy): allowEmptyServices not disabled when set to false
+* fix(Traefik Hub): compatibility with Traefik Proxy v3.2
+* fix(KubernetesCRD): 🐛 IngressClass should be readable even when kubernetesIngress is disabled
+* feat(deps): update traefik docker tag to v3.2.1
+* feat(Traefik Proxy): add `abortOnPluginFailure` field
+* feat(Traefik Hub): add APICatalogItem and ManagedSubscription support
+* docs: 📚️ fix typos in values and readme
+* chore(release): 🚀 publish v33.1.0-rc1
+
+### Default value changes
+
+```diff
+diff --git a/traefik/values.yaml b/traefik/values.yaml
+index be89b00..9b4379c 100644
+--- a/traefik/values.yaml
++++ b/traefik/values.yaml
+@@ -120,6 +120,8 @@ core:  # @schema additionalProperties: false
+ 
+ # Traefik experimental features
+ experimental:
++  # -- Defines whether all plugins must be loaded successfully for Traefik to start
++  abortOnPluginFailure: false
+   # -- Enable traefik experimental plugins
+   plugins: {}
+   # demo:
+@@ -807,7 +809,7 @@ persistence:
+ certificatesResolvers: {}
+ 
+ # -- If hostNetwork is true, runs traefik in the host network namespace
+-# To prevent unschedulabel pods due to port collisions, if hostNetwork=true
++# To prevent unschedulable pods due to port collisions, if hostNetwork=true
+ # and replicas>1, a pod anti-affinity is recommended and will be set if the
+ # affinity is left as default.
+ hostNetwork: false
+```
+
 ## 33.0.0  ![AppVersion: v3.2.0](https://img.shields.io/static/v1?label=AppVersion&message=v3.2.0&color=success&logo=) ![Kubernetes: >=1.22.0-0](https://img.shields.io/static/v1?label=Kubernetes&message=%3E%3D1.22.0-0&color=informational&logo=kubernetes) ![Helm: v3](https://img.shields.io/static/v1?label=Helm&message=v3&color=informational&logo=helm)
 
 **Release date:** 2024-10-30
@@ -28,17 +113,19 @@
 There are multiple breaking changes in this release:
 
 1. The default port of `traefik` entrypoint has changed from `9000` to `8080`, just like the Traefik Proxy default port
-  * You _may_ have to update probes accordingly (or set this port back to 9000)
+   * You _may_ have to update probes accordingly (or set this port back to 9000)
 2. `publishedService` is enabled by default on Ingress provider
-  * You _can_ disable it, if needed
+   * You _can_ disable it, if needed
 3. The `POD_NAME` and `POD_NAMESPACE` environment variables are now set by default, without values.
-  * It is no longer necessary to add them in values and so, it can be removed from user values.
+   * It is no longer necessary to add them in values and so, it can be removed from user values.
 4. In _values_, **certResolvers** specific syntax has been reworked to align with Traefik Proxy syntax.
-  * PR [#1214](https://github.com/traefik/traefik-helm-chart/pull/1214) contains a complete before / after example on how to update _values_
-5. Traefik Proxy 3.2 supports Gateway API v1.2
-  * The CRDs of this version comes with Gateway API CRD v1.2 of standard channel.
-  * The CRDs needs to be updated, as documented in the README.
-  * It is recommended to check that other software using Gateway API on your cluster are compatible
+   * PR [#1214](https://github.com/traefik/traefik-helm-chart/pull/1214) contains a complete before / after example on how to update _values_
+5. Traefik Proxy 3.2 supports Gateway API v1.2 (standard channel)
+   * It is recommended to check that other software using Gateway API on your cluster are compatible
+   * There is a breaking change on CRD upgrade in this version, it _may_ do not work out of the box
+   * See [release notes](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v1.2.0) of gateway API v1.2 on how to upgrade their CRDs and avoid issues about invalid values on v1alpha2 version
+
+The CRDs needs to be updated, as documented in the README.
 
 :information_source: A separate helm chart, just for CRDs, is being considered for a future release. See PR [#1123](https://github.com/traefik/traefik-helm-chart/pull/1223)
 

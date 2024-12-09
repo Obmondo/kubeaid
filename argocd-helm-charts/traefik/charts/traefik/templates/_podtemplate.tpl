@@ -156,7 +156,7 @@
             mountPath: {{ .mountPath }}
             readOnly: true
           {{- end }}
-          {{- if gt (len .Values.experimental.plugins) 0 }}
+          {{- if and (gt (len .Values.experimental.plugins) 0) (ne (include "traefik.hasPluginsVolume" .Values.deployment.additionalVolumes) "true") }}
           - name: plugins
             mountPath: "/plugins-storage"
           {{- end }}
@@ -448,6 +448,9 @@
           - "--experimental.plugins.{{ $pluginName }}.moduleName={{ $plugin.moduleName }}"
           - "--experimental.plugins.{{ $pluginName }}.version={{ $plugin.version }}"
           {{- end }}
+          {{- if and (semverCompare ">=3.2.1-0" $version) (.Values.experimental.abortOnPluginFailure)}}
+          - "--experimental.abortonpluginfailure={{ .Values.experimental.abortOnPluginFailure }}"
+          {{- end }}
           {{- if .Values.providers.kubernetesCRD.enabled }}
           - "--providers.kubernetescrd"
            {{- if .Values.providers.kubernetesCRD.labelSelector }}
@@ -462,8 +465,10 @@
            {{- if .Values.providers.kubernetesCRD.allowExternalNameServices }}
           - "--providers.kubernetescrd.allowExternalNameServices=true"
            {{- end }}
-           {{- if .Values.providers.kubernetesCRD.allowEmptyServices }}
-          - "--providers.kubernetescrd.allowEmptyServices=true"
+           {{- if ne .Values.providers.kubernetesCRD.allowEmptyServices nil }}
+            {{- with .Values.providers.kubernetesCRD.allowEmptyServices | toString }}
+          - "--providers.kubernetescrd.allowEmptyServices={{ . }}"
+            {{- end }}
            {{- end }}
            {{- if and .Values.rbac.namespaced (semverCompare ">=3.1.2-0" $version) }}
           - "--providers.kubernetescrd.disableClusterScopeResources=true"
@@ -477,8 +482,10 @@
            {{- if .Values.providers.kubernetesIngress.allowExternalNameServices }}
           - "--providers.kubernetesingress.allowExternalNameServices=true"
            {{- end }}
-           {{- if .Values.providers.kubernetesIngress.allowEmptyServices }}
-          - "--providers.kubernetesingress.allowEmptyServices=true"
+           {{- if ne .Values.providers.kubernetesIngress.allowEmptyServices nil }}
+            {{- with .Values.providers.kubernetesIngress.allowEmptyServices | toString }}
+          - "--providers.kubernetesingress.allowEmptyServices={{ . }}"
+            {{- end }}
            {{- end }}
            {{- if and .Values.service.enabled .Values.providers.kubernetesIngress.publishedService.enabled }}
           - "--providers.kubernetesingress.ingressendpoint.publishedservice={{ template "providers.kubernetesIngress.publishedServicePath" . }}"
@@ -599,7 +606,7 @@
               {{- if (semverCompare "<3.1.3-0" $version) }}
                 {{- fail "ERROR: allowACMEByPass has been introduced with Traefik v3.1.3+" -}}
               {{- end }}
-          - "--entryPoints.name.allowACMEByPass=true"
+          - "--entryPoints.{{ $entrypoint }}.allowACMEByPass=true"
             {{- end }}
             {{- if $config.forwardedHeaders }}
               {{- if $config.forwardedHeaders.trustedIPs }}
@@ -812,7 +819,7 @@
         {{- if .Values.deployment.additionalVolumes }}
           {{- toYaml .Values.deployment.additionalVolumes | nindent 8 }}
         {{- end }}
-        {{- if gt (len .Values.experimental.plugins) 0 }}
+        {{- if and (gt (len .Values.experimental.plugins) 0) (ne (include "traefik.hasPluginsVolume" .Values.deployment.additionalVolumes) "true") }}
         - name: plugins
           emptyDir: {}
         {{- end }}
