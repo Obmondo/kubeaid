@@ -1,16 +1,14 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 2024-12-09
-### Major Version Upgrades %%^^
-
-### Minor Version Upgrades %%^^
+## 6.3.0
+### Minor Version Upgrades
 - Updated traefik from version 33.0.0 to 33.1.0
 - Updated sonarqube from version 10.7.0+3598 to 10.8.0
 - Updated sealed-secrets from version 2.16.2 to 2.17.0
 - Updated aws-efs-csi-driver from version 3.0.8 to 3.1.2
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
 - Updated teleport-kube-agent from version 17.0.2 to 17.0.4
 - Updated teleport-cluster from version 17.0.2 to 17.0.4
 - Added strimzi-kafka-operator from version 0.38.0 to 0.38.0
