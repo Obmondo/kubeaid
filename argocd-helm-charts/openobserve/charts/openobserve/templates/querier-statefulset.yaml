@@ -77,14 +77,21 @@ spec:
             httpGet:
               path: /healthz
               port: {{ .Values.config.ZO_HTTP_PORT }}
-            initialDelaySeconds: {{ .Values.probes.querier.initialDelaySeconds | default 10 }}
-            failureThreshold: {{ .Values.probes.querier.failureThreshold | default 3 }}
+            initialDelaySeconds: {{ .Values.probes.querier.config.livenessProbe.initialDelaySeconds | default 10 }}
+            periodSeconds: {{ .Values.probes.querier.config.livenessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.probes.querier.config.livenessProbe.timeoutSeconds | default 10 }}
+            successThreshold: {{ .Values.probes.querier.config.livenessProbe.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.probes.querier.config.livenessProbe.failureThreshold | default 3 }}
+            terminationGracePeriodSeconds: {{ .Values.probes.querier.config.livenessProbe.terminationGracePeriodSeconds | default 30 }}
           readinessProbe:
             httpGet:
               path: /healthz
               port: {{ .Values.config.ZO_HTTP_PORT }}
-            initialDelaySeconds: {{ .Values.probes.querier.initialDelaySeconds | default 10 }}
-            failureThreshold: {{ .Values.probes.querier.failureThreshold | default 3 }}
+            initialDelaySeconds: {{ .Values.probes.querier.config.readinessProbe.initialDelaySeconds | default 10 }}
+            periodSeconds: {{ .Values.probes.querier.config.readinessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.probes.querier.config.readinessProbe.timeoutSeconds | default 10 }}
+            successThreshold: {{ .Values.probes.querier.config.readinessProbe.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.probes.querier.config.readinessProbe.failureThreshold | default 3 }}
           {{- end }}
           resources:
             {{- toYaml .Values.resources.querier | nindent 12 }}

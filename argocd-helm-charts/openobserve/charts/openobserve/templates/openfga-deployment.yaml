@@ -53,6 +53,27 @@ spec:
               name: http
             - containerPort: 8081
               name: grpc
+          {{- if .Values.probes.openfga.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.config.ZO_HTTP_PORT }}
+            initialDelaySeconds: {{ .Values.probes.openfga.config.livenessProbe.initialDelaySeconds | default 10 }}
+            periodSeconds: {{ .Values.probes.openfga.config.livenessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.probes.openfga.config.livenessProbe.timeoutSeconds | default 10 }}
+            successThreshold: {{ .Values.probes.openfga.config.livenessProbe.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.probes.openfga.config.livenessProbe.failureThreshold | default 3 }}
+            terminationGracePeriodSeconds: {{ .Values.probes.openfga.config.livenessProbe.terminationGracePeriodSeconds | default 30 }}
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.config.ZO_HTTP_PORT }}
+            initialDelaySeconds: {{ .Values.probes.openfga.config.readinessProbe.initialDelaySeconds | default 10 }}
+            periodSeconds: {{ .Values.probes.openfga.config.readinessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.probes.openfga.config.readinessProbe.timeoutSeconds | default 10 }}
+            successThreshold: {{ .Values.probes.openfga.config.readinessProbe.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.probes.openfga.config.readinessProbe.failureThreshold | default 3 }}
+          {{- end }}
           resources:
             limits:
               cpu: 200m

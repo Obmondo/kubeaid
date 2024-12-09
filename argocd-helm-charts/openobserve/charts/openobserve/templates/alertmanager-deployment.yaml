@@ -70,17 +70,24 @@ spec:
               containerPort: {{ .Values.config.ZO_REPORT_SERVER_HTTP_PORT }}
           {{- if .Values.probes.alertmanager.enabled }}
           livenessProbe:
-           httpGet:
-             path: /healthz
-             port: {{ .Values.config.ZO_HTTP_PORT }}
-           initialDelaySeconds: {{ .Values.probes.alertmanager.initialDelaySeconds | default 10 }}
-           failureThreshold: {{ .Values.probes.alertmanager.failureThreshold | default 3 }}
+            httpGet:
+              path: /healthz
+              port: {{ .Values.config.ZO_HTTP_PORT }}
+            initialDelaySeconds: {{ .Values.probes.alertmanager.config.livenessProbe.initialDelaySeconds | default 10 }}
+            periodSeconds: {{ .Values.probes.alertmanager.config.livenessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.probes.alertmanager.config.livenessProbe.timeoutSeconds | default 10 }}
+            successThreshold: {{ .Values.probes.alertmanager.config.livenessProbe.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.probes.alertmanager.config.livenessProbe.failureThreshold | default 3 }}
+            terminationGracePeriodSeconds: {{ .Values.probes.alertmanager.config.livenessProbe.terminationGracePeriodSeconds | default 30 }}
           readinessProbe:
-           httpGet:
-             path: /healthz
-             port: {{ .Values.config.ZO_HTTP_PORT }}
-           initialDelaySeconds: {{ .Values.probes.alertmanager.initialDelaySeconds | default 10 }}
-           failureThreshold: {{ .Values.probes.alertmanager.failureThreshold | default 3 }}
+            httpGet:
+              path: /healthz
+              port: {{ .Values.config.ZO_HTTP_PORT }}
+            initialDelaySeconds: {{ .Values.probes.alertmanager.config.readinessProbe.initialDelaySeconds | default 10 }}
+            periodSeconds: {{ .Values.probes.alertmanager.config.readinessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.probes.alertmanager.config.readinessProbe.timeoutSeconds | default 10 }}
+            successThreshold: {{ .Values.probes.alertmanager.config.readinessProbe.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.probes.alertmanager.config.readinessProbe.failureThreshold | default 3 }}
           {{- end }}
           resources:
             {{- toYaml .Values.resources.alertmanager | nindent 12 }}

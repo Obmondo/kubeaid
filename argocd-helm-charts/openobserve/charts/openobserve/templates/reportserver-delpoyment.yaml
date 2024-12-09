@@ -56,14 +56,27 @@ spec:
             - name: http
               containerPort: {{ .Values.config.ZO_HTTP_PORT }}
               protocol: TCP
+          {{- if .Values.probes.reportserver.enabled }}
           livenessProbe:
             httpGet:
-              path: /api/healthz
-              port: http
+              path: /healthz
+              port: {{ .Values.config.ZO_HTTP_PORT }}
+            initialDelaySeconds: {{ .Values.probes.reportserver.config.livenessProbe.initialDelaySeconds | default 10 }}
+            periodSeconds: {{ .Values.probes.reportserver.config.livenessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.probes.reportserver.config.livenessProbe.timeoutSeconds | default 10 }}
+            successThreshold: {{ .Values.probes.reportserver.config.livenessProbe.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.probes.reportserver.config.livenessProbe.failureThreshold | default 3 }}
+            terminationGracePeriodSeconds: {{ .Values.probes.reportserver.config.livenessProbe.terminationGracePeriodSeconds | default 30 }}
           readinessProbe:
             httpGet:
-              path: /api/healthz
-              port: http
+              path: /healthz
+              port: {{ .Values.config.ZO_HTTP_PORT }}
+            initialDelaySeconds: {{ .Values.probes.reportserver.config.readinessProbe.initialDelaySeconds | default 10 }}
+            periodSeconds: {{ .Values.probes.reportserver.config.readinessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.probes.reportserver.config.readinessProbe.timeoutSeconds | default 10 }}
+            successThreshold: {{ .Values.probes.reportserver.config.readinessProbe.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.probes.reportserver.config.readinessProbe.failureThreshold | default 3 }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources.reportserver | nindent 12 }}
           {{- with .Values.reportserver.volumeMounts }}

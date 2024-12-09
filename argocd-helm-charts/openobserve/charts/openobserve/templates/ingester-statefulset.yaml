@@ -96,19 +96,26 @@ spec:
               containerPort: {{ .Values.config.ZO_HTTP_PORT }}
             - name: grpc
               containerPort: {{ .Values.config.ZO_GRPC_PORT }}
-          {{- if .Values.probes.enabled }}
+          {{- if .Values.probes.ingester.enabled }}
           livenessProbe:
-           httpGet:
-             path: /healthz
-             port: {{ .Values.config.ZO_HTTP_PORT }}
-           initialDelaySeconds: {{ .Values.probes.initialDelaySeconds | default 10 }}
-           failureThreshold: {{ .Values.probes.failureThreshold | default 3 }}
+            httpGet:
+              path: /healthz
+              port: {{ .Values.config.ZO_HTTP_PORT }}
+            initialDelaySeconds: {{ .Values.probes.ingester.config.livenessProbe.initialDelaySeconds | default 10 }}
+            periodSeconds: {{ .Values.probes.ingester.config.livenessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.probes.ingester.config.livenessProbe.timeoutSeconds | default 10 }}
+            successThreshold: {{ .Values.probes.ingester.config.livenessProbe.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.probes.ingester.config.livenessProbe.failureThreshold | default 3 }}
+            terminationGracePeriodSeconds: {{ .Values.probes.ingester.config.livenessProbe.terminationGracePeriodSeconds | default 30 }}
           readinessProbe:
-           httpGet:
-             path: /healthz
-             port: {{ .Values.config.ZO_HTTP_PORT }}
-           initialDelaySeconds: {{ .Values.probes.initialDelaySeconds | default 10 }}
-           failureThreshold: {{ .Values.probes.failureThreshold | default 3 }}
+            httpGet:
+              path: /healthz
+              port: {{ .Values.config.ZO_HTTP_PORT }}
+            initialDelaySeconds: {{ .Values.probes.ingester.config.readinessProbe.initialDelaySeconds | default 10 }}
+            periodSeconds: {{ .Values.probes.ingester.config.readinessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.probes.ingester.config.readinessProbe.timeoutSeconds | default 10 }}
+            successThreshold: {{ .Values.probes.ingester.config.readinessProbe.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.probes.ingester.config.readinessProbe.failureThreshold | default 3 }}
           {{- end }}
           resources:
             {{- toYaml .Values.resources.ingester | nindent 12 }}

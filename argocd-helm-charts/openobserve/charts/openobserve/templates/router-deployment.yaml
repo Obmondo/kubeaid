@@ -70,17 +70,24 @@ spec:
               containerPort: {{ .Values.config.ZO_GRPC_PORT }}
           {{- if .Values.probes.router.enabled }}
           livenessProbe:
-           httpGet:
-             path: /healthz
-             port: {{ .Values.config.ZO_HTTP_PORT }}
-           initialDelaySeconds: {{ .Values.probes.router.initialDelaySeconds | default 10 }}
-           failureThreshold: {{ .Values.probes.router.failureThreshold | default 3 }}
+            httpGet:
+              path: /healthz
+              port: {{ .Values.config.ZO_HTTP_PORT }}
+            initialDelaySeconds: {{ .Values.probes.router.config.livenessProbe.initialDelaySeconds | default 10 }}
+            periodSeconds: {{ .Values.probes.router.config.livenessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.probes.router.config.livenessProbe.timeoutSeconds | default 10 }}
+            successThreshold: {{ .Values.probes.router.config.livenessProbe.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.probes.router.config.livenessProbe.failureThreshold | default 3 }}
+            terminationGracePeriodSeconds: {{ .Values.probes.router.config.livenessProbe.terminationGracePeriodSeconds | default 30 }}
           readinessProbe:
-           httpGet:
-             path: /healthz
-             port: {{ .Values.config.ZO_HTTP_PORT }}
-           initialDelaySeconds: {{ .Values.probes.router.initialDelaySeconds | default 10 }}
-           failureThreshold: {{ .Values.probes.router.failureThreshold | default 3 }}
+            httpGet:
+              path: /healthz
+              port: {{ .Values.config.ZO_HTTP_PORT }}
+            initialDelaySeconds: {{ .Values.probes.router.config.readinessProbe.initialDelaySeconds | default 10 }}
+            periodSeconds: {{ .Values.probes.router.config.readinessProbe.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.probes.router.config.readinessProbe.timeoutSeconds | default 10 }}
+            successThreshold: {{ .Values.probes.router.config.readinessProbe.successThreshold | default 1 }}
+            failureThreshold: {{ .Values.probes.router.config.readinessProbe.failureThreshold | default 3 }}
           {{- end }}
           resources:
             {{- toYaml .Values.resources.router | nindent 12 }}

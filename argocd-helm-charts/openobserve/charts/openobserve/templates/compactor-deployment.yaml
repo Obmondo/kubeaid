@@ -73,14 +73,21 @@ spec:
            httpGet:
              path: /healthz
              port: {{ .Values.config.ZO_HTTP_PORT }}
-           initialDelaySeconds: {{ .Values.probes.compactor.initialDelaySeconds | default 10 }}
-           failureThreshold: {{ .Values.probes.compactor.failureThreshold | default 3 }}
+           initialDelaySeconds: {{ .Values.probes.compactor.config.livenessProbe.initialDelaySeconds | default 10 }}
+           periodSeconds: {{ .Values.probes.compactor.config.livenessProbe.periodSeconds | default 10 }}
+           timeoutSeconds: {{ .Values.probes.compactor.config.livenessProbe.timeoutSeconds | default 10 }}
+           successThreshold: {{ .Values.probes.compactor.config.livenessProbe.successThreshold | default 1 }}
+           failureThreshold: {{ .Values.probes.compactor.config.livenessProbe.failureThreshold | default 3 }}
+           terminationGracePeriodSeconds: {{ .Values.probes.compactor.config.livenessProbe.terminationGracePeriodSeconds | default 30 }}
           readinessProbe:
            httpGet:
              path: /healthz
              port: {{ .Values.config.ZO_HTTP_PORT }}
-           initialDelaySeconds: {{ .Values.probes.compactor.initialDelaySeconds | default 10 }}
-           failureThreshold: {{ .Values.probes.compactor.failureThreshold | default 3 }}
+           initialDelaySeconds: {{ .Values.probes.compactor.config.readinessProbe.initialDelaySeconds | default 10 }}
+           periodSeconds: {{ .Values.probes.compactor.config.readinessProbe.periodSeconds | default 10 }}
+           timeoutSeconds: {{ .Values.probes.compactor.config.readinessProbe.timeoutSeconds | default 10 }}
+           successThreshold: {{ .Values.probes.compactor.config.readinessProbe.successThreshold | default 1 }}
+           failureThreshold: {{ .Values.probes.compactor.config.readinessProbe.failureThreshold | default 3 }}
           {{- end }}
           resources:
             {{- toYaml .Values.resources.compactor | nindent 12 }}

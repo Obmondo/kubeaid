@@ -8,6 +8,9 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated aws-efs-csi-driver from version 3.0.8 to 3.1.2
 
 ### Patch Version Upgrades %%^^
+- Updated openobserve-collector from version 0.3.14 to 0.3.15
+- Updated openobserve-standalone from version 0.13.5 to 0.13.6
+- Updated openobserve from version 0.13.5 to 0.13.8
 - Updated oncall from version 1.13.3 to 1.13.9
 - Updated metallb from version 6.3.15 to 6.3.16
 - Updated fluent-bit from version 0.48.1 to 0.48.3
