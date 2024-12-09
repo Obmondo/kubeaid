@@ -8,6 +8,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated aws-efs-csi-driver from version 3.0.8 to 3.1.2
 
 ### Patch Version Upgrades %%^^
+- Updated rabbitmq-cluster-operator from version 4.3.27 to 4.3.29
 - Updated openobserve-collector from version 0.3.14 to 0.3.15
 - Updated openobserve-standalone from version 0.13.5 to 0.13.6
 - Updated openobserve from version 0.13.5 to 0.13.8
