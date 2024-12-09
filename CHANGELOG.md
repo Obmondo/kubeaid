@@ -10,6 +10,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated aws-efs-csi-driver from version 3.0.8 to 3.1.2
 
 ### Patch Version Upgrades %%^^
+- Updated teleport-kube-agent from version 17.0.2 to 17.0.4
 - Updated teleport-cluster from version 17.0.2 to 17.0.4
 - Added strimzi-kafka-operator from version 0.38.0 to 0.38.0
 - Updated rabbitmq-cluster-operator from version 4.3.27 to 4.3.29
