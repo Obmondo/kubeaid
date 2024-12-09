@@ -8,6 +8,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated aws-efs-csi-driver from version 3.0.8 to 3.1.2
 
 ### Patch Version Upgrades %%^^
+- Updated metallb from version 6.3.15 to 6.3.16
 - Updated fluent-bit from version 0.48.1 to 0.48.3
 - Updated external-dns from version 8.6.0 to 8.6.1
 - Updated crossplane from version 1.18.0 to 1.18.1
