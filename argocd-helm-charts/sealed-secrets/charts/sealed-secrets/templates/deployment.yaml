@@ -82,6 +82,14 @@ spec:
             - --key-renew-period
             - {{ .Values.keyrenewperiod | quote }}
             {{- end }}
+            {{- if .Values.keyttl }}
+            - --key-ttl
+            - {{ .Values.keyttl | quote }}
+            {{- end }}
+            {{- if .Values.keycutofftime }}
+            - --key-cutoff-time
+            - {{ .Values.keycutofftime | quote }}
+            {{- end }}
             {{- if .Values.rateLimit }}
             - --rate-limit
             - {{ .Values.rateLimit | quote }}
@@ -136,6 +144,10 @@ spec:
             {{- if .Values.containerPorts.metrics }}
             - --listen-metrics-addr
             - {{ printf ":%s" (.Values.containerPorts.metrics | toString) }}
+            {{- end }}
+            {{- if .Values.maxRetries }}
+            - --max-unseal-retries
+            - {{ .Values.maxRetries | quote }}
             {{- end }}
           {{- end }}
           image: {{ printf "%s/%s:%s" .Values.image.registry .Values.image.repository .Values.image.tag }}
