@@ -1,6 +1,14 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-12-09
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+
+### Patch Version Upgrades %%^^
+- Updated argo-cd from version 7.7.5 to 7.7.7
+
 ### Improvements
 - [`27bc985d`](../../commit/27bc985d) fix helm repo update script failing to untar newly downloaded chart tar files when naming is different and HELM_UPSTREAM_CHART_VERSION giving unbound variable error when there is no upstream chart already present
 - [`59cd0be3`](../../commit/59cd0be3) adding blackbox prober for important services
