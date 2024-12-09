@@ -8,6 +8,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated aws-efs-csi-driver from version 3.0.8 to 3.1.2
 
 ### Patch Version Upgrades %%^^
+- Updated external-dns from version 8.6.0 to 8.6.1
 - Updated crossplane from version 1.18.0 to 1.18.1
 - Updated argo-cd from version 7.7.5 to 7.7.7
 
