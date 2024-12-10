@@ -1,4 +1,8 @@
 controlPlaneLoadBalancer:
   enabled: true
+
 robot:
   floating: false
+
+robotSSHKeysSecretName: hetzner-robot-ssh-keys
+cloudCredentialsSecretName: cloud-credentials

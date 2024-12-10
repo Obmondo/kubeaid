@@ -3,7 +3,6 @@ apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: HetznerBareMetalMachineTemplate
 metadata:
   name: {{ .Values.global.clusterName }}-control-plane
-  namespace: capi-cluster-{{ .Values.global.customerid }}
 spec:
   template:
     spec:
@@ -66,4 +65,4 @@ spec:
             name: sshkey-name
             privateKey: ssh-privatekey
             publicKey: ssh-publickey
-          name: capi-cluster-robot-ssh
+          name: {{ .Values.robotSSHKeysSecretName }}

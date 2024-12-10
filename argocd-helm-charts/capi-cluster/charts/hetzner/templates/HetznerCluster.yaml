@@ -3,7 +3,6 @@ apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: HetznerCluster
 metadata:
   name: {{ .Values.global.clusterName }}
-  namespace: capi-cluster-{{ .Values.global.customerid }}
   labels:
     cluster.x-k8s.io/name: {{ .Values.global.clusterName }}
 spec:
@@ -31,7 +30,7 @@ spec:
       hcloudToken: hcloud
       hetznerRobotPassword: robot-password
       hetznerRobotUser: robot-user
-    name: capi-cluster-hetzner
+    name: {{ .Values.cloudCredentialsSecretName }}
   sshKeys:
     hcloud:
     - name: cluster
@@ -40,4 +39,4 @@ spec:
         name: sshkey-name
         privateKey: ssh-privatekey
         publicKey: ssh-publickey
-      name: capi-cluster-robot-ssh
+      name: {{ .Values.robotSSHKeysSecretName }}
