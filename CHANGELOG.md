@@ -1,6 +1,19 @@
 # Changelog
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 2024-12-13
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+
+### Patch Version Upgrades %%^^
+- Added opentelemetry-operator from version 0.75.1 to 0.75.1
+- Added opentelemetry-operator from version 0.75.1 to 0.75.1
+- Updated openobserve-collector from version 0.3.14 to 0.3.15
+- Added opentelemetry-operator from version 0.75.1 to 0.75.1
+- Added opentelemetry-operator from version 0.75.1 to 0.75.1
+- Updated openobserve-collector from version 0.3.14 to 0.3.15
+
 ## 6.3.0
 ### Minor Version Upgrades
 - Updated traefik from version 33.0.0 to 33.1.0
