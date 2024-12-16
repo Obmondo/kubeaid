@@ -17,6 +17,13 @@ All releases and the changes included in them (pulled from git commits added sin
 - Added opentelemetry-operator from version 0.75.1 to 0.75.1
 - Updated openobserve-collector from version 0.3.14 to 0.3.15
 
+### Improvements
+- [`832a1406`](../../commit/832a1406) add kafka operator chart and templates
+- [`a84f8da7`](../../commit/a84f8da7) Add proxy mode to keycloak chart due to upgrade to v25
+- [`14d71e97`](../../commit/14d71e97) 730 Add openserve-collector & opentelemetry-operator
+- [`78691fcc`](../../commit/78691fcc) removing explicit resource namespaces and templatizing secret names
+- [`2a6f45c5`](../../commit/2a6f45c5) fix: Update tar command to use updated name after renaming
+
 ## 6.3.0
 
 ### Minor Version Upgrades
