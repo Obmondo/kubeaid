@@ -5,12 +5,18 @@ Strimzi provides a way to run an [Apache Kafka®](https://kafka.apache.org) clus
 See our [website](https://strimzi.io) for more details about the project.
 
 **!!! IMPORTANT !!!**
-Upgrading to Strimzi 0.32 and newer directly from Strimzi 0.22 and earlier is no longer possible.
-Please follow the [documentation](https://strimzi.io/docs/operators/latest/full/deploying.html#assembly-upgrade-str) for more details.
 
-**!!! IMPORTANT !!!**
-From Strimzi 0.36 on, we support only Kubernetes 1.21 and newer.
-Kubernetes versions 1.19 and 1.20 are no longer supported.
+* From Strimzi 0.44.0 on, we support only Kubernetes 1.25 and newer.
+  Kubernetes 1.23 and 1.24 are not supported anymore.
+* ZooKeeper support will be soon removed from Apache Kafka and Strimzi.
+  Currently, the last Strimzi version with ZooKeeper support is expected to be Strimzi 0.45.
+  Please plan your migration to KRaft (ZooKeeper-less Apache Kafka) accordingly.
+  Follow the [documentation](https://strimzi.io/docs/operators/latest/full/deploying.html#assembly-kraft-mode-str) for more details. 
+* Kafka Mirror Maker 1 support will be soon removed from Apache Kafka and Strimzi.
+  Currently, the last Strimzi version with Mirror Maker 1 support is expected to be Strimzi 0.45.
+  Please plan your migration to Mirror Maker 2 or another mirroring tool.
+* Upgrading to Strimzi 0.32 and newer directly from Strimzi 0.22 and earlier is no longer possible.
+  Please follow the [documentation](https://strimzi.io/docs/operators/latest/full/deploying.html#assembly-upgrade-str) for more details.
 
 ## Introduction
 
@@ -21,13 +27,16 @@ cluster using the [Helm](https://helm.sh) package manager.
 ### Supported Features
 
 * **Manages the Kafka Cluster** - Deploys and manages all of the components of this complex application, including dependencies like Apache ZooKeeper® that are traditionally hard to administer.
+* **KRaft support** - Allows running Apache Kafka clusters in the KRaft mode (without ZooKeeper).
 * **Includes Kafka Connect** - Allows for configuration of common data sources and sinks to move data into and out of the Kafka cluster.
 * **Topic Management** - Creates and manages Kafka Topics within the cluster.
 * **User Management** - Creates and manages Kafka Users within the cluster.
 * **Connector Management** - Creates and manages Kafka Connect connectors.
-* **Includes Kafka Mirror Maker 1 and 2** - Allows for mirroring data between different Apache Kafka® clusters.
+* **Includes Kafka MirrorMaker** - Allows for mirroring data between different Apache Kafka® clusters.
 * **Includes HTTP Kafka Bridge** - Allows clients to send and receive messages through an Apache Kafka® cluster via the HTTP protocol.
 * **Includes Cruise Control** - Automates the process of balancing partitions across an Apache Kafka® cluster.
+* **Auto-rebalancing when scaling** - Automatically rebalance the Kafka cluster after a scale-up or before a scale-down.
+* **Tiered storage** - Offloads older, less critical data to a lower-cost, lower-performance storage tier, such as object storage.
 * **Prometheus monitoring** - Built-in support for monitoring using Prometheus.
 * **Grafana Dashboards** - Built-in support for loading Grafana® dashboards via the grafana_sidecar
 
@@ -59,7 +68,7 @@ Strimzi is licensed under the [Apache License, Version 2.0](https://github.com/s
 
 ## Prerequisites
 
-- Kubernetes 1.21+
+- Kubernetes 1.25+
 
 ## Installing the Chart
 
@@ -91,11 +100,12 @@ the documentation for more details.
 | Parameter                                   | Description                                                                     | Default                      |
 |---------------------------------------------|---------------------------------------------------------------------------------|------------------------------|
 | `replicas`                                  | Number of replicas of the cluster operator                                      | 1                            |
+| `revisionHistoryLimit`                      | Number of replicaSet to keep of the operator deployment                         | 10                           |
 | `watchNamespaces`                           | Comma separated list of additional namespaces for the strimzi-operator to watch | []                           |
 | `watchAnyNamespace`                         | Watch the whole Kubernetes cluster (all namespaces)                             | `false`                      |
 | `defaultImageRegistry`                      | Default image registry for all the images                                       | `quay.io`                    |
 | `defaultImageRepository`                    | Default image registry for all the images                                       | `strimzi`                    |
-| `defaultImageTag`                           | Default image tag for all the images except Kafka Bridge                        | `0.38.0`                     |
+| `defaultImageTag`                           | Default image tag for all the images except Kafka Bridge                        | `0.44.0`                     |
 | `image.registry`                            | Override default Cluster Operator image registry                                | `nil`                        |
 | `image.repository`                          | Override default Cluster Operator image repository                              | `nil`                        |
 | `image.name`                                | Cluster Operator image name                                                     | `cluster-operator`           |
@@ -113,6 +123,9 @@ the documentation for more details.
 | `rbac.create`                               | Whether to create RBAC related resources                                        | `yes`                        |
 | `serviceAccountCreate`                      | Whether to create a service account                                             | `yes`                        |
 | `serviceAccount`                            | Cluster Operator's service account                                              | `strimzi-cluster-operator`   |
+| `podDisruptionBudget.enabled`               | Whether to enable the podDisruptionBudget feature                               | `false`                      |
+| `podDisruptionBudget.minAvailable`          | Default value for how many pods must be running in a cluster                    | `1`                          |
+| `podDisruptionBudget.maxUnavailable`        | Default value for how many pods can be down                                     | `nil`                        |
 | `extraEnvs`                                 | Extra environment variables for the Cluster operator container                  | `[]`                         |
 | `kafka.image.registry`                      | Override default Kafka image registry                                           | `nil`                        |
 | `kafka.image.repository`                    | Override default Kafka image repository                                         | `nil`                        |
@@ -153,16 +166,10 @@ the documentation for more details.
 | `kafkaInit.image.name`                      | Init Kafka image name                                                           | `operator`                   |
 | `kafkaInit.image.tag`                       | Override default Init Kafka image tag                                           | `nil`                        |
 | `kafkaInit.image.digest`                    | Override Init Kafka image tag with digest                                       | `nil`                        |
-| `tlsSidecarEntityOperator.image.registry`   | Override default TLS Sidecar Entity Operator image registry                     | `nil`                        |
-| `tlsSidecarEntityOperator.image.repository` | Override default TLS Sidecar Entity Operator image repository                   | `nil`                        |
-| `tlsSidecarEntityOperator.image.name`       | TLS Sidecar Entity Operator image name                                          | `kafka`                      |
-| `tlsSidecarEntityOperator.image.tagPrefix`  | Override default TLS Sidecar Entity Operator image tag prefix                   | `nil`                        |
-| `tlsSidecarEntityOperator.image.tag`        | Override default TLS Sidecar Entity Operator image tag and ignore suffix        | `nil`                        |
-| `tlsSidecarEntityOperator.image.digest`     | Override TLS Sidecar Entity Operator image tag with digest                      | `nil`                        |
 | `kafkaBridge.image.registry`                | Override default Kafka Bridge image registry                                    | `quay.io`                    |
 | `kafkaBridge.image.repository`              | Override default Kafka Bridge image repository                                  | `strimzi`                    |
 | `kafkaBridge.image.name`                    | Kafka Bridge image name                                                         | `kafka-bridge`               |
-| `kafkaBridge.image.tag`                     | Override default Kafka Bridge image tag                                         | `0.27.0`                     |
+| `kafkaBridge.image.tag`                     | Override default Kafka Bridge image tag                                         | `0.30.0`                     |
 | `kafkaBridge.image.digest`                  | Override Kafka Bridge image tag with digest                                     | `nil`                        |
 | `kafkaExporter.image.registry`              | Override default Kafka Exporter image registry                                  | `nil`                        |
 | `kafkaExporter.image.repository`            | Override default Kafka Exporter image repository                                | `nil`                        |
@@ -181,9 +188,9 @@ the documentation for more details.
 | `kanikoExecutor.image.name`                 | Kaniko Executor image name                                                      | `kaniko-executor`            |
 | `kanikoExecutor.image.tag`                  | Override default Kaniko Executor image tag                                      | `nil`                        |
 | `kanikoExecutor.image.digest`               | Override Kaniko Executor image tag with digest                                  | `nil`                        |
-| `resources.limits.memory`                   | Memory constraint for limits                                                    | `256Mi`                      |
+| `resources.limits.memory`                   | Memory constraint for limits                                                    | `384Mi`                      |
 | `resources.limits.cpu`                      | CPU constraint for limits                                                       | `1000m`                      |
-| `resources.requests.memory`                 | Memory constraint for requests                                                  | `256Mi`                      |
+| `resources.requests.memory`                 | Memory constraint for requests                                                  | `384Mi`                      |
 | `livenessProbe.initialDelaySeconds`         | Liveness probe initial delay in seconds                                         | 10                           |
 | `livenessProbe.periodSeconds`               | Liveness probe period in seconds                                                | 30                           |
 | `readinessProbe.initialDelaySeconds`        | Readiness probe initial delay in seconds                                        | 10                           |
@@ -207,6 +214,7 @@ the documentation for more details.
 | `mavenBuilder.image.tag`                    | Override default Maven Builder image tag                                        | `nil`                        |
 | `mavenBuilder.image.digest`                 | Override Maven Builder image tag with digest                                    | `nil`                        |
 | `logConfiguration`                          | Override default `log4j.properties` content                                     | `nil`                        |
+| `logLevel`                                  | Override default logging level                                                  | `INFO`                       |
 | `dashboards.enable`                         | Generate configmaps containing the dashboards                                   | `false`                      |
 | `dashboards.label`                          | How should the dashboards be labeled for the sidecar                            | `grafana_dashboard`          |
 | `dashboards.labelValue`                     | What should the dashboards label value be for the sidecar                       | `"1"`                        |

@@ -1,0 +1,54 @@
+{{- if .Values.kafka }}
+{{- range .Values.kafka }}
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: {{ .name }}
+spec:
+  kafka:
+    replicas: {{ .kafka.replicas }}
+    authorization:
+      type: {{ .kafka.authorization.type }}
+    listeners:
+    {{- range .kafka.listeners }}
+      - name: {{ .name }}
+        port: {{ .port }}
+        type: {{ .type }}
+        tls: {{ .tls }}
+        {{- if .authentication }}
+        authentication:
+          type: {{ .authentication.type | default "tls" }}
+        {{- end }}
+    {{- end }}
+    storage:
+      type: {{ .kafka.storage.type }}
+      class: {{ .kafka.storage.type | default "rook-ceph-block" }}
+      size: {{ .kafka.storage.size }}
+      
+      # volumes is to be set if the above storage type is jbod
+      {{- if eq .kafka.storage.type "jbod" }}
+      volumes:
+        {{- range .kafka.storage.volumes }}
+        - id: {{ .id }}
+          class: {{ .class }}
+          type: {{ .type }}
+          size: {{ .size }}
+          deleteClaim: {{ .deleteClaim }}
+        {{- end}}
+      {{- end}}
+    config:
+      {{- range $key, $value := .kafka.config }}
+      {{ $key }}: {{ $value }}
+      {{- end }}
+  zookeeper:
+    replicas: {{ .zookeeper.replicas}}
+    storage:
+      type: {{ .zookeeper.storage.type }}
+      class: {{ .zookeeper.storage.class }}
+      size: {{ .zookeeper.storage.size }}
+      deleteClaim: {{ .zookeeper.storage.deleteClaim }}
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+{{- end}}
+{{- end }}

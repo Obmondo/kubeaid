@@ -11,6 +11,9 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicas }}
+  {{- if .Values.revisionHistoryLimit }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  {{- end }}
   selector:
     matchLabels:
       name: strimzi-cluster-operator
@@ -136,6 +139,10 @@ spec:
             {{- if ne (int .Values.connectBuildTimeoutMs) 300000 }}
             - name: STRIMZI_CONNECT_BUILD_TIMEOUT_MS
               value: {{ .Values.connectBuildTimeoutMs | quote }}
+            {{- end }}
+            {{- if ne .Values.generatePodDisruptionBudget true}}
+            - name: STRIMZI_POD_DISRUPTION_BUDGET_GENERATION
+              value: {{ .Values.generatePodDisruptionBudget | quote }}
             {{- end }}
             {{- if .Values.extraEnvs }}
 {{ toYaml .Values.extraEnvs | indent 12 }}

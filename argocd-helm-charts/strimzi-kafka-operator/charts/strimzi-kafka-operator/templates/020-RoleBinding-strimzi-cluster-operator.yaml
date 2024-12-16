@@ -1,6 +1,10 @@
 {{- if .Values.rbac.create -}}
 {{- $root := . -}}
-{{- range append .Values.watchNamespaces .Release.Namespace }}
+{{- $watchNamespaces := .Values.watchNamespaces -}}
+{{- if $root.Values.watchAnyNamespace }}
+  {{- $watchNamespaces = list -}}  
+{{- end }}
+{{- range append $watchNamespaces .Release.Namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 {{- if $root.Values.watchAnyNamespace }}
@@ -13,8 +17,10 @@ metadata:
   name: strimzi-cluster-operator-namespaced
   {{- else }}
   name: strimzi-cluster-operator
-  {{- end }}
+  {{- end }}  
+  {{- if not $root.Values.watchAnyNamespace }}
   namespace: {{ . }}
+  {{- end }}
   labels:
     app: {{ template "strimzi.name" $root }}
     chart: {{ template "strimzi.chart" $root }}

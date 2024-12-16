@@ -50,6 +50,14 @@ spec:
         openAPIV3Schema:
           type: object
           properties:
+            apiVersion:
+              type: string
+              description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
+            kind:
+              type: string
+              description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+            metadata:
+              type: object
             spec:
               type: object
               properties:
@@ -73,7 +81,7 @@ spec:
                 config:
                   x-kubernetes-preserve-unknown-fields: true
                   type: object
-                  description: "The Kafka Connector configuration. The following properties cannot be set: connector.class, tasks.max."
+                  description: "The Kafka Connector configuration. The following properties cannot be set: name, connector.class, tasks.max."
                 pause:
                   type: boolean
                   description: Whether the connector should be paused. Defaults to false.
@@ -84,6 +92,30 @@ spec:
                     - stopped
                     - running
                   description: The state the connector should be in. Defaults to running.
+                listOffsets:
+                  type: object
+                  properties:
+                    toConfigMap:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                      description: Reference to the ConfigMap where the list of offsets will be written to.
+                  required:
+                    - toConfigMap
+                  description: Configuration for listing offsets.
+                alterOffsets:
+                  type: object
+                  properties:
+                    fromConfigMap:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                      description: Reference to the ConfigMap where the new offsets are stored.
+                  required:
+                    - fromConfigMap
+                  description: Configuration for altering offsets.
               description: The specification of the Kafka Connector.
             status:
               type: object

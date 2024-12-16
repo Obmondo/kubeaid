@@ -1,0 +1,57 @@
+kafka:
+  - name: strimzi-kafka
+    kafka:
+      replicas: 1
+      authorization:
+        type: simple
+      listeners:
+        - name: external
+          port: 9094
+          type: nodeport
+          tls: true
+          authentication:
+            type: tls
+      storage:
+        type: jbod
+        volumes:
+        - id: 0
+          class: rook-ceph-block
+          type: persistent-claim
+          size: 1Gi
+          deleteClaim: false
+      config:
+        offsets.topic.replication.factor: 1
+        transaction.state.log.replication.factor: 1
+        transaction.state.log.min.isr: 1
+        default.replication.factor: 1
+        min.insync.replicas: 1
+    zookeeper:
+      replicas: 3
+      storage:
+        type: persistent-claim
+        class: rook-ceph-block
+        size: 1Gi
+        deleteClaim: false
+
+kafkaTopics:
+  - topicName: my-topic
+    cluster: strimzi-kafka
+    partitions: 3
+    replicas: 1
+
+kafkaUser:
+  - name: my-user
+    cluster: strimzi-kafka
+    authentication:
+      type: tls
+    authorization:
+      type: simple
+      acls:
+        - type: allow
+          resource:
+            type: topic
+            name: my-topic
+            patternType: literal
+          host: "*"
+          operations:
+            - Read
