@@ -2,13 +2,13 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## Unreleased Changes
+## 7.0.0
 
-### Major Version Upgrades %%^^
+### Major Version Upgrades
 - Updated snapshot-controller from version 3.0.6 to 4.0.0
 - Updated keycloakx from version 2.6.0 to 3.0.0
 
-### Minor Version Upgrades %%^^
+### Minor Version Upgrades
 - Updated traefik from version 33.1.0 to 33.2.1
 - Updated redmine from version 32.0.1 to 32.1.1
 - Updated rabbitmq-cluster-operator from version 4.3.29 to 4.4.0
@@ -18,7 +18,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated aws-ebs-csi-driver from version 2.37.0 to 2.38.1
 - Updated strimzi-kafka-operator from version 0.38.0 to 0.44.0
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
 - Updated teleport-kube-agent from version 17.0.4 to 17.0.5
 - Updated teleport-cluster from version 17.0.4 to 17.0.5
 - Updated openobserve-collector from version 0.3.15 to 0.3.18
