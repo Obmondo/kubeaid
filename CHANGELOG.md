@@ -10,6 +10,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated strimzi-kafka-operator from version 0.38.0 to 0.44.0
 
 ### Patch Version Upgrades %%^^
+- Updated argo-cd from version 7.7.7 to 7.7.10
 - Added opentelemetry-operator from version 0.75.1 to 0.75.1
 - Added opentelemetry-operator from version 0.75.1 to 0.75.1
 - Updated openobserve-collector from version 0.3.14 to 0.3.15
