@@ -7,6 +7,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated aws-ebs-csi-driver from version 2.37.0 to 2.38.1
 - Updated strimzi-kafka-operator from version 0.38.0 to 0.44.0
 
 ### Patch Version Upgrades %%^^
