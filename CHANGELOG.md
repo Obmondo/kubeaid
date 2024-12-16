@@ -18,6 +18,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated strimzi-kafka-operator from version 0.38.0 to 0.44.0
 
 ### Patch Version Upgrades %%^^
+- Updated teleport-kube-agent from version 17.0.4 to 17.0.5
 - Updated teleport-cluster from version 17.0.4 to 17.0.5
 - Updated openobserve-collector from version 0.3.15 to 0.3.18
 - Updated openobserve from version 0.14.1 to 0.14.7
