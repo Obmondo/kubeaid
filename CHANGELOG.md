@@ -8,6 +8,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated keycloakx from version 2.6.0 to 3.0.0
 
 ### Minor Version Upgrades %%^^
+- Updated rabbitmq-cluster-operator from version 4.3.29 to 4.4.0
 - Updated metallb from version 6.3.16 to 6.4.1
 - Updated gatekeeper from version 3.17.1 to 3.18.0
 - Updated external-dns from version 8.6.1 to 8.7.0
