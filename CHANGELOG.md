@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ## Unreleased Changes
 
 ### Major Version Upgrades %%^^
+- Updated keycloakx from version 2.6.0 to 3.0.0
 
 ### Minor Version Upgrades %%^^
 - Updated gatekeeper from version 3.17.1 to 3.18.0
