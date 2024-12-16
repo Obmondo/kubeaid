@@ -1,15 +1,8 @@
 annotations:
-  artifacthub.io/changes: "- \"fix: :bug: support specifying plugins storage\"\n-
-    \"fix(Traefik): support for entrypoint option on allowACMEByPass\"\n- \"fix(Traefik
-    Proxy): allowEmptyServices not disabled when set to false\"\n- \"fix(Traefik Hub):
-    compatibility with Traefik Proxy v3.2\"\n- \"fix(KubernetesCRD): \U0001F41B IngressClass
-    should be readable even when kubernetesIngress is disabled\"\n- \"feat(deps):
-    update traefik docker tag to v3.2.1\"\n- \"feat(Traefik Proxy): add `abortOnPluginFailure`
-    field\"\n- \"feat(Traefik Hub): add APICatalogItem and ManagedSubscription support\"\n-
-    \"docs: \U0001F4DA️ fix typos in values and readme\"\n- \"chore(release): \U0001F680
-    publish v33.1.0-rc1\"\n"
+  artifacthub.io/changes: "- \"fix(Gateway API): CRDs should only be defined once\"\n-
+    \"chore(release): \U0001F680 publish v33.2.1\"\n"
 apiVersion: v2
-appVersion: v3.2.1
+appVersion: v3.2.2
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
 icon: https://raw.githubusercontent.com/traefik/traefik/v2.3/docs/content/assets/img/traefik.logo.png
@@ -31,4 +24,4 @@ sources:
 - https://github.com/traefik/traefik
 - https://github.com/traefik/traefik-helm-chart
 type: application
-version: 33.1.0
+version: 33.2.1
