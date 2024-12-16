@@ -2,20 +2,14 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 2024-12-16
-
-### Minor Version Upgrades %%^^
-
-- Updated strimzi-kafka-operator from version 0.38.0 to 0.44.0
-
-## 2024-12-13
+## Unreleased Changes
 
 ### Major Version Upgrades %%^^
 
 ### Minor Version Upgrades %%^^
+- Updated strimzi-kafka-operator from version 0.38.0 to 0.44.0
 
 ### Patch Version Upgrades %%^^
-
 - Added opentelemetry-operator from version 0.75.1 to 0.75.1
 - Added opentelemetry-operator from version 0.75.1 to 0.75.1
 - Updated openobserve-collector from version 0.3.14 to 0.3.15
