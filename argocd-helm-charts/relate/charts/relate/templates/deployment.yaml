@@ -49,6 +49,11 @@ spec:
               httpHeaders:
                 - name: Host
                   value: relate
+            initialDelaySeconds: 500        
+            periodSeconds: 100             
+            timeoutSeconds: 300             
+            failureThreshold: 3           
+            successThreshold: 1
           readinessProbe:
             httpGet:
               path: /
@@ -56,6 +61,11 @@ spec:
               httpHeaders:
                 - name: Host
                   value: relate
+            initialDelaySeconds: 500
+            periodSeconds: 100
+            timeoutSeconds: 300
+            failureThreshold: 3
+            successThreshold: 1
           {{- if .Values.resources }}
           resources: {{- toYaml .Values.resources | nindent 12 }}
           {{- end }}
