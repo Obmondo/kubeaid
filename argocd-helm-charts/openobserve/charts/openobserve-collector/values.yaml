@@ -14,6 +14,7 @@ exporters:
       stream-name: k8s_events
 
 replicaCount: 1
+k8sCluster: "cluster1"
 
 image:
   repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib
@@ -121,7 +122,7 @@ agent:
         # Exclude logs from all containers named otel-collector or otc-container (otel-contrib)
         - /var/log/pods/*/otel-collector/*.log  # named otel-collector
         - /var/log/pods/*/otc-container/*.log   # named otc-container (for otel-contrib containers)
-        # - /var/log/pods/*/openobserve/*.log     # named openobserve. Would want to avoid cyclical logs
+        - /var/log/pods/*/openobserve-ingester/*.log     # avoid cyclical logs as ingester logs can be massive
       start_at: end
       include_file_path: true
       include_file_name: false
@@ -335,15 +336,15 @@ agent:
     pipelines:
       logs:
         receivers: [filelog/std]
-        processors: [batch, k8sattributes]
+        processors: [batch, attributes, k8sattributes]
         exporters: [otlphttp/openobserve]
       metrics:
         receivers: [kubeletstats]
-        processors: [batch, k8sattributes]
+        processors: [batch, attributes, k8sattributes]
         exporters: [otlphttp/openobserve]
       traces:
         receivers: [otlp]
-        processors: [batch, k8sattributes]
+        processors: [batch, attributes, k8sattributes]
         exporters: [otlphttp/openobserve]
 
 gateway:
@@ -653,13 +654,13 @@ gateway:
     pipelines:
       logs/k8s_events:
         receivers: [k8s_events]
-        processors: [batch, k8sattributes, resourcedetection]
+        processors: [batch, attributes, k8sattributes, resourcedetection]
         exporters: [otlphttp/openobserve_k8s_events]
       metrics:
         receivers: [k8s_cluster, spanmetrics, servicegraph]
-        processors: [batch, k8sattributes, resourcedetection]
+        processors: [batch, attributes, k8sattributes, resourcedetection]
         exporters: [otlphttp/openobserve]
       traces:
         receivers: [otlp]
-        processors: [batch, k8sattributes, resourcedetection]
+        processors: [batch, attributes, k8sattributes, resourcedetection]
         exporters: [otlphttp/openobserve, spanmetrics, servicegraph]

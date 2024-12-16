@@ -45,7 +45,7 @@ If you are developing this chart then you should clone the repo and make any mod
 You can generate output of the chart using below command to verify:
 
 ```shell
-helm -n openobserve-collector template o2c . > o1.yaml
+helm -n openobserve-collector template o2c . > o2c1.yaml
 ```
 
 You can install using:
@@ -59,6 +59,7 @@ or
 ```shell
 helm --namespace openobserve-collector \
   install o2c . \
+  --set k8sCluster=cluster1  \
   --set exporters."otlphttp/openobserve".endpoint=URL  \
   --set exporters."otlphttp/openobserve".headers.Authorization="Basic base64 encoded auth"  \
   --set exporters."otlphttp/openobserve_k8s_events".endpoint=URL  \

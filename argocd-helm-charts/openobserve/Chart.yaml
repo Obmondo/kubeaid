@@ -3,10 +3,10 @@ name: openobserve
 version: 0.13.4
 dependencies:
   - name: openobserve
-    version: 0.14.1
+    version: 0.14.7
     repository: https://charts.openobserve.ai/
   - name: openobserve-collector
-    version: 0.3.15
+    version: 0.3.18
     repository: https://charts.openobserve.ai/
   - name: opentelemetry-operator
     version: 0.75.1

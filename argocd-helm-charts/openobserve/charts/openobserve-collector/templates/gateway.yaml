@@ -46,6 +46,11 @@ spec:
     connectors:
 {{ toYaml .Values.gateway.connectors | indent 6 }}
     processors:
+      attributes:
+        actions:
+          - key: k8s_cluster
+            action: insert
+            value: {{ .Values.k8sCluster | quote }}
 {{ toYaml .Values.gateway.processors | indent 6 }}
     extensions:
 {{ toYaml .Values.gateway.extensions | indent 6 }}
