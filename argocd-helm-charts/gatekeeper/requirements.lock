@@ -1,6 +1,6 @@
 dependencies:
 - name: gatekeeper
   repository: https://open-policy-agent.github.io/gatekeeper/charts
-  version: 3.17.1
-digest: sha256:3d5fd4974e7a684340d0be0f753a9ac20187c70cd79bfce1ca5fb926d95ab790
-generated: "2024-09-16T19:07:56.594176209+05:30"
+  version: 3.18.0
+digest: sha256:ebdb89c0a3ea9ca6a427bb79e5a78377e367268a2649d61886100322e8e07709
+generated: "2024-12-17T01:35:00.507020652+05:30"
