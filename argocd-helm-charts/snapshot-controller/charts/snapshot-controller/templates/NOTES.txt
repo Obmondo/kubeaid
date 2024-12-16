@@ -1,9 +1,6 @@
 {{- if .Values.controller.enabled }}
 Volume Snapshot Controller installed.
 {{- end }}
-{{- if .Values.webhook.enabled }}
-Validation for VolumeSnapshots installed.
-{{- end }}
 
 {{- if and (not (.Capabilities.APIVersions.Has "snapshot.storage.k8s.io/v1")) (not (.Capabilities.APIVersions.Has "snapshot.storage.k8s.io/v1beta") ) }}
 Please install the snapshot CRDs, otherwise the controller will not run.

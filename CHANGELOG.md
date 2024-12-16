@@ -5,6 +5,7 @@ All releases and the changes included in them (pulled from git commits added sin
 ## Unreleased Changes
 
 ### Major Version Upgrades %%^^
+- Updated snapshot-controller from version 3.0.6 to 4.0.0
 - Updated keycloakx from version 2.6.0 to 3.0.0
 
 ### Minor Version Upgrades %%^^
