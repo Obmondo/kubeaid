@@ -137,8 +137,6 @@ bump_version() {
 major_change_detected=false
 minor_change_detected=false
 
-date="$(date +"%Y-%m-%d")"
-
 # Function to determine change type and store change
 determine_change_type() {
   local action=$1
@@ -229,11 +227,19 @@ function update_helm_chart {
             # For example for strimzi kafka operator downloaded tar file has name strimzi-kafka-operator-helm-3-chart-0.38.0.tgz 
             # while we look for strimzi-kafka-operator-0.38.0.tgz
             tar_file=$(find "$HELM_CHART_DEP_PATH" -maxdepth 1 -type f -name "*.tgz" -print -quit)
-            mv "$tar_file" "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_UPSTREAM_CHART_VERSION.tgz"
+            expected_tar_file="$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_UPSTREAM_CHART_VERSION.tgz"
+
+            # Check if the downloaded tar file matches the expected name
+            if [ "$tar_file" != "$expected_tar_file" ]; then
+                echo "Renaming $tar_file to $expected_tar_file"
+                mv "$tar_file" "$expected_tar_file"
+            else
+                echo "The tar file is already named correctly: $tar_file"
+            fi
 
             # Untar the tgz file
-            tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz" || {
-              echo "Failed to extract $HELM_CHART_NAME-$HELM_CHART_VERSION.tgz. Skipping."
+            tar -C "$HELM_CHART_DEP_PATH" -xvf "$expected_tar_file" || {
+              echo "Failed to extract $expected_tar_file. Skipping."
               continue
             }
 
@@ -258,12 +264,20 @@ function update_helm_chart {
           # For example for strimzi kafka operator downloaded tar file has name strimzi-kafka-operator-helm-3-chart-0.38.0.tgz 
           # while we look for strimzi-kafka-operator-0.38.0.tgz
           tar_file=$(find "$HELM_CHART_DEP_PATH" -maxdepth 1 -type f -name "*.tgz" -print -quit)
-          mv "$tar_file" "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz"
+          expected_tar_file="$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_UPSTREAM_CHART_VERSION.tgz"
+
+          # Check if the downloaded tar file matches the expected name
+          if [ "$tar_file" != "$expected_tar_file" ]; then
+              echo "Renaming $tar_file to $expected_tar_file"
+              mv "$tar_file" "$expected_tar_file"
+          else
+              echo "The tar file is already named correctly: $tar_file"
+          fi
 
 
           # Untar the tgz file
-          tar -C "$HELM_CHART_DEP_PATH" -xvf "$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz" || {
-            echo "Failed to extract $HELM_CHART_NAME-$HELM_CHART_VERSION.tgz. Skipping."
+          tar -C "$HELM_CHART_DEP_PATH" -xvf "$expected_tar_file" || {
+            echo "Failed to extract $expected_tar_file. Skipping."
             continue
           }
           
@@ -310,15 +324,15 @@ EOF
     change_type="patch"
   fi
 
-  # Check if the current date section exists
-  if ! grep -q "^## $date" "$changelog_file"; then
-    sed -i "/All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file./a\\\n## $date" CHANGELOG.md
-    sed -i "/$date/a\\### Patch Version Upgrades %%^^" CHANGELOG.md
-    sed -i "/$date/a\\### Minor Version Upgrades %%^^\n" CHANGELOG.md
-    sed -i "/$date/a\\### Major Version Upgrades %%^^\n" CHANGELOG.md
+  # Check if the Unreleased Changes section exists
+  if ! grep -q "^## Unreleased Changes" "$changelog_file"; then
+    sed -i "/All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file./a\\\n## Unreleased Changes" CHANGELOG.md
+    sed -i "/Unreleased Changes/a\\### Patch Version Upgrades %%^^" CHANGELOG.md
+    sed -i "/Unreleased Changes/a\\### Minor Version Upgrades %%^^\n" CHANGELOG.md
+    sed -i "/Unreleased Changes/a\\### Major Version Upgrades %%^^\n" CHANGELOG.md
   fi
 
-  # Add the new entry under the appropriate section under the current date
+  # Add the new entry under the appropriate section under the Unreleased Changes
   case "$change_type" in
     major)
       sed -i "/### Major Version Upgrades %%^^/a\\- $message" "$changelog_file"
@@ -386,7 +400,7 @@ if "$UPDATE_ALL"; then
   done < <(find ./"$ARGOCD_CHART_PATH" -maxdepth 1 -mindepth 1 -type d | sort)
 
   # Check if the current date entry exists in the file
-  if grep -q "$date" CHANGELOG.md; then
+  if grep -q "Unreleased Changes" CHANGELOG.md; then
     bump_type="patch"
     current_ver="$(get_current_version)"
 
@@ -399,15 +413,15 @@ if "$UPDATE_ALL"; then
 
     new_ver="$(bump_version "$current_ver" "$bump_type")"
 
-    sed -i "s/$date/$new_ver/" CHANGELOG.md
-    echo "Updated the changelog entry from '$date' to '$new_ver'"
+    sed -i "s/Unreleased Changes/$new_ver/" CHANGELOG.md
+    echo "Updated the changelog entry from 'Unreleased Changes' to '$new_ver'"
 
     # Remove Chnages heading markers
     sed -i 's/ %%\^\^//g' CHANGELOG.md
     # Remove empty sections
-    sed -i '/### Major Version Upgrades/{N;/### Major Version Upgrades\n$/d;}' CHANGELOG.md
-    sed -i '/### Minor Version Upgrades/{N;/### Minor Version Upgrades\n$/d;}' CHANGELOG.md
-    sed -i '/### Patch Version Upgrades/{N;/### Patch Version Upgrades\n$/d;}' CHANGELOG.md
+    sed -i '/### Major Version Upgrades/{N;/### Major Version Upgrades\n\n###$/d;}' CHANGELOG.md
+    sed -i '/### Minor Version Upgrades/{N;/### Minor Version Upgrades\n\n###$/d;}' CHANGELOG.md
+    sed -i '/### Patch Version Upgrades/{N;/### Patch Version Upgrades\n\n###$/d;}' CHANGELOG.md
 
     if $PULL_REQUEST; then
       git add CHANGELOG.md
