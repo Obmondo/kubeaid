@@ -1,0 +1,15 @@
+groups:
+  - name: monitor::system::docker
+    rules:
+      - alert: monitor::system::docker::status
+        expr: |
+          (
+            sum by (certname, name) (increase(container_last_seen{name!~"^runner.*"}[30m])) < 1200
+          ) and on(certname) obmondo_monitoring{alert_id="monitor::system::docker::status"} > 0
+        for: 5m
+        labels:
+          alert_id: monitor::system::docker::status
+          severity: critical
+        annotations:
+          summary: "Docker container {{$labels.name}} is down on host {{ $labels.certname }}"
+          description: "Docker container **{{ $labels.name }}** is down since from 10min on server **{{ $labels.certname }}**"

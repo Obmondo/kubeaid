@@ -1,0 +1,9 @@
+{{- if .Values.prometheusRule.docker }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: docker-rules
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  {{- $.Files.Get "rules/docker.yaml" | nindent 4 }}
+{{- end }}

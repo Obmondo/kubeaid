@@ -32,6 +32,7 @@ prometheusRule:
   cpu: true
   dellhw: true
   disk: true
+  docker: true
   drbd: true
   elasticsearch: true
   file_size: true
