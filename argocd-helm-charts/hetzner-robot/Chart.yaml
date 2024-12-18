@@ -1,0 +1,6 @@
+apiVersion: v2
+name: hetzner-robot
+description: |
+  A Helm Chart to support automatic k8s floating IP failover, on hetzner physical servers.
+version: 0.1.0
+appVersion: "1.0.0"

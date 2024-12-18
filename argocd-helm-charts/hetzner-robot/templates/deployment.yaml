@@ -1,0 +1,70 @@
+---
+{{- if .Values.failoverIP | trim | eq "" }}
+{{- fail "failoverIP must be provided" }}
+{{- end }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-failover
+  labels:
+    app: {{ .Release.Name }}-failover
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-failover
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-failover
+    spec:
+      containers:
+      - name: {{ .Release.Name }}-failover
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        env:
+        - name: FAILOVER_IP
+          value: {{ .Values.failoverIP }}
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: INTERVAL
+          value: "{{ .Values.interval }}"
+        - name: API_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .cloudCredentialsSecretName }}
+              key: robot-user
+        - name: API_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .cloudCredentialsSecretName }}
+              key: robot-password
+        - name: API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .cloudCredentialsSecretName }}
+              key: hcloud
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "pgrep hetzner-failover"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "pgrep hetzner-failover"
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: ""

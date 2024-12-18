@@ -1,0 +1,12 @@
+---
+image:
+  repository: ghcr.io/obmondo/hetzner-robot
+  tag: v1.0.0
+
+# Failover IP that pod will manage
+failoverIP: ""
+
+# Interval to check the failover IP is running on the node, where pod is running
+interval: 60s
+
+cloudCredentialsSecretName: cloud-credentials

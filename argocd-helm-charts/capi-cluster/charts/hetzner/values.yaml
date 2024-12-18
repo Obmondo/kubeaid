@@ -1,6 +1,9 @@
 controlPlaneLoadBalancer:
   enabled: true
 
+controlPlaneEndpoint:
+  port: 6443
+
 robot:
   floating: false
 
