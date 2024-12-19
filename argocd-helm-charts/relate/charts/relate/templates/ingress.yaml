@@ -23,6 +23,13 @@ spec:
           {{- if .Values.ingress.extraPaths }}
           {{- toYaml .Values.ingress.extraPaths | nindent 10 }}
           {{- end }}
+          - path: /static/
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-service  # The service you created to serve static files
+                port:
+                  number: 80
           - path: {{ .Values.ingress.path }}
             {{- if eq "true" (include "relate.supportsPathType" .) }}
             pathType: {{ .Values.ingress.pathType }}

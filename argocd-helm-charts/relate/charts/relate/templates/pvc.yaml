@@ -29,3 +29,15 @@ spec:
 {{- end }}
 {{- end }}
 {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-staticdata 
+spec:
+  accessModes:
+    - ReadWriteOnce 
+  resources:
+    requests:
+      storage: {{ default "100Mi" .Values.nginx.pvcStorage }} 
+

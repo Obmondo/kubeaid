@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-nginx-config
+data:
+  nginx.conf: |
+    events {
+    worker_connections 10;}
+    http{
+    server {
+        listen 80;
+        server_name {{ .Values.nginx.serverName }};
+        location /static/ {
+          root {{ .Values.nginx.rootDirectory }};
+          autoindex on;
+          try_files $uri $uri.html =404;
+        }
+    }
+    }
