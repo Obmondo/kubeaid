@@ -34,17 +34,17 @@ spec:
         - name: API_USERNAME
           valueFrom:
             secretKeyRef:
-              name: {{ .cloudCredentialsSecretName }}
+              name: {{ .Values.cloudCredentialsSecretName }}
               key: robot-user
         - name: API_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .cloudCredentialsSecretName }}
+              name: {{ .Values.cloudCredentialsSecretName }}
               key: robot-password
         - name: API_TOKEN
           valueFrom:
             secretKeyRef:
-              name: {{ .cloudCredentialsSecretName }}
+              name: {{ .Values.cloudCredentialsSecretName }}
               key: hcloud
         livenessProbe:
           exec:
