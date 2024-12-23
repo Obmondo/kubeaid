@@ -28,6 +28,10 @@ spec:
       serviceAccountName: {{ include "ccm-hetzner.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+      - name: hetzner-secret
+        secret:
+          secretName: {{ .Values.secret.name }}
       tolerations:
         # Introduced with CAPI v1.4, more info: https://cluster-api.sigs.k8s.io/developer/providers/bootstrap.html#taint-nodes-at-creation
         - key: "node.cluster.x-k8s.io/uninitialized"
@@ -70,38 +74,11 @@ spec:
 {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - mountPath: /etc/hetzner-secret
+            name: hetzner-secret
+            readOnly: true
           env:
-            - name: NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-            - name: HCLOUD_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  {{- if .Values.secret.create }}
-                  name: {{ include "ccm-hetzner.fullname" . }}
-                  {{- else }}
-                  name: {{ .Values.secret.name }}
-                  {{- end }}
-                  key: {{ .Values.secret.key.token }}
-            - name: ROBOT_USER_NAME
-              valueFrom:
-                secretKeyRef:
-                  {{- if .Values.secret.create }}
-                  name: {{ include "ccm-hetzner.fullname" . }}
-                  {{- else }}
-                  name: {{ .Values.secret.name }}
-                  {{- end }}
-                  key: {{ .Values.secret.key.robotUserName }}
-            - name: ROBOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  {{- if .Values.secret.create }}
-                  name: {{ include "ccm-hetzner.fullname" . }}
-                  {{- else }}
-                  name: {{ .Values.secret.name }}
-                  {{- end }}
-                  key: {{ .Values.secret.key.robotPassword }}
             - name: HCLOUD_DEBUG
               value: "{{ .Values.env.debug }}"
             - name: HCLOUD_LOAD_BALANCERS_ENABLED

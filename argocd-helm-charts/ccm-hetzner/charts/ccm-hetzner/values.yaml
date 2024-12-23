@@ -36,10 +36,13 @@ secret:
   create: false
   name: hetzner # Name of an existing secret
   key:
-    token: hcloud # Name of an existing key for the hcloud-token in the above specified secret
-    robotUserName: robot-user
-    robotPassword: robot-password
     network: network # Name of an existing key for the hcloud-network in the above specified secret
+
+    ## These values could be set in v1. For v2 we introduced hot-reloading of the secret.
+    ## These values are no longer configurable:
+    # token: hcloud
+    # robotUserName: robot-user
+    # robotPassword: robot-password
 
 pdb:
   enabled: true
