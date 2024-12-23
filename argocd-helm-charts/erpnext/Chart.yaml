@@ -1,0 +1,7 @@
+apiVersion: v2
+name: erpnext
+version: 1.0.0
+dependencies:
+  - name: erpnext
+    version: 7.0.146
+    repository: https://helm.erpnext.com
