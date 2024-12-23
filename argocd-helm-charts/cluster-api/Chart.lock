@@ -1,6 +1,6 @@
 dependencies:
 - name: cluster-api-operator
   repository: https://kubernetes-sigs.github.io/cluster-api-operator
-  version: 0.14.0
-digest: sha256:6676fd5d872f9fade692fb142096059a78fca059a5478b94c8045124dba74d29
-generated: "2024-10-14T11:57:32.949792972+05:30"
+  version: 0.15.0
+digest: sha256:c0eb1039d4f06b3d4ac665bda44d7ddea5a35e8941b33ffd98b4f93d65dfcc6a
+generated: "2024-12-23T10:16:27.343783076+05:30"

@@ -7,6 +7,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated ccm-hetzner from version 1.1.15 to 2.0.1
 
 ### Minor Version Upgrades %%^^
+- Updated cluster-api-operator from version 0.14.0 to 0.15.0
 
 ### Patch Version Upgrades %%^^
 - Updated cilium from version 1.16.4 to 1.16.5
