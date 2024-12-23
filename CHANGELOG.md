@@ -10,6 +10,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cluster-api-operator from version 0.14.0 to 0.15.0
 
 ### Patch Version Upgrades %%^^
+- Updated gatekeeper from version 3.18.0 to 3.18.1
 - Updated external-dns from version 8.7.0 to 8.7.1
 - Updated crossplane from version 1.18.1 to 1.18.2
 - Updated cilium from version 1.16.4 to 1.16.5
