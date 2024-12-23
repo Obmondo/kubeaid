@@ -8,6 +8,8 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated ccm-hetzner from version 1.1.15 to 2.0.1
 
 ### Minor Version Upgrades %%^^
+- Updated rook-ceph-cluster from version v1.15.6 to v1.16.0
+- Updated rook-ceph from version v1.15.6 to v1.16.0
 - Updated opensearch from version 2.27.1 to 2.28.0
 - Updated community-operator from version 0.11.0 to 0.12.0
 - Updated gitlab-runner from version 0.71.0 to 0.72.0

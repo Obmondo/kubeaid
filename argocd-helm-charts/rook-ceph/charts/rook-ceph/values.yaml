@@ -6,8 +6,8 @@ image:
   # -- Image
   repository: docker.io/rook/ceph
   # -- Image tag
-  # @default -- `v1.15.6`
-  tag: v1.15.6
+  # @default -- `v1.16.0`
+  tag: v1.16.0
   # -- Image pull policy
   pullPolicy: IfNotPresent
 
@@ -88,10 +88,6 @@ csi:
   # in some network configurations where the SDN does not provide access to an external cluster or
   # there is significant drop in read/write performance
   enableCSIHostNetwork: true
-  # -- Deprecation note: Rook uses "holder" pods to allow CSI to connect to the multus public network
-  # without needing hosts to the network. Holder pods are being removed. See issue for details:
-  # https://github.com/rook/rook/issues/13055. New Rook deployments should set this to "true".
-  disableHolderPods: true
   # -- Enable Snapshotter in CephFS provisioner pod
   enableCephfsSnapshotter: true
   # -- Enable Snapshotter in NFS provisioner pod
@@ -484,7 +480,7 @@ csi:
     # -- Ceph CSI image repository
     repository: quay.io/cephcsi/cephcsi
     # -- Ceph CSI image tag
-    tag: v3.12.2
+    tag: v3.13.0
 
   registrar:
     # -- Kubernetes CSI registrar image repository
@@ -534,7 +530,7 @@ csi:
     # -- CSIAddons sidecar image repository
     repository: quay.io/csiaddons/k8s-sidecar
     # -- CSIAddons sidecar image tag
-    tag: v0.9.1
+    tag: v0.11.0
 
   nfs:
     # -- Enable the nfs csi driver
