@@ -8,6 +8,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated ccm-hetzner from version 1.1.15 to 2.0.1
 
 ### Minor Version Upgrades %%^^
+- Updated teleport-cluster from version 17.0.5 to 17.1.1
 - Updated strimzi-kafka-operator from version 0.44.0 to 0.45.0
 - Updated rook-ceph-cluster from version v1.15.6 to v1.16.0
 - Updated rook-ceph from version v1.15.6 to v1.16.0
