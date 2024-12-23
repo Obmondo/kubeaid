@@ -2,12 +2,12 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## Unreleased Changes
-### Major Version Upgrades %%^^
+## 8.0.0
+### Major Version Upgrades
 - Updated keycloakx from version 3.0.0 to 4.0.0
 - Updated ccm-hetzner from version 1.1.15 to 2.0.1
 
-### Minor Version Upgrades %%^^
+### Minor Version Upgrades
 - Updated teleport-kube-agent from version 17.0.5 to 17.1.1
 - Updated teleport-cluster from version 17.0.5 to 17.1.1
 - Updated strimzi-kafka-operator from version 0.44.0 to 0.45.0
@@ -18,7 +18,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated gitlab-runner from version 0.71.0 to 0.72.0
 - Updated cluster-api-operator from version 0.14.0 to 0.15.0
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
 - Updated sonarqube from version 10.8.0 to 10.8.1
 - Updated rabbitmq-cluster-operator from version 4.4.0 to 4.4.1
 - Added openobserve from version 0.14.7 to 0.14.7
