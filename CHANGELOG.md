@@ -2,6 +2,13 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`109b8841`](../../commit/109b8841) Fixing hetzner-robot Helm chart
+- [`26b6539e`](../../commit/26b6539e) Adding the hetzner-robot KubeAid App
+- [`8fb9ab22`](../../commit/8fb9ab22) Updated the docker rules and fixed the test case for docker container status
+- [`66d3c0ad`](../../commit/66d3c0ad) update from pg operator from zalando to cncf for relate in kbm
+- [`75ecc54e`](../../commit/75ecc54e) Update helm chart update script to handle individual helm update logging properly and fix name change bug
+
 ## 7.0.0
 
 ### Major Version Upgrades
