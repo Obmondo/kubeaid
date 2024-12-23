@@ -30,6 +30,12 @@ spec:
   {{- if eq (include "gitlab-runner.server-session-service-type" .) "Headless" }}
   clusterIP: None
   {{- end }}
+  {{- if .Values.sessionServer.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ .Values.sessionServer.externalTrafficPolicy }}
+  {{- end }}
+  {{- if .Values.sessionServer.internalTrafficPolicy }}
+  internalTrafficPolicy: {{ .Values.sessionServer.internalTrafficPolicy }}
+  {{- end }}
   ports:
   - protocol: TCP
     port: {{ include "gitlab-runner.server-session-external-port" . }}
