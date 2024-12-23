@@ -3,5 +3,5 @@ name: keycloakx
 version: 1.0.0
 dependencies:
   - name: keycloakx
-    version: 3.0.0
+    version: 4.0.0
     repository: https://codecentric.github.io/helm-charts

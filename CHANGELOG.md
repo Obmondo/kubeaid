@@ -4,6 +4,7 @@ All releases and the changes included in them (pulled from git commits added sin
 
 ## Unreleased Changes
 ### Major Version Upgrades %%^^
+- Updated keycloakx from version 3.0.0 to 4.0.0
 - Updated ccm-hetzner from version 1.1.15 to 2.0.1
 
 ### Minor Version Upgrades %%^^
