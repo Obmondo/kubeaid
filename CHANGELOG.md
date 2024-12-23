@@ -16,6 +16,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cluster-api-operator from version 0.14.0 to 0.15.0
 
 ### Patch Version Upgrades %%^^
+- Updated sonarqube from version 10.8.0 to 10.8.1
 - Updated rabbitmq-cluster-operator from version 4.4.0 to 4.4.1
 - Added openobserve from version 0.14.7 to 0.14.7
 - Updated metallb from version 6.4.1 to 6.4.2
