@@ -2,6 +2,14 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## Unreleased Changes
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+
+### Patch Version Upgrades %%^^
+- Updated argo-cd from version 7.7.10 to 7.7.11
+
 ### Improvements
 - [`109b8841`](../../commit/109b8841) Fixing hetzner-robot Helm chart
 - [`26b6539e`](../../commit/26b6539e) Adding the hetzner-robot KubeAid App
