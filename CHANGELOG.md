@@ -13,6 +13,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated cluster-api-operator from version 0.14.0 to 0.15.0
 
 ### Patch Version Upgrades %%^^
+- Added openobserve from version 0.14.7 to 0.14.7
 - Updated metallb from version 6.4.1 to 6.4.2
 - Updated gatekeeper from version 3.18.0 to 3.18.1
 - Updated external-dns from version 8.7.0 to 8.7.1
