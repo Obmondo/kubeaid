@@ -39,5 +39,5 @@ spec:
     - ReadWriteOnce 
   resources:
     requests:
-      storage: {{ default "100Mi" .Values.nginx.pvcStorage }} 
+      storage: {{ default "300Mi" .Values.nginx.pvcStorage }} 
 
