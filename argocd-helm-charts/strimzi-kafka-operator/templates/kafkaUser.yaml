@@ -17,7 +17,6 @@ spec:
       - type: {{ .type }}
         resource:
           type: {{ .resource.type }}
-          # resource of type cluster does not support name and patternType 
         {{- if ne .resource.type "cluster" }}
           name: {{ .resource.name }}
           patternType: {{ .resource.patternType }}

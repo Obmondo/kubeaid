@@ -7,8 +7,10 @@ metadata:
 spec:
   kafka:
     replicas: {{ .kafka.replicas }}
+    {{- if .kafka.authorization }}
     authorization:
       type: {{ .kafka.authorization.type }}
+    {{- end}}
     listeners:
     {{- range .kafka.listeners }}
       - name: {{ .name }}
@@ -19,13 +21,38 @@ spec:
         authentication:
           type: {{ .authentication.type | default "tls" }}
         {{- end }}
+        {{- if .configuration }}
+        configuration:
+            bootstrap:
+              host: {{ .configuration.bootstrap.host }}
+              {{- if .configuration.bootstrap.annotations }}
+              annotations:
+                {{- range $key, $value := .configuration.bootstrap.annotations }}
+                {{ $key }}: {{ $value }}
+                {{- end }}
+              {{- end}}
+            brokers:
+            {{- range .configuration.brokers }}
+            - broker: {{ .id }}
+              host: {{ .host }}
+              {{- if .annotations }}
+              annotations:
+                {{- range $key, $value := .annotations }}
+                {{ $key }}: {{ $value }}
+                {{- end }}
+              {{- end}}
+            {{- end}}
+            class: {{ .configuration.class }}
+        {{- end}}
     {{- end }}
     storage:
       type: {{ .kafka.storage.type }}
-      class: {{ .kafka.storage.type | default "rook-ceph-block" }}
+      {{- if .kafka.storage.class }}
+      class: {{ .kafka.storage.class}}
+      {{- end}}
+      {{- if .kafka.storage.size}}
       size: {{ .kafka.storage.size }}
-      
-      # volumes is to be set if the above storage type is jbod
+      {{- end}}
       {{- if eq .kafka.storage.type "jbod" }}
       volumes:
         {{- range .kafka.storage.volumes }}

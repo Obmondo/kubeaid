@@ -8,13 +8,11 @@ kafka:
         - name: internal
           port: 9094
           type: internal
-          tls: true
+          tls: false
           authentication:
-            type: tls
-
+            type: scram-sha-512
       storage:
         type: jbod
-        # volumes is to be set if the above storage type is jbod
         volumes:
         - id: 0
           class: rook-ceph-block
@@ -45,14 +43,13 @@ kafkaUser:
   - name: my-user
     cluster: strimzi-kafka
     authentication:
-      type: tls
+      type: scram-sha-512
     authorization:
       type: simple
       acls:
         - type: allow
           resource:
             type: topic
-            # resource of type cluster does not support name and patternType
             name: my-topic
             patternType: literal
           host: "*"
@@ -62,7 +59,7 @@ kafkaUser:
         - type: allow
           resource:
             type: group
-            name: my-consumer-group
+            name: my-group
             patternType: literal
           host: "*"
           operations:
@@ -70,17 +67,16 @@ kafkaUser:
 
 ingress:
   enable: false
-  class: nginx
   name: kafka
   rules:
     - host: localhost
       http:
         paths:
           - path: /
-            pathType: Prefix
+            pathType: prefix
             backend:
               service:
-                name: strimzi-kafka-kafka-internal-bootstrap # name of the bootstrap services <cluster_name>-kafka-<listener_name>-bootstrap
+                name: strimzi-kafka-kafka-internal-bootstrap
                 port:
                   number: 9094
   tls:
