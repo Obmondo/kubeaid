@@ -22,6 +22,36 @@
               summary: 'The device has disk sata failures.'
             },
           },
+          {
+            alert: 'SmartMonDeviceSmartHealthy',
+            expr: 'smartmon_device_smart_healthy == 0',
+            'for': '3h',
+            labels: {
+              severity: 'critical',
+              alert_id: 'SmartMonDeviceSmartHealthy',
+            },
+            annotations: {
+              description: 'Disk **{{ $labels.disk }}** on **{{ $labels.certname }}** has SMART failure',
+              summary: 'Disk has SMART failure.'
+            },
+          },
+          {
+            alert: 'SmartMonReallocatedSectorCtRawValue',
+            expr: 'smartmon_reallocated_sector_ct_raw_value > smartmon_reallocated_sector_ct_threshold',
+            'for': '3h',
+            labels: {
+              severity: 'critical',
+              alert_id: 'SmartMonReallocatedSectorCtRawValue',
+            },
+            annotations: {
+              description: 'Disk **{{ $labels.disk }}** on **{{ $labels.certname }}** has remapped sector too many times,
+          instance="**{{ $labels.instance }}**",
+          type="**{{ $labels.type }}**",
+
+          Reallocated Sectors Count -  This value is primarily used as a metric of the life expectancy of the drive; a drive which has had any reallocations at all is significantly more likely to fail in the immediate months.',
+              summary: 'Disk has remapped disk sector too many times.'
+            },
+          },
         ],
       },
     ],

@@ -1,0 +1,76 @@
+---
+evaluation_interval: 1m
+
+rule_files:
+  - ../rules/smartmon.yaml
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: obmondo_monitoring{certname="jacen.enableit", alert_id="monitor::system::service::smartmon::smartmon_udma_crc_error_count_raw_value"}
+        values: 1x200
+      - series: smartmon_udma_crc_error_count_raw_value{certname="jacen.enableit", disk="/dev/sdb", type="sat", instance="htzhel1-ax41a.enableit:63385"}
+        values: 1x200
+      - series: smartmon_udma_crc_error_count_raw_value{certname="jacen.enableit", disk="/dev/sba", type="sat", instance="htzhel1-ax41a.enableit:63385"}
+        values: 0x200
+
+      - series: obmondo_monitoring{certname="jacen.enableit", alert_id="monitor::system::service::smartmon::disk_healthy"}
+        values: 1x1000
+      - series: smartmon_device_smart_healthy{certname="jacen.enableit", disk="/dev/sdb"}
+        values: 0x1000
+
+      - series: obmondo_monitoring{certname="jacen.enableit", alert_id="monitor::system::service::smartmon::smartmon_reallocated_sector_ct_raw_value"}
+        values: 1x200
+      - series: smartmon_reallocated_sector_ct_raw_value{certname="jacen.enableit", disk="/dev/sdb", type="sat", instance="htzhel1-ax41a.enableit:63385"}
+        values: 250x200
+      - series: smartmon_reallocated_sector_ct_threshold{certname="jacen.enableit", disk="/dev/sdb", type="sat", instance="htzhel1-ax41a.enableit:63385"}
+        values: 100x200
+
+    alert_rule_test:
+      - alertname: 'monitor::system::service::smartmon::smartmon_udma_crc_error_count_raw_value'
+        eval_time: 3h
+        exp_alerts:
+          - exp_labels:
+              severity: 'critical'
+              certname: 'jacen.enableit'
+              disk: '/dev/sdb'
+              type: sat
+              instance: "htzhel1-ax41a.enableit:63385"
+              alert_id: 'monitor::system::service::smartmon::smartmon_udma_crc_error_count_raw_value'
+            exp_annotations:
+              summary: 'Disk **/dev/sdb** on **jacen.enableit** has disk sata failure'
+              description: |
+                Disk **/dev/sdb** on **jacen.enableit** has disk sata failure,
+                instance="**htzhel1-ax41a.enableit:63385**",
+                type="**sat**",
+
+                UDMA_CRC_Error_Count - The number of errors related to data transfer over the interface. A value of **1** is concerning and indicates potential issues with the data cable or connections.
+      - alertname: 'monitor::system::service::smartmon::disk_healthy'
+        eval_time: 3h
+        exp_alerts:
+          - exp_labels:
+              severity: 'critical'
+              certname: 'jacen.enableit'
+              disk: '/dev/sdb'
+              alert_id: 'monitor::system::service::smartmon::disk_healthy'
+            exp_annotations:
+              summary: 'Disk **/dev/sdb** on **jacen.enableit** has SMART failure'
+              description: 'Disk **/dev/sdb** on **jacen.enableit** has SMART failure'
+      - alertname: 'monitor::system::service::smartmon::smartmon_reallocated_sector_ct_raw_value'
+        eval_time: 3h
+        exp_alerts:
+          - exp_labels:
+              severity: 'critical'
+              certname: 'jacen.enableit'
+              disk: '/dev/sdb'
+              type: sat
+              instance: "htzhel1-ax41a.enableit:63385"
+              alert_id: 'monitor::system::service::smartmon::smartmon_reallocated_sector_ct_raw_value'
+            exp_annotations:
+              summary: 'Disk **/dev/sdb** on **jacen.enableit** has remapped disk sector too many times'
+              description: |
+                Disk **/dev/sdb** on **jacen.enableit** has remapped sector too many times,
+                instance="**htzhel1-ax41a.enableit:63385**",
+                type="**sat**",
+
+                Reallocated Sectors Count -  This value is primarily used as a metric of the life expectancy of the drive; a drive which has had any reallocations at all is significantly more likely to fail in the immediate months.

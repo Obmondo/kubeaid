@@ -12,3 +12,26 @@ groups:
     labels:
       alert_id: SmartMonUdmaCrcErrorCountRawValue
       severity: critical
+  - alert: SmartMonDeviceSmartHealthy
+    annotations:
+      description: Disk **{{ $labels.disk }}** on **{{ $labels.certname }}** has SMART failure
+      summary: Disk has SMART failure.
+    expr: smartmon_device_smart_healthy == 0
+    for: 3h
+    labels:
+      alert_id: SmartMonDeviceSmartHealthy
+      severity: critical
+  - alert: SmartMonReallocatedSectorCtRawValue
+    annotations:
+      description: |-
+        Disk **{{ $labels.disk }}** on **{{ $labels.certname }}** has remapped sector too many times,
+                  instance="**{{ $labels.instance }}**",
+                  type="**{{ $labels.type }}**",
+
+                  Reallocated Sectors Count -  This value is primarily used as a metric of the life expectancy of the drive; a drive which has had any reallocations at all is significantly more likely to fail in the immediate months.
+      summary: Disk has remapped disk sector too many times.
+    expr: smartmon_reallocated_sector_ct_raw_value > smartmon_reallocated_sector_ct_threshold
+    for: 3h
+    labels:
+      alert_id: SmartMonReallocatedSectorCtRawValue
+      severity: critical
