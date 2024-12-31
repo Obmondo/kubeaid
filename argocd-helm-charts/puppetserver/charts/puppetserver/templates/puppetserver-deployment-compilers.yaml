@@ -308,7 +308,7 @@ spec:
               subPath: hiera.yaml
             {{- if and (or (.Values.hiera.eyaml.existingMap) (.Values.hiera.eyaml.existingSecret)) (not .Values.hiera.eyaml.public_key) (not .Values.hiera.eyaml.private_key)  }}
             - name: eyaml-volume
-              mountPath: /etc/puppetlabs/puppet/eyaml/keys
+              mountPath: /tmp/puppet/configmap/eyaml/keys
             {{- end }}
             {{- end }}
           securityContext:

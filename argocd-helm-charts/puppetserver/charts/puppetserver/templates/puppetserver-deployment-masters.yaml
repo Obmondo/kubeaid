@@ -125,12 +125,6 @@ spec:
               cp /tmp/puppet/configmap/hiera.yaml /etc/puppetlabs/puppet/hiera.yaml;
               chown puppet:puppet /etc/puppetlabs/puppet/hiera.yaml;
               {{- end }}
-              {{- if or (.Values.hiera.eyaml.public_key) (.Values.hiera.eyaml.private_key) (.Values.hiera.eyaml.existingMap) (.Values.hiera.eyaml.existingSecret) }}
-              cp /tmp/puppet/configmap/eyaml/*private_key.pkcs7.pem /etc/puppetlabs/puppet/eyaml/keys/;
-              chown puppet:puppet /etc/puppetlabs/puppet/eyaml/keys/*private_key.pkcs7.pem;
-              cp /tmp/puppet/configmap/eyaml/*public_key.pkcs7.pem /etc/puppetlabs/puppet/eyaml/keys/;
-              chown puppet:puppet /etc/puppetlabs/puppet/eyaml/keys/*public_key.pkcs7.pem;
-              {{- end }}
               {{- end }}
               {{- end }}
               cp /tmp/puppet/configmap/site.pp /etc/puppetlabs/puppet/manifests/site.pp;
@@ -144,6 +138,12 @@ spec:
               {{- if eq .Values.puppetserver.persistence.confd.enabled true }}
               cp -rp /etc/puppetlabs/puppetserver/conf.d/* /conf.d/;
               {{- end}}
+              {{- if or (.Values.hiera.eyaml.public_key) (.Values.hiera.eyaml.private_key) (.Values.hiera.eyaml.existingMap) (.Values.hiera.eyaml.existingSecret) }}
+              cp /tmp/puppet/configmap/eyaml/*private_key.pkcs7.pem /etc/puppetlabs/puppet/eyaml/keys/;
+              chown puppet:puppet /etc/puppetlabs/puppet/eyaml/keys/*private_key.pkcs7.pem;
+              cp /tmp/puppet/configmap/eyaml/*public_key.pkcs7.pem /etc/puppetlabs/puppet/eyaml/keys/;
+              chown puppet:puppet /etc/puppetlabs/puppet/eyaml/keys/*public_key.pkcs7.pem;
+              {{- end }}
           securityContext:
             runAsUser: 0
             runAsNonRoot: false
@@ -335,7 +335,7 @@ spec:
             {{- end }}
             {{- if and (or (.Values.hiera.eyaml.existingMap) (.Values.hiera.eyaml.existingSecret)) (not .Values.hiera.eyaml.public_key) (not .Values.hiera.eyaml.private_key)  }}
             - name: eyaml-volume
-              mountPath: /etc/puppetlabs/puppet/eyaml/keys
+              mountPath: /tmp/puppet/configmap/eyaml/keys
             {{- end }}
             {{- end }}
           securityContext:
