@@ -1,1 +1,37 @@
 ---
+erpnext:
+  dbHost: erpnext-mariadb
+  dbPort: 3306
+  dbRootUser: root
+  dbRootPassword: secretpassword
+  dbRds: false
+  persistence:
+    worker:
+      storageClass: "ceph-filesystem"
+  mariadb:
+    enabled: false
+  redis-cache:
+    enabled: false
+    host: "redis://erpnext-redis-cache:6379"
+  redis-queue:
+    enabled: false
+    host: "redis://erpnext-redis-queue:6379"
+
+mariadb:
+  rootPasswordSecretKeyRef:
+    name: root-user-secrets
+    key: MARIADB_ROOT_PASSWORD
+    generate: false
+  storage:
+    size: 10Gi
+    storageClassName: zfs-localpv
+    resizeInUseVolumes: true
+    waitForVolumeResize: true
+  image: "mariadb:11.6.2-noble"
+  imagePullPolicy: IfNotPresent
+
+redisCache:
+  storage: 4Gi
+
+redisQueue:
+  storage: 4Gi

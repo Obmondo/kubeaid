@@ -1,0 +1,9 @@
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Database
+metadata:
+  name: {{ .Release.Name }}-mariadb
+spec:
+  mariaDbRef:
+    name: {{ .Release.Name }}-mariadb
+  characterSet: utf8mb4
+  collate: utf8mb4_unicode_ci

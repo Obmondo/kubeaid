@@ -1,0 +1,35 @@
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: MariaDB
+metadata:
+  name: {{ .Release.Name }}-mariadb
+spec:
+  rootPasswordSecretKeyRef:
+    name: {{ .Values.mariadb.rootPasswordSecretKeyRef.name }}
+    key: {{ .Values.mariadb.rootPasswordSecretKeyRef.key }}
+    generate: {{ .Values.mariadb.rootPasswordSecretKeyRef.generate }}
+
+  storage:
+    size: {{ .Values.mariadb.storage.size }}
+    storageClassName: {{ .Values.mariadb.storage.storageClassName }}
+    resizeInUseVolumes: {{ .Values.mariadb.storage.resizeInUseVolumes }}
+    waitForVolumeResize: {{ .Values.mariadb.storage.waitForVolumeResize }}
+
+  securityContext:
+    allowPrivilegeEscalation: false
+
+  podDisruptionBudget:
+    maxUnavailable: 50%
+
+  myCnf: |
+    [mariadb]
+    bind-address=*
+    default_storage_engine=InnoDB
+    binlog_format=row
+    innodb_autoinc_lock_mode=2
+    innodb_buffer_pool_size=1024M
+    max_allowed_packet=256M
+
+  image: {{ .Values.mariadb.image }}
+  imagePullPolicy: {{ .Values.mariadb.imagePullPolicy }}
+  imagePullSecrets:
+    - name: registry
