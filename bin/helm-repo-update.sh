@@ -393,10 +393,6 @@ if "$UPDATE_ALL"; then
 
     update_helm_chart "$path" "$CHART_VERSION"
 
-    # Commit for each individual helm chart
-    if $PULL_REQUEST; then
-      pull_request "$chart_name"
-    fi
   done < <(find ./"$ARGOCD_CHART_PATH" -maxdepth 1 -mindepth 1 -type d | sort)
 
   # Check if the current date entry exists in the file
@@ -423,10 +419,6 @@ if "$UPDATE_ALL"; then
     sed -i '/### Minor Version Upgrades/{N;/### Minor Version Upgrades\n\n###$/d;}' CHANGELOG.md
     sed -i '/### Patch Version Upgrades/{N;/### Patch Version Upgrades\n\n###$/d;}' CHANGELOG.md
 
-    if $PULL_REQUEST; then
-      git add CHANGELOG.md
-      git commit -m "Update to new tag for Kubeaid"
-    fi
   else
     bump_type="patch"
     current_ver="$(get_current_version)"
@@ -437,6 +429,8 @@ if "$UPDATE_ALL"; then
 fi
 
 if $PULL_REQUEST; then
+  git add .
+  git commit -m "periodic helm chart update"
   git push origin "$branch_name"
 fi
 
