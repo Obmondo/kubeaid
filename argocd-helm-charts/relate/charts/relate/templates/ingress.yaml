@@ -27,9 +27,9 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: nginx-service  # The service you created to serve static files
+                name: relate
                 port:
-                  number: 80
+                  number: 8001
           - path: {{ .Values.ingress.path }}
             {{- if eq "true" (include "relate.supportsPathType" .) }}
             pathType: {{ .Values.ingress.pathType }}

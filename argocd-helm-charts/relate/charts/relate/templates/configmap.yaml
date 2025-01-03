@@ -8,11 +8,12 @@ data:
     worker_connections 10;}
     http{
     server {
-        listen 80;
+        listen 8001;
         server_name {{ .Values.nginx.serverName }};
         location /static/ {
           root {{ .Values.nginx.rootDirectory }};
           autoindex on;
+          include mime.types;
           try_files $uri $uri.html =404;
         }
     }

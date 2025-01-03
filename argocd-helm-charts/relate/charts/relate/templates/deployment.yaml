@@ -34,6 +34,17 @@ spec:
       priorityClassName: {{ .Values.priorityClassName | quote }}
       {{- end }}
       containers:
+        - name: nginx
+          image: {{  .Values.nginx.image | default "nginx:latest" }}
+          imagePullPolicy: {{  .Values.nginx.pullPolicy | default "IfNotPresent"}}  # Default pull policy if not provided
+          volumeMounts:
+            - name: nginx-config-volume
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: shared-static-data
+              mountPath: /var/www/relate/static
+          ports:
+            - containerPort: 8001
         - name: relate
           command:
               - /run-relate.sh
@@ -91,38 +102,7 @@ spec:
         - name: shared-static-data
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-staticdata
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ .Release.Name }}-nginx-deployment
-spec:
-  replicas: {{ default 1 .Values.nginx.replicas }}  # Default to 1 replica if not provided
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-        - name: nginx
-          image: {{  .Values.nginx.image | default "nginx:latest" }}
-          imagePullPolicy: {{  .Values.nginx.pullPolicy | default "IfNotPresent"}}  # Default pull policy if not provided
-          volumeMounts:
-            - name: nginx-config-volume
-              mountPath: /etc/nginx/nginx.conf
-              subPath: nginx.conf
-            - name: shared-static-data
-              mountPath: /var/www/relate/static
-          ports:
-            - containerPort: 80
-
-      volumes:
         - name: nginx-config-volume
           configMap:
             name: {{ .Release.Name }}-nginx-config
-        - name: shared-static-data
-          persistentVolumeClaim:
-            claimName: {{ .Release.Name }}-staticdata  # Default PVC name if not provided
+

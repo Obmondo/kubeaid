@@ -5,6 +5,6 @@ metadata:
 spec:
   immediate: true # Backup starts immediately after ScheduledBackup has been created
   backupOwnerReference: self
-  schedule: "0 0 0 * * *"
+  schedule: "0 0 3 * * *"
   cluster:
     name: relate-pgsql # Cluster name

@@ -40,4 +40,6 @@ spec:
   resources:
     requests:
       storage: {{ default "300Mi" .Values.nginx.pvcStorage }} 
-
+  {{- if .Values.nginx.storageClass }}
+  storageClassName: {{ .Values.nginx.storageClass }}
+  {{- end }}

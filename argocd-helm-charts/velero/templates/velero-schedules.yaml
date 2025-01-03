@@ -11,8 +11,12 @@ spec:
     hooks: {}
     csiSnapshotTimeout: 40m
     itemOperationTimeout: 300m
-    includedNamespaces:
-    - '*'
+    includedNamespaces: 
+    {{- if .Values.schedule.includedNamespaces }}
+    {{- toYaml .Values.schedule.includedNamespaces | nindent 6 }}
+    {{- else }}
+      - "*"
+    {{- end }}
     ttl: 720h0m0s
     metadata:
       labels:
@@ -31,8 +35,12 @@ spec:
     hooks: {}
     csiSnapshotTimeout: 40m
     itemOperationTimeout: 300m
-    includedNamespaces:
-    - '*'
+    includedNamespaces: 
+    {{- if .Values.schedule.includedNamespaces }}
+    {{- toYaml .Values.schedule.includedNamespaces | nindent 6 }}
+    {{- else }}
+      - "*"
+    {{- end }}
     ttl: 2160h0m0s
     metadata:
       labels:
@@ -52,8 +60,12 @@ spec:
     hooks: {}
     csiSnapshotTimeout: 40m
     itemOperationTimeout: 300m
-    includedNamespaces:
-    - '*'
+    includedNamespaces: 
+    {{- if .Values.schedule.includedNamespaces }}
+    {{- toYaml .Values.schedule.includedNamespaces | nindent 6 }}
+    {{- else }}
+      - "*"
+    {{- end }}
     ttl: 336h0m0s
     metadata:
       labels:
