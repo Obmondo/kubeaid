@@ -4,14 +4,14 @@ apiVersion: monitoring.coreos.com/v1
 metadata:
   name: blackbox-probe-keycloakx
 spec:
-  interval: 6h
+  interval: 30m
   module: http_2xx
   prober:
     url: blackbox-exporter.monitoring.svc.cluster.local:19115
   targets:
     staticConfig:
       static:
-        {{- range (((.Values).keycloakx).ingress).hosts }}
-        - {{ . }}
+        {{- range (((.Values).keycloakx).ingress).rules }}
+        - https://{{ .host }}
         {{- end }}
 {{- end}}
