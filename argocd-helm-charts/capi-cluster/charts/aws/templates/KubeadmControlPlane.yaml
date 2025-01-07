@@ -16,6 +16,13 @@ spec:
         {{- if ((.Values.controlPlane).apiServer).extraVolumes }}
         {{- ((.Values.controlPlane).apiServer).extraVolumes | toYaml | nindent 8 }}
         {{- end }}
+      etcd:
+        local:
+          extraEnvs:
+            - name: ETCD_METRICS
+              value: extensive
+            - name: ETCD_LISTEN_METRICS_URLS
+              value: "http://0.0.0.0:9081"
       controllerManager:
         extraArgs:
           cloud-provider: external
