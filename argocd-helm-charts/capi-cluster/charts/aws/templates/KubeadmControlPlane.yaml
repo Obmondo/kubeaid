@@ -14,7 +14,7 @@ spec:
           {{- ((.Values.controlPlane).apiServer).extraArgs | toYaml | nindent 10 }}
           {{- end }}
         {{- if ((.Values.controlPlane).apiServer).extraVolumes }}
-        {{- ((.Values.controlPlane).apiServer).extraVolumes | toYaml | nindent 8 }}
+        extraVolumes: {{- ((.Values.controlPlane).apiServer).extraVolumes | toYaml | nindent 10 }}
         {{- end }}
       etcd:
         local:
@@ -27,7 +27,7 @@ spec:
         extraArgs:
           cloud-provider: external
     {{- if (.Values.controlPlane).files }}
-    {{- (.Values.controlPlane).files | toYaml | nindent 4 }}
+    files: {{- (.Values.controlPlane).files | toYaml | nindent 6 }}
     {{- end }}
     initConfiguration:
       skipPhases:
