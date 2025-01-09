@@ -1,0 +1,6 @@
+dependencies:
+- name: ciso-assistant
+  repository: https://intuitem.github.io/ca-helm-chart/
+  version: 0.1.0
+digest: sha256:f653855173603589b6313e2b13dc46ba7af0ffb0b51f5e3e53f3d7408f86e20d
+generated: "2025-01-09T11:45:16.151540813+05:30"
