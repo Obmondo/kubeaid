@@ -43,12 +43,10 @@ traefik:
   metrics:
     prometheus:
       serviceMonitor:
-        metricRelabelings: []
-        relabelings: []
+        enabled: true
         jobLabel: traefik
         interval: 10s
         honorLabels: true
-
 # defines an ingressroute (public url - custom traefik CRD that replaces generic ingress type) for traefik dashboard. Not advised to enable - and below needs addition of a specific url to be accessible.
 #  ingressRoute:
 #    dashboard:
