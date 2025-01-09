@@ -2,5 +2,11 @@ dependencies:
 - name: hetzner
   repository: file://charts/hetzner
   version: 1.0.0
-digest: sha256:b121eed1dfb35a13d25423736ad8c29e6bfb8960c9a6399ae8ca8903b9022fdc
-generated: "2024-04-03T13:58:00.643153458+05:30"
+- name: aws
+  repository: file://charts/aws
+  version: 1.0.0
+- name: azure
+  repository: file://charts/azure
+  version: 1.0.0
+digest: sha256:94b7e2e4b2d49e8ee1a67b9274740a74bbc3c935f0bddb04a48ad756edc7d042
+generated: "2025-01-09T18:21:56.925877+05:30"
