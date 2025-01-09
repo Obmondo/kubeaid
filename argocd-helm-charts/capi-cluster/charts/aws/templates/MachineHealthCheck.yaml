@@ -7,7 +7,8 @@ spec:
   maxUnhealthy: 100%
   selector:
     matchLabels:
-      cluster.x-k8s.io/control-plane: {{ .Values.global.clusterName }}-control-plane
+      cluster.x-k8s.io/cluster-name: {{ .Values.global.clusterName }}
+      cluster.x-k8s.io/control-plane: ""
   unhealthyConditions:
     - type: Ready
       status: Unknown
