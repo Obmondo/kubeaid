@@ -18,11 +18,9 @@ spec:
         {{- end }}
       etcd:
         local:
-          extraEnvs:
-            - name: ETCD_METRICS
-              value: extensive
-            - name: ETCD_LISTEN_METRICS_URLS
-              value: "http://0.0.0.0:9081"
+          extraArgs:
+            metrics: extensive
+            listen-metrics-urls: "http://0.0.0.0:9081"
       controllerManager:
         extraArgs:
           cloud-provider: external
