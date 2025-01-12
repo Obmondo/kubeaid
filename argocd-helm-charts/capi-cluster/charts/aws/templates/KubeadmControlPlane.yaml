@@ -24,8 +24,8 @@ spec:
       controllerManager:
         extraArgs:
           cloud-provider: external
-    {{- if (.Values.controlPlane).files }}
-    files: {{- (.Values.controlPlane).files | toYaml | nindent 6 }}
+    {{- if ((.Values.controlPlane).apiServer).files }}
+    files: {{- ((.Values.controlPlane).apiServer).files | toYaml | nindent 6 }}
     {{- end }}
     initConfiguration:
       skipPhases:
