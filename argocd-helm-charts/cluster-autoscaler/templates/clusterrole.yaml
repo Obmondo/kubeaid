@@ -1,0 +1,20 @@
+{{- if .Values.enableClusterAPIScaleFromZeroSupport -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+{{ include "cluster-autoscaler.labels" (index .Subcharts "cluster-autoscaler") | indent 4 }}
+  name: {{ template "cluster-autoscaler.fullname" (index .Subcharts "cluster-autoscaler") }}-capi-extension
+rules:
+{{- if .Values.enableClusterAPIScaleFromZeroSupport.aws }}
+  - apiGroups:
+    - infrastructure.cluster.x-k8s.io
+    resources:
+    - awsmachinetemplates
+    verbs:
+    - get
+    - list
+    - watch
+{{- end }}
+{{- end -}}
+

@@ -3,3 +3,9 @@ cluster-autoscaler:
     repository: registry.k8s.io/autoscaling/cluster-autoscaler
     tag: v1.26.3
   revisionHistoryLimit: 0
+
+# If true, allows the Cluster AutoScaler related ServiceAccount to `get`, `list` and `watch` the
+# infrastructure machine template types.
+# REFER : https://cluster-api.sigs.k8s.io/tasks/automated-machine-management/autoscaling#rbac-changes-for-scaling-from-zero.
+enableClusterAPIScaleFromZeroSupport:
+  aws: false

@@ -1,0 +1,17 @@
+{{- if .Values.enableClusterAPIScaleFromZeroSupport -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+{{ include "cluster-autoscaler.labels" (index .Subcharts "cluster-autoscaler") | indent 4 }}
+  name: {{ template "cluster-autoscaler.fullname" (index .Subcharts "cluster-autoscaler") }}-capi-extension
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ template "cluster-autoscaler.fullname" (index .Subcharts "cluster-autoscaler") }}-capi-extension
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "cluster-autoscaler.serviceAccountName" (index .Subcharts "cluster-autoscaler") }}
+    namespace: {{ .Release.Namespace }}
+{{- end -}}
+
