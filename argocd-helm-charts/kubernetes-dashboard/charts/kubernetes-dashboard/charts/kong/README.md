@@ -19,6 +19,9 @@ helm install kong/kong --generate-name
 
 ## Table of contents
 
+- [Kong for Kubernetes](#kong-for-kubernetes)
+- [TL;DR;](#tldr)
+- [Table of contents](#table-of-contents)
 - [Prerequisites](#prerequisites)
 - [Install](#install)
 - [Uninstall](#uninstall)
@@ -57,6 +60,8 @@ helm install kong/kong --generate-name
   - [Ingress Controller Parameters](#ingress-controller-parameters)
     - [The `env` section](#the-env-section)
     - [The `customEnv` section](#the-customenv-section)
+    - [The `gatewayDiscovery` section](#the-gatewaydiscovery-section)
+      - [Configuration](#configuration-1)
   - [General Parameters](#general-parameters)
     - [The `env` section](#the-env-section-1)
     - [The `customEnv` section](#the-customenv-section-1)
@@ -71,9 +76,7 @@ helm install kong/kong --generate-name
   - [Sessions](#sessions)
   - [Email/SMTP](#emailsmtp)
 - [Prometheus Operator integration](#prometheus-operator-integration)
-- [Argo CD considerations](#argo-cd-considerations)
-- [Changelog](https://github.com/Kong/charts/blob/main/charts/kong/CHANGELOG.md)
-- [Upgrading](https://github.com/Kong/charts/blob/main/charts/kong/UPGRADE.md)
+- [Argo CD Considerations](#argo-cd-considerations)
 - [Seeking help](#seeking-help)
 
 ## Prerequisites
@@ -621,6 +624,7 @@ directory.
 | migrations.preUpgrade              | Run "kong migrations up" jobs                                                         | `true`              |
 | migrations.postUpgrade             | Run "kong migrations finish" jobs                                                     | `true`              |
 | migrations.annotations             | Annotations for migration job pods                                                    | `{"sidecar.istio.io/inject": "false" |
+| migrations.ttlSecondsAfterFinished | Automatically deletes completed pods after a specified time to clean up resources     |                     |
 | migrations.jobAnnotations          | Additional annotations for migration jobs                                             | `{}`                |
 | migrations.backoffLimit            | Override the system backoffLimit                                                      | `{}`                |
 | waitImage.enabled                  | Spawn init containers that wait for the database before starting Kong                 | `true`              |
@@ -737,7 +741,7 @@ section of `values.yaml` file:
 |--------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
 | enabled                                    | Deploy the ingress controller, rbac and crd                                                                                                              | true                               |
 | image.repository                           | Docker image with the ingress controller                                                                                                                 | kong/kubernetes-ingress-controller |
-| image.tag                                  | Version of the ingress controller                                                                                                                        | `3.0`                              |
+| image.tag                                  | Version of the ingress controller                                                                                                                        | `3.4`                              |
 | image.effectiveSemver                      | Version of the ingress controller used for version-specific features when image.tag is not a valid semantic version                                      |                                    |
 | readinessProbe                             | Kong ingress controllers readiness probe                                                                                                                 |                                    |
 | livenessProbe                              | Kong ingress controllers liveness probe                                                                                                                  |                                    |
@@ -751,6 +755,7 @@ section of `values.yaml` file:
 | watchNamespaces                            | List of namespaces to watch. Watches all namespaces if empty                                                                                             | []                                 |
 | admissionWebhook.enabled                   | Whether to enable the validating admission webhook                                                                                                       | true                               |
 | admissionWebhook.failurePolicy             | How unrecognized errors from the admission endpoint are handled (Ignore or Fail)                                                                         | Ignore                             |
+| admissionWebhook.filterSecrets             | Limit the webhook to only Secrets with the appropriate KIC validation labels.                                                                            | false                              |
 | admissionWebhook.port                      | The port the ingress controller will listen on for admission webhooks                                                                                    | 8080                               |
 | admissionWebhook.address                   | The address the ingress controller will listen on for admission webhooks, if not 0.0.0.0                                                                 |                                    |
 | admissionWebhook.annotations               | Annotations for the Validation Webhook Configuration                                                                                                     |                                    |
@@ -767,7 +772,8 @@ section of `values.yaml` file:
 | gatewayDiscovery.adminApiService.namespace | The namespace of the Kong admin API service (for more details see [gatewayDiscovery section][gd_section])                                                | `.Release.Namespace`               |
 | gatewayDiscovery.adminApiService.name      | The name of the Kong admin API service (for more details see [gatewayDiscovery section][gd_section])                                                     | ""                                 |
 | konnect.enabled                            | Enable synchronisation of data plane configuration with Konnect Runtime Group                                                                            | false                              |
-| konnect.runtimeGroupID                     | Konnect Runtime Group's unique identifier.                                                                                                               |                                    |
+| konnect.runtimeGroupID                     | Deprecated: Konnect Runtime Group's unique identifier.                                                                                                   |                                    |
+| konnect.controlPlaneID                     | Konnect Control Plane's unique identifier.                                                                                                               |                                    |
 | konnect.apiHostname                        | Konnect API hostname. Defaults to a production US-region.                                                                                                | us.kic.api.konghq.com              |
 | konnect.tlsClientCertSecretName            | Name of the secret that contains Konnect Runtime Group's client TLS certificate.                                                                         | konnect-client-tls                 |
 | konnect.license.enabled                    | Enable automatic license provisioning for Gateways managed by Ingress Controller in Konnect mode.                                                        | false                              |
@@ -859,6 +865,7 @@ On the Gateway release side, set either `admin.tls.client.secretName` to the nam
 | ---------------------------------- | ------------------------------------------------------------------------------------- | ------------------- |
 | namespace                          | Namespace to deploy chart resources                                                   |                     |
 | deployment.kong.enabled            | Enable or disable deploying Kong                                                      | `true`              |
+| deployment.revisionHistoryLimit    | The number of `ReplicaSet`s to retain.                                              | `10`                |
 | deployment.minReadySeconds         | Minimum number of seconds for which newly created pods should be ready without any of its container crashing, for it to be considered available. |                     |
 | deployment.initContainers          | Create initContainers. Please go to Kubernetes doc for the spec of the initContainers |                     |
 | deployment.daemonset               | Use a DaemonSet instead of a Deployment                                               | `false`             |
@@ -905,12 +912,14 @@ On the Gateway release side, set either `admin.tls.client.secretName` to the nam
 | securityContext                    | Set the securityContext for Kong Pods                                                 | `{}`                |
 | containerSecurityContext           | Set the securityContext for Containers                                                | See values.yaml     |
 | serviceMonitor.enabled             | Create ServiceMonitor for Prometheus Operator                                         | `false`             |
+| serviceMonitor.trustCRDsExist      | Do not check for the Prometheus Operator CRDs, just try to deploy                     | `false`             |
 | serviceMonitor.interval            | Scraping interval                                                                     | `30s`               |
 | serviceMonitor.namespace           | Where to create ServiceMonitor                                                        |                     |
 | serviceMonitor.labels              | ServiceMonitor labels                                                                 | `{}`                |
 | serviceMonitor.targetLabels        | ServiceMonitor targetLabels                                                           | `{}`                |
 | serviceMonitor.honorLabels         | ServiceMonitor honorLabels                                                            | `{}`                |
 | serviceMonitor.metricRelabelings   | ServiceMonitor metricRelabelings                                                      | `{}`                |
+| serviceMonitor.relabelings         | ServiceMonitor relabelings                                                            | `[]`                |
 | extraConfigMaps                    | ConfigMaps to add to mounted volumes                                                  | `[]`                |
 | extraSecrets                       | Secrets to add to mounted volumes                                                     | `[]`                |
 | nameOverride                       | Replaces "kong" in resource names, like "RELEASENAME-nameOverride" instead of "RELEASENAME-kong" | `""`                |

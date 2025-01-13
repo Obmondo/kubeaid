@@ -12,6 +12,8 @@ spec:
     serviceAccount: {{ include "openobserve-collector.serviceAccountName" . }}
     prometheusCR:
       enabled: true
+      serviceMonitorSelector: {}
+      podMonitorSelector: {}
   serviceAccount: {{ include "openobserve-collector.serviceAccountName" . }}
   image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
   env:

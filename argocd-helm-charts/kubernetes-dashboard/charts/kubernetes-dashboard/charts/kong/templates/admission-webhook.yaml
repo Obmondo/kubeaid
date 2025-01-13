@@ -41,7 +41,22 @@ metadata:
   {{- end }}
   {{- end }}
 webhooks:
-- name: validations.kong.konghq.com
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    {{- if not .Values.ingressController.admissionWebhook.certificate.provided }}
+    caBundle: {{ b64enc $caCert }}
+    {{- else }}
+    {{- if .Values.ingressController.admissionWebhook.certificate.caBundle }}
+    caBundle: {{ b64enc .Values.ingressController.admissionWebhook.certificate.caBundle }}
+    {{- end }}
+    {{- end }}
+    service:
+      name: {{ template "kong.service.validationWebhook" . }}
+      namespace: {{ template "kong.namespace" . }}
+  failurePolicy: {{ .Values.ingressController.admissionWebhook.failurePolicy }}
+  matchPolicy: {{ .Values.ingressController.admissionWebhook.matchPolicy }}
+  name: secrets.credentials.validation.ingress-controller.konghq.com
   {{- with .Values.ingressController.admissionWebhook.namespaceSelector }}
   namespaceSelector:
     {{- toYaml . | nindent 4 }}
@@ -51,10 +66,98 @@ webhooks:
   {{- end }}
   objectSelector:
     matchExpressions:
+    - key: "konghq.com/credential"
+      operator: "Exists"
+    {{- /* Do not validate Konnect credentials, these are targeted for KGO */}}
+    - key: "konghq.com/credential"
+      operator: "NotIn"
+      values:
+      - "konnect"
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - secrets
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    {{- if not .Values.ingressController.admissionWebhook.certificate.provided }}
+    caBundle: {{ b64enc $caCert }}
+    {{- else }}
+    {{- if .Values.ingressController.admissionWebhook.certificate.caBundle }}
+    caBundle: {{ b64enc .Values.ingressController.admissionWebhook.certificate.caBundle }}
+    {{- end }}
+    {{- end }}
+    service:
+      name: {{ template "kong.service.validationWebhook" . }}
+      namespace: {{ template "kong.namespace" . }}
+  failurePolicy: {{ .Values.ingressController.admissionWebhook.failurePolicy }}
+  matchPolicy: {{ .Values.ingressController.admissionWebhook.matchPolicy }}
+  name: secrets.plugins.validation.ingress-controller.konghq.com
+  {{- with .Values.ingressController.admissionWebhook.namespaceSelector }}
+  namespaceSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.ingressController.admissionWebhook.timeoutSeconds }}
+  timeoutSeconds: {{ . }}
+  {{- end }}
+  {{- if .Values.ingressController.admissionWebhook.filterSecrets }}
+  objectSelector:
+    matchExpressions:
+    - key: "konghq.com/validate"
+      operator: "Exists"
+    {{- /* Do not validate Konnect credentials, these are targeted for KGO */}}
+    - key: "konghq.com/credential"
+      operator: "NotIn"
+      values:
+      - "konnect"
+  {{- else }}
+  objectSelector:
+    matchExpressions:
     - key: owner
       operator: NotIn
       values:
       - helm
+    {{- /* Do not validate Konnect credentials, these are targeted for KGO */}}
+    - key: "konghq.com/credential"
+      operator: "NotIn"
+      values:
+      - "konnect"
+  {{- end }}
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - secrets
+  sideEffects: None
+- name: validations.kong.konghq.com
+  matchPolicy: {{ .Values.ingressController.admissionWebhook.matchPolicy }}
+  {{- with .Values.ingressController.admissionWebhook.namespaceSelector }}
+  namespaceSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.ingressController.admissionWebhook.matchConditions }}
+  matchConditions:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.ingressController.admissionWebhook.objectSelector }}
+  objectSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.ingressController.admissionWebhook.timeoutSeconds }}
+  timeoutSeconds: {{ . }}
+  {{- end }}
   failurePolicy: {{ .Values.ingressController.admissionWebhook.failurePolicy }}
   sideEffects: None
   admissionReviewVersions: ["v1beta1"]
@@ -75,18 +178,15 @@ webhooks:
 {{- if (semverCompare ">= 2.8.0" (include "kong.effectiveVersion" .Values.ingressController.image)) }}
     - kongingresses
 {{- end }}
+{{- if (semverCompare ">= 3.0.0" (include "kong.effectiveVersion" .Values.ingressController.image)) }}
   - apiGroups:
     - ''
     apiVersions:
     - 'v1'
     operations:
-{{- if (semverCompare ">= 2.12.1" (include "kong.effectiveVersion" .Values.ingressController.image)) }}
     - CREATE
-{{- end }}
     - UPDATE
     resources:
-    - secrets
-{{- if (semverCompare ">= 3.0.0" (include "kong.effectiveVersion" .Values.ingressController.image)) }}
     - services
 {{- end }}
 {{- if (semverCompare ">= 2.12.0" (include "kong.effectiveVersion" .Values.ingressController.image)) }}

@@ -2,7 +2,7 @@
 
 OpenCost and OpenCost UI
 
-![Version: 1.42.3](https://img.shields.io/badge/Version-1.42.3-informational?style=flat-square)
+![Version: 1.43.0](https://img.shields.io/badge/Version-1.43.0-informational?style=flat-square)
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 ![AppVersion: 1.113.0](https://img.shields.io/badge/AppVersion-1.113.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/opencost)](https://artifacthub.io/packages/search?repo=opencost)
@@ -119,6 +119,8 @@ $ helm install opencost opencost/opencost
 | opencost.prometheus.amp.workspaceId | string | `""` | Workspace ID for AMP |
 | opencost.prometheus.bearer_token | string | `""` | Prometheus Bearer token |
 | opencost.prometheus.bearer_token_key | string | `"DB_BEARER_TOKEN"` |  |
+| opencost.prometheus.createMonitoringClusterRoleBinding | bool | `false` | If true, the helm chart will create a ClusterRoleBinding to grant the OpenCost ServiceAccount access to query Prometheus. |
+| opencost.prometheus.createMonitoringResourceReaderRoleBinding | bool | `false` | If true, create a Role and RoleBinding to allow Prometheus to list and watch OpenCost resources. |
 | opencost.prometheus.existingSecretName | string | `nil` | Existing secret name that contains credentials for Prometheus |
 | opencost.prometheus.external.enabled | bool | `false` | Use external Prometheus (eg. Grafana Cloud) |
 | opencost.prometheus.external.url | string | `"https://prometheus.example.com/prometheus"` | External Prometheus url |
@@ -126,6 +128,9 @@ $ helm install opencost opencost/opencost
 | opencost.prometheus.internal.namespaceName | string | `"prometheus-system"` | Namespace of in-cluster Prometheus |
 | opencost.prometheus.internal.port | int | `80` | Service port of in-cluster Prometheus |
 | opencost.prometheus.internal.serviceName | string | `"prometheus-server"` | Service name of in-cluster Prometheus |
+| opencost.prometheus.kubeRBACProxy | bool | `false` | If true, opencost will use kube-rbac-proxy to authenticate with in cluster Prometheus for openshift |
+| opencost.prometheus.monitoringServiceAccountName | string | `"prometheus-k8s"` | Name of the Prometheus serviceaccount to bind to the Resource Reader Role Binding. |
+| opencost.prometheus.monitoringServiceAccountNamespace | string | `"openshift-monitoring"` | Namespace of the Prometheus serviceaccount to bind to the Resource Reader Role Binding. |
 | opencost.prometheus.password | string | `""` | Prometheus Basic auth password |
 | opencost.prometheus.password_key | string | `"DB_BASIC_AUTH_PW"` | Key in the secret that references the password |
 | opencost.prometheus.secret_name | string | `nil` | Secret name that contains credentials for Prometheus |

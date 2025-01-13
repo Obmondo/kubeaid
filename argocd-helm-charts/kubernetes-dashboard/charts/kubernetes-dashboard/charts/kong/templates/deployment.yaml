@@ -23,6 +23,9 @@ spec:
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   {{- end }}
+  {{- if .Values.deployment.revisionHistoryLimit }}
+  revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "kong.selectorLabels" . | nindent 6 }}
@@ -58,7 +61,8 @@ spec:
         {{- include "kong.metaLabels" . | nindent 8 }}
         app.kubernetes.io/component: app
         app: {{ template "kong.fullname" . }}
-        version: {{ .Chart.AppVersion | quote }}
+        {{ $version := semver (include "kong.effectiveVersion" .Values.image) }}
+        version: {{ printf "%d.%d" $version.Major $version.Minor | quote }}
         {{- if .Values.podLabels }}
         {{ include "kong.renderTpl" (dict "value" .Values.podLabels "context" $) | nindent 8 }}
         {{- end }}

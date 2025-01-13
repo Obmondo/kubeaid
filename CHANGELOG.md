@@ -2,6 +2,37 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 8.1.0
+### Minor Version Upgrades
+- Updated velero from version 8.1.0 to 8.2.0
+- Updated prometheus-smartctl-exporter from version 0.11.0 to 0.13.0
+- Updated postgres-operator from version 1.13.0 to 1.14.0
+- Updated opensearch-dashboards from version 2.25.0 to 2.26.0
+- Updated opensearch from version 2.28.0 to 2.30.0
+- Updated opentelemetry-operator from version 0.75.1 to 0.78.1
+- Updated opencost from version 1.42.3 to 1.43.0
+- Updated oncall from version 1.13.11 to 1.14.1
+- Updated keycloakx from version 4.0.0 to 6.0.0
+- Updated cluster-autoscaler from version 9.43.2 to 9.45.0
+- Updated cloudnative-pg from version 0.22.1 to 0.23.0
+
+### Patch Version Upgrades
+- Updated teleport-kube-agent from version 17.1.1 to 17.1.5
+- Updated teleport-cluster from version 17.1.1 to 17.1.5
+- Added rook-ceph-cluster from version v1.16.0 to v1.16.0
+- Updated rook-ceph from version v1.16.0 to v1.16.1
+- Updated openobserve-collector from version 0.3.18 to 0.3.21
+- Added openobserve from version 0.14.7 to 0.14.7
+- Updated kubernetes-dashboard from version 7.10.0 to 7.10.1
+- Updated keda from version 2.16.0 to 2.16.1
+- Updated harbor from version 1.16.0 to 1.16.1
+- Updated gatekeeper from version 3.18.1 to 3.18.2
+- Updated fluent-bit from version 0.48.3 to 0.48.4
+- Updated erpnext from version 7.0.146 to 7.0.155
+- Updated aws-efs-csi-driver from version 3.1.4 to 3.1.5
+- Updated argocd-image-updater from version 0.11.3 to 0.11.4
+- Updated argo-cd from version 7.7.11 to 7.7.15
+
 ### Improvements
 - [`4241f405`](../../commit/4241f405) (chore/capi-cluster) : minor UX improve by modifying a Helm parameter path
 - [`f665ed21`](../../commit/f665ed21) (fix/capi-cluster) : using extraArgs instead of extraEnvs to enable ETCD metrics

@@ -30,7 +30,8 @@ app.kubernetes.io/name: {{ template "kong.name" . }}
 helm.sh/chart: {{ template "kong.chart" . }}
 app.kubernetes.io/instance: "{{ .Release.Name }}"
 app.kubernetes.io/managed-by: "{{ .Release.Service }}"
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{ $version := semver (include "kong.effectiveVersion" .Values.image) }}
+app.kubernetes.io/version: {{ printf "%d.%d" $version.Major $version.Minor | quote }}
 {{- range $key, $value := .Values.extraLabels }}
 {{ $key }}: {{ include "kong.renderTpl" (dict "value" $value "context" $) | quote }}
 {{- end }}
@@ -210,6 +211,7 @@ spec:
   ports:
   {{- if .http }}
   {{- if .http.enabled }}
+  {{- if ne ( .http.servicePort | toString ) "0" }}
   - name: kong-{{ .serviceName }}
     port: {{ .http.servicePort }}
     targetPort: {{ .http.containerPort }}
@@ -220,6 +222,7 @@ spec:
     nodePort: {{ .http.nodePort }}
   {{- end }}
     protocol: TCP
+  {{- end }}
   {{- end }}
   {{- end }}
   {{- if .tls.enabled }}
@@ -329,7 +332,9 @@ Parameters: takes a service (e.g. .Values.proxy) as its argument and returns KON
   {{- $portMaps := list -}}
 
   {{- if .http.enabled -}}
+  {{- if ne (.http.servicePort | toString ) "0" -}}
         {{- $portMaps = append $portMaps (printf "%d:%d" (int64 .http.servicePort) (int64 .http.containerPort)) -}}
+  {{- end -}}
   {{- end -}}
 
   {{- if .tls.enabled -}}
@@ -527,10 +532,16 @@ The name of the Service which will be used by the controller to update the Ingre
   {{- end }}
 
   {{- $konnect := .Values.ingressController.konnect -}}
-  {{- $_ := required "ingressController.konnect.runtimeGroupID is required when ingressController.konnect.enabled" $konnect.runtimeGroupID -}}
+
+  {{- if $konnect.controlPlaneID }}
+  {{- $_ = set $autoEnv "CONTROLLER_KONNECT_CONTROL_PLANE_ID" $konnect.controlPlaneID -}}
+  {{- else if $konnect.runtimeGroupID }}
+  {{- $_ = set $autoEnv "CONTROLLER_KONNECT_CONTROL_PLANE_ID" $konnect.runtimeGroupID -}}
+  {{- else }}
+  {{- fail "At least one of konnect.controlPlaneID or konnect.runtimeGroupID must be set." -}}
+  {{- end }}
 
   {{- $_ = set $autoEnv "CONTROLLER_KONNECT_SYNC_ENABLED" true -}}
-  {{- $_ = set $autoEnv "CONTROLLER_KONNECT_RUNTIME_GROUP_ID" $konnect.runtimeGroupID -}}
   {{- $_ = set $autoEnv "CONTROLLER_KONNECT_ADDRESS" (printf "https://%s" .Values.ingressController.konnect.apiHostname) -}}
 
   {{- $tlsCert := include "secretkeyref" (dict "name" $konnect.tlsClientCertSecretName "key" "tls.crt") -}}
@@ -1115,8 +1126,17 @@ the template that it itself is using form the above sections.
       {{- $_ := set $autoEnv "KONG_ADMIN_GUI_AUTH_CONF" $guiAuthConf -}}
     {{- end }}
 
-    {{- $guiSessionConf := include "secretkeyref" (dict "name" .Values.enterprise.rbac.session_conf_secret "key" "admin_gui_session_conf") -}}
-    {{- $_ := set $autoEnv "KONG_ADMIN_GUI_SESSION_CONF" $guiSessionConf -}}
+    {{/*
+    KONG_ADMIN_GUI_SESSION_CONF is required for Kong versions <3.6.0.
+    For >=3.6.0, when openid-connect is used as the admin_gui_auth, the session_conf_secret is not required.
+    https://docs.konghq.com/gateway/3.6.x/kong-manager/auth/oidc/migrate/
+    */}}
+    {{- if or (not (eq .Values.enterprise.rbac.admin_gui_auth "openid-connect"))
+              (semverCompare "< 3.6.0" (include "kong.effectiveVersion" .Values.image))
+    -}}
+      {{- $guiSessionConf := include "secretkeyref" (dict "name" .Values.enterprise.rbac.session_conf_secret "key" "admin_gui_session_conf") -}}
+      {{- $_ := set $autoEnv "KONG_ADMIN_GUI_SESSION_CONF" $guiSessionConf -}}
+    {{- end }}
   {{- end }}
 
   {{- if .Values.enterprise.smtp.enabled }}
@@ -1284,6 +1304,51 @@ role sets used in the charts. Updating these requires separating out cluster
 resource roles into their separate templates.
 */}}
 {{- define "kong.kubernetesRBACRules" -}}
+{{- if (semverCompare ">= 3.4.0" (include "kong.effectiveVersion" .Values.ingressController.image)) }}
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+{{- if or (.Capabilities.APIVersions.Has "gateway.networking.k8s.io/v1alpha3") (.Capabilities.APIVersions.Has "gateway.networking.k8s.io/v1alpha2") (.Capabilities.APIVersions.Has "gateway.networking.k8s.io/v1beta1") (.Capabilities.APIVersions.Has "gateway.networking.k8s.io/v1")}}
+{{- end }}
+- apiGroups:
+  - gateway.networking.k8s.io
+  resources:
+  - backendtlspolicies
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - gateway.networking.k8s.io
+  resources:
+  - backendtlspolicies/status
+  verbs:
+  - patch
+  - update
+{{- end }}
+{{- if (semverCompare ">= 3.2.0" (include "kong.effectiveVersion" .Values.ingressController.image)) }}
+- apiGroups:
+  - configuration.konghq.com
+  resources:
+  - kongcustomentities
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - configuration.konghq.com
+  resources:
+  - kongcustomentities/status
+  verbs:
+  - get
+  - patch
+  - update
+{{- end }}
 {{- if and (semverCompare ">= 3.1.0" (include "kong.effectiveVersion" .Values.ingressController.image))
            (contains (print .Values.ingressController.env.feature_gates) "KongServiceFacade=true") }}
 - apiGroups:
@@ -1647,6 +1712,14 @@ resource roles into their separate templates.
   - get
   - list
   - watch
+{{- end -}}
+
+{{/*
+kong.kubernetesRBACClusterRoles outputs a static list of RBAC rules (the "rules" block
+of a Role or ClusterRole) that provide the ingress controller access to the
+Kubernetes Cluster-scoped resources it uses to build Kong configuration.
+*/}}
+{{- define "kong.kubernetesRBACClusterRules" -}}
 {{- if (semverCompare ">= 3.1.0" (include "kong.effectiveVersion" .Values.ingressController.image)) }}
 - apiGroups:
   - configuration.konghq.com
@@ -1665,14 +1738,6 @@ resource roles into their separate templates.
   - patch
   - update
 {{- end -}}
-{{- end -}}
-
-{{/*
-kong.kubernetesRBACClusterRoles outputs a static list of RBAC rules (the "rules" block
-of a Role or ClusterRole) that provide the ingress controller access to the
-Kubernetes Cluster-scoped resources it uses to build Kong configuration.
-*/}}
-{{- define "kong.kubernetesRBACClusterRules" -}}
 {{- if (semverCompare ">= 3.1.0" (include "kong.effectiveVersion" .Values.ingressController.image)) }}
 - apiGroups:
   - configuration.konghq.com

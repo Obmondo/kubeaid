@@ -19,6 +19,9 @@ deployment:
     # Setting this to false with ingressController.enabled=true will create a
     # controller-only release.
     enabled: true
+  # The number of old `ReplicaSet`s to retain.
+  revisionHistoryLimit: 10
+
   ## Minimum number of seconds for which a newly created pod should be ready without any of its container crashing,
   ## for it to be considered available.
   # minReadySeconds: 60
@@ -130,10 +133,10 @@ extraLabels: {}
 # Specify Kong's Docker image and repository details here
 image:
   repository: kong
-  tag: "3.6"
+  tag: "3.8"
   # Kong Enterprise
   # repository: kong/kong-gateway
-  # tag: "3.5"
+  # tag: "3.8"
 
   # Specify a semver version if your image tag is not one (e.g. "nightly")
   effectiveSemver:
@@ -279,7 +282,9 @@ proxy:
   # Enable creating a Kubernetes service for the proxy
   enabled: true
   type: LoadBalancer
-  loadBalancerClass:
+  loadBalancerClass: ""
+  # Configures optional firewall rules and in the VPC network to only allow certain source ranges.
+  loadBalancerSourceRanges: []
   # Override proxy Service name
   nameOverride: ""
   # To specify annotations or labels for the proxy service, add them to the respective
@@ -297,6 +302,9 @@ proxy:
   http:
     # Enable plaintext HTTP listen for the proxy
     enabled: true
+    # Set the servicePort: 0 to skip exposing in the service but still
+    # let the port open in container to allow https to http mapping for
+    # tls terminated at LB.
     servicePort: 80
     containerPort: 8000
     # Set a nodePort which is available if service type is NodePort
@@ -475,6 +483,8 @@ migrations:
   jobAnnotations: {}
   # Optionally set a backoffLimit. If none is set, Jobs will use the cluster default
   backoffLimit:
+  # Optionally set to specify the time-to-live (TTL) for a pod after it has completed its execution before automatic deletion. If left unset, pod lifetime is indefinite.
+  ttlSecondsAfterFinished:
   resources: {}
   # Example reasonable setting for "resources":
   # resources:
@@ -529,7 +539,7 @@ ingressController:
   enabled: true
   image:
     repository: kong/kubernetes-ingress-controller
-    tag: "3.1"
+    tag: "3.4"
     # Optionally set a semantic version for version-gated features. This can normally
     # be left unset. You only need to set this if your tag is not a semver string,
     # such as when you are using a "next" tag. Set this to the effective semantic
@@ -578,12 +588,23 @@ ingressController:
   envFrom: []
 
   admissionWebhook:
+    matchPolicy: Equivalent
     enabled: true
+    # Limit the `secrets.plugins.validation.ingress-controller.konghq.com` webhook
+    # to only Secrets with the appropriate KIC "konghq.com/validate" label.
+    filterSecrets: false
     failurePolicy: Ignore
     port: 8080
     certificate:
       provided: false
     namespaceSelector: {}
+    # ObjectSelector specifies which objects to match against validations.kong.konghq.com webhook webhook
+    objectSelector:
+      matchExpressions:
+      - key: owner
+        operator: NotIn
+        values:
+        - helm
     # Specifiy the secretName when the certificate is provided via a TLS secret
     # secretName: ""
     # Specifiy the CA bundle of the provided certificate.
@@ -643,9 +664,10 @@ ingressController:
 
   konnect:
     enabled: false
-
-    # Specifies a Konnect Runtime Group's ID that the controller will push its data-plane config to.
+    # Deprecated: Specifies a Konnect Runtime Group's ID that the controller will push its data-plane config to.
     runtimeGroupID: ""
+    # Specifies a Konnect Control Plane's ID that the controller will push its data-plane config to.
+    controlPlaneID: ""
 
     # Specifies a Konnect API hostname that the controller will use to push its data-plane config to.
     # By default, this is set to US region's production API hostname.
@@ -993,6 +1015,7 @@ serviceMonitor:
   # If you wish to gather metrics from a Kong instance with the proxy disabled (such as a hybrid control plane), see:
   # https://github.com/Kong/charts/blob/main/charts/kong/README.md#prometheus-operator-integration
   enabled: false
+  trustCRDsExist: false
   # interval: 30s
   # Specifies namespace, where ServiceMonitor should be installed
   # namespace: monitoring
@@ -1003,6 +1026,7 @@ serviceMonitor:
 
   # honorLabels: false
   # metricRelabelings: []
+  # relabelings: []
 
 # -----------------------------------------------------------------------------
 # Kong Enterprise parameters
@@ -1028,7 +1052,9 @@ enterprise:
     # If RBAC is enabled, this Secret must contain an admin_gui_session_conf key
     # The key value must be a secret configuration, following the example at
     # https://docs.konghq.com/enterprise/latest/kong-manager/authentication/sessions
-    session_conf_secret: kong-session-config
+    # If using 3.6+ and OIDC, session configuration is instead handled in the auth configuration,
+    # and this field can be left empty.
+    session_conf_secret: "kong-session-config"  # CHANGEME
     # If admin_gui_auth is not set to basic-auth, provide a secret name which
     # has an admin_gui_auth_conf key containing the plugin config JSON
     admin_gui_auth_conf_secret: CHANGEME-admin-gui-auth-conf-secret
