@@ -1,24 +1,67 @@
+{{- if .Values.ingress.enabled -}}
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  annotations:
-    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-  name: ciso-assistant-{{ .Values.clientName }}
+  name: ciso-assistant
   labels:
     client: {{ .Values.clientName }}
     {{- include "common.labels" . | nindent 4 }}
+  annotations:
+    {{- range $key, $value := .Values.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
 spec:
-  ingressClassName: nginx
+  {{- if .Values.ingress.tls }}
+  tls:
+    {{- range .Values.ingress.tls }}
+    - hosts:
+        - {{ .hosts | join ", " | quote }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
   rules:
-  - host: {{ .Values.clientName }}.{{ .Values.clusterDomain }}
-    http:
-      paths:
-      - backend:
-          service:
-            name: ciso-assistant-{{ .Values.clientName }}
-            port:
-              number: 443
-        path: /
-        pathType: Prefix
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- if $.Values.caddy.enabled }}
+          - backend:
+              service:
+                name: ciso-assistant-{{ $.Values.clientName }}
+                port:
+                  number: 443
+            path: /
+            pathType: Prefix
+          {{- else }}
+          - backend:
+              service:
+                name: ciso-assistant-ciso
+                port:
+                  number: 3000
+            path: /
+            pathType: Prefix
+          - backend:
+              service:
+                name: ciso-assistant-ciso
+                port:
+                  number: 8000
+            path: /api/iam/sso/redirect/
+            pathType: Prefix
+          - backend:
+              service:
+                name: ciso-assistant-ciso
+                port:
+                  number: 8000
+            path: /api/accounts/saml/0/acs/
+            pathType: Prefix
+          - backend:
+              service:
+                name: ciso-assistant-ciso
+                port:
+                  number: 8000
+            path: /api/accounts/saml/0/acs/finish/
+            pathType: Prefix
+          {{- end }}
+    {{- end }}
+{{- end }}

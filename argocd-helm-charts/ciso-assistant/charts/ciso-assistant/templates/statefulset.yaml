@@ -107,6 +107,7 @@ spec:
         client: {{ .Values.clientName }}
       name: db-data
     spec:
+      storageClassName: {{ .Values.persistence.storageClass | quote }}
       accessModes:
       - {{ .Values.persistence.accessMode }}
       resources:

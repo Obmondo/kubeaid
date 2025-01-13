@@ -1,1 +1,9 @@
 ---
+ciso-assistant:
+  clientName: ciso
+  email:
+    debug: true
+  ingress:
+    enabled: true
+  caddy:
+    enabled: false

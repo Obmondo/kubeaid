@@ -7,6 +7,7 @@ metadata:
     {{- include "common.labels" . | nindent 4 }}
 spec:
   ports:
+  {{- if .Values.caddy.enabled }}
   - name: http
     port: 80
     protocol: TCP
@@ -15,6 +16,16 @@ spec:
     port: 443
     protocol: TCP
     targetPort: 443
+  {{- else }}
+  - name: http-backend
+    port: 8000
+    protocol: TCP
+    targetPort: 8000
+  - name: http-frontend
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  {{- end }}
   selector:
     app: ciso-assistant
     client: {{ .Values.clientName }}

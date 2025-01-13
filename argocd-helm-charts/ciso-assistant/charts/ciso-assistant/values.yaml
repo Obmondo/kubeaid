@@ -42,3 +42,6 @@ image:
 persistence:
   size: 5Gi
   accessMode: ReadWriteOnce
+
+ingress:
+  enabled: false
