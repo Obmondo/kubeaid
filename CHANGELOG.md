@@ -2,6 +2,32 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`4241f405`](../../commit/4241f405) (chore/capi-cluster) : minor UX improve by modifying a Helm parameter path
+- [`f665ed21`](../../commit/f665ed21) (fix/capi-cluster) : using extraArgs instead of extraEnvs to enable ETCD metrics
+- [`3a7a104a`](../../commit/3a7a104a) fix: moving the opsmondo alert into respective git repo
+- [`3ca6d588`](../../commit/3ca6d588) fix: watchdog alerts should come from opsmondo helm chart
+- [`09df8811`](../../commit/09df8811) (traefik) : enabling ServiceMonitor
+- [`bc851e4d`](../../commit/bc851e4d) (capi-cluster) : using cluster-name + control-plane as label selectors in MachineHealthcheck
+- [`1f947eef`](../../commit/1f947eef) (cluster-api) : Updating cluster-api-operator subchart to v0.15.1
+- [`377a47af`](../../commit/377a47af) Updating container image versions in cluster-api and capi-cluster Helm chart
+- [`8d444ae6`](../../commit/8d444ae6) (capi-cluster) : syncing Chart.lock with Chart.yaml
+- [`72e80d21`](../../commit/72e80d21) (capi-cluster) : AWS Infrastructure Provider component should run in a master node
+- [`4c9661a0`](../../commit/4c9661a0) (capi-cluster) : Helm chart error fixes
+- [`a3563a80`](../../commit/a3563a80) (capi-cluster) : Always having ETCD metrics enabled
+- [`064f1c48`](../../commit/064f1c48) (feat/capi-cluster) : allowing users to pass : extraArgs and extraVolumes to KubeAPI | files to be added in master nodes
+- [`f2deec6e`](../../commit/f2deec6e) Update the README for relate chart Add nginx to relate deployment templated velero schedule's includenamespaces field
+- [`452c1edf`](../../commit/452c1edf) adding ciso-assistant in helm charts
+- [`bbcca257`](../../commit/bbcca257) fixed all blackbox probes
+- [`ffcdb71a`](../../commit/ffcdb71a) remove commit for each helm update
+- [`3a5d13af`](../../commit/3a5d13af) update kafka-operator chart, add steps in doc to use go with kafka
+- [`4d7095be`](../../commit/4d7095be) adding templates to setup mariadb and redis instance using corresponding operators for erpnext
+- [`dfea13b8`](../../commit/dfea13b8) adding erpnext helm chart under kubeaid to enable sales support data collection
+- [`dc1641de`](../../commit/dc1641de) add smartmon disk relocated sector alert, move all smartmon alert rules to one file
+- [`619be769`](../../commit/619be769) bug fix: mount eyaml secret on /tmp/puppet/configmap/eyaml/keys upstream pr - https://github.com/puppetlabs/puppetserver-helm-chart/pull/239
+- [`0e64d89d`](../../commit/0e64d89d) update default volume
+- [`86572b42`](../../commit/86572b42) add cnpg backup and ngnix server to serve static files
+
 ## 8.0.0
 ### Major Version Upgrades
 - Updated keycloakx from version 3.0.0 to 4.0.0
