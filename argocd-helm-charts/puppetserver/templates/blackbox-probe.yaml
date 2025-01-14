@@ -2,7 +2,7 @@
 kind: Probe
 apiVersion: monitoring.coreos.com/v1
 metadata:
-  name: blackbox-probe-argocd
+  name: blackbox-probe-puppetserver
 spec:
   interval: 30m
   module: http_2xx
