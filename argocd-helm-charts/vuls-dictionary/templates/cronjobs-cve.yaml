@@ -1,0 +1,36 @@
+{{- if .Values.cve.enabled }}
+{{- $dictionaries := .Values.cve.fetchDB -}}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "vuls-dictionary.fullname" . }}-cve-fetch-jobs
+spec:
+  suspend: false
+  schedule: {{ .Values.schedule | quote }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+            - name: dictionary
+              persistentVolumeClaim:
+                claimName: {{ include "vuls-dictionary.fullname" . }}-pvc
+          restartPolicy: OnFailure
+          containers:
+            {{- range $index, $dict := $dictionaries }}
+            - name: {{ include "vuls-dictionary.fullname" $ }}-cve-{{ $dict }}
+              securityContext:
+                {{- toYaml $.Values.securityContext | nindent 16 }}
+              image: "{{ $.Values.image.cve.repository }}:{{ $.Values.image.cve.tag | default $.Chart.AppVersion }}"
+              imagePullPolicy: {{ $.Values.image.pullPolicy }}
+              command:
+                - go-cve-dictionary
+                - fetch
+                - {{ $dict }}
+              resources:
+                {{- toYaml $.Values.resources | nindent 16 }}
+              volumeMounts:
+                - name: dictionary
+                  mountPath: /go-cve-dictionary
+            {{- end }}
+{{- end }}

@@ -1,0 +1,74 @@
+{{- if .Values.oval.enabled }}
+{{- $oval := .Values.oval.fetchDB -}}
+{{- range $distro, $versions := $oval -}}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "vuls-dictionary.fullname" $ }}-oval-{{ $distro }}-fetch-jobs
+spec:
+  suspend: false
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+            - name: dictionary
+              persistentVolumeClaim:
+                claimName: {{ include "vuls-dictionary.fullname" $ }}-pvc
+          restartPolicy: OnFailure
+          containers:
+            {{- range $version := $versions }}
+            - name: {{ include "vuls-dictionary.fullname" $ }}-oval-{{ $distro }}-{{ include "vuls-dictionary.sanitizeName" $version }}
+              securityContext:
+                {{- toYaml $.Values.securityContext | nindent 16 }}
+              image: "{{ $.Values.image.oval.repository }}:{{ $.Values.image.oval.tag | default $.Chart.AppVersion }}"
+              imagePullPolicy: {{ $.Values.image.pullPolicy }}
+              {{- if eq $distro "sles-server" }}
+              command:
+                - goval-dictionary
+                - fetch
+                - suse
+                - --suse-type
+                - suse-enterprise-server
+                - {{ $version | quote }}
+              {{- else if eq $distro "sles-desktop" }}
+              command:
+                - goval-dictionary
+                - fetch
+                - suse
+                - --suse-type
+                - suse-enterprise-desktop
+                - {{ $version | quote }}
+              {{- else if eq $distro "opensuse" }}
+              command:
+                - goval-dictionary
+                - fetch
+                - suse
+                - --suse-type
+                - opensuse
+                - {{ $version | quote }}
+              {{- else if eq $distro "opensuse-leap" }}
+              command:
+                - goval-dictionary
+                - fetch
+                - suse
+                - --suse-type
+                - opensuse-leap
+                - {{ $version | quote }}
+              {{- else }}
+              command:
+                - goval-dictionary
+                - fetch
+                - {{ $distro }}
+                - {{ $version | quote }}
+              {{- end }}
+              resources:
+                {{- toYaml $.Values.resources | nindent 16 }}
+              volumeMounts:
+                - name: dictionary
+                  mountPath: /go-cve-dictionary
+{{- end }}
+---
+{{- end }}
+{{- end }}

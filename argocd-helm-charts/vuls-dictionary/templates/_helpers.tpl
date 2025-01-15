@@ -60,3 +60,10 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/* Define a helper function to sanitize names and convert floats to strings */}}
+{{- define "vuls-dictionary.sanitizeName" -}}
+{{- $input := . -}}
+{{- $name := $input | replace "." "-" -}}
+{{- $name | replace " " "-" -}}  {{/* Optional: Replace spaces with dashes as well */}}
+{{- end -}}

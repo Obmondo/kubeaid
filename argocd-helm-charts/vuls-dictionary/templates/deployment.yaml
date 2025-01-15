@@ -50,17 +50,6 @@ spec:
           volumeMounts:
             - name: dictionary
               mountPath: /go-cve-dictionary
-          lifecycle:
-            postStart:
-              exec:
-                command: [
-                  "sh", "-c",
-                  {{- $dictionaries := .Values.cve.fetchDB -}}
-                  {{- range $index, $dict := $dictionaries -}}
-                  {{- if $index }} && {{ end }}
-                  go-cve-dictionary fetch {{ $dict }}
-                  {{- end }}
-                ]
         {{- end }}
         {{- if .Values.oval.enabled }}
         - name: {{ .Chart.Name }}-oval
@@ -68,6 +57,8 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.oval.repository }}:{{ .Values.image.oval.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - server
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -78,18 +69,9 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
           volumeMounts:
             - name: dictionary
               mountPath: /go-cve-dictionary
-          {{- end }}
-          lifecycle:
-            postStart:
-              exec:
-                command: [
-                  "sh", "-c",
-                  "go-cve-dictionary fetch oval"
-                ]
         {{- end }}
       volumes:
         - name: dictionary
