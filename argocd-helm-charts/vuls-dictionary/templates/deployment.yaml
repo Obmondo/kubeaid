@@ -47,10 +47,9 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
           volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+            - name: dictionary
+              mountPath: /go-cve-dictionary
           lifecycle:
             postStart:
               exec:
@@ -81,7 +80,8 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with .Values.volumeMounts }}
           volumeMounts:
-            {{- toYaml . | nindent 12 }}
+            - name: dictionary
+              mountPath: /go-cve-dictionary
           {{- end }}
           lifecycle:
             postStart:
@@ -91,10 +91,10 @@ spec:
                   "go-cve-dictionary fetch oval"
                 ]
         {{- end }}
-      {{- with .Values.volumes }}
       volumes:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        - name: dictionary
+          persistentVolumeClaim:
+            claimName: {{ include "vuls-dictionary.fullname" . }}-pvc
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
