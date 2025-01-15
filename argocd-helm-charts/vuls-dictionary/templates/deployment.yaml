@@ -29,11 +29,14 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
+        {{- if .Values.cve.enabled }}
         - name: {{ .Chart.Name }}-cve
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.cve.repository }}:{{ .Values.image.cve.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - server
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -48,6 +51,19 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          lifecycle:
+            postStart:
+              exec:
+                command: [
+                  "sh", "-c",
+                  {{- $dictionaries := .Values.cve.fetchDB -}}
+                  {{- range $index, $dict := $dictionaries -}}
+                  {{- if $index }} && {{ end }}
+                  go-cve-dictionary fetch {{ $dict }}
+                  {{- end }}
+                ]
+        {{- end }}
+        {{- if .Values.oval.enabled }}
         - name: {{ .Chart.Name }}-oval
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
@@ -67,7 +83,14 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-
+          lifecycle:
+            postStart:
+              exec:
+                command: [
+                  "sh", "-c",
+                  "go-cve-dictionary fetch oval"
+                ]
+        {{- end }}
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

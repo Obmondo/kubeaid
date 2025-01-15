@@ -108,3 +108,14 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+oval:
+  enabled: true
+
+cve:
+  enabled: true
+  fetchDB:
+    - nvd
+    - mitre
+    - jvn
+    - fortinet
