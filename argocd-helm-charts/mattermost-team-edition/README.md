@@ -324,3 +324,73 @@ velero-pgdata-mattermost-pgsql-0-lzzqs         true         pgdata-mattermost-pg
 32Gi          velero-snapshot   snapcontent-4f967d06-d9ce-4052-bd51-f2bd717cad01   27d            27d
 sbdtu5498@sbdtu5498-TUF-Gaming-FX505DT-FX505DT:~/Videos/Personal Stuff$ kubectl get volumesnapshot velero-mattermost-team-edition-d4l78 -n mattermost -o yaml
 ```
+
+### Migrating the postgress operator to cnpg
+
+1. Backup existing mattermost database.
+
+```sh
+pg_dump -c -U mattermost | gzip > mattermost_dbdump_2024-01-15.sql.gz
+
+# Copy the data to local machine
+kubectl cp mattermost/mattermost-pgsql-0:/mattermost_dbdump_2024-01-15.sql.gz ./mattermost_dbdump_2024-01-15.sql.gz
+```
+
+* Create the PR for migrating postgress operator [kubeaid-config-Reflink](https://gitea.obmondo.com/EnableIT/kubeaid-config-enableit/pulls/1033/files) [Kubeaid-Ref-link](https://gitea.obmondo.com/EnableIT/KubeAid/pulls/592)
+* Log in to Argocd and update the manifest, ensuring your branch is set in the targetRevision.
+* Review the diff carefully and make sure not to remove the existing PostgreSQL deployment **acid.zalan.do/postgresql/mattermost/mattermost-pgsql**
+* Once all the steps above are completed, sync the application in Argocd.
+* Confirm that the new pods for mattermost-pgsql-1 and mattermost-team-edition are up and running.
+* To copy the database backup to the new PostgreSQL pod, create a new Ubuntu pod within the Mattermost namespace, then import the database from there.
+
+```sh 
+vim ubuntu-sleep.yaml ## Add the below content 
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu
+  labels:
+    app: ubuntu
+spec:
+  containers:
+  - image: ubuntu
+    command:
+      - "sleep"
+      - "604800"
+    imagePullPolicy: IfNotPresent
+    name: ubuntu
+  restartPolicy: Always
+
+
+kubectl apply -f ubuntu-sleep.yaml -n mattermost
+```
+
+* Install Postgresql package inside the Ubuntu pod and import the database.
+
+```sh
+apt update
+apt install postgress
+```
+
+* Transfer the backup database file to the Ubuntu pod.
+ 
+```sh
+kubectl cp mattermost_dbdump_2024-01-15.sql.gz mattermost/ubuntu:/tmp
+cd /tmp
+gzip -d mattermost_dbdump_2024-01-15.sql.gz
+```
+
+* Retrieve database user password by accessing the secrets (mattermost-pgsql-app) in k9s.
+* Obtain the host IP of the Postgres pod from service using k9s.
+* Execute the command to import the backup database into PostgreSQL.
+
+```sh
+psql -h 10.98.77.222 -p 5432 -d mattermost -U mattermost < mattermost_dbdump_2024-01-15.sql
+or 
+pg_restore -h 10.98.77.222 -p 5432 -d mattermost -U mattermost < mattermost_dbdump_2024-01-15.sql
+```
+
+* Start the mattermost-team-edition application by syncing the deployment from the Argo CD UI.
+* Once the application is up and running, log in to Mattermost to confirm that the old chats, uploaded files, and images are accessible.
+* After verifying the application works as expected, delete the Ubuntu pod.

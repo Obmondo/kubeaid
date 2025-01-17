@@ -8,15 +8,15 @@ mattermost-team-edition:
   - name: MM_DB_USERNAME
     valueFrom:
       secretKeyRef:
-        name: mattermost.mattermost-pgsql.credentials.postgresql.acid.zalan.do
+        name: mattermost-pgsql-app
         key: username
   - name: MM_DB_PASSWORD
     valueFrom:
       secretKeyRef:
-        name: mattermost.mattermost-pgsql.credentials.postgresql.acid.zalan.do
+        name: mattermost-pgsql-app
         key: password
   - name: MM_SQLSETTINGS_DATASOURCE
-    value: postgres://$(MM_DB_USERNAME):$(MM_DB_PASSWORD)@mattermost-pgsql:5432/mattermost?sslmode=require&connect_timeout=100
+    value: postgres://$(MM_DB_USERNAME):$(MM_DB_PASSWORD)@mattermost-pgsql-rw:5432/mattermost?sslmode=require&connect_timeout=100
   - name: MM_GITLABSETTINGS_ID
     valueFrom:
       secretKeyRef:
@@ -47,9 +47,10 @@ mattermost-team-edition:
   readinessProbe:
     initialDelaySeconds: 150
 
-postgresql:
+postgres:
   size: 8Gi
-  logicalBackup: true
+  recover: false
+  pass: mattermost-pgsql-app
   resources:
     limits:
       memory: 800Mi
