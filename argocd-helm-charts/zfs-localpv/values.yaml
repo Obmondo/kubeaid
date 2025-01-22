@@ -45,7 +45,7 @@ zfs-localpv:
       create: true
       name: zfs-csi-controller-critical
 
-
 # poolname must be provided and should be same as the zfs pool created on node for storageclass to be correctly configured.
 storageClass:
   enabled: false
+  shared: true
