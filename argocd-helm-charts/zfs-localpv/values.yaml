@@ -47,8 +47,5 @@ zfs-localpv:
 
 
 # poolname must be provided and should be same as the zfs pool created on node for storageclass to be correctly configured.
-# reclaimPolicy is for storageClass, could be Delete(default) or Retain.
 storageClass:
-  enabled: true
-  poolName: nvmelocal
-  reclaimPolicy: {}
+  enabled: false
