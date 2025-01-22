@@ -5,8 +5,10 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: {{ $className }}
+allowVolumeExpansion: {{ $classOptions.allowVolumeExpansion | default true }}
 parameters:
   recordsize: {{ $classOptions.recordsize | default "4k" | quote }}
+  thinprovision: {{ $classOptions.thinprovision | default "no" | quote }}
   compression: {{ $classOptions.compression | default "off" | quote }}
   dedup: {{ $classOptions.dedup | default "off" | quote }}
   fstype: {{ $classOptions.fstype | default "zfs" | quote }}
