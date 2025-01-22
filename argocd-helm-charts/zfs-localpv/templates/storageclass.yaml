@@ -5,15 +5,23 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: {{ $className }}
-allowVolumeExpansion: {{ $classOptions.allowVolumeExpansion | default true }}
+{{- if $classOptions.allowVolumeExpansion }}
+allowVolumeExpansion: {{ $classOptions.allowVolumeExpansion }}
+{{- end }}
 parameters:
-  recordsize: {{ $classOptions.recordsize | default "4k" | quote }}
-  thinprovision: {{ $classOptions.thinprovision | default "no" | quote }}
+  recordsize: {{ $classOptions.recordsize | default "4k" }}
+  {{- if $classOptions.thinprovision }}
+  thinprovision: {{ $classOptions.thinprovision | quote }}
+  {{- end }}
   compression: {{ $classOptions.compression | default "off" | quote }}
-  dedup: {{ $classOptions.dedup | default "off" | quote }}
-  fstype: {{ $classOptions.fstype | default "zfs" | quote }}
-  poolname: {{ required "poolName is required for storage class " $classOptions.poolName | quote }}
-  shared: {{ $classOptions.shared | default "no" | quote }}
+  {{- if $classOptions.dedup }}
+  dedup: {{ $classOptions.dedup | quote }}
+  {{- end }}
+  fstype: {{ $classOptions.fstype | default "zfs" }}
+  poolname: {{ required "poolName is required for storage class " $classOptions.poolName }}
+  {{- if $classOptions.shared }}
+  shared: {{ $classOptions.shared | quote }}
+  {{- end }}
 provisioner: zfs.csi.openebs.io
 reclaimPolicy: {{ $classOptions.reclaimPolicy | default "Delete" }}
 ---
