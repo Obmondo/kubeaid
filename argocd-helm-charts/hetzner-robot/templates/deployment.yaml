@@ -29,19 +29,17 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.hostIP
-        - name: INTERVAL
-          value: "{{ .Values.interval }}"
-        - name: API_USERNAME
+        - name: HETZNER_ROBOT_USERNAME
           valueFrom:
             secretKeyRef:
               name: {{ .Values.cloudCredentialsSecretName }}
               key: robot-user
-        - name: API_PASSWORD
+        - name: HETZNER_ROBOT_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ .Values.cloudCredentialsSecretName }}
               key: robot-password
-        - name: API_TOKEN
+        - name: HETZNER_API_TOKEN
           valueFrom:
             secretKeyRef:
               name: {{ .Values.cloudCredentialsSecretName }}

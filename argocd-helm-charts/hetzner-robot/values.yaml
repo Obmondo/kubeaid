@@ -6,7 +6,4 @@ image:
 # Failover IP that pod will manage
 failoverIP: ""
 
-# Interval to check the failover IP is running on the node, where pod is running
-interval: 60s
-
 cloudCredentialsSecretName: cloud-credentials
