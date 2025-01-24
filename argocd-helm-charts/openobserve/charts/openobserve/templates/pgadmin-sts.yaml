@@ -1,0 +1,69 @@
+{{- if and .Values.postgres.pgadmin.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "openobserve.fullname" . }}-pgadmin
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    name: pgadmin
+spec:
+  serviceName: {{ include "openobserve.fullname" . }}-pgadmin
+  replicas: 1
+  selector:
+    matchLabels:
+      name: pgadmin
+      app: pgadmin
+  template:
+    metadata:
+      labels:
+        name: pgadmin
+        app: pgadmin
+    spec:
+      securityContext:
+        fsGroup: 2000
+        runAsUser: 10000
+        runAsGroup: 3000
+        runAsNonRoot: true
+      # terminationGracePeriodSeconds: 0
+      containers:
+        - name: pgadmin
+          image: "{{ .Values.postgres.pgadmin.image.repository }}:{{ .Values.postgres.pgadmin.image.tag }}"
+          env:
+            - name: PGADMIN_DEFAULT_EMAIL
+              value: {{ .Values.postgres.pgadmin.PGADMIN_DEFAULT_EMAIL }}
+            - name: PGADMIN_DEFAULT_PASSWORD
+              value: {{ .Values.postgres.pgadmin.PGADMIN_DEFAULT_PASSWORD }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+          - name: data
+            mountPath: /var/lib/pgadmin
+          - name: log
+            mountPath: /var/log/pgadmin
+          resources:
+            requests:
+              memory: {{ .Values.postgres.pgadmin.resources.requests.memory }}
+              cpu: {{ .Values.postgres.pgadmin.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.postgres.pgadmin.resources.limits.memory }}
+              cpu: {{ .Values.postgres.pgadmin.resources.limits.cpu }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+  - metadata:
+      name: log
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+{{- end }}

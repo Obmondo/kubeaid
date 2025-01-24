@@ -1,0 +1,13 @@
+{{- if .Values.reportserver.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "openobserve.fullname" . }}-reportserver
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "openobserve.labels" . | nindent 4 }}
+data:
+  # Report server will call this router URL to visit the dashboards and generate PDFs from them
+  ZO_WEB_URL: "http://{{ include "openobserve.fullname" . }}-router.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.config.ZO_HTTP_PORT }}"
+{{- end }}
+ 

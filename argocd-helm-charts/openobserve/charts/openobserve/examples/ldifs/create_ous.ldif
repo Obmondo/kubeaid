@@ -1,0 +1,13 @@
+# Create OU for Users
+dn: ou=users,dc=o2,dc=ai
+objectClass: organizationalUnit
+ou: users
+description: Organizational Unit for Users
+
+# Create OU for Teams
+dn: ou=teams,dc=o2,dc=ai
+objectClass: organizationalUnit
+ou: teams
+description: Organizational Unit for Teams
+
+

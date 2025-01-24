@@ -1,0 +1,14 @@
+{{- if and .Values.postgres.pgadmin.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openobserve.fullname" . }}-pgadmin
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  selector:
+    app: pgadmin
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+{{- end }}

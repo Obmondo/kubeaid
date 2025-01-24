@@ -1,0 +1,14 @@
+{{- if and .Values.enterprise.enabled .Values.enterprise.dex.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "openobserve.fullname" . }}-{{- .Release.Namespace -}}-dex
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "openobserve.fullname" . }}-{{- .Release.Namespace -}}-dex
+subjects:
+- kind: ServiceAccount
+  name: {{ include "openobserve.fullname" . }}-dex                 # Service account assigned to the dex pod.
+  namespace: {{ .Release.Namespace | quote }}  # The namespace dex is running in.
+{{- end }}

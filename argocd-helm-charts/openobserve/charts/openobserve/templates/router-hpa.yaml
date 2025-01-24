@@ -1,0 +1,33 @@
+{{- if .Values.autoscaling.router.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "openobserve.fullname" . }}-router
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "openobserve.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "openobserve.fullname" . }}-router
+  minReplicas: {{ .Values.autoscaling.router.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.router.maxReplicas }}
+  metrics:
+    {{- if .Values.autoscaling.router.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.router.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.autoscaling.router.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.router.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

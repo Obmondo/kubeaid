@@ -1,0 +1,17 @@
+# Create OU for Team1
+dn: ou=team1,ou=teams,dc=o2,dc=ai
+objectClass: organizationalUnit
+ou: team1
+description: Organizational Unit for Team 1
+
+# Create OU for Team2
+dn: ou=team2,ou=teams,dc=o2,dc=ai
+objectClass: organizationalUnit
+ou: team2
+description: Organizational Unit for Team 2
+
+# Create OU for Team3
+dn: ou=team3,ou=teams,dc=o2,dc=ai
+objectClass: organizationalUnit
+ou: team3
+description: Organizational Unit for Team 3

@@ -5,8 +5,5 @@ dependencies:
 - name: openobserve-collector
   repository: https://charts.openobserve.ai/
   version: 0.3.21
-- name: opentelemetry-operator
-  repository: https://open-telemetry.github.io/opentelemetry-helm-charts
-  version: 0.79.0
-digest: sha256:310055ba69ae394f734de7e65ee1f034d63d9043ee129c7183e8b2174a747205
-generated: "2025-01-27T11:59:23.382541937+05:30"
+digest: sha256:ceae91943c3306f330fd0cc35983f6b05f25d62aa9b25a022255207ecff366d2
+generated: "2025-01-24T15:14:37.450184259+05:30"
