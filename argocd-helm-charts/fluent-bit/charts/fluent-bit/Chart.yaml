@@ -1,7 +1,7 @@
 annotations:
   artifacthub.io/changes: |
     - kind: changed
-      description: "Updated Fluent Bit OCI image to v3.2.4."
+      description: "Adding additional watch paths for hot reload"
 apiVersion: v1
 appVersion: 3.2.4
 description: Fast and lightweight log processor and forwarder or Linux, OSX and BSD
@@ -24,4 +24,4 @@ maintainers:
 name: fluent-bit
 sources:
 - https://github.com/fluent/fluent-bit/
-version: 0.48.4
+version: 0.48.5

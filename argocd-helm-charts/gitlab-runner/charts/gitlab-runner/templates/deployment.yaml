@@ -8,8 +8,8 @@ metadata:
     chart: {{ include "gitlab-runner.chart" . }}
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
-    {{- range $key, $value := .Values.deploymentLabels }}
-    {{   $key }}: {{ $value | quote }}
+    {{- if .Values.deploymentLabels }}
+    {{- tpl (toYaml .Values.deploymentLabels) . | nindent 4 }}
     {{- end }}
   {{- if .Values.deploymentAnnotations }}
   annotations:

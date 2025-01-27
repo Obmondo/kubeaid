@@ -2,7 +2,7 @@
 
 OpenCost and OpenCost UI
 
-![Version: 1.43.0](https://img.shields.io/badge/Version-1.43.0-informational?style=flat-square)
+![Version: 1.43.2](https://img.shields.io/badge/Version-1.43.2-informational?style=flat-square)
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 ![AppVersion: 1.113.0](https://img.shields.io/badge/AppVersion-1.113.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/opencost)](https://artifacthub.io/packages/search?repo=opencost)
@@ -29,6 +29,7 @@ $ helm install opencost opencost/opencost
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | annotations | object | `{}` | Annotations to add to the all the resources |
+| clusterName | string | `"cluster.local"` | Override the default name of cluster - Can be found in /etc/kubernetes/admin.conf: clusters -> cluster -> name |
 | extraVolumes | list | `[]` | A list of volumes to be added to the pod |
 | fullnameOverride | string | `""` | Overwrite all resources name created by the chart |
 | imagePullSecrets | list | `[]` | List of secret names to use for pulling the images |

@@ -2,6 +2,43 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 9.0.0
+### Major Version Upgrades
+- Updated sonarqube from version 10.8.1 to 2025.1.0
+
+### Minor Version Upgrades
+- Updated velero from version 8.2.0 to 8.3.0
+- Updated traefik from version 33.2.1 to 34.1.0
+- Updated teleport-kube-agent from version 17.1.5 to 17.2.2
+- Updated teleport-cluster from version 17.1.5 to 17.2.2
+- Updated opentelemetry-operator from version 0.78.1 to 0.79.0
+- Updated gitlab-runner from version 0.72.0 to 0.73.3
+- Updated cluster-autoscaler from version 9.45.0 to 9.46.0
+- Updated aws-ebs-csi-driver from version 2.38.1 to 2.39.1
+- Updated argocd-image-updater from version 0.11.4 to 0.12.0
+
+### Patch Version Upgrades
+- Updated whoami from version 5.2.0 to 5.2.1
+- Updated snapshot-controller from version 4.0.0 to 4.0.1
+- Updated sealed-secrets from version 2.17.0 to 2.17.1
+- Added rook-ceph-cluster from version v1.16.0 to v1.16.0
+- Updated rook-ceph from version v1.16.1 to v1.16.2
+- Updated reloader from version 1.2.0 to 1.2.1
+- Updated redmine from version 32.1.1 to 32.1.2
+- Updated rabbitmq-cluster-operator from version 4.4.1 to 4.4.3
+- Updated opensearch from version 2.30.0 to 2.30.1
+- Added openobserve from version 0.14.7 to 0.14.7
+- Updated opencost from version 1.43.0 to 1.43.2
+- Updated metallb from version 6.4.2 to 6.4.4
+- Updated mattermost-team-edition from version 6.6.67 to 6.6.70
+- Updated harbor from version 1.16.1 to 1.16.2
+- Updated fluent-bit from version 0.48.4 to 0.48.5
+- Updated external-dns from version 8.7.1 to 8.7.3
+- Updated erpnext from version 7.0.155 to 7.0.160
+- Updated cilium from version 1.16.5 to 1.16.6
+- Updated cert-manager from version v1.16.2 to v1.16.3
+- Updated argo-cd from version 7.7.15 to 7.7.17
+
 ### Improvements
 - [`85a48265`](../../commit/85a48265) Migrating cnpg in mattermost and updating the logical backup templates.
 - [`3a498a67`](../../commit/3a498a67) fix: yamllint fix

@@ -686,6 +686,8 @@ deploymentAnnotations: {}
 deploymentLabels: {}
   # Example:
   # owner.team: <my_cool_team>
+  # owner.team: "{{ .Values.team }}"
+  # tags.{{ .Values.tag }}/env: "{{ .Values.environment }}"
 
 ## Lifecycle options to be added to deployment
 ##

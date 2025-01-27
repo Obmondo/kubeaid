@@ -66,7 +66,7 @@ spec:
       {{- end }}
       containers:
         - name: ebs-plugin
-          image: {{ printf "%s%s:%s" (default "" .Values.image.containerRegistry) .Values.image.repository (default (printf "v%s" .Chart.AppVersion) (toString .Values.image.tag)) }}
+          image: {{ include "aws-ebs-csi-driver.fullImagePath" $ }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - node
@@ -112,6 +112,10 @@ spec:
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: {{ .otelExporterEndpoint }}
             {{- end }}
+            {{- if .Values.fips }}
+            - name: AWS_USE_FIPS_ENDPOINT
+              value: "true"
+            {{- end }}
             {{- with .Values.node.env }}
             {{- . | toYaml | nindent 12 }}
             {{- end }}
@@ -127,6 +131,14 @@ spec:
               mountPath: /csi
             - name: device-dir
               mountPath: /dev
+            {{- if .Values.node.selinux }}
+            - name: selinux-sysfs
+              mountPath: /sys/fs/selinux
+              readOnly: true
+            - name: selinux-config
+              mountPath: /etc/selinux/config
+              readOnly: true
+            {{- end }}
           {{- with .Values.node.volumeMounts }}
           {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -244,6 +256,16 @@ spec:
           hostPath:
             path: /dev
             type: Directory
+        {{- if .Values.node.selinux }}
+        - name: selinux-sysfs
+          hostPath:
+            path: /sys/fs/selinux
+            type: Directory
+        - name: selinux-config
+          hostPath:
+            path: /etc/selinux/config
+            type: File
+        {{- end }}
         - name: probe-dir
           {{- if .Values.node.probeDirVolume }}
           {{- toYaml .Values.node.probeDirVolume | nindent 10 }}

@@ -1,9 +1,27 @@
-## v0.72.0 (2024-12-13)
+## v0.73.3 (2025-01-23)
 
 ### New features
 
-- Update GitLab Runner version to v17.7.0
-- Make externalTrafficPolicy/internalTrafficPolicy configurable for services [!499](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/merge_requests/499) (Matthias Baur @m.baur)
+- Update GitLab Runner version to v17.8.3
+
+## v0.73.2 (2025-01-23)
+
+### New features
+
+- Update GitLab Runner version to v17.8.2
+
+## v0.73.1 (2025-01-18)
+
+### New features
+
+- Update GitLab Runner version to v17.8.1
+
+## v0.73.0 (2025-01-10)
+
+### New features
+
+- Update GitLab Runner version to v17.8.0
+- Add deploymentLabels interpolation [!502](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/merge_requests/502) (Sarafa Lawal @afaras72)
 
 ## v0.71.0 (2024-11-15)
 

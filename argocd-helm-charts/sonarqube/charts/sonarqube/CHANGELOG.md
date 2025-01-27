@@ -1,11 +1,20 @@
 # SonarQube Chart Changelog
 All changes to this chart will be documented in this file.
 
+## [2025.1.0]
+* Update Chart's version to 2025.1.0
+* Upgrade SonarQube Server to 2025.1.0
+* Upgrade SonarQube Community Build to 25.1.0.102122
+* Update ingress-nginx subchart to 4.11.3
+* Support Kubernetes v1.32
+* Remove the default passcode provided with `monitoringPasscode`
+* Support Openshift v4.17
+* Improves editions and versions setting for sonarqube chart
+
 ## [10.8.1]
 * Update Chart's version to 10.8.1
-* Upgrade SonarQube Server to 10.8.1
 * Remove immutable labels selector `app.kubernetes.io/name` and `app.kubernetes.io/version` as it breaks upgrades
-* Set `image.tag` empty in default value file; `image.tag` is dynamically set according to the `edition` and `community` fields, with user-defined value taking precedence
+* set `image.tag` empty in default value file, `image.tag` is dynamically set according to the `edition` and `community` fields. user-defined have precedence
 
 ## [10.8.0]
 * Update Chart's version to 10.8.0

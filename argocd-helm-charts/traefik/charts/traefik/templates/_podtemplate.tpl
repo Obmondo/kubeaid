@@ -108,7 +108,7 @@
               {{- fail "ERROR: All hostPort must match their respective containerPort when `hostNetwork` is enabled" }}
             {{- end }}
           {{- end }}
-        - name: {{ $name | quote }}
+        - name: {{ $name | lower | quote }}
           containerPort: {{ default $config.port $config.containerPort }}
           {{- if $config.hostPort }}
           hostPort: {{ $config.hostPort }}
@@ -392,8 +392,8 @@
           - "--tracing.serviceName={{ . }}"
             {{- end }}
 
-            {{- range $name, $value := .globalAttributes }}
-          - "--tracing.globalAttributes.{{ $name }}={{ $value }}"
+            {{- range $name, $value := .resourceAttributes }}
+          - "--tracing.resourceAttributes.{{ $name }}={{ $value }}"
             {{- end }}
 
             {{- range $index, $value := .capturedRequestHeaders }}
@@ -467,6 +467,14 @@
             {{- end }}
            {{- end }}
           {{- end }}
+          {{- end }}
+          {{- with .Values.experimental.fastProxy }}
+            {{- if .enabled }}
+          - "--experimental.fastProxy"
+            {{- end }}
+            {{- if .debug }}
+          - "--experimental.fastProxy.debug"
+            {{- end }}
           {{- end }}
           {{- range $pluginName, $plugin := .Values.experimental.plugins }}
           {{- if or (ne (typeOf $plugin) "map[string]interface {}") (not (hasKey $plugin "moduleName")) (not (hasKey $plugin "version")) }}
@@ -555,9 +563,9 @@
              {{- with .hostname }}
           - "--providers.kubernetesgateway.statusaddress.hostname={{ . }}"
              {{- end }}
-             {{- with .service }}
-          - "--providers.kubernetesgateway.statusaddress.service.name={{ tpl .name $ }}"
-          - "--providers.kubernetesgateway.statusaddress.service.namespace={{ tpl .namespace $ }}"
+             {{- if (and .service.enabled $.Values.service.enabled) }}
+          - "--providers.kubernetesgateway.statusaddress.service.name={{ .service.name | default (include "traefik.fullname" $) }}"
+          - "--providers.kubernetesgateway.statusaddress.service.namespace={{ .service.namespace | default (include "traefik.namespace" $) }}"
              {{- end }}
             {{- end }}
             {{- if .nativeLBByDefault }}
@@ -590,14 +598,29 @@
           {{- range $entrypoint, $config := $.Values.ports }}
           {{- if $config }}
             {{- if $config.redirectTo }}
-             {{- $toPort := index $.Values.ports $config.redirectTo.port }}
+              {{- fail "ERROR: redirectTo syntax has been removed in v34 of this Chart. See Release notes or EXAMPLES.md for new syntax." -}}
+            {{- end }}
+            {{- if $config.redirections }}
+             {{- with $config.redirections.entryPoint }}
+              {{- if not (hasKey $.Values.ports .to) }}
+                {{- $errorMsg := printf "ERROR: Cannot redirect %s to %s: entryPoint not found" $entrypoint .to }}
+                {{- fail $errorMsg }}
+              {{- end }}
+              {{- $toPort := index $.Values.ports .to }}
+              {{- if and (($toPort.tls).enabled) (ne .scheme "https") }}
+                {{- $errorMsg := printf "ERROR: Cannot redirect %s to %s without setting scheme to https" $entrypoint .to }}
+                {{- fail $errorMsg }}
+              {{- end }}
           - "--entryPoints.{{ $entrypoint }}.http.redirections.entryPoint.to=:{{ $toPort.exposedPort }}"
-          - "--entryPoints.{{ $entrypoint }}.http.redirections.entryPoint.scheme=https"
-             {{- if $config.redirectTo.priority }}
-          - "--entryPoints.{{ $entrypoint }}.http.redirections.entryPoint.priority={{ $config.redirectTo.priority }}"
-             {{- end }}
-             {{- if $config.redirectTo.permanent }}
-          - "--entryPoints.{{ $entrypoint }}.http.redirections.entryPoint.permanent=true"
+              {{- with .scheme }}
+          - "--entryPoints.{{ $entrypoint }}.http.redirections.entryPoint.scheme={{ . }}"
+              {{- end }}
+              {{- with .priority }}
+          - "--entryPoints.{{ $entrypoint }}.http.redirections.entryPoint.priority={{ . }}"
+              {{- end }}
+              {{- with .permanent }}
+          - "--entryPoints.{{ $entrypoint }}.http.redirections.entryPoint.permanent={{ . }}"
+              {{- end }}
              {{- end }}
             {{- end }}
             {{- if $config.middlewares }}
@@ -754,8 +777,14 @@
               {{- with .admission.secretName }}
           - "--hub.apimanagement.admission.secretName={{ . }}"
               {{- end }}
+              {{- if .openApi.validateRequestMethodAndPath }}
+          - "--hub.apiManagement.openApi.validateRequestMethodAndPath=true"
+              {{- end }}
              {{- end }}
             {{- end }}
+            {{- if .experimental.aigateway }}
+          - "--hub.experimental.aigateway"
+            {{- end -}}
             {{- with .platformUrl }}
           - "--hub.platformUrl={{ . }}"
             {{- end -}}

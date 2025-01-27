@@ -1,8 +1,11 @@
 annotations:
-  artifacthub.io/changes: "- \"fix(Gateway API): CRDs should only be defined once\"\n-
-    \"chore(release): \U0001F680 publish v33.2.1\"\n"
+  artifacthub.io/changes: |
+    - "fix(Traefik Proxy): support uppercase letters in entrypoint names"
+    - "feat(deps): update traefik docker tag to v3.3.2"
+    - "feat(Traefik Hub): add OAS validateRequestMethodAndPath - CRDs update"
+    - "chore(release): publish v34.1.0 and CRDs v1.2.0"
 apiVersion: v2
-appVersion: v3.2.2
+appVersion: v3.3.2
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
 icon: https://raw.githubusercontent.com/traefik/traefik/v2.3/docs/content/assets/img/traefik.logo.png
@@ -24,4 +27,4 @@ sources:
 - https://github.com/traefik/traefik
 - https://github.com/traefik/traefik-helm-chart
 type: application
-version: 33.2.1
+version: 34.1.0

@@ -152,6 +152,17 @@
                 "abortOnPluginFailure": {
                     "type": "boolean"
                 },
+                "fastProxy": {
+                    "properties": {
+                        "debug": {
+                            "type": "boolean"
+                        },
+                        "enabled": {
+                            "type": "boolean"
+                        }
+                    },
+                    "type": "object"
+                },
                 "kubernetesGateway": {
                     "properties": {
                         "enabled": {
@@ -258,6 +269,22 @@
                             "type": "object"
                         },
                         "enabled": {
+                            "type": "boolean"
+                        },
+                        "openApi": {
+                            "properties": {
+                                "validateRequestMethodAndPath": {
+                                    "type": "boolean"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "type": "object"
+                },
+                "experimental": {
+                    "properties": {
+                        "aigateway": {
                             "type": "boolean"
                         }
                     },
@@ -1034,8 +1061,13 @@
                             },
                             "type": "object"
                         },
-                        "redirectTo": {
-                            "properties": {},
+                        "redirections": {
+                            "properties": {
+                                "entryPoint": {
+                                    "properties": {},
+                                    "type": "object"
+                                }
+                            },
                             "type": "object"
                         },
                         "targetPort": {
@@ -1370,6 +1402,9 @@
                                 },
                                 "service": {
                                     "properties": {
+                                        "enabled": {
+                                            "type": "boolean"
+                                        },
                                         "name": {
                                             "type": "string"
                                         },
@@ -1577,10 +1612,6 @@
                 "capturedResponseHeaders": {
                     "type": "array"
                 },
-                "globalAttributes": {
-                    "properties": {},
-                    "type": "object"
-                },
                 "otlp": {
                     "properties": {
                         "enabled": {
@@ -1650,6 +1681,10 @@
                             "type": "object"
                         }
                     },
+                    "type": "object"
+                },
+                "resourceAttributes": {
+                    "properties": {},
                     "type": "object"
                 },
                 "safeQueryParams": {

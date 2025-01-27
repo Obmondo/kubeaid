@@ -1,17 +1,25 @@
 annotations:
   artifacthub.io/changes: |
     - kind: changed
-      description: "Update Chart's version 10.8.1"
+      description: "Update Chart's version to 2025.1.0"
     - kind: changed
-      description: "Upgrade SonarQube Server to 10.8.1"
+      description: "Upgrade SonarQube Server to 2025.1.0"
     - kind: changed
-      description: "Remove immutable labels selector 'app.kubernetes.io/name' and 'app.kubernetes.io/version' as it breaks upgrades"
+      description: "Upgrade SonarQube Community Build to 25.1.0.102122"
     - kind: changed
-      description: "Set 'image.tag' empty in default value file, 'image.tag' is dynamically set according to the 'edition' and 'community' fields, with user-defined value taking precedence."
+      description: "Update ingress-nginx subchart to 4.11.3"
+    - kind: changed
+      description: "Support Kubernetes v1.32"
+    - kind: changed
+      description: "Remove the default passcode provided with 'monitoringPasscode'"
+    - kind: changed
+      description: "Support Openshift v4.17"
+    - kind: changed
+      description: "Improves editions and versions setting for sonarqube chart"
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/images: |
     - name: sonarqube
-      image: sonarqube:24.12.0.100206-community
+      image: sonarqube:25.1.0.102122-community
   artifacthub.io/links: |
     - name: support
       url: https://community.sonarsource.com/
@@ -19,7 +27,7 @@ annotations:
       url: https://github.com/SonarSource/helm-chart-sonarqube/tree/master/charts/sonarqube
   charts.openshift.io/name: sonarqube
 apiVersion: v2
-appVersion: 10.8.1
+appVersion: 2025.1.0
 dependencies:
 - condition: postgresql.enabled
   name: postgresql
@@ -28,7 +36,7 @@ dependencies:
 - condition: nginx.enabled,ingress-nginx.enabled
   name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
-  version: 4.11.2
+  version: 4.11.3
 description: SonarQube is a self-managed, automatic code review tool that systematically
   helps you deliver clean code. As a core element of our Sonar solution, SonarQube
   integrates into your existing workflow and detects issues in your code to help you
@@ -56,4 +64,4 @@ sources:
 - https://github.com/SonarSource/docker-sonarqube
 - https://github.com/SonarSource/sonarqube
 type: application
-version: 10.8.1
+version: 2025.1.0

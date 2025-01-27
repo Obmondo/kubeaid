@@ -1,51 +1,63 @@
 # SonarQube
 
-Code better in up to 27 languages. Improve Code Quality and Code Security throughout your workflow. [SonarQube](https://www.sonarsource.com/products/sonarqube/) can detect Bugs, Vulnerabilities, Security Hotspots and Code Smells and give you the guidance to fix them.
+Code better in more than 30 languages. Improve Code Quality and Code Security throughout your workflow. [SonarQube Server](https://www.sonarsource.com/products/sonarqube/) can detect Bugs, Vulnerabilities, Security Hotspots and Code Smells and give you the guidance to fix them.
 
 ## Introduction
 
-This chart bootstraps an instance of the latest SonarQube version with a PostgreSQL database.
+This chart bootstraps an instance of the latest SonarQube Server version with a PostgreSQL database.
 
 The latest version of the chart installs the latest SonarQube version.
 
-To install the version of the chart for SonarQube 9.9 LTA, please read the section [below](#installing-the-sonarqube-99-lta-chart). Deciding between LTA and Latest? [This may help](https://www.sonarsource.com/products/sonarqube/downloads/lts/)
+To install the version of the chart for SonarQube 9.9 LTA, please read the section [below](#installing-the-sonarqube-99-lta-chart). Deciding between LTA and Latest? [This may help](https://www.sonarsource.com/products/sonarqube/downloads/lts/).
 
-Please note that this chart only supports SonarQube Community, Developer, and Enterprise editions.
+Please note that this chart only supports SonarQube Server Developer and Enterprise editions and SonarQube Community Build. For SonarQube Server Data Center Edition refer to this [chart](https://artifacthub.io/packages/helm/sonarqube/sonarqube-dce).
 
 ## Compatibility
 
-Compatible SonarQube Server Version: `10.8.1`
-Compatible SonarQube Community Build: `24.12.0.100206`
+Compatible SonarQube Server Version: `2025.1.0`
+Compatible SonarQube Community Build: `25.1.0.102122`
 
-Supported Kubernetes Versions: From `1.24` to `1.31`
-Supported Openshift Versions: From `4.11` to `4.16`
+Supported Kubernetes Versions: From `1.29` to `1.32`
+Supported Openshift Versions: From `4.11` to `4.17`
 
-## Installing the chart
+## Installing SonarQube Server
 
-To install the chart:
+Here is an example of how to install the SonarQube Server Developer edition:
 
 ```bash
 helm repo add sonarqube https://SonarSource.github.io/helm-chart-sonarqube
 helm repo update
 kubectl create namespace sonarqube
-helm upgrade --install -n sonarqube sonarqube sonarqube/sonarqube
+export MONITORING_PASSCODE="yourPasscode"
+helm upgrade --install -n sonarqube sonarqube sonarqube/sonarqube --set edition=developer,monitoringPasscode=$MONITORING_PASSCODE
 ```
 
-The above command deploys SonarQube on the Kubernetes cluster in the default configuration in the sonarqube namespace. 
+The above command deploys SonarQube on the Kubernetes cluster in the default configuration in the sonarqube namespace.
 If you are interested in deploying SonarQube on Openshift, please check the [dedicated section](#openshift).
 
 The [configuration](#configuration) section lists the parameters that can be configured during installation.
 
 The default login is admin/admin.
 
-## Installing the SonarQube Community Build chart
+## Installing SonarQube Community Build
 
 The SonarQube Community Edition has been replaced by the SonarQube Community Build.
 If you want to install the SonarQube Community Build chart, please set `community.enabled` to `true`.
 The `community.buildNumber` parameter will be set to the latest Community Build.
-The `community` value is deprecated and won't be supported for `edition` anymore.
 
-## Installing the SonarQube 9.9 LTA chart
+## Upgrading to SonarQube Server 2025.1 LTA
+
+When upgrading to SonarQube Server 2025.1 LTA from a previous versions, you should read carefully [the official documentation](https://docs.sonarsource.com/sonarqube-server/latest/server-upgrade-and-maintenance/upgrade/upgrade-the-server/determine-path/) and determine the right upgrade path based on your current SonarQube Server version.
+
+When upgrading to the 2025.1 LTA version, you will experience a few changes.
+
+* The `monitoringPasscode` needs to be set by the users. Set either that or `monitoringPasscodeSecretName` and `monitoringPasscodeSecretKey`.
+* The `edition` parameter is now required to be explicitly set by the user to either `developer` or `enterprise`.
+* Users that want to install the SonarQube Community Build, must set `community.enabled` to `true` (check the [dedicated section](#installing-the-sonarqube-community-build-chart)).
+
+## Installing previous chart versions
+
+### Installing the SonarQube 9.9 LTA chart
 
 The version of the chart for the SonarQube 9.9 LTA is being distributed as the `8.x.x` version of this chart.
 
@@ -146,9 +158,9 @@ For this reason, it is recommended to set Xmx to the ~80% of the total amount of
 
 Please find here the default SonarQube Xmx parameters to setup the memory requests and limits accordingly.
 
-| Edition            | Sum of Xmx |
+| SonarQube Offering | Sum of Xmx |
 | ------------------ | ---------- |
-| community edition  | 1536M      |
+| community build    | 1536M      |
 | developer edition  | 1536M      |
 | enterprise edition | 5G         |
 
@@ -240,29 +252,29 @@ The following table lists the configurable parameters of the SonarQube chart and
 
 ### Global
 
-| Parameter               | Description                                                                                                                             | Default            |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
-| `deploymentType`        | (DEPRECATED) Deployment Type (supported values are `StatefulSet` or `Deployment`)                                                       | `StatefulSet`      |
-| `replicaCount`          | Number of replicas deployed (supported values are 0 and 1)                                                                              | `1`                |
-| `deploymentStrategy`    | Deployment strategy. Setting the strategy type is deprecated and it will be hardcoded to `Recreate`                                     | `{type: Recreate}` |
-| `priorityClassName`     | Schedule pods on priority (e.g. `high-priority`)                                                                                        | `None`             |
-| `schedulerName`         | Kubernetes scheduler name                                                                                                               | `None`             |
-| `affinity`              | Node / Pod affinities                                                                                                                   | `{}`               |
-| `tolerations`           | List of node taints to tolerate                                                                                                         | `[]`               |
-| `nodeSelector`          | Node labels for pod assignment                                                                                                          | `{}`               |
-| `hostAliases`           | Aliases for IPs in /etc/hosts                                                                                                           | `[]`               |
-| `podLabels`             | Map of labels to add to the pods                                                                                                        | `{}`               |
-| `env`                   | Environment variables to attach to the pods                                                                                             | `{}`               |
-| `annotations`           | SonarQube Pod annotations                                                                                                               | `{}`               |
-| `edition`               | SonarQube Edition to use (e.g. `community`, `developer` or `enterprise`). Please note that the default `community` value is deprecated. | `community`        |
-| `community.enabled`     | Install SonarQube Community Build. When set to `true`, this parameter replaces `edition=community`                                      | `true`             |
-| `community.buildNumber` | The SonarQube Community Build number to install                                                                                         | `24.12.0.100206`   |
-| `sonarWebContext`       | SonarQube web context, also serve as default value for `ingress.path`, `account.sonarWebContext` and probes path.                       | ``                 |
-| `httpProxySecret`       | Should contain `http_proxy`, `https_proxy` and `no_proxy` keys, will superseed every other proxy variables                              | ``                 |
-| `httpProxy`             | HTTP proxy for downloading JMX agent and install plugins, will superseed initContainer specific http proxy variables                    | ``                 |
-| `httpsProxy`            | HTTPS proxy for downloading JMX agent and install plugins, will superseed initContainer specific https proxy variable                   | ``                 |
-| `noProxy`               | No proxy for downloading JMX agent and install plugins, will superseed initContainer specific no proxy variables                        | ``                 |
-| `ingress-nginx.enabled` | Install Nginx Ingress Helm                                                                                                              | `false`            |
+| Parameter               | Description                                                                                                           | Default            |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| `deploymentType`        | (DEPRECATED) Deployment Type (supported values are `StatefulSet` or `Deployment`)                                     | `StatefulSet`      |
+| `replicaCount`          | Number of replicas deployed (supported values are 0 and 1)                                                            | `1`                |
+| `deploymentStrategy`    | Deployment strategy. Setting the strategy type is deprecated and it will be hardcoded to `Recreate`                   | `{type: Recreate}` |
+| `priorityClassName`     | Schedule pods on priority (e.g. `high-priority`)                                                                      | `None`             |
+| `schedulerName`         | Kubernetes scheduler name                                                                                             | `None`             |
+| `affinity`              | Node / Pod affinities                                                                                                 | `{}`               |
+| `tolerations`           | List of node taints to tolerate                                                                                       | `[]`               |
+| `nodeSelector`          | Node labels for pod assignment                                                                                        | `{}`               |
+| `hostAliases`           | Aliases for IPs in /etc/hosts                                                                                         | `[]`               |
+| `podLabels`             | Map of labels to add to the pods                                                                                      | `{}`               |
+| `env`                   | Environment variables to attach to the pods                                                                           | `{}`               |
+| `annotations`           | SonarQube Pod annotations                                                                                             | `{}`               |
+| `edition`               | SonarQube Edition to use (`developer` or `enterprise`).                                                               | `None`             |
+| `community.enabled`     | Install SonarQube Community Build. When set to `true`, `edition` must not be set.                                     | `false`            |
+| `community.buildNumber` | The SonarQube Community Build number to install                                                                       | `25.1.0.102122`   |
+| `sonarWebContext`       | SonarQube web context, also serve as default value for `ingress.path`, `account.sonarWebContext` and probes path.     | ``                 |
+| `httpProxySecret`       | Should contain `http_proxy`, `https_proxy` and `no_proxy` keys, will supersede every other proxy variables            | ``                 |
+| `httpProxy`             | HTTP proxy for downloading JMX agent and install plugins, will supersede initContainer specific http proxy variables  | ``                 |
+| `httpsProxy`            | HTTPS proxy for downloading JMX agent and install plugins, will supersede initContainer specific https proxy variable | ``                 |
+| `noProxy`               | No proxy for downloading JMX agent and install plugins, will supersede initContainer specific no proxy variables      | ``                 |
+| `ingress-nginx.enabled` | Install Nginx Ingress Helm                                                                                            | `false`            |
 
 ### NetworkPolicies
 
@@ -289,13 +301,13 @@ The following table lists the configurable parameters of the SonarQube chart and
 
 ### Image
 
-| Parameter           | Description                                                                                       | Default                        |
-| ------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------ |
-| `image.repository`  | image repository                                                                                  | `sonarqube`                    |
-| `image.tag`         | `sonarqube` image tag. Please note that the default `{{ .Values.community.buildNumber }}-community` is deprecated. | `24.12.0.100206-community` |
-| `image.pullPolicy`  | Image pull policy                                                                                 | `IfNotPresent`                 |
-| `image.pullSecret`  | (DEPRECATED) imagePullSecret to use for private repository                                        | `None`                         |
-| `image.pullSecrets` | imagePullSecrets to use for private repository                                                    | `None`                         |
+| Parameter           | Description                                                | Default        |
+| ------------------- | ---------------------------------------------------------- | -------------- |
+| `image.repository`  | image repository                                           | `sonarqube`    |
+| `image.tag`         | `sonarqube` image tag.                                     | `None`         |
+| `image.pullPolicy`  | Image pull policy                                          | `IfNotPresent` |
+| `image.pullSecret`  | (DEPRECATED) imagePullSecret to use for private repository | `None`         |
+| `image.pullSecrets` | imagePullSecrets to use for private repository             | `None`         |
 
 ### Security
 
@@ -450,7 +462,7 @@ The following table lists the configurable parameters of the SonarQube chart and
 | `sonarProperties`              | Custom `sonar.properties` key-value pairs (e.g., "sonarProperties.sonar.forceAuthentication=true")                                       | `None`           |
 | `sonarSecretProperties`        | Additional `sonar.properties` key-value pairs to load from a secret                                                                      | `None`           |
 | `sonarSecretKey`               | Name of existing secret used for settings encryption                                                                                     | `None`           |
-| `monitoringPasscode`           | Value for sonar.web.systemPasscode needed for LivenessProbes (encoded to Base64 format)                                                  | `define_it`      |
+| `monitoringPasscode`           | Value for sonar.web.systemPasscode needed for LivenessProbes                                                                             | `None`           |
 | `monitoringPasscodeSecretName` | Name of the secret where to load `monitoringPasscode`                                                                                    | `None`           |
 | `monitoringPasscodeSecretKey`  | Key of an existing secret containing `monitoringPasscode`                                                                                | `None`           |
 | `extraContainers`              | Array of extra containers to run alongside the `sonarqube` container (aka. Sidecars)                                                     | `[]`             |
