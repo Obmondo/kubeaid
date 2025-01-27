@@ -2,6 +2,22 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`85a48265`](../../commit/85a48265) Migrating cnpg in mattermost and updating the logical backup templates.
+- [`3a498a67`](../../commit/3a498a67) fix: yamllint fix
+- [`54d4431e`](../../commit/54d4431e) feat: split the cronjob, so all the container does not get spawned on a single node
+- [`05cb0098`](../../commit/05cb0098) feat: added pvc support
+- [`09a33c39`](../../commit/09a33c39) feat: added instruction to download the dbs
+- [`9ce10d93`](../../commit/9ce10d93) chore: renamed from cve-dict to vuls-dict
+- [`47ab3474`](../../commit/47ab3474) fix: the appversion and correct key to lookup to find the image.tag
+- [`b1088620`](../../commit/b1088620) fix: deleted unwanted files from helm chart of cve-dictionary
+- [`8075b92c`](../../commit/8075b92c) feat: added vuls-cve and oval db
+- [`6d899590`](../../commit/6d899590) Fix project name in jsonnet for ArgoCD kubeaid apps
+- [`9d77e0f5`](../../commit/9d77e0f5) fixing probe name for puppetserver
+- [`b2db6ed7`](../../commit/b2db6ed7) adding ingress template for ciso-assistant
+- [`93444600`](../../commit/93444600) (fix/capi-cluster) : MachineDeployment min-size defaults to 0
+- [`df9eeb99`](../../commit/df9eeb99) (feat/capi-cluster) : add ClusterRole and ClusterRoleBinding, to support ClusterAPI scale from zero feature
+
 ## 8.1.0
 ### Minor Version Upgrades
 - Updated velero from version 8.1.0 to 8.2.0
