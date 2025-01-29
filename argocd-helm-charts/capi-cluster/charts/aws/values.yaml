@@ -1,10 +1,11 @@
 secretName: cloud-credentials
+
 bastion:
-  enabled: true
+  enabled: True
 vpc:
+  id: ""
   cidrBlock: 10.14.0.0/22
 pods:
   cidrBlock: 10.244.0.0/16
-
 controlPlane:
   loadBalancerType: nlb

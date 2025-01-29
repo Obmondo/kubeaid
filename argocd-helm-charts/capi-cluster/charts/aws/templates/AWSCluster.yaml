@@ -10,6 +10,9 @@ spec:
   bastion: {{ toYaml .Values.bastion | nindent 4 }}
   network:
     vpc:
+      {{- if .Values.vpc.id }}
+      id: {{ .Values.vpc.id }}
+      {{- end }}
       cidrBlock: {{ .Values.vpc.cidrBlock }}
     cni:
       cniIngressRules:
