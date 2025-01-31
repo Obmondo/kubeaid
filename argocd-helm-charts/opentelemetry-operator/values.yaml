@@ -1,0 +1,8 @@
+opentelemetry-operator:
+  manager:
+    collectorImage:
+      repository: otel/opentelemetry-collector-k8s
+opentelemetry-collector:
+  image:
+    repository: otel/opentelemetry-collector-k8s
+  mode: daemonset
