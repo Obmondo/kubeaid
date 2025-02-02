@@ -111,10 +111,10 @@ rook-ceph-cluster:
           resources:
             limits:
               cpu: null
-              memory: "500Mi"
+              memory: "700Mi"
             requests:
-              cpu: "100m"
-              memory: "100Mi"
+              cpu: "200m"
+              memory: "500Mi"
           priorityClassName: system-cluster-critical
       storageClass:
         enabled: true
