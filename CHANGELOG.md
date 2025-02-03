@@ -2,6 +2,14 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`3f135670`](../../commit/3f135670) fix: changed the resources to have a decent load working with it
+- [`fc45ac62`](../../commit/fc45ac62) Add opentelemetry collector chart
+- [`91d9d45f`](../../commit/91d9d45f) feat(capi-cluster/aws) : accepting existing VPC ID from the user
+- [`bb2de70e`](../../commit/bb2de70e) use postInitApplicationSQL instead of postInitSQL in puppet psql to add extensions
+- [`a9ba19cd`](../../commit/a9ba19cd) add postInitSQL key in puppetserver psql to add psql extensions required for puppet 8
+- [`1593d7cc`](../../commit/1593d7cc) Move opentelemetry operator outside of openobserve
+
 ## 9.0.0
 ### Major Version Upgrades
 - Updated sonarqube from version 10.8.1 to 2025.1.0
