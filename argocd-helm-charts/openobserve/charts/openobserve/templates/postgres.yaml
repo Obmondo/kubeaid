@@ -24,4 +24,5 @@ spec:
   postgresql: {{ .Values.postgres.spec.postgresql | toYaml | nindent 4 }}
   monitoring: {{ .Values.postgres.spec.monitoring | toYaml | nindent 4 }}
   backup: {{ .Values.postgres.spec.backup | toYaml | nindent 4 }}
+  affinity: {{ .Values.postgres.spec.affinity | toYaml | nindent 4 }}
 {{- end }}

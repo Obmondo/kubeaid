@@ -129,6 +129,9 @@ spec:
           env:
             - name: ZO_NODE_ROLE
               value: "ingester"
+            {{- with .Values.ingester.extraEnv }}
+            {{- toYaml . |  nindent 12 }}
+            {{- end }}
             {{- with .Values.extraEnv }}
             {{- toYaml . |  nindent 12 }}
             {{- end }}

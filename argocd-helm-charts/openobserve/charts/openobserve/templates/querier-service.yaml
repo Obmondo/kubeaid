@@ -6,6 +6,7 @@ metadata:
   labels:
     {{- include "openobserve.labels" . | nindent 4 }}
     prometheus.io/scrape: "true"
+    role: querier
 spec:
   # type: {{ .Values.service.type }}
   ports:

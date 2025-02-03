@@ -30,11 +30,19 @@ metadata:
     {{- end }}
   name: {{ template "kubernetes-dashboard.fullname" . }}-{{ .Values.api.role }}
 spec:
+  type: {{ .Values.api.service.type }}
   ports:
-    - name: {{ .Values.api.role }}
-    {{- with (index .Values.api.containers.ports 0) }}
-      port: {{ .containerPort }}
+    {{- range $port := .Values.api.containers.ports }}
+    - name: {{ $port.name }}
+      port: {{ $port.containerPort }}
+      {{ if $port.protocol }}protocol: {{ $port.protocol }}{{- end }}
+      {{ if $port.appProtocol }}appProtocol: {{ $port.appProtocol }}{{- end }}
+      {{ if $port.nodePort }}nodePort: {{ $port.nodePort }}{{- end }}
+      {{ if $port.targetPort }}targetPort: {{ $port.targetPort }}{{- end }}
     {{- end }}
+  {{ with .Values.api.service.extraSpec }}
+  {{ . | toYaml | nindent 2 }}
+  {{- end }}
   selector:
     {{- include "kubernetes-dashboard.matchLabels" . | nindent 4 }}
     app.kubernetes.io/name: {{ template "kubernetes-dashboard.name" . }}-{{ .Values.api.role }}

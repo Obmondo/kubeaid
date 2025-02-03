@@ -68,6 +68,7 @@ alertmanager:
     ZO_META_CONNECTION_POOL_MIN_SIZE: "0"
     ZO_META_CONNECTION_POOL_MAX_SIZE: "0"
     ZO_ACTIX_REQ_TIMEOUT: "30"
+  extraEnv: []
 
 compactor:
   # Compactor specific configuration
@@ -76,6 +77,7 @@ compactor:
     ZO_META_CONNECTION_POOL_MIN_SIZE: "0"
     ZO_META_CONNECTION_POOL_MAX_SIZE: "0"
     ZO_ACTIX_REQ_TIMEOUT: "30"
+  extraEnv: []
 
 router:
   # Router specific configuration
@@ -83,6 +85,7 @@ router:
     ZO_META_CONNECTION_POOL_MIN_SIZE: "0"
     ZO_META_CONNECTION_POOL_MAX_SIZE: "0"
     ZO_ACTIX_REQ_TIMEOUT: "30"
+  extraEnv: []
 
 ingester:
   # Ingester specific configuration
@@ -90,6 +93,7 @@ ingester:
     ZO_META_CONNECTION_POOL_MIN_SIZE: "0"
     ZO_META_CONNECTION_POOL_MAX_SIZE: "0"
     ZO_ACTIX_REQ_TIMEOUT: "30"
+  extraEnv: []
   headless:
     enabled: false
   persistence:
@@ -108,6 +112,7 @@ querier:
     ZO_META_CONNECTION_POOL_MIN_SIZE: "0"
     ZO_META_CONNECTION_POOL_MAX_SIZE: "0"
     ZO_ACTIX_REQ_TIMEOUT: "30"
+  extraEnv: []
   persistence: # If enabled it will be used for disk cache. Highly recommend to enable this for production
     enabled: true
     size: 100Gi
@@ -182,10 +187,14 @@ config:
   ZO_DATA_IDX_DIR: ""
   ZO_DATA_STREAM_DIR: ""
   ZO_DATA_CACHE_DIR: ""
+  ZO_MMDB_DATA_DIR: ""
   ZO_UI_ENABLED: "true"
   ZO_UI_SQL_BASE64_ENABLED: "false"
   ZO_WEB_URL: ""
   ZO_BASE_URI: ""
+  ZO_HEALTH_CHECK_ENABLED: "true"
+  ZO_HEALTH_CHECK_TIMEOUT: "10"
+  ZO_HEALTH_CHECK_FAILED_TIMES: "5"
   ZO_CLUSTER_COORDINATOR: "nats"
   ZO_QUEUE_STORE: ""
   ZO_META_STORE: "postgres"
@@ -198,6 +207,7 @@ config:
   ZO_WIDENING_SCHEMA_EVOLUTION: "true"
   ZO_SKIP_SCHEMA_VALIDATION: "false"
   ZO_FEATURE_FULLTEXT_EXTRA_FIELDS: ""
+  ZO_FEATURE_INDEX_EXTRA_FIELDS: ""
   ZO_FEATURE_DISTINCT_EXTRA_FIELDS: ""
   ZO_FEATURE_FILELIST_DEDUP_ENABLED: "false"
   ZO_FEATURE_QUERY_QUEUE_ENABLED: "true"
@@ -205,27 +215,29 @@ config:
   ZO_FEATURE_QUICK_MODE_FIELDS: "" # default fields for quick mode
   ZO_FEATURE_QUERY_PARTITION_STRATEGY: "file_hash"
   ZO_FEATURE_PER_THREAD_LOCK: "false"
-  ZO_RESULT_CACHE_ENABLED: "false" # Enable result cache for query results
-  ZO_USE_MULTIPLE_RESULT_CACHE: "false" # Enable to use mulple result caches for query results
+  ZO_RESULT_CACHE_ENABLED: "true" # Enable result cache for query results
+  ZO_USE_MULTIPLE_RESULT_CACHE: "true" # Enable to use mulple result caches for query results
   ZO_RESULT_CACHE_SELECTION_STRATEGY: "overlap" # Strategy to use for result cache, default is both , possible value - both,overlap , duration
   ZO_RESULT_CACHE_DISCARD_DURATION: "60" # Discard data of last n seconds from cached results
   ZO_CONSISTENT_HASH_VNODES: "100"
   ZO_QUERY_OPTIMIZATION_NUM_FIELDS: "0"
+  ZO_SCHEMA_MAX_FIELDS_TO_ENABLE_UDS: "100"
+  ZO_USER_DEFINED_SCHEMA_MAX_FIELDS: "200"
+  ZO_QUICK_MODE_ENABLED: "false"
+  ZO_QUICK_MODE_FORCE_ENABLED: "true"
   ZO_QUICK_MODE_NUM_FIELDS: "500"
   ZO_QUICK_MODE_STRATEGY: ""
-  ZO_QUICK_MODE_FILE_LIST_ENABLED: "false"
-  ZO_QUICK_MODE_FILE_LIST_INTERVAL: "300"
   ZO_BLOOM_FILTER_ENABLED: "true"
   ZO_BLOOM_FILTER_DEFAULT_FIELDS: ""
   ZO_ENABLE_INVERTED_INDEX: "true"
   ZO_INVERTED_INDEX_STORE_FORMAT: "tantivy" # InvertedIndex store format, parquet(default), tantivy, both
-  ZO_INVERTED_INDEX_SEARCH_FORMAT: "tantivy"  # InvertedIndex search format, parquet(default), tantivy.
-  ZO_INVERTED_INDEX_TANTIVY_MODE: "puffin"  # Tantivy search mode, puffin or mmap, default is puffin.
+  ZO_INVERTED_INDEX_SEARCH_FORMAT: "tantivy" # InvertedIndex search format, parquet(default), tantivy.
+  ZO_INVERTED_INDEX_TANTIVY_MODE: "puffin" # Tantivy search mode, puffin or mmap, default is puffin.
   ZO_INVERTED_INDEX_COUNT_OPTIMIZER_ENABLED: "true"
   ZO_FEATURE_QUERY_REMOVE_FILTER_WITH_INDEX: "true"
   ZO_INVERTED_INDEX_SPLIT_CHARS: ""
-  ZO_FULL_TEXT_SEARCH_TYPE: "prefix"  # Search through full text fields with either 'contains' , 'eq' or 'prefix' match.
-  ZO_QUERY_ON_STREAM_SELECTION: "true"  # Toggle search to be trigger based on button click event.
+  ZO_FULL_TEXT_SEARCH_TYPE: "prefix" # Search through full text fields with either 'contains' , 'eq' or 'prefix' match.
+  ZO_QUERY_ON_STREAM_SELECTION: "true" # Toggle search to be trigger based on button click event.
   ZO_DISTINCT_VALUES_INTERVAL: "10"
   ZO_DISTINCT_VALUES_HOURLY: "false"
   ZO_TRACING_ENABLED: "false"
@@ -252,7 +264,7 @@ config:
   ZO_MEM_PERSIST_INTERVAL: "5"
   ZO_ENRICHMENT_TABLE_LIMIT: "10" # size in mb
   ZO_WAL_WRITE_BUFFER_SIZE: "16384"
-  ZO_WAL_FSYNC_DISABLED: "false"  
+  ZO_WAL_FSYNC_DISABLED: "false"
   ZO_QUERY_THREAD_NUM: "0"
   ZO_QUERY_TIMEOUT: "600"
   ZO_ROUTE_TIMEOUT: "600"
@@ -364,7 +376,6 @@ config:
   ZO_PROF_PYROSCOPE_SERVER_URL: "http://localhost:4040"
   ZO_PROF_PYROSCOPE_PROJECT_NAME: "openobserve"
   ZO_ENTRY_PER_SCHEMA_VERSION_ENABLED: "true"
-  ZO_QUICK_MODE_ENABLED: "false"
   ZO_QUERY_GROUP_BASE_SPEED: "768" # MB/s/core
   ZO_QUERY_PARTITION_BY_SECS: "1" # In how many seconds we want to get the results per partition
   ZO_QUERY_PARTITION_MIN_SECS: "600" # seconds. This is the minimum time range for a partition
@@ -386,13 +397,12 @@ config:
   ZO_SKIP_FORMAT_BULK_STREAM_NAME: false
   ZO_BULK_RESPONSE_INCLUDE_ERRORS_ONLY: false
   ZO_ALLOW_USER_DEFINED_SCHEMAS: "true"
-  ZO_MEM_TABLE_STREAMS: ""  # Streams for which dedicated MemTable will be used as comma separated values
+  ZO_MEM_TABLE_STREAMS: "" # Streams for which dedicated MemTable will be used as comma separated values
   ZO_DEFAULT_SCRAPE_INTERVAL: "15"
   ZO_CIRCUIT_BREAKER_ENABLED: "false"
   ZO_CIRCUIT_BREAKER_RATIO: "100"
-  ZO_MMDB_DATA_DIR: "./data/openobserve/mmdb/"
   ZO_MMDB_DISABLE_DOWNLOAD: "false"
-  ZO_MMDB_UPDATE_DURATION: "86400"  # Everyday to test
+  ZO_MMDB_UPDATE_DURATION: "86400" # Everyday to test
   ZO_MMDB_GEOLITE_CITYDB_URL: "https://geoip.zinclabs.dev/GeoLite2-City.mmdb"
   ZO_MMDB_GEOLITE_CITYDB_SHA256_URL: "https://geoip.zinclabs.dev/GeoLite2-ASN.sha256"
   ZO_MMDB_GEOLITE_ASNDB_URL: "https://geoip.zinclabs.dev/GeoLite2-ASN.mmdb"
@@ -409,8 +419,7 @@ config:
   ZO_SELF_METRIC_CONSUMPTION_INTERVAL: "60" # self-consume metrics interval, unit seconds
   ZO_SELF_METRIC_CONSUMPTION_ACCEPTLIST: "" # only these metrics will be self-consumed, comma separated
   ZO_SWAGGER_ENABLED: "true"
-
-
+  ZO_WEBSOCKET_ENABLED: "true"
 
 # Add extra environment variables to all pods, useful for overriding secrets
 extraEnv: []
@@ -431,7 +440,6 @@ service:
   #  service.beta.kubernetes.io/aws-load-balancer-internal: "true"
   #  service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
 
-
 certIssuer:
   enabled: false
 
@@ -442,7 +450,12 @@ ingress:
     cert-manager.io/issuer: letsencrypt
     kubernetes.io/tls-acme: "true"
     nginx.ingress.kubernetes.io/enable-cors: "true"
-    # nginx.ingress.kubernetes.io/connection-proxy-header: keep-alive
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1" # Enable HTTP/1.1 for WebSockets
+    nginx.ingress.kubernetes.io/enable-websocket: "true"
+    nginx.ingress.kubernetes.io/proxy-set-headers: |
+      Upgrade $http_upgrade;
+      Connection "Upgrade";
+    # nginx.ingress.kubernetes.io/connection-proxy-header: keep-alive # keep-alive should be disabled for websockets to work
     # nginx.ingress.kubernetes.io/proxy-connect-timeout: '600'
     # nginx.ingress.kubernetes.io/proxy-send-timeout: '600'
     # nginx.ingress.kubernetes.io/proxy-read-timeout: '600'
@@ -692,6 +705,8 @@ postgres:
     password: Batman123 # password # username is hardcoded to openobserve, db is hardcoded to app
     enableSuperuserAccess: true # if true then superuser access will be enabled. You can get the password from appropriate secret once the postgres is deployed
     instances: 2 # creates a primary and a replica. replica will become primary if the primary fails
+    affinity: # see details https://cloudnative-pg.io/documentation/1.24/scheduling/
+      podAntiAffinityType: preferred
     storage:
       size: 10Gi
     postgresql:
@@ -756,6 +771,9 @@ enterprise:
           inCluster: true
       web:
         http: 0.0.0.0:5556
+      frontend:
+        issuer: "OpenObserve"
+        logoURL: "https://cloud.openobserve.ai/web/src/assets/images/common/open_observe_logo.svg"
       expiry:
         idTokens: 10m
         refreshTokens:

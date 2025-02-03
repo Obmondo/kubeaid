@@ -1,5 +1,23 @@
 # Helm chart
 
+## v2.39.3
+
+### Urgent Upgrade Notes
+
+Please upgrade from v2.39.2 directly to v2.39.3 to avoid upgrade failures if you are using this chart as a subchart.
+
+### Bug or Regression
+- Fix sub-charting by removing values schema ([#2322](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/2322), [@ElijahQuinones]((https://github.com/ElijahQuinones)
+
+## v2.39.2
+
+### Urgent Upgrade Notes
+
+Please upgrade from v2.38.1 directly to v2.39.2 to avoid upgrade failures if you are relying on `a1CompatibilityDaemonSet`. 
+
+### Bug or Regression
+- Fix helm regression when `a1CompatibilityDaemonSet=true` ([#2316](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/2316), [@AndrewSirenko](https://github.com/AndrewSirenko))
+
 ## v2.39.1
 
 ### Bug or Regression

@@ -2,6 +2,25 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 9.1.0
+### Minor Version Upgrades
+- Updated traefik from version 34.1.0 to 34.2.0
+- Updated mariadb-operator from version 0.36.0 to 0.37.1
+- Updated keycloakx from version 6.0.0 to 7.0.0
+- Updated cluster-api-operator from version 0.15.1 to 0.16.0
+
+### Patch Version Upgrades
+- Updated teleport-kube-agent from version 17.2.2 to 17.2.3
+- Updated teleport-cluster from version 17.2.2 to 17.2.3
+- Added rook-ceph-cluster from version v1.16.0 to v1.16.0
+- Updated redmine from version 32.1.2 to 32.1.4
+- Updated openobserve-collector from version 0.3.21 to 0.3.22
+- Updated openobserve from version 0.14.7 to 0.14.18
+- Updated kubernetes-dashboard from version 7.10.1 to 7.10.3
+- Updated erpnext from version 7.0.160 to 7.0.161
+- Updated aws-ebs-csi-driver from version 2.39.1 to 2.39.3
+- Updated argo-cd from version 7.7.17 to 7.7.22
+
 ### Improvements
 - [`3f135670`](../../commit/3f135670) fix: changed the resources to have a decent load working with it
 - [`fc45ac62`](../../commit/fc45ac62) Add opentelemetry collector chart

@@ -1,9 +1,7 @@
 annotations:
-  artifacthub.io/changes: |
-    - "fix(Traefik Proxy): support uppercase letters in entrypoint names"
-    - "feat(deps): update traefik docker tag to v3.3.2"
-    - "feat(Traefik Hub): add OAS validateRequestMethodAndPath - CRDs update"
-    - "chore(release): publish v34.1.0 and CRDs v1.2.0"
+  artifacthub.io/changes: "- \"fix: :bug: permanent redirect should be disableable\"\n-
+    \"feat: :sparkles: add hub tracing capabilities\"\n- \"docs: \U0001F4DA️ fix typo
+    in Guidelines.md\"\n- \"chore(release): publish v34.2.0\"\n"
 apiVersion: v2
 appVersion: v3.3.2
 description: A Traefik based Kubernetes ingress controller
@@ -27,4 +25,4 @@ sources:
 - https://github.com/traefik/traefik
 - https://github.com/traefik/traefik-helm-chart
 type: application
-version: 34.1.0
+version: 34.2.0

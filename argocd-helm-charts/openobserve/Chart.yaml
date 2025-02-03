@@ -3,8 +3,8 @@ name: openobserve
 version: 0.13.4
 dependencies:
   - name: openobserve
-    version: 0.14.7
+    version: 0.14.18
     repository: https://charts.openobserve.ai/
   - name: openobserve-collector
-    version: 0.3.21
+    version: 0.3.22
     repository: https://charts.openobserve.ai/

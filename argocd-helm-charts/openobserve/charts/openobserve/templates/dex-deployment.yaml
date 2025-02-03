@@ -70,7 +70,7 @@ spec:
             - configMapRef:
                 name: {{ include "openobserve.fullname" . }}
             - secretRef:
-                name: {{ include "openobserve.fullname" . }}
+                name: {{ if .Values.externalSecret.enabled }}{{ .Values.externalSecret.name }}{{ else }}{{ include "openobserve.fullname" . }}{{ end }}
           env:
             {{- with .Values.enterprise.dex.extraEnv }}
             {{- toYaml . |  nindent 12 }}

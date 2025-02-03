@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: v0.14.0
+appVersion: v0.14.1
 dependencies:
 - condition: etcd.enabled
   name: etcd
@@ -21,4 +21,4 @@ maintainers:
   url: https://openobserve.ai
 name: openobserve
 type: application
-version: 0.14.7
+version: 0.14.18

@@ -14,8 +14,6 @@ kubeVersion: '>=1.26.0-0'
 maintainers:
 - email: martin.montes@mariadb.com
   name: mmontes11
-- email: pieter.humphrey@mariadb.com
-  name: mariadb-pieterhumphrey
 name: mariadb-operator-crds
 type: application
-version: 0.36.0
+version: 0.37.1

@@ -6,6 +6,7 @@ metadata:
   labels:
     {{- include "openobserve.labels" . | nindent 4 }}
     prometheus.io/scrape: "true"
+    role: router
   {{- with .Values.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

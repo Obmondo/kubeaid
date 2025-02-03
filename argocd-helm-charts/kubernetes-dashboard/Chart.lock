@@ -1,6 +1,6 @@
 dependencies:
 - name: kubernetes-dashboard
   repository: https://kubernetes.github.io/dashboard/
-  version: 7.10.1
-digest: sha256:2859f4c6ff64b9f88fb94b309592661a5ed1d74e0a8e680133b7ac149114bbfa
-generated: "2025-01-13T15:05:55.153719101+05:30"
+  version: 7.10.3
+digest: sha256:e7d31950f4d8acaf4daaece3c09e13052734fb0f4dd51f9ea736153f3dc1f19f
+generated: "2025-02-03T12:48:26.85071416+05:30"

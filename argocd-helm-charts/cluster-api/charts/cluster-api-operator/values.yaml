@@ -7,6 +7,7 @@ controlPlane: ""
 infrastructure: ""
 addon: ""
 manager.featureGates: {}
+fetchConfig: {}
 # ---
 # Common configuration secret options
 configSecret: {}
@@ -19,7 +20,7 @@ leaderElection:
 image:
   manager:
     repository: registry.k8s.io/capi-operator/cluster-api-operator
-    tag: v0.15.1
+    tag: v0.16.0
     pullPolicy: IfNotPresent
 env:
   manager: []
