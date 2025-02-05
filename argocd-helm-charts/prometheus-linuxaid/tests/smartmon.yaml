@@ -26,6 +26,11 @@ tests:
       - series: smartmon_reallocated_sector_ct_threshold{certname="jacen.enableit", disk="/dev/sdb", type="sat", instance="htzhel1-ax41a.enableit:63385"}
         values: 100x200
 
+      - series: obmondo_monitoring{certname="jacen.enableit", alert_id="monitor::system::service::smartmon::smartctl_device_percentage_used"}
+        values: 1x200
+      - series: smartctl_device_percentage_used{certname="jacen.enableit", disk="/dev/sdb", instance="htzhel1-ax41a.enableit:63385"}
+        values: 105x200
+
     alert_rule_test:
       - alertname: 'monitor::system::service::smartmon::smartmon_udma_crc_error_count_raw_value'
         eval_time: 3h
@@ -74,3 +79,19 @@ tests:
                 type="**sat**",
 
                 Reallocated Sectors Count -  This value is primarily used as a metric of the life expectancy of the drive; a drive which has had any reallocations at all is significantly more likely to fail in the immediate months.
+      - alertname: 'monitor::system::service::smartmon::smartctl_device_percentage_used'
+        eval_time: 3h
+        exp_alerts:
+          - exp_labels:
+              severity: 'critical'
+              certname: 'jacen.enableit'
+              disk: '/dev/sdb'
+              instance: "htzhel1-ax41a.enableit:63385"
+              alert_id: 'monitor::system::service::smartmon::smartctl_device_percentage_used'
+            exp_annotations:
+              summary: 'Disk **/dev/sdb** on **jacen.enableit** has exceeded 100% of NVM subsystem life'
+              description: |
+                Disk **/dev/sdb** on **jacen.enableit** has exceeded 100% of NVM subsystem life,
+                instance="**htzhel1-ax41a.enableit:63385**",
+
+                Percentage Used: Contains a vendor specific estimate of the percentage of NVM subsystem life used based on the actual usage and the manufacturer’s prediction of NVM life. A value of 100 indicates that the estimated endurance of the NVM in the NVM subsystem has been consumed, but may not indicate an NVM subsystem failure. The value is allowed to exceed 100. Percentages greater than 254 shall be represented as 255. This value shall be updated once per power-on hour (when the controller is not in a sleep state).

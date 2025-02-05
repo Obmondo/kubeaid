@@ -41,3 +41,16 @@ groups:
           type="**{{ $labels.type }}**",
 
           Reallocated Sectors Count -  This value is primarily used as a metric of the life expectancy of the drive; a drive which has had any reallocations at all is significantly more likely to fail in the immediate months.
+    - alert: monitor::system::service::smartmon::smartctl_device_percentage_used
+      expr: smartctl_device_percentage_used > 100 and on(certname) obmondo_monitoring
+      for: 3h
+      labels:
+        severity: critical
+        alert_id: monitor::system::service::smartmon::smartctl_device_percentage_used
+      annotations:
+        summary: 'Disk **{{ $labels.disk }}** on **{{ $labels.certname }}** has exceeded 100% of NVM subsystem life'
+        description: |
+          Disk **{{ $labels.disk }}** on **{{ $labels.certname }}** has exceeded 100% of NVM subsystem life,
+          instance="**{{ $labels.instance }}**",
+
+          Percentage Used: Contains a vendor specific estimate of the percentage of NVM subsystem life used based on the actual usage and the manufacturer’s prediction of NVM life. A value of 100 indicates that the estimated endurance of the NVM in the NVM subsystem has been consumed, but may not indicate an NVM subsystem failure. The value is allowed to exceed 100. Percentages greater than 254 shall be represented as 255. This value shall be updated once per power-on hour (when the controller is not in a sleep state).
