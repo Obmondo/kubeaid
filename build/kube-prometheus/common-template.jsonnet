@@ -247,11 +247,6 @@ local mixins = remove_nulls([
     vars,
   ),
   addMixin(
-    'monitoring',
-    (import 'mixins/monitoring/mixin.libsonnet'),
-    vars,
-  ),
-  addMixin(
     'smartmon',
     (import 'mixins/smartmon/mixin.libsonnet'),
     vars,
