@@ -2,6 +2,11 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`86cc10d7`](../../commit/86cc10d7) [Fix] Install promtool v2.55.0
+- [`d4371a7d`](../../commit/d4371a7d) add nvme percentage used rule in smartmon
+- [`d6aa5338`](../../commit/d6aa5338) fix kubeaid build script: remove unknown monitoring mixin
+
 ## 9.1.0
 ### Minor Version Upgrades
 - Updated traefik from version 34.1.0 to 34.2.0
