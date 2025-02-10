@@ -86,7 +86,7 @@ spec:
                   data. For instance, if the Volume was created with "off" and the
                   next day the compression was modified to "on", the data written
                   prior to setting "on" will not be compressed. Default Value: off.'
-                pattern: ^(on|off|lzjb|zstd|zstd-[1-9]|zstd-1[0-9]|gzip|gzip-[1-9]|zle|lz4)$
+                pattern: ^(on|off|lzjb|zstd(?:-fast|-[1-9]|-1[0-9])?|gzip(?:-[1-9])?|zle|lz4)$
                 type: string
               dedup:
                 description: 'Deduplication is the process for removing redundant
@@ -148,6 +148,14 @@ spec:
                   has been created. PoolName can not be edited after the volume has
                   been provisioned.
                 minLength: 1
+                type: string
+              quotaType:
+                description: 'quotaType determines whether the dataset volume quota
+                  type is of type "quota" or "refquota". QuotaType can not be modified
+                  once volume has been provisioned. Default Value: quota.'
+                enum:
+                - quota
+                - refquota
                 type: string
               recordsize:
                 description: 'Specifies a suggested block size for files in the file

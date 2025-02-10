@@ -1,9 +1,12 @@
 annotations:
-  artifacthub.io/changes: "- \"fix: :bug: permanent redirect should be disableable\"\n-
-    \"feat: :sparkles: add hub tracing capabilities\"\n- \"docs: \U0001F4DA️ fix typo
-    in Guidelines.md\"\n- \"chore(release): publish v34.2.0\"\n"
+  artifacthub.io/changes: |
+    - "fix(Traefik Hub): AIServices are available in API Gateway"
+    - "fix(Traefik Hub): :bug: handle main and latest build"
+    - "feat: :sparkles: add missing microcks provider for Hu"b
+    - "feat(deps): update traefik docker tag to v3.3.3"
+    - "chore: update CRDs to v1.14.1"
 apiVersion: v2
-appVersion: v3.3.2
+appVersion: v3.3.3
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
 icon: https://raw.githubusercontent.com/traefik/traefik/v2.3/docs/content/assets/img/traefik.logo.png
@@ -25,4 +28,4 @@ sources:
 - https://github.com/traefik/traefik
 - https://github.com/traefik/traefik-helm-chart
 type: application
-version: 34.2.0
+version: 34.3.0

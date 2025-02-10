@@ -107,6 +107,7 @@ release: {{ .Release.Name }}
 Create component labels openebs zfs-localpv node daemon
 */}}
 {{- define "zfslocalpv.zfsNode.componentLabels" -}}
+app: {{ .Values.zfsNode.componentName | quote }}
 openebs.io/component-name: {{ .Values.zfsNode.componentName | quote }}
 {{- end -}}
 

@@ -57,7 +57,11 @@ data:
   ZO_HTTP_IPV6_ENABLED: "{{ .Values.config.ZO_HTTP_IPV6_ENABLED }}"
   ZO_GRPC_PORT: "{{ .Values.config.ZO_GRPC_PORT }}"
   ZO_GRPC_ADDR: "{{ .Values.config.ZO_GRPC_ADDR }}"
-  ZO_GRPC_TIMEOUT: "{{ .Values.config.ZO_GRPC_TIMEOUT }}"
+  {{- /* ZO_GRPC_CONNECT_TIMEOUT or ZO_GRPC_TIMEOUT are accepted for backwards compatibility. */}}
+  ZO_GRPC_CONNECT_TIMEOUT: "{{
+    toString .Values.config.ZO_GRPC_CONNECT_TIMEOUT | eq "600"
+      | ternary (.Values.config.ZO_GRPC_TIMEOUT | default "600") .Values.config.ZO_GRPC_CONNECT_TIMEOUT 
+  }}"
   ZO_GRPC_MAX_MESSAGE_SIZE: "{{ .Values.config.ZO_GRPC_MAX_MESSAGE_SIZE }}"
   ZO_GRPC_ORG_HEADER_KEY: "{{ .Values.config.ZO_GRPC_ORG_HEADER_KEY }}"
   ZO_GRPC_STREAM_HEADER_KEY: "{{ .Values.config.ZO_GRPC_STREAM_HEADER_KEY }}"
@@ -282,12 +286,16 @@ data:
   O2_SUPER_CLUSTER_PUBLIC_ADDR: "{{ .Values.enterprise.parameters.O2_SUPER_CLUSTER_PUBLIC_ADDR }}"
   O2_SUPER_CLUSTER_PUBLIC_PORT: "{{ .Values.enterprise.parameters.O2_SUPER_CLUSTER_PUBLIC_PORT }}"
   O2_SUPER_CLUSTER_GRPC_TOKEN: "{{ .Values.enterprise.parameters.O2_SUPER_CLUSTER_GRPC_TOKEN }}"
+  O2_SEARCH_GROUP_CPU_LIMIT_ENABLED: "{{ .Values.enterprise.parameters.O2_SEARCH_GROUP_CPU_LIMIT_ENABLED }}"
+  O2_SEARCH_GROUP_DYNAMIC_RESOURCE: "{{ .Values.enterprise.parameters.O2_SEARCH_GROUP_DYNAMIC_RESOURCE }}"
   O2_SEARCH_GROUP_LONG_MAX_CPU: "{{ .Values.enterprise.parameters.O2_SEARCH_GROUP_LONG_MAX_CPU }}"
   O2_SEARCH_GROUP_LONG_MAX_MEMORY: "{{ .Values.enterprise.parameters.O2_SEARCH_GROUP_LONG_MAX_MEMORY }}"
   O2_SEARCH_GROUP_LONG_MAX_CONCURRENCY: "{{ .Values.enterprise.parameters.O2_SEARCH_GROUP_LONG_MAX_CONCURRENCY }}"
   O2_SEARCH_GROUP_SHORT_MAX_CPU: "{{ .Values.enterprise.parameters.O2_SEARCH_GROUP_SHORT_MAX_CPU }}"
   O2_SEARCH_GROUP_SHORT_MAX_MEMORY: "{{ .Values.enterprise.parameters.O2_SEARCH_GROUP_SHORT_MAX_MEMORY }}"
   O2_SEARCH_GROUP_SHORT_MAX_CONCURRENCY: "{{ .Values.enterprise.parameters.O2_SEARCH_GROUP_SHORT_MAX_CONCURRENCY }}"
+  O2_SEARCH_GROUP_USER_LONG_MAX_CONCURRENCY: "{{ .Values.enterprise.parameters.O2_SEARCH_GROUP_USER_LONG_MAX_CONCURRENCY }}"
+  O2_SEARCH_GROUP_USER_SHORT_MAX_CONCURRENCY: "{{ .Values.enterprise.parameters.O2_SEARCH_GROUP_USER_SHORT_MAX_CONCURRENCY }}"
   O2_SEARCH_GROUP_BASE_SPEED: "{{ .Values.enterprise.parameters.O2_SEARCH_GROUP_BASE_SPEED }}"
   O2_SEARCH_GROUP_BASE_SECS: "{{ .Values.enterprise.parameters.O2_SEARCH_GROUP_BASE_SECS }}"
   ZO_SMTP_ENABLED: "{{ .Values.config.ZO_SMTP_ENABLED }}"
@@ -325,4 +333,5 @@ data:
   ZO_SELF_METRIC_CONSUMPTION_ACCEPTLIST: "{{ .Values.config.ZO_SELF_METRIC_CONSUMPTION_ACCEPTLIST }}"
   ZO_SWAGGER_ENABLED: "{{ .Values.config.ZO_SWAGGER_ENABLED }}"
   ZO_WEBSOCKET_ENABLED: "{{ .Values.config.ZO_WEBSOCKET_ENABLED }}"
+  ZO_MIN_AUTO_REFRESH_INTERVAL: "{{ .Values.config.ZO_MIN_AUTO_REFRESH_INTERVAL }}"
 

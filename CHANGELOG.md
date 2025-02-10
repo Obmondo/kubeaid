@@ -2,6 +2,30 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 9.2.0
+### Minor Version Upgrades
+- Updated zfs-localpv from version 2.6.2 to 2.7.0
+- Updated traefik from version 34.2.0 to 34.3.0
+- Updated opentelemetry-collector from version 0.115.0 to 0.116.0
+- Updated cilium from version 1.16.6 to 1.17.0
+- Updated cert-manager from version v1.16.3 to v1.17.0
+- Updated argo-cd from version 7.7.22 to 7.8.2
+
+### Patch Version Upgrades
+- Updated tigera-operator from version v3.29.1 to v3.29.2
+- Updated teleport-kube-agent from version 17.2.3 to 17.2.6
+- Updated teleport-cluster from version 17.2.3 to 17.2.6
+- Added rook-ceph-cluster from version v1.16.0 to v1.16.0
+- Updated rook-ceph from version v1.16.2 to v1.16.3
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated openobserve from version 0.14.18 to 0.14.20
+- Updated oncall from version 1.14.1 to 1.14.3
+- Updated metallb from version 6.4.4 to 6.4.5
+- Updated kubernetes-dashboard from version 7.10.3 to 7.10.4
+- Updated keycloakx from version 7.0.0 to 7.0.1
+- Updated external-dns from version 8.7.3 to 8.7.4
+- Updated erpnext from version 7.0.161 to 7.0.164
+
 ### Improvements
 - [`86cc10d7`](../../commit/86cc10d7) [Fix] Install promtool v2.55.0
 - [`d4371a7d`](../../commit/d4371a7d) add nvme percentage used rule in smartmon
