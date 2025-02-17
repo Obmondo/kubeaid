@@ -2,6 +2,28 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 9.3.0
+### Minor Version Upgrades
+- Updated opentelemetry-operator from version 0.79.0 to 0.80.1
+- Updated opensearch-dashboards from version 2.26.0 to 2.27.0
+- Updated opensearch from version 2.30.1 to 2.31.0
+- Updated crossplane from version 1.18.2 to 1.19.0
+
+### Patch Version Upgrades
+- Updated zfs-localpv from version 2.7.0 to 2.7.1
+- Updated teleport-kube-agent from version 17.2.6 to 17.2.7
+- Updated teleport-cluster from version 17.2.6 to 17.2.7
+- Added rook-ceph-cluster from version v1.16.0 to v1.16.0
+- Updated rabbitmq-cluster-operator from version 4.4.3 to 4.4.5
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated oncall from version 1.14.3 to 1.14.4
+- Updated metallb from version 6.4.5 to 6.4.6
+- Updated fluent-bit from version 0.48.5 to 0.48.6
+- Updated erpnext from version 7.0.164 to 7.0.166
+- Updated cilium from version 1.17.0 to 1.17.1
+- Updated cert-manager from version v1.17.0 to v1.17.1
+- Updated aws-efs-csi-driver from version 3.1.5 to 3.1.6
+
 ## 9.2.0
 ### Minor Version Upgrades
 - Updated zfs-localpv from version 2.6.2 to 2.7.0
