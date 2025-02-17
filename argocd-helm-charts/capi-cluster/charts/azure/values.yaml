@@ -11,11 +11,11 @@ global:
     - name: azurepolicy
       enabled: true
   clusterNetwork:
-    pod: 
+    pod:
       cidrBlocks: 192.168.0.0/16
     services:
       cidrBlocks: "10.96.0.0/12"
-  virtualNetwork: 
+  virtualNetwork:
     name: controlplan-vnet
     cidrBlock: "10.1.0.0/16"
     subnet:

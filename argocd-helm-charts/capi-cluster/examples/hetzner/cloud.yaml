@@ -1,0 +1,44 @@
+global:
+  clusterName: kubeaid-demo-aws
+  kubernetes:
+    version: v1.31.0
+  kubeaid:
+    repo: https://github.com/Archisman-Mridha/kubeaid
+  kubeaidConfig:
+    repo: https://github.com/Archisman-Mridha/kubeaid-config
+provider:
+  hetzner: true
+
+hetzner:
+  cloudCredentialsSecretName: cloud-credentials
+
+  controlPlane:
+    loadBalancer:
+      enabled: true
+    endpoint:
+      port: 6443
+    regions:
+      - fsn1
+      - nbg1
+    machineType: cax11
+    replicas: 3
+
+  hcloud:
+    sshKeyName: cluster
+
+    enabled: true
+
+    network:
+      zone: eu-central
+
+    nodeGroups:
+      - name: bootstrapper
+        minSize: 1
+        maxSize: 3
+        machineType: cax11
+        sshKeys:
+          - name: cluster
+        labels:
+          node-role.kubernetes.io/bootstrapper: ""
+          node.cluster.x-k8s.io/nodegroup: bootstrapper
+        taints: []

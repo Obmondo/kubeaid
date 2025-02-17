@@ -16,4 +16,3 @@ spec:
     namespace: {{ .Release.Namespace }}
   tenantID: {{ .Values.global.tenantID }}
   type: ServicePrincipal
-  

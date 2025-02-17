@@ -1,16 +1,58 @@
 {{- if (.Values.global).enableClusterAutoscaler }}
-{{- range $index, $nodeGroup := $.Values.nodeGroups }}
+
+{{/*
+  All the replicas within a MachineDeployment will reside in the same Availability Zone.
+
+  To ensure that the worker machines are spread across failure domains, per node-group, we need to
+  create N MachineDeployment for your N failure domains, scaling them independently.
+  Resiliency to failures comes from having multiple MachineDeployment. 
+*/}}
+{{- $failureDomains := list "a" "b" "c" }}
+
+{{- range $nodeGroupIndex, $nodeGroup := $.Values.nodeGroups }}
+{{- range $failureDomainIndex, $failureDomain := $failureDomains }}
 ---
+
+{{/* Calculate the Failure Domain specific min size. */}}
+  {{- $baseMinSizePerFD := (div $nodeGroup.minSize (len $failureDomains)) }}
+
+  {{- $fdSpecificExtraMinSize := 0 }}
+
+    {{- if (and (eq $failureDomain "a") (ge (mod $nodeGroup.minSize 3) 1))}}
+    {{- $fdSpecificExtraMinSize = 1 }}
+    {{- end }}
+
+    {{- if (and (eq $failureDomain "b") (ge (mod $nodeGroup.minSize 3) 2))}}
+    {{- $fdSpecificExtraMinSize = 1 }}
+    {{- end }}
+
+  {{- $fdSpecificMinSize := (add $baseMinSizePerFD $fdSpecificExtraMinSize) }}
+
+{{/* Calculate the Failure Domain specific max size. */}}
+  {{- $baseMaxSizePerFD := (div $nodeGroup.maxSize (len $failureDomains)) }}
+
+  {{- $fdSpecificExtraMaxSize := 0 }}
+
+    {{- if (and (eq $failureDomain "a") (ge (mod $nodeGroup.maxSize 3) 1))}}
+    {{- $fdSpecificExtraMaxSize = 1 }}
+    {{- end }}
+
+    {{- if (and (eq $failureDomain "b") (ge (mod $nodeGroup.maxSize 3) 2))}}
+    {{- $fdSpecificExtraMaxSize = 1 }}
+    {{- end }}
+
+  {{- $fdSpecificMaxSize := (add $baseMaxSizePerFD $fdSpecificExtraMaxSize) }}
+
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachineDeployment
 metadata:
-  name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
+  name: {{ printf "%s-%s-%s" $.Values.global.clusterName $nodeGroup.name $failureDomain }}
   annotations:
-    cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: {{ $nodeGroup.minSize | default 0 | quote }}
-    cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size: {{ $nodeGroup.maxSize | default 3 | quote }}
+    cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: {{ $fdSpecificMinSize | quote }}
+    cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size: {{ $fdSpecificMaxSize | quote }}
 spec:
   clusterName: {{ $.Values.global.clusterName }}
-  replicas: {{ $nodeGroup.replicas | default 2 }}
+  replicas: {{ $fdSpecificMinSize }}
   template:
     {{- if $nodeGroup.labels }}
     metadata:
@@ -35,6 +77,8 @@ spec:
         apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
         kind: AWSMachineTemplate
         name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
+      failureDomain: {{ printf "%s%s" $.Values.region $failureDomain | quote }}
       version: {{ $.Values.global.kubernetes.version }}
+{{- end }}
 {{- end }}
 {{- end }}

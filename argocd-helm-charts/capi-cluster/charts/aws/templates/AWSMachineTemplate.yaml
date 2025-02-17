@@ -6,6 +6,14 @@ spec:
   template:
     spec:
       iamInstanceProfile: control-plane.cluster-api-provider-aws.sigs.k8s.io
+      # Required by CAPA (Cluster API Provider AWS), when using IAM Roles instead of credentials
+      # stored in Kubernetes Secret.
+      # REFER : https://github.com/kubernetes-sigs/cluster-api-provider-aws/issues/4247.
+      instanceMetadataOptions:
+        httpEndpoint: enabled
+        httpPutResponseHopLimit: 2
+        httpTokens: optional # Both IMDSv1 and IMDSv2 are enabled.
+        instanceMetadataTags: disabled
       instanceType: {{ .Values.controlPlane.instanceType }}
       sshKeyName: {{ .Values.controlPlane.sshKeyName }}
       imageLookupBaseOS: ubuntu-20.04
@@ -26,6 +34,11 @@ spec:
     spec:
       ami: {{ toYaml $nodeGroup.ami | nindent 8 }}
       iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io
+      instanceMetadataOptions:
+        httpEndpoint: enabled
+        httpPutResponseHopLimit: 2
+        httpTokens: optional
+        instanceMetadataTags: disabled
       instanceType: {{ $nodeGroup.instanceType }}
       sshKeyName: {{ $nodeGroup.sshKeyName }}
       imageLookupBaseOS: ubuntu-20.04

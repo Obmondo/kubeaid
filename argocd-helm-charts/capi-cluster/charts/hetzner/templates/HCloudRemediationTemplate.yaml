@@ -1,0 +1,15 @@
+{{/* CASE : Control Plane is in HCloud. */}}
+{{- if and ((.Values.hcloud).enabled) ((.Values.hcloud).controlPlane) }}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: HCloudRemediationTemplate
+metadata:
+  name: control-plane-remediation-request
+spec:
+  template:
+    spec:
+      strategy:
+        retryLimit: 1
+        timeout: 3m0s
+        type: Reboot
+{{- end }}

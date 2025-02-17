@@ -55,7 +55,7 @@ spec:
       - API_SERVER_PORT=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $5}')
       - helm template kubeaid/argocd-helm-charts/cilium --values kubeaid/argocd-helm-charts/cilium/values.yaml --set cilium.k8sServiceHost=${API_SERVER_HOST} --set cilium.k8sServicePort=${API_SERVER_PORT} --namespace cilium | kubectl apply -f -
       # Install AWS Cloud Controller Manager.
-      - helm template kubeaid/argocd-helm-charts/ccm-aws --values kubeaid/argocd-helm-charts/ccm-aws/values.yaml --namespace kube-system | kubectl apply -f -
+      - helm template kubeaid/argocd-helm-charts/ccm-aws --values kubeaid/argocd-helm-charts/ccm-aws/values.yaml --set hostNetworking=true --namespace kube-system | kubectl apply -f -
   machineTemplate:
     infrastructureRef:
       apiVersion: infrastructure.cluster.x-k8s.io/v1beta2

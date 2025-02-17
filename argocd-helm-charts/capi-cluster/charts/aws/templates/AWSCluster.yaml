@@ -14,6 +14,8 @@ spec:
       id: {{ .Values.vpc.id }}
       {{- end }}
       cidrBlock: {{ .Values.vpc.cidrBlock }}
+      availabilityZoneSelection: Ordered
+      availabilityZoneUsageLimit: 3
     cni:
       cniIngressRules:
         - description: Cilium
@@ -29,4 +31,5 @@ spec:
           fromPort: 8
           toPort: 8
   controlPlaneLoadBalancer:
-    loadBalancerType: {{ .Values.controlPlane.loadBalancerType }}
+    loadBalancerType: {{ .Values.controlPlane.loadBalancer.type }}
+    scheme: {{ .Values.controlPlane.loadBalancer.scheme | default "internet-facing" }}

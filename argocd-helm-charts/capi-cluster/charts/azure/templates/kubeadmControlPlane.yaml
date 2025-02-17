@@ -1,5 +1,4 @@
 {{- if .Values.selfManagedCluster.enabled }}
-# for testing need to update
 apiVersion: controlplane.cluster.x-k8s.io/v1beta1
 kind: KubeadmControlPlane
 metadata:

@@ -92,25 +92,6 @@ spec:
       path: /etc/kubernetes/encryption-provider.yaml
       permissions: "0600"
     - content: |
-        [Unit]
-        Description=Cilium BPF mounts
-        Documentation=https://docs.cilium.io/
-        DefaultDependencies=no
-        Before=local-fs.target umount.target
-        After=swap.target
-
-        [Mount]
-        What=bpffs
-        Where=/sys/fs/bpf
-        Type=bpf
-        Options=rw,nosuid,nodev,noexec,relatime,mode=700
-
-        [Install]
-        WantedBy=multi-user.target
-      owner: root:root
-      path: /etc/systemd/system/sys-fs-bpf.mount
-      permissions: "0744"
-    - content: |
         net.ipv4.conf.lxc*.rp_filter = 0
       owner: root:root
       path: /etc/sysctl.d/99-cilium.conf
@@ -142,6 +123,53 @@ spec:
       owner: root:root
       path: /etc/kubernetes/resolv.conf
       permissions: "0744"
+    - content: |
+        # Copyright The containerd Authors.
+        #
+        # Licensed under the Apache License, Version 2.0 (the "License");
+        # you may not use this file except in compliance with the License.
+        # You may obtain a copy of the License at
+        #
+        #     http://www.apache.org/licenses/LICENSE-2.0
+        #
+        # Unless required by applicable law or agreed to in writing, software
+        # distributed under the License is distributed on an "AS IS" BASIS,
+        # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        # See the License for the specific language governing permissions and
+        # limitations under the License.
+        #
+        # https://raw.githubusercontent.com/containerd/containerd/main/containerd.service
+
+        [Unit]
+        Description=containerd container runtime
+        Documentation=https://containerd.io
+        After=network.target local-fs.target dbus.service
+
+        [Service]
+        ExecStartPre=-/sbin/modprobe overlay
+        ExecStart=/usr/local/bin/containerd
+
+        Type=notify
+        Delegate=yes
+        KillMode=process
+        Restart=always
+        RestartSec=5
+
+        # Having non-zero Limit*s causes performance problems due to accounting overhead
+        # in the kernel. We recommend using cgroups to do container-local accounting.
+        LimitNPROC=infinity
+        LimitCORE=infinity
+
+        # Comment TasksMax if your systemd version does not supports it.
+        # Only systemd 226 and above support this version.
+        TasksMax=infinity
+        OOMScoreAdjust=-999
+
+        [Install]
+        WantedBy=multi-user.target
+      owner: root:root
+      path: /etc/systemd/system/containerd.service
+      permissions: "0744"
     initConfiguration:
       nodeRegistration:
         kubeletExtraArgs:
@@ -172,10 +200,12 @@ spec:
           tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256
     preKubeadmCommands:
       - set -x
-      - export CONTAINERD=1.7.19
+      - export CONTAINERD=1.7.25
+      - export RUNC=1.2.3
       - export KUBERNETES_VERSION=$(echo {{ .Values.global.kubernetes.version }} | sed 's/^v//')
-      - export TRIMMED_KUBERNETES_VERSION=$(echo {{ .Values.global.kubernetes.version }} | sed 's/^v//' | awk -F . '{print
-        $1 "." $2}')
+      - export TRIMMED_KUBERNETES_VERSION=$(echo {{ .Values.global.kubernetes.version }} | sed 's/^v//'
+        | awk -F . '{print $1 "." $2}')
+      - ARCH="$(dpkg --print-architecture)"
       - localectl set-locale LANG=en_US.UTF-8
       - localectl set-locale LANGUAGE=en_US.UTF-8
       - apt-get update -y
@@ -183,12 +213,16 @@ spec:
       - sed -i '/swap/d' /etc/fstab
       - swapoff -a
       - modprobe overlay && modprobe br_netfilter && sysctl --system
-      - wget https://github.com/containerd/containerd/releases/download/v$CONTAINERD/cri-containerd-cni-$CONTAINERD-linux-amd64.tar.gz
-      - wget https://github.com/containerd/containerd/releases/download/v$CONTAINERD/cri-containerd-cni-$CONTAINERD-linux-amd64.tar.gz.sha256sum
-      - sha256sum --check cri-containerd-cni-$CONTAINERD-linux-amd64.tar.gz.sha256sum
-      - tar --no-overwrite-dir -C / -xzf cri-containerd-cni-$CONTAINERD-linux-amd64.tar.gz
-      - rm -f cri-containerd-cni-$CONTAINERD-linux-amd64.tar.gz cri-containerd-cni-$CONTAINERD-linux-amd64.tar.gz.sha256sum
-      - chmod -R 644 /etc/cni && chown -R root:root /etc/cni
+      - wget https://github.com/opencontainers/runc/releases/download/v$RUNC/runc.$ARCH
+      - wget https://github.com/opencontainers/runc/releases/download/v$RUNC/runc.sha256sum
+      - sha256sum --check --ignore-missing runc.sha256sum
+      - install runc.$ARCH /usr/local/sbin/runc
+      - rm -f runc.$ARCH runc.sha256sum
+      - wget https://github.com/containerd/containerd/releases/download/v$CONTAINERD/containerd-$CONTAINERD-linux-$ARCH.tar.gz
+      - wget https://github.com/containerd/containerd/releases/download/v$CONTAINERD/containerd-$CONTAINERD-linux-$ARCH.tar.gz.sha256sum
+      - sha256sum --check containerd-$CONTAINERD-linux-$ARCH.tar.gz.sha256sum
+      - tar -zxf containerd-$CONTAINERD-linux-$ARCH.tar.gz -C /usr/local
+      - rm -f containerd-$CONTAINERD-linux-$ARCH.tar.gz containerd-$CONTAINERD-linux-$ARCH.tar.gz.sha256sum
       - mkdir -p /etc/containerd
       - containerd config default > /etc/containerd/config.toml
       - sed -i  "s/SystemdCgroup = false/SystemdCgroup = true/" /etc/containerd/config.toml
@@ -199,27 +233,48 @@ spec:
       - echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v$TRIMMED_KUBERNETES_VERSION/deb/
         /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
       - apt-get update
-      - apt-get install -y kubelet=$KUBERNETES_VERSION-1.1 kubeadm=$KUBERNETES_VERSION-1.1
-        kubectl=$KUBERNETES_VERSION-1.1  bash-completion && apt-mark hold kubelet kubectl
+      - apt-get install -y kubelet="$KUBERNETES_VERSION-*" kubeadm="$KUBERNETES_VERSION-*"
+        kubectl="$KUBERNETES_VERSION-*" bash-completion && apt-mark hold kubelet kubectl
         kubeadm && systemctl enable kubelet
       - kubeadm config images pull --kubernetes-version $KUBERNETES_VERSION
       - echo 'source <(kubectl completion bash)' >>/root/.bashrc
-      - echo 'export KUBECONFIG=/etc/kubernetes/super-admin.conf' >>/root/.bashrc
+      - echo 'export KUBECONFIG=/etc/kubernetes/admin.conf' >>/root/.bashrc
       - apt-get -y autoremove && apt-get -y clean all
     postKubeadmCommands:
-      - set -x
-      - curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
-      - echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
-      - apt-get -y update
-      - apt-get -y install git helm
-      - git clone https://github.com/Obmondo/kubeaid.git
-      - kubectl create ns cilium
-      - helm template kubeaid/argocd-helm-charts/cilium --values kubeaid/argocd-helm-charts/cilium/values.yaml -n cilium | kubectl apply -f -n cilium
-      - helm template kubeaid/argocd-helm-charts/ccm-hetzner --set ccm-hetzner.secret.name=capi-cluster-hetzner --namespace kube-system --set ccm-hetzner.privateNetwork.enabled=false | kubectl apply -f -n kube-system
+      # Install Helm.
+      - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+      # Clone KubeAid.
+      - git clone https://github.com/Archisman-Mridha/kubeaid.git
+      # Copy kubeconfig to ~/.kube/config
+      - mkdir -p $HOME/.kube
+      - sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+      - sudo chown $(id -u):$(id -g) $HOME/.kube/config
+      # Install Cilium.
+      - kubectl create namespace cilium
+      - API_SERVER_URL=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+      - API_SERVER_HOST=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $4}')
+      - API_SERVER_PORT=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $5}')
+      - helm template kubeaid/argocd-helm-charts/cilium --values kubeaid/argocd-helm-charts/cilium/values.yaml --set cilium.k8sServiceHost=${API_SERVER_HOST} --set cilium.k8sServicePort=${API_SERVER_PORT} --namespace cilium | kubectl apply -f -
+      # Install Hetzner Cloud Controller Manager.
+      - helm template kubeaid/argocd-helm-charts/ccm-hetzner --values kubeaid/argocd-helm-charts/ccm-hetzner/values.yaml --namespace kube-system | kubectl apply -f -
+
+  version: {{ .Values.global.kubernetes.version }}
+
+  {{/* Control Plane is in HCloud. */}}
+  {{- if and ((.Values.hcloud).enabled) (.Values.hcloud.controlPlane) }}
+  machineTemplate:
+    infrastructureRef:
+      apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+      kind: HCloudMachineTemplate
+      name: {{ .Values.global.clusterName }}-control-plane
+  replicas: {{ .Values.hcloud.controlPlane.replicas }}
+
+  {{/* Control Plane is in Hetzner Bare Metal. */}}
+  {{- else }}
   machineTemplate:
     infrastructureRef:
       apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
       kind: HetznerBareMetalMachineTemplate
       name: {{ .Values.global.clusterName }}-control-plane
-  replicas: 3
-  version: {{ .Values.global.kubernetes.version }}
+  replicas: {{ len .Values.robot.controlPlane.nodes }}
+  {{- end }}

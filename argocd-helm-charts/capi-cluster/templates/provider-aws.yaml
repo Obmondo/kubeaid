@@ -30,6 +30,7 @@ spec:
         operator: "Exists"
         effect: "NoSchedule"
   manager:
+    cacheNamespace: {{ $namespace }}
     metrics:
       bindAddress: ":8181"
     syncPeriod: 10m0s

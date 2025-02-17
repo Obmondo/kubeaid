@@ -22,9 +22,9 @@ spec:
   version: {{ .Values.global.caph.version }}
   fetchConfig:
     url: https://github.com/syself/cluster-api-provider-hetzner/releases/download/{{ .Values.global.caph.version }}/infrastructure-components.yaml
-  manager: {}
-    # bug: cluster-api renders it as
-    # --metrics-bind-addr and CAPH wants --metrics-bind-address
+  manager:
+    cacheNamespace: {{ $namespace }}
+    # BUG : ClusterAPI renders --metrics-bind-addr but CAPH wants --metrics-bind-address.
     # metrics:
     #   bindAddress: ":8181"
     # syncPeriod: 10m0s

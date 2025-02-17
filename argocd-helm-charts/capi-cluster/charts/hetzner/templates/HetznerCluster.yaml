@@ -7,36 +7,62 @@ metadata:
     cluster.x-k8s.io/name: {{ .Values.global.clusterName }}
 spec:
   controlPlaneEndpoint:
-    host: {{ .Values.controlPlaneEndpoint.host }}
-    port: {{ .Values.controlPlaneEndpoint.port | default 6443 }}
+    host: {{ include "controlPlaneHost" . | default "" }}
+    port: 6443
+
+  {{/* CASE : Control Plane is in Hetzner Cloud */}}
+  {{- if and (.Values.hcloud).enabled .Values.hcloud.controlPlane }}
+  {{- if (.Values.hcloud.controlPlane.loadBalancer).enabled }}
   controlPlaneLoadBalancer:
-    {{- if .Values.controlPlaneLoadBalancer.region }}
-    region: {{ .Values.controlPlaneLoadBalancer.region }}
-    {{- end }}
-    enabled: {{ .Values.controlPlaneLoadBalancer.enabled }}
+    enabled: true
+    region: {{ .Values.hcloud.controlPlane.loadBalancer.region }}
+  {{- end }}
   controlPlaneRegions:
-  {{- range .Values.controlPlaneRegions }}
+  {{- range .Values.hcloud.controlPlane.regions }}
   - {{ . | quote }}
   {{- end }}
+  {{- end }}
+
+  {{/* TODO : Make sure that Control Plane is either in Hetzner Bare Metal or in Hetzner Cloud. */}}
+
+  {{- if (.Values.hcloud).enabled }}
   hcloudNetwork:
-    enabled: false
+    enabled: true
+    networkZone: {{ .Values.hcloud.network.zone | default "eu-central" }}
+  {{- end }}
+
   hcloudPlacementGroups:
-  - name: control-plane
-    type: spread
-  - name: md-0
-    type: spread
+    - name: control-plane
+      type: spread
+
+    {{/* For node-groups in Hetzner Cloud. */}}
+    {{- range $index, $nodeGroup := ($.Values.hcloud).nodeGroups }}
+    - name: {{ $nodeGroup.name }}
+      type: spread
+    {{- end }}
+
+    {{/* For node-groups in Hetzner Bare Metal. */}}
+    {{- range $index, $nodeGroup := ($.Values.robot).nodeGroups }}
+    - name: {{ $nodeGroup.name }}
+      type: spread
+    {{- end }}
+
+  # Reference to a token to be used when reconciling this cluster. This is generated in the
+  # security section under API TOKENS.
+  # NOTE : Read & write is necessary.
   hetznerSecretRef:
     key:
       hcloudToken: hcloud
       hetznerRobotPassword: robot-password
       hetznerRobotUser: robot-user
     name: {{ .Values.cloudCredentialsSecretName }}
+
   sshKeys:
     hcloud:
-    - name: cluster
+      - name: {{ .Values.hcloud.sshKeyName }}
     robotRescueSecretRef:
       key:
         name: sshkey-name
         privateKey: ssh-privatekey
         publicKey: ssh-publickey
-      name: {{ .Values.robotSSHKeysSecretName }}
+      name: {{ .Values.robot.sshKeysSecretName }}

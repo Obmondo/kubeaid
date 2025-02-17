@@ -1,8 +1,14 @@
+{{/* CASE : Control Plane is in Hetzner Bare Metal. */}}
+{{- if and ((.Values.robot).enabled) ((.Values.robot).controlPlane) }}
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: HetznerBareMetalMachineTemplate
 metadata:
   name: {{ .Values.global.clusterName }}-control-plane
+  annotations:
+    # Use fixed node names for bare metal servers, since there are storage integrations that allow
+    # you to use the storage of the bare metal servers and that work with fixed node names.
+    capi.syself.com/constant-bare-metal-hostname: "true"
 spec:
   template:
     spec:
@@ -65,4 +71,83 @@ spec:
             name: sshkey-name
             privateKey: ssh-privatekey
             publicKey: ssh-publickey
-          name: {{ .Values.robotSSHKeysSecretName }}
+          name: {{ .Values.robot.sshKeysSecretName }}
+{{- end }}
+
+{{/* Handling node-groups in Hetzner Bare Metal. */}}
+{{- if and ((.Values.robot).enabled) ((.Values.robot).nodeGroups) }}
+{{- range $index, $nodeGroup := $.Values.robot.nodeGroups }}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: HetznerBareMetalMachineTemplate
+metadata:
+  name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
+  annotations:
+    # Use fixed node names for bare metal servers, since there are storage integrations that allow
+    # you to use the storage of the bare metal servers and that work with fixed node names.
+    capi.syself.com/constant-bare-metal-hostname: "true"
+spec:
+  template:
+    spec:
+      hostSelector:
+        matchLabels:
+          role: {{ .Values.global.clusterName }}-control-plane
+      installImage:
+        image:
+          path: /root/.oldroot/nfs/images/Ubuntu-2404-noble-amd64-base.tar.gz
+        partitions:
+        - fileSystem: ext4
+          mount: /boot
+          size: 1024M
+        - fileSystem: vg0
+          mount: lvm
+          size: 100G
+        swraid: 1
+        swraidLevel: 1
+        logicalVolumeDefinitions:
+        - vg: vg0
+          name: root
+          mount: /
+          filesystem: ext4
+          size: 20G
+        postInstallScript: |
+          #!/bin/bash
+          wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          chmod a+x /usr/local/bin/yq
+          touch /etc/netplan/60-floating-ip.yaml && chmod 600 /etc/netplan/60-floating-ip.yaml
+          interface_name=$(/usr/local/bin/yq '.network.ethernets.[] | key' /etc/netplan/01-netcfg.yaml)
+
+          cat << EOT > /etc/netplan/60-floating-ip.yaml
+          # Floating IP from Hetzner
+          network:
+            version: 2
+            renderer: networkd
+            ethernets:
+              $interface_name:
+                addresses:
+                - {{ .Values.controlPlaneEndpoint.host }}/32
+          EOT
+
+          mkdir -p /etc/cloud/cloud.cfg.d && touch /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
+          echo "network: { config: disabled }" > /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
+          apt-get update && apt-get install -y cloud-init apparmor apparmor-utils
+          cat << EOT > /etc/cloud/cloud.cfg.d/99-admin-ssh-keys.cfg
+          users:
+            - name: root
+              ssh_authorized_keys:
+              {{- range .Values.global.sshKeys }}
+               - {{ . }}
+              {{- end }}
+          EOT
+          cloud-init clean --logs
+      sshSpec:
+        portAfterCloudInit: 22
+        portAfterInstallImage: 22
+        secretRef:
+          key:
+            name: sshkey-name
+            privateKey: ssh-privatekey
+            publicKey: ssh-publickey
+          name: {{ .Values.robot.sshKeysSecretName }}
+{{- end }}
+{{- end }}

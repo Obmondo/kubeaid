@@ -2,13 +2,13 @@ global:
   kubernetes:
     version: v1.31.0
   clusterAPI:
-    version: v1.9.3
+    version: v1.9.4
   enableClusterAutoscaler: true
   capa:
     version: v2.7.1
     enableMachinePools: false
   caph:
-    version: v1.0.0
+    version: v1.0.1
   capz:
     version: v1.17.2
   kubeaid:

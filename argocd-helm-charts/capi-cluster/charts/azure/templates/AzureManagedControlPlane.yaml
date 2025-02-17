@@ -1,19 +1,23 @@
-{{- if .Values.managedCluster }}
+{{- if .Values.managedCluster.enabled }}
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: AzureManagedControlPlane
 metadata:
   name: {{ .Values.global.clusterName }}-control-plane
-  namespace: {{ .Release.Namespace }}
 spec:
   location: {{ .Values.location }}
+
   resourceGroupName: {{ .Values.resourceGroupName }}
-  sshPublicKey: {{ .Values.sshPublicKey | b64enc }}
   subscriptionID: {{ .Values.subscriptionID }}
+
   version: {{ .Values.global.kubernetes.version }}
-  networkPolicy: {{ .Values.global.networkPolicy }} #azure # or calico
-  networkPlugin: {{ .Values.global.networkPlugin }} #azure # or kubenet
+  networkPolicy: {{ .Values.global.networkPolicy }}
+  networkPlugin: {{ .Values.global.networkPlugin }}
+
+  sshPublicKey: {{ .Values.sshPublicKey | b64enc }}
+
   sku:
-    tier: {{ .Values.global.skuTier }} #Free # or Standard
+    tier: {{ .Values.global.skuTier }}
+
   {{- if .Values.global.addonProfiles }}
   addonProfiles:
   {{- range $profile := .Values.global.addonProfiles }}
@@ -30,6 +34,7 @@ spec:
       name: {{ .Values.global.virtualNetwork.subnet.name }}
       cidrBlock: {{ .Values.global.virtualNetwork.subnet.cidrBlock | toString }}
   {{- end }}
+
   identityRef:
     name: {{ .Values.global.clusterName }}-cluster-identity
     kind: AzureClusterIdentity
