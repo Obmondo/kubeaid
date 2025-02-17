@@ -44,7 +44,7 @@ helm upgrade --install frappe-bench --namespace erpnext frappe/erpnext --set per
     7. [Fix volume permission](#fix-volume-permission)
 6. [Uninstall the Chart](#uninstall-the-chart)
 7. [Migrate from Helm Chart 3.x.x to 4.x.x](#migrate-from-helm-chart-3xx-to-4xx)
-
+8. [Configure Keycloak](#configure-keycloak)
 ## Introduction
 
 This chart bootstraps a [Frappe/ERPNext](https://github.com/frappe/frappe_docker) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
@@ -752,4 +752,54 @@ Upgrade
 
 ```shell
 helm upgrade frappe-bench -n erpnext frappe/erpnext -f custom-values.yaml
+```
+
+## Configure Keycloak
+This guide provides a step-by-step process for integrating Keycloak with ERPNext .
+
+### Setup Keycloak Client
+Follow these steps to create and configure a client in Keycloak:
+
+1. Login to the Keycloak Admin Dashboard.
+2. In the sidebar, go to Clients.
+3. Click on Create Client.
+4. Enter the Client ID as erpnext (or your preferred name).
+5. Click on Next.
+6. Enable the Client Authentication.
+7. Click on Next.
+8. In the next screen, set the Valid Redirect URIs  as 
+```
+/api/method/frappe.integrations.oauth2_logins.login_via_keycloak/keycloak.
+```
+9. Click on Save.
+10. Go to the Credentials tab.
+Copy the Client Secret and store it securely for later use.
+
+### Configure ERPNext Social Login
+To set up the social login in ERPNext, proceed as follows:
+
+1. Go to the ERPNext Dashboard.
+2. In the sidebar, navigate to the Integrations tab.
+3. Click on Social Login Key.
+4. In the Social Login Provider dropdown menu, select 5. Custom.
+6. In the Provider field, enter keycloak (or your preferred name).
+7. Enter the Client ID and Client Secret that you previously obtained from the Keycloak dashboard.
+8. In the Base URL enter your provider(keycloak) url followed by realms and the realm you are in , in our case it's master
+so our base URL is
+```
+ https://localhost:8080/auth/realms/testerp
+```
+9. Scroll to the top and check the Enable Social Login checkbox.
+10. Click on Save.
+11. Field like Authorize URL, Redirect URL ,Access Token URL and API Endpoint are already prefilled in the version we host. If not please refer this [Doc](https://gitlab.com/bitspur/frappe/keycloak#2-configure-erpnext-social-login)
+
+12. ERPNext might not work on HTTPS. To configure ERPNext to use HTTPS, Run the below Commands on Gunicorn POD.
+Solution picked from [#39705](https://github.com/frappe/erpnext/issues/39705#issuecomment-2076966724) 
+
+```
+bench --site ayx.test.com set-config host_name https://ayx.test.com
+```
+
+```
+ bench --site {{site-name}} set-config restart_supervisor_on_update 1 bench --site {{site-name}} set-config restart_systemd_on_update 1
 ```
