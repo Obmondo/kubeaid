@@ -56,6 +56,14 @@ spec:
       - helm template kubeaid/argocd-helm-charts/cilium --values kubeaid/argocd-helm-charts/cilium/values.yaml --set cilium.k8sServiceHost=${API_SERVER_HOST} --set cilium.k8sServicePort=${API_SERVER_PORT} --namespace cilium | kubectl apply -f -
       # Install AWS Cloud Controller Manager.
       - helm template kubeaid/argocd-helm-charts/ccm-aws --values kubeaid/argocd-helm-charts/ccm-aws/values.yaml --set hostNetworking=true --namespace kube-system | kubectl apply -f -
+    {{- if (gt (len $.Values.global.additionalUsers) 0) }}
+    users:
+      {{- range $index, $additionalUser := $.Values.global.additionalUsers }}
+      - name: {{ $additionalUser.name }}
+        sshAuthorizedKeys:
+          - {{ $additionalUser.sshPublicKey }}
+      {{- end }}
+    {{- end }}
   machineTemplate:
     infrastructureRef:
       apiVersion: infrastructure.cluster.x-k8s.io/v1beta2

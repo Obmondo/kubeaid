@@ -50,6 +50,12 @@ metadata:
   annotations:
     cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: {{ $fdSpecificMinSize | quote }}
     cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size: {{ $fdSpecificMaxSize | quote }}
+    capacity.cluster-autoscaler.kubernetes.io/memory: "{{ $nodeGroup.memory }}G"
+    capacity.cluster-autoscaler.kubernetes.io/cpu: "{{ $nodeGroup.cpu }}"
+    capacity.cluster-autoscaler.kubernetes.io/ephemeral-disk: "{{ $nodeGroup.rootVolumeSize | default 35 }}Gi"
+    capacity.cluster-autoscaler.kubernetes.io/maxPods: "500"
+    capacity.cluster-autoscaler.kubernetes.io/labels: "{{- $labels := list }}{{- range $key, $value := $nodeGroup.labels }}{{- $labels = append $labels (printf "%s=%s" $key $value) }}{{- end }}{{- join "," $labels }}"
+    capacity.cluster-autoscaler.kubernetes.io/taints: "{{- $taints := list }}{{- range $taint := $nodeGroup.taints }}{{- $taints = append $taints (printf "%s=%s:%s" $taint.key $taint.value $taint.effect) }}{{- end }}{{- join "," $taints }}"
 spec:
   clusterName: {{ $.Values.global.clusterName }}
   replicas: {{ $fdSpecificMinSize }}
