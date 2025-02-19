@@ -61,8 +61,8 @@ spec:
               seccompProfile:
                 type: RuntimeDefault
           restartPolicy: OnFailure
-          serviceAccount: sealed-secrets
-          serviceAccountName: sealed-secrets
+          serviceAccount: {{ template "sealed-secrets.serviceAccountName" (index .Subcharts "sealed-secrets") }}
+          serviceAccountName: {{ template "sealed-secrets.serviceAccountName" (index .Subcharts "sealed-secrets") }}
           volumes:
           - configMap:
               defaultMode: 420

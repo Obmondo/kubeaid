@@ -17,6 +17,6 @@ sealed-secrets:
 networkpolicies: false
 backup:
   schedule: "5 4 * * *"
-  image: ghcr.io/obmondo/backup-sealed-secrets-keys@sha256:21119359a94efdbf6ce81e8887e0ae35e9988d9e5ce0c485879ffc4f42aaf1ae
+  image: ghcr.io/obmondo/backup-sealed-secrets-keys@sha256:7e409526cd68d09ccb7519cfbd92120e9425d6c459d11b2e6af1c20c7f177c17
   namespace: system
   provider: aws
