@@ -2,6 +2,13 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`9d02ac9c`](../../commit/9d02ac9c) feat(capi-cluster/aws) : added support to specify additional users, each with corresponding SSH public key | fixed scale from 0 support and node cordoning issue
+- [`87c451b1`](../../commit/87c451b1) fix(sealed-secrets) : using correct container image and service-account name
+- [`69127059`](../../commit/69127059) updates from my KubeAid fork
+- [`a0541c48`](../../commit/a0541c48) (fix/hetzner-failover) : Adjust envs
+- [`f108bb10`](../../commit/f108bb10) (fix/capi-cluster) : default values file structure | using super-admin.conf as the kubeconfig file
+
 ## 9.3.0
 ### Minor Version Upgrades
 - Updated opentelemetry-operator from version 0.79.0 to 0.80.1
