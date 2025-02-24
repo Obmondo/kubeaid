@@ -82,7 +82,7 @@ spec:
             command: ["/bin/bash", "/configmaps/check-live", "{{ default 4 .Values.probeTimeoutSeconds | add -1 | max 1 }}"]
           initialDelaySeconds: {{ default 60 .Values.livenessProbe.initialDelaySeconds }}
           timeoutSeconds: {{ default 4 .Values.probeTimeoutSeconds }}
-          periodSeconds: {{ default 10 .Values.livenessProbe.periodSeconds }}
+          periodSeconds: {{ default 60 .Values.livenessProbe.periodSeconds }}
           successThreshold: {{ default 1 .Values.livenessProbe.successThreshold }}
           failureThreshold: {{ default 3 .Values.livenessProbe.failureThreshold }}
           {{- if .Values.livenessProbe.terminationGracePeriodSeconds }}
@@ -93,7 +93,7 @@ spec:
             command: ["/usr/bin/pgrep","gitlab.*runner"]
           initialDelaySeconds: {{ default 60 .Values.readinessProbe.initialDelaySeconds }}
           timeoutSeconds: {{ default 4 .Values.probeTimeoutSeconds }}
-          periodSeconds: {{ default 10 .Values.readinessProbe.periodSeconds }}
+          periodSeconds: {{ default 60 .Values.readinessProbe.periodSeconds }}
           successThreshold: {{ default 1 .Values.readinessProbe.successThreshold }}
           failureThreshold: {{ default 3 .Values.readinessProbe.failureThreshold }}
         ports:
@@ -123,6 +123,9 @@ spec:
         {{- end }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
+        {{- if .Values.extraContainers }}
+{{ toYaml .Values.extraContainers | indent 6 }}
+        {{- end }}
       volumes:
       - name: runner-secrets
         emptyDir:

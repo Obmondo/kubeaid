@@ -125,12 +125,12 @@ data:
     RUN_UNTAGGED="{{ ternary "--run-untagged=true" "" (and (hasKey .Values.runners "runUntagged") .Values.runners.runUntagged) }}"
     ACCESS_LEVEL="{{ ternary "--access-level=ref_protected" "" (and (hasKey .Values.runners "protected") .Values.runners.protected) }}"
 
-    {{- if eq (include "gitlab-runner.isAuthToken" . ) "true" }}
-    RUN_UNTAGGED=""
-    ACCESS_LEVEL=""
-    unset REGISTER_LOCKED
-    unset RUNNER_TAG_LIST
-    {{- end }}
+    if [ -n "$CI_SERVER_TOKEN" ] && [ "${CI_SERVER_TOKEN#glrt-}" != "$CI_SERVER_TOKEN" ]; then
+      RUN_UNTAGGED=""
+      ACCESS_LEVEL=""
+      unset REGISTER_LOCKED
+      unset RUNNER_TAG_LIST
+    fi
 
     for i in $(seq 1 "${MAX_REGISTER_ATTEMPTS}"); do
       echo "Registration attempt ${i} of ${MAX_REGISTER_ATTEMPTS}"
@@ -141,10 +141,8 @@ data:
         {{- if and (hasKey .Values.runners "maximumTimeout") .Values.runners.maximumTimeout }}
         --maximum-timeout={{ .Values.runners.maximumTimeout | quote -}} \
         {{- end }}
-        {{- if eq (include "gitlab-runner.isAuthToken" . ) "false" }}
         ${RUN_UNTAGGED} \
         ${ACCESS_LEVEL} \
-        {{- end }}
         {{- if .Values.runners.config }}
         --template-config /configmaps/config.template.toml \
         {{- else if .Values.runners.configPath }}

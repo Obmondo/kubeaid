@@ -6,8 +6,8 @@ image:
   # -- Image
   repository: docker.io/rook/ceph
   # -- Image tag
-  # @default -- `v1.16.3`
-  tag: v1.16.3
+  # @default -- `v1.16.4`
+  tag: v1.16.4
   # -- Image pull policy
   pullPolicy: IfNotPresent
 
@@ -43,6 +43,9 @@ unreachableNodeTolerationSeconds: 5
 
 # -- Whether the operator should watch cluster CRD in its own namespace or not
 currentNamespaceOnly: false
+
+# -- Custom pod labels for the operator
+operatorPodLabels: {}
 
 # -- Pod annotations
 annotations: {}

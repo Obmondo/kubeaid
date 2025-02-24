@@ -117,23 +117,6 @@ lifecycle:
 {{- end -}}
 
 {{/*
-Define if the registration token provided (if any)
-is an authentication token or not
-*/}}
-{{- define "gitlab-runner.isAuthToken" -}}
-{{- $isAuthToken := false -}}
-{{- $hasRegistrationToken := hasKey .Values "runnerRegistrationToken" -}}
-{{- if $hasRegistrationToken -}}
-{{-   $token := .Values.runnerRegistrationToken -}}
-{{-   $isAuthToken = or (empty $token) (hasPrefix "glrt-" $token) -}}
-{{- else -}}
-{{-   $token := default "" .Values.runnerToken -}}
-{{-   $isAuthToken = and (not (empty $token)) (hasPrefix "glrt-" $token) -}}
-{{- end -}}
-{{- $isAuthToken -}}
-{{- end -}}
-
-{{/*
 Define if session server can be enabled by checking
 if the number of replicas is eq to 1
 */}}

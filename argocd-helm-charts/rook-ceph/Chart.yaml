@@ -3,7 +3,7 @@ name: rook-ceph
 version: 1.0.0
 dependencies:
   - name: rook-ceph
-    version: v1.16.3
+    version: v1.16.4
     repository: https://charts.rook.io/release
     #repository: "oci://ghcr.io/Obmondo"
   - name: rook-ceph-cluster

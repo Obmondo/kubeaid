@@ -1,8 +1,11 @@
 annotations:
   artifacthub.io/changes: |
-    - Update base image to HAProxy 3.0.4
+    - Update base image to HAProxy 3.1.5
+    - Conditionalize config volumeMount subpath (#285)
+    - Conditionalize subPath for haproxy-config configmap
+    - Add deployment annotations as a configurable property. (#281)
 apiVersion: v2
-appVersion: 3.0.4
+appVersion: 3.1.5
 description: A Helm chart for HAProxy on Kubernetes
 home: https://github.com/haproxytech/helm-charts/tree/main/haproxy
 icon: https://raw.githubusercontent.com/haproxytech/helm-charts/main/haproxy/chart-icon.png
@@ -16,4 +19,4 @@ name: haproxy
 sources:
 - http://www.haproxy.org/
 type: application
-version: 1.23.0
+version: 1.24.0

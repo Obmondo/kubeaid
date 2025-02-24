@@ -42,7 +42,7 @@ imagePullPolicy: IfNotPresent
 ## Configure the livenessProbe
 livenessProbe: {}
 #   initialDelaySeconds: 60
-#   periodSeconds: 10
+#   periodSeconds: 60
 #   successThreshold: 1
 #   failureThreshold: 3
 #   terminationGracePeriodSeconds: 30
@@ -50,7 +50,7 @@ livenessProbe: {}
 ## Configure the readinessProbe
 readinessProbe: {}
 #   initialDelaySeconds: 60
-#   periodSeconds: 10
+#   periodSeconds: 60
 #   successThreshold: 1
 #   failureThreshold: 3
 
@@ -794,3 +794,19 @@ extraObjects: []
 #     dataFrom:
 #     - extract:
 #         key: my-secret-store-secret
+
+## Add additional containers to the Pod, e.g. to run as sidecars.
+##
+## Example:
+#  - name: docker
+#    image: docker:20.10-dind
+#    securityContext:
+#      privileged: true
+#    volumeMounts:
+#      - mountPath: /var/run/
+#        name: dind-socket
+#    lifecycle:
+#      postStart:
+#        exec:
+#          command: [ "sh", "-c", "until docker info; do sleep 1; done;" ]
+extraContainers: []

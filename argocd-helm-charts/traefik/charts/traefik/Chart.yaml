@@ -1,10 +1,6 @@
 annotations:
-  artifacthub.io/changes: |
-    - "fix(Traefik Hub): AIServices are available in API Gateway"
-    - "fix(Traefik Hub): :bug: handle main and latest build"
-    - "feat: :sparkles: add missing microcks provider for Hu"b
-    - "feat(deps): update traefik docker tag to v3.3.3"
-    - "chore: update CRDs to v1.14.1"
+  artifacthub.io/changes: "- \"feat(CRDs): update Traefik Hub CRDs to v1.17.0\"\n-
+    \"chore(release): \U0001F680 publish v34.4.0 and CRDs v1.4.0\"\n"
 apiVersion: v2
 appVersion: v3.3.3
 description: A Traefik based Kubernetes ingress controller
@@ -28,4 +24,4 @@ sources:
 - https://github.com/traefik/traefik
 - https://github.com/traefik/traefik-helm-chart
 type: application
-version: 34.3.0
+version: 34.4.0

@@ -2,6 +2,33 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 9.4.0
+### Minor Version Upgrades
+- Updated velero from version 8.3.0 to 8.4.0
+- Updated traefik from version 34.3.0 to 34.4.0
+- Updated reloader from version 1.2.1 to 1.3.0
+- Updated opentelemetry-collector from version 0.116.0 to 0.117.0
+- Updated oncall from version 1.14.4 to 1.15.0
+- Updated haproxy from version 1.23.0 to 1.24.0
+- Updated gitlab-runner from version 0.73.3 to 0.74.0
+- Updated aws-ebs-csi-driver from version 2.39.3 to 2.40.0
+
+### Patch Version Upgrades
+- Updated yetibot from version 1.0.107 to 1.0.108
+- Updated teleport-kube-agent from version 17.2.7 to 17.2.8
+- Updated teleport-cluster from version 17.2.7 to 17.2.8
+- Added rook-ceph-cluster from version v1.16.0 to v1.16.0
+- Updated rook-ceph from version v1.16.3 to v1.16.4
+- Added opentelemetry-operator from version 0.80.1 to 0.80.1
+- Updated opensearch-dashboards from version 2.27.0 to 2.27.1
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated metallb from version 6.4.6 to 6.4.7
+- Updated mattermost-team-edition from version 6.6.70 to 6.6.71
+- Updated external-dns from version 8.7.4 to 8.7.5
+- Updated erpnext from version 7.0.166 to 7.0.168
+- Updated aws-efs-csi-driver from version 3.1.6 to 3.1.7
+- Updated argo-cd from version 7.8.2 to 7.8.5
+
 ### Improvements
 - [`9d02ac9c`](../../commit/9d02ac9c) feat(capi-cluster/aws) : added support to specify additional users, each with corresponding SSH public key | fixed scale from 0 support and node cordoning issue
 - [`87c451b1`](../../commit/87c451b1) fix(sealed-secrets) : using correct container image and service-account name
