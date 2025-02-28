@@ -37,16 +37,16 @@ First, fork the [KubeAid Config](http://github.com/Obmondo/kubeaid-config) repo.
 Run and exec into the KubeAid Bootstrap Script container :
 
 ```sh
-NETWORK_NAME=k3d-management-cluster
-if ! docker network ls | grep -q $(NETWORK_NAME); then \
-	docker network create $(NETWORK_NAME); \
+NETWORK_NAME="k3d-management-cluster"
+if ! docker network ls | grep -q "$NETWORK_NAME"; then
+    docker network create "$NETWORK_NAME"
 fi
 
 docker run --name kubeaid-bootstrap-script \
-	--network $(NETWORK_NAME) \
-	-v /var/run/docker.sock:/var/run/docker.sock \
-	-v ./outputs:/outputs \
-	-d \
+ --network "$NETWORK_NAME" \
+ -v /var/run/docker.sock:/var/run/docker.sock \
+ -v ./outputs:/outputs \
+ -d \
   ghcr.io/obmondo/kubeaid-bootstrap-script:v0.5
 
 docker exec -it kubeaid-bootstrap-script /bin/bash
@@ -56,7 +56,7 @@ KubeAid Bootstrap Script requires a config file, which it'll use to prepare your
 
 ```sh
 kubeaid-bootstrap-script config generate aws \
-	--config ./outputs/kubeaid-bootstrap-script.config.yaml
+ --config ./outputs/kubeaid-bootstrap-script.config.yaml
 ```
 
 Open the sample YAML configuration file generated at `./outputs/kubeaid-bootstrap-script.config.yaml` and update the following fields with your specific values :
@@ -70,8 +70,8 @@ Open the sample YAML configuration file generated at `./outputs/kubeaid-bootstra
 
   ```sh
   aws ec2 create-key-pair \
-  	--key-name kubeaid-demo \
-  	--query 'KeyMaterial' --output text --region <aws-region> > ./outputs/kubeaid-demo.pem
+   --key-name kubeaid-demo \
+   --query 'KeyMaterial' --output text --region <aws-region> > ./outputs/kubeaid-demo.pem
   ```
 
 Export your AWS credentials as environment variables :
@@ -87,7 +87,7 @@ Now to bootstrap the Kubernetes (v1.31.0) cluster with 3 control plane node and 
 
 ```sh
 kubeaid-bootstrap-script cluster bootstrap aws \
-	--config /outputs/kubeaid-bootstrap-script.config.yaml
+ --config /outputs/kubeaid-bootstrap-script.config.yaml
 ```
 
 > [!NOTE]
@@ -137,16 +137,16 @@ In a real life scenario, you may have deleted the temporary management cluster /
 
 ```sh
 kubeaid-bootstrap-script devenv create aws \
-	--config /outputs/kubeaid-bootstrap-script.config.yaml
+ --config /outputs/kubeaid-bootstrap-script.config.yaml
 ```
 
 Now, to upgrade the cluster, run :
 
 ```sh
 kubeaid-bootstrap-script cluster upgrade aws \
-	--config /outputs/kubeaid-bootstrap-script.config.yaml \
-	--k8s-version v1.32.0 \
-	--ami-id ami-xxxxxxxxxx
+ --config /outputs/kubeaid-bootstrap-script.config.yaml \
+ --k8s-version v1.32.0 \
+ --ami-id ami-xxxxxxxxxx
 ```
 
 It'll update your KubeAid config repository (specifically, the corresponding **capi-cluster.values.yaml** file) and trigger Kubernetes version upgrades for the Control Plane and each node-group.
