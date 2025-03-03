@@ -2,6 +2,31 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 10.0.0
+### Major Version Upgrades
+- Updated gitea from version 10.6.0 to 11.0.0
+
+### Minor Version Upgrades
+- Updated teleport-kube-agent from version 17.2.8 to 17.3.0
+- Updated teleport-cluster from version 17.2.8 to 17.3.0
+- Updated opentelemetry-operator from version 0.80.1 to 0.81.0
+- Updated opensearch-dashboards from version 2.27.1 to 2.28.0
+- Updated opensearch from version 2.31.0 to 2.32.0
+- Updated cluster-api-operator from version 0.16.0 to 0.17.0
+
+### Patch Version Upgrades
+- Added rook-ceph-cluster from version v1.16.0 to v1.16.0
+- Updated redmine from version 32.1.4 to 32.1.5
+- Added opentelemetry-collector from version 0.117.0 to 0.117.0
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated openobserve from version 0.14.20 to 0.14.31
+- Updated kubernetes-dashboard from version 7.10.4 to 7.10.5
+- Updated fluent-bit from version 0.48.6 to 0.48.8
+- Updated erpnext from version 7.0.168 to 7.0.171
+- Updated cluster-autoscaler from version 9.46.0 to 9.46.2
+- Updated aws-ebs-csi-driver from version 2.40.0 to 2.40.2
+- Updated argo-cd from version 7.8.5 to 7.8.7
+
 ### Improvements
 - [`d97438bd`](../../commit/d97438bd) fix(blogs/capi/aws) : fixed a command
 - [`cba37bb2`](../../commit/cba37bb2) chore(docs) : updating part 1 of the KubeAid demonstration blog series for AWS

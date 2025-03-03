@@ -311,6 +311,9 @@ https
   {{- if not (hasKey .Values.gitea.config.metrics "ENABLED") -}}
     {{- $_ := set .Values.gitea.config.metrics "ENABLED" .Values.gitea.metrics.enabled -}}
   {{- end -}}
+  {{- if and (not (hasKey .Values.gitea.config.metrics "TOKEN")) (.Values.gitea.metrics.token) (.Values.gitea.metrics.enabled) -}}
+    {{- $_ := set .Values.gitea.config.metrics "TOKEN" .Values.gitea.metrics.token -}}
+  {{- end -}}
   {{- /* redis queue */ -}}
   {{- if or ((index .Values "redis-cluster").enabled) ((index .Values "redis").enabled) -}}
     {{- $_ := set .Values.gitea.config.queue "TYPE" "redis" -}}
@@ -464,4 +467,8 @@ https
     {{- $probe = unset . $chartDefaultMethod -}}
   {{- end -}}
   {{- toYaml $probe -}}
+{{- end -}}
+
+{{- define "gitea.metrics-secret-name" -}}
+{{ default (printf "%s-metrics-secret" (include "gitea.fullname" .)) }}
 {{- end -}}

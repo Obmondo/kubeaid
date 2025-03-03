@@ -48,8 +48,8 @@ clusterDomain: cluster.local
 ## @param image.rootless Wether or not to pull the rootless version of Gitea, only works on Gitea 1.14.x or higher
 ## @param image.fullOverride Completely overrides the image registry, path/image, tag and digest. **Adjust `image.rootless` accordingly and review [Rootless defaults](#rootless-defaults).**
 image:
-  registry: ""
-  repository: gitea/gitea
+  registry: "docker.gitea.com"
+  repository: gitea
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
   digest: ""
@@ -361,13 +361,16 @@ signing:
 ## @param actions.statefulset.nodeSelector NodeSelector for the statefulset
 ## @param actions.statefulset.tolerations Tolerations for the statefulset
 ## @param actions.statefulset.affinity Affinity for the statefulset
+## @param actions.statefulset.extraVolumes Extra volumes for the statefulset
 ## @param actions.statefulset.actRunner.repository The Gitea act runner image
 ## @param actions.statefulset.actRunner.tag The Gitea act runner tag
 ## @param actions.statefulset.actRunner.pullPolicy The Gitea act runner pullPolicy
+## @param actions.statefulset.actRunner.extraVolumeMounts Allows mounting extra volumes in the act runner container
 ## @param actions.statefulset.actRunner.config [default: Too complex. See values.yaml] Act runner custom configuration. See [Act Runner documentation](https://docs.gitea.com/usage/actions/act-runner#configuration) for details.
 ## @param actions.statefulset.dind.repository The Docker-in-Docker image
 ## @param actions.statefulset.dind.tag The Docker-in-Docker image tag
 ## @param actions.statefulset.dind.pullPolicy The Docker-in-Docker pullPolicy
+## @param actions.statefulset.dind.extraVolumeMounts Allows mounting extra volumes in the Docker-in-Docker container
 ## @param actions.statefulset.dind.extraEnvs Allows adding custom environment variables, such as `DOCKER_IPTABLES_LEGACY`
 ## @param actions.provisioning.enabled Create a job that will create and save the token in a Kubernetes Secret
 ## @param actions.provisioning.annotations Job's annotations
@@ -391,25 +394,27 @@ actions:
     nodeSelector: {}
     tolerations: []
     affinity: {}
+    extraVolumes: []
 
     actRunner:
       repository: gitea/act_runner
       tag: 0.2.11
       pullPolicy: IfNotPresent
+      extraVolumeMounts: []
 
+      # See full example here: https://gitea.com/gitea/act_runner/src/branch/main/internal/pkg/config/config.example.yaml
       config: |
         log:
           level: debug
         cache:
           enabled: false
-        runner:
-          labels:
-            - "ubuntu-latest"
 
     dind:
       repository: docker
       tag: 25.0.2-dind
       pullPolicy: IfNotPresent
+      extraVolumeMounts: []
+
       # If the container keeps crashing in your environment, you might have to add the `DOCKER_IPTABLES_LEGACY` environment variable.
       # See https://github.com/docker-library/docker/issues/463#issuecomment-1881909456
       extraEnvs: []
@@ -420,7 +425,7 @@ actions:
     image:
       repository: busybox
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "1.36.1"
+      tag: "1.37.0"
 
   provisioning:
     enabled: false
@@ -461,6 +466,7 @@ gitea:
     passwordMode: keepUpdated
 
   ## @param gitea.metrics.enabled Enable Gitea metrics
+  ## @param gitea.metrics.token used for `bearer` token authentication on metrics endpoint. If not specified or empty metrics endpoint is public.
   ## @param gitea.metrics.serviceMonitor.enabled Enable Gitea metrics service monitor. Requires, that `gitea.metrics.enabled` is also set to true, to enable metrics generally.
   ## @param gitea.metrics.serviceMonitor.interval Interval at which metrics should be scraped. If not specified Prometheus' global scrape interval is used.
   ## @param gitea.metrics.serviceMonitor.relabelings RelabelConfigs to apply to samples before scraping.
@@ -469,6 +475,7 @@ gitea:
   ## @param gitea.metrics.serviceMonitor.tlsConfig TLS configuration to use when scraping the metric endpoint by Prometheus.
   metrics:
     enabled: false
+    token:
     serviceMonitor:
       enabled: false
       #  additionalLabels:

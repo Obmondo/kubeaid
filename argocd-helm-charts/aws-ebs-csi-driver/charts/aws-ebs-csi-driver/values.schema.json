@@ -9,6 +9,10 @@
       "additionalProperties": true,
       "description": "Allowing global parameters for sub-charting"
     },
+    "enabled": {
+      "type": ["boolean", "null"],
+      "description": "No effect - reserved for use in sub-charting"
+    },
     "a1CompatibilityDaemonSet": {
       "type": "boolean",
       "description": "Enable compatibility for the A1 instance family via use of an AL2-based image in a separate DaemonSet",
@@ -16,6 +20,7 @@
     },
     "additionalDaemonSets": {
       "type": ["object", "null"],
+      "additionalProperties": false,
       "description": "Additional DaemonSets of the node pod",
       "default": null,
       "patternProperties": {
@@ -38,6 +43,7 @@
     },
     "helmTester": {
       "type": "object",
+      "additionalProperties": false,
       "description": "Supply a custom image to the ebs-csi-driver-test pod in helm-tester.yaml",
       "properties": {
         "enabled": {
@@ -60,6 +66,7 @@
     },
     "awsAccessSecret": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "name": {
           "type": "string",
@@ -77,6 +84,7 @@
     },
     "image": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "pullPolicy": {
           "type": "string",
@@ -227,25 +235,7 @@
         },
         "securityContext": {
           "type": "object",
-          "description": "SecurityContext on the controller pod",
-          "properties": {
-            "runAsNonRoot": {
-              "type": "boolean",
-              "default": true
-            },
-            "runAsUser": {
-              "type": "integer",
-              "default": 1000
-            },
-            "runAsGroup": {
-              "type": "integer",
-              "default": 1000
-            },
-            "fsGroup": {
-              "type": "integer",
-              "default": 1000
-            }
-          }
+          "description": "SecurityContext on the controller pod"
         },
         "httpEndpoint": {
           "type": ["string", "null"],
@@ -332,6 +322,7 @@
         },
         "serviceAccount": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "create": {
               "type": "boolean",
@@ -381,7 +372,16 @@
         },
         "otelTracing": {
           "type": ["object", "null"],
+          "additionalProperties": false,
           "description": "Enable opentelemetry tracing for the plugin running on the daemonset",
+          "properties": {
+            "otelServiceName": {
+              "type": "string"
+            },
+            "otelExporterEndpoint": {
+              "type": "string"
+            }
+          },
           "default": null
         },
         "volumes": {
@@ -396,29 +396,11 @@
         },
         "containerSecurityContext": {
           "type": "object",
-          "description": "SecurityContext on the controller container (see sidecars for securityContext on sidecar containers)",
-          "properties": {
-            "seccompProfile": {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "default": "RuntimeDefault"
-                }
-              }
-            },
-            "readOnlyRootFilesystem": {
-              "type": "boolean",
-              "default": true
-            },
-            "privileged": {
-              "type": "boolean",
-              "default": true
-            }
-          }
+          "description": "SecurityContext on the controller container (see sidecars for securityContext on sidecar containers)"
         },
         "serviceMonitor": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "forceEnable": {
               "type": "boolean",
@@ -426,13 +408,7 @@
             },
             "labels": {
               "type": "object",
-              "description": "Additional labels for ServiceMonitor object",
-              "properties": {
-                "release": {
-                  "type": "string",
-                  "default": "prometheus"
-                }
-              }
+              "description": "Additional labels for ServiceMonitor object"
             },
             "interval": {
               "type": "string",
@@ -441,22 +417,7 @@
           }
         },
         "updateStrategy": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "default": "RollingUpdate"
-            },
-            "rollingUpdate": {
-              "type": "object",
-              "properties": {
-                "maxUnavailable": {
-                  "type": "integer",
-                  "default": 1
-                }
-              }
-            }
-          }
+          "type": "object"
         },
         "initContainers": {
           "type": "array",
@@ -464,13 +425,7 @@
           "default": []
         },
         "socketDirVolume": {
-          "type": "object",
-          "properties": {
-            "emptyDir": {
-              "type": ["object", "null"],
-              "default": null
-            }
-          }
+          "type": "object"
         },
         "nameOverride": {
           "type": ["string", "null"],
@@ -558,13 +513,7 @@
           "default": []
         },
         "probeDirVolume": {
-          "type": "object",
-          "properties": {
-            "emptyDir": {
-              "type": "object",
-              "default": null
-            }
-          }
+          "type": "object"
         },
         "namespaceOverride": {
           "type": ["string", "null"],
@@ -639,25 +588,7 @@
         },
         "securityContext": {
           "type": "object",
-          "description": "SecurityContext on the node pod",
-          "properties": {
-            "runAsNonRoot": {
-              "type": "boolean",
-              "default": false
-            },
-            "runAsUser": {
-              "type": "integer",
-              "default": 0
-            },
-            "runAsGroup": {
-              "type": "integer",
-              "default": 0
-            },
-            "fsGroup": {
-              "type": "integer",
-              "default": 0
-            }
-          }
+          "description": "SecurityContext on the node pod"
         },
         "priorityClassName": {
           "description": "Priority class for the Node Daemonset",
@@ -690,6 +621,7 @@
         },
         "serviceAccount": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "create": {
               "type": "boolean",
@@ -748,35 +680,10 @@
         },
         "containerSecurityContext": {
           "type": "object",
-          "description": "securityContext on the node container (see sidecars for securityContext on sidecar containers). Privileged containers always run as `Unconfined`, which means that they are not restricted by a seccomp profile.",
-          "properties": {
-            "readOnlyRootFilesystem": {
-              "type": "boolean",
-              "default": true
-            },
-            "privileged": {
-              "type": "boolean",
-              "default": true
-            }
-          }
+          "description": "securityContext on the node container (see sidecars for securityContext on sidecar containers). Privileged containers always run as `Unconfined`, which means that they are not restricted by a seccomp profile."
         },
         "updateStrategy": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "default": "RollingUpdate"
-            },
-            "rollingUpdate": {
-              "type": "object",
-              "properties": {
-                "maxUnavailable": {
-                  "type": "string",
-                  "default": "10%"
-                }
-              }
-            }
-          }
+          "type": "object"
         },
         "daemonSetAnnotations": {
           "type": ["object", "null"],
@@ -784,6 +691,15 @@
         },
         "otelTracing": {
           "type": ["object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "otelServiceName": {
+              "type": "string"
+            },
+            "otelExporterEndpoint": {
+              "type": "string"
+            }
+          },
           "description": "Enable opentelemetry tracing for the plugin running on the daemonset",
           "default": null
         }
@@ -841,6 +757,7 @@
             },
             "leaderElection": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "enabled": {
                   "type": "boolean",
@@ -849,29 +766,11 @@
               }
             },
             "securityContext": {
-              "type": "object",
-              "properties": {
-                "seccompProfile": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "default": "RuntimeDefault"
-                    }
-                  }
-                },
-                "readOnlyRootFilesystem": {
-                  "type": "boolean",
-                  "default": true
-                },
-                "allowPrivilegeEscalation": {
-                  "type": "boolean",
-                  "default": false
-                }
-              }
+              "type": "object"
             },
             "image": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "pullPolicy": {
                   "type": "string",
@@ -915,6 +814,7 @@
             },
             "leaderElection": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "enabled": {
                   "type": "boolean",
@@ -923,26 +823,7 @@
               }
             },
             "securityContext": {
-              "type": "object",
-              "properties": {
-                "seccompProfile": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "default": "RuntimeDefault"
-                    }
-                  }
-                },
-                "readOnlyRootFilesystem": {
-                  "type": "boolean",
-                  "default": true
-                },
-                "allowPrivilegeEscalation": {
-                  "type": "boolean",
-                  "default": false
-                }
-              }
+              "type": "object"
             },
             "additionalClusterRoleRules": {
               "type": ["array", "null"],
@@ -951,6 +832,7 @@
             },
             "image": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "pullPolicy": {
                   "type": "string",
@@ -1004,6 +886,7 @@
             },
             "image": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "pullPolicy": {
                   "type": "string",
@@ -1019,26 +902,7 @@
               }
             },
             "securityContext": {
-              "type": "object",
-              "properties": {
-                "seccompProfile": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "default": "RuntimeDefault"
-                    }
-                  }
-                },
-                "readOnlyRootFilesystem": {
-                  "type": "boolean",
-                  "default": true
-                },
-                "allowPrivilegeEscalation": {
-                  "type": "boolean",
-                  "default": false
-                }
-              }
+              "type": "object"
             }
           }
         },
@@ -1065,6 +929,7 @@
             },
             "leaderElection": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "enabled": {
                   "type": "boolean",
@@ -1083,6 +948,7 @@
             },
             "image": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "pullPolicy": {
                   "type": "string",
@@ -1098,26 +964,7 @@
               }
             },
             "securityContext": {
-              "type": "object",
-              "properties": {
-                "seccompProfile": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "default": "RuntimeDefault"
-                    }
-                  }
-                },
-                "readOnlyRootFilesystem": {
-                  "type": "boolean",
-                  "default": true
-                },
-                "allowPrivilegeEscalation": {
-                  "type": "boolean",
-                  "default": false
-                }
-              }
+              "type": "object"
             }
           }
         },
@@ -1127,6 +974,7 @@
           "properties": {
             "image": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "pullPolicy": {
                   "type": "string",
@@ -1150,17 +998,7 @@
               "default": null
             },
             "securityContext": {
-              "type": "object",
-              "properties": {
-                "readOnlyRootFilesystem": {
-                  "type": "boolean",
-                  "default": true
-                },
-                "allowPrivilegeEscalation": {
-                  "type": "boolean",
-                  "default": false
-                }
-              }
+              "type": "object"
             }
           }
         },
@@ -1187,6 +1025,7 @@
             },
             "image": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "pullPolicy": {
                   "type": "string",
@@ -1206,32 +1045,15 @@
               "default": null
             },
             "securityContext": {
-              "type": "object",
-              "properties": {
-                "seccompProfile": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "default": "RuntimeDefault"
-                    }
-                  }
-                },
-                "readOnlyRootFilesystem": {
-                  "type": "boolean",
-                  "default": true
-                },
-                "allowPrivilegeEscalation": {
-                  "type": "boolean",
-                  "default": false
-                }
-              }
+              "type": "object"
             },
             "livenessProbe": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "exec": {
                   "type": "object",
+                  "additionalProperties": false,
                   "properties": {
                     "command": {
                       "type": "array",
@@ -1282,6 +1104,7 @@
             },
             "leaderElection": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "enabled": {
                   "type": "boolean",
@@ -1295,6 +1118,7 @@
             },
             "image": {
               "type": "object",
+              "additionalProperties": false,
               "properties": {
                 "pullPolicy": {
                   "type": "string",
@@ -1310,26 +1134,7 @@
               }
             },
             "securityContext": {
-              "type": "object",
-              "properties": {
-                "seccompProfile": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "default": "RuntimeDefault"
-                    }
-                  }
-                },
-                "readOnlyRootFilesystem": {
-                  "type": "boolean",
-                  "default": true
-                },
-                "allowPrivilegeEscalation": {
-                  "type": "boolean",
-                  "default": false
-                }
-              }
+              "type": "object"
             }
           }
         }

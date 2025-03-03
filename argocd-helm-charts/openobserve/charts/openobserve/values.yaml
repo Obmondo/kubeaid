@@ -6,14 +6,14 @@ image:
   oss:
     repository: public.ecr.aws/zinclabs/openobserve
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.14.0"
+    tag: "v0.14.4"
   enterprise:
     repository: public.ecr.aws/zinclabs/openobserve-enterprise
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.14.0"
+    tag: "v0.14.4"
   reportserver:
     repository: public.ecr.aws/zinclabs/report-server
-    tag: "v0.0.9-6618bad"
+    tag: "v0.0.10-rc3-14e738a"
   busybox:
     repository: public.ecr.aws/docker/library/busybox
     tag: 1.36.1
@@ -152,7 +152,7 @@ auth:
 
   AZURE_STORAGE_ACCOUNT_KEY: ""
   AZURE_STORAGE_ACCOUNT_NAME: ""
-  ZO_META_POSTGRES_DSN: ""
+  ZO_META_POSTGRES_DSN: "postgres://userid:password@host:5432/dbname"
   ZO_META_MYSQL_DSN: ""
   ZO_TRACING_HEADER_KEY: "Authorization"
   ZO_TRACING_HEADER_VALUE: "Basic cm9vdEBleGFtcGxlLmNvbTpDb21wbGV4cGFzcyMxMjM="
@@ -193,8 +193,8 @@ config:
   ZO_WEB_URL: ""
   ZO_BASE_URI: ""
   ZO_HEALTH_CHECK_ENABLED: "true"
-  ZO_HEALTH_CHECK_TIMEOUT: "10"
-  ZO_HEALTH_CHECK_FAILED_TIMES: "5"
+  ZO_HEALTH_CHECK_TIMEOUT: "5"
+  ZO_HEALTH_CHECK_FAILED_TIMES: "3"
   ZO_CLUSTER_COORDINATOR: "nats"
   ZO_QUEUE_STORE: ""
   ZO_META_STORE: "postgres"
@@ -202,10 +202,7 @@ config:
   ZO_META_CONNECTION_POOL_MAX_SIZE: "0"
   ZO_META_TRANSACTION_RETRIES: "3"
   ZO_META_TRANSACTION_LOCK_TIMEOUT: "600" # seconds
-  ZO_COLUMN_TIMESTAMP: "_timestamp"
   ZO_COLS_PER_RECORD_LIMIT: "200"
-  ZO_WIDENING_SCHEMA_EVOLUTION: "true"
-  ZO_SKIP_SCHEMA_VALIDATION: "false"
   ZO_FEATURE_FULLTEXT_EXTRA_FIELDS: ""
   ZO_FEATURE_INDEX_EXTRA_FIELDS: ""
   ZO_FEATURE_DISTINCT_EXTRA_FIELDS: ""
@@ -219,9 +216,11 @@ config:
   ZO_USE_MULTIPLE_RESULT_CACHE: "true" # Enable to use mulple result caches for query results
   ZO_RESULT_CACHE_SELECTION_STRATEGY: "overlap" # Strategy to use for result cache, default is both , possible value - both,overlap , duration
   ZO_RESULT_CACHE_DISCARD_DURATION: "60" # Discard data of last n seconds from cached results
-  ZO_CONSISTENT_HASH_VNODES: "100"
+  ZO_METRICS_CACHE_ENABLED: "true" # Enable result cache for metrics query
+  ZO_METRICS_CACHE_MAX_ENTRIES: "100000"
+  ZO_CONSISTENT_HASH_VNODES: "1000"
   ZO_QUERY_OPTIMIZATION_NUM_FIELDS: "0"
-  ZO_SCHEMA_MAX_FIELDS_TO_ENABLE_UDS: "100"
+  ZO_SCHEMA_MAX_FIELDS_TO_ENABLE_UDS: "150"
   ZO_USER_DEFINED_SCHEMA_MAX_FIELDS: "200"
   ZO_QUICK_MODE_ENABLED: "false"
   ZO_QUICK_MODE_FORCE_ENABLED: "true"
@@ -230,13 +229,9 @@ config:
   ZO_BLOOM_FILTER_ENABLED: "true"
   ZO_BLOOM_FILTER_DEFAULT_FIELDS: ""
   ZO_ENABLE_INVERTED_INDEX: "true"
-  ZO_INVERTED_INDEX_STORE_FORMAT: "tantivy" # InvertedIndex store format, parquet(default), tantivy, both
-  ZO_INVERTED_INDEX_SEARCH_FORMAT: "tantivy" # InvertedIndex search format, parquet(default), tantivy.
-  ZO_INVERTED_INDEX_TANTIVY_MODE: "puffin" # Tantivy search mode, puffin or mmap, default is puffin.
   ZO_INVERTED_INDEX_COUNT_OPTIMIZER_ENABLED: "true"
   ZO_FEATURE_QUERY_REMOVE_FILTER_WITH_INDEX: "true"
-  ZO_INVERTED_INDEX_SPLIT_CHARS: ""
-  ZO_FULL_TEXT_SEARCH_TYPE: "prefix" # Search through full text fields with either 'contains' , 'eq' or 'prefix' match.
+  ZO_INVERTED_INDEX_CAMEL_CASE_TOKENIZER_DISABLED: "true"
   ZO_QUERY_ON_STREAM_SELECTION: "true" # Toggle search to be trigger based on button click event.
   ZO_DISTINCT_VALUES_INTERVAL: "10"
   ZO_DISTINCT_VALUES_HOURLY: "false"
@@ -267,6 +262,7 @@ config:
   ZO_WAL_FSYNC_DISABLED: "false"
   ZO_QUERY_THREAD_NUM: "0"
   ZO_QUERY_TIMEOUT: "600"
+  ZO_QUERY_INGESTER_TIMEOUT: "0"
   ZO_ROUTE_TIMEOUT: "600"
   ZO_QUERY_DEFAULT_LIMIT: "1000"
   ZO_ROUTE_MAX_CONNECTIONS: "1024"
@@ -275,6 +271,7 @@ config:
   ZO_ACTIX_REQ_TIMEOUT: "30" # in second
   ZO_ACTIX_KEEP_ALIVE: "30" # in second
   ZO_ACTIX_SHUTDOWN_TIMEOUT: "10" # in second
+  ZO_ACTIX_SLOW_LOG_THRESHOLD: "5" # in second
   ZO_INGEST_ALLOWED_UPTO: "24"
   ZO_INGEST_FLATTEN_LEVEL: "3"
   ZO_LOGS_FILE_RETENTION: "hourly"
@@ -337,7 +334,6 @@ config:
   ZO_S3_REGION_NAME: "us-east-2" # do not need to set this if enabled minio is being used. settings will be picked from minio section
   ZO_S3_BUCKET_NAME: "o2-dev-bucket" # do not need to set this if enabled minio is being used. settings will be picked from minio section
   ZO_S3_BUCKET_PREFIX: ""
-  ZO_S3_FEATURE_FORCE_PATH_STYLE: "false"
   ZO_S3_FEATURE_FORCE_HOSTED_STYLE: "false"
   ZO_S3_FEATURE_HTTP1_ONLY: "false"
   ZO_S3_FEATURE_HTTP2_ONLY: "false"
@@ -347,6 +343,7 @@ config:
   ZO_S3_ALLOW_INVALID_CERTIFICATES: "false"
   ZO_S3_MAX_RETRIES: "10"
   ZO_S3_MAX_IDLE_PER_HOST: "0"
+  ZO_S3_CONNECTION_KEEPALIVE_TIMEOUT: "20"
   ZO_USAGE_REPORTING_ENABLED: "false"
   ZO_USAGE_REPORTING_MODE: "local"
   ZO_USAGE_REPORTING_URL: "http://localhost:5080/api/_meta/usage/_json"
@@ -358,7 +355,6 @@ config:
   ZO_PRINT_KEY_CONFIG: "false"
   ZO_PRINT_KEY_EVENT: "false"
   ZO_PRINT_KEY_SQL: "false"
-  ZO_INGESTER_SERVICE_URL: ""
   ZO_IGNORE_FILE_RETENTION_BY_STREAM: "false"
   ZO_RUM_ENABLED: "false"
   ZO_RUM_APPLICATION_ID: ""
@@ -379,8 +375,6 @@ config:
   ZO_QUERY_GROUP_BASE_SPEED: "768" # MB/s/core
   ZO_QUERY_PARTITION_BY_SECS: "1" # In how many seconds we want to get the results per partition
   ZO_QUERY_PARTITION_MIN_SECS: "600" # seconds. This is the minimum time range for a partition
-  RUST_LOG: "info"
-  RUST_BACKTRACE: "0"
   ZO_SHOW_STREAM_DATES_DOCS_NUM: true # Show docs count and stream dates
   ZO_INGEST_BLOCKED_STREAMS: "" # // use comma to split multiple streams
   ZO_INGEST_INFER_SCHEMA_PER_REQUEST: "true"
@@ -419,8 +413,11 @@ config:
   ZO_SELF_METRIC_CONSUMPTION_INTERVAL: "60" # self-consume metrics interval, unit seconds
   ZO_SELF_METRIC_CONSUMPTION_ACCEPTLIST: "" # only these metrics will be self-consumed, comma separated
   ZO_SWAGGER_ENABLED: "true"
-  ZO_WEBSOCKET_ENABLED: "true"
+  ZO_WEBSOCKET_ENABLED: "false"
   ZO_MIN_AUTO_REFRESH_INTERVAL: "5"
+  ZO_MAX_DASHBOARD_SERIES: "100"
+  RUST_LOG: "info"
+  RUST_BACKTRACE: "0"
 
 # Add extra environment variables to all pods, useful for overriding secrets
 extraEnv: []
@@ -899,7 +896,7 @@ probes:
         failureThreshold: 3
         terminationGracePeriodSeconds: 30
   ingester:
-    enabled: true
+    enabled: false
     config:
       readinessProbe:
         initialDelaySeconds: 10
@@ -916,7 +913,7 @@ probes:
         failureThreshold: 3
         terminationGracePeriodSeconds: 30
   querier:
-    enabled: true
+    enabled: false
     config:
       readinessProbe:
         initialDelaySeconds: 10

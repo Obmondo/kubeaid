@@ -107,6 +107,10 @@ spec:
               value: /data
             - name: GITEA_TEMP
               value: /tmp/gitea
+            - name: TMP_EXISTING_ENVS_FILE
+              value: /tmp/existing-envs
+            - name: ENV_TO_INI_MOUNT_POINT
+              value: /env-to-ini-mounts
             {{- if .Values.deployment.env }}
             {{- toYaml .Values.deployment.env | nindent 12 }}
             {{- end }}
@@ -149,6 +153,8 @@ spec:
           env:
             - name: GNUPGHOME
               value: {{ .Values.signing.gpgHome }}
+            - name: TMP_RAW_GPG_KEY
+              value: /raw/private.asc
           volumeMounts:
             - name: init
               mountPath: /usr/sbin
@@ -285,6 +291,13 @@ spec:
               value: /data
             - name: GITEA_TEMP
               value: /tmp/gitea
+            {{- if and (hasKey .Values.resources "limits") (hasKey .Values.resources.limits "cpu") }}
+            - name: GOMAXPROCS
+              valueFrom:
+                resourceFieldRef:
+                  divisor: "1"
+                  resource: limits.cpu
+            {{- end }}
             - name: TMPDIR
               value: /tmp/gitea
             {{- if .Values.image.rootless }}
@@ -347,16 +360,16 @@ spec:
       hostAliases:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.nodeSelector }}
+      {{- range $key, $value := .Values.nodeSelector }}
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
+        {{ $key }}: {{ $value | quote }}
       {{- end }}
     {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
     {{- end }}
     {{- with .Values.topologySpreadConstraints }}
-      topologySpreadConstraints: 
+      topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
     {{- end }}
     {{- with .Values.tolerations }}

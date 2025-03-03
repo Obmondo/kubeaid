@@ -5,6 +5,7 @@
 # Common VCS dirs
 .git/
 .gitignore
+.gitmodules
 .bzr/
 .bzrignore
 .hg/
@@ -31,3 +32,10 @@ Makefile
 .drone.yml
 CONTRIBUTING.md
 unittests/
+.editorconfig
+.prettierignore
+.yamllint
+CODEOWNERS
+renovate.json5
+.commitlintrc.json
+.gitsv/

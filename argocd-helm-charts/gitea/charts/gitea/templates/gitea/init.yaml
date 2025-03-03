@@ -7,11 +7,7 @@ metadata:
     {{- include "gitea.labels" . | nindent 4 }}
 type: Opaque
 stringData:
-  configure_gpg_environment.sh: |-
-    #!/usr/bin/env bash
-    set -eu
-
-    gpg --batch --import /raw/private.asc
+{{ (.Files.Glob "scripts/init-containers/init/*.sh").AsConfig | indent 2 }}
   init_directory_structure.sh: |-
     #!/usr/bin/env bash
 

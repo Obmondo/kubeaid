@@ -32,4 +32,4 @@ maintainers:
 name: kubernetes-dashboard
 sources:
 - https://github.com/kubernetes/dashboard
-version: 7.10.4
+version: 7.10.5

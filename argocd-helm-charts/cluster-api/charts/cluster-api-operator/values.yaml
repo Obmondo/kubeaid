@@ -5,6 +5,7 @@ core: ""
 bootstrap: ""
 controlPlane: ""
 infrastructure: ""
+ipam: ""
 addon: ""
 manager.featureGates: {}
 fetchConfig: {}
@@ -20,7 +21,7 @@ leaderElection:
 image:
   manager:
     repository: registry.k8s.io/capi-operator/cluster-api-operator
-    tag: v0.16.0
+    tag: v0.17.0
     pullPolicy: IfNotPresent
 env:
   manager: []

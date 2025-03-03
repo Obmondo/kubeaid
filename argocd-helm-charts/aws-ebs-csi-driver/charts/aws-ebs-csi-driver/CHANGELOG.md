@@ -1,6 +1,23 @@
 # Helm chart
 
+## v2.40.2
+
+### Bug or Regression
+
+- Add enabled flag to schema for sub-charting ([#2359](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/2359), [@ConnorJC3](https://github.com/ConnorJC3))
+
+## v2.40.1
+
+### Bug or Regression
+
+- Prevent null deref when enableWindows and otelTracing enabled on node ([#2357](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/2357), [@ConnorJC3](https://github.com/ConnorJC3)) 
+- Fix incorrect properties validation in Helm schema ([#2356](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/2356), [@ConnorJC3](https://github.com/ConnorJC3))
+
 ## v2.40.0
+
+#### Default for enable windows changed
+
+The default value for enableWindows has been changed from false to true. This change makes it so the node damemonset will be scheduled on windows nodes by default. If you wish to not have the node daemonset scheduled on your windows nodes you will need to change enableWindows to false.
 
 ### Feature
 

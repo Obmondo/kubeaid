@@ -8,6 +8,7 @@
   - [Dependency Versioning](#dependency-versioning)
 - [Installing](#installing)
 - [High Availability](#high-availability)
+- [Limit resources](#limit-resources)
 - [Configuration](#configuration)
   - [Default Configuration](#default-configuration)
     - [Database defaults](#database-defaults)
@@ -30,6 +31,7 @@
   - [OAuth2 Settings](#oauth2-settings)
 - [Configure commit signing](#configure-commit-signing)
 - [Metrics and profiling](#metrics-and-profiling)
+  - [Secure Metrics Endpoint](#secure-metrics-endpoint)
 - [Pod annotations](#pod-annotations)
 - [Themes](#themes)
 - [Renovate](#renovate)
@@ -138,6 +140,12 @@ Alternatively, the chart can also be installed from Dockerhub (since v9.6.0)
 helm install gitea oci://registry-1.docker.io/giteacharts/gitea
 ```
 
+To avoid potential Dockerhub rate limits, the chart can also be installed via [docker.gitea.com](https://blog.gitea.com/docker-registry-update/) (since v9.6.0)
+
+```sh
+helm install gitea oci://docker.gitea.com/charts/gitea
+```
+
 When upgrading, please refer to the [Upgrading](#upgrading) section at the bottom of this document for major and breaking changes.
 
 ## High Availability
@@ -147,6 +155,44 @@ Care must be taken for production use as not all implementation details of Gitea
 
 Deploying a HA-ready Gitea instance requires some effort including using HA-ready dependencies.
 See the [HA Setup](docs/ha-setup.md) document for more details.
+
+## Limit resources
+
+If the application is deployed with a CPU resource limit, Prometheus may throw a CPU throttling warning for the
+application. This has more or less to do with the fact that the application finds the number of CPUs of the host, but
+cannot use the available CPU time to perform computing operations.
+
+The application must be informed that despite several CPUs only a part (limit) of the available computing time is
+available. As this is a Golang application, this can be implemented using `GOMAXPROCS`. The following example is one way
+of defining `GOMAXPROCS` automatically based on the defined CPU limit like `1000m`. Please keep in mind, that the CFS
+rate of `100ms` - default on each kubernetes node, is also very important to avoid CPU throttling.
+
+Further information about this topic can be found [here](https://kanishk.io/posts/cpu-throttling-in-containerized-go-apps/).
+
+> [!NOTE]
+> The environment variable `GOMAXPROCS` is set automatically, when a CPU limit is defined. An explicit configuration is
+> not anymore required.
+>
+> Please note that a CPU limit < `1000m` can also lead to CPU throttling. Please read the linked documentation carefully.
+
+```yaml
+deployment:
+  env:
+  # Will be automatically defined!
+  - name: GOMAXPROCS
+    valueFrom:
+      resourceFieldRef:
+        divisor: "1" # Is required for GitDevOps systems like ArgoCD/Flux. Otherwise throw the system a diff error. (k8s-default=1)
+        resource: limits.cpu
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 512Mi
+```
 
 ## Configuration
 
@@ -538,7 +584,7 @@ You can interact with the postgres settings as displayed in the following exampl
 postgresql:
   persistence:
     enabled: true
-    claimName: MyAwesomeGiteaPostgresClaim
+    existingClaim: MyAwesomeGiteaPostgresClaim
 ```
 
 ### Admin User
@@ -747,6 +793,21 @@ gitea:
       ENABLE_PPROF: true
 ```
 
+### Secure Metrics Endpoint
+
+Metrics endpoint `/metrics` can be secured by using `Bearer` token authentication.
+
+**Note:** Providing non-empty `TOKEN` value will also require authentication for `ServiceMonitor`.
+
+```yaml
+gitea:
+  metrics:
+    token: "secure-token"
+    enabled: true
+    serviceMonitor:
+      enabled: true
+```
+
 ## Pod annotations
 
 Annotations can be added to the Gitea pod.
@@ -876,16 +937,16 @@ To comply with the Gitea helm chart definition of the digest parameter, a "custo
 
 ### Image
 
-| Name                 | Description                                                                                                                                                      | Value          |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
-| `image.registry`     | image registry, e.g. gcr.io,docker.io                                                                                                                            | `""`           |
-| `image.repository`   | Image to start for this pod                                                                                                                                      | `gitea/gitea`  |
-| `image.tag`          | Visit: [Image tag](https://hub.docker.com/r/gitea/gitea/tags?page=1&ordering=last_updated). Defaults to `appVersion` within Chart.yaml.                          | `""`           |
-| `image.digest`       | Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest`                                                       | `""`           |
-| `image.pullPolicy`   | Image pull policy                                                                                                                                                | `IfNotPresent` |
-| `image.rootless`     | Wether or not to pull the rootless version of Gitea, only works on Gitea 1.14.x or higher                                                                        | `true`         |
-| `image.fullOverride` | Completely overrides the image registry, path/image, tag and digest. **Adjust `image.rootless` accordingly and review [Rootless defaults](#rootless-defaults).** | `""`           |
-| `imagePullSecrets`   | Secret to use for pulling the image                                                                                                                              | `[]`           |
+| Name                 | Description                                                                                                                                                      | Value              |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| `image.registry`     | image registry, e.g. gcr.io,docker.io                                                                                                                            | `docker.gitea.com` |
+| `image.repository`   | Image to start for this pod                                                                                                                                      | `gitea`            |
+| `image.tag`          | Visit: [Image tag](https://hub.docker.com/r/gitea/gitea/tags?page=1&ordering=last_updated). Defaults to `appVersion` within Chart.yaml.                          | `""`               |
+| `image.digest`       | Image digest. Allows to pin the given image tag. Useful for having control over mutable tags like `latest`                                                       | `""`               |
+| `image.pullPolicy`   | Image pull policy                                                                                                                                                | `IfNotPresent`     |
+| `image.rootless`     | Wether or not to pull the rootless version of Gitea, only works on Gitea 1.14.x or higher                                                                        | `true`             |
+| `image.fullOverride` | Completely overrides the image registry, path/image, tag and digest. **Adjust `image.rootless` accordingly and review [Rootless defaults](#rootless-defaults).** | `""`               |
+| `imagePullSecrets`   | Secret to use for pulling the image                                                                                                                              | `[]`               |
 
 ### Security
 
@@ -1010,38 +1071,41 @@ To comply with the Gitea helm chart definition of the digest parameter, a "custo
 
 ### Gitea Actions
 
-| Name                                           | Description                                                                                                                                 | Value                          |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| `actions.enabled`                              | Create an act runner StatefulSet.                                                                                                           | `false`                        |
-| `actions.init.image.repository`                | The image used for the init containers                                                                                                      | `busybox`                      |
-| `actions.init.image.tag`                       | The image tag used for the init containers                                                                                                  | `1.36.1`                       |
-| `actions.statefulset.annotations`              | Act runner annotations                                                                                                                      | `{}`                           |
-| `actions.statefulset.labels`                   | Act runner labels                                                                                                                           | `{}`                           |
-| `actions.statefulset.resources`                | Act runner resources                                                                                                                        | `{}`                           |
-| `actions.statefulset.nodeSelector`             | NodeSelector for the statefulset                                                                                                            | `{}`                           |
-| `actions.statefulset.tolerations`              | Tolerations for the statefulset                                                                                                             | `[]`                           |
-| `actions.statefulset.affinity`                 | Affinity for the statefulset                                                                                                                | `{}`                           |
-| `actions.statefulset.actRunner.repository`     | The Gitea act runner image                                                                                                                  | `gitea/act_runner`             |
-| `actions.statefulset.actRunner.tag`            | The Gitea act runner tag                                                                                                                    | `0.2.11`                       |
-| `actions.statefulset.actRunner.pullPolicy`     | The Gitea act runner pullPolicy                                                                                                             | `IfNotPresent`                 |
-| `actions.statefulset.actRunner.config`         | Act runner custom configuration. See [Act Runner documentation](https://docs.gitea.com/usage/actions/act-runner#configuration) for details. | `Too complex. See values.yaml` |
-| `actions.statefulset.dind.repository`          | The Docker-in-Docker image                                                                                                                  | `docker`                       |
-| `actions.statefulset.dind.tag`                 | The Docker-in-Docker image tag                                                                                                              | `25.0.2-dind`                  |
-| `actions.statefulset.dind.pullPolicy`          | The Docker-in-Docker pullPolicy                                                                                                             | `IfNotPresent`                 |
-| `actions.statefulset.dind.extraEnvs`           | Allows adding custom environment variables, such as `DOCKER_IPTABLES_LEGACY`                                                                | `[]`                           |
-| `actions.provisioning.enabled`                 | Create a job that will create and save the token in a Kubernetes Secret                                                                     | `false`                        |
-| `actions.provisioning.annotations`             | Job's annotations                                                                                                                           | `{}`                           |
-| `actions.provisioning.labels`                  | Job's labels                                                                                                                                | `{}`                           |
-| `actions.provisioning.resources`               | Job's resources                                                                                                                             | `{}`                           |
-| `actions.provisioning.nodeSelector`            | NodeSelector for the job                                                                                                                    | `{}`                           |
-| `actions.provisioning.tolerations`             | Tolerations for the job                                                                                                                     | `[]`                           |
-| `actions.provisioning.affinity`                | Affinity for the job                                                                                                                        | `{}`                           |
-| `actions.provisioning.ttlSecondsAfterFinished` | ttl for the job after finished in order to allow helm to properly recognize that the job completed                                          | `300`                          |
-| `actions.provisioning.publish.repository`      | The image that can create the secret via kubectl                                                                                            | `bitnami/kubectl`              |
-| `actions.provisioning.publish.tag`             | The publish image tag that can create the secret                                                                                            | `1.29.0`                       |
-| `actions.provisioning.publish.pullPolicy`      | The publish image pullPolicy that can create the secret                                                                                     | `IfNotPresent`                 |
-| `actions.existingSecret`                       | Secret that contains the token                                                                                                              | `""`                           |
-| `actions.existingSecretKey`                    | Secret key                                                                                                                                  | `""`                           |
+| Name                                              | Description                                                                                                                                 | Value                          |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `actions.enabled`                                 | Create an act runner StatefulSet.                                                                                                           | `false`                        |
+| `actions.init.image.repository`                   | The image used for the init containers                                                                                                      | `busybox`                      |
+| `actions.init.image.tag`                          | The image tag used for the init containers                                                                                                  | `1.37.0`                       |
+| `actions.statefulset.annotations`                 | Act runner annotations                                                                                                                      | `{}`                           |
+| `actions.statefulset.labels`                      | Act runner labels                                                                                                                           | `{}`                           |
+| `actions.statefulset.resources`                   | Act runner resources                                                                                                                        | `{}`                           |
+| `actions.statefulset.nodeSelector`                | NodeSelector for the statefulset                                                                                                            | `{}`                           |
+| `actions.statefulset.tolerations`                 | Tolerations for the statefulset                                                                                                             | `[]`                           |
+| `actions.statefulset.affinity`                    | Affinity for the statefulset                                                                                                                | `{}`                           |
+| `actions.statefulset.extraVolumes`                | Extra volumes for the statefulset                                                                                                           | `[]`                           |
+| `actions.statefulset.actRunner.repository`        | The Gitea act runner image                                                                                                                  | `gitea/act_runner`             |
+| `actions.statefulset.actRunner.tag`               | The Gitea act runner tag                                                                                                                    | `0.2.11`                       |
+| `actions.statefulset.actRunner.pullPolicy`        | The Gitea act runner pullPolicy                                                                                                             | `IfNotPresent`                 |
+| `actions.statefulset.actRunner.extraVolumeMounts` | Allows mounting extra volumes in the act runner container                                                                                   | `[]`                           |
+| `actions.statefulset.actRunner.config`            | Act runner custom configuration. See [Act Runner documentation](https://docs.gitea.com/usage/actions/act-runner#configuration) for details. | `Too complex. See values.yaml` |
+| `actions.statefulset.dind.repository`             | The Docker-in-Docker image                                                                                                                  | `docker`                       |
+| `actions.statefulset.dind.tag`                    | The Docker-in-Docker image tag                                                                                                              | `25.0.2-dind`                  |
+| `actions.statefulset.dind.pullPolicy`             | The Docker-in-Docker pullPolicy                                                                                                             | `IfNotPresent`                 |
+| `actions.statefulset.dind.extraVolumeMounts`      | Allows mounting extra volumes in the Docker-in-Docker container                                                                             | `[]`                           |
+| `actions.statefulset.dind.extraEnvs`              | Allows adding custom environment variables, such as `DOCKER_IPTABLES_LEGACY`                                                                | `[]`                           |
+| `actions.provisioning.enabled`                    | Create a job that will create and save the token in a Kubernetes Secret                                                                     | `false`                        |
+| `actions.provisioning.annotations`                | Job's annotations                                                                                                                           | `{}`                           |
+| `actions.provisioning.labels`                     | Job's labels                                                                                                                                | `{}`                           |
+| `actions.provisioning.resources`                  | Job's resources                                                                                                                             | `{}`                           |
+| `actions.provisioning.nodeSelector`               | NodeSelector for the job                                                                                                                    | `{}`                           |
+| `actions.provisioning.tolerations`                | Tolerations for the job                                                                                                                     | `[]`                           |
+| `actions.provisioning.affinity`                   | Affinity for the job                                                                                                                        | `{}`                           |
+| `actions.provisioning.ttlSecondsAfterFinished`    | ttl for the job after finished in order to allow helm to properly recognize that the job completed                                          | `300`                          |
+| `actions.provisioning.publish.repository`         | The image that can create the secret via kubectl                                                                                            | `bitnami/kubectl`              |
+| `actions.provisioning.publish.tag`                | The publish image tag that can create the secret                                                                                            | `1.29.0`                       |
+| `actions.provisioning.publish.pullPolicy`         | The publish image pullPolicy that can create the secret                                                                                     | `IfNotPresent`                 |
+| `actions.existingSecret`                          | Secret that contains the token                                                                                                              | `""`                           |
+| `actions.existingSecretKey`                       | Secret key                                                                                                                                  | `""`                           |
 
 ### Gitea
 
@@ -1053,6 +1117,7 @@ To comply with the Gitea helm chart definition of the digest parameter, a "custo
 | `gitea.admin.email`                          | Email for the Gitea admin user                                                                                                 | `gitea@local.domain` |
 | `gitea.admin.passwordMode`                   | Mode for how to set/update the admin user password. Options are: initialOnlyNoReset, initialOnlyRequireReset, and keepUpdated  | `keepUpdated`        |
 | `gitea.metrics.enabled`                      | Enable Gitea metrics                                                                                                           | `false`              |
+| `gitea.metrics.token`                        | used for `bearer` token authentication on metrics endpoint. If not specified or empty metrics endpoint is public.              | `nil`                |
 | `gitea.metrics.serviceMonitor.enabled`       | Enable Gitea metrics service monitor. Requires, that `gitea.metrics.enabled` is also set to true, to enable metrics generally. | `false`              |
 | `gitea.metrics.serviceMonitor.interval`      | Interval at which metrics should be scraped. If not specified Prometheus' global scrape interval is used.                      | `""`                 |
 | `gitea.metrics.serviceMonitor.relabelings`   | RelabelConfigs to apply to samples before scraping.                                                                            | `[]`                 |
@@ -1173,6 +1238,28 @@ See [CONTRIBUTORS GUIDE](CONTRIBUTING.md) for details.
 This section lists major and breaking changes of each Helm Chart version.
 Please read them carefully to upgrade successfully, especially the change of the **default database backend**!
 If you miss this, blindly upgrading may delete your Postgres instance and you may lose your data!
+
+<details>
+
+<summary>To 11.0.0</summary>
+
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable-next-line -->
+**Breaking changes**
+<!-- prettier-ignore-end -->
+
+- Update Gitea to 1.23.x (review the [1.23 release blog post](https://blog.gitea.com/release-of-1.23.0/) for all application breaking changes)
+- Update PostgreSQL sub-chart dependencies to appVersion 17.x
+- Update Redis sub-chart to version 20.x (appVersion 7.4)
+  Although there are no breaking changes in the Redis Chart itself, it updates Redis from `7.2` to `7.4`. We recommend checking the release notes:
+  - [Redis Chart release notes (starting with v20.0.0)](https://github.com/bitnami/charts/blob/HEAD/bitnami/redis/CHANGELOG.md#2000-2024-08-09).
+  - [Redis 7.4 release notes](https://raw.githubusercontent.com/redis/redis/7.4/00-RELEASENOTES).
+- Update Redis Cluster sub-chart to version 11.x (appVersion 7.4)
+  Although there are no breaking changes in the Redis Chart itself, it updates Redis from `7.2` to `7.4`. We recommend checking the release notes:
+  - [Redis Chart release notes (starting with v11.0.0)](https://github.com/bitnami/charts/blob/HEAD/bitnami/redis-cluster/CHANGELOG.md#1100-2024-08-09).
+  - [Redis 7.4 release notes](https://raw.githubusercontent.com/redis/redis/7.4/00-RELEASENOTES).
+
+</details>
 
 <details>
 
