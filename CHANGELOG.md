@@ -2,6 +2,10 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`d97438bd`](../../commit/d97438bd) fix(blogs/capi/aws) : fixed a command
+- [`cba37bb2`](../../commit/cba37bb2) chore(docs) : updating part 1 of the KubeAid demonstration blog series for AWS
+
 ## 9.4.0
 ### Minor Version Upgrades
 - Updated velero from version 8.3.0 to 8.4.0
