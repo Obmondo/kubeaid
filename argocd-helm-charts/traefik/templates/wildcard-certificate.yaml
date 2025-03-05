@@ -1,5 +1,5 @@
-{{- if .Values.wildcardCertificates.enabled -}}
-{{- range .Values.wildcardCertificates.domains }}
+{{- if .Values.wildcardCertificates | default false }}
+{{- range .Values.wildcardCertificates.domains  }}
 
 {{- if not (contains "*." .) }}
 {{- fail (printf "The domain %s must start with '*.'" .) }}
@@ -20,5 +20,5 @@ spec:
   - "{{ . | replace "*" "" | printf "%s" | trimPrefix "." }}"
 
 ---
-{{- end -}}
-{{- end -}}
+{{- end }}
+{{- end }}
