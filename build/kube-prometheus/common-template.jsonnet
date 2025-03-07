@@ -376,7 +376,7 @@ local kp =
                 } else {}
             },
           },
-          ruleNamespaceSelector: null,
+          ruleNamespaceSelector: {},
         },
       },
       networkPolicy+: {
