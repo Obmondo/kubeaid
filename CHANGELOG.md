@@ -2,6 +2,12 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 10.0.1
+### Improvements
+- [`b17fc1c7`](../../commit/b17fc1c7) fix(kube-prometheus) : setting ruleNamespaceSelector to {} instead of null
+- [`8b6e0d95`](../../commit/8b6e0d95) fix(kube-prometheus) : check whether vars.prometheus.storage.classname exists or not
+- [`fc86d47e`](../../commit/fc86d47e) traefik fix
+
 ## 10.0.0
 ### Major Version Upgrades
 - Updated gitea from version 10.6.0 to 11.0.0
