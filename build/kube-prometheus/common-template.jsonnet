@@ -370,10 +370,9 @@ local kp =
               spec: {
                 accessModes: ['ReadWriteOnce'],
                 resources: { requests: { storage: vars.prometheus.storage.size } },
-              },
-                + if std.objectHas(vars.prometheus.storage, 'classname') then {
-                  storageClassName: vars.prometheus.storage.classname
-                } else {}
+              } + if std.objectHas(vars.prometheus.storage, 'classname') then (
+                { storageClassName: vars.prometheus.storage.classname }
+              ) else {},
             },
           },
           ruleNamespaceSelector: {},
