@@ -1,0 +1,117 @@
+# Default values for media.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  # Global ingress annotations that is shared by all the ingress services.
+  # For example, use it to override extern-dns records.
+  ingress:
+    annotations: {}
+      # The IP to register with external-dns for this service
+      #external-dns.alpha.kubernetes.io/target: 192.168.20.5
+
+  # If running in a multi-node kubernetes cluster, "pin" the media container
+  # to the given host where the /opt/media volume exists. Uncomment the
+  # nodeSelector and update the hostname accordingly.
+  #nodeSelector: 
+    #kubernetes.io/hostname: "my-hostname"
+
+  # Comment this out when pinning the media container to a specfic host.
+  nodeSelector: {}
+
+replicaCount: 1
+
+image:
+  repository: registry.opensuse.org/isv/suse/edge/metal3/containers/images/ironic
+  pullPolicy: IfNotPresent
+  tag: 26.1.2.2
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsUser: 10475
+  fsGroup: 10475
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  seccompProfile:
+    type: RuntimeDefault
+  runAsNonRoot: true
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: media.suse.baremetal
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+tolerations: []
+
+affinity: {}
+
+# volumes
+volumes:
+  - name: assets
+    persistentVolumeClaim:
+      claimName: media
+
+# volume mounts
+volumeMounts:
+  - mountPath: /srv/www/htdocs
+    name: assets
+
+# media volume settings
+mediaVolume:
+  storageClassName: local
+  accessModes:
+  - ReadOnlyMany
+  hostPath: /opt/media
+  storage: 5Gi

@@ -1,0 +1,43 @@
+{{- if .Values.global.enable_tls -}}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ironic-cacert
+spec:
+  commonName: ironic-ca
+  isCA: true
+  ipAddresses:
+  - {{ .Values.global.ironicIP }}
+  issuerRef:
+    kind: Issuer
+    name: selfsigned-issuer
+  secretName: ironic-cacert
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ironic-cert
+spec:
+  commonName: ironic-cert
+  ipAddresses:
+  - {{ .Values.global.ironicIP }}
+  issuerRef:
+    kind: Issuer
+    name: ca-issuer
+  secretName: ironic-cert
+{{- if .Values.global.enable_vmedia_tls }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ironic-vmedia-cert
+spec:
+  commonName: ironic-vmedia-cert
+  ipAddresses:
+  - {{ .Values.global.ironicIP }}
+  issuerRef:
+    kind: Issuer
+    name: ca-issuer
+  secretName: ironic-vmedia-cert
+{{- end }}
+{{- end }}

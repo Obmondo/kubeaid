@@ -1,0 +1,90 @@
+# Default values for baremetal-operator.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  # specify comma serparate beginning and end of the range of IP
+  # addresses the DHCP server will manage.
+  dhcpRange: 192.168.20.20,192.168.20.80
+
+  # Network interface on which provisioning network can be accessed
+  provisioningInterface: ens4
+
+  # IP Address assigned to network interface on provisioning network
+  provisioningIP: 192.168.20.5
+
+  # If running in a multi-node kubernetes cluster, "pin" the baremtal container
+  # to the same host where the ironic and media containers
+  # arerunning. Uncomment the nodeSelector and update the hostname accordingly.
+  #nodeSelector: 
+    #kubernetes.io/hostname: "my-hostname"
+
+  # Comment this out when pinning the baremetal-operator container to a specfic host.
+  nodeSelector: {}
+
+replicaCount: 1
+
+images:
+  baremetalOperator:
+    repository: registry.opensuse.org/isv/suse/edge/metal3/containers/images/baremetal-operator
+    pullPolicy: IfNotPresent
+    tag: "0.8.0"
+  rbacProxy:
+    repository: registry.opensuse.org/isv/suse/edge/metal3/containers/images/kube-rbac-proxy
+    pullPolicy: IfNotPresent
+    tag: "0.18.1"
+
+imagePullSecrets: []
+nameOverride: "manger"
+fullnameOverride: "baremetal-operator"
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: "baremetal-operator-controller-manager"
+
+podAnnotations: {}
+
+securityContext:
+  runAsUser: 11000
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  seccompProfile:
+    type: RuntimeDefault
+  runAsNonRoot: true
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+tolerations: []
+
+affinity: {}
+
+baremetaloperator:
+  httpPort: "6180"

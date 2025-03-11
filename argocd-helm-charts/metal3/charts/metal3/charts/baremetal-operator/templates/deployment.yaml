@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    {{- include "baremetal-operator.labels" . | nindent 4 }}
+    control-plane: controller-manager
+    webhook: metal3-io-v1alpha1-baremetalhost
+  name: {{ include "baremetal-operator.fullname" . }}-controller-manager
+spec:
+  minReadySeconds: 10
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "baremetal-operator.selectorLabels" . | nindent 6 }}
+      control-plane: controller-manager
+  template:
+    metadata:
+      labels:
+        {{- include "baremetal-operator.selectorLabels" . | nindent 8 }}
+        control-plane: controller-manager
+        webhook: metal3-io-v1alpha1-baremetalhost
+    spec:
+      containers:
+      - args:
+        - --metrics-addr=127.0.0.1:8085
+        - --enable-leader-election
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        envFrom:
+        - configMapRef:
+            name: {{ include "baremetal-operator.fullname" . }}-ironic
+        image: "{{ .Values.images.baremetalOperator.repository }}:{{ .Values.images.baremetalOperator.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.images.baremetalOperator.pullPolicy }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        livenessProbe:
+          failureThreshold: 10
+          httpGet:
+            path: /healthz
+            port: 9440
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+        name: manager
+        ports:
+        - containerPort: 9443
+          name: webhook-server
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 10
+          httpGet:
+            path: /readyz
+            port: 9440
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+        volumeMounts:
+        - mountPath: /tmp/k8s-webhook-server/serving-certs
+          name: cert
+          readOnly: true
+        {{- if .Values.global.enable_basicAuth }}
+        - name: ironic-basic-auth
+          mountPath: "/opt/metal3/auth/ironic/username"
+          subPath: username
+          readOnly: true
+        - name: ironic-basic-auth
+          mountPath: "/opt/metal3/auth/ironic/password"
+          subPath: password
+          readOnly: true
+        {{- end }}
+        {{- if .Values.global.enable_tls }}
+        - name: cacert
+          mountPath: "/opt/metal3/certs/ca"
+          readOnly: true
+        {{- end }}
+      - args:
+        - --secure-listen-address=0.0.0.0:8443
+        - --upstream=http://127.0.0.1:8085/
+        - --logtostderr=true
+        - --v=10
+        image: "{{ .Values.images.rbacProxy.repository }}:{{ .Values.images.rbacProxy.tag }}"
+        imagePullPolicy: {{ .Values.images.rbacProxy.pullPolicy }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        name: kube-rbac-proxy
+        ports:
+        - containerPort: 8443
+          name: https
+      serviceAccountName: {{ include "baremetal-operator.serviceAccountName" . }}
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: bmo-webhook-server-cert
+      {{- if .Values.global.enable_basicAuth }}
+      - name: ironic-basic-auth
+        secret:
+          secretName: ironic-basic-auth
+      {{- end }}
+      {{- if .Values.global.enable_tls }}
+      - name: cacert
+        secret:
+          secretName: ironic-cacert
+      {{- end }}
+      {{- with .Values.global.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

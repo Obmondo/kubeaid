@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mariadb.fullname" . }}
+  labels:
+    {{- include "mariadb.labels" . | nindent 4 }}
+spec:
+  replicas: {{.Values.replicaCount}}
+  selector:
+    matchLabels:
+      {{- include "mariadb.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mariadb.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- $volmounts := toYaml .Values.volumeMounts | trim | nindent 12 }}
+      {{- $volumes := toYaml .Values.volumes | trim | nindent 8 }}
+      serviceAccountName: {{ include "mariadb.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: mariadb
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        env:
+          - name: MARIADB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: ironic-mariadb
+          - name: RESTART_CONTAINER_CERTIFICATE_UPDATED
+            valueFrom:
+              configMapKeyRef:
+                name: mariadb-cm
+                key: RESTART_CONTAINER_CERTIFICATE_UPDATED
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sh
+              - -c
+              - mysqladmin shutdown -uironic -p$(printenv MARIADB_PASSWORD)
+        livenessProbe:
+          exec:
+            command:
+              - sh
+              - -c
+              - mysqladmin status -uironic -p$(printenv MARIADB_PASSWORD)
+          failureThreshold: 10
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        ports:
+          - containerPort: 3306
+            name: mariadb
+            protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+              - sh
+              - -c
+              - mysqladmin status -uironic -p$(printenv MARIADB_PASSWORD)
+          failureThreshold: 10
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        volumeMounts:
+            {{- $volmounts }}
+      {{- with .Values.global.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        {{- $volumes }}

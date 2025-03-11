@@ -1,0 +1,67 @@
+global:
+  databaseServiceName: "metal3-mariadb"
+  nodeSelector: {}
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
+
+image:
+  repository: registry.opensuse.org/isv/suse/edge/metal3/containers/images/suse/mariadb
+  pullPolicy: IfNotPresent
+  tag: 10.6.15.1
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsUser: 10060
+  fsGroup: 10060
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  seccompProfile:
+    type: RuntimeDefault
+  runAsNonRoot: true
+
+# Password for the mariadb ironic user
+password: ""
+
+persistence:
+  # storageClass for the mariadb data volume
+  storageClass: ""
+  # size of the mariadb data volume
+  size: "1Gi"
+  # accessMode of the mariadb data volume PVC
+  # If empty defaults to ReadWriteOnce when replicaCount=1 otherwise ReadWriteMany
+  accessMode: ""
+  # flag to indicate to keep pvc upon helm uninstall
+  keep: false
+
+volumeMounts:
+  - name: mariadb-data-volume
+    mountPath: /var/lib/mysql
+
+volumes:
+  - name: mariadb-data-volume
+    persistentVolumeClaim:
+      claimName: mariadb-volume-claim

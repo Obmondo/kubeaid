@@ -1,0 +1,107 @@
+# The metal3 chart is a parent chart that installs
+# all of the other charts that a metal3 deployment needs,
+# but doesn't actually deploy any services itself.
+
+global:
+  # IP on which the Ironic services will be exposed
+  ironicIP: ""
+
+  # whether to enable mariadb (default is sqlite)
+  enable_mariadb: false
+
+  # whether to enable media server.
+  enable_metal3_media_server: false
+
+  # whether to enable dnsmasq on the provisioning network (for PXE boot)
+  enable_dnsmasq: false
+
+  # whether to enable PXE boot capability
+  # NOTE: enable_dnsmasq must set to 'true' in order for this option to be effective.
+  enable_pxe_boot: false
+
+  # whether to enable tls
+  enable_tls: true
+
+  # whether to enable the TLS of the Virtual Media.
+  enable_vmedia_tls: true
+
+  # whether to enable basic auth
+  enable_basicAuth: true
+
+  auth:
+    ironicUsername: ""
+    ironicPassword: ""
+
+  # whether to have additional trusted CA
+  # NOTE: If enabled, a secret with name tls-ca-additional should be deployed
+  # The secret should be like this:
+  # data:
+  #   ca-additional.crt: <b64enc cert>
+  additionalTrustedCAs: false
+
+  # Will be used when tls is enabled
+  vmediaTLSPort: 6185
+
+  # IP address of the router associated with the specified DHCP
+  # address range
+  dnsmasqDefaultRouter: ""
+
+  # IP address of the dns server to be provided with DHCP
+  # response
+  dnsmasqDNSServer: ""
+
+  # specify comma-delimited range of IP addresses the DHCP server will manage.
+  # e.g 192.168.20.20,192.168.20.80
+  dhcpRange: ""
+
+  # Network interface on which provisioning network can be accessed
+  provisioningInterface: ""
+
+  # IP Address assigned to network interface on provisioning network
+  provisioningIP: ""
+
+  # Name for the MariaDB service
+  databaseServiceName: metal3-mariadb
+
+  # In a multi-node cluster use the node selector to ensure the pods
+  # all run on the same host where the dnsmasqDNSServer and provisioningIP
+  # and /opt/media exist. Uncomment the nodeSelector and update the
+  # hostname accordingly.
+  #nodeSelector:
+    #kubernetes.io/hostname: "csrancher-n1"
+
+#
+# media service
+#
+
+# Override any settings for the metal3 media service here
+metal3-media:
+  # location where media files should be placed so that they are
+  # available to the Ironic deployment services.
+  mediaVolume:
+    hostPath: /opt/media
+
+
+#
+# ironic service
+#
+
+# Override any settings for the metal3 ironic service here
+# Ensure the storageClass is defined
+metal3-ironic:
+  service:
+    type: LoadBalancer
+  persistence:
+    ironic:
+      # storageClass for the ironic shared volume
+      storageClass: ""
+
+#
+# Database Service
+#
+
+# Override any settings for the metal3 mariadb service here
+metal3-mariadb:
+  # storageClass for the mysql datastore
+  persistence:
+    storageClass: ""

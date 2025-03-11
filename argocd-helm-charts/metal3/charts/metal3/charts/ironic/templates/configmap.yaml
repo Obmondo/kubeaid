@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ironic-bmo
+  labels:
+    {{- include "ironic.labels" . | nindent 4 }}
+data:
+  {{- $enableTLS := .Values.global.enable_tls }}
+  {{- $enableVMediaTLS := .Values.global.enable_vmedia_tls }}
+  {{- $protocol := ternary "https" "http" $enableTLS }}
+  {{- $ironicIP := .Values.global.ironicIP | default "" }}
+  {{- $ironicApiHost := print $ironicIP ":6385" }}
+  {{- $ironicBootHost := print $ironicIP ":6180" }}
+  {{- $ironicCacheHost := print $ironicIP ":6180" }}
+
+  {{- if  ( .Values.global.enable_dnsmasq ) }}
+  DNSMASQ_BOOT_SERVER_ADDRESS: {{ $ironicBootHost }}
+  DNSMASQ_DNS_SERVER_ADDRESS: {{ .Values.global.dnsmasqDNSServer }}
+  DNSMASQ_DEFAULT_ROUTER: {{ .Values.global.dnsmasqDefaultRouter }}
+  DHCP_RANGE: {{ .Values.global.dhcpRange }}
+  {{- end }}
+  {{- if  .Values.debug.ironicRamdiskSshKey }}
+  IRONIC_RAMDISK_SSH_KEY: {{ .Values.debug.ironicRamdiskSshKey }}
+  {{- end }}
+  HTTP_PORT: "6180"
+  PREDICTABLE_NIC_NAMES: "{{ .Values.global.predictableNicNames }}"
+  USE_IRONIC_INSPECTOR: "false"
+  IRONIC_API_BASE_URL: {{ $protocol }}://{{ $ironicApiHost }}
+  IRONIC_API_HOST: {{ $ironicApiHost }}
+  IRONIC_API_HTTPD_SERVER_NAME: {{ $ironicApiHost }}
+  IRONIC_ENDPOINT: {{ $protocol }}://{{ $ironicApiHost }}/v1/
+  # Switch VMedia to HTTP if enable_vmedia_tls is false
+  {{- if and $enableTLS $enableVMediaTLS }}
+    {{- $ironicBootHost = print $ironicIP ":" .Values.global.vmediaTLSPort }}
+    {{- $ironicCacheHost = print $ironicIP ":" .Values.global.vmediaTLSPort }}
+    {{- $protocol = "https" }}
+  {{- else }}
+    {{- $protocol = "http" }}
+  {{- end }}
+  IRONIC_EXTERNAL_HTTP_URL: {{ $protocol }}://{{ $ironicCacheHost }}
+  CACHEURL: {{ $protocol }}://{{ $ironicCacheHost }}/images
+  DEPLOY_KERNEL_URL: {{ $protocol }}://{{ $ironicBootHost }}/images/ironic-python-agent.kernel
+  DEPLOY_RAMDISK_URL: {{ $protocol }}://{{ $ironicBootHost }}/images/ironic-python-agent.initramfs
+  IRONIC_BOOT_BASE_URL: {{ $protocol }}://{{ $ironicBootHost }}
+  IRONIC_VMEDIA_HTTPD_SERVER_NAME: {{ $ironicBootHost }}
+  ENABLE_PXE_BOOT: "{{ .Values.global.enable_pxe_boot }}"
+  {{- if .Values.global.provisioningInterface }}
+  PROVISIONING_INTERFACE: {{ .Values.global.provisioningInterface }}
+  {{- end }}
+  {{- if .Values.global.provisioningIP }}
+  PROVISIONING_IP: {{ .Values.global.provisioningIP }}
+  {{- end }}
+  IRONIC_ILO_USE_SWIFT: "false"
+  IRONIC_ILO_USE_WEB_SERVER_FOR_IMAGES: "true"
+  IRONIC_FAST_TRACK: "true"
+  LISTEN_ALL_INTERFACES: "true"
+  {{- if .Values.global.ironicIP }}
+  IRONIC_IP: {{ .Values.global.ironicIP }}
+  {{- end }}
+  {{- if  ( .Values.global.enable_tls ) }}
+  RESTART_CONTAINER_CERTIFICATE_UPDATED: "true"
+  IRONIC_KERNEL_PARAMS: {{ .Values.global.ironicKernelParams }} tls.enabled=true
+  IPA_INSECURE: "0"
+  IRONIC_REVERSE_PROXY_SETUP: "true"
+  {{- if  ( .Values.global.enable_vmedia_tls ) }}
+  VMEDIA_TLS_PORT: "{{ .Values.global.vmediaTLSPort }}"
+  {{- end }}
+  {{- else }}
+  RESTART_CONTAINER_CERTIFICATE_UPDATED: "false"
+  IRONIC_KERNEL_PARAMS: {{ .Values.global.ironicKernelParams }}
+  IPA_INSECURE: "1"
+  IRONIC_REVERSE_PROXY_SETUP: "false"
+  {{- end }}
+  {{- if  ( .Values.global.enable_basicAuth ) }}
+  AUTH_STRATEGY: "http_basic"
+  {{- end }}
+  {{- if .Values.global.enable_mariadb }}
+  MARIADB_HOST: {{ .Values.global.databaseServiceName }}.{{ .Release.Namespace }}.svc.cluster.local
+  IRONIC_USE_MARIADB: "true"
+  {{- else }}
+  IRONIC_USE_MARIADB: "false"
+  {{- end }}

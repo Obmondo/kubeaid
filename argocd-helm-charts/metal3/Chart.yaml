@@ -1,0 +1,7 @@
+apiVersion: v2
+name: metal3
+version: 1.0.0
+dependencies:
+  - name: metal3
+    version: 0.9.3
+    repository: https://suse-edge.github.io/charts

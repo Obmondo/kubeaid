@@ -1,0 +1,14 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: media
+  labels:
+    {{- include "media.labels" . | nindent 4 }}
+spec:
+  storageClassName: {{ .Values.mediaVolume.storageClassName }}
+  accessModes:
+   {{ toYaml .Values.mediaVolume.accessModes }}
+  resources:
+    requests:
+      storage: {{ .Values.mediaVolume.storage }}

@@ -1,0 +1,26 @@
+{{- if .Values.persistence.ironic.size }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ironic-shared-volume
+  {{- if .Values.persistence.ironic.keep }}
+  annotations:
+    "helm.sh/resource-policy": keep
+  {{- end }}
+spec:
+  accessModes:
+  {{- if .Values.persistence.ironic.accessMode }}
+  - {{ .Values.persistence.ironic.accessMode }}
+  {{- else if eq (int .Values.replicaCount) 1 }}
+  - ReadWriteOnce
+  {{- else }}
+  - ReadWriteMany
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.ironic.size }}
+  {{- if .Values.persistence.ironic.storageClass }}
+  storageClassName: {{ .Values.persistence.ironic.storageClass }}
+  {{- end }}
+  volumeMode: Filesystem
+{{- end }}

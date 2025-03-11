@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.global.databaseServiceName }}
+  labels:
+    {{- include "mariadb.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "mariadb.selectorLabels" . | nindent 4 }}
+  ports:
+  {{- with .Values.service.ports }}
+    {{- toYaml . | nindent 2 }}
+  {{- end }}

@@ -1,0 +1,278 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ironic.fullname" . }}
+  labels:
+    {{- include "ironic.labels" . | nindent 4 }}
+spec:
+  minReadySeconds: 10
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "ironic.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ironic.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- if .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- end }}
+      {{- if .Values.baremetaloperator.ironichostNetwork }}
+      hostNetwork: {{ .Values.baremetaloperator.ironichostNetwork }}
+      {{- end }}
+      containers:
+      - name: ironic-httpd
+        image: {{ .Values.images.ironic.repository }}:{{ .Values.images.ironic.tag }}
+        imagePullPolicy: {{ .Values.images.ironic.pullPolicy }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        command:
+        - /bin/runhttpd
+        envFrom:
+        - configMapRef:
+            name: ironic-bmo
+        livenessProbe:
+          exec:
+            command: ["sh", "-c", "curl -sSfk https://127.0.0.1:6385"]
+          failureThreshold: 10
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        ports:
+        {{- if and .Values.global.enable_tls .Values.global.enable_vmedia_tls }}
+          - containerPort: {{ .Values.global.vmediaTLSPort }}
+            name: httpd-tls
+            protocol: TCP
+        {{- else }}
+          - containerPort: 6180
+            name: httpd
+            protocol: TCP
+        {{- end }}
+        readinessProbe:
+          exec:
+            command: ["sh", "-c", "curl -sSfk https://127.0.0.1:6385"]
+          failureThreshold: 10
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        volumeMounts:
+          {{- include "ironic.sharedVolumeMount" . | nindent 10 }}
+        {{- if .Values.global.enable_tls }}
+          {{- include "ironic.CAVolumeMounts" . | nindent 10 }}
+          - name: cert-ironic
+            mountPath: "/certs/ironic"
+            readOnly: true
+          {{- if .Values.global.enable_vmedia_tls }}
+          - name: cert-ironic-vmedia
+            mountPath: "/certs/vmedia"
+            readOnly: true
+          {{- end }}
+          - mountPath: /shared/html/tstcerts
+            name: cert-ironic-ca
+            readOnly: true
+        {{- end }}
+      - name: ironic-log-watch
+        image: {{ .Values.images.ironic.repository }}:{{ .Values.images.ironic.tag }}
+        imagePullPolicy: {{ .Values.images.ironic.pullPolicy }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        command:
+        - /bin/runlogwatch.sh
+        volumeMounts:
+          {{- include "ironic.sharedVolumeMount" . | nindent 10 }}
+      - name: ironic
+        image: {{ .Values.images.ironic.repository }}:{{ .Values.images.ironic.tag }}
+        imagePullPolicy: {{ .Values.images.ironic.pullPolicy }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        command:
+        - /bin/runironic
+        envFrom:
+        - configMapRef:
+            name: ironic-bmo
+        env:
+        {{- if .Values.global.enable_basicAuth }}
+        - name: IRONIC_HTPASSWD
+          valueFrom:
+            secretKeyRef:
+              name: ironic-basic-auth
+              key: htpasswd
+        {{- end }}
+        {{- if .Values.global.enable_mariadb }}
+        - name: MARIADB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: ironic-mariadb
+        {{- end }}
+        livenessProbe:
+          exec:
+            command: ["/bin/ironic-liveness"]
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          successThreshold: 1
+          failureThreshold: 10
+        ports:
+        - containerPort: 6385
+          name: api
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command: ["/bin/ironic-readiness"]
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          successThreshold: 1
+          failureThreshold: 10
+        volumeMounts:
+          {{- include "ironic.sharedVolumeMount" . | nindent 10 }}
+          {{- if .Values.global.enable_basicAuth }}
+          - mountPath: "/auth/ironic/auth-config"
+            name: ironic-basic-auth
+            subPath: auth-config
+            readOnly: true
+          {{- end }}
+          {{- if .Values.global.enable_tls }}
+          {{- include "ironic.CAVolumeMounts" . | nindent 10 }}
+          - name: cert-ironic
+            mountPath: "/certs/ironic"
+            readOnly: true
+          - mountPath: /etc/pki/trust/anchors
+            name: trusted-certs
+            readOnly: true
+        lifecycle:
+          postStart:
+            exec:
+              command:
+               - update-ca-certificates
+        {{- end }}
+      {{- if .Values.global.enable_dnsmasq }}
+      - name: ironic-dnsmasq
+        image: {{ .Values.images.ironic.repository }}:{{ .Values.images.ironic.tag }}
+        imagePullPolicy: {{ .Values.images.ironic.pullPolicy }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
+        command:
+        - /bin/rundnsmasq
+        envFrom:
+        - configMapRef:
+            name: ironic-bmo
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - ss -lun | grep :67 && ss -lun | grep :69
+          failureThreshold: 10
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        ports:
+        - containerPort: 67
+          name: dhcp
+          protocol: UDP
+        - containerPort: 69
+          name: tftp
+          protocol: UDP
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - ss -lun | grep :67 && ss -lun | grep :69
+          failureThreshold: 10
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 10
+        volumeMounts:
+          {{- include "ironic.sharedVolumeMount" . | nindent 10 }}
+      {{- end }}
+      initContainers:
+      - name: ironic-ipa-downloader
+        image: {{ .Values.images.ironicIPADownloader.repository }}:{{ .Values.images.ironicIPADownloader.tag }}
+        imagePullPolicy: {{ .Values.images.ironicIPADownloader.pullPolicy }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        command:
+          - /usr/local/bin/get-resource.sh
+        envFrom:
+        - configMapRef:
+            name: ironic-ipa-downloader
+        volumeMounts:
+          {{- include "ironic.sharedVolumeMount" . | nindent 10 }}
+        {{- if .Values.global.enable_tls }}
+          - mountPath: /tmp/ironic-certificates
+            name: trusted-certs
+        {{- end }}
+      volumes:
+      - name: ironic-data-volume
+      {{- if .Values.persistence.ironic.size }}
+        persistentVolumeClaim:
+          claimName: ironic-shared-volume
+      {{- else }}
+        emptyDir: {}
+      {{- end }}
+      {{- if .Values.global.enable_basicAuth }}
+      - name: ironic-basic-auth
+        secret:
+          secretName: ironic-basic-auth
+      {{- if .Values.global.enable_tls }}
+      - name: trusted-certs
+        projected:
+          sources:
+          - secret:
+              name: ironic-cacert
+        {{- if .Values.global.additionalTrustedCAs }}
+          - secret:
+              name: tls-ca-additional
+        {{- end }}
+      - name: cert-ironic-ca
+        secret:
+          secretName: ironic-cacert
+      - name: cert-ironic
+        secret:
+          secretName: ironic-cert
+      {{- if .Values.global.enable_vmedia_tls }}
+      - name: cert-ironic-vmedia-ca
+        secret:
+          secretName: ironic-cacert
+      - name: cert-ironic-vmedia
+        secret:
+          secretName: ironic-vmedia-cert
+      {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- with .Values.global.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.global.dnsPolicy }}
+      dnsPolicy:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ironic-ipa-downloader
+  labels:
+    {{- include "ironic.labels" . | nindent 4 }}
+data:
+  {{- with .Values.baremetaloperator }}
+  {{ if .ipaBaseUri }}
+  IPA_BASEURI: {{ .ipaBaseUri }}
+  {{ end }}
+  {{ end }}

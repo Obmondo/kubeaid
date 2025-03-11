@@ -1,0 +1,8 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  labels:
+    {{- include "baremetal-operator.labels" . | nindent 4 }}
+  name: {{ include "baremetal-operator.fullname" . }}-selfsigned-issuer
+spec:
+  selfSigned: {}

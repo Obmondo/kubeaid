@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ironic.fullname" . }}
+  labels:
+    {{- include "ironic.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  {{- $enableTLS := .Values.global.enable_tls }}
+  {{- $enableVMediaTLS := .Values.global.enable_vmedia_tls }}
+  {{- range .Values.service.ports }}
+  {{- if and (eq .name "httpd") (or (not $enableTLS) (not $enableVMediaTLS)) }}
+    - name: {{ .name }}
+      port: {{ .port }}
+      protocol: {{ .protocol }}
+      targetPort: {{ .targetPort }}
+  {{- else if and (eq .name "httpd-tls") ($enableTLS) ($enableVMediaTLS) }}
+    - name: {{ .name }}
+      port: {{ .port }}
+      protocol: {{ .protocol }}
+      targetPort: {{ .targetPort }}
+  {{- else if and (ne .name "httpd") (ne .name "httpd-tls") }}
+    - name: {{ .name }}
+      port: {{ .port }}
+      protocol: {{ .protocol }}
+      targetPort: {{ .targetPort }}
+  {{- end }}
+  {{- end }}
+  selector:
+    {{- include "ironic.selectorLabels" . | nindent 4 }}
+  {{- if or (eq .Values.service.type "LoadBalancer") (eq .Values.service.type "NodePort") }}
+  externalIPs:
+    {{- toYaml .Values.service.externalIPs | nindent 4 }}
+  {{- end }}
