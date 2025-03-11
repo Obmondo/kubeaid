@@ -429,8 +429,9 @@ if "$UPDATE_ALL"; then
 fi
 
 if $PULL_REQUEST; then
+  current_ver="$(get_current_version)"
   git add .
-  git commit -m "periodic helm chart update"
+  git commit -S -m "KubeAid release '$current_ver'"
   git push origin "$branch_name"
 fi
 
