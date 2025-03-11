@@ -2,6 +2,10 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`29ddc747`](../../commit/29ddc747) fix(capi-cluster/aws) : user must specify subnet IDs when using an existing VPC
+- [`5d41a062`](../../commit/5d41a062) fix: typo bug in jsonnet, which was causing kube build to fail when generating the config file
+
 ## 10.0.1
 ### Improvements
 - [`b17fc1c7`](../../commit/b17fc1c7) fix(kube-prometheus) : setting ruleNamespaceSelector to {} instead of null
