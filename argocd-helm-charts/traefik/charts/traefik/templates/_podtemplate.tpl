@@ -272,6 +272,11 @@
           {{- if .Values.metrics.prometheus.manualRouting }}
           - "--metrics.prometheus.manualrouting=true"
           {{- end }}
+          {{- if .Values.metrics.prometheus.headerLabels }}
+          {{- range $label, $headerKey := .Values.metrics.prometheus.headerLabels }}
+          - "--metrics.prometheus.headerlabels.{{ $label }}={{ $headerKey }}"
+          {{- end }}
+          {{- end }}
           {{- end }}
           {{- with .Values.metrics.statsd }}
           - "--metrics.statsd=true"
@@ -814,6 +819,9 @@
             {{- end }}
             {{- if and $.Values.tracing.otlp.enabled .tracing.additionalTraceHeaders.enabled }}
               {{- include "traefik.yaml2CommandLineArgs" (dict "path" "hub.tracing.additionalTraceHeaders.traceContext" "content" $.Values.hub.tracing.additionalTraceHeaders.traceContext) | nindent 10 }}
+            {{- end }}
+            {{- if .providers.consulCatalogEnterprise.enabled }}
+              {{- include "traefik.yaml2CommandLineArgs" (dict "path" "hub.providers.consulCatalogEnterprise" "content" (omit $.Values.hub.providers.consulCatalogEnterprise "enabled")) | nindent 10 }}
             {{- end }}
             {{- if .providers.microcks.enabled }}
               {{- include "traefik.yaml2CommandLineArgs" (dict "path" "hub.providers.microcks" "content" (omit $.Values.hub.providers.microcks "enabled")) | nindent 10 }}

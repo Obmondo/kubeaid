@@ -8,10 +8,12 @@
 # dbRootUser: ""
 # dbRootPassword: ""
 # dbRds: false
+# dbExistingSecret: ""
+# dbExistingSecretPasswordKey: "password"
 
 image:
   repository: frappe/erpnext
-  tag: v15.53.4
+  tag: v15.54.3
   pullPolicy: IfNotPresent
 
 nginx:
@@ -317,6 +319,8 @@ jobs:
     forceCreate: false
     siteName: "erp.cluster.local"
     adminPassword: "changeit"
+    adminExistingSecret: ""
+    adminExistingSecretKey: "password"
     installApps:
     - "erpnext"
     dbType: "mariadb"
@@ -398,7 +402,7 @@ redis-cache:
   architecture: standalone
   auth:
     enabled: false
-    sentinal: false
+    sentinel: false
   master:
     containerPorts:
       redis: 6379
@@ -412,7 +416,7 @@ redis-queue:
   architecture: standalone
   auth:
     enabled: false
-    sentinal: false
+    sentinel: false
   master:
     containerPorts:
       redis: 6379

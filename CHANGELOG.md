@@ -2,6 +2,34 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 10.1.1
+### Minor Version Upgrades
+- Updated velero from version 8.4.0 to 8.5.0
+- Updated reloader from version 1.3.0 to 2.0.0
+- Updated prometheus-adapter from version 4.11.0 to 4.13.0
+- Updated opentelemetry-operator from version 0.81.0 to 0.82.0
+- Updated kubernetes-dashboard from version 7.10.5 to 7.11.1
+
+### Patch Version Upgrades
+- Updated traefik from version 34.4.0 to 34.4.1
+- Updated teleport-kube-agent from version 17.3.0 to 17.3.3
+- Updated teleport-cluster from version 17.3.0 to 17.3.3
+- Added rook-ceph-cluster from version v1.16.0 to v1.16.0
+- Updated rook-ceph from version v1.16.4 to v1.16.5
+- Updated redmine from version 32.1.5 to 32.1.6
+- Updated rabbitmq-cluster-operator from version 4.4.5 to 4.4.6
+- Added opentelemetry-collector from version 0.117.0 to 0.117.0
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated oncall from version 1.15.0 to 1.15.2
+- Updated metallb from version 6.4.7 to 6.4.8
+- Updated gitlab-runner from version 0.74.0 to 0.74.1
+- Updated fluent-bit from version 0.48.8 to 0.48.9
+- Updated external-dns from version 8.7.5 to 8.7.7
+- Updated erpnext from version 7.0.171 to 7.0.175
+- Updated cloudnative-pg from version 0.23.0 to 0.23.2
+- Updated aws-ebs-csi-driver from version 2.40.2 to 2.40.3
+- Updated argo-cd from version 7.8.7 to 7.8.10
+
 ### Improvements
 - [`29ddc747`](../../commit/29ddc747) fix(capi-cluster/aws) : user must specify subnet IDs when using an existing VPC
 - [`5d41a062`](../../commit/5d41a062) fix: typo bug in jsonnet, which was causing kube build to fail when generating the config file

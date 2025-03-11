@@ -1,8 +1,11 @@
 annotations:
-  artifacthub.io/changes: "- \"feat(CRDs): update Traefik Hub CRDs to v1.17.0\"\n-
-    \"chore(release): \U0001F680 publish v34.4.0 and CRDs v1.4.0\"\n"
+  artifacthub.io/changes: "- \"fix(Traefik Proxy): headerLabels does not exist for
+    metrics.prometheus\"\n- \"fix(Traefik Hub): add missing consulCatalogEnterprise
+    provider\"\n- \"feat(deps): update traefik docker tag to v3.3.4\"\n- \"docs(Traefik
+    Proxy): fix VALUES.md generation on prometheus values\"\n- \"chore(release): \U0001F680
+    publish v34.4.1\"\n"
 apiVersion: v2
-appVersion: v3.3.3
+appVersion: v3.3.4
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
 icon: https://raw.githubusercontent.com/traefik/traefik/v2.3/docs/content/assets/img/traefik.logo.png
@@ -21,7 +24,7 @@ maintainers:
 - name: jnoordsij
 name: traefik
 sources:
-- https://github.com/traefik/traefik
 - https://github.com/traefik/traefik-helm-chart
+- https://github.com/traefik/traefik
 type: application
-version: 34.4.0
+version: 34.4.1
