@@ -36,4 +36,4 @@ rm "$temp_file"
 commit_msg="Add commit since ${latest_tag} tag to CHANGELOG.md"
 
 git add CHANGELOG.md
-git commit -m "$commit_msg"
+git commit -S -m "$commit_msg"
