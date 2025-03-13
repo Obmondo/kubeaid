@@ -2,7 +2,7 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## 10.1.1
+## 10.1.0
 ### Minor Version Upgrades
 - Updated velero from version 8.4.0 to 8.5.0
 - Updated reloader from version 1.3.0 to 2.0.0
