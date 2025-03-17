@@ -2,6 +2,10 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`0e60e5da`](../../commit/0e60e5da) Revert "add for clause for the domain status alert"
+- [`a39e6426`](../../commit/a39e6426) add for clause for the domain status alert
+
 ## 10.1.0
 ### Minor Version Upgrades
 - Updated velero from version 8.4.0 to 8.5.0
