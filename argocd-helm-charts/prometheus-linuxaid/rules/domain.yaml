@@ -5,7 +5,6 @@ groups:
       expr: |
         (probe_http_status_code == 0 or probe_http_status_code >= 500) and on(certname) probe_http_content_length <= 0
         and on(certname) obmondo_monitoring{alert_id="monitor::domains::status"} > 0
-      for: 10m
       labels:
         severity: critical
         alert_id: monitor::domains::status
