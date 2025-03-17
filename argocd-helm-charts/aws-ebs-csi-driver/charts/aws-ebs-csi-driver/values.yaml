@@ -11,7 +11,7 @@ image:
 customLabels: {}
 # k8s-app: aws-ebs-csi-driver
 
-# Instruct the AWS SDK to use AWS FIPS endpoints, and deploy container built with BoringCrypto (a FIPS-validated cryptographic library) instead of the Go default
+# Instruct the AWS SDK to use AWS FIPS endpoints, and deploy container built with Boring Crypto (a FIPS-validated cryptographic library) instead of the Go default
 #
 # The EBS CSI Driver FIPS images have not undergone FIPS certification, and no official guarantee is made about the compliance of these images under the FIPS standard
 # Users relying on these images for FIPS compliance should perform their own independent evaluation
@@ -511,4 +511,4 @@ nodeComponentOnly: false
 helmTester:
   enabled: true
   # Supply a custom image to the ebs-csi-driver-test pod in helm-tester.yaml
-  image: "us-central1-docker.pkg.dev/k8s-staging-test-infra/images/kubekins-e2e:v20250227-3a13bdd784-master"
+  image: "us-central1-docker.pkg.dev/k8s-staging-test-infra/images/kubekins-e2e:v20250311-73aac21714-master"

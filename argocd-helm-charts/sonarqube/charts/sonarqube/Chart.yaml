@@ -1,21 +1,9 @@
 annotations:
   artifacthub.io/changes: |
     - kind: changed
-      description: "Update Chart's version to 2025.1.0"
+      description: "Update Chart's version to 2025.1.1"
     - kind: changed
-      description: "Upgrade SonarQube Server to 2025.1.0"
-    - kind: changed
-      description: "Upgrade SonarQube Community Build to 25.1.0.102122"
-    - kind: changed
-      description: "Update ingress-nginx subchart to 4.11.3"
-    - kind: changed
-      description: "Support Kubernetes v1.32"
-    - kind: changed
-      description: "Remove the default passcode provided with 'monitoringPasscode'"
-    - kind: changed
-      description: "Support Openshift v4.17"
-    - kind: changed
-      description: "Improves editions and versions setting for sonarqube chart"
+      description: "Upgrade SonarQube Server to 2025.1.1"
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/images: |
     - name: sonarqube
@@ -27,7 +15,7 @@ annotations:
       url: https://github.com/SonarSource/helm-chart-sonarqube/tree/master/charts/sonarqube
   charts.openshift.io/name: sonarqube
 apiVersion: v2
-appVersion: 2025.1.0
+appVersion: 2025.1.1
 dependencies:
 - condition: postgresql.enabled
   name: postgresql
@@ -64,4 +52,4 @@ sources:
 - https://github.com/SonarSource/docker-sonarqube
 - https://github.com/SonarSource/sonarqube
 type: application
-version: 2025.1.0
+version: 2025.1.1

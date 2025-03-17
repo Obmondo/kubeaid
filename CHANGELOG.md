@@ -2,6 +2,24 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 10.2.0
+### Minor Version Upgrades
+- Updated whoami from version 5.2.1 to 5.3.0
+- Updated opentelemetry-operator from version 0.82.0 to 0.83.0
+- Updated aws-ebs-csi-driver from version 2.40.3 to 2.41.0
+
+### Patch Version Upgrades
+- Updated sonarqube from version 2025.1.0 to 2025.1.1
+- Added rook-ceph-cluster from version v1.16.0 to v1.16.0
+- Added opentelemetry-collector from version 0.117.0 to 0.117.0
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated mattermost-team-edition from version 6.6.71 to 6.6.73
+- Updated erpnext from version 7.0.175 to 7.0.176
+- Updated cluster-autoscaler from version 9.46.2 to 9.46.3
+- Updated cluster-api-operator from version 0.17.0 to 0.17.1
+- Updated cilium from version 1.17.1 to 1.17.2
+- Updated argo-cd from version 7.8.10 to 7.8.11
+
 ### Improvements
 - [`0e60e5da`](../../commit/0e60e5da) Revert "add for clause for the domain status alert"
 - [`a39e6426`](../../commit/a39e6426) add for clause for the domain status alert
