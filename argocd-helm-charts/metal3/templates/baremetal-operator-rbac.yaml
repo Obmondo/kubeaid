@@ -1,0 +1,30 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: baremetal-operator-role
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["metal3.io"]
+  resources: 
+  - "baremetalhosts"
+  - "bmceventsubscriptions"
+  - "hostfirmwaresettings"
+  - "hostfirmwarecomponents"
+  - "dataimages"
+  - "hostupdatepolicies"
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: baremetal-operator-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: baremetal-operator-controller-manager
+  namespace: metal3
+roleRef:
+  kind: ClusterRole
+  name: baremetal-operator-role
+  apiGroup: rbac.authorization.k8s.io

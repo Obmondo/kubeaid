@@ -1,9 +1,35 @@
 ---
 metal3:
   global:
-    enable_dnsmasq: true
-    enable_pxe_boot: true
-    enable_tls: false
-    enable_vmedia_tls: false
-    enable_basicAuth: false
+    ironicIP: ""
+    enable_mariadb: false
+    enable_metal3_media_server: false
+    enable_dnsmasq: false
+    enable_pxe_boot: false
+    enable_tls: true
+    enable_vmedia_tls: true
+    enable_basicAuth: true
     ironicKernelParams: "console=tty1"
+    additionalTrustedCAs: false
+    vmediaTLSPort: 6185
+  metal3-ironic:
+    service:
+      type: ClusterIP
+    externalIPs: ""
+    persistence:
+      ironic:
+        size: ""
+        storageClass: ""
+  metal3-baremetal-operator:
+    images:
+      baremetalOperator:
+        tag: "0.9.0"
+
+bmh:
+## Example baremetalhost configuration
+#  host-0:
+#    mac: "00:00:00:00:00:00"
+#    os: "ubuntu:24.04.2"
+#    bmc: "10.10.10.10"
+#    secretName: "host-0-bmc"
+#    rootDeviceSerialNumber: ""
