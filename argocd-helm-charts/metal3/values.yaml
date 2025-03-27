@@ -6,3 +6,4 @@ metal3:
     enable_tls: false
     enable_vmedia_tls: false
     enable_basicAuth: false
+    ironicKernelParams: "console=tty1"
