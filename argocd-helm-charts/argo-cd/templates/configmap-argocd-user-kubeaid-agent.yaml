@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-user-kubeaid-agent
+  labels:
+    app.kubernetes.io/name: argocd-user-kubeaid-agent
+    app.kubernetes.io/part-of: argocd
+data:
+  # add an additional local user with apiKey and login capabilities
+  #   apiKey - allows generating API keys
+  #   login - allows to login using UI
+  accounts.kubeaid-agent: apiKey
