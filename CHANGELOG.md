@@ -2,6 +2,11 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`165f0ea0`](../../commit/165f0ea0) revert argocd image updater file deletion
+- [`9fee0318`](../../commit/9fee0318) fix: changed it to ttyS1 for ironic agent
+- [`0a2fa253`](../../commit/0a2fa253) adding metal3 helm chart
+
 ## 10.2.0
 ### Minor Version Upgrades
 - Updated whoami from version 5.2.1 to 5.3.0
