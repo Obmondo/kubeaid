@@ -67,9 +67,9 @@ The following table lists the configurable parameters of the Redis chart and the
 | `auth` | Configures redis with AUTH (requirepass & masterauth conf params) | bool | `false` |
 | `authKey` | Defines the key holding the redis password in existing secret. | string | `"auth"` |
 | `configmap.labels` | Custom labels for the redis configmap | object | `{}` |
-| `configmapTest.image` | Image for redis-ha-configmap-test hook | object | `{"repository":"koalaman/shellcheck","tag":"v0.5.0"}` |
+| `configmapTest.image` | Image for redis-ha-configmap-test hook | object | `{"repository":"koalaman/shellcheck","tag":"v0.10.0"}` |
 | `configmapTest.image.repository` | Repository of the configmap shellcheck test image. | string | `"koalaman/shellcheck"` |
-| `configmapTest.image.tag` | Tag of the configmap shellcheck test image. | string | `"v0.5.0"` |
+| `configmapTest.image.tag` | Tag of the configmap shellcheck test image. | string | `"v0.10.0"` |
 | `configmapTest.resources` | Resources for the ConfigMap test pod | object | `{}` |
 | `containerSecurityContext` | Security context to be added to the Redis containers. | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}}` |
 | `emptyDir` | Configuration of `emptyDir`, used only if persistentVolume is disabled and no hostPath specified | object | `{}` |
@@ -86,7 +86,7 @@ The following table lists the configurable parameters of the Redis chart and the
 | `hostPath.path` | Use this path on the host for data storage. path is evaluated as template so placeholders are replaced | string | `""` |
 | `image.pullPolicy` | Redis image pull policy | string | `"IfNotPresent"` |
 | `image.repository` | Redis image repository | string | `"public.ecr.aws/docker/library/redis"` |
-| `image.tag` | Redis image tag | string | `"7.2.4-alpine"` |
+| `image.tag` | Redis image tag | string | `"7.2.7-alpine"` |
 | `imagePullSecrets` | Reference to one or more secrets to be used when pulling redis images | list | `[]` |
 | `init.resources` | Extra init resources | object | `{}` |
 | `labels` | Custom labels for the redis pod | object | `{}` |

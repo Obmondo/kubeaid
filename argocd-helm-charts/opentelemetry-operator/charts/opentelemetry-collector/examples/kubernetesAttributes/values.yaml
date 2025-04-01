@@ -1,0 +1,21 @@
+mode: deployment
+
+image:
+  repository: "otel/opentelemetry-collector-k8s"
+
+command:
+  name: "otelcol-k8s"
+
+presets:
+  kubernetesAttributes:
+    enabled: true
+
+config:
+  service:
+    pipelines:      
+      traces:
+        processors:
+          - resource
+          - k8sattributes
+          - batch
+      

@@ -2,9 +2,9 @@
 
 OpenCost and OpenCost UI
 
-![Version: 1.43.2](https://img.shields.io/badge/Version-1.43.2-informational?style=flat-square)
+![Version: 2.0.1](https://img.shields.io/badge/Version-2.0.1-informational?style=flat-square)
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
-![AppVersion: 1.113.0](https://img.shields.io/badge/AppVersion-1.113.0-informational?style=flat-square)
+![AppVersion: 1.114.0](https://img.shields.io/badge/AppVersion-1.114.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/opencost)](https://artifacthub.io/packages/search?repo=opencost)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/opencost-oci)](https://artifacthub.io/packages/search?repo=opencost-oci)
 
@@ -12,8 +12,9 @@ OpenCost and OpenCost UI
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| mattray |  | <https://mattray.dev> |
+| jessegoodier |  |  |
 | toscott |  |  |
+| mittal-ishaan |  |  |
 | brito-rafa | <rafa@stormforge.io> |  |
 
 ## Installing the Chart
@@ -71,7 +72,7 @@ $ helm install opencost opencost/opencost
 | opencost.exporter.image.pullPolicy | string | `"IfNotPresent"` | Exporter container image pull policy |
 | opencost.exporter.image.registry | string | `"ghcr.io"` | Exporter container image registry |
 | opencost.exporter.image.repository | string | `"opencost/opencost"` | Exporter container image name |
-| opencost.exporter.image.tag | string | `"1.113.0@sha256:b313d6d320058bbd3841a948fb636182f49b46df2368d91e2ae046ed03c0f83c"` | Exporter container image tag |
+| opencost.exporter.image.tag | string | `"1.114.0@sha256:e0e6d87827559544d19d0096f3a0c0a62e2bcac4479031f7849f3ee823ad19fb"` | Exporter container image tag |
 | opencost.exporter.livenessProbe.enabled | bool | `true` | Whether probe is enabled |
 | opencost.exporter.livenessProbe.failureThreshold | int | `3` | Number of failures for probe to be considered failed |
 | opencost.exporter.livenessProbe.initialDelaySeconds | int | `10` | Number of seconds before probe is initiated |
@@ -88,7 +89,7 @@ $ helm install opencost opencost/opencost
 | opencost.exporter.readinessProbe.path | string | `"/healthz"` | Probe path |
 | opencost.exporter.readinessProbe.periodSeconds | int | `10` | Probe frequency in seconds |
 | opencost.exporter.replicas | int | `1` | Number of OpenCost replicas to run |
-| opencost.exporter.resources.limits | object | `{"cpu":"999m","memory":"1Gi"}` | CPU/Memory resource limits |
+| opencost.exporter.resources.limits | object | `{"memory":"1Gi"}` | CPU/Memory resource limits |
 | opencost.exporter.resources.requests | object | `{"cpu":"10m","memory":"55Mi"}` | CPU/Memory resource requests |
 | opencost.exporter.securityContext | object | `{}` | The security options the container should be run with |
 | opencost.exporter.startupProbe.enabled | bool | `true` | Whether probe is enabled |
@@ -116,12 +117,15 @@ $ helm install opencost opencost/opencost
 | opencost.metrics.serviceMonitor.scrapeTimeout | string | `"10s"` | Timeout after which the scrape is ended |
 | opencost.metrics.serviceMonitor.tlsConfig | object | `{}` | TLS configuration for scraping metrics |
 | opencost.nodeSelector | object | `{}` | Node labels for pod assignment |
+| opencost.platforms.openshift.createMonitoringClusterRoleBinding | bool | `false` | If true, the helm chart will create a ClusterRoleBinding to grant the OpenCost ServiceAccount access to query Prometheus. |
+| opencost.platforms.openshift.createMonitoringResourceReaderRoleBinding | bool | `false` | If true, create a Role and RoleBinding to allow Prometheus to list and watch OpenCost resources. |
+| opencost.platforms.openshift.enabled | bool | `false` | Enable OpenShift specific configurations |
+| opencost.platforms.openshift.monitoringServiceAccountName | string | `"prometheus-k8s"` | Name of the Prometheus serviceaccount to bind to the Resource Reader Role Binding. |
+| opencost.platforms.openshift.monitoringServiceAccountNamespace | string | `"openshift-monitoring"` | Namespace of the Prometheus serviceaccount to bind to the Resource Reader Role Binding. |
 | opencost.prometheus.amp.enabled | bool | `false` | Use Amazon Managed Service for Prometheus (AMP) |
 | opencost.prometheus.amp.workspaceId | string | `""` | Workspace ID for AMP |
 | opencost.prometheus.bearer_token | string | `""` | Prometheus Bearer token |
 | opencost.prometheus.bearer_token_key | string | `"DB_BEARER_TOKEN"` |  |
-| opencost.prometheus.createMonitoringClusterRoleBinding | bool | `false` | If true, the helm chart will create a ClusterRoleBinding to grant the OpenCost ServiceAccount access to query Prometheus. |
-| opencost.prometheus.createMonitoringResourceReaderRoleBinding | bool | `false` | If true, create a Role and RoleBinding to allow Prometheus to list and watch OpenCost resources. |
 | opencost.prometheus.existingSecretName | string | `nil` | Existing secret name that contains credentials for Prometheus |
 | opencost.prometheus.external.enabled | bool | `false` | Use external Prometheus (eg. Grafana Cloud) |
 | opencost.prometheus.external.url | string | `"https://prometheus.example.com/prometheus"` | External Prometheus url |
@@ -130,8 +134,6 @@ $ helm install opencost opencost/opencost
 | opencost.prometheus.internal.port | int | `80` | Service port of in-cluster Prometheus |
 | opencost.prometheus.internal.serviceName | string | `"prometheus-server"` | Service name of in-cluster Prometheus |
 | opencost.prometheus.kubeRBACProxy | bool | `false` | If true, opencost will use kube-rbac-proxy to authenticate with in cluster Prometheus for openshift |
-| opencost.prometheus.monitoringServiceAccountName | string | `"prometheus-k8s"` | Name of the Prometheus serviceaccount to bind to the Resource Reader Role Binding. |
-| opencost.prometheus.monitoringServiceAccountNamespace | string | `"openshift-monitoring"` | Namespace of the Prometheus serviceaccount to bind to the Resource Reader Role Binding. |
 | opencost.prometheus.password | string | `""` | Prometheus Basic auth password |
 | opencost.prometheus.password_key | string | `"DB_BASIC_AUTH_PW"` | Key in the secret that references the password |
 | opencost.prometheus.secret_name | string | `nil` | Secret name that contains credentials for Prometheus |
@@ -181,10 +183,17 @@ $ helm install opencost opencost/opencost
 | opencost.ui.readinessProbe.initialDelaySeconds | int | `30` | Number of seconds before probe is initiated |
 | opencost.ui.readinessProbe.path | string | `"/healthz"` | Probe path |
 | opencost.ui.readinessProbe.periodSeconds | int | `10` | Probe frequency in seconds |
-| opencost.ui.resources.limits | object | `{"cpu":"999m","memory":"1Gi"}` | CPU/Memory resource limits |
+| opencost.ui.resources.limits | object | `{"memory":"1Gi"}` | CPU/Memory resource limits |
 | opencost.ui.resources.requests | object | `{"cpu":"10m","memory":"55Mi"}` | CPU/Memory resource requests |
+| opencost.ui.route.annotations | object | `{}` | Annotations for Ingress resource |
+| opencost.ui.route.enabled | bool | `false` | OpenShift route for OpenCost UI |
+| opencost.ui.route.host | string | `"example.local"` |  |
+| opencost.ui.route.path | string | `nil` |  |
+| opencost.ui.route.targetPort | string | `"http-ui"` | Redirect ingress to an extraPort defined on the service such as oauth-proxy |
+| opencost.ui.route.tls | list | `[]` | Ingress TLS configuration |
 | opencost.ui.securityContext | object | `{}` | The security options the container should be run with |
 | opencost.ui.uiPort | int | `9090` |  |
+| opencost.ui.useDefaultFqdn | bool | `false` |  |
 | plugins.configs | string | `nil` |  |
 | plugins.enabled | bool | `false` |  |
 | plugins.folder | string | `"/opt/opencost/plugin"` |  |

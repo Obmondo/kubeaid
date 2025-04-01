@@ -1,0 +1,33 @@
+{{- if and .Values.enterprise.enabled .Values.enterprise.actions.enabled .Values.autoscaling.actions.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "openobserve.fullname" . }}-actions
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "openobserve.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: {{ include "openobserve.fullname" . }}-actions
+  minReplicas: {{ .Values.autoscaling.actions.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.actions.maxReplicas }}
+  metrics:
+    {{- if .Values.autoscaling.actions.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.actions.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.autoscaling.actions.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.actions.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }} 

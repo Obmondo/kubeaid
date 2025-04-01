@@ -1,0 +1,41 @@
+{{- if and .Values.enterprise.enabled .Values.enterprise.actions.enabled -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "openobserve.fullname" . }}-actions
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "openobserve.labels" . | nindent 4 }}
+rules:
+- apiGroups: [ "" ]
+  resources: [ "namespaces" ]
+  verbs: [ "create", "get", "list", "patch", "update" ]
+- apiGroups: ["batch"]
+  resources: ["jobs", "cronjobs"]
+  verbs: ["create", "list", "get", "delete"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["create", "list", "get", "delete"]
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["create", "patch", "delete", "get", "list"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["create", "patch", "delete", "get", "list", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "openobserve.fullname" . }}-actions
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "openobserve.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "openobserve.fullname" . }}-actions
+subjects:
+- kind: ServiceAccount
+  name: {{ include "openobserve.serviceAccountName" . }}-actions
+  namespace: {{ .Release.Namespace | quote }}
+{{- end }} 

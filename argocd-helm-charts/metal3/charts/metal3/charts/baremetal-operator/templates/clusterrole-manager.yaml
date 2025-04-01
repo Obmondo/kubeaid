@@ -184,3 +184,23 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - metal3.io
+  resources:
+  - hostupdatepolicies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - metal3.io
+  resources:
+  - hostupdatepolicies/status
+  verbs:
+  - get
+  - patch
+  - update

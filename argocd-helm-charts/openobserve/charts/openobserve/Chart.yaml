@@ -8,7 +8,7 @@ dependencies:
 - condition: nats.enabled
   name: nats
   repository: https://nats-io.github.io/k8s/helm/charts/
-  version: 1.2.6
+  version: 1.2.11
 - condition: minio.enabled
   name: minio
   repository: https://charts.min.io
@@ -21,4 +21,4 @@ maintainers:
   url: https://openobserve.ai
 name: openobserve
 type: application
-version: 0.14.31
+version: 0.14.40

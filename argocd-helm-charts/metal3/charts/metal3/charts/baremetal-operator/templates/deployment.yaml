@@ -24,8 +24,8 @@ spec:
     spec:
       containers:
       - args:
-        - --metrics-addr=127.0.0.1:8085
         - --enable-leader-election
+        - --tls-min-version=TLS13
         env:
         - name: POD_NAME
           valueFrom:
@@ -56,6 +56,9 @@ spec:
         - containerPort: 9443
           name: webhook-server
           protocol: TCP
+        - containerPort: 8443
+          protocol: TCP
+          name: https
         readinessProbe:
           failureThreshold: 10
           httpGet:
@@ -84,19 +87,6 @@ spec:
           mountPath: "/opt/metal3/certs/ca"
           readOnly: true
         {{- end }}
-      - args:
-        - --secure-listen-address=0.0.0.0:8443
-        - --upstream=http://127.0.0.1:8085/
-        - --logtostderr=true
-        - --v=10
-        image: "{{ .Values.images.rbacProxy.repository }}:{{ .Values.images.rbacProxy.tag }}"
-        imagePullPolicy: {{ .Values.images.rbacProxy.pullPolicy }}
-        securityContext:
-          {{- toYaml .Values.securityContext | nindent 10 }}
-        name: kube-rbac-proxy
-        ports:
-        - containerPort: 8443
-          name: https
       serviceAccountName: {{ include "baremetal-operator.serviceAccountName" . }}
       terminationGracePeriodSeconds: 10
       volumes:

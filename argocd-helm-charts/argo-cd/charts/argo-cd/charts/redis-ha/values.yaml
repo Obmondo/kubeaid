@@ -14,7 +14,7 @@ image:
   # -- Redis image repository
   repository: public.ecr.aws/docker/library/redis
   # -- Redis image tag
-  tag: 7.2.4-alpine
+  tag: 7.2.7-alpine
   # -- Redis image pull policy
   pullPolicy: IfNotPresent
 
@@ -70,7 +70,7 @@ configmapTest:
     # -- Repository of the configmap shellcheck test image.
     repository: koalaman/shellcheck
     # -- Tag of the configmap shellcheck test image.
-    tag: v0.5.0
+    tag: v0.10.0
   # -- Resources for the ConfigMap test pod
   resources: {}
 
@@ -127,7 +127,7 @@ haproxy:
     # -- HAProxy Image Repository
     repository: public.ecr.aws/docker/library/haproxy
     # -- HAProxy Image Tag
-    tag: 2.9.4-alpine
+    tag: 3.0.7-alpine
     # -- HAProxy Image PullPolicy
     pullPolicy: IfNotPresent
 
@@ -700,9 +700,9 @@ exporter:
   # -- If `true`, the prometheus exporter sidecar is enabled
   enabled: false
   # -- Exporter image
-  image: oliver006/redis_exporter
+  image: quay.io/oliver006/redis_exporter
   # -- Exporter image tag
-  tag: v1.57.0
+  tag: v1.67.0
   # -- Exporter image pullPolicy
   pullPolicy: IfNotPresent
 
@@ -889,6 +889,8 @@ tls:
 # EXAMPLE source for s3 restore: 's3://bucket/dump.rdb'
 # REQUIRED for ssh restore: 'key' should be in one line including CR i.e. '-----BEGIN RSA PRIVATE KEY-----\n...\n...\n...\n-----END RSA PRIVATE KEY-----'
 # EXAMPLE source for ssh restore: 'user@server:/path/dump.rdb'
+# REQUIRED for redis restore: 'source' should be in form of redis connection uri: 'redis://[username:password@]host:port[/db]'
+# EXAMPLE source for redis restore: 'redis://username:password@localhost:6379'
 restore:
   # -- Timeout for the restore
   timeout: 600
@@ -914,6 +916,8 @@ restore:
     # Key should be in one line separated with \n.
     # i.e. `-----BEGIN RSA PRIVATE KEY-----\n...\n...\n-----END RSA PRIVATE KEY-----`
     key: ""
+  redis:
+    source: ""
 
 ## Custom PrometheusRule to be defined
 ## The value is evaluated as a template, so, for example, the value can depend on .Release or .Chart

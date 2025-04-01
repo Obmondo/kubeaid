@@ -2,7 +2,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: backups.k8s.mariadb.com
 spec:
   group: k8s.mariadb.com
@@ -705,6 +705,16 @@ spec:
                             pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                             x-kubernetes-int-or-string: true
                         type: object
+                      hostPath:
+                        description: 'Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#hostpathvolumesource-v1-core'
+                        properties:
+                          path:
+                            type: string
+                          type:
+                            type: string
+                        required:
+                        - path
+                        type: object
                       nfs:
                         description: 'Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nfsvolumesource-v1-core.'
                         properties:
@@ -946,6 +956,16 @@ spec:
                             pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                             x-kubernetes-int-or-string: true
                         type: object
+                      hostPath:
+                        description: 'Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#hostpathvolumesource-v1-core'
+                        properties:
+                          path:
+                            type: string
+                          type:
+                            type: string
+                        required:
+                        - path
+                        type: object
                       nfs:
                         description: 'Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nfsvolumesource-v1-core.'
                         properties:
@@ -1095,7 +1115,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: connections.k8s.mariadb.com
 spec:
   group: k8s.mariadb.com
@@ -1346,7 +1366,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: databases.k8s.mariadb.com
 spec:
   group: k8s.mariadb.com
@@ -1520,7 +1540,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: grants.k8s.mariadb.com
 spec:
   group: k8s.mariadb.com
@@ -1711,7 +1731,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: mariadbs.k8s.mariadb.com
 spec:
   group: k8s.mariadb.com
@@ -2516,6 +2536,16 @@ spec:
                                 pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                 x-kubernetes-int-or-string: true
                             type: object
+                          hostPath:
+                            description: 'Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#hostpathvolumesource-v1-core'
+                            properties:
+                              path:
+                                type: string
+                              type:
+                                type: string
+                            required:
+                            - path
+                            type: object
                           nfs:
                             description: 'Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nfsvolumesource-v1-core.'
                             properties:
@@ -2587,6 +2617,16 @@ spec:
                             - type: string
                             pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                             x-kubernetes-int-or-string: true
+                        type: object
+                      hostPath:
+                        description: 'Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#hostpathvolumesource-v1-core'
+                        properties:
+                          path:
+                            type: string
+                          type:
+                            type: string
+                        required:
+                        - path
                         type: object
                       nfs:
                         description: 'Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nfsvolumesource-v1-core.'
@@ -4892,6 +4932,11 @@ spec:
                                     x-kubernetes-list-type: atomic
                                 type: object
                             type: object
+                          args:
+                            description: Args to be used in the Container.
+                            items:
+                              type: string
+                            type: array
                           image:
                             description: |-
                               Image name to be used as metrics exporter. The supported format is `<image>:<tag>`.
@@ -5718,6 +5763,11 @@ spec:
                                 x-kubernetes-list-type: atomic
                             type: object
                         type: object
+                      args:
+                        description: Args to be used in the Container.
+                        items:
+                          type: string
+                        type: array
                       image:
                         description: |-
                           Image name to be used as metrics exporter. The supported format is `<image>:<tag>`.
@@ -6991,13 +7041,13 @@ spec:
                     - type: integer
                     - type: string
                     description: Size of the PVCs to be mounted by MariaDB. Required
-                      if not provided in 'VolumeClaimTemplate'. It superseeds the
+                      if not provided in 'VolumeClaimTemplate'. It supersedes the
                       storage size specified in 'VolumeClaimTemplate'.
                     pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                     x-kubernetes-int-or-string: true
                   storageClassName:
                     description: |-
-                      StorageClassName to be used to provision the PVCS. It superseeds the 'StorageClassName' specified in 'VolumeClaimTemplate'.
+                      StorageClassName to be used to provision the PVCS. It supersedes the 'StorageClassName' specified in 'VolumeClaimTemplate'.
                       If not provided, the default 'StorageClass' configured in the cluster is used.
                     type: string
                   volumeClaimTemplate:
@@ -7461,6 +7511,16 @@ spec:
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
                       type: object
+                    hostPath:
+                      description: 'Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#hostpathvolumesource-v1-core'
+                      properties:
+                        path:
+                          type: string
+                        type:
+                          type: string
+                      required:
+                      - path
+                      type: object
                     name:
                       type: string
                     nfs:
@@ -7734,7 +7794,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: maxscales.k8s.mariadb.com
 spec:
   group: k8s.mariadb.com
@@ -8954,6 +9014,11 @@ spec:
                                 x-kubernetes-list-type: atomic
                             type: object
                         type: object
+                      args:
+                        description: Args to be used in the Container.
+                        items:
+                          type: string
+                        type: array
                       image:
                         description: |-
                           Image name to be used as metrics exporter. The supported format is `<image>:<tag>`.
@@ -10263,7 +10328,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: restores.k8s.mariadb.com
 spec:
   group: k8s.mariadb.com
@@ -11018,6 +11083,16 @@ spec:
                             pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                             x-kubernetes-int-or-string: true
                         type: object
+                      hostPath:
+                        description: 'Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#hostpathvolumesource-v1-core'
+                        properties:
+                          path:
+                            type: string
+                          type:
+                            type: string
+                        required:
+                        - path
+                        type: object
                       nfs:
                         description: 'Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nfsvolumesource-v1-core.'
                         properties:
@@ -11129,6 +11204,16 @@ spec:
                         pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                         x-kubernetes-int-or-string: true
                     type: object
+                  hostPath:
+                    description: 'Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#hostpathvolumesource-v1-core'
+                    properties:
+                      path:
+                        type: string
+                      type:
+                        type: string
+                    required:
+                    - path
+                    type: object
                   nfs:
                     description: 'Refer to the Kubernetes docs: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#nfsvolumesource-v1-core.'
                     properties:
@@ -11227,7 +11312,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: sqljobs.k8s.mariadb.com
 spec:
   group: k8s.mariadb.com
@@ -11956,7 +12041,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.17.2
   name: users.k8s.mariadb.com
 spec:
   group: k8s.mariadb.com

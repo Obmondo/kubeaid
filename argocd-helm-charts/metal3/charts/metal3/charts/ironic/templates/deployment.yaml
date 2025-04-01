@@ -77,9 +77,6 @@ spec:
             mountPath: "/certs/vmedia"
             readOnly: true
           {{- end }}
-          - mountPath: /shared/html/tstcerts
-            name: cert-ironic-ca
-            readOnly: true
         {{- end }}
       - name: ironic-log-watch
         image: {{ .Values.images.ironic.repository }}:{{ .Values.images.ironic.tag }}

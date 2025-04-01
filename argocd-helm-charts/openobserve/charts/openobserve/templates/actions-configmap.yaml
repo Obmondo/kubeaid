@@ -1,0 +1,16 @@
+{{- if and .Values.enterprise.enabled .Values.enterprise.actions.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "openobserve.fullname" . }}-actions
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "openobserve.labels" . | nindent 4 }}
+data:
+  O2_ACTION_MAX_MEMORY_MIB:  "{{ .Values.enterprise.actions.parameters.O2_ACTION_MAX_MEMORY_MIB }}"
+  O2_ACTION_MIN_MEMORY_MIB:  "{{ .Values.enterprise.actions.parameters.O2_ACTION_MIN_MEMORY_MIB }}"
+  O2_ACTION_MAX_MILLI_CPU:  "{{ .Values.enterprise.actions.parameters.O2_ACTION_MAX_MILLI_CPU }}"
+  O2_ACTION_MIN_MILLI_CPU:  "{{ .Values.enterprise.actions.parameters.O2_ACTION_MIN_MILLI_CPU }}"
+  O2_SCRIPT_SERVER_TOKEN:  "{{ .Values.enterprise.actions.parameters.O2_SCRIPT_SERVER_TOKEN }}"
+{{- end }}
+ 

@@ -72,7 +72,7 @@ Additionally, this chart allows to provide LDAP and admin user configuration wit
 ## Update and versioning policy
 
 The Gitea helm chart versioning does not follow Gitea's versioning.
-The latest chart version can be looked up in [https://dl.gitea.com/charts](https://dl.gitea.com/charts) or in the [repository releases](https://gitea.com/gitea/helm-chart/releases).
+The latest chart version can be looked up in [https://dl.gitea.com/charts](https://dl.gitea.com/charts) or in the [repository releases](https://gitea.com/gitea/helm-gitea/releases).
 
 The chart aims to follow Gitea's releases closely.
 There might be times when the chart is behind the latest Gitea release.
@@ -534,7 +534,7 @@ and the repository exists.
 ```
 
 To solve this problem add the capability `SYS_CHROOT` to the `securityContext`.
-More about this issue [here](https://gitea.com/gitea/helm-chart/issues/161).
+More about this issue [here](https://gitea.com/gitea/helm-gitea/issues/161).
 
 ### Cache
 
@@ -548,7 +548,7 @@ redis-cluster:
   enabled: true
 ```
 
-⚠️ The redis charts [do not work well with special characters in the password](https://gitea.com/gitea/helm-chart/issues/690).
+⚠️ The redis charts [do not work well with special characters in the password](https://gitea.com/gitea/helm-gitea/issues/690).
 Consider omitting such or open an issue in the Bitnami repo and let us know once this got fixed.
 
 ### Persistence
@@ -739,7 +739,7 @@ gitea:
 
 When using the rootless image the gpg key folder is not persistent by default.
 If you consider using signed commits for internal Gitea activities (e.g. initial commit), you'd need to provide a signing key.
-Prior to [PR186](https://gitea.com/gitea/helm-chart/pulls/186), imported keys had to be re-imported once the container got replaced by another.
+Prior to [PR186](https://gitea.com/gitea/helm-gitea/pulls/186), imported keys had to be re-imported once the container got replaced by another.
 
 The mentioned PR introduced a new configuration object `signing` allowing you to configure prerequisites for commit signing.
 By default this section is disabled to maintain backwards compatibility.
@@ -1329,7 +1329,7 @@ The first item here (`<memcache service name>`) will be different compared to th
 The above changes are motivated by the idea to tidy dependencies but also have HA-ready ones at the same time.
 The previous `memcache` default was not HA-ready, hence we decided to switch to `redis-cluster` by default.
 
-If you are coming from an existing deployment and [#356](https://gitea.com/gitea/helm-chart/issues/356) is still open, you need to set the config sections for `cache`, `session` and `queue` explicitly:
+If you are coming from an existing deployment and [#356](https://gitea.com/gitea/helm-gitea/issues/356) is still open, you need to set the config sections for `cache`, `session` and `queue` explicitly:
 
 ```yaml
 gitea:
@@ -1354,7 +1354,7 @@ gitea:
 <!-- prettier-ignore-end -->
 
 If you are facing errors like `WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED` due to this automatic transition:
-Have a look at [this discussion](https://gitea.com/gitea/helm-chart/issues/487#issue-220660) and either set `image.rootless: false` or manually update your `~/.ssh/known_hosts` file(s).
+Have a look at [this discussion](https://gitea.com/gitea/helm-gitea/issues/487#issue-220660) and either set `image.rootless: false` or manually update your `~/.ssh/known_hosts` file(s).
 
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable-next-line -->
@@ -1410,7 +1410,7 @@ With respect to `values.yaml`, parameters `username`, `database` and `password` 
 Please adjust your `values.yaml` accordingly.
 
 **Attention**: The Postgres upgrade is not automatically handled by the chart and must be done by yourself.
-See [this comment](https://gitea.com/gitea/helm-chart/issues/452#issuecomment-740885) for an extensive walkthrough.
+See [this comment](https://gitea.com/gitea/helm-gitea/issues/452#issuecomment-740885) for an extensive walkthrough.
 We again highly encourage users to use an external (managed) database for production instances.
 
 </details>

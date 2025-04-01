@@ -10,7 +10,7 @@ image:
   enterprise:
     repository: public.ecr.aws/zinclabs/openobserve-enterprise
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.14.4"
+    tag: "v0.14.5-rc5"
   reportserver:
     repository: public.ecr.aws/zinclabs/report-server
     tag: "v0.0.10-rc3-14e738a"
@@ -60,7 +60,8 @@ replicaCount:
   alertmanager: 1
   compactor: 1
   zplane: 0
-  reportserver: 0
+  reportserver: 1
+  actions: 1
 
 alertmanager:
   # Alertmanager specific configuration
@@ -121,7 +122,22 @@ querier:
       - ReadWriteOnce
 
 reportserver:
-  enabled: false # if true then reportserver will be deployed as part of openobserve
+  enabled: true # if true then reportserver will be deployed as part of openobserve
+  # Additional volumes on the output Deployment definition.
+  volumes: []
+  # - name: foo
+  #   secret:
+  #     secretName: mysecret
+  #     optional: false
+
+  # Additional volumeMounts on the output Deployment definition.
+  volumeMounts: []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
+
+actions:
+  enabled: true
   # Additional volumes on the output Deployment definition.
   volumes: []
   # - name: foo
@@ -153,7 +169,9 @@ auth:
   AZURE_STORAGE_ACCOUNT_KEY: ""
   AZURE_STORAGE_ACCOUNT_NAME: ""
   ZO_META_POSTGRES_DSN: "postgres://userid:password@host:5432/dbname"
+  ZO_META_POSTGRES_RO_DSN: ""
   ZO_META_MYSQL_DSN: ""
+  ZO_META_MYSQL_RO_DSN: ""
   ZO_TRACING_HEADER_KEY: "Authorization"
   ZO_TRACING_HEADER_VALUE: "Basic cm9vdEBleGFtcGxlLmNvbTpDb21wbGV4cGFzcyMxMjM="
   ZO_RUM_CLIENT_TOKEN: ""
@@ -229,9 +247,9 @@ config:
   ZO_BLOOM_FILTER_ENABLED: "true"
   ZO_BLOOM_FILTER_DEFAULT_FIELDS: ""
   ZO_ENABLE_INVERTED_INDEX: "true"
-  ZO_INVERTED_INDEX_COUNT_OPTIMIZER_ENABLED: "true"
   ZO_FEATURE_QUERY_REMOVE_FILTER_WITH_INDEX: "true"
-  ZO_INVERTED_INDEX_CAMEL_CASE_TOKENIZER_DISABLED: "true"
+  ZO_INVERTED_INDEX_COUNT_OPTIMIZER_ENABLED: "true"
+  ZO_INVERTED_INDEX_CAMEL_CASE_TOKENIZER_DISABLED: "false"
   ZO_QUERY_ON_STREAM_SELECTION: "true" # Toggle search to be trigger based on button click event.
   ZO_DISTINCT_VALUES_INTERVAL: "10"
   ZO_DISTINCT_VALUES_HOURLY: "false"
@@ -308,6 +326,7 @@ config:
   ZO_DISK_CACHE_RELEASE_SIZE: "0"
   ZO_DISK_CACHE_GC_SIZE: "100"
   ZO_DISK_CACHE_GC_INTERVAL: "0"
+  ZO_ETCD_ADDR: "etcd.openobserve.svc.cluster.local:2379"
   ZO_ETCD_PREFIX: "/zinc/observe/"
   ZO_ETCD_CONNECT_TIMEOUT: "5"
   ZO_ETCD_COMMAND_TIMEOUT: "5"
@@ -320,7 +339,6 @@ config:
   ZO_ETCD_KEY_FILE: ""
   ZO_ETCD_DOMAIN_NAME: ""
   ZO_ETCD_LOAD_PAGE_SIZE: "100"
-  ZO_NATS_ADDR: "nats://nats.openobserve.svc.cluster.local:4222"
   ZO_NATS_PREFIX: "o2_"
   ZO_NATS_USER: ""
   ZO_NATS_PASSWORD: ""
@@ -417,6 +435,7 @@ config:
   ZO_MIN_AUTO_REFRESH_INTERVAL: "5"
   ZO_MAX_DASHBOARD_SERIES: "100"
   RUST_LOG: "info"
+  O2_SCRIPT_SERVER_TOKEN: "ghf3543gfd476ioudrs2432ghf"
   RUST_BACKTRACE: "0"
 
 # Add extra environment variables to all pods, useful for overriding secrets
@@ -526,6 +545,12 @@ autoscaling:
     maxReplicas: 100
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
+  actions:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
 
 nodeSelector:
   ingester: {}
@@ -563,6 +588,7 @@ nats:
   config:
     cluster:
       enabled: true
+      replicas: 3
     routeURLs:
       user: ""
       password: ""
@@ -578,11 +604,11 @@ nats:
       enabled: true
       podMonitor:
         enabled: true
-    natsBox:
-      container:
-        image:
-          repository: natsio/nats-box
-          tag: 0.14.5-nonroot
+  natsBox:
+    container:
+      image:
+        repository: natsio/nats-box
+        tag: 0.16.0-nonroot
 
 etcd:
   enabled: false # if true then etcd will be deployed as part of openobserve
@@ -716,7 +742,7 @@ postgres:
     backup: {} # All the configuration associated with an object store from https://cloudnative-pg.io/documentation/1.17/backup_recovery/
 
 enterprise:
-  enabled: false
+  enabled: true
   parameters:
     O2_AUDIT_ENABLED: "true"
     O2_AUDIT_BATCH_SIZE: "500"
@@ -741,10 +767,25 @@ enterprise:
     O2_SEARCH_GROUP_USER_SHORT_MAX_CONCURRENCY: "2"
     O2_SEARCH_GROUP_BASE_SPEED: "1024" # in MB
     O2_SEARCH_GROUP_BASE_SECS: "10" # in seconds
+  actions:
+    enabled: true
+    parameters:
+      O2_ACTION_MAX_MEMORY_MIB: "500"
+      O2_ACTION_MIN_MEMORY_MIB: "128"
+      O2_ACTION_MAX_MILLI_CPU: "128"
+      O2_ACTION_MIN_MILLI_CPU: "128"
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    extraEnv: []
   openfga:
     enabled: false
     parameters:
-      O2_OPENFGA_LIST_ONLY_PERMITTED: "true"
+      O2_OPENFGA_LIST_ONLY_PERMITTED: "false"
       O2_MAP_GROUP_TO_ROLE: "true"
       O2_MAP_GROUP_TO_ROLE_SKIP_CREATION: "false"
       O2_OPENFGA_PAGE_SIZE: "100"

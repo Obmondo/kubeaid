@@ -123,8 +123,8 @@ podTemplate:
 container:
   env:
     # different from k8s units, suffix must be B, KiB, MiB, GiB, or TiB
-    # should be ~90% of memory limit
-    GOMEMLIMIT: 7GiB
+    # should be ~80% of memory limit
+    GOMEMLIMIT: 6GiB
   merge:
     # recommended limit is at least 2 CPU cores and 8Gi Memory for production JetStream clusters
     resources:
@@ -138,11 +138,27 @@ container:
 
 ### Specify Image Version
 
-```yaml
-container:
-  image:
-    tag: x.y.z-alpine
-```
+The container image can now be overridden by specifying either the image tag, an image digest, or a full image name. Examples below illustrate the options:
+
+- To set the tag:
+  ```yaml
+  container:
+    image:
+      tag: x.y.z-alpine
+  ```
+- To use an image digest, which overrides the tag:
+  ```yaml
+  container:
+    image:
+      repository: nats
+      digest: sha256:abcdef1234567890...
+  ```
+- To override the registry, repository, tag, and digest all at once, specify a full image name:
+  ```yaml
+  container:
+    image:
+      fullImageName: custom-reg.io/myimage@sha256:abcdef1234567890...
+  ```
 
 ### Operator Mode with NATS Resolver
 

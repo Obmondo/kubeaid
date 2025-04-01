@@ -2,6 +2,36 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 10.3.0
+### Minor Version Upgrades
+- Updated velero from version 8.5.0 to 8.7.0
+- Updated traefik from version 34.4.1 to 34.5.0
+- Updated teleport-kube-agent from version 17.3.3 to 17.4.1
+- Updated teleport-cluster from version 17.3.3 to 17.4.1
+- Updated sonarqube from version 2025.1.1 to 2025.2.0
+- Updated opentelemetry-collector from version 0.117.0 to 0.120.0
+- Updated opentelemetry-operator from version 0.83.0 to 0.84.1
+- Updated opencost from version 1.43.2 to 2.0.1
+- Updated metal3 from version 0.9.3 to 0.10.1
+- Updated mariadb-operator from version 0.37.1 to 0.38.0
+- Updated gitlab-runner from version 0.74.1 to 0.75.1
+- Updated cluster-api-operator from version 0.17.1 to 0.18.0
+
+### Patch Version Upgrades
+- Updated tigera-operator from version v3.29.2 to v3.29.3
+- Updated snapshot-controller from version 4.0.1 to 4.0.2
+- Added rook-ceph-cluster from version v1.16.0 to v1.16.0
+- Updated rook-ceph from version v1.16.5 to v1.16.6
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated openobserve from version 0.14.31 to 0.14.40
+- Updated gitea from version 11.0.0 to 11.0.1
+- Updated external-dns from version 8.7.7 to 8.7.8
+- Updated erpnext from version 7.0.176 to 7.0.182
+- Updated crossplane from version 1.19.0 to 1.19.1
+- Updated cluster-autoscaler from version 9.46.3 to 9.46.6
+- Updated aws-efs-csi-driver from version 3.1.7 to 3.1.8
+- Updated argo-cd from version 7.8.11 to 7.8.15
+
 ### Improvements
 - [`165f0ea0`](../../commit/165f0ea0) revert argocd image updater file deletion
 - [`9fee0318`](../../commit/9fee0318) fix: changed it to ttyS1 for ironic agent

@@ -31,13 +31,13 @@ stringData:
       {{- if .Values.gitea.config.cron -}}
         {{- if .Values.gitea.config.cron.GIT_GC_REPOS -}}
           {{- if eq .Values.gitea.config.cron.GIT_GC_REPOS.ENABLED true -}}
-            {{ fail "Invoking the garbage collector via CRON is not yet supported when running with multiple replicas. Please set 'cron.GIT_GC_REPOS.enabled = false'." }}
+            {{ fail "Invoking the garbage collector via CRON is not yet supported when running with multiple replicas. Please set 'gitea.config.cron.GIT_GC_REPOS.enabled = false'." }}
           {{- end }}
         {{- end }}
       {{- end }}
     
       {{- if eq (first .Values.persistence.accessModes) "ReadWriteOnce" -}}
-        {{- fail "When using multiple replicas, a RWX file system is required and gitea.persistence.accessModes[0] must be set to ReadWriteMany." -}}
+        {{- fail "When using multiple replicas, a RWX file system is required and persistence.accessModes[0] must be set to ReadWriteMany." -}}
       {{- end }}
       {{- if .Values.gitea.config.indexer -}}
         {{- if eq .Values.gitea.config.indexer.ISSUE_INDEXER_TYPE "bleve" -}}

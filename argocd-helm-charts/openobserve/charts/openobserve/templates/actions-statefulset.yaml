@@ -1,0 +1,64 @@
+{{- if and .Values.enterprise.enabled .Values.enterprise.actions.enabled -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "openobserve.fullname" . }}-actions
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "openobserve.labels" . | nindent 4 }}
+    name: openobserve
+spec:
+  serviceName: {{ include "openobserve.fullname" . }}-actions
+  {{- if not .Values.autoscaling.actions.enabled }}
+  replicas: {{ .Values.replicaCount.actions }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "openobserve.selectorLabels" . | nindent 6 }}
+      name: openobserve
+      app: openobserve
+      role: actions
+  template:
+    metadata:
+      labels:
+        {{- include "openobserve.selectorLabels" . | nindent 8 }}
+        name: openobserve
+        app: openobserve
+        role: actions
+    spec:
+      serviceAccountName: {{ include "openobserve.serviceAccountName" . }}-actions
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: data
+          emptyDir: {}
+      containers:
+        - name: openobserve
+          image: "{{ .Values.image.enterprise.repository }}:{{ .Values.image.enterprise.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "openobserve.fullname" . }}
+            - configMapRef:
+                name: {{ include "openobserve.fullname" . }}-actions
+            - secretRef:
+                name: {{ if .Values.externalSecret.enabled }}{{ .Values.externalSecret.name }}{{ else }}{{ include "openobserve.fullname" . }}{{ end }}
+          env:
+            - name: ZO_NODE_ROLE
+              value: "scriptserver"
+            - name: ZO_DATA_DIR
+              value: "/data/"
+            - name: O2_ACTION_NAMESPACE
+              value: {{ .Release.Namespace | quote }}
+            {{- with .Values.extraEnv }}
+            {{- toYaml . |  nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.enterprise.actions.resources | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.config.ZO_HTTP_PORT }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+{{- end }} 

@@ -28,11 +28,7 @@ images:
   baremetalOperator:
     repository: registry.opensuse.org/isv/suse/edge/metal3/containers/images/baremetal-operator
     pullPolicy: IfNotPresent
-    tag: "0.8.0"
-  rbacProxy:
-    repository: registry.opensuse.org/isv/suse/edge/metal3/containers/images/kube-rbac-proxy
-    pullPolicy: IfNotPresent
-    tag: "0.18.1"
+    tag: "0.9.0"
 
 imagePullSecrets: []
 nameOverride: "manger"

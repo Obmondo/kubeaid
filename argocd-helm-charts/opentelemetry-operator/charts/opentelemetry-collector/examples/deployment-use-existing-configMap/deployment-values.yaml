@@ -1,0 +1,28 @@
+mode: deployment
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 200M
+
+configMap:
+  create: false
+
+image:
+  repository: "otel/opentelemetry-collector-k8s"
+
+command:
+  name: "otelcol-k8s"
+  extraArgs: ["--config=/conf/config.yaml"]
+
+extraVolumes:
+  - name: custom-otelcol-configmap
+    configMap:
+      name: custom-otel-collector-config
+      items:
+        - key: config
+          path: config.yaml
+      defaultMode: 420
+extraVolumeMounts:
+  - name: custom-otelcol-configmap
+    mountPath: /conf/config.yaml
