@@ -92,6 +92,57 @@ Details about setup if you are interested:
   * Create `Developer` group, with role mappings to `kube_developer`
   * *ToDo*: Add more user groups
 
+## Setup Keycloak with Azure AD as it's identity provider
+
+* Configure Azure App Registration
+  1.  Create an App Registration in Azure AD:
+      - Navigate to Azure AD and create a new app registration
+
+      ![azure](static/1.png)
+      - Register Keycloak as an Application in Azure AD
+
+      ![azure](static/2.png)
+      - Save the Client ID and Client Secret from Azure AD. This information will be needed later in Keycloak.
+  2. Obtain Client ID and Client Secret
+      - After the registration is complete, go to the app's overview page and copy the "Application (client) ID". 
+      - Navigate to "Certificates & secrets" and create a new client secret. Copy the value of the client 
+        secret as it will not be shown again.
+
+      ![azure](static/3.png)
+  3. Configure API Permissions:
+      - Go to "API permissions" and add the required Microsoft Graph API permissions. Typically, you need
+        `User.Read` and `openid`, `profile`, and `email` permissions.
+
+      ![azure](static/4.png)
+
+      ![azure](static/5.png)
+  4. On click Add a permission, the above similar pane will be displayed as shown and you will click on Add
+      permission. Then, after Add permission, you will have similar configuration to the below image.
+
+      ![azure](static/6.png)
+  5. First, let’s create a realm for this purpose and choose after the realm is selected.
+    ![azure](static/7.png)
+  6. Next, we are going to create the OpenID Connect configuration with the Azure App Registration details already created above.
+    ![azure](static/8.png)
+    - In the detail page, fill out the details as required below:
+    * Enter the alias of your choice.Enable Use discovery endpoint, if not already enabled
+    * Input the Discovery URL from Azure (copied before) into the Discovery endpoint
+    * Input the Client ID. This is the application (client) ID copied from Azure app registration.
+    * Input Client Secret. This is the application secret copied from Azure app registration
+    ![azure](static/9.png)
+    - Next, copy the redirect URL. This needs to be updated in the Azure app registration.
+    - Go back to the Azure registered app, and click “Add a Redirect URL” → “Add a platform” →
+      “Web”. Input the redirect URL in the required field and click Configure.
+    ![azure](static/10.png)
+    - To make sure, this integration works, we need to see whether the default account URL redirects to Azure AD SSO as we configured.
+      For this, go to Keycloak interface, choose your realm and go to “Clients” from the left panel and click on “account-console”.
+    ![azure](static/11.png)
+    - Click on Settings tab
+      * for “Valid Redirect URIs”, fill the appropriate redirect URI for your UI app
+      * for “Web origins”, fill * for all origins (for production, use private secured client network)
+      * click Save.
+    ![azure](static/12.png)
+
 ## Setup Keycloak as Identity Provider on a Keycloak
 
 * Log into the keycloak server, using your personal admin account
