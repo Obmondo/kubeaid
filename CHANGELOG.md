@@ -2,6 +2,12 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`7127e98e`](../../commit/7127e98e) Add steps to setup keycloak with azure ad
+- [`50bef534`](../../commit/50bef534) KubeAid release '10.3.0'
+- [`28e32acf`](../../commit/28e32acf) Add commit since 10.2.0 tag to CHANGELOG.md
+- [`fc1695d7`](../../commit/fc1695d7) feat: added kubeaid-agent user for argocd, so kubeaid-agent can talk to argocd
+
 ## 10.3.0
 ### Minor Version Upgrades
 - Updated velero from version 8.5.0 to 8.7.0
