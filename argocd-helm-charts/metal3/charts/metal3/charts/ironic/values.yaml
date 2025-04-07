@@ -56,11 +56,11 @@ images:
   ironic:
     repository: registry.opensuse.org/isv/suse/edge/metal3/containers/images/ironic
     pullPolicy: IfNotPresent
-    tag: 26.1.2.3
+    tag: 26.1.2.4
   ironicIPADownloader:
     repository: registry.opensuse.org/isv/suse/edge/metal3/containers/images/ironic-ipa-downloader
     pullPolicy: IfNotPresent
-    tag: 3.0.2
+    tag: 3.0.3
 
 nameOverride: ""
 fullnameOverride: ""

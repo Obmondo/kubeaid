@@ -12,6 +12,7 @@ data:
   {{- $ironicApiHost := print $ironicIP ":6385" }}
   {{- $ironicBootHost := print $ironicIP ":6180" }}
   {{- $ironicCacheHost := print $ironicIP ":6180" }}
+  {{- $deployArch := .Values.global.deployArchitecture }}
 
   {{- if  ( .Values.global.enable_dnsmasq ) }}
   DNSMASQ_BOOT_SERVER_ADDRESS: {{ $ironicBootHost }}
@@ -39,8 +40,9 @@ data:
   {{- end }}
   IRONIC_EXTERNAL_HTTP_URL: {{ $protocol }}://{{ $ironicCacheHost }}
   CACHEURL: {{ $protocol }}://{{ $ironicCacheHost }}/images
-  DEPLOY_KERNEL_URL: {{ $protocol }}://{{ $ironicBootHost }}/images/ironic-python-agent.kernel
-  DEPLOY_RAMDISK_URL: {{ $protocol }}://{{ $ironicBootHost }}/images/ironic-python-agent.initramfs
+  DEPLOY_KERNEL_URL: {{ $protocol }}://{{ $ironicBootHost }}/images/ironic-python-agent-{{ $deployArch }}.kernel
+  DEPLOY_RAMDISK_URL: {{ $protocol }}://{{ $ironicBootHost }}/images/ironic-python-agent-{{ $deployArch }}.initramfs
+  DEPLOY_ARCHITECTURE: {{ $deployArch }}
   IRONIC_BOOT_BASE_URL: {{ $protocol }}://{{ $ironicBootHost }}
   IRONIC_VMEDIA_HTTPD_SERVER_NAME: {{ $ironicBootHost }}
   ENABLE_PXE_BOOT: "{{ .Values.global.enable_pxe_boot }}"

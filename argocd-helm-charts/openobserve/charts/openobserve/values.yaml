@@ -60,7 +60,7 @@ replicaCount:
   alertmanager: 1
   compactor: 1
   zplane: 0
-  reportserver: 1
+  reportserver: 0
   actions: 1
 
 alertmanager:
@@ -70,6 +70,12 @@ alertmanager:
     ZO_META_CONNECTION_POOL_MAX_SIZE: "0"
     ZO_ACTIX_REQ_TIMEOUT: "30"
   extraEnv: []
+  persistence: # If enabled it will be used for disk cache. Highly recommend to enable this for production
+    enabled: true
+    size: 100Gi
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
 
 compactor:
   # Compactor specific configuration
@@ -230,6 +236,8 @@ config:
   ZO_FEATURE_QUICK_MODE_FIELDS: "" # default fields for quick mode
   ZO_FEATURE_QUERY_PARTITION_STRATEGY: "file_hash"
   ZO_FEATURE_PER_THREAD_LOCK: "false"
+  ZO_FEATURE_QUERY_STREAMING_AGGS: "false"
+  ZO_DATAFUSION_STREAMING_AGGS_CACHE_MAX_ENTRIES: "100000"
   ZO_RESULT_CACHE_ENABLED: "true" # Enable result cache for query results
   ZO_USE_MULTIPLE_RESULT_CACHE: "true" # Enable to use mulple result caches for query results
   ZO_RESULT_CACHE_SELECTION_STRATEGY: "overlap" # Strategy to use for result cache, default is both , possible value - both,overlap , duration
@@ -414,7 +422,7 @@ config:
   ZO_CIRCUIT_BREAKER_ENABLED: "false"
   ZO_CIRCUIT_BREAKER_RATIO: "100"
   ZO_MMDB_DISABLE_DOWNLOAD: "false"
-  ZO_MMDB_UPDATE_DURATION: "86400" # Everyday to test
+  ZO_MMDB_UPDATE_DURATION_DAYS: "30" # 30 days
   ZO_MMDB_GEOLITE_CITYDB_URL: "https://geoip.zinclabs.dev/GeoLite2-City.mmdb"
   ZO_MMDB_GEOLITE_CITYDB_SHA256_URL: "https://geoip.zinclabs.dev/GeoLite2-ASN.sha256"
   ZO_MMDB_GEOLITE_ASNDB_URL: "https://geoip.zinclabs.dev/GeoLite2-ASN.mmdb"

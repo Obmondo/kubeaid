@@ -2,6 +2,29 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 10.4.0
+### Minor Version Upgrades
+- Updated redmine from version 32.1.6 to 32.2.0
+- Updated metal3 from version 0.10.1 to 0.11.0
+
+### Patch Version Upgrades
+- Updated velero from version 8.7.0 to 8.7.1
+- Updated teleport-kube-agent from version 17.4.1 to 17.4.2
+- Updated teleport-cluster from version 17.4.1 to 17.4.2
+- Added rook-ceph-cluster from version v1.16.0 to v1.16.0
+- Updated rabbitmq-cluster-operator from version 4.4.6 to 4.4.7
+- Updated opentelemetry-collector from version 0.120.0 to 0.120.2
+- Added opentelemetry-operator from version 0.84.1 to 0.84.1
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated openobserve from version 0.14.40 to 0.14.42
+- Updated community-operator from version 0.12.0 to 0.12.1
+- Updated metallb from version 6.4.8 to 6.4.9
+- Updated external-dns from version 8.7.8 to 8.7.10
+- Updated erpnext from version 7.0.182 to 7.0.183
+- Updated cluster-api-operator from version 0.18.0 to 0.18.1
+- Updated argocd-image-updater from version 0.12.0 to 0.12.1
+- Updated argo-cd from version 7.8.15 to 7.8.23
+
 ### Improvements
 - [`7127e98e`](../../commit/7127e98e) Add steps to setup keycloak with azure ad
 - [`50bef534`](../../commit/50bef534) KubeAid release '10.3.0'

@@ -63,6 +63,9 @@ global:
   # Name for the MariaDB service
   databaseServiceName: metal3-mariadb
 
+  # Architecture for deployed nodes (either x86_64 or arm64)
+  deployArchitecture: x86_64
+
   # In a multi-node cluster use the node selector to ensure the pods
   # all run on the same host where the dnsmasqDNSServer and provisioningIP
   # and /opt/media exist. Uncomment the nodeSelector and update the

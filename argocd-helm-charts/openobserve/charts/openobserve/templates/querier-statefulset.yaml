@@ -50,6 +50,10 @@ spec:
         {{- if .Values.nats.enabled }}
         - name: check-nats
           image: {{ .Values.image.busybox.repository }}:{{ .Values.image.busybox.tag }}
+          resources:
+            limits:
+              cpu: 50m
+              memory: 50Mi
           command: ['sh', '-c', '
             until nc -zv {{ .Release.Name }}-nats 4222; do
               echo "Waiting for NATS to be ready...";

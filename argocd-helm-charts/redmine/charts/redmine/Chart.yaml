@@ -6,6 +6,7 @@ annotations:
     - name: redmine
       image: docker.io/bitnami/redmine:6.0.4-debian-12-r0
   licenses: Apache-2.0
+  tanzuCategory: application
 apiVersion: v2
 appVersion: 6.0.4
 dependencies:
@@ -42,4 +43,4 @@ maintainers:
 name: redmine
 sources:
 - https://github.com/bitnami/charts/tree/main/bitnami/redmine
-version: 32.1.6
+version: 32.2.0

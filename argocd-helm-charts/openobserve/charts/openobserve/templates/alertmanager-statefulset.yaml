@@ -1,12 +1,18 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "openobserve.fullname" . }}-alertmanager
   namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "openobserve.labels" . | nindent 4 }}
 spec:
+  serviceName: "{{ include "openobserve.fullname" . }}-alertmanager"
   replicas: {{ .Values.replicaCount.alertmanager }}
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0  # Set to 0 to allow all pods to update in parallel
   selector:
     matchLabels:
       {{- include "openobserve.selectorLabels" . | nindent 6 }}
@@ -40,17 +46,21 @@ spec:
               sleep 5;
             done;
           ']
-        {{- end }} 
+        {{- end }}
         {{- if .Values.nats.enabled }}
         - name: check-nats
           image: {{ .Values.image.busybox.repository }}:{{ .Values.image.busybox.tag }}
+          resources:
+            limits:
+              cpu: 50m
+              memory: 50Mi
           command: ['sh', '-c', '
             until nc -zv {{ .Release.Name }}-nats 4222; do
               echo "Waiting for NATS to be ready...";
               sleep 2;
             done;
           ']
-         {{- end }} 
+        {{- end }}
       containers:
         - name: {{ .Chart.Name }}-alertmanager
           securityContext:
@@ -109,7 +119,11 @@ spec:
             {{- with .Values.extraEnv }}
             {{- toYaml . |  nindent 12 }}
             {{- end }}
-
+          {{- if .Values.alertmanager.persistence.enabled }}
+          volumeMounts:
+            - name: cache
+              mountPath: /data
+          {{- end }}
       {{- with .Values.nodeSelector.alertmanager }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -122,3 +136,17 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+  {{- if .Values.alertmanager.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: cache
+      spec:
+        accessModes:
+          {{- range .Values.alertmanager.persistence.accessModes }}
+            - {{ . | quote }}
+          {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.alertmanager.persistence.size }}
+        storageClassName: {{ .Values.alertmanager.persistence.storageClass }}
+  {{- end }}

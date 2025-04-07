@@ -5,6 +5,7 @@
   {{- $ironicApiHost := print $ironicIP ":6385" }}
   {{- $ironicBootHost := print $ironicIP ":6180" }}
   {{- $ironicCacheHost := print $ironicIP ":6180" }}
+  {{- $deployArch := .Values.global.deployArchitecture }}
 
 apiVersion: v1
 data:
@@ -19,8 +20,9 @@ data:
     {{- $protocol = "http" }}
   {{- end }}
   CACHEURL: "{{ $protocol }}://{{ $ironicCacheHost }}/images"
-  DEPLOY_KERNEL_URL: "{{ $protocol }}://{{ $ironicBootHost }}/images/ironic-python-agent.kernel"
-  DEPLOY_RAMDISK_URL: "{{ $protocol }}://{{ $ironicBootHost }}/images/ironic-python-agent.initramfs"
+  DEPLOY_KERNEL_URL: "{{ $protocol }}://{{ $ironicBootHost }}/images/ironic-python-agent-{{ $deployArch }}.kernel"
+  DEPLOY_RAMDISK_URL: "{{ $protocol }}://{{ $ironicBootHost }}/images/ironic-python-agent-{{ $deployArch }}.initramfs"
+  DEPLOY_ARCHITECTURE: "{{ $deployArch }}"
 kind: ConfigMap
 metadata:
   name: baremetal-operator-ironic
