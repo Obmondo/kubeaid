@@ -24,12 +24,25 @@ spec:
         {{- if .configuration }}
         configuration:
             bootstrap:
-              {{- if .configuration.bootstrap.alternativeNames}}
-              alternativeNames:
-              {{- range .configuration.bootstrap.alternativeNames}}
-                 - {{ . }}
-              {{- end }}
-              {{- end }}
+              host: {{ .configuration.bootstrap.host }}
+              {{- if .configuration.bootstrap.annotations }}
+              annotations:
+                {{- range $key, $value := .configuration.bootstrap.annotations }}
+                {{ $key }}: {{ $value }}
+                {{- end }}
+              {{- end}}
+            brokers:
+            {{- range .configuration.brokers }}
+            - broker: {{ .id }}
+              host: {{ .host }}
+              {{- if .annotations }}
+              annotations:
+                {{- range $key, $value := .annotations }}
+                {{ $key }}: {{ $value }}
+                {{- end }}
+              {{- end}}
+            {{- end}}
+            class: {{ .configuration.class }}
         {{- end}}
     {{- end }}
     storage:

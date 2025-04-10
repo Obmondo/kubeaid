@@ -7,22 +7,17 @@ kafka:
       listeners:
         - name: internal
           port: 9094
-          type: nodeport
+          type: internal
           tls: true
           authentication:
             type: tls
-          configuration:
-            bootstrap:
-              alternativeNames:
-                - 192.168.49.2
-                - kafka.localhost.com
 
       storage:
         type: jbod
         # volumes is to be set if the above storage type is jbod
         volumes:
         - id: 0
-          class: standard
+          class: rook-ceph-block
           type: persistent-claim
           size: 1Gi
           deleteClaim: false
@@ -36,7 +31,7 @@ kafka:
       replicas: 3
       storage:
         type: persistent-claim
-        class: standard
+        class: rook-ceph-block
         size: 1Gi
         deleteClaim: false
 
@@ -74,11 +69,11 @@ kafkaUser:
             - Read
 
 ingress:
-  enable: true
+  enable: false
   class: nginx
   name: kafka
   rules:
-    - host: kafka.localhost.com
+    - host: localhost
       http:
         paths:
           - path: /
