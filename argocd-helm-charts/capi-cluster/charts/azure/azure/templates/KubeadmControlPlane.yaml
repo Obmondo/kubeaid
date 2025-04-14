@@ -1,0 +1,88 @@
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: KubeadmControlPlane
+metadata:
+  name: {{ .Values.global.clusterName }}-control-plane
+spec:
+  kubeadmConfigSpec:
+    clusterConfiguration:
+      apiServer:
+        extraArgs:
+          cloud-provider: external
+        timeoutForControlPlane: 20m0s
+      controllerManager:
+        extraArgs:
+          cloud-provider: external
+          cluster-name: {{ .Values.global.clusterName }}
+      etcd:
+        local:
+          dataDir: /var/lib/etcddisk/etcd
+          extraArgs:
+            quota-backend-bytes: "8589934592"
+    diskSetup:
+      filesystems:
+        - device: /dev/disk/azure/scsi1/lun0
+          extraOpts:
+            - -E
+            - lazy_itable_init=1,lazy_journal_init=1
+          filesystem: ext4
+          label: etcd_disk
+        - device: ephemeral0.1
+          filesystem: ext4
+          label: ephemeral0
+          replaceFS: ntfs
+      partitions:
+        - device: /dev/disk/azure/scsi1/lun0
+          layout: true
+          overwrite: false
+          tableType: gpt
+    files:
+      {{/* Automated tools that use Azure services should always have restricted permissions to
+           ensure that Azure resources are secure. Therefore, instead of having applications sign
+           in as a fully privileged user, Azure offers service principals.
+           An Azure service principal is an identity created for use with applications, hosted
+           services, and automated tools. This identity is used to access resources.
+           REFERENCE : https://learn.microsoft.com/en-us/cli/azure/azure-cli-sp-tutorial-1 */}}
+      - contentFrom:
+          secret:
+            key: control-plane-azure.json
+            name: {{ .Values.global.clusterName }}-control-plane-azure-json
+        owner: root:root
+        path: /etc/kubernetes/azure.json
+        permissions: "0644"
+    initConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          cloud-provider: external
+        name: '{{"{{"}} ds.meta_data.local_hostname {{"}}"}}'
+    joinConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          cloud-provider: external
+        name: '{{"{{"}} ds.meta_data.local_hostname {{"}}"}}'
+    mounts:
+      - - LABEL=etcd_disk
+        - /var/lib/etcddisk
+    postKubeadmCommands:
+      # Install Helm.
+      - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+      # Clone KubeAid.
+      - git clone https://github.com/Obmondo/kubeaid.git
+      # Copy kubeconfig to ~/.kube/config
+      - mkdir -p $HOME/.kube
+      - sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+      - sudo chown $(id -u):$(id -g) $HOME/.kube/config
+      # Install Cilium.
+      - kubectl create namespace cilium
+      - API_SERVER_URL=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+      - API_SERVER_HOST=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $4}')
+      - API_SERVER_PORT=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $5}')
+      - helm template kubeaid/argocd-helm-charts/cilium --values kubeaid/argocd-helm-charts/cilium/values.yaml --set cilium.k8sServiceHost=${API_SERVER_HOST} --set cilium.k8sServicePort=${API_SERVER_PORT} --namespace cilium | kubectl apply -f -
+      # Install Azure Cloud Controller Manager.
+      - helm template kubeaid/argocd-helm-charts/ccm-azure --set cloud-provider-azure.infra.clusterName={{ .Values.global.clusterName }} --namespace kube-system | kubectl apply -f -
+  machineTemplate:
+    infrastructureRef:
+      apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+      kind: AzureMachineTemplate
+      name: {{ .Values.global.clusterName }}-control-plane
+  replicas: {{ .Values.controlPlane.replicas }}
+  version: {{ .Values.global.kubernetes.version }}

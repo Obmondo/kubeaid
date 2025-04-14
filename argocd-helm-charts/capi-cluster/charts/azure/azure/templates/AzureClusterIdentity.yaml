@@ -1,0 +1,37 @@
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureClusterIdentity
+metadata:
+  labels:
+    {{/* This label is required. So, when we do `clusterctl move`, this resource gets picked up and
+         moved as well. */}}
+    clusterctl.cluster.x-k8s.io/move-hierarchy: "true"
+  name: {{ .Values.global.clusterName }}-cluster-identity
+spec:
+  {{/* Azure AD Workload identity is similar to IRSA in AWS. You can read more about it here :
+       https://azure.github.io/azure-workload-identity/docs/introduction.html. */}}
+  type: WorkloadIdentity
+
+  {{/* A tenant is a Microsoft Entra ID entity that typically encompasses an organization.
+       Tenants can have one or more subscriptions, which are agreements with Microsoft to use cloud
+       services, including Azure. Every Azure resource is associated with a subscription.
+       REFERENCE : https://learn.microsoft.com/en-us/azure/azure-portal/get-subscription-tenant-id. */}}
+  tenantID: {{ .Values.tenantID }}
+
+  {{/* While developers can securely store the secrets in Azure Key Vault, services need a way to
+       access Azure Key Vault. Managed identities provide an automatically managed identity in
+       Microsoft Entra ID for applications to use when connecting to resources that support
+       Microsoft Entra authentication. Applications can use managed identities to obtain Microsoft
+       Entra tokens without having to manage any credentials.
+       There are two types of managed identities :
+       
+       (1) System Assigned
+       
+       (2) User Assigned - You can create a user-assigned managed identity and assign it to one or
+                           more Azure Resources.
+                           
+        REFERENCE : https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview#managed-identity-types. */}}
+  clientID: {{ .Values.userAssignedIdentity.clientID }}
+
+  allowedNamespaces: 
+    list:
+      - {{ .Release.Namespace }}

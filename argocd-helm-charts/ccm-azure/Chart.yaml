@@ -1,0 +1,12 @@
+apiVersion: v2
+name: ccm-azure
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+# Versions are expected to follow Semantic Versioning (https://semver.org/)
+version: 0.1.0
+
+dependencies:
+  - name: cloud-provider-azure
+    version: 1.32.0
+    repository: https://raw.githubusercontent.com/kubernetes-sigs/cloud-provider-azure/master/helm/repo
