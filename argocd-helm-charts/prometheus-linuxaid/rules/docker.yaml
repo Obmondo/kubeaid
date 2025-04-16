@@ -4,7 +4,7 @@ groups:
       - alert: monitor::system::docker::status
         expr: |
           (
-            sum by (certname, name) (increase(container_last_seen{name!~"^runner.*"}[30m])) < 1200
+            sum by (certname, name) (increase(container_last_seen{name!~"^runner.*", name!~"^GITEA-ACTIONS-TASK.*"}[30m])) < 1200
           ) and on(certname) obmondo_monitoring{alert_id="monitor::system::docker::status"} > 0
         for: 5m
         labels:
