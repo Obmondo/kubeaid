@@ -10,7 +10,7 @@ global:
   caph:
     version: v1.0.1
   capz:
-    version: v1.18.1
+    version: v1.19.2
   kubeaid:
     repo: https://github.com/Obmondo/KubeAid.git
   pods:

@@ -6,15 +6,18 @@ metadata:
 {{ include "cluster-autoscaler.labels" (index .Subcharts "cluster-autoscaler") | indent 4 }}
   name: {{ template "cluster-autoscaler.fullname" (index .Subcharts "cluster-autoscaler") }}-capi-extension
 rules:
-{{- if .Values.enableClusterAPIScaleFromZeroSupport.aws }}
   - apiGroups:
     - infrastructure.cluster.x-k8s.io
     resources:
+    {{- if .Values.enableClusterAPIScaleFromZeroSupport.aws }}
     - awsmachinetemplates
+    {{- else if .Values.enableClusterAPIScaleFromZeroSupport.hcloud }}
+    - hcloudmachinetemplates
+    {{- else if .Values.enableClusterAPIScaleFromZeroSupport.azure }}
+    - azuremachinetemplates
+    {{- end }}
     verbs:
     - get
     - list
     - watch
-{{- end }}
 {{- end -}}
-

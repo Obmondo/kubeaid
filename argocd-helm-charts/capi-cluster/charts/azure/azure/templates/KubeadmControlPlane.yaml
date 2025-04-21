@@ -8,11 +8,15 @@ spec:
       apiServer:
         extraArgs:
           cloud-provider: external
+          service-account-issuer: {{ .Values.serviceAccountIssuer.url }}
+          service-account-key-file: "/etc/kubernetes/pki/sa.pub"
+          service-account-signing-key-file: "/etc/kubernetes/pki/sa.key"
         timeoutForControlPlane: 20m0s
       controllerManager:
         extraArgs:
           cloud-provider: external
           cluster-name: {{ .Values.global.clusterName }}
+          service-account-private-key-file: "/etc/kubernetes/pki/sa.key"
       etcd:
         local:
           dataDir: /var/lib/etcddisk/etcd
@@ -36,6 +40,20 @@ spec:
           overwrite: false
           tableType: gpt
     files:
+      {{/* TODO : Consume Service Account signer public and private keys via Kubernetes Secrets. */}}
+      - content: |
+{{- .Values.serviceAccountIssuer.publicKey | nindent 10 }}
+        owner: root:root
+        path: "/etc/kubernetes/pki/sa.pub"
+        permissions: "0644"
+      - content: |
+{{- .Values.serviceAccountIssuer.privateKey | nindent 10 }}
+        owner: root:root
+        path: "/etc/kubernetes/pki/sa.key"
+        permissions: "0644"
+      {{- if ((.Values.controlPlane).apiServer).files }}
+      {{- ((.Values.controlPlane).apiServer).files | toYaml | nindent 6 }}
+      {{- end }}
       {{/* Automated tools that use Azure services should always have restricted permissions to
            ensure that Azure resources are secure. Therefore, instead of having applications sign
            in as a fully privileged user, Azure offers service principals.
@@ -50,6 +68,8 @@ spec:
         path: /etc/kubernetes/azure.json
         permissions: "0644"
     initConfiguration:
+      skipPhases:
+         - addon/kube-proxy
       nodeRegistration:
         kubeletExtraArgs:
           cloud-provider: external
