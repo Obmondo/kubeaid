@@ -2,6 +2,12 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`a02aeefb`](../../commit/a02aeefb) ignore monitoring buildx container
+- [`c1a0eee8`](../../commit/c1a0eee8) ignore docker container down alerts for gitea actions task
+- [`9211891c`](../../commit/9211891c) feat(capi-cluster/azure) : support provisioning self-managed Azure based Kubernetes cluster using ClusterAPI
+- [`cca9be4e`](../../commit/cca9be4e) Add docs for fluent bit DNS issue
+
 ## 10.4.0
 ### Minor Version Upgrades
 - Updated redmine from version 32.1.6 to 32.2.0
