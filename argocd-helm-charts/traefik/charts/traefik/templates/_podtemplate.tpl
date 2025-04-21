@@ -1,5 +1,5 @@
 {{- define "traefik.podTemplate" }}
-  {{- $version := include "imageVersion" $ }}
+  {{- $version := include "proxyVersion" $ }}
     metadata:
       annotations:
       {{- if .Values.deployment.podAnnotations }}
@@ -108,7 +108,7 @@
               {{- fail "ERROR: All hostPort must match their respective containerPort when `hostNetwork` is enabled" }}
             {{- end }}
           {{- end }}
-        - name: {{ $name | lower | quote }}
+        - name: {{ include "traefik.portname" $name }}
           containerPort: {{ default $config.port $config.containerPort }}
           {{- if $config.hostPort }}
           hostPort: {{ $config.hostPort }}
@@ -116,9 +116,9 @@
           {{- if $config.hostIP }}
           hostIP: {{ $config.hostIP }}
           {{- end }}
-          protocol: {{ default "TCP" $config.protocol | quote }}
+          protocol: {{ default "TCP" $config.protocol }}
           {{- if ($config.http3).enabled }}
-        - name: "{{ $name }}-http3"
+        - name: {{ printf "%s-http3" $name | include "traefik.portname" }}
           containerPort: {{ $config.port }}
            {{- if $config.hostPort }}
           hostPort: {{ default $config.hostPort $config.http3.advertisedPort }}
@@ -401,16 +401,16 @@
           - "--tracing.resourceAttributes.{{ $name }}={{ $value }}"
             {{- end }}
 
-            {{- range $index, $value := .capturedRequestHeaders }}
-          - "--tracing.capturedRequestHeaders[{{ $index }}]={{ $value }}"
+            {{- if .capturedRequestHeaders }}
+          - "--tracing.capturedRequestHeaders={{ .capturedRequestHeaders | join "," }}"
             {{- end }}
 
-            {{- range $index, $value := .capturedResponseHeaders }}
-          - "--tracing.capturedResponseHeaders[{{ $index }}]={{ $value }}"
+            {{- if .capturedResponseHeaders }}
+          - "--tracing.capturedResponseHeaders={{ .capturedResponseHeaders | join "," }}"
             {{- end }}
 
             {{- if .safeQueryParams }}
-          - "--tracing.safeQueryParams={{- .safeQueryParams | join "," -}}"
+          - "--tracing.safeQueryParams={{ .safeQueryParams | join "," }}"
             {{- end }}
 
           {{- end }}

@@ -18,7 +18,15 @@ Create chart name and version as used by the chart label.
 Create the chart image name.
 */}}
 {{- define "traefik.image-name" -}}
+{{- if .Values.oci_meta.enabled -}}
+ {{- if .Values.hub.token -}}
+{{- printf "%s/%s:%s" .Values.oci_meta.repo .Values.oci_meta.images.hub.image .Values.oci_meta.images.hub.tag }}
+ {{- else -}}
+{{- printf "%s/%s:%s" .Values.oci_meta.repo .Values.oci_meta.images.proxy.image .Values.oci_meta.images.proxy.tag }}
+ {{- end -}}
+{{- else -}}
 {{- printf "%s/%s:%s" .Values.image.registry .Values.image.repository (.Values.image.tag | default .Chart.AppVersion) }}
+{{- end -}}
 {{- end -}}
 
 {{/*
@@ -93,6 +101,33 @@ are multiple namespaced releases with the same release name.
 {{- end -}}
 
 {{/*
+Change input to a valid name for a port.
+This is a best effort to convert input to a valid port name for Kubernetes,
+which per RFC 6335 only allows lowercase alphanumeric characters and '-',
+and additionally imposes a limit of 15 characters on the length of the name.
+See also https://kubernetes.io/docs/concepts/services-networking/service/#multi-port-services
+and https://www.rfc-editor.org/rfc/rfc6335#section-5.1.
+*/}}
+{{- define "traefik.portname" -}}
+{{- $portName := . -}}
+{{- $portName = $portName | lower -}}
+{{- $portName = $portName | trimPrefix "-" | trunc 15 | trimSuffix "-" -}}
+{{- print $portName -}}
+{{- end -}}
+
+{{/*
+Change input to a valid port reference.
+See also the traefik.portname helper.
+*/}}
+{{- define "traefik.portreference" -}}
+{{- if kindIs "string" . -}}
+    {{- print (include "traefik.portname" .) -}}
+{{- else -}}
+    {{- print . -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Construct the path for the providers.kubernetesingress.ingressendpoint.publishedservice.
 By convention this will simply use the <namespace>/<service-name> to match the name of the
 service generated.
@@ -128,23 +163,27 @@ Renders a complete tree, even values that contains template.
   {{- end }}
 {{- end -}}
 
-{{- define "imageVersion" -}}
+{{- define "proxyVersion" -}}
 {{/*
 Traefik hub is based on v3.1 (v3.0 before v3.3.1) of traefik proxy, so this is a hack to avoid to much complexity in RBAC management which are
 based on semverCompare
 */}}
 {{- if $.Values.hub.token -}}
- {{ $hubVersion := "v3.2" }}
- {{- if regexMatch "v[0-9]+.[0-9]+.[0-9]+" (default "" $.Values.image.tag) -}}
-    {{- if semverCompare "<v3.3.2-0" $.Values.image.tag -}}
-        {{ $hubVersion = "v3.0" }}
-    {{- else if semverCompare "<v3.7.0-0" $.Values.image.tag -}}
-        {{ $hubVersion = "v3.1" }}
+ {{- $version := ($.Values.oci_meta.enabled | ternary $.Values.oci_meta.images.hub.tag $.Values.image.tag) -}}
+ {{- $hubProxyVersion := "v3.3" }}
+ {{- if regexMatch "v[0-9]+.[0-9]+.[0-9]+" (default "" $version) -}}
+    {{- if semverCompare "<v3.3.2-0" $version -}}
+        {{- $hubProxyVersion = "v3.0" }}
+    {{- else if semverCompare "<v3.7.0-0" $version -}}
+        {{- $hubProxyVersion = "v3.1" }}
+    {{- else if semverCompare "<v3.11.0-0" $version -}}
+        {{ $hubProxyVersion = "v3.2" }}
     {{- end -}}
  {{- end -}}
-{{ $hubVersion }}
+{{ $hubProxyVersion }}
 {{- else -}}
-{{ (split "@" (default $.Chart.AppVersion $.Values.image.tag))._0 | replace "latest-" "" | replace "experimental-" "" }}
+{{- $imageVersion := ($.Values.oci_meta.enabled | ternary $.Values.oci_meta.images.proxy.tag $.Values.image.tag) -}}
+{{ (split "@" (default $.Chart.AppVersion $imageVersion))._0 | replace "latest-" "" | replace "experimental-" "" }}
 {{- end -}}
 {{- end -}}
 

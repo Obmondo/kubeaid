@@ -6,14 +6,14 @@ image:
   oss:
     repository: public.ecr.aws/zinclabs/openobserve
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.14.4"
+    tag: "v0.14.5"
   enterprise:
     repository: public.ecr.aws/zinclabs/openobserve-enterprise
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.14.5-rc5"
+    tag: "v0.14.5"
   reportserver:
     repository: public.ecr.aws/zinclabs/report-server
-    tag: "v0.0.10-rc3-14e738a"
+    tag: "v0.11.0-70baf7a"
   busybox:
     repository: public.ecr.aws/docker/library/busybox
     tag: 1.36.1
@@ -129,18 +129,11 @@ querier:
 
 reportserver:
   enabled: true # if true then reportserver will be deployed as part of openobserve
-  # Additional volumes on the output Deployment definition.
-  volumes: []
-  # - name: foo
-  #   secret:
-  #     secretName: mysecret
-  #     optional: false
-
-  # Additional volumeMounts on the output Deployment definition.
-  volumeMounts: []
-  # - name: foo
-  #   mountPath: "/etc/foo"
-  #   readOnly: true
+  extraEnv: # Below env variable are required due to https://github.com/puppeteer/puppeteer/issues/11023#issuecomment-1776247197
+    - name: XDG_CONFIG_HOME
+      value: /tmp/.chromium
+    - name: XDG_CACHE_HOME
+      value: /tmp/.chromium
 
 actions:
   enabled: true
@@ -220,7 +213,7 @@ config:
   ZO_HEALTH_CHECK_TIMEOUT: "5"
   ZO_HEALTH_CHECK_FAILED_TIMES: "3"
   ZO_CLUSTER_COORDINATOR: "nats"
-  ZO_QUEUE_STORE: ""
+  ZO_QUEUE_STORE: "nats"
   ZO_META_STORE: "postgres"
   ZO_META_CONNECTION_POOL_MIN_SIZE: "0"
   ZO_META_CONNECTION_POOL_MAX_SIZE: "0"
@@ -236,12 +229,11 @@ config:
   ZO_FEATURE_QUICK_MODE_FIELDS: "" # default fields for quick mode
   ZO_FEATURE_QUERY_PARTITION_STRATEGY: "file_hash"
   ZO_FEATURE_PER_THREAD_LOCK: "false"
-  ZO_FEATURE_QUERY_STREAMING_AGGS: "false"
-  ZO_DATAFUSION_STREAMING_AGGS_CACHE_MAX_ENTRIES: "100000"
   ZO_RESULT_CACHE_ENABLED: "true" # Enable result cache for query results
   ZO_USE_MULTIPLE_RESULT_CACHE: "true" # Enable to use mulple result caches for query results
   ZO_RESULT_CACHE_SELECTION_STRATEGY: "overlap" # Strategy to use for result cache, default is both , possible value - both,overlap , duration
   ZO_RESULT_CACHE_DISCARD_DURATION: "60" # Discard data of last n seconds from cached results
+  ZO_DISK_RESULT_CACHE_MAX_SIZE: "0" # MB, default is 10% of local volume available space and maximum 20GB
   ZO_METRICS_CACHE_ENABLED: "true" # Enable result cache for metrics query
   ZO_METRICS_CACHE_MAX_ENTRIES: "100000"
   ZO_CONSISTENT_HASH_VNODES: "1000"
@@ -318,7 +310,7 @@ config:
   ZO_COMPACT_BATCH_SIZE: "500"
   ZO_COMPACT_BLOCKED_ORGS: ""
   ZO_MEMORY_CACHE_ENABLED: "true"
-  ZO_MEMORY_CACHE_STRATEGY: "lru"
+  ZO_MEMORY_CACHE_STRATEGY: "lru"  # lru, fifo, time_lru https://github.com/openobserve/openobserve/pull/6489
   ZO_MEMORY_CACHE_CACHE_LATEST_FILES: "false"
   ZO_MEMORY_CACHE_MAX_SIZE: "0"
   ZO_MEMORY_CACHE_SKIP_SIZE: "0"
@@ -328,7 +320,7 @@ config:
   ZO_MEMORY_CACHE_DATAFUSION_MEMORY_POOL: ""
   ZO_MEMORY_CACHE_DATAFUSION_MAX_SIZE: "0"
   ZO_DISK_CACHE_ENABLED: "true"
-  ZO_DISK_CACHE_STRATEGY: "lru"
+  ZO_DISK_CACHE_STRATEGY: "lru" # lru, fifo, time_lru https://github.com/openobserve/openobserve/pull/6489
   ZO_DISK_CACHE_MAX_SIZE: "0"
   ZO_DISK_CACHE_SKIP_SIZE: "0"
   ZO_DISK_CACHE_RELEASE_SIZE: "0"
@@ -439,7 +431,9 @@ config:
   ZO_SELF_METRIC_CONSUMPTION_INTERVAL: "60" # self-consume metrics interval, unit seconds
   ZO_SELF_METRIC_CONSUMPTION_ACCEPTLIST: "" # only these metrics will be self-consumed, comma separated
   ZO_SWAGGER_ENABLED: "true"
-  ZO_WEBSOCKET_ENABLED: "false"
+  ZO_WEBSOCKET_ENABLED: "true"
+  ZO_FEATURE_QUERY_STREAMING_AGGS: "true"
+  ZO_DATAFUSION_STREAMING_AGGS_CACHE_MAX_ENTRIES: "100000"
   ZO_MIN_AUTO_REFRESH_INTERVAL: "5"
   ZO_MAX_DASHBOARD_SERIES: "100"
   RUST_LOG: "info"

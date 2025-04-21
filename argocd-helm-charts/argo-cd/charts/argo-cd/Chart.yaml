@@ -1,12 +1,12 @@
 annotations:
   artifacthub.io/changes: |
-    - kind: fixed
-      description: Secret for embedded Redis deployments now always uses the same name and key
+    - kind: changed
+      description: Update kubelogin documentation for extra containers
   artifacthub.io/signKey: |
     fingerprint: 2B8F22F57260EFA67BE1C5824B11F800CD9D2252
     url: https://argoproj.github.io/argo-helm/pgp_keys.asc
 apiVersion: v2
-appVersion: v2.14.9
+appVersion: v2.14.10
 dependencies:
 - condition: redis-ha.enabled
   name: redis-ha
@@ -28,4 +28,4 @@ name: argo-cd
 sources:
 - https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
 - https://github.com/argoproj/argo-cd
-version: 7.8.23
+version: 7.8.27

@@ -2,6 +2,43 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 11.0.0
+### Major Version Upgrades
+- Updated velero from version 8.7.1 to 9.0.0
+- Updated traefik from version 34.5.0 to 35.0.1
+
+### Minor Version Upgrades
+- Updated rook-ceph from version v1.16.6 to v1.17.0
+- Updated reloader from version 2.0.0 to 2.1.1
+- Updated prometheus-adapter from version 4.13.0 to 4.14.1
+- Updated opentelemetry-collector from version 0.120.2 to 0.122.1
+- Updated community-operator from version 0.12.1 to 0.13.0
+- Updated kubernetes-dashboard from version 7.11.1 to 7.12.0
+- Updated keda from version 2.16.1 to 2.17.0
+- Updated harbor from version 1.16.2 to 1.17.0
+- Updated gitlab-runner from version 0.75.1 to 0.76.0
+- Updated gatekeeper from version 3.18.2 to 3.19.0
+- Updated aws-ebs-csi-driver from version 2.41.0 to 2.42.0
+
+### Patch Version Upgrades
+- Updated teleport-kube-agent from version 17.4.2 to 17.4.5
+- Updated teleport-cluster from version 17.4.2 to 17.4.5
+- Added rook-ceph-cluster from version v1.16.0 to v1.16.0
+- Updated redmine from version 32.2.0 to 32.2.2
+- Added opentelemetry-operator from version 0.84.1 to 0.84.1
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated openobserve from version 0.14.42 to 0.14.53
+- Updated opencost from version 2.0.1 to 2.0.2
+- Updated oncall from version 1.15.2 to 1.15.6
+- Updated mattermost-team-edition from version 6.6.73 to 6.6.74
+- Updated mariadb-operator from version 0.38.0 to 0.38.1
+- Updated fluent-bit from version 0.48.9 to 0.48.10
+- Updated external-dns from version 8.7.10 to 8.7.11
+- Updated erpnext from version 7.0.183 to 7.0.193
+- Updated cilium from version 1.17.2 to 1.17.3
+- Updated cloud-provider-azure from version 1.32.0 to 1.32.3
+- Updated argo-cd from version 7.8.23 to 7.8.27
+
 ### Improvements
 - [`a02aeefb`](../../commit/a02aeefb) ignore monitoring buildx container
 - [`c1a0eee8`](../../commit/c1a0eee8) ignore docker container down alerts for gitea actions task

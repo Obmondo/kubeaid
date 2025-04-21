@@ -80,14 +80,6 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources.reportserver | nindent 12 }}
-          {{- with .Values.reportserver.volumeMounts }}
-          volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-      {{- with .Values.reportserver.volumes }}
-      volumes:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       {{- with .Values.nodeSelector.reportserver }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

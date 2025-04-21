@@ -1,10 +1,9 @@
 annotations:
-  artifacthub.io/changes: "- \"fix(gateway): `gateway.namespace` value is ignored\"\n-
-    \"feat: allow templating the additionalVolumeMounts configuration\"\n- \"feat(CRDs):
-    \U0001F527 update Traefik Hub CRDs to v1.17.2\"\n- \"chore(release): publish crds
-    1.6.0 and traefik 34.5.0\"\n"
+  artifacthub.io/changes: |
+    - "feat(deps): update traefik docker tag to v3.3.6"
+    - "chore(release): :rocket: publish traefik 35.0.1"
 apiVersion: v2
-appVersion: v3.3.4
+appVersion: v3.3.6
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
 icon: https://raw.githubusercontent.com/traefik/traefik/v2.3/docs/content/assets/img/traefik.logo.png
@@ -26,4 +25,4 @@ sources:
 - https://github.com/traefik/traefik-helm-chart
 - https://github.com/traefik/traefik
 type: application
-version: 34.5.0
+version: 35.0.1

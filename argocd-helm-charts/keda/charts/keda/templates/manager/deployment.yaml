@@ -45,6 +45,7 @@ spec:
         {{- end }}
       {{- end }}
     spec:
+      enableServiceLinks: {{ .Values.enableServiceLinks }}
       {{- if .Values.priorityClassName }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
       {{- end }}
@@ -82,6 +83,7 @@ spec:
           - "--zap-log-level={{ .Values.logging.operator.level }}"
           - "--zap-encoder={{ .Values.logging.operator.format }}"
           - "--zap-time-encoding={{ .Values.logging.operator.timeEncoding }}"
+          - "--enable-webhook-patching={{ .Values.webhooks.enabled }}"
           {{- if .Values.logging.operator.stackTracesEnabled }}
           - "--zap-stacktrace-level=error"
           {{- end }}

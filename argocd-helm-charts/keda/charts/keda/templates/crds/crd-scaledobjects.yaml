@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
+    controller-gen.kubebuilder.io/version: v0.16.5
     {{- if (or .Values.crds.additionalAnnotations .Values.additionalAnnotations) }}
     {{- toYaml (merge .Values.crds.additionalAnnotations .Values.additionalAnnotations) | nindent 4 }}
     {{- end }}
@@ -224,6 +224,9 @@ spec:
                         description: |-
                           MetricTargetType specifies the type of metric being targeted, and should be either
                           "Value", "AverageValue", or "Utilization"
+                        enum:
+                        - AverageValue
+                        - Value
                         type: string
                       target:
                         type: string
@@ -235,6 +238,14 @@ spec:
               fallback:
                 description: Fallback is the spec for fallback options
                 properties:
+                  behavior:
+                    default: static
+                    enum:
+                    - static
+                    - currentReplicas
+                    - currentReplicasIfHigher
+                    - currentReplicasIfLower
+                    type: string
                   failureThreshold:
                     format: int32
                     type: integer
@@ -319,6 +330,8 @@ spec:
           status:
             description: ScaledObjectStatus is the status for a ScaledObject resource
             properties:
+              authenticationsTypes:
+                type: string
               compositeScalerName:
                 type: string
               conditions:
@@ -396,6 +409,8 @@ spec:
                 - version
                 type: object
               scaleTargetKind:
+                type: string
+              triggersTypes:
                 type: string
             type: object
         required:

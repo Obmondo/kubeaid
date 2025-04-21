@@ -7,7 +7,7 @@ image:
   repository: docker.io/rook/ceph
   # -- Image tag
   # @default -- `master`
-  tag: v1.16.6
+  tag: master
   # -- Image pull policy
   pullPolicy: IfNotPresent
 
@@ -489,7 +489,7 @@ csi:
     # -- Ceph CSI image repository
     repository: quay.io/cephcsi/cephcsi
     # -- Ceph CSI image tag
-    tag: v3.13.1
+    tag: v3.14.0
 
   registrar:
     # -- Kubernetes CSI registrar image repository
@@ -539,7 +539,7 @@ csi:
     # -- CSIAddons sidecar image repository
     repository: quay.io/csiaddons/k8s-sidecar
     # -- CSIAddons sidecar image tag
-    tag: v0.11.0
+    tag: v0.12.0
 
   nfs:
     # -- Enable the nfs csi driver
@@ -660,6 +660,13 @@ enableOBCWatchOperatorNamespace: true
 # -- Specify the prefix for the OBC provisioner in place of the cluster namespace
 # @default -- `ceph cluster namespace`
 obcProvisionerNamePrefix:
+
+# -- Many OBC additional config fields may be risky for administrators to allow users control over.
+# The safe and default-allowed fields are 'maxObjects' and 'maxSize'.
+# Other fields should be considered risky. To allow all additional configs, use this value:
+#   "maxObjects,maxSize,bucketMaxObjects,bucketMaxSize,bucketPolicy,bucketLifecycle,bucketOwner"
+# @default -- "maxObjects,maxSize"
+obcAllowAdditionalConfigFields: "maxObjects,maxSize"
 
 monitoring:
   # -- Enable monitoring. Requires Prometheus to be pre-installed.

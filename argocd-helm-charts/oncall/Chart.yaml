@@ -3,5 +3,5 @@ name: oncall
 version: 1.0.0
 dependencies:
   - name: oncall
-    version: 1.15.2
+    version: 1.15.6
     repository: https://grafana.github.io/helm-charts
