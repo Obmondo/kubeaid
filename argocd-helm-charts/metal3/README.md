@@ -30,142 +30,6 @@ The `BareMetalHost` resource moves through various states during its lifecycle:
 And for deprovisioning:
 - `Provisioned` → `Deleting` → `Cleaning` → `Available`
 
-## Redfish API and BMC Communication
-
-Metal3 communicates with server hardware through the BMC (Baseboard Management Controller), typically using one of these protocols:
-
-### Redfish API
-
-Redfish is a modern, RESTful API for out-of-band server management. Metal3 uses Redfish to:
-
-- Power servers on/off
-- Configure boot devices
-- Mount virtual media (ISO images)
-- Monitor hardware health
-- Access server console
-
-Example Redfish BMC configuration in a `BareMetalHost`:
-
-```yaml
-spec:
-  bmc:
-    address: redfish://<bmc-ip>/redfish/v1/Systems/1
-    credentialsName: server1-bmc-credentials
-```
-
-#### Redfish API Examples
-
-Here are some practical examples of interacting directly with the Redfish API using curl with basic authentication:
-
-**1. Get System Information**
-
-```bash
-# Get basic system information
-curl -k -X GET \
-  https://<bmc-ip>/redfish/v1/Systems/1 \
-  -u admin:password \
-  | jq
-```
-
-**2. Power Operations**
-
-```bash
-# Get current power state
-curl -k -X GET \
-  https://<bmc-ip>/redfish/v1/Systems/1 \
-  -u admin:password \
-  | jq '.PowerState'
-
-# Power on a server
-curl -k -X POST \
-  https://<bmc-ip>/redfish/v1/Systems/1/Actions/ComputerSystem.Reset \
-  -H "Content-Type: application/json" \
-  -u admin:password \
-  -d '{"ResetType": "On"}'
-
-# Power off a server
-curl -k -X POST \
-  https://<bmc-ip>/redfish/v1/Systems/1/Actions/ComputerSystem.Reset \
-  -H "Content-Type: application/json" \
-  -u admin:password \
-  -d '{"ResetType": "ForceOff"}'
-```
-
-**3. Boot Configuration**
-
-```bash
-# Set next boot to PXE
-curl -k -X PATCH \
-  https://<bmc-ip>/redfish/v1/Systems/1 \
-  -H "Content-Type: application/json" \
-  -u admin:password \
-  -d '{"Boot": {"BootSourceOverrideTarget": "Pxe", "BootSourceOverrideEnabled": "Once"}}'
-
-# Set next boot to disk
-curl -k -X PATCH \
-  https://<bmc-ip>/redfish/v1/Systems/1 \
-  -H "Content-Type: application/json" \
-  -u admin:password \
-  -d '{"Boot": {"BootSourceOverrideTarget": "Hdd", "BootSourceOverrideEnabled": "Once"}}'
-```
-
-**4. Virtual Media Operations**
-
-```bash
-# Get available virtual media devices
-curl -k -X GET \
-  https://<bmc-ip>/redfish/v1/Managers/1/VirtualMedia \
-  -u admin:password \
-  | jq
-
-# Insert ISO image (virtual CD)
-curl -k -X POST \
-  https://<bmc-ip>/redfish/v1/Managers/1/VirtualMedia/CD/Actions/VirtualMedia.InsertMedia \
-  -H "Content-Type: application/json" \
-  -u admin:password \
-  -d '{"Image": "http://webserver/image.iso", "Inserted": true, "WriteProtected": true}'
-
-# Eject virtual media
-curl -k -X POST \
-  https://<bmc-ip>/redfish/v1/Managers/1/VirtualMedia/CD/Actions/VirtualMedia.EjectMedia \
-  -H "Content-Type: application/json" \
-  -u admin:password
-```
-
-**5. Hardware Inventory**
-
-```bash
-# Get processor information
-curl -k -X GET \
-  https://<bmc-ip>/redfish/v1/Systems/1/Processors \
-  -u admin:password \
-  | jq
-
-# Get memory information
-curl -k -X GET \
-  https://<bmc-ip>/redfish/v1/Systems/1/Memory \
-  -u admin:password \
-  | jq
-
-# Get disk/storage information
-curl -k -X GET \
-  https://<bmc-ip>/redfish/v1/Systems/1/Storage \
-  -u admin:password \
-  | jq
-```
-
-**Note:** The exact Redfish API structure may vary between server vendors. The examples above follow the Redfish standard, but you may need to adjust paths or payload formats based on your specific hardware.
-
-### IPMI
-
-For older hardware without Redfish support, IPMI (Intelligent Platform Management Interface) can be used:
-
-```yaml
-spec:
-  bmc:
-    address: ipmi://<bmc-ip>
-    credentialsName: server1-bmc-credentials
-```
 
 ## Provisioning Methods
 
@@ -179,6 +43,8 @@ Metal3 supports multiple provisioning methods:
    - No requirement for a dedicated provisioning network
    - Works over the management network
    - Requires Redfish support with Virtual Media capability
+
+All the below requirements and examples are for **BMC** . We can even provision nodes in **VMware** which is WIP.
 
 ## Firewall Requirements
 
@@ -242,7 +108,7 @@ type: Opaque
 stringData:
   networkData: |
     interfaces:
-    - name: enp1s0f0
+    - name: <interface name>
       type: ethernet
       state: up
       mac-address: "<mac-address>"
@@ -260,7 +126,7 @@ stringData:
       config:
       - destination: 0.0.0.0/0
         next-hop-address: <gateway-ip>
-        next-hop-interface: enp1s0f0
+        next-hop-interface: <interface name>
 ```
 
 To set-up the provisioned server network you should create a secret with the name `<baremetalhost>-networkdata` which should look like:
@@ -269,15 +135,15 @@ To set-up the provisioned server network you should create a secret with the nam
 {
   "links": [
     {
-      "id": "enp1s0f0",
+      "id": "<interface name>",
       "type": "phy",
       "ethernet_mac_address": "<mac-address>"
     }
   ],
   "networks": [
     {
-      "id": "enp1s0f0",
-      "link": "enp1s0f0",
+      "id": "<interface name>",
+      "link": "<interface name>",
       "type": "ipv4",
       "routes":
         {
@@ -291,153 +157,33 @@ To set-up the provisioned server network you should create a secret with the nam
 }
 ```
 
-## Using Ironic APIs Directly
+## Userdata setup
 
-While Metal3 provides a Kubernetes-native interface, you can also interact directly with the Ironic API for advanced use cases:
-
-### Ironic API Endpoints
-
-- Node management: `http://<ironic-ip>:6385/v1/nodes`
-- Image service: `http://<ironic-ip>:<vmediaTLSPort>/images`
-
-### Ironic API Examples Using curl
-
-Here are some practical examples of interacting with the Ironic API using curl:
-
-**1. Node Management**
+If we want to configure the partion or create users or anything in the server on the first boot - we need to create a secret `<baremetalhost>-userdata`
+The below one assigns the hostname to the server, creates a sudo user and make sure the `/` partition is 50G.
 
 ```bash
-# List all nodes with details
-curl -X GET http://<ironic-ip>:6385/v1/nodes/detail | jq
+#cloud-config
 
-# Get information about a specific node
-curl -X GET http://<ironic-ip>:6385/v1/nodes/<node-uuid> | jq
+hostname: tdkcphsmn01
 
-# Create a new node
-curl -X POST \
-  http://<ironic-ip>:6385/v1/nodes \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "test-node",
-    "driver": "ipmi",
-    "driver_info": {
-      "ipmi_address": "<bmc-ip>",
-      "ipmi_username": "admin",
-      "ipmi_password": "password"
-    },
-    "properties": {
-      "cpu_arch": "x86_64",
-      "local_gb": 100,
-      "cpus": 4,
-      "memory_mb": 16384
-    }
-  }' | jq
+users:
+  - name: test
+    groups: [sudo]
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    lock_passwd: false
+    passwd: $6$4Ku44dv4Gh4vE/l/$hvcWyIb6SyL2huyQ/cPVNjya0g30tcpryiYSPNWavIVAxGMOFp2l7RHB0mBgAe.I149w1SloBmGNnjwICIx1M/
 
-# Delete a node
-curl -X DELETE http://<ironic-ip>:6385/v1/nodes/<node-uuid>
+growpart:
+  mode: 'off'
+
+runcmd:
+  - echo yes | parted /dev/nvme2n1 ---pretend-input-tty resizepart 1 50GB
+  - resize2fs /dev/nvme2n1p1
 ```
 
-**2. Node Power Management**
-
-```bash
-# Get the current power state
-curl -X GET http://<ironic-ip>:6385/v1/nodes/<node-uuid>/states | jq
-
-# Power on a node
-curl -X PUT \
-  http://<ironic-ip>:6385/v1/nodes/<node-uuid>/states/power \
-  -H "Content-Type: application/json" \
-  -d '{"target": "power on"}' | jq
-
-# Power off a node
-curl -X PUT \
-  http://<ironic-ip>:6385/v1/nodes/<node-uuid>/states/power \
-  -H "Content-Type: application/json" \
-  -d '{"target": "power off"}' | jq
-
-# Reboot a node
-curl -X PUT \
-  http://<ironic-ip>:6385/v1/nodes/<node-uuid>/states/power \
-  -H "Content-Type: application/json" \
-  -d '{"target": "reboot"}' | jq
-```
-
-**3. Node Provisioning**
-
-```bash
-# Set node to available state (after cleaning)
-curl -X PUT \
-  http://<ironic-ip>:6385/v1/nodes/<node-uuid>/states/provision \
-  -H "Content-Type: application/json" \
-  -d '{"target": "available"}'
-
-# Deploy a node with an image
-curl -X PUT \
-  http://<ironic-ip>:6385/v1/nodes/<node-uuid>/states/provision \
-  -H "Content-Type: application/json" \
-  -d '{
-    "target": "active",
-    "configdrive": {"user_data": "BASE64_ENCODED_USER_DATA_HERE"},
-    "instance_info": {
-      "image_source": "http://webserver/image.qcow2",
-      "image_checksum": "md5sum_value_here",
-      "root_gb": 20
-    }
-  }'
-
-# Clean a node
-curl -X PUT \
-  http://<ironic-ip>:6385/v1/nodes/<node-uuid>/states/provision \
-  -H "Content-Type: application/json" \
-  -d '{"target": "clean", "clean_steps": [{"interface": "deploy", "step": "erase_devices"}]}'
-```
-
-**4. Node Inspection**
-
-```bash
-# Trigger hardware inspection on a node
-curl -X PUT \
-  http://<ironic-ip>:6385/v1/nodes/<node-uuid>/states/provision \
-  -H "Content-Type: application/json" \
-  -d '{"target": "inspect"}'
-
-# Get inspection data
-curl -X GET http://<ironic-ip>:6385/v1/nodes/<node-uuid>/states/inventory | jq
-```
-
-**5. Ironic Image Management**
-
-```bash
-# List available images
-curl -X GET http://<ironic-ip>:<vmediaTLSPort>/images | jq
-
-# Upload a kernel image
-curl -X PUT \
-  http://<ironic-ip>:<vmediaTLSPort>/images/kernel-image \
-  --data-binary @/path/to/kernel
-
-# Upload an initramfs image
-curl -X PUT \
-  http://<ironic-ip>:<vmediaTLSPort>/images/initramfs-image \
-  --data-binary @/path/to/initramfs
-```
-
-**Note:** When interacting with the Ironic API and enable_basicAuth is present then used flag -u with parameters ironicUsername:ironicPassword.
-
-## Deploying Metal3 with this Helm Chart
-
-### Prerequisites
-
-- Kubernetes cluster with cert-manager installed
-- LoadBalancer capability (e.g., MetalLB or cloud provider)
-- Static IP address for Ironic services
-
-### Basic Installation
-
-```bash
-helm repo add suse-edge https://suse-edge.github.io/charts
-helm pull suse-edge/metal3 --untar
-```
+`/dev/nvme2n1` is the same disk where you have set the `rootDeviceHints` for.
 
 ## Further Resources
 
