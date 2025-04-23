@@ -14,10 +14,10 @@ velero:
       enabled: true
   resources:
     limits:
-      memory: 512Mi
+      memory: 4Gi
     requests:
       cpu: 3m
-      memory: 128Mi
+      memory: 2Gi
   upgradeJobResources:
     requests:
       memory: 100Mi
