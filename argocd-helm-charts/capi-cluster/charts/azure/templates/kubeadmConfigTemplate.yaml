@@ -1,17 +1,18 @@
-{{- if .Values.selfManagedCluster.enabled }}
+{{- if (.Values.global).enableClusterAutoscaler }}
+{{- range $index, $nodeGroup := $.Values.nodeGroups }}
+---
 apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
 kind: KubeadmConfigTemplate
 metadata:
-  name: {{ .Values.global.clusterName }}-md-0
-  namespace: {{ .Release.Namespace }}
+  name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
 spec:
   template:
     spec:
       files:
       - contentFrom:
           secret:
-            key: sp.json
-            name: {{ .Values.selfManagedCluster.clientSecret.workerNodeAzure }}
+            key: worker-node-azure.json
+            name: {{ $.Values.global.clusterName }}-{{ $nodeGroup.name }}-azure-json
         owner: root:root
         path: /etc/kubernetes/azure.json
         permissions: "0644"
@@ -19,5 +20,17 @@ spec:
         nodeRegistration:
           kubeletExtraArgs:
             cloud-provider: external
-          name: {{ .Values.selfManagedCluster.localHostname }}
+          name: '{{"{{"}} ds.meta_data.local_hostname {{"}}"}}'
+          {{- if $nodeGroup.taints }}
+          taints: {{- toYaml $nodeGroup.taints | nindent 10 }}
+          {{- end }}
+      {{- if (gt (len $.Values.global.additionalUsers) 0) }}
+      users:
+        {{- range $index, $additionalUser := $.Values.global.additionalUsers }}
+        - name: {{ $additionalUser.name }}
+          sshAuthorizedKeys:
+            - {{ $additionalUser.sshPublicKey }}
+        {{- end }}
+      {{- end }}
+{{- end }}
 {{- end }}

@@ -1,32 +1,37 @@
-{{- if .Values.selfManagedCluster.enabled }}
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: AzureMachineTemplate
 metadata:
-  name: {{ .Values.global.clusterName }}-system
-  namespace: {{ .Release.Namespace }}
+  name: {{ .Values.global.clusterName }}-control-plane
 spec:
   template:
     spec:
-      vmSize: {{ .Values.systemPool.sku }}
+      vmSize: {{ .Values.controlPlane.vmSize }}
       osDisk:
-        diskSizeGB: {{ .Values.systemPool.osDiskSizeGB }}
+        diskSizeGB: {{ .Values.controlPlane.diskSizeGB }}
         osType: Linux
-      sshPublicKey: {{ .Values.sshPublicKey | b64enc }}
-{{- end }}
+      dataDisks:
+        {{/* Atleast 80GB is recommended.
+             REFERENCE : https://etcd.io/docs/v3.4/faq/ */}}
+        - diskSizeGB: 256
+          lun: 0
+          nameSuffix: etcddisk
+      sshPublicKey: {{ $.Values.sshPublicKey | b64enc }}
+      identity: UserAssigned
+      userAssignedIdentities:
+        - providerID: /subscriptions/{{ .Values.subscriptionID }}/resourceGroups/{{ .Values.resourceGroup }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{{ .Values.userAssignedIdentity.name }}
+
 ---
-{{- if .Values.selfManagedCluster.enabled }}
+{{- range $index, $nodeGroup := $.Values.nodeGroups }}
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: AzureMachineTemplate
 metadata:
-  name: {{ .Values.global.clusterName }}-user
-  namespace: {{ .Release.Namespace }}
+  name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
 spec:
   template:
     spec:
-      vmSize: {{ .Values.userPool.sku }}
+      vmSize: {{ $nodeGroup.vmSize }}
       osDisk:
-        diskSizeGB: {{ .Values.userPool.osDiskSizeGB }}
+        diskSizeGB: {{ $nodeGroup.diskSizeGB }}
         osType: Linux
-      sshPublicKey: {{ .Values.sshPublicKey | b64enc }}
+      sshPublicKey: {{ $.Values.sshPublicKey | b64enc }}
 {{- end }}
----
