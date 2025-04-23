@@ -1,0 +1,23 @@
+{{/*
+  Integrating Container Storage Interface (CSI) snapshot support into Velero enables Velero to
+  backup and restore CSI-backed volumes using the Kubernetes CSI Snapshot Beta APIs.
+
+  Velero’s CSI support does not rely on the Velero VolumeSnapshotter plugin interface.
+
+  You can read about the working mechanism of Velero CSI integration here :
+  https://velero.io/docs/v1.6/csi/.
+*/}}
+{{- range $volumeSnapshotClassIndex, $volumeSnapshotClass := $.Values.volumeSnapshotClasses }}
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: {{ $volumeSnapshotClass.name }}
+  labels:
+    velero.io/csi-volumesnapshot-class: "true"
+  {{- if $volumeSnapshotClass.isDefaultClass }}
+  annotations:
+    snapshot.storage.kubernetes.io/is-default-class: "true"
+  {{- end }}
+driver: {{ $volumeSnapshotClass.driver }}
+deletionPolicy: {{ $volumeSnapshotClass.deletionPolicy }}
+{{- end }}
