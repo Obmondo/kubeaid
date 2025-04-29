@@ -13,3 +13,21 @@ harbor:
     revisionHistoryLimit: 0
   registry:
     revisionHistoryLimit: 0
+  database:
+    type: external
+    external:
+      host: harbor-pgsql-rw
+      username: harbor
+      existingSecret: harbor-pgsql-app
+
+postgres:
+  size: 3Gi
+  recover: false
+  pass: harbor-pgsql-app
+  resources:
+    limits:
+      memory: 800Mi
+      cpu: 250m
+    requests:
+      memory: 500Mi
+      cpu: 250m
