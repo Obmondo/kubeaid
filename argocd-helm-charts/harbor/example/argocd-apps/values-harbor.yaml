@@ -1,0 +1,22 @@
+harbor:
+  expose:
+    tls:
+      certSource: secret
+      secret:
+        secretName: harbor-cert
+    ingress:
+      hosts:
+        core: harbor.example.com
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt
+        kubernetes.io/ingress.class: traefik-cert-manager
+  externalURL: https://harbor.example.com
+  persistence:
+    persistentVolumeClaim:
+      registry:
+        size: 10Gi
+      jobservice:
+        jobLog:
+          size: 3Gi
+postgres:
+  size: 6Gi
