@@ -2,6 +2,8 @@ puppetserver:
   puppetserver:
     name: puppetserver
     puppeturl: "https://github.com/Obmondo/LinuxAid.git"
+    image: ghcr.io/voxpupuli/container-puppetserver
+    tag: 7.17.0-v1.5.0
     masters:
       resources:
         requests:
@@ -30,6 +32,8 @@ puppetserver:
   puppetdb:
     enabled: true
     name: puppetdb
+    image: ghcr.io/voxpupuli/container-puppetdb
+    tag: 7.18.0-v1.5.0
     resources:
       requests:
         memory: 1024Mi
