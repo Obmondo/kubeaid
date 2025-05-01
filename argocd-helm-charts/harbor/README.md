@@ -40,59 +40,6 @@ docker push "<registry_url>/<project_name>/<image_name>:<tag>"
 
 Harbor allows role based access management. To give an user some specific perms, you need to go to harbor, and in the Projects dashboard, go to the particular project name add user and select group that needs to be assigned to that particular user. Here is a link that elaborately explains what roles gives what permission to a particular user - https://goharbor.io/docs/2.1.0/administration/managing-users/user-permissions-by-role/
 
-## Database Migration to postgres cnpg
-
-* Created a PR for migrating the database to PostgreSQL using CNPG.
-* Synced the PostgreSQL database changes, and confirmed the PostgreSQL pod was running.
-* Removed the Harbor ingress from ArgoCD to prevent incoming traffic during migration.
-* Deployed a temporary Ubuntu pod and installed the PostgreSQL client.
-
-```sh
-vim ubuntu-sleep.yaml ## Add the below content 
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: ubuntu
-  labels:
-    app: ubuntu
-spec:
-  containers:
-  - image: ubuntu
-    command:
-      - "sleep"
-      - "604800"
-    imagePullPolicy: IfNotPresent
-    name: ubuntu
-  restartPolicy: Always
-
-
-kubectl apply -f ubuntu-sleep.yaml -n harbor
-```
-
-* Installing postgressql-client in ubuntu pod 
-
-```sh
- apt update
- apt install postgresql-client
-```
-
-* Took a backup of the registry database from the harbor-database pod using the Ubuntu pod.
-
-```sh
- pg_dump -h harbor-database -U postgres -d registry | gzip > /tmp/registry.sql
-```
-
-* The postgres user password can be retrieved from the relevant Kubernetes secret.
-* Restored the database backup to the new PostgreSQL pod.
-
-```sh
- psql -h harbor-pgsql-rw -U harbor -d registry -f /tmp/registry.sql
-```
-
-* After restoring, synced the backup without deleting the existing harbor-database pod.
-* Once the application was up and healthy, re-applied the ingress and verified Harbor functionality.
-
 ## Debugging Harbor OIDC Issues
 
 Sometimes, when the changes related to your OIDC provider is done in Harbor, it starts throwing errors which goes like
