@@ -49,6 +49,8 @@ puppetserver:
     name: puppetboard
     image: ghcr.io/voxpupuli/puppetboard
     tag: 6.0.1
+    extraEnv:
+      PUPPETBOARD_WORKERS: 2
 
   metrics:
     prometheus:
