@@ -24,6 +24,9 @@ spec:
           {{- if $nodeGroup.taints }}
           taints: {{- toYaml $nodeGroup.taints | nindent 10 }}
           {{- end }}
+      preKubeadmCommands:
+        # Delete password for the root user.
+        - passwd -d root
       {{- if (gt (len $.Values.global.additionalUsers) 0) }}
       users:
         {{- range $index, $additionalUser := $.Values.global.additionalUsers }}

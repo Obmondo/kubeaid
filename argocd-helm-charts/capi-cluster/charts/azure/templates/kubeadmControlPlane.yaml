@@ -40,14 +40,17 @@ spec:
           overwrite: false
           tableType: gpt
     files:
-      {{/* TODO : Consume Service Account signer public and private keys via Kubernetes Secrets. */}}
-      - content: |
-{{- .Values.serviceAccountIssuer.publicKey | nindent 10 }}
+      - contentFrom:
+          secret:
+            name: service-account-issuer-keys
+            key: public
         owner: root:root
         path: "/etc/kubernetes/pki/sa.pub"
         permissions: "0644"
-      - content: |
-{{- .Values.serviceAccountIssuer.privateKey | nindent 10 }}
+      - contentFrom:
+          secret:
+            name: service-account-issuer-keys
+            key: private
         owner: root:root
         path: "/etc/kubernetes/pki/sa.key"
         permissions: "0644"
@@ -82,6 +85,9 @@ spec:
     mounts:
       - - LABEL=etcd_disk
         - /var/lib/etcddisk
+    preKubeadmCommands:
+      # Delete password for the root user.
+      - passwd -d root
     postKubeadmCommands:
       # Install Helm.
       - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
@@ -102,7 +108,6 @@ spec:
           --set cilium.kubeProxyReplacement=true \
           --set cilium.k8sServiceHost=${API_SERVER_HOST} \
           --set cilium.k8sServicePort=${API_SERVER_PORT} \
-          --set cilium.bpf.masquerade=true \
           --namespace cilium | kubectl apply -f -
       # Install Azure Cloud Controller Manager.
       - helm template kubeaid/argocd-helm-charts/ccm-azure --set cloud-provider-azure.infra.clusterName={{ .Values.global.clusterName }} --namespace kube-system | kubectl apply -f -
