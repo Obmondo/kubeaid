@@ -50,5 +50,5 @@ tests:
         alertname: VeleroUnsuccessfulBackup
         exp_alerts: []
 
-  # ───────────────────────────────────────────────────────────────────────────────────────────────
-  # (3) The first backup completed successfully at t = 20m. And it's currently t = 1d45m.
+# ───────────────────────────────────────────────────────────────────────────────────────────────
+# (3) The first backup completed successfully at t = 20m. And it's currently t = 1d45m.

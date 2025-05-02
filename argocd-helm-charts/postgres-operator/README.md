@@ -207,15 +207,15 @@ So that postgres-operator will use that to manage the instance
   - name: CLONE_AWS_REGION
     value: eu-west-1
   - name: CLONE_AWS_ACCESS_KEY_ID
-    value: kam
+    value: kcm
   - name: CLONE_AWS_SECRET_ACCESS_KEY
-    value: vie7ooN8ka5shodoogaxuGh3
+    value: xxxxxx123
   - name: CLONE_METHOD
     value: CLONE_WITH_WALG
   - name: CLONE_AWS_ENDPOINT
     value: https://s3.obmondo.com
   - name: CLONE_WAL_S3_BUCKET
-    value: kam-postgres-backups
+    value: kcm-postgres-backups
   - name: CLONE_WALG_BUCKET_SCOPE_SUFFIX
   - name: CLONE_TARGET_TIME
     value: "2023-02-07T10:02:12+00:00"
