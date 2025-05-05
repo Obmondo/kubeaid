@@ -12,11 +12,11 @@ If you're new to KubeAid, check out our [README](../README.md) and our [setup gu
 
 ## Deploying Harbor with KubeAid
 
-- `argocd-apps/templates/keycloak.yaml`: This is a template for ArgoCD application. Click [here](../argocd-helm-charts/harbor/example/argocd-apps/templates/harbor.yaml)
-- `argocd-apps/values-keycloak.yaml`: This file lets you customize Harbor template file using values. Click [here](../argocd-helm-charts/harbor/example/argocd-apps/values-harbor.yaml)
+- `argocd-apps/templates/harbor.yaml`: This is a template for ArgoCD application. Click [here](../argocd-helm-charts/harbor/example/argocd-apps/templates/harbor.yaml)
+- `argocd-apps/values-harbor.yaml`: This file lets you customize Harbor template file using values. Click [here](../argocd-helm-charts/harbor/example/argocd-apps/values-harbor.yaml)
 
 Deployment Steps:
-1. Modify the Keycloak template to fit your environment (e.g., sources, destinations, etc.).
+1. Modify the Harbor template to fit your environment (e.g., sources, destinations, etc.).
 2. Update the values file with your specific configurations.
 3. Push the changes to your kubeaid-config repository.
 4. Sync the changes in ArgoCD root application, you can choose to just sync your harbor application as well
