@@ -1,14 +1,12 @@
----
-{{/* CASE : Control Plane is in HCloud. */}}
-{{- if and ((.Values.hcloud).enabled) ((.Values.hcloud).controlPlane) }}
+{{- if eq .Values.controlPlaneType "hcloud" }}
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachineHealthCheck
 metadata:
   name: {{ .Values.global.clusterName }}-control-plane-unhealthy-5m
 spec:
   clusterName: {{ .Values.global.clusterName }}
-  maxUnhealthy: 100%
-  nodeStartupTimeout: 15m0s
+  maxUnhealthy: {{ .Values.remediation.hcloud.controlPlane.maxUnhealthy }}
+  nodeStartupTimeout: {{ .Values.remediation.hcloud.controlPlane.nodeStartupTimeout }}
   remediationTemplate:
     apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
     kind: HCloudRemediationTemplate
@@ -18,9 +16,9 @@ spec:
       cluster.x-k8s.io/control-plane: ""
   unhealthyConditions:
   - status: Unknown
-    timeout: 3m0s
+    timeout: {{ .Values.remediation.hcloud.controlPlane.timeout }}
     type: Ready
   - status: "False"
-    timeout: 3m0s
+    timeout: {{ .Values.remediation.hcloud.controlPlane.timeout }}
     type: Ready
 {{- end }}

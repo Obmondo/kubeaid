@@ -1,0 +1,13 @@
+{{- if eq .Values.controlPlaneType "baremetal" }}
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: HetznerBareMetalRemediationTemplate
+metadata:
+  name: control-plane-remediation-request
+spec:
+  template:
+    spec:
+      strategy:
+        retryLimit: {{ .Values.remediation.baremetal.controlPlane.retryLimit }}
+        timeout: {{ .Values.remediation.baremetal.controlPlane.timeout }}
+        type: {{ .Values.remediation.baremetal.controlPlane.type }}
+{{- end }}

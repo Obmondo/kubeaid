@@ -1,8 +1,14 @@
----
+{{- $suffixes := list "md-0" }}
+{{- if or .Values.includeWorker.baremetal (eq .Values.controlPlaneMachineType "baremetal") }}
+  {{- $suffixes = list "md-0" "md-1" }}
+{{- end }}
+
+{{- $root := . }}
+{{- range $i, $suffix := $suffixes }}
 apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
 kind: KubeadmConfigTemplate
 metadata:
-  name: {{ .Values.global.clusterName }}
+  name: {{ $root.Values.global.clusterName }}-{{ $suffix }}
 spec:
   template:
     spec:
@@ -103,11 +109,10 @@ spec:
       preKubeadmCommands:
       - set -x
       - grep VERSION= /etc/os-release; uname -a
-      - export CONTAINERD=1.7.25
-      - export RUNC=1.2.3
-      - export KUBERNETES_VERSION=$(echo {{ .Values.global.kubernetes.version }} | sed 's/^v//')
-      - export TRIMMED_KUBERNETES_VERSION=$(echo {{ .Values.global.kubernetes.version }} | sed 's/^v//'
-        | awk -F . '{print $1 "." $2}')
+      - export CONTAINERD=1.7.26
+      - export RUNC=1.2.5
+      - export KUBERNETES_VERSION="{{ $root.Values.kubernetesVersion }}"
+      - export TRIMMED_KUBERNETES_VERSION=$(echo ${KUBERNETES_VERSION} | sed 's/^v//' | awk -F . '{print $1 "." $2}')
       - ARCH="$(dpkg --print-architecture)"
       - localectl set-locale LANG=en_US.UTF-8
       - localectl set-locale LANGUAGE=en_US.UTF-8
@@ -129,19 +134,14 @@ spec:
       - mkdir -p /etc/containerd
       - containerd config default > /etc/containerd/config.toml
       - sed -i  "s/SystemdCgroup = false/SystemdCgroup = true/" /etc/containerd/config.toml
-      - systemctl daemon-reload && systemctl enable containerd && systemctl start
-        containerd
+      - systemctl daemon-reload && systemctl enable containerd && systemctl start containerd
       - mkdir -p /etc/apt/keyrings/
-      - curl -fsSL https://pkgs.k8s.io/core:/stable:/v$TRIMMED_KUBERNETES_VERSION/deb/Release.key
-        | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-      - echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v$TRIMMED_KUBERNETES_VERSION/deb/
-        /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+      - curl -fsSL https://pkgs.k8s.io/core:/stable:/v$TRIMMED_KUBERNETES_VERSION/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+      - echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v$TRIMMED_KUBERNETES_VERSION/deb/" | sudo tee /etc/apt/sources.list.d/kubernetes.list
       - apt-get update
-      - apt-get install -y kubelet="$KUBERNETES_VERSION-*" kubeadm="$KUBERNETES_VERSION-*"
-        kubectl="$KUBERNETES_VERSION-*" bash-completion && apt-mark hold kubelet kubectl
-        kubeadm && systemctl enable kubelet
+      - apt-get install -y kubelet="$KUBERNETES_VERSION-*" kubeadm="$KUBERNETES_VERSION-*" kubectl="$KUBERNETES_VERSION-*" bash-completion && apt-mark hold kubelet kubectl kubeadm && systemctl enable kubelet
       - kubeadm config images pull --kubernetes-version $KUBERNETES_VERSION
       - echo 'source <(kubectl completion bash)' >>/root/.bashrc
       - echo 'export KUBECONFIG=/etc/kubernetes/admin.conf' >>/root/.bashrc
       - apt-get -y autoremove && apt-get -y clean all
-
+{{- end }}

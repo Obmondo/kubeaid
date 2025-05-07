@@ -1,4 +1,3 @@
----
 apiVersion: controlplane.cluster.x-k8s.io/v1beta1
 kind: KubeadmControlPlane
 metadata:
@@ -15,7 +14,6 @@ spec:
           default-unreachable-toleration-seconds: "45"
           enable-aggregator-routing: "true"
           enable-bootstrap-token-auth: "true"
-          encryption-provider-config: /etc/kubernetes/encryption-provider.yaml
           etcd-cafile: /etc/kubernetes/pki/etcd/ca.crt
           etcd-certfile: /etc/kubernetes/pki/etcd/server.crt
           etcd-keyfile: /etc/kubernetes/pki/etcd/server.key
@@ -35,10 +33,6 @@ spec:
           tls-cert-file: /etc/kubernetes/pki/apiserver.crt
           tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256
           tls-private-key-file: /etc/kubernetes/pki/apiserver.key
-        extraVolumes:
-        - hostPath: /etc/kubernetes/encryption-provider.yaml
-          mountPath: /etc/kubernetes/encryption-provider.yaml
-          name: encryption-provider
       controllerManager:
         extraArgs:
           allocate-node-cidrs: "true"
@@ -76,21 +70,27 @@ spec:
           profiling: "false"
           secure-port: "10259"
     files:
+{{- if or .Values.includeWorker.baremetal (eq .Values.controlPlaneMachineType "baremetal") }}
     - content: |
-        apiVersion: apiserver.config.k8s.io/v1
-        kind: EncryptionConfiguration
-        resources:
-          - resources:
-            - secrets
-            providers:
-            - aescbc:
-                keys:
-                - name: key1
-                  secret: 8d7iAcg3/NwN9aijhtEXj5kL2NOHIgokGFjbIBfL6X0=
-            - identity: {}
+        [Unit]
+        Description=Cilium BPF mounts
+        Documentation=https://docs.cilium.io/
+        DefaultDependencies=no
+        Before=local-fs.target umount.target
+        After=swap.target
+
+        [Mount]
+        What=bpffs
+        Where=/sys/fs/bpf
+        Type=bpf
+        Options=rw,nosuid,nodev,noexec,relatime,mode=700
+
+        [Install]
+        WantedBy=multi-user.target
       owner: root:root
-      path: /etc/kubernetes/encryption-provider.yaml
-      permissions: "0600"
+      path: /etc/systemd/system/sys-fs-bpf.mount
+      permissions: "0744"
+{{- end }}
     - content: |
         net.ipv4.conf.lxc*.rp_filter = 0
       owner: root:root
@@ -199,82 +199,51 @@ spec:
           rotate-server-certificates: "true"
           tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256
     preKubeadmCommands:
-      - set -x
-      - export CONTAINERD=1.7.25
-      - export RUNC=1.2.3
-      - export KUBERNETES_VERSION=$(echo {{ .Values.global.kubernetes.version }} | sed 's/^v//')
-      - export TRIMMED_KUBERNETES_VERSION=$(echo {{ .Values.global.kubernetes.version }} | sed 's/^v//'
-        | awk -F . '{print $1 "." $2}')
-      - ARCH="$(dpkg --print-architecture)"
-      - localectl set-locale LANG=en_US.UTF-8
-      - localectl set-locale LANGUAGE=en_US.UTF-8
-      - apt-get update -y
-      - apt-get -y install at jq unzip wget socat mtr logrotate apt-transport-https
-      - sed -i '/swap/d' /etc/fstab
-      - swapoff -a
-      - modprobe overlay && modprobe br_netfilter && sysctl --system
-      - wget https://github.com/opencontainers/runc/releases/download/v$RUNC/runc.$ARCH
-      - wget https://github.com/opencontainers/runc/releases/download/v$RUNC/runc.sha256sum
-      - sha256sum --check --ignore-missing runc.sha256sum
-      - install runc.$ARCH /usr/local/sbin/runc
-      - rm -f runc.$ARCH runc.sha256sum
-      - wget https://github.com/containerd/containerd/releases/download/v$CONTAINERD/containerd-$CONTAINERD-linux-$ARCH.tar.gz
-      - wget https://github.com/containerd/containerd/releases/download/v$CONTAINERD/containerd-$CONTAINERD-linux-$ARCH.tar.gz.sha256sum
-      - sha256sum --check containerd-$CONTAINERD-linux-$ARCH.tar.gz.sha256sum
-      - tar -zxf containerd-$CONTAINERD-linux-$ARCH.tar.gz -C /usr/local
-      - rm -f containerd-$CONTAINERD-linux-$ARCH.tar.gz containerd-$CONTAINERD-linux-$ARCH.tar.gz.sha256sum
-      - mkdir -p /etc/containerd
-      - containerd config default > /etc/containerd/config.toml
-      - sed -i  "s/SystemdCgroup = false/SystemdCgroup = true/" /etc/containerd/config.toml
-      - systemctl daemon-reload && systemctl enable containerd && systemctl start containerd
-      - mkdir -p /etc/apt/keyrings/
-      - curl -fsSL https://pkgs.k8s.io/core:/stable:/v$TRIMMED_KUBERNETES_VERSION/deb/Release.key
-        | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-      - echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v$TRIMMED_KUBERNETES_VERSION/deb/
-        /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-      - apt-get update
-      - apt-get install -y kubelet="$KUBERNETES_VERSION-*" kubeadm="$KUBERNETES_VERSION-*"
-        kubectl="$KUBERNETES_VERSION-*" bash-completion && apt-mark hold kubelet kubectl
-        kubeadm && systemctl enable kubelet
-      - kubeadm config images pull --kubernetes-version $KUBERNETES_VERSION
-      - echo 'source <(kubectl completion bash)' >>/root/.bashrc
-      - echo 'export KUBECONFIG=/etc/kubernetes/admin.conf' >>/root/.bashrc
-      - apt-get -y autoremove && apt-get -y clean all
-    postKubeadmCommands:
-      # Install Helm.
-      - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-      # Clone KubeAid.
-      - git clone https://github.com/Archisman-Mridha/kubeaid.git
-      # Copy kubeconfig to ~/.kube/config
-      - mkdir -p $HOME/.kube
-      - sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-      - sudo chown $(id -u):$(id -g) $HOME/.kube/config
-      # Install Cilium.
-      - kubectl create namespace cilium
-      - API_SERVER_URL=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
-      - API_SERVER_HOST=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $4}')
-      - API_SERVER_PORT=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $5}')
-      - helm template kubeaid/argocd-helm-charts/cilium --values kubeaid/argocd-helm-charts/cilium/values.yaml --set cilium.k8sServiceHost=${API_SERVER_HOST} --set cilium.k8sServicePort=${API_SERVER_PORT} --namespace cilium | kubectl apply -f -
-      # Install Hetzner Cloud Controller Manager.
-      - helm template kubeaid/argocd-helm-charts/ccm-hetzner --values kubeaid/argocd-helm-charts/ccm-hetzner/values.yaml --namespace kube-system | kubectl apply -f -
-
-  version: {{ .Values.global.kubernetes.version }}
-
-  {{/* Control Plane is in HCloud. */}}
-  {{- if and ((.Values.hcloud).enabled) (.Values.hcloud.controlPlane) }}
+    - set -x
+    - export CONTAINERD=1.7.26
+    - export RUNC=1.2.5
+    - export KUBERNETES_VERSION="{{ .Values.kubernetesVersion }}"
+    - export TRIMMED_KUBERNETES_VERSION=$(echo ${KUBERNETES_VERSION} | sed 's/^v//'
+      | awk -F . '{print $1 "." $2}')
+    - ARCH="$(dpkg --print-architecture)"
+    - localectl set-locale LANG=en_US.UTF-8
+    - localectl set-locale LANGUAGE=en_US.UTF-8
+    - apt-get update -y
+    - apt-get -y install at jq unzip wget socat mtr logrotate apt-transport-https
+    - sed -i '/swap/d' /etc/fstab
+    - swapoff -a
+    - modprobe overlay && modprobe br_netfilter && sysctl --system
+    - wget https://github.com/opencontainers/runc/releases/download/v$RUNC/runc.$ARCH
+    - wget https://github.com/opencontainers/runc/releases/download/v$RUNC/runc.sha256sum
+    - sha256sum --check --ignore-missing runc.sha256sum
+    - install runc.$ARCH /usr/local/sbin/runc
+    - rm -f runc.$ARCH runc.sha256sum
+    - wget https://github.com/containerd/containerd/releases/download/v$CONTAINERD/containerd-$CONTAINERD-linux-$ARCH.tar.gz
+    - wget https://github.com/containerd/containerd/releases/download/v$CONTAINERD/containerd-$CONTAINERD-linux-$ARCH.tar.gz.sha256sum
+    - sha256sum --check containerd-$CONTAINERD-linux-$ARCH.tar.gz.sha256sum
+    - tar -zxf containerd-$CONTAINERD-linux-$ARCH.tar.gz -C /usr/local
+    - rm -f containerd-$CONTAINERD-linux-$ARCH.tar.gz containerd-$CONTAINERD-linux-$ARCH.tar.gz.sha256sum
+    - mkdir -p /etc/containerd
+    - containerd config default > /etc/containerd/config.toml
+    - sed -i  "s/SystemdCgroup = false/SystemdCgroup = true/" /etc/containerd/config.toml
+    - systemctl daemon-reload && systemctl enable containerd && systemctl start containerd
+    - mkdir -p /etc/apt/keyrings/
+    - curl -fsSL https://pkgs.k8s.io/core:/stable:/v$TRIMMED_KUBERNETES_VERSION/deb/Release.key
+      | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    - echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v$TRIMMED_KUBERNETES_VERSION/deb/
+      /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+    - apt-get update
+    - apt-get install -y kubelet="$KUBERNETES_VERSION-*" kubeadm="$KUBERNETES_VERSION-*"
+      kubectl="$KUBERNETES_VERSION-*" bash-completion && apt-mark hold kubelet kubectl
+      kubeadm && systemctl enable kubelet
+    - kubeadm config images pull --kubernetes-version $KUBERNETES_VERSION
+    - echo 'source <(kubectl completion bash)' >>/root/.bashrc
+    - echo 'export KUBECONFIG=/etc/kubernetes/admin.conf' >>/root/.bashrc
+    - apt-get -y autoremove && apt-get -y clean all
   machineTemplate:
     infrastructureRef:
       apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
-      kind: HCloudMachineTemplate
+      kind: {{ .Values.controlPlaneMachineType}}
       name: {{ .Values.global.clusterName }}-control-plane
-  replicas: {{ .Values.hcloud.controlPlane.replicas }}
-
-  {{/* Control Plane is in Hetzner Bare Metal. */}}
-  {{- else }}
-  machineTemplate:
-    infrastructureRef:
-      apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
-      kind: HetznerBareMetalMachineTemplate
-      name: {{ .Values.global.clusterName }}-control-plane
-  replicas: {{ len .Values.robot.controlPlane.nodes }}
-  {{- end }}
+  replicas: {{ .Values.controlPlaneMachineCount }}
+  version: {{ .Values.kubernetesVersion }}
