@@ -1,9 +1,0 @@
-{{- if .Values.prometheusRule.opsmondo }}
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  name: opsmondo-rules
-  namespace: monitoring-{{ .Values.customerid }}
-spec:
-  {{- $.Files.Get "rules/opsmondo.yaml" | nindent 4 }}
-{{- end }}
