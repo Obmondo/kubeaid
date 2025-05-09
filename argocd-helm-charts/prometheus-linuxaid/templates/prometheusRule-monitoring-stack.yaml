@@ -1,9 +1,0 @@
-{{- if .Values.prometheusRule.monitoring_stack }}
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  name: monitoring-stack-rules
-  namespace: monitoring-{{ .Values.customerid }}
-spec:
-  {{- $.Files.Get "rules/monitoring_stack.yaml" | nindent 4 }}
-{{- end }}
