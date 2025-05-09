@@ -56,3 +56,10 @@ docker run -ti --rm -v $(pwd):/etc/prometheus/:ro --entrypoint /bin/promtool pro
 [`modules/enableit/monitor/manifests/system`](https://gitea.obmondo.com/EnableIT/LinuxAid/src/branch/master/modules/enableit/monitor/manifests/system) by creating a
 new file f.ex [dns.pp](https://gitea.obmondo.com/EnableIT/LinuxAid/src/branch/master/modules/enableit/monitor/manifests/system/dns.pp)(if it doesn't exist)
 * set prometheusRule value to true in value file, f.ex [for dns alerts](https://gitea.obmondo.com/EnableIT/KubeAid/src/branch/master/argocd-helm-charts/prometheus-linuxaid/values.yaml#L28)
+
+## Backing up prometheus data
+
+We highly encourage creating regular backups of your Prometheus data to protect against data loss in the event of an unrecoverable failure in your monitoring deployment. 
+Without proper backups, there is always a risk of losing valuable metrics and historical data.
+
+For backup and restore operations, we support and recommend using Velero, a reliable solution for backing up Kubernetes resources and persistent volumes.
