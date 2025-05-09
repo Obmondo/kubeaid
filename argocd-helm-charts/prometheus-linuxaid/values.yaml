@@ -96,6 +96,7 @@ alertmanager:
       - receiver: 'obmondo'
         matchers:
         - "alertname = Watchdog"
+        repeat_interval: 5m
       - receiver: 'null'
         matchers:
         - "namespace =~ testing|obmondo-ci"

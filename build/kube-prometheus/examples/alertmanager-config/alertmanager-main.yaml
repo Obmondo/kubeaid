@@ -44,6 +44,7 @@ spec:
           - receiver: 'obmondo'
             matchers:
             - "alertname = Watchdog"
+            repeat_interval: 5m
           - receiver: 'null'
             matchers:
             - "alertname = InfoInhibitor"
