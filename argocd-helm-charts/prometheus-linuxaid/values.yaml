@@ -64,47 +64,47 @@ alertmanager:
       resolve_timeout: 5m
 
     inhibit_rules:
-    - "equal":
-      - "namespace"
-      - "alertname"
-      "source_matchers":
-      - "severity = critical"
-      "target_matchers":
-      - "severity =~ warning|info"
-    - "equal":
-      - "namespace"
-      - "alertname"
-      "source_matchers":
-      - "severity = warning"
-      "target_matchers":
-      - "severity = info"
-    - "equal":
-      - "namespace"
-      "source_matchers":
-      - "alertname = InfoInhibitor"
-      "target_matchers":
-      - "severity = info"
+      - "equal":
+          - "namespace"
+          - "alertname"
+        "source_matchers":
+          - "severity = critical"
+        "target_matchers":
+          - "severity =~ warning|info"
+      - "equal":
+          - "namespace"
+          - "alertname"
+        "source_matchers":
+          - "severity = warning"
+        "target_matchers":
+          - "severity = info"
+      - "equal":
+          - "namespace"
+        "source_matchers":
+          - "alertname = InfoInhibitor"
+        "target_matchers":
+          - "severity = info"
 
     route:
       group_by:
-        - 'namespace'
+        - "namespace"
       group_wait: 10s
       group_interval: 10s
       repeat_interval: 1h
-      receiver: 'obmondo'
+      receiver: "obmondo"
       routes:
-      - receiver: 'obmondo'
-        matchers:
-        - "alertname = Watchdog"
-        repeat_interval: 5m
-      - receiver: 'null'
-        matchers:
-        - "namespace =~ testing|obmondo-ci"
-      - receiver: 'null'
-        matchers:
-        - "alertname = InfoInhibitor"
-      - receiver: obmondo
-        continue: true
+        - receiver: "obmondo"
+          matchers:
+            - "alertname = Watchdog"
+          repeat_interval: 5m
+        - receiver: "null"
+          matchers:
+            - "namespace =~ testing|obmondo-ci"
+        - receiver: "null"
+          matchers:
+            - "alertname = InfoInhibitor"
+        - receiver: obmondo
+          continue: true
 
     receivers:
       - name: "null"
