@@ -1,4 +1,4 @@
-FROM harbor.obmondo.com/obmondo/dockerfiles/noble-generic-build@sha256:7db3fa938fb169b94c60599665ba9f740a1c7a1223dd47092dcf082469d8c24b
+FROM harbor.obmondo.com/obmondo/dockerfiles/noble-generic-build:1.0.0
 
 LABEL org.opencontainers.image.authors="Ashish Jaiswal <ashish@enableit.dk>"
 
