@@ -2,6 +2,37 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`df5caa0a`](../../commit/df5caa0a) chore: remove old monitoring stack rules
+- [`10df1661`](../../commit/10df1661) chore: remove old opsmondo rules
+- [`99727ddc`](../../commit/99727ddc) chore: lint the yaml formatting
+- [`e93a0392`](../../commit/e93a0392) fix: reduce repeat_interval to 5m for obmondo route
+- [`367ba05d`](../../commit/367ba05d) update tag noble generic build in dockerfile
+- [`8ad021e6`](../../commit/8ad021e6) renaming velero alert expressions test file from rules.yaml to tests.yaml
+- [`f8e1440f`](../../commit/f8e1440f) fix(keycloakx/backup) : updated keycloakx's postgres logical backup container image
+- [`16aef75e`](../../commit/16aef75e) Add Loki stack Helm chart with dependencies and configuration
+- [`51d259a3`](../../commit/51d259a3) fix: correct file names
+- [`3271b72d`](../../commit/3271b72d) Update postgres wiki
+- [`c08cfa44`](../../commit/c08cfa44) feat(capi-cluster/azure) : adding the azure-workload-identity-webhook KubeAid chart
+- [`6d3d3879`](../../commit/6d3d3879) feat(capi-cluster/azure) : consuming service account issuer keys from Kubernetes Secret | removing root account password for each node
+- [`5a5beacf`](../../commit/5a5beacf) Enable logical backup for harbor
+- [`5da4825b`](../../commit/5da4825b) fix: puppetboard worker is increased to 2
+- [`a6e61128`](../../commit/a6e61128) fix: added the default image.tag for puppetserver and puppetdb
+- [`4a5a455e`](../../commit/4a5a455e) fix: updated puppetboard image.tag to 6.0.1
+- [`d336600c`](../../commit/d336600c) feat: added harbor blog and examples
+- [`168f7683`](../../commit/168f7683) added improved velero alerts and Prometheus unit tests
+- [`6ab3bbb1`](../../commit/6ab3bbb1) feat(alerting/velero) : alerts should be generated when there are no successfull backups / snapshots for a schedule
+- [`7ef1ce15`](../../commit/7ef1ce15) feat(velero) : adding VolumeSnapshotClass template
+- [`7348ec29`](../../commit/7348ec29) increase memory request and limit for Velero pod
+- [`79611254`](../../commit/79611254) feat: moved Harbor DB migration doc to wiki
+- [`30244101`](../../commit/30244101) fix HELM_UPSTREAM_CHART_VERSION unbound error when no upstream chart is present
+- [`fe405a27`](../../commit/fe405a27) changes done locally to ensure required SANs are there in kafka certificates
+- [`ae1790db`](../../commit/ae1790db) migrating harbor database to postgress cnpg
+- [`0d228919`](../../commit/0d228919) fix(capi-cluster/azure) : fixed the subchart
+- [`631b14a4`](../../commit/631b14a4) capu-cluster/azure chart changes
+- [`bd159817`](../../commit/bd159817) Updated Readme
+- [`fd542e54`](../../commit/fd542e54) adding metal3 readme, hostupdatepolicy crd, and baremetal-operaor rbac rules
+
 ## 11.0.0
 ### Major Version Upgrades
 - Updated velero from version 8.7.1 to 9.0.0
