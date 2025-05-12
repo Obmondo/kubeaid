@@ -113,10 +113,10 @@ spec:
           env:
             - name: ZO_NODE_ROLE
               value: "alertmanager"
-            {{- with .Values.alertmanager.extraEnv }}
+            {{- with .Values.extraEnv }}
             {{- toYaml . |  nindent 12 }}
             {{- end }}
-            {{- with .Values.extraEnv }}
+            {{- with .Values.alertmanager.extraEnv }}
             {{- toYaml . |  nindent 12 }}
             {{- end }}
           {{- if .Values.alertmanager.persistence.enabled }}

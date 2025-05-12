@@ -2,7 +2,7 @@
 
 OpenCost and OpenCost UI
 
-![Version: 2.0.2](https://img.shields.io/badge/Version-2.0.2-informational?style=flat-square)
+![Version: 2.1.2](https://img.shields.io/badge/Version-2.1.2-informational?style=flat-square)
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 ![AppVersion: 1.114.0](https://img.shields.io/badge/AppVersion-1.114.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/opencost)](https://artifacthub.io/packages/search?repo=opencost)
@@ -58,6 +58,12 @@ $ helm install opencost opencost/opencost
 | opencost.customPricing.enabled | bool | `false` | Enables custom pricing configuration |
 | opencost.customPricing.provider | string | `"custom"` | Sets the provider type for the custom pricing file. |
 | opencost.dataRetention.dailyResolutionDays | int | `15` |  |
+| opencost.exporter.apiIngress.annotations | object | `{}` | Annotations for Ingress resource |
+| opencost.exporter.apiIngress.enabled | bool | `false` | Ingress for OpenCost API |
+| opencost.exporter.apiIngress.hosts | list | See [values.yaml](values.yaml) | A list of host rules used to configure the Ingress |
+| opencost.exporter.apiIngress.ingressClassName | string | `""` | Ingress controller which implements the resource |
+| opencost.exporter.apiIngress.servicePort | string | `"http"` | Redirect ingress to an extraPort defined on the service such as oauth-proxy |
+| opencost.exporter.apiIngress.tls | list | `[]` | Ingress TLS configuration |
 | opencost.exporter.apiPort | int | `9003` |  |
 | opencost.exporter.aws.access_key_id | string | `""` | AWS secret key id |
 | opencost.exporter.aws.secret_access_key | string | `""` | AWS secret access key |
@@ -119,6 +125,8 @@ $ helm install opencost opencost/opencost
 | opencost.nodeSelector | object | `{}` | Node labels for pod assignment |
 | opencost.platforms.openshift.createMonitoringClusterRoleBinding | bool | `false` | If true, the helm chart will create a ClusterRoleBinding to grant the OpenCost ServiceAccount access to query Prometheus. |
 | opencost.platforms.openshift.createMonitoringResourceReaderRoleBinding | bool | `false` | If true, create a Role and RoleBinding to allow Prometheus to list and watch OpenCost resources. |
+| opencost.platforms.openshift.enablePromAccess | bool | `false` | If true, enable internal prom access |
+| opencost.platforms.openshift.enableSCC | bool | `false` | If true, set Security Context Constraints on serviceaccount for read/write premissions |
 | opencost.platforms.openshift.enabled | bool | `false` | Enable OpenShift specific configurations |
 | opencost.platforms.openshift.monitoringServiceAccountName | string | `"prometheus-k8s"` | Name of the Prometheus serviceaccount to bind to the Resource Reader Role Binding. |
 | opencost.platforms.openshift.monitoringServiceAccountNamespace | string | `"openshift-monitoring"` | Namespace of the Prometheus serviceaccount to bind to the Resource Reader Role Binding. |
@@ -132,6 +140,7 @@ $ helm install opencost opencost/opencost
 | opencost.prometheus.internal.enabled | bool | `true` | Use in-cluster Prometheus |
 | opencost.prometheus.internal.namespaceName | string | `"prometheus-system"` | Namespace of in-cluster Prometheus |
 | opencost.prometheus.internal.port | int | `80` | Service port of in-cluster Prometheus |
+| opencost.prometheus.internal.scheme | string | `"http"` | Scheme to use for in-cluster Prometheus |
 | opencost.prometheus.internal.serviceName | string | `"prometheus-server"` | Service name of in-cluster Prometheus |
 | opencost.prometheus.kubeRBACProxy | bool | `false` | If true, opencost will use kube-rbac-proxy to authenticate with in cluster Prometheus for openshift |
 | opencost.prometheus.password | string | `""` | Prometheus Basic auth password |
@@ -143,6 +152,7 @@ $ helm install opencost opencost/opencost
 | opencost.prometheus.thanos.internal.enabled | bool | `true` |  |
 | opencost.prometheus.thanos.internal.namespaceName | string | `"opencost"` |  |
 | opencost.prometheus.thanos.internal.port | int | `10901` |  |
+| opencost.prometheus.thanos.internal.scheme | string | `"http"` |  |
 | opencost.prometheus.thanos.internal.serviceName | string | `"my-thanos-query"` |  |
 | opencost.prometheus.thanos.maxSourceResolution | string | `""` |  |
 | opencost.prometheus.thanos.queryOffset | string | `""` |  |

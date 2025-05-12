@@ -53,6 +53,9 @@ spec:
             {{- with .Values.extraEnv }}
             {{- toYaml . |  nindent 12 }}
             {{- end }}
+            {{- with .Values.reportserver.extraEnv }}
+            {{- toYaml . |  nindent 12 }}
+            {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.config.ZO_HTTP_PORT }}

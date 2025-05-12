@@ -6,11 +6,11 @@ image:
   oss:
     repository: public.ecr.aws/zinclabs/openobserve
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.14.5"
+    tag: "v0.14.7"
   enterprise:
     repository: public.ecr.aws/zinclabs/openobserve-enterprise
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.14.5"
+    tag: "v0.14.7"
   reportserver:
     repository: public.ecr.aws/zinclabs/report-server
     tag: "v0.11.0-70baf7a"
@@ -58,6 +58,7 @@ replicaCount:
   querier: 1
   router: 1
   alertmanager: 1
+  alertquerier: 0
   compactor: 1
   zplane: 0
   reportserver: 0
@@ -127,6 +128,20 @@ querier:
     accessModes:
       - ReadWriteOnce
 
+alertquerier:
+  # Alertquerier specific configuration
+  config:
+    ZO_META_CONNECTION_POOL_MIN_SIZE: "0"
+    ZO_META_CONNECTION_POOL_MAX_SIZE: "0"
+    ZO_ACTIX_REQ_TIMEOUT: "30"
+  extraEnv: []
+  persistence: # If enabled it will be used for disk cache. Highly recommend to enable this for production
+    enabled: true
+    size: 100Gi
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+
 reportserver:
   enabled: true # if true then reportserver will be deployed as part of openobserve
   extraEnv: # Below env variable are required due to https://github.com/puppeteer/puppeteer/issues/11023#issuecomment-1776247197
@@ -156,6 +171,33 @@ externalSecret:
   # name of the external secret
   name: "super-secret"
 
+### super secret - create a secret like this in the same namespace as the chart
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: super-secret
+# type: Opaque
+# stringData:
+#   ZO_ROOT_USER_EMAIL: "root@example.com"
+#   ZO_ROOT_USER_PASSWORD: "Complexpass#123"
+
+#   # do not need to set this if enabled minio is being used. settings will be picked from minio section. Also IRSA is preferred if on EKS. Set the Service account section with the correct IAM role ARN. Refer https://zinc.dev/docs/guide/ha_deployment/#amazon-eks-s3
+#   ZO_S3_ACCESS_KEY: ""
+#   ZO_S3_SECRET_KEY: ""
+
+#   AZURE_STORAGE_ACCOUNT_KEY: ""
+#   AZURE_STORAGE_ACCOUNT_NAME: ""
+#   ZO_META_POSTGRES_DSN: "postgres://openobserve:Batman123@o2-openobserve-postgres-rw:5432/app"
+#   OPENFGA_DATASTORE_URI: "postgres://openobserve:Batman123@o2-openobserve-postgres-rw:5432/app"
+#   ZO_META_POSTGRES_RO_DSN: ""
+#   ZO_TRACING_HEADER_KEY: "Authorization"
+#   ZO_TRACING_HEADER_VALUE: "Basic cm9vdEBleGFtcGxlLmNvbTpDb21wbGV4cGFzcyMxMjM="
+#   ZO_RUM_CLIENT_TOKEN: ""
+#   ZO_REPORT_USER_EMAIL: "" # Check details at https://github.com/openobserve/o2_report_server
+#   ZO_REPORT_USER_PASSWORD: ""
+#   ZO_SMTP_USER_NAME: "ABAAQQQQFFFFF" # Replace with your own SMTP username
+#   ZO_SMTP_PASSWORD: "+fjlahsguykevfkajvjk#jsbj43$bjkjbkk" # Replace with your own SMTP password
+
 # Credentials for authentication. Will be stored in a k8s secret
 auth:
   ZO_ROOT_USER_EMAIL: "root@example.com"
@@ -169,8 +211,6 @@ auth:
   AZURE_STORAGE_ACCOUNT_NAME: ""
   ZO_META_POSTGRES_DSN: "postgres://userid:password@host:5432/dbname"
   ZO_META_POSTGRES_RO_DSN: ""
-  ZO_META_MYSQL_DSN: ""
-  ZO_META_MYSQL_RO_DSN: ""
   ZO_TRACING_HEADER_KEY: "Authorization"
   ZO_TRACING_HEADER_VALUE: "Basic cm9vdEBleGFtcGxlLmNvbTpDb21wbGV4cGFzcyMxMjM="
   ZO_RUM_CLIENT_TOKEN: ""
@@ -184,6 +224,7 @@ config:
   ZO_CLUSTER_NAME: "o2"
   ZO_INSTANCE_NAME: ""
   ZO_NODE_ROLE: "all"
+  ZO_NODE_ROLE_GROUP: ""
   ZO_LOCAL_MODE: "false"
   ZO_LOCAL_MODE_STORAGE: "disk"
   ZO_HTTP_PORT: "5080"
@@ -307,11 +348,10 @@ config:
   ZO_COMPACT_MAX_FILE_SIZE: "512"
   ZO_COMPACT_DATA_RETENTION_DAYS: "3650"
   ZO_COMPACT_DELETE_FILES_DELAY_HOURS: "2"
-  ZO_COMPACT_BATCH_SIZE: "500"
+  ZO_COMPACT_BATCH_SIZE: "0"
   ZO_COMPACT_BLOCKED_ORGS: ""
   ZO_MEMORY_CACHE_ENABLED: "true"
-  ZO_MEMORY_CACHE_STRATEGY: "lru"  # lru, fifo, time_lru https://github.com/openobserve/openobserve/pull/6489
-  ZO_MEMORY_CACHE_CACHE_LATEST_FILES: "false"
+  ZO_MEMORY_CACHE_STRATEGY: "lru" # lru, fifo, time_lru https://github.com/openobserve/openobserve/pull/6489
   ZO_MEMORY_CACHE_MAX_SIZE: "0"
   ZO_MEMORY_CACHE_SKIP_SIZE: "0"
   ZO_MEMORY_CACHE_RELEASE_SIZE: "0"
@@ -326,6 +366,11 @@ config:
   ZO_DISK_CACHE_RELEASE_SIZE: "0"
   ZO_DISK_CACHE_GC_SIZE: "100"
   ZO_DISK_CACHE_GC_INTERVAL: "0"
+  ZO_CACHE_LATEST_FILES_ENABLED: "false"
+  ZO_CACHE_LATEST_FILES_PARQUET: "true"
+  ZO_CACHE_LATEST_FILES_INDEX: "true"
+  ZO_CACHE_LATEST_FILES_DELETE_MERGE_FILES: "false"
+  ZO_CACHE_LATEST_FILES_DOWNLOAD_FROM_NODE: "false"
   ZO_ETCD_ADDR: "etcd.openobserve.svc.cluster.local:2379"
   ZO_ETCD_PREFIX: "/zinc/observe/"
   ZO_ETCD_CONNECT_TIMEOUT: "5"
@@ -439,6 +484,8 @@ config:
   RUST_LOG: "info"
   O2_SCRIPT_SERVER_TOKEN: "ghf3543gfd476ioudrs2432ghf"
   RUST_BACKTRACE: "0"
+  ZO_PROMETHEUS_ENABLED: "false"
+  ZO_HISTOGRAM_ENABLED: "true" # show/hode histogram on logs page by default
 
 # Add extra environment variables to all pods, useful for overriding secrets
 extraEnv: []
@@ -560,6 +607,7 @@ nodeSelector:
   compactor: {}
   router: {}
   alertmanager: {}
+  alertquerier: {}
   zplane: {}
   dex: {}
   reportserver: {}
@@ -570,6 +618,7 @@ tolerations:
   compactor: []
   router: []
   alertmanager: []
+  alertquerier: []
   zplane: []
   dex: []
   reportserver: []
@@ -580,6 +629,7 @@ affinity:
   compactor: {}
   router: {}
   alertmanager: {}
+  alertquerier: {}
   zplane: {}
   dex: {}
   reportserver: {}
@@ -610,7 +660,7 @@ nats:
     container:
       image:
         repository: natsio/nats-box
-        tag: 0.16.0-nonroot
+        tag: 0.17.0-nonroot
 
 etcd:
   enabled: false # if true then etcd will be deployed as part of openobserve
@@ -769,6 +819,10 @@ enterprise:
     O2_SEARCH_GROUP_USER_SHORT_MAX_CONCURRENCY: "2"
     O2_SEARCH_GROUP_BASE_SPEED: "1024" # in MB
     O2_SEARCH_GROUP_BASE_SECS: "10" # in seconds
+    O2_COMPACT_DOWNSAMPLING_INTERVAL: "3600" # in seconds
+    O2_METRICS_DOWNSAMPLING_RULES: ""
+    O2_RATE_LIMIT_ENABLED: "false"
+    O2_RATE_LIMIT_RULE_REFRESH_INTERVAL: "10" # in seconds
   actions:
     enabled: true
     parameters:
@@ -776,16 +830,16 @@ enterprise:
       O2_ACTION_MIN_MEMORY_MIB: "128"
       O2_ACTION_MAX_MILLI_CPU: "128"
       O2_ACTION_MIN_MILLI_CPU: "128"
-    resources:
-      limits:
-        cpu: 1000m
-        memory: 1Gi
-      requests:
-        cpu: 100m
-        memory: 128Mi
+    resources: {}
+      # limits:
+      #   cpu: 1000m
+      #   memory: 1Gi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
     extraEnv: []
   openfga:
-    enabled: false
+    enabled: true
     parameters:
       O2_OPENFGA_LIST_ONLY_PERMITTED: "false"
       O2_MAP_GROUP_TO_ROLE: "true"
@@ -956,6 +1010,23 @@ probes:
         failureThreshold: 3
         terminationGracePeriodSeconds: 30
   querier:
+    enabled: false
+    config:
+      readinessProbe:
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        timeoutSeconds: 5
+        successThreshold: 1
+        failureThreshold: 3
+        terminationGracePeriodSeconds: 30
+      livenessProbe:
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        timeoutSeconds: 5
+        successThreshold: 1
+        failureThreshold: 3
+        terminationGracePeriodSeconds: 30
+  alertquerier:
     enabled: false
     config:
       readinessProbe:

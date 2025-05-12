@@ -290,6 +290,9 @@
                     },
                     "type": "object"
                 },
+                "namespaces": {
+                    "type": "array"
+                },
                 "providers": {
                     "properties": {
                         "consulCatalogEnterprise": {
@@ -1966,6 +1969,9 @@
                 }
             },
             "type": "object"
+        },
+        "versionOverride": {
+            "type": "string"
         },
         "volumes": {
             "type": "array"

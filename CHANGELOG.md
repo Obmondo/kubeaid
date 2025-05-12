@@ -2,6 +2,46 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 12.0.0
+### Major Version Upgrades
+- Updated opensearch-dashboards from version 2.28.0 to 3.0.0
+- Updated opensearch from version 2.32.0 to 3.0.0
+- Updated argo-cd from version 7.8.27 to 8.0.1
+
+### Minor Version Upgrades
+- Updated velero from version 9.0.0 to 9.1.2
+- Updated traefik from version 35.0.1 to 35.2.0
+- Updated tigera-operator from version v3.29.3 to v3.30.0
+- Updated strimzi-kafka-operator from version 0.45.0 to 0.46.0
+- Updated prometheus-smartctl-exporter from version 0.13.0 to 0.15.1
+- Updated rook-ceph-cluster from version v1.16.0 to v1.17.2
+- Updated opencost from version 2.0.2 to 2.1.2
+- Updated oncall from version 1.15.6 to 1.16.0
+- Updated fluent-bit from version 0.48.10 to 0.49.0
+- Updated external-dns from version 8.7.11 to 8.8.2
+- Updated cluster-api-operator from version 0.18.1 to 0.19.0
+- Updated aws-ebs-csi-driver from version 2.42.0 to 2.43.0
+
+### Patch Version Upgrades
+- Updated teleport-kube-agent from version 17.4.5 to 17.4.9
+- Updated teleport-cluster from version 17.4.5 to 17.4.9
+- Updated rook-ceph from version v1.17.0 to v1.17.2
+- Updated reloader from version 2.1.1 to 2.1.3
+- Updated redmine from version 32.2.2 to 32.2.4
+- Updated rabbitmq-cluster-operator from version 4.4.7 to 4.4.10
+- Updated opentelemetry-collector from version 0.122.1 to 0.122.5
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated openobserve from version 0.14.53 to 0.14.71
+- Updated metallb from version 6.4.9 to 6.4.12
+- Updated metal3 from version 0.11.0 to 0.11.1
+- Updated mattermost-team-edition from version 6.6.74 to 6.6.76
+- Updated gitlab-runner from version 0.76.0 to 0.76.1
+- Updated gatekeeper from version 3.19.0 to 3.19.1
+- Updated erpnext from version 7.0.193 to 7.0.197
+- Updated cert-manager from version v1.17.1 to v1.17.2
+- Updated cloud-provider-azure from version 1.32.3 to 1.32.4
+- Updated aws-efs-csi-driver from version 3.1.8 to 3.1.9
+
 ### Improvements
 - [`df5caa0a`](../../commit/df5caa0a) chore: remove old monitoring stack rules
 - [`10df1661`](../../commit/10df1661) chore: remove old opsmondo rules

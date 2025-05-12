@@ -96,7 +96,11 @@ upgradeCRDsJob:
   extraVolumeMounts: []
   # Extra key/value pairs to be used as environment variables. Optional.
   extraEnvVars: {}
-
+  # Configure if API credential for Service Account is automounted.
+  automountServiceAccountToken: true
+  # Configure the shell cmd in case you are using custom image
+  # shellCmd: /tmp/sh
+  # updateCmd: /velero install --crds-only --dry-run -o yaml | /tmp/kubectl apply -f -
 
 # Configure the dnsPolicy of the Velero deployment
 # See: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
@@ -296,6 +300,10 @@ kubectl:
   annotations: {}
   # Labels to set for the upgrade/cleanup job. Optional.
   labels: {}
+  # Extra volumes for the upgrade/cleanup job. Optional.
+  extraVolumes: []
+  # Extra volumeMounts for the upgrade/cleanup job.. Optional.
+  extraVolumeMounts: []
 
 # This job upgrades the CRDs.
 upgradeCRDs: true
@@ -497,6 +505,8 @@ serviceAccount:
     labels:
     imagePullSecrets: []
     # - registrySecretName
+    # Configure if API credential for Service Account is automounted.
+    automountServiceAccountToken: true
 
 # Info about the secret to be used by the Velero deployment, which
 # should contain credentials for the cloud provider IAM account you've
@@ -544,6 +554,8 @@ nodeAgent:
   pluginVolumePath: /var/lib/kubelet/plugins
   # Pod priority class name to use for the node-agent daemonset. Optional.
   priorityClassName: ""
+  # Pod runtime class name to use for the node-agent daemonset. Optional.
+  runtimeClassName: ""
   # Resource requests/limits to specify for the node-agent daemonset deployment. Optional.
   # https://velero.io/docs/v1.6/customize-installation/#customize-resource-requests-and-limits
   resources: {}

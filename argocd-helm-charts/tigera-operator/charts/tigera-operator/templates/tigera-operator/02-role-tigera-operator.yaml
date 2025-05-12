@@ -6,7 +6,6 @@ metadata:
   labels:
     {{- include "tigera-operator.labels" (dict "context" .) | nindent 4 }}
 rules:
-{{- if eq .Values.installation.kubernetesProvider "openshift" }}
   # The tigera/operator installs CustomResourceDefinitions necessary for itself
   # and Calico more broadly to function.
   - apiGroups:
@@ -28,6 +27,8 @@ rules:
     resourceNames:
       - adminnetworkpolicies.policy.networking.k8s.io
       - apiservers.operator.tigera.io
+      - baselineadminnetworkpolicies.policy.networking.k8s.io
+      - gatewayapis.operator.tigera.io
       - imagesets.operator.tigera.io
       - installations.operator.tigera.io
       - tigerastatuses.operator.tigera.io
@@ -39,6 +40,7 @@ rules:
       - clusterinformations.crd.projectcalico.org
       - felixconfigurations.crd.projectcalico.org
       - globalnetworkpolicies.crd.projectcalico.org
+      - stagedglobalnetworkpolicies.crd.projectcalico.org
       - globalnetworksets.crd.projectcalico.org
       - hostendpoints.crd.projectcalico.org
       - ipamblocks.crd.projectcalico.org
@@ -48,9 +50,13 @@ rules:
       - ipreservations.crd.projectcalico.org
       - kubecontrollersconfigurations.crd.projectcalico.org
       - networkpolicies.crd.projectcalico.org
+      - stagednetworkpolicies.crd.projectcalico.org
+      - stagedkubernetesnetworkpolicies.crd.projectcalico.org
       - networksets.crd.projectcalico.org
       - tiers.crd.projectcalico.org
-{{- end}}
+      - whiskers.operator.tigera.io
+      - goldmanes.operator.tigera.io
+      - managementclusterconnections.operator.tigera.io
   - apiGroups:
       - ""
     resources:
@@ -61,7 +67,6 @@ rules:
       - endpoints
       - events
       - configmaps
-      - secrets
       - serviceaccounts
     verbs:
       - create
@@ -74,6 +79,7 @@ rules:
       - ""
     resources:
       - resourcequotas
+      - secrets
     verbs:
       - list
       - get
@@ -145,16 +151,30 @@ rules:
   - apiGroups:
       - operator.tigera.io
     resources:
+      # Note: any resources used by the operator within an OwnerReference for resources
+      # it creates requires permissions to <resource>/finalizers.
+      - apiservers
       - apiservers/finalizers
+      - apiservers/status
+      - gatewayapis
+      - gatewayapis/finalizers
+      - gatewayapis/status
+      - goldmanes
+      - goldmanes/finalizers
+      - goldmanes/status
+      - imagesets
       - installations
-      - installations/status
       - installations/finalizers
+      - installations/status
+      - managementclusterconnections
+      - managementclusterconnections/finalizers
+      - managementclusterconnections/status
       - tigerastatuses
       - tigerastatuses/status
       - tigerastatuses/finalizers
-      - apiservers
-      - apiservers/status
-      - imagesets
+      - whiskers
+      - whiskers/finalizers
+      - whiskers/status
     verbs:
       - get
       - list
@@ -204,6 +224,7 @@ rules:
     resources:
     - kubecontrollersconfigurations
     - bgpconfigurations
+    - clusterinformations
     verbs:
     - get
     - list
@@ -296,7 +317,7 @@ rules:
     verbs:
       - list
       - watch
-{{- if eq .Values.installation.kubernetesProvider "openshift" }}
+{{- if eq (lower .Values.installation.kubernetesProvider) "openshift" }}
   # When running in OpenShift, we need to update networking config.
   - apiGroups:
       - config.openshift.io
@@ -362,13 +383,6 @@ rules:
       - ipamblocks
     verbs:
       - list
-  # Need this permission for the calicoctl version mismatch checking
-  - apiGroups:
-      - crd.projectcalico.org
-    resources:
-      - clusterinformations
-    verbs:
-      - get
   # For AWS security group setup.
   - apiGroups:
       - batch
@@ -380,6 +394,7 @@ rules:
       - update
       - list
       - watch
+      - delete
 {{- else }}
   # Add the appropriate pod security policy permissions
   - apiGroups:
@@ -437,3 +452,71 @@ rules:
       - create
       - list
       - watch
+  # Additions for Gateway API support.
+  # 1. The operator needs to reconcile gateway.networking.k8s.io and gateway.envoyproxy.io CRDs.
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - update
+    resourceNames:
+      - backendlbpolicies.gateway.networking.k8s.io
+      - backendtlspolicies.gateway.networking.k8s.io
+      - gatewayclasses.gateway.networking.k8s.io
+      - gateways.gateway.networking.k8s.io
+      - grpcroutes.gateway.networking.k8s.io
+      - httproutes.gateway.networking.k8s.io
+      - referencegrants.gateway.networking.k8s.io
+      - tcproutes.gateway.networking.k8s.io
+      - tlsroutes.gateway.networking.k8s.io
+      - udproutes.gateway.networking.k8s.io
+      - backends.gateway.envoyproxy.io
+      - backendtrafficpolicies.gateway.envoyproxy.io
+      - clienttrafficpolicies.gateway.envoyproxy.io
+      - envoyextensionpolicies.gateway.envoyproxy.io
+      - envoypatchpolicies.gateway.envoyproxy.io
+      - envoyproxies.gateway.envoyproxy.io
+      - httproutefilters.gateway.envoyproxy.io
+      - securitypolicies.gateway.envoyproxy.io
+  # 2. GatewayClasses and EnvoyProxy configurations.
+  - apiGroups:
+      - gateway.networking.k8s.io
+    resources:
+      - gatewayclasses
+    verbs:
+      - create
+      - update
+      - delete
+      - list
+      - get
+      - watch
+  - apiGroups:
+      - gateway.envoyproxy.io
+    resources:
+      - envoyproxies
+    verbs:
+      - create
+      - update
+      - delete
+      - list
+      - get
+      - watch
+  # 3. For Gateway API the operator needs to be able to create and reconcile a certificate
+  # generation job.
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - create
+      - list
+      - watch
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - update
+    resourceNames:
+      - tigera-gateway-api-gateway-helm-certgen

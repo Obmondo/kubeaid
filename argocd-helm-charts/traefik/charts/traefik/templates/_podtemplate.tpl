@@ -1,5 +1,5 @@
 {{- define "traefik.podTemplate" }}
-  {{- $version := include "proxyVersion" $ }}
+  {{- $version := include "traefik.proxyVersion" $ }}
     metadata:
       annotations:
       {{- if .Values.deployment.podAnnotations }}
@@ -774,6 +774,9 @@
             {{- if and (not .apimanagement.enabled) ($.Values.hub.apimanagement.admission.listenAddr) }}
                {{- fail "ERROR: Cannot configure admission without enabling hub.apimanagement" }}
             {{- end }}
+            {{- if .namespaces }}
+          - "--hub.namespaces={{ join "," (uniq (concat (include "traefik.namespace" $ | list) .namespaces)) }}"
+            {{- end }}
             {{- with .apimanagement }}
              {{- if .enabled }}
               {{- $listenAddr := default ":9943" .admission.listenAddr }}
@@ -814,8 +817,10 @@
               {{- end }}
              {{- end }}
             {{- end }}
-            {{- with .sendlogs }}
+            {{- if ne .sendlogs nil }}
+              {{- with .sendlogs | toString}}
           - "--hub.sendlogs={{ . }}"
+              {{- end }}
             {{- end }}
             {{- if and $.Values.tracing.otlp.enabled .tracing.additionalTraceHeaders.enabled }}
               {{- include "traefik.yaml2CommandLineArgs" (dict "path" "hub.tracing.additionalTraceHeaders.traceContext" "content" $.Values.hub.tracing.additionalTraceHeaders.traceContext) | nindent 10 }}
@@ -855,7 +860,7 @@
           - name: HUB_TOKEN
             valueFrom:
               secretKeyRef:
-                name: {{ . }}
+                name: {{ empty $.Values.hub.createSecret | ternary . "traefik-hub-license" }}
                 key: token
           {{- end }}
         {{- with .Values.env }}

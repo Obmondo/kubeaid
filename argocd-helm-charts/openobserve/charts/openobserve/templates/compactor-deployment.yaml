@@ -105,10 +105,10 @@ spec:
           env:
             - name: ZO_NODE_ROLE
               value: "compactor"
-            {{- with .Values.compactor.extraEnv }}
+            {{- with .Values.extraEnv }}
             {{- toYaml . |  nindent 12 }}
             {{- end }}
-            {{- with .Values.extraEnv }}
+            {{- with .Values.compactor.extraEnv }}
             {{- toYaml . |  nindent 12 }}
             {{- end }}
 

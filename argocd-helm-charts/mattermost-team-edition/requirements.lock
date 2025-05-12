@@ -1,6 +1,6 @@
 dependencies:
 - name: mattermost-team-edition
   repository: https://helm.mattermost.com
-  version: 6.6.74
-digest: sha256:c9720e63a361b19a478774c4ba0345df299844a17f9d22fbc659bd0af70d8e06
-generated: "2025-04-21T12:01:31.031236434+05:30"
+  version: 6.6.76
+digest: sha256:797eaaa07306ab61799fbefe81ad395f1904f4ff0b0c3ea5423617f8900578e4
+generated: "2025-05-13T01:56:40.292363888+05:30"

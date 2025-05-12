@@ -238,6 +238,7 @@ config:
     tls:
       # config.nats.tls must be enabled also
       # when enabled, monitoring port will use HTTPS with the options from config.nats.tls
+      # if promExporter is also enabled, consider setting promExporter.monitorDomain
       enabled: false
 
   profiling:
@@ -312,7 +313,7 @@ config:
 container:
   image:
     repository: nats
-    tag: 2.10.26-alpine
+    tag: 2.11.1-alpine
     pullPolicy:
     registry:
     # if digest is provided, it overrides tag (example: "sha256:abcdef1234567890")
@@ -357,7 +358,7 @@ reloader:
   enabled: true
   image:
     repository: natsio/nats-server-config-reloader
-    tag: 0.16.1
+    tag: 0.17.1
     pullPolicy:
     registry:
     digest:
@@ -369,7 +370,7 @@ reloader:
   # all nats container volume mounts with the following prefixes
   # will be mounted into the reloader container
   natsVolumeMountPrefixes:
-  - /etc/
+    - /etc/
 
   # merge or patch the container
   # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.24/#container-v1-core
@@ -384,13 +385,16 @@ promExporter:
   enabled: false
   image:
     repository: natsio/prometheus-nats-exporter
-    tag: 0.16.0
+    tag: 0.17.2
     pullPolicy:
     registry:
     digest:
     fullImageName:
 
   port: 7777
+  # if config.monitor.tls.enabled is set to true, monitorDomain must be set to the common name
+  # or a SAN used in the tls certificate
+  monitorDomain: localhost
   # env var map, see nats.env for an example
   env: {}
 
@@ -411,7 +415,6 @@ promExporter:
     patch: []
     # defaults to "{{ include "nats.fullname" $ }}"
     name:
-
 
 ############################################################
 # service
@@ -519,7 +522,6 @@ serviceAccount:
   # defaults to "{{ include "nats.fullname" $ }}"
   name:
 
-
 ############################################################
 # natsBox
 #
@@ -572,7 +574,7 @@ natsBox:
   container:
     image:
       repository: natsio/nats-box
-      tag: 0.16.0
+      tag: 0.17.0
       pullPolicy:
       registry:
       digest:
@@ -633,7 +635,6 @@ natsBox:
     patch: []
     # defaults to "{{ include "nats.fullname" $ }}-box"
     name:
-
 
 ################################################################################
 # Extra user-defined resources

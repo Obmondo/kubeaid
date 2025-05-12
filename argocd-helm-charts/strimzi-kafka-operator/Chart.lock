@@ -1,6 +1,6 @@
 dependencies:
 - name: strimzi-kafka-operator
   repository: https://strimzi.io/charts/
-  version: 0.45.0
-digest: sha256:011af6fe3326467266313e1ea5944cb9e875871bc354f8ae8614a6cea9d824b3
-generated: "2024-12-23T10:56:30.762359657+05:30"
+  version: 0.46.0
+digest: sha256:4d83f415590b73b5abd35965eeba1e56d80e671adc91fbe53f384753fa91eb90
+generated: "2025-05-13T02:27:57.449150122+05:30"

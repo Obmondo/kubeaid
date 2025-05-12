@@ -109,10 +109,10 @@ spec:
           env:
             - name: ZO_NODE_ROLE
               value: "querier"
-            {{- with .Values.querier.extraEnv }}
+            {{- with .Values.extraEnv }}
             {{- toYaml . |  nindent 12 }}
             {{- end }}
-            {{- with .Values.extraEnv }}
+            {{- with .Values.querier.extraEnv }}
             {{- toYaml . |  nindent 12 }}
             {{- end }}
           {{- if .Values.querier.persistence.enabled }}

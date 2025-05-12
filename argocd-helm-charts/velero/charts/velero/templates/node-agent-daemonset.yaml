@@ -26,6 +26,7 @@ spec:
     metadata:
       labels:
         name: node-agent
+        role: node-agent
         app.kubernetes.io/name: {{ include "velero.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
@@ -55,12 +56,16 @@ spec:
       {{- end }}
     {{- end }}
       serviceAccountName: {{ include "velero.serverServiceAccount" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.server.automountServiceAccountToken }}
       {{- with .Values.nodeAgent.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- if .Values.nodeAgent.priorityClassName }}
       priorityClassName: {{ include "velero.nodeAgent.priorityClassName" . }}
+      {{- end }}
+      {{- if .Values.runtimeClassName }}
+      runtimeClassName: {{ include "velero.nodeAgent.runtimeClassName" . }}
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       volumes:

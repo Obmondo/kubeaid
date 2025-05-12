@@ -22,18 +22,19 @@ spec:
           env:
             - name: OPENFGA_DATASTORE_ENGINE
               value: postgres
+            {{- if .Values.postgres.enabled }}
             - name: OPENFGA_DATASTORE_URI
-              {{- if .Values.postgres.enabled }}
               value: "postgres://openobserve:{{ .Values.postgres.spec.password }}@{{ include "openobserve.fullname" . }}-postgres-rw.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:5432/app?sslmode=disable"
-              {{- else if .Values.auth.ZO_META_POSTGRES_DSN }}
+            {{- else if .Values.auth.ZO_META_POSTGRES_DSN }}
+            - name: OPENFGA_DATASTORE_URI
               value: "{{ .Values.auth.ZO_META_POSTGRES_DSN }}"
-              {{- else if .Values.auth.ZO_META_MYSQL_DSN }}
-              value: "{{ .Values.auth.ZO_META_MYSQL_DSN }}"
-              {{- else if .Values.config.ZO_META_MYSQL_DSN }}
-              value: "{{ .Values.config.ZO_META_MYSQL_DSN }}"
-              {{- else }}
+            {{- else if .Values.config.ZO_META_POSTGRES_DSN }}
+            - name: OPENFGA_DATASTORE_URI
               value: "{{ .Values.config.ZO_META_POSTGRES_DSN }}"
-              {{- end }}
+            {{- end }}
+          envFrom:
+            - secretRef:  # postgres detail can be picked up from secret if not found anywhere else
+                name: {{ if .Values.externalSecret.enabled }}{{ .Values.externalSecret.name }}{{ else }}{{ include "openobserve.fullname" . }}{{ end }}
           resources:
             limits:
               cpu: 200m
@@ -46,14 +47,21 @@ spec:
           env:
             - name: OPENFGA_DATASTORE_ENGINE
               value: postgres
+            {{- if .Values.postgres.enabled }}
             - name: OPENFGA_DATASTORE_URI
-              {{- if .Values.postgres.enabled }}
               value: "postgres://openobserve:{{ .Values.postgres.spec.password }}@{{ include "openobserve.fullname" . }}-postgres-rw.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:5432/app?sslmode=disable"
-              {{- else }}
+            {{- else if .Values.auth.ZO_META_POSTGRES_DSN }}
+            - name: OPENFGA_DATASTORE_URI
               value: "{{ .Values.auth.ZO_META_POSTGRES_DSN }}"
-              {{- end }}
+            {{- else if .Values.config.ZO_META_POSTGRES_DSN }}
+            - name: OPENFGA_DATASTORE_URI
+              value: "{{ .Values.config.ZO_META_POSTGRES_DSN }}"
+            {{- end }}
             - name: OPENFGA_LOG_FORMAT
               value: json
+          envFrom:
+            - secretRef:
+                name: {{ if .Values.externalSecret.enabled }}{{ .Values.externalSecret.name }}{{ else }}{{ include "openobserve.fullname" . }}{{ end }}
           ports:
             - containerPort: 8080
               name: http

@@ -75,7 +75,7 @@ spec:
           {{- if .Values.probes.router.enabled }}
           livenessProbe:
             httpGet:
-              path: /healthz
+              path: {{ .Values.config.ZO_BASE_URI | default "" }}/healthz
               port: {{ .Values.config.ZO_HTTP_PORT }}
             initialDelaySeconds: {{ .Values.probes.router.config.livenessProbe.initialDelaySeconds | default 10 }}
             periodSeconds: {{ .Values.probes.router.config.livenessProbe.periodSeconds | default 10 }}
@@ -85,7 +85,7 @@ spec:
             terminationGracePeriodSeconds: {{ .Values.probes.router.config.livenessProbe.terminationGracePeriodSeconds | default 30 }}
           readinessProbe:
             httpGet:
-              path: /healthz
+              path: {{ .Values.config.ZO_BASE_URI | default "" }}/healthz
               port: {{ .Values.config.ZO_HTTP_PORT }}
             initialDelaySeconds: {{ .Values.probes.router.config.readinessProbe.initialDelaySeconds | default 10 }}
             periodSeconds: {{ .Values.probes.router.config.readinessProbe.periodSeconds | default 10 }}
@@ -105,10 +105,10 @@ spec:
           env:
             - name: ZO_NODE_ROLE
               value: "router"
-            {{- with .Values.router.extraEnv }}
+            {{- with .Values.extraEnv }}
             {{- toYaml . |  nindent 12 }}
             {{- end }}
-            {{- with .Values.extraEnv }}
+            {{- with .Values.router.extraEnv }}
             {{- toYaml . |  nindent 12 }}
             {{- end }}
             

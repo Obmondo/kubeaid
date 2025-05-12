@@ -1,6 +1,6 @@
 # traefik
 
-![Version: 35.0.1](https://img.shields.io/badge/Version-35.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v3.3.6](https://img.shields.io/badge/AppVersion-v3.3.6-informational?style=flat-square)
+![Version: 35.2.0](https://img.shields.io/badge/Version-35.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v3.3.6](https://img.shields.io/badge/AppVersion-v3.3.6-informational?style=flat-square)
 
 A Traefik based Kubernetes ingress controller
 
@@ -87,6 +87,7 @@ Kubernetes: `>=1.22.0-0`
 | hub.apimanagement.enabled | bool | `false` | Set to true in order to enable API Management. Requires a valid license token. |
 | hub.apimanagement.openApi.validateRequestMethodAndPath | bool | `false` | When set to true, it will only accept paths and methods that are explicitly defined in its OpenAPI specification |
 | hub.experimental.aigateway | bool | `false` | Set to true in order to enable AI Gateway. Requires a valid license token. |
+| hub.namespaces | list | `[]` | By default, Traefik Hub provider watches all namespaces. When using `rbac.namespaced`, it will watch helm release namespace and namespaces listed in this array. |
 | hub.providers.consulCatalogEnterprise.cache | bool | `false` | Use local agent caching for catalog reads. |
 | hub.providers.consulCatalogEnterprise.connectAware | bool | `false` | Enable Consul Connect support. |
 | hub.providers.consulCatalogEnterprise.connectByDefault | bool | `false` | Consider every service as Connect capable by default. |
@@ -149,7 +150,7 @@ Kubernetes: `>=1.22.0-0`
 | image.pullPolicy | string | `"IfNotPresent"` | Traefik image pull policy |
 | image.registry | string | `"docker.io"` | Traefik image host registry |
 | image.repository | string | `"traefik"` | Traefik image repository |
-| image.tag | string | `nil` | defaults to appVersion |
+| image.tag | string | `nil` | defaults to appVersion. It's used for version checking, even prefixed with experimental- or latest-. When a digest is required, `versionOverride` can be used to set the version. |
 | ingressClass | object | `{"enabled":true,"isDefaultClass":true,"name":""}` | Create a default IngressClass for Traefik |
 | ingressRoute.dashboard.annotations | object | `{}` | Additional ingressRoute annotations (e.g. for kubernetes.io/ingress.class) |
 | ingressRoute.dashboard.enabled | bool | `false` | Create an IngressRoute for the dashboard |
@@ -167,7 +168,7 @@ Kubernetes: `>=1.22.0-0`
 | ingressRoute.healthcheck.middlewares | list | `[]` | Additional ingressRoute middlewares (e.g. for authentication) |
 | ingressRoute.healthcheck.services | list | `[{"kind":"TraefikService","name":"ping@internal"}]` | The internal service used for the healthcheck ingressRoute |
 | ingressRoute.healthcheck.tls | object | `{}` | TLS options (e.g. secret containing certificate) |
-| instanceLabelOverride | string | `""` |  |
+| instanceLabelOverride | string | `""` | This field override the default app.kubernetes.io/instance label for all Objects. |
 | livenessProbe.failureThreshold | int | `3` | The number of consecutive failures allowed before considering the probe as failed. |
 | livenessProbe.initialDelaySeconds | int | `2` | The number of seconds to wait before starting the first probe. |
 | livenessProbe.periodSeconds | int | `10` | The number of seconds to wait between consecutive probes. |
@@ -305,12 +306,12 @@ Kubernetes: `>=1.22.0-0`
 | providers.kubernetesCRD.allowExternalNameServices | bool | `false` | Allows to reference ExternalName services in IngressRoute |
 | providers.kubernetesCRD.enabled | bool | `true` | Load Kubernetes IngressRoute provider |
 | providers.kubernetesCRD.ingressClass | string | `""` | When the parameter is set, only resources containing an annotation with the same value are processed. Otherwise, resources missing the annotation, having an empty value, or the value traefik are processed. It will also set required annotation on Dashboard and Healthcheck IngressRoute when enabled. |
-| providers.kubernetesCRD.namespaces | list | `[]` | Array of namespaces to watch. If left empty, Traefik watches all namespaces. |
+| providers.kubernetesCRD.namespaces | list | `[]` | Array of namespaces to watch. If left empty, Traefik watches all namespaces. . When using `rbac.namespaced`, it will watch helm release namespace and namespaces listed in this array. |
 | providers.kubernetesCRD.nativeLBByDefault | bool | `false` | Defines whether to use Native Kubernetes load-balancing mode by default. |
 | providers.kubernetesGateway.enabled | bool | `false` | Enable Traefik Gateway provider for Gateway API |
 | providers.kubernetesGateway.experimentalChannel | bool | `false` | Toggles support for the Experimental Channel resources (Gateway API release channels documentation). This option currently enables support for TCPRoute and TLSRoute. |
 | providers.kubernetesGateway.labelselector | string | `""` | A label selector can be defined to filter on specific GatewayClass objects only. |
-| providers.kubernetesGateway.namespaces | list | `[]` | Array of namespaces to watch. If left empty, Traefik watches all namespaces. |
+| providers.kubernetesGateway.namespaces | list | `[]` | Array of namespaces to watch. If left empty, Traefik watches all namespaces. . When using `rbac.namespaced`, it will watch helm release namespace and namespaces listed in this array. |
 | providers.kubernetesGateway.nativeLBByDefault | bool | `false` | Defines whether to use Native Kubernetes load-balancing mode by default. |
 | providers.kubernetesGateway.statusAddress.hostname | string | `""` | This Hostname will get copied to the Gateway status.addresses. |
 | providers.kubernetesGateway.statusAddress.ip | string | `""` | This IP will get copied to the Gateway status.addresses, and currently only supports one IP value (IPv4 or IPv6). |
@@ -319,7 +320,7 @@ Kubernetes: `>=1.22.0-0`
 | providers.kubernetesIngress.allowExternalNameServices | bool | `false` | Allows to reference ExternalName services in Ingress |
 | providers.kubernetesIngress.enabled | bool | `true` | Load Kubernetes Ingress provider |
 | providers.kubernetesIngress.ingressClass | string | `nil` | When ingressClass is set, only Ingresses containing an annotation with the same value are processed. Otherwise, Ingresses missing the annotation, having an empty value, or the value traefik are processed. |
-| providers.kubernetesIngress.namespaces | list | `[]` | Array of namespaces to watch. If left empty, Traefik watches all namespaces. |
+| providers.kubernetesIngress.namespaces | list | `[]` | Array of namespaces to watch. If left empty, Traefik watches all namespaces. . When using `rbac.namespaced`, it will watch helm release namespace and namespaces listed in this array. |
 | providers.kubernetesIngress.nativeLBByDefault | bool | `false` | Defines whether to use Native Kubernetes load-balancing mode by default. |
 | providers.kubernetesIngress.publishedService.enabled | bool | `true` | Enable [publishedService](https://doc.traefik.io/traefik/providers/kubernetes-ingress/#publishedservice) |
 | providers.kubernetesIngress.publishedService.pathOverride | string | `""` | Override path of Kubernetes Service used to copy status from. Format: namespace/servicename. Default to Service deployed with this Chart. |
@@ -375,6 +376,7 @@ Kubernetes: `>=1.22.0-0`
 | updateStrategy.rollingUpdate.maxSurge | int | `1` |  |
 | updateStrategy.rollingUpdate.maxUnavailable | int | `0` |  |
 | updateStrategy.type | string | `"RollingUpdate"` | Customize updateStrategy of Deployment or DaemonSet |
+| versionOverride | string | `""` | This field override the default version extracted from image.tag |
 | volumes | list | `[]` | Add volumes to the traefik pod. The volume name will be passed to tpl. This can be used to mount a cert pair or a configmap that holds a config.toml file. After the volume has been mounted, add the configs into traefik by using the `additionalArguments` list below, eg: `additionalArguments: - "--providers.file.filename=/config/dynamic.toml" - "--ping" - "--ping.entrypoint=web"` |
 
 ----------------------------------------------

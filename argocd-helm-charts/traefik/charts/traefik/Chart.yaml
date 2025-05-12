@@ -1,7 +1,8 @@
 annotations:
-  artifacthub.io/changes: |
-    - "feat(deps): update traefik docker tag to v3.3.6"
-    - "chore(release): :rocket: publish traefik 35.0.1"
+  artifacthub.io/changes: "- \"fix(Traefik Hub): really disable sendlogs when set
+    to false\"\n- \"fix(Traefik Hub): prefix mutating webhook by release name\"\n-
+    \"feat(Traefik Hub): option to set token in values\"\n- \"chore(release): \U0001F680
+    publish v35.1.1\"\n"
 apiVersion: v2
 appVersion: v3.3.6
 description: A Traefik based Kubernetes ingress controller
@@ -25,4 +26,4 @@ sources:
 - https://github.com/traefik/traefik-helm-chart
 - https://github.com/traefik/traefik
 type: application
-version: 35.0.1
+version: 35.2.0

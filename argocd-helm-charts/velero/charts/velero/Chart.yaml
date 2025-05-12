@@ -9,11 +9,9 @@ maintainers:
   name: jenting
 - email: jiangd@vmware.com
   name: reasonerjt
-- email: mqiu@vmware.com
-  name: qiuming-best
 - email: yinw@vmware.com
   name: ywk253100
 name: velero
 sources:
 - https://github.com/vmware-tanzu/velero
-version: 9.0.0
+version: 9.1.2

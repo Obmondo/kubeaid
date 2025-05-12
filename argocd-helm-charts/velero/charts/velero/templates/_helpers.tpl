@@ -65,11 +65,33 @@ Create the Velero priority class name.
 {{- end -}}
 
 {{/*
+Create the Velero runtime class name.
+*/}}
+{{- define "velero.runtimeClassName" -}}
+{{- if .Values.runtimeClassName -}}
+  {{- .Values.runtimeClassName -}}
+{{- else -}}
+  {{- include "velero.fullname" . -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Create the node-Agent priority class name.
 */}}
 {{- define "velero.nodeAgent.priorityClassName" -}}
 {{- if .Values.nodeAgent.priorityClassName -}}
   {{- .Values.nodeAgent.priorityClassName -}}
+{{- else -}}
+  {{- include "velero.fullname" . -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the node-Agent runtime class name.
+*/}}
+{{- define "velero.nodeAgent.runtimeClassName" -}}
+{{- if .Values.nodeAgent.runtimeClassName -}}
+  {{- .Values.nodeAgent.runtimeClassName -}}
 {{- else -}}
   {{- include "velero.fullname" . -}}
 {{- end -}}

@@ -1,6 +1,6 @@
 dependencies:
 - name: redmine
   repository: https://charts.bitnami.com/bitnami
-  version: 32.2.2
-digest: sha256:1b46c017110fc848b6ff2dbf934de1c8d764558278ff41624fa824c0eb7f3af0
-generated: "2025-04-21T12:15:58.56782837+05:30"
+  version: 32.2.4
+digest: sha256:88da3475fffdffb9d16e2c38122bd54500856a1f61a9bb8619dd590aeaf1d6bf
+generated: "2025-05-13T02:19:58.718421575+05:30"

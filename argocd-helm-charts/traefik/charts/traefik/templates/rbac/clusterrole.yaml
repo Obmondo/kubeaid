@@ -1,4 +1,4 @@
-{{- $version := include "proxyVersion" $ }}
+{{- $version := include "traefik.proxyVersion" $ }}
 {{- if and .Values.rbac.enabled (not .Values.rbac.namespaced) }}
 ---
 kind: ClusterRole
@@ -235,7 +235,6 @@ rules:
       - hub.traefik.io
     resources:
       - accesscontrolpolicies
-      - apiaccesses
       - apiportals
       - apiratelimits
       - apis

@@ -53,6 +53,9 @@ spec:
             {{- with .Values.extraEnv }}
             {{- toYaml . |  nindent 12 }}
             {{- end }}
+            {{- with .Values.actions.extraEnv }}
+            {{- toYaml . |  nindent 12 }}
+            {{- end }}
           resources:
             {{- toYaml .Values.enterprise.actions.resources | nindent 12 }}
           ports:
