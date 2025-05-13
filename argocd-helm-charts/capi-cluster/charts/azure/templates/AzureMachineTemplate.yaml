@@ -6,6 +6,10 @@ spec:
   template:
     spec:
       vmSize: {{ .Values.controlPlane.vmSize }}
+      {{- if .Values.imageID }}
+      image:
+        id: {{ .Values.imageID }}
+      {{- end }}
       osDisk:
         diskSizeGB: {{ .Values.controlPlane.diskSizeGB }}
         osType: Linux
@@ -30,6 +34,10 @@ spec:
   template:
     spec:
       vmSize: {{ $nodeGroup.vmSize }}
+      {{- if $.Values.imageID }}
+      image:
+        id: {{ $.Values.imageID }}
+      {{- end }}
       osDisk:
         diskSizeGB: {{ $nodeGroup.diskSizeGB }}
         osType: Linux
