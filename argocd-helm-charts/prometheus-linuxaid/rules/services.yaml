@@ -12,7 +12,7 @@ groups:
       expr: |
         (
           record::monitor::system::service::down unless
-          ignoring (state, type) threshold::monitor::system::service::down::blacklist
+          ignoring (state, type, exported_certname) threshold::monitor::system::service::down::blacklist
         ) and on(certname) obmondo_monitoring{alert_id="monitor::system::service::down"} > 0
       for: 30m
       labels:
