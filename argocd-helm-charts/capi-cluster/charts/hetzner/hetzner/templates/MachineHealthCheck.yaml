@@ -1,0 +1,25 @@
+{{/* Handling control-plane in HCloud. */}}
+{{- if or (eq .Values.mode "hcloud") (eq .Values.mode "hybrid") }}
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineHealthCheck
+metadata:
+  name: {{ .Values.global.clusterName }}-control-plane-unhealthy-5m
+spec:
+  clusterName: {{ .Values.global.clusterName }}
+  maxUnhealthy: 100%
+  nodeStartupTimeout: 15m0s
+  remediationTemplate:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: HCloudRemediationTemplate
+    name: control-plane-remediation-request
+  selector:
+    matchLabels:
+      cluster.x-k8s.io/control-plane: ""
+  unhealthyConditions:
+  - status: Unknown
+    timeout: 3m0s
+    type: Ready
+  - status: "False"
+    timeout: 3m0s
+    type: Ready
+{{- end }}

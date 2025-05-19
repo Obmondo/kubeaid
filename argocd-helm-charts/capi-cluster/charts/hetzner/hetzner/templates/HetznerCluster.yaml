@@ -1,0 +1,77 @@
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: HetznerCluster
+metadata:
+  name: {{ .Values.global.clusterName }}
+  labels:
+    cluster.x-k8s.io/name: {{ .Values.global.clusterName }}
+spec:
+  controlPlaneEndpoint:
+    host: {{ (.Values.controlPlane.endpoint).host | default "" | quote }}
+    port: 6443
+
+  controlPlaneRegions: {{ toYaml .Values.controlPlane.regions | nindent 4 }}
+
+{{/* Handling control-plane in HCloud */}}
+{{- if or (eq .Values.mode "hcloud") (eq .Values.mode "hybrid") }}
+
+  {{- if (.Values.controlPlane.loadBalancer).enabled }}
+  controlPlaneLoadBalancer:
+    enabled: true
+    region: {{ .Values.controlPlane.loadBalancer.region }}
+  {{- end }}
+
+  {{- if (.Values.network).enabled }}
+  hcloudNetwork:
+    enabled: true
+    networkZone: {{ .Values.zone }}
+  {{- end }}
+
+{{- end }}
+
+  hcloudPlacementGroups:
+    - name: control-plane
+      type: spread
+
+    {{/* For node-groups in HCloud. */}}
+    {{- if or (eq .Values.mode "hcloud") (eq .Values.mode "hybrid") }}
+    {{- range $index, $nodeGroup := .Values.nodeGroups.hcloud }}
+    - name: {{ $nodeGroup.name }}
+      type: spread
+    {{- end }}
+    {{- end }}
+
+    {{/* For node-groups in Hetzner Bare Metal. */}}
+    {{- if or (eq .Values.mode "bare-metal") (eq .Values.mode "hybrid") }}
+    {{- range $index, $nodeGroup := .Values.nodeGroups.bareMetal }}
+    - name: {{ $nodeGroup.name }}
+      type: spread
+    {{- end }}
+    {{- end }}
+
+  hetznerSecretRef:
+    name: {{ .Values.cloudCredentialsSecretName }}
+    key:
+      # Reference to a token to be used when reconciling this cluster.
+      # You can generate an HCloud token in the security section under API TOKENS.
+      # NOTE : Read & write is necessary.
+      hcloudToken: hcloud
+
+      hetznerRobotPassword: robot-password
+      hetznerRobotUser: robot-user
+
+  sshKeys:
+    # ClusterAPI will access the VMs using these HCloud SSH Keys (before bootstrapping the
+    # Kubernetes cluster).
+    # NOTE : Each SSH Key is cluster wide.
+    hcloud:
+      - name: {{ .Values.hcloudSSHKeyPairName }}
+    {{- if or (eq .Values.mode "bare-metal") (eq .Values.mode "hybrid") }}
+    # Defines the reference to the secret where the SSH key for the rescue system is stored.
+    # Make sure, that any other HCloud SSH Key with this name doesn't exist.
+    robotRescueSecretRef:
+      key:
+        name: sshkey-name
+        privateKey: ssh-privatekey
+        publicKey: ssh-publickey
+      name: {{ .Values.rescueSSHKeyPairSecretName }}
+    {{- end }}
