@@ -1,75 +1,17 @@
-global:
-  clusterName: kubeaid-demo-hetzner-robot
+mode: hybrid
 
-kubernetesVersion: v1.31.0
+cloudCredentialsSecretName: cloud-credentials
+
+zone: eu-central
+location: hel1
+
+hcloudSSHKeyPairName: cluster
+rescueSSHKeyPairSecretName: rescue-ssh-keypair
+
+network:
+  enabled: true
 
 imageName: ubuntu-24.04
-
-controlPlaneType: baremetal
-controlPlaneMachineCount: 3
-controlPlaneMachineType: cax41
-
-workerMachineType: cax41
-workerMachineCount:
-  baremetal: 0
-  hcloud: 0
-includeWorker:
-  hcloud: false
-  baremetal: true
-
-remediation:
-  enabled:
-    hcloud: true
-    baremetal: true
-  hcloud:
-    controlPlane:
-      retryLimit: 1
-      timeout: 180s
-      type: Reboot
-      maxUnhealthy: 100%
-      nodeStartupTimeout: 15m
-    worker:
-      retryLimit: 1
-      timeout: 180s
-      type: Reboot
-      maxUnhealthy: 100%
-      nodeStartupTimeout: 15m
-  baremetal:
-    controlPlane:
-      retryLimit: 2
-      timeout: 300s
-      type: Reboot
-      maxUnhealthy: 100%
-      nodeStartupTimeout: 60m
-    worker:
-      retryLimit: 2
-      timeout: 300s
-      type: Reboot
-      maxUnhealthy: 100%
-      nodeStartupTimeout: 60m
-
-baremetalHosts:
-  WithRaid:
-  # Is integer.
-  - serverID: "***"
-    role: control-plane
-    description: "Control Plane Node 1"
-    # Is hexadecimal.
-    wwn:
-    - "0x***"
-    - "0x***"
-  - serverID: "***"
-    role: control-plane
-    description: "Control Plane Node 2"
-    wwn:
-    - "0x***"
-    - "0x***"
-  - serverID: "***"
-    role: control-plane
-    description: "Control Plane Node 3"
-    wwn:
-    - "0x***"
-    - "0x***"
 
 installImage:
   controlPlane:
@@ -81,23 +23,17 @@ installImage:
     rootPartitionSize: all
     swRaid: 1
 
-ssh:
-  # Name of the SSH key present in the HCloud console that will be added to the HCloud server.
-  keyName: cluster
-  # Keys related to the secret with the name robotRescueSecretName.
-  robotRescueSecretKey:
-    # Name of the SSH key present in the HCloud console and its content.
-    name: sshkey-name
-    privateKey: ssh-privatekey
-    publicKey: ssh-publickey
-  # Name of the secret holding details of the SSH key that will be added to the baremetal Hetzner server.
-  robotRescueSecretName: robot-ssh
+controlPlane:
+  machineType: cax11
+  replicas: 3
+  regions:
+    - fsn1
+    - nbg1
+    - hel1
+  loadBalancer:
+    enabled: true
+    region: hel1
 
-hcloudRegion: hel1
-
-# Secret holding credentials related to the Hetzner console login.
-hetznerSecretName: hetzner
-hetznerSecretKey:
-  hcloudToken: hcloud
-  hetznerRobotPassword: robot-password
-  hetznerRobotUser: robot-user
+nodeGroups:
+  bareMetal: []
+  hcloud: []

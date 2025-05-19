@@ -32,47 +32,47 @@ helm install my-cluster ./hetzner-cluster-helm --values values.yaml
 
 The following table lists the configurable parameters of the chart and their default values.
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `clusterName` | Name of the Kubernetes cluster | `kubeaid-demo-hetzner-robot` |
-| `imageName` | OS image name to use for nodes | `ubuntu-24.04` |
-| `controlPlaneType` | Type of control plane machines (`baremetal` or `hcloud`) | `baremetal` |
-| `controlPlaneMachineCount` | Number of control plane nodes | `3` |
-| `controlPlaneMachineType` | Machine type for control plane nodes | `cax41` |
-| `workerMachineType` | Machine type for worker nodes | `cax41` |
-| `workerMachineCount.baremetal` | Number of baremetal worker nodes | `0` |
-| `workerMachineCount.hcloud` | Number of Hetzner Cloud worker nodes | `0` |
-| `includeWorker.hcloud` | Enable Hetzner Cloud worker nodes | `false` |
-| `includeWorker.baremetal` | Enable baremetal worker nodes | `true` |
-| `remediation.enabled.hcloud` | Enable remediation for Hetzner Cloud machines | `true` |
-| `remediation.enabled.baremetal` | Enable remediation for baremetal machines | `true` |
-| `remediation.hcloud.controlPlane.retryLimit` | Retry limit for Hetzner Cloud control plane remediation | `1` |
-| `remediation.hcloud.controlPlane.timeout` | Timeout for Hetzner Cloud control plane remediation | `180s` |
-| `remediation.hcloud.controlPlane.type` | Type of remediation for Hetzner Cloud control plane | `Reboot` |
-| `remediation.hcloud.controlPlane.maxUnhealthy` | Maximum percentage of unhealthy nodes allowed | `100%` |
-| `remediation.hcloud.controlPlane.nodeStartupTimeout` | Timeout for node startup after remediation | `15m` |
-| `remediation.hcloud.worker` | Remediation settings for Hetzner Cloud worker nodes | See values.yaml |
-| `remediation.baremetal.controlPlane` | Remediation settings for baremetal control plane nodes | See values.yaml |
-| `remediation.baremetal.worker` | Remediation settings for baremetal worker nodes | See values.yaml |
-| `baremetalHosts.WithRaid` | List of baremetal servers with RAID configuration | See values.yaml |
-| `baremetalHosts.WithRaid[].serverID` | Hetzner Robot server ID | |
-| `baremetalHosts.WithRaid[].role` | Role of the server (control-plane/worker) | |
-| `baremetalHosts.WithRaid[].description` | Description of the server | |
-| `baremetalHosts.WithRaid[].wwn` | World Wide Names of the server's disks | |
-| `installImage.controlPlane.imagePath` | Path to OS installation image for control plane | `/root/.oldroot/nfs/images/Ubuntu-2204-jammy-amd64-base.tar.gz` |
-| `installImage.controlPlane.rootPartitionSize` | Root partition size for control plane | `all` |
-| `installImage.controlPlane.swRaid` | Software RAID level for control plane | `1` |
-| `installImage.worker` | Installation settings for worker nodes | See values.yaml |
-| `ssh.keyName` | Name of SSH key in Hetzner Cloud console | `cluster` |
-| `ssh.robotRescueSecretKey.name` | Key name in the secret for SSH key name | `sshkey-name` |
-| `ssh.robotRescueSecretKey.privateKey` | Key name in the secret for SSH private key | `ssh-privatekey` |
-| `ssh.robotRescueSecretKey.publicKey` | Key name in the secret for SSH public key | `ssh-publickey` |
-| `ssh.robotRescueSecretName` | Name of the secret containing SSH keys | `robot-ssh` |
-| `hcloudRegion` | Hetzner Cloud region | `hel1` |
-| `hetznerSecretName` | Name of the secret containing Hetzner credentials | `hetzner` |
-| `hetznerSecretKey.hcloudToken` | Key name in the secret for Hetzner Cloud token | `hcloud` |
-| `hetznerSecretKey.hetznerRobotPassword` | Key name in the secret for Hetzner Robot password | `robot-password` |
-| `hetznerSecretKey.hetznerRobotUser` | Key name in the secret for Hetzner Robot username | `robot-user` |
+| Parameter                                            | Description                                              | Default                                                         |
+| ---------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------- |
+| `clusterName`                                        | Name of the Kubernetes cluster                           | `kubeaid-demo-hetzner-robot`                                    |
+| `imageName`                                          | OS image name to use for nodes                           | `ubuntu-24.04`                                                  |
+| `controlPlaneType`                                   | Type of control plane machines (`baremetal` or `hcloud`) | `baremetal`                                                     |
+| `controlPlaneMachineCount`                           | Number of control plane nodes                            | `3`                                                             |
+| `controlPlaneMachineType`                            | Machine type for control plane nodes                     | `cax41`                                                         |
+| `workerMachineType`                                  | Machine type for worker nodes                            | `cax41`                                                         |
+| `workerMachineCount.baremetal`                       | Number of baremetal worker nodes                         | `0`                                                             |
+| `workerMachineCount.hcloud`                          | Number of Hetzner Cloud worker nodes                     | `0`                                                             |
+| `includeWorker.hcloud`                               | Enable Hetzner Cloud worker nodes                        | `false`                                                         |
+| `includeWorker.baremetal`                            | Enable baremetal worker nodes                            | `true`                                                          |
+| `remediation.enabled.hcloud`                         | Enable remediation for Hetzner Cloud machines            | `true`                                                          |
+| `remediation.enabled.baremetal`                      | Enable remediation for baremetal machines                | `true`                                                          |
+| `remediation.hcloud.controlPlane.retryLimit`         | Retry limit for Hetzner Cloud control plane remediation  | `1`                                                             |
+| `remediation.hcloud.controlPlane.timeout`            | Timeout for Hetzner Cloud control plane remediation      | `180s`                                                          |
+| `remediation.hcloud.controlPlane.type`               | Type of remediation for Hetzner Cloud control plane      | `Reboot`                                                        |
+| `remediation.hcloud.controlPlane.maxUnhealthy`       | Maximum percentage of unhealthy nodes allowed            | `100%`                                                          |
+| `remediation.hcloud.controlPlane.nodeStartupTimeout` | Timeout for node startup after remediation               | `15m`                                                           |
+| `remediation.hcloud.worker`                          | Remediation settings for Hetzner Cloud worker nodes      | See values.yaml                                                 |
+| `remediation.baremetal.controlPlane`                 | Remediation settings for baremetal control plane nodes   | See values.yaml                                                 |
+| `remediation.baremetal.worker`                       | Remediation settings for baremetal worker nodes          | See values.yaml                                                 |
+| `baremetalHosts.WithRaid`                            | List of baremetal servers with RAID configuration        | See values.yaml                                                 |
+| `baremetalHosts.WithRaid[].serverID`                 | Hetzner Robot server ID                                  |                                                                 |
+| `baremetalHosts.WithRaid[].role`                     | Role of the server (control-plane/worker)                |                                                                 |
+| `baremetalHosts.WithRaid[].description`              | Description of the server                                |                                                                 |
+| `baremetalHosts.WithRaid[].wwn`                      | World Wide Names of the server's disks                   |                                                                 |
+| `installImage.controlPlane.imagePath`                | Path to OS installation image for control plane          | `/root/.oldroot/nfs/images/Ubuntu-2204-jammy-amd64-base.tar.gz` |
+| `installImage.controlPlane.rootPartitionSize`        | Root partition size for control plane                    | `all`                                                           |
+| `installImage.controlPlane.swRaid`                   | Software RAID level for control plane                    | `1`                                                             |
+| `installImage.worker`                                | Installation settings for worker nodes                   | See values.yaml                                                 |
+| `ssh.keyName`                                        | Name of SSH key in Hetzner Cloud console                 | `cluster`                                                       |
+| `ssh.robotRescueSecretKey.name`                      | Key name in the secret for SSH key name                  | `sshkey-name`                                                   |
+| `ssh.robotRescueSecretKey.privateKey`                | Key name in the secret for SSH private key               | `ssh-privatekey`                                                |
+| `ssh.robotRescueSecretKey.publicKey`                 | Key name in the secret for SSH public key                | `ssh-publickey`                                                 |
+| `ssh.robotRescueSecretName`                          | Name of the secret containing SSH keys                   | `robot-ssh`                                                     |
+| `hcloudRegion`                                       | Hetzner Cloud region                                     | `hel1`                                                          |
+| `hetznerSecretName`                                  | Name of the secret containing Hetzner credentials        | `hetzner`                                                       |
+| `hetznerSecretKey.hcloudToken`                       | Key name in the secret for Hetzner Cloud token           | `hcloud`                                                        |
+| `hetznerSecretKey.hetznerRobotPassword`              | Key name in the secret for Hetzner Robot password        | `robot-password`                                                |
+| `hetznerSecretKey.hetznerRobotUser`                  | Key name in the secret for Hetzner Robot username        | `robot-user`                                                    |
 
 ## Usage
 
