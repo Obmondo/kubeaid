@@ -5,6 +5,7 @@ metadata:
   name: alertmanager-main
   namespace: monitoring
 spec:
+  encryptedData: {}
   template:
     data:
       alertmanager.yaml: |
