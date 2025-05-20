@@ -1,1 +1,48 @@
 ---
+odoo:
+  postgresql:
+    enabled: false
+
+  externalDatabase:
+    host: odoo-pgsql-rw
+    port: 5432
+    user: odoo
+    password: ""
+    database: odoo
+    create: false
+    existingSecret: "odoo-pgsql-app"
+    existingSecretPasswordKey: "password"
+
+  odooEmail: admin@example.com
+  allowEmptyPassword: false
+
+  persistence:
+    enabled: true
+    size: 8Gi
+
+  service:
+    type: NodePort
+    ports:
+      http: 80
+    nodePorts:
+      http: 30080
+
+  ingress:
+    enabled: false
+
+# tolerations:
+#   - key: "node-role.kubernetes.io/control-plane"
+#     operator: "Exists"
+#     effect: "NoSchedule"
+
+postgres:
+  size: 4Gi
+  recover: false
+  pass: odoo-pgsql-app
+  resources:
+    limits:
+      memory: 1000Mi
+      cpu: 500Mi
+    requests:
+      memory: 500Mi
+      cpu: 250m
