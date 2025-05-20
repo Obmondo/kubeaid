@@ -11,13 +11,25 @@ rules:
     resources:
     {{- if .Values.enableClusterAPIScaleFromZeroSupport.aws }}
     - awsmachinetemplates
-    {{- else if .Values.enableClusterAPIScaleFromZeroSupport.hcloud }}
-    - hcloudmachinetemplates
     {{- else if .Values.enableClusterAPIScaleFromZeroSupport.azure }}
     - azuremachinetemplates
+    {{- else if .Values.enableClusterAPIScaleFromZeroSupport.hcloud }}
+    - hcloudmachinetemplates
     {{- end }}
     verbs:
     - get
     - list
     - watch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+      - csinodes
+      - csidrivers
+      - csistoragecapacities
+      - volumeattachments
+    verbs:
+      - get
+      - list
+      - watch
 {{- end -}}
