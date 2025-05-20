@@ -1,6 +1,6 @@
 dependencies:
-- name: ccm-hetzner
-  repository: https://charts.syself.com
-  version: 2.0.1
-digest: sha256:3df18e0a1f11ea39e70bb20c9a3bd45f3ecd0c71a26fe7abc10e27879425cfca
-generated: "2024-12-23T10:12:48.001962012+05:30"
+- name: hcloud-cloud-controller-manager
+  repository: https://charts.hetzner.cloud
+  version: 1.25.0
+digest: sha256:a91cdfcc0e997aafb113ed243d2dd992119cb2c905bb9fab1df7172b7c3e681a
+generated: "2025-05-20T19:42:04.457818+05:30"

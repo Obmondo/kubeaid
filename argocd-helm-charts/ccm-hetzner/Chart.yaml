@@ -2,6 +2,6 @@ apiVersion: v2
 name: ccm-hetzner
 version: 1.0.0
 dependencies:
-  - name: ccm-hetzner
-    version: 2.0.1
-    repository: https://charts.syself.com
+  - name: hcloud-cloud-controller-manager
+    version: 1.25.0
+    repository: https://charts.hetzner.cloud
