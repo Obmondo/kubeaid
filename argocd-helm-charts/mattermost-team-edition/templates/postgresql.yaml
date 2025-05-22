@@ -10,7 +10,12 @@ spec:
   instances: {{ ((.Values.postgres).instance) | default 1 }}
   {{ if (.Values.postgres).recover }}
   bootstrap:
-    recovery: mattermost-pgsql
+    recovery:
+      source: mattermost-pgsql
+      database: mattermost
+      owner: mattermost
+      secret: 
+        name: mattermost-pgsql-app
   {{ else }}
   bootstrap:
     initdb:
@@ -30,34 +35,34 @@ spec:
     {{- end }}
   {{- if (.Values.postgres).recover }}
   externalClusters:
-    name: mattermost-pgsql
-    barmanObjectStore:
-      destinationPath: {{ ((.Values.postgres).backup).destinationPath }}
-      endpointURL: {{ ((.Values.postgres).backup).endpointURL }}
-      {{- if eq ((.Values.postgres).backup).cloud "aws" }}
-      s3Credentials:
-        accessKeyId:
-          name: mattermost-pgsql-backup-creds
-          key: ACCESS_KEY_ID
-        secretAccessKey:
-          name: mattermost-pgsql-backup-creds
-          key: ACCESS_SECRET_KEY
-      {{- end }}
-      {{- if eq ((.Values.postgres).backup).cloud "azure" }}
-      azureCredentials:
-        connectionString:
-          name: mattermost-pgsql-backup-creds
-          key: AZURE_CONNECTION_STRING
-        storageAccount:
-          name: mattermost-pgsql-backup-creds
-          key: AZURE_STORAGE_ACCOUNT
-        storageKey:
-          name: mattermost-pgsql-backup-creds
-          key: AZURE_STORAGE_KEY
-        storageSasToken:
-          name: mattermost-pgsql-backup-creds
-          key: AZURE_STORAGE_SAS_TOKEN
-      {{- end }}
+    - name: mattermost-pgsql
+      barmanObjectStore:
+        destinationPath: {{ ((.Values.postgres).backup).destinationPath }}
+        endpointURL: {{ ((.Values.postgres).backup).endpointURL }}
+        {{- if eq ((.Values.postgres).backup).cloud "aws" }}
+        s3Credentials:
+          accessKeyId:
+            name: mattermost-pgsql-postgres-pod-env
+            key: AWS_ACCESS_KEY_ID
+          secretAccessKey:
+            name: mattermost-pgsql-postgres-pod-env
+            key: AWS_SECRET_ACCESS_KEY
+        {{- end }}
+        {{- if eq ((.Values.postgres).backup).cloud "azure" }}
+        azureCredentials:
+          connectionString:
+            name: mattermost-pgsql-postgres-pod-env
+            key: AZURE_CONNECTION_STRING
+          storageAccount:
+            name: mattermost-pgsql-postgres-pod-env
+            key: AZURE_STORAGE_ACCOUNT
+          storageKey:
+            name: mattermost-pgsql-postgres-pod-env
+            key: AZURE_STORAGE_KEY
+          storageSasToken:
+            name: mattermost-pgsql-postgres-pod-env
+            key: AZURE_STORAGE_SAS_TOKEN
+        {{- end }}  
         wal:
           maxParallel: 8
   {{- end }}
@@ -69,25 +74,25 @@ spec:
       {{- if eq ((.Values.postgres).backup).cloud "aws" }}
       s3Credentials:
         accessKeyId:
-          name: mattermost-pgsql-backup-creds
-          key: ACCESS_KEY_ID
+          name: mattermost-pgsql-postgres-pod-env
+          key: AWS_ACCESS_KEY_ID
         secretAccessKey:
-          name: mattermost-pgsql-backup-creds
-          key: ACCESS_SECRET_KEY
+          name: mattermost-pgsql-postgres-pod-env
+          key: AWS_SECRET_ACCESS_KEY
       {{- end }}
       {{- if eq ((.Values.postgres).backup).cloud "azure" }}
       azureCredentials:
         connectionString:
-          name: mattermost-pgsql-backup-creds
+          name: mattermost-pgsql-postgres-pod-env
           key: AZURE_CONNECTION_STRING
         storageAccount:
-          name: mattermost-pgsql-backup-creds
+          name: mattermost-pgsql-postgres-pod-env
           key: AZURE_STORAGE_ACCOUNT
         storageKey:
-          name: mattermost-pgsql-backup-creds
+          name: mattermost-pgsql-postgres-pod-env
           key: AZURE_STORAGE_KEY
         storageSasToken:
-          name: mattermost-pgsql-backup-creds
+          name: mattermost-pgsql-postgres-pod-env
           key: AZURE_STORAGE_SAS_TOKEN
       {{- end }}
       wal:
