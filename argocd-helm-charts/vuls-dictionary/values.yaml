@@ -42,7 +42,10 @@ service:
   # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
   type: ClusterIP
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
-  port: 80
+  govalDictionary:
+    port: 1324
+  goCVEDictionary:
+    port: 1323
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
@@ -53,20 +56,11 @@ ingress:
     - host: chart-example.local
       paths:
         - path: /
-          pathType: ImplementationSpecific
+          pathType: PathPrefix
   tls: []
 
 resources: {}
 
-# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-livenessProbe:
-  httpGet:
-    path: /
-    port: http
-readinessProbe:
-  httpGet:
-    path: /
-    port: http
 
 nodeSelector: {}
 

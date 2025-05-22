@@ -38,13 +38,25 @@ spec:
           args:
             - server
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
+            - name: http_go_cve_dictionary
+              containerPort: {{ .Values.service.goCVEDictionary.port }}
               protocol: TCP
           livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
+             initialDelaySeconds: 300
+             httpGet:
+              path: /go-cve-dictionary/health
+              port: {{ .Values.service.goCVEDictionary.port }}
+              httpHeaders:
+                - name: Host
+                  value: {{ (index .Values.ingress.hosts 0).host }}
           readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
+            initialDelaySeconds: 300
+            httpGet:
+              path: /go-cve-dictionary/health
+              port: {{ .Values.service.goCVEDictionary.port }}
+              httpHeaders:
+                - name: Host
+                  value: {{ .Values.domain }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
@@ -60,13 +72,25 @@ spec:
           args:
             - server
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
+            - name: http_goval_dictionary
+              containerPort: {{ .Values.service.govalDictionary.port }}
               protocol: TCP
           livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
+            initialDelaySeconds: 300
+            httpGet:
+              path: /goval-dictionary/health
+              port: {{ .Values.service.govalDictionary.port }}
+              httpHeaders:
+                - name: Host
+                  value: {{ (index .Values.ingress.hosts 0).host }}
           readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
+            initialDelaySeconds: 300
+            httpGet:
+              path: /goval-dictionary/health
+              port: {{ .Values.service.govalDictionary.port }}
+              httpHeaders:
+                - name: Host
+                  value: {{ .Values.domain }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
