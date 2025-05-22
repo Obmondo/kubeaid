@@ -56,7 +56,7 @@ spec:
               port: {{ .Values.service.goCVEDictionary.port }}
               httpHeaders:
                 - name: Host
-                  value: {{ .Values.domain }}
+                  value: {{ (index .Values.ingress.hosts 0).host }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
@@ -90,7 +90,7 @@ spec:
               port: {{ .Values.service.govalDictionary.port }}
               httpHeaders:
                 - name: Host
-                  value: {{ .Values.domain }}
+                  value: {{ (index .Values.ingress.hosts 0).host }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
