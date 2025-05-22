@@ -8,12 +8,12 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.goCVEDictionary }}
-      targetPort: http_go_cve
+      targetPort: http-go-cve
       protocol: TCP
-      name: http_go_cve
+      name: http-go-cve
     - port: {{ .Values.service.govalDictionary }}
-      targetPort: http_goval
+      targetPort: http-goval
       protocol: TCP
-      name: http_goval
+      name: http-goval
   selector:
     {{- include "vuls-dictionary.selectorLabels" . | nindent 4 }}
