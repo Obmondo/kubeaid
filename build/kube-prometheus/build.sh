@@ -12,16 +12,20 @@
 set -euo pipefail
 
 declare -i apply=0 \
-        debug=0 \
-        build_all=0
+  debug=0 \
+  build_all=0
 
 declare dry_run='' \
-        cluster_dir=''
+  cluster_dir=''
 
-basedir="$(dirname "$(readlink -f "${0}")")"
+function realpath() {
+  [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
+basedir="$(dirname "$(realpath "${0}")")"
 
 function _exit() {
-  if ! (( debug )); then
+  if ! ((debug)); then
     if [ -v tmpdir ] && [ -d "${tmpdir}" ]; then
       rm -rf "${tmpdir}"
     fi
@@ -40,7 +44,7 @@ Arguments:
   -a|--apply
     Apply the resulting manifests.
   -c|--create-namespaces
-    Automatically create any namespaces that doesn't exist when applying.
+    Automatically create any namespaces that don't exist when applying.
   -d|--debug
     Leave temporary output folder when exiting.
   --dry-run=<client|server>
@@ -48,38 +52,38 @@ Arguments:
 EOF
 }
 
-while (( $# > 0 )); do
+while (($# > 0)); do
   case "${1}" in
-    -a|--apply)
-      apply=1
-      ;;
-    -d|--debug)
-      debug=1
-      ;;
-    --dry-run=*)
-      [[ "${1}" =~ --dry-run=(.+) ]]
-      dry_run="${BASH_REMATCH[1]}"
-      ;;
-    --build-all)
-      build_all=1
-      ;;
-    -h|--help)
-      usage
-      exit 0
-      ;;
-    *)
-      if ! [ -d "${1}" ]; then
-        echo "Invalid argument ${1}"
-        exit 2
-      fi
-      cluster_dir="${1}"
-      ;;
+  -a | --apply)
+    apply=1
+    ;;
+  -d | --debug)
+    debug=1
+    ;;
+  --dry-run=*)
+    [[ "${1}" =~ --dry-run=(.+) ]]
+    dry_run="${BASH_REMATCH[1]}"
+    ;;
+  --build-all)
+    build_all=1
+    ;;
+  -h | --help)
+    usage
+    exit 0
+    ;;
+  *)
+    if ! [ -d "${1}" ]; then
+      echo "Invalid argument ${1}"
+      exit 2
+    fi
+    cluster_dir="${1}"
+    ;;
   esac
   shift
 done
 
 if ! [[ "${cluster_dir}" ]]; then
-  echo "missing argument cluster_dir"
+  echo "Missing argument cluster_dir"
   exit 2
 fi
 
@@ -87,22 +91,22 @@ cluster=$(basename "$cluster_dir")
 cluster_jsonnet="${cluster_dir}/${cluster}-vars.jsonnet"
 
 if [ ! -e "${cluster_jsonnet}" ]; then
-  echo "no such variable file ${cluster_jsonnet}"
+  echo "No such variable file ${cluster_jsonnet}"
   exit 2
 fi
 
-# sanity checks
-if ! tmp=$(jsonnet --version); then
-  echo "missing the program 'jsonnet'"
+# Sanity checks for jsonnet version
+if ! tmp=$(jsonnet --version 2>&1); then
+  echo "Missing the program 'jsonnet'"
   exit 2
 fi
-if ! [[ "${tmp}" =~ v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
-  echo "unable to parse jsonnet version ('${tmp}')"
+if ! [[ "${tmp}" =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+  echo "Unable to parse jsonnet version ('${tmp}')"
   exit 2
 fi
 
-declare -i _version=$(( (BASH_REMATCH[1]*10**6) + (BASH_REMATCH[2]*10**3) + BASH_REMATCH[3] ))
-if (( _version < 18000 )); then
+declare -i _version=$(((BASH_REMATCH[1] * 10 ** 6) + (BASH_REMATCH[2] * 10 ** 3) + BASH_REMATCH[3]))
+if ((_version < 18000)); then
   echo "jsonnet version too old; aborting"
   exit 2
 fi
@@ -169,25 +173,26 @@ fi
 
 echo "INFO: compiling jsonnet files into '${outdir}' from sources at ${jsonnet_lib_path}"
 
-# use a temporary dir when compiling to make it an atomic operation
+# Use a temporary directory
 tmpdir=$(mktemp -d)
 mkdir "${tmpdir}/setup"
 
+# Compile jsonnet files
 # shellcheck disable=SC2016
 jsonnet -J \
-        "${jsonnet_lib_path}" \
-        --ext-code-file vars="${cluster_jsonnet}" \
-        -m "${tmpdir}" \
-        "${basedir}/common-template.jsonnet" |
+  "${jsonnet_lib_path}" \
+  --ext-code-file vars="${cluster_jsonnet}" \
+  -m "${tmpdir}" \
+  "${basedir}/common-template.jsonnet" |
   while read -r f; do
-    gojsontoyaml < "${f}" > "${f}.yaml"
+    gojsontoyaml <"${f}" >"${f}.yaml"
     rm "${f}"
   done
 
 rm -rf "${outdir}"
 mv "${tmpdir}" "${outdir}"
 
-if (( apply )); then
+if ((apply)); then
   kubectl_args=()
   if [[ "$dry_run" ]]; then
     kubectl_args+=("--dry-run=${dry_run}")
