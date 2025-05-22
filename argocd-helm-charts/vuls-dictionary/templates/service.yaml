@@ -7,11 +7,11 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.goCVEDictionary }}
+    - port: {{ .Values.service.goCVEDictionary.port }}
       targetPort: http-go-cve
       protocol: TCP
       name: http-go-cve
-    - port: {{ .Values.service.govalDictionary }}
+    - port: {{ .Values.service.govalDictionary.port }}
       targetPort: http-goval
       protocol: TCP
       name: http-goval
