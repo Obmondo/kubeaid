@@ -134,5 +134,6 @@ cve:
     - fortinet
 
 persistence:
+  storageClass: zfs-localpv
   enabled: true
   size: 5Gi
