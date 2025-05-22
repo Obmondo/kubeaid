@@ -38,7 +38,7 @@ spec:
           args:
             - server
           ports:
-            - name: http_go_cve_dictionary
+            - name: http_go_cve
               containerPort: {{ .Values.service.goCVEDictionary.port }}
               protocol: TCP
           livenessProbe:
@@ -72,7 +72,7 @@ spec:
           args:
             - server
           ports:
-            - name: http_goval_dictionary
+            - name: http_goval
               containerPort: {{ .Values.service.govalDictionary.port }}
               protocol: TCP
           livenessProbe:
