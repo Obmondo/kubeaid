@@ -55,8 +55,12 @@ ingress:
   hosts:
     - host: chart-example.local
       paths:
-        - path: /
-          pathType: PathPrefix
+        - path: /goval-dictionary
+          pathType: Prefix
+          servicePort: 1324
+        - path: /go-cve-dictionary
+          pathType: Prefix
+          servicePort: 1323
   tls: []
 
 resources: {}

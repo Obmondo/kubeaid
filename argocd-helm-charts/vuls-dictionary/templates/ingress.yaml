@@ -37,7 +37,7 @@ spec:
               service:
                 name: {{ include "vuls-dictionary.fullname" $ }}
                 port:
-                  number: {{ $.Values.service.port }}
+                  number: {{ .servicePort }}
           {{- end }}
     {{- end }}
 {{- end }}
