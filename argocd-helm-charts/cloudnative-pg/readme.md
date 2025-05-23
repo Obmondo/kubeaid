@@ -8,6 +8,8 @@ You can backup your data in S3 or Azure blob storage
 
 The `spec.backup` section of the Cluster resource contains the parameters needed to configure backups.
 
+CronJobs for postgresql logical backup cronjob template can be found [here](./examples/backup-template/postgresql-logical-backup.yaml).
+
 ### For S3
 
 Here is a sample configuration for backing up data to S3-compatible storage:

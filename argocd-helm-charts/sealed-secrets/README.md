@@ -158,7 +158,9 @@ For restoring the secrets, in a cluster use .
 kubectl apply -f backup_key.yml
 ```
 
-### Automated way (velero)
+### Automated way
+
+#### Velero
 
 Run the commands from the velero pod in the cluster .
 
@@ -183,6 +185,10 @@ Restore the backup with the name that is created/exists.
 velero restore create <restore-name> --include-namespaces system --include-resources pods --selector sealedsecrets.bitnami.com/sealed-secrets-key=active --from-backup <backup-name>
 ```
 
+#### CronJob
+
+Backup sealed secrets via [cronjob](./templates/cronjob.yaml)
+
 ### Backup Setup on aws
 
 Create the s3 bucket
@@ -190,3 +196,4 @@ Create the s3 bucket
 ```sh
 aws s3api create-bucket --bucket kbm-sealed-secrets-backups --region eu-west-1 --endpoint-url=https://s3.obmondo.com
 ```
+

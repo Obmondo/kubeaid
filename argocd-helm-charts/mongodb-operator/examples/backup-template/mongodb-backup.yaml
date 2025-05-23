@@ -1,0 +1,104 @@
+{{if (.Values.logicalbackup).enabled}}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mongodb-backup
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 1
+  schedule: {{(.Values.logicalbackup).schedule | default "45 03 * * *"}}
+  successfulJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: mongodb-backup
+        {{- if .Values.logicalbackup.annotations }}
+          annotations:
+            {{- toYaml .Values.logicalbackup.annotations | nindent 12 }}
+        {{- end }}
+        spec:
+          containers:
+            - name: mongodb-backup
+              image: ghcr.io/obmondo/mongodb-backup:latest
+              imagePullPolicy: IfNotPresent
+              env:
+                # The MongoDB URI to access the database.
+                # E.g.
+                # Standalone instance   "mongodb://user:pass@host:port/dbname"
+                # ReplicaSet            "mongodb://user:pass@mongo-rs0.svc:27017?replicaSet=mongo-rs&ssl=false"
+                - name: MONGO_URI
+                  valueFrom:
+                    secretKeyRef:
+                      name: mongodbbackup
+                      key: MONGO_URI
+                # Setting this to true will take a backup of all the databases
+                - name: MONGO_COMPLETE
+                  valueFrom:
+                    secretKeyRef:
+                      name: mongodbbackup
+                      key: MONGO_COMPLETE
+                - name: BACKUP_PROVIDER
+                  value: {{ (.Values.logicalbackup).provider | default "az" }}
+              {{- if eq .Values.logicalbackup.provider "s3" }}
+                - name: S3_BUCKET
+                  value: {{ (.Values.logicalbackup).s3bucket }}
+                - name: S3_PATH
+                  value: {{ (.Values.logicalbackup).s3backuppath }}
+              {{- if not .Values.logicalbackup.useiamrole }}
+                - name: BACKUP_S3_REGION
+                  value: {{ (.Values.logicalbackup).s3region | default "us-east-1" }}
+                - name: BACKUP_S3_ENDPOINT
+                  value: {{ (.Values.logicalbackup).s3endpoint }}
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: awsaccesskeyid
+                      key: AWS_ACCESS_KEY_ID
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: mongodbbackup
+                      key: AWS_SECRET_ACCESS_KEY
+              {{- end }}
+              {{- else if eq .Values.logicalbackup.provider "az" }}
+                - name: AZ_BACKUP_PATH
+                  value:  {{ (.Values.logicalbackup).azbackuppath | default "mongodb-backup/graylog-mongodb" }}
+                - name: AZURE_STORAGE_ACCOUNT_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: mongodbbackup
+                      key: AZURE_STORAGE_ACCOUNT_NAME
+                # Azure accountkey
+                - name: AZURE_STORAGE_ACCOUNT_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: mongodbbackup
+                      key: AZURE_STORAGE_ACCOUNT_KEY
+                # Azure container namemongodbbackup
+                - name: AZURE_STORAGE_CONTAINER
+                  valueFrom:
+                    secretKeyRef:
+                      name: mongodbbackup
+                      key: AZURE_STORAGE_CONTAINER
+              {{- end }}
+
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 256Mi
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+              securityContext:
+                privileged: false
+                readOnlyRootFilesystem: false
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          terminationGracePeriodSeconds: 300
+
+{{ end }}

@@ -92,6 +92,10 @@ So that postgres-operator will use that to manage the instance
 
 * [values.yaml](../mattermost-team-edition/values.yaml) file
 
+## Backup
+
+CronJobs for postgresql logical backup cronjob template can be found [here](./examples/backup-template/postgresql-logical-backup.yaml).
+
 ## Restore Postgres DB using pg dump
 
 1. change the DELETE to RETAIN on pv (find pv from the respective pvc)

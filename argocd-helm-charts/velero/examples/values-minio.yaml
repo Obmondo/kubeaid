@@ -1,0 +1,38 @@
+# Example velero file using minio as back up storage location
+velero:
+  configuration:
+    backupStorageLocation:
+    - name: default
+      provider: aws
+      bucket: velero-local
+      config:
+        region: "minio"
+        s3ForcePathStyle: true
+        s3Url: http://minio.minio.svc.cluster.local:9000
+    volumeSnapshotLocation:
+    - name: default
+      provider: aws
+      config:
+        region: "minio"
+        profile: "default"
+  credentials:
+    useSecret: true
+    secretContents:
+      cloud: |
+        [default]
+        aws_access_key_id = admin
+        aws_secret_access_key = admin123
+  initContainers:
+  - name: velero-velero-plugin-for-aws
+    image: 'velero/velero-plugin-for-aws:v1.5.1'
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - mountPath: /target
+      name: plugins
+
+schedule:
+  includedNamespaces:
+    - "default"
+  daily: true
+  weekly: false
+  sixhourly: false

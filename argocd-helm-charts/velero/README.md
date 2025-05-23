@@ -1,9 +1,74 @@
 # Velero
 
+## Setting up Velero
+
+### Configuration
+
+- **Plugin usage:**
+  - Azure: `velero-plugin-for-microsoft-azure`
+  - AWS: `velero-plugin-for-aws`
+- **Snapshot mechanism:**
+  - Azure: CSI snapshots via Azure Disk CSI Driver
+  - AWS: EBS snapshots via AWS EBS CSI Driver
+- **Storage bucket for Velero metadata:**
+  - Azure: Azure Blob Storage
+  - AWS: Amazon S3
+- **Backup naming convention:** `daily-backup-<namespace>-<timestamp>`
+
+### Scheduling
+
+- Daily full-volume backups via `velero schedule` CRDs
+- Retention policies configured using TTL settings in Velero schedules
+
+Example value files can be found [here](./examples).
+
 ## How to check the backup in Velero
+
+- using `kubectl`
 
 ```sh
 kubectl get backup -n velero
+```
+
+- using `velero` 
+
+```sh
+velero get backups
+```
+
+## Check backup schedules
+
+- using `kubectl`
+
+```sh
+kubectl get schedules -n velero
+```
+
+- using `velero`
+```sh
+velero get schedules
+```
+
+## Triggering manual backups
+
+- To trigger a manual backup using existing schedule
+
+```bash
+velero create backup manual-backup --from-schedule daily-backup`
+```
+
+## Restoring using existing backups
+
+- To restore from a backup
+
+```bash
+velero restore create --from-backup manual-backup
+```
+
+- To verify restore request has been created
+
+```bash
+velero get restores
 ```
 
 ## Docs
