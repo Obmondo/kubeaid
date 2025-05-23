@@ -3,4 +3,4 @@ dependencies:
   repository: https://raw.githubusercontent.com/kubernetes-sigs/cloud-provider-azure/master/helm/repo
   version: 1.33.0
 digest: sha256:8689a5a41a364fbbe377c6ca32ec609dd9e2b531ac9fd5031fbfc998491488ce
-generated: "2025-05-26T23:40:58.290164499+05:30"
+generated: "2025-05-23T07:07:33.471969+05:30"
