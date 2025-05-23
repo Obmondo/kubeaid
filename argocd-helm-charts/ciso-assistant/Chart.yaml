@@ -2,6 +2,6 @@ apiVersion: v2
 name: ciso-assistant
 version: 1.0.0
 dependencies:
-  - name: ciso-assistant
-    version: 0.1.0
+  - name: ciso-assistant-next
+    version: 0.4.1
     repository: https://intuitem.github.io/ca-helm-chart/

@@ -1,7 +1,0 @@
-apiVersion: v2
-appVersion: v1.9.7
-description: A Helm chart for CISO Assistant k8s's deployment
-icon: https://intuitem.com/ciso-assistant.svg
-name: ciso-assistant
-type: application
-version: 0.1.0
