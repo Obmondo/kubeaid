@@ -1,9 +1,35 @@
 ---
 ciso-assistant-next:
-  clientName: ciso
-  email:
-    debug: true
+  backend:
+    config:
+      databaseType: externalPgsql
+    persistence:
+      sqlite:
+        enabled: true
+  frontend:
+    service:
+      annotations:
+        load-balancer.hetzner.cloud/network-zone: eu-central
+    postgresql:
+      enabled: false
+  externalPgsql:
+    host: ciso-assistant-pgsql-rw
+    port: 5432
+    user: ciso-assistant
+    database: ciso-assistant
+    create: false
+    existingSecret: ciso-assistant-pgsql-app
   ingress:
     enabled: true
-  caddy:
-    enabled: false
+
+postgres:
+  size: 5Gi
+  recover: false
+  pass: ciso-assistant-pgsql-app
+  resources:
+    limits:
+      memory: 1000Mi
+      cpu: 500Mi
+    requests:
+      memory: 500Mi
+      cpu: 250m

@@ -1,7 +1,11 @@
 apiVersion: v2
 name: ciso-assistant
 version: 1.0.0
-dependencies:
-  - name: ciso-assistant-next
-    version: 0.4.1
-    repository: https://intuitem.github.io/ca-helm-chart/
+# FIXME: NOTE: some how it was failing for me, so simply copied from github
+# Error: An error occurred while checking for chart dependencies. You may need to run `helm dependency build` to fetch missing dependencies: found in Chart.yaml, but missing in charts/ directory: ciso-assistant-next
+# Need to update the underlying chart manually, till we fix the error above
+
+#dependencies:
+#  - name: ciso-assistant-next
+#    version: 0.4.1
+#    repository: https://intuitem.github.io/ca-helm-chart/
