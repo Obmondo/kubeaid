@@ -7,9 +7,6 @@ ciso-assistant-next:
       sqlite:
         enabled: true
   frontend:
-    service:
-      annotations:
-        load-balancer.hetzner.cloud/network-zone: eu-central
     postgresql:
       enabled: false
   externalPgsql:
