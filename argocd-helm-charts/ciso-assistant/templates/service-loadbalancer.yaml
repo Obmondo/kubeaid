@@ -1,0 +1,38 @@
+{{- if .Values.service.loadBalancer.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: ciso-assistant-{{ index .Values "ciso-assistant" "clientName" }}-loadbalancer
+  labels:
+    client: {{ index .Values "ciso-assistant" "clientName" }}
+    {{- include "common.labels" . | nindent 4 }}
+  annotations:
+    {{- range $key, $value := .Values.service.loadBalancer.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  type: LoadBalancer
+  ports:
+  {{- if index .Values "ciso-assistant" "caddy" "enabled" }}
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 443
+  {{- else }}
+  - name: http-backend
+    port: 8000
+    protocol: TCP
+    targetPort: 8000
+  - name: http-frontend
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  {{- end }}
+  selector:
+    app: ciso-assistant
+    client: {{ index .Values "ciso-assistant" "clientName" }}
+{{- end }}

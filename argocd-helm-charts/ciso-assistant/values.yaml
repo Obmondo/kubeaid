@@ -7,3 +7,8 @@ ciso-assistant:
     enabled: true
   caddy:
     enabled: false
+
+service:
+  loadBalancer:
+    enabled: true
+    annotations: {}
