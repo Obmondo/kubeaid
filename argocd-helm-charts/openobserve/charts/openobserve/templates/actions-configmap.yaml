@@ -11,6 +11,7 @@ data:
   O2_ACTION_MIN_MEMORY_MIB:  "{{ .Values.enterprise.actions.parameters.O2_ACTION_MIN_MEMORY_MIB }}"
   O2_ACTION_MAX_MILLI_CPU:  "{{ .Values.enterprise.actions.parameters.O2_ACTION_MAX_MILLI_CPU }}"
   O2_ACTION_MIN_MILLI_CPU:  "{{ .Values.enterprise.actions.parameters.O2_ACTION_MIN_MILLI_CPU }}"
+  O2_ACTION_CONTAINER_IMAGE:  "{{ .Values.enterprise.actions.parameters.O2_ACTION_CONTAINER_IMAGE }}"
   O2_SCRIPT_SERVER_TOKEN:  "{{ .Values.enterprise.actions.parameters.O2_SCRIPT_SERVER_TOKEN }}"
 {{- end }}
  

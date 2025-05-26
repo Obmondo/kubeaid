@@ -1,6 +1,6 @@
 # traefik
 
-![Version: 35.2.0](https://img.shields.io/badge/Version-35.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v3.3.6](https://img.shields.io/badge/AppVersion-v3.3.6-informational?style=flat-square)
+![Version: 35.4.0](https://img.shields.io/badge/Version-35.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v3.4.0](https://img.shields.io/badge/AppVersion-v3.4.0-informational?style=flat-square)
 
 A Traefik based Kubernetes ingress controller
 
@@ -11,7 +11,6 @@ A Traefik based Kubernetes ingress controller
 | Name | Email | Url |
 | ---- | ------ | --- |
 | mloiseleur | <michel.loiseleur@traefik.io> |  |
-| charlie-haley | <charlie.haley@traefik.io> |  |
 | darkweaver87 | <remi.buisson@traefik.io> |  |
 | jnoordsij |  |  |
 
@@ -34,7 +33,7 @@ Kubernetes: `>=1.22.0-0`
 | autoscaling.enabled | bool | `false` | Create HorizontalPodAutoscaler object. See EXAMPLES.md for more details. |
 | certificatesResolvers | object | `{}` | Certificates resolvers configuration. Ref: https://doc.traefik.io/traefik/https/acme/#certificate-resolvers See EXAMPLES.md for more details. |
 | commonLabels | object | `{}` | Add additional label to all resources |
-| core.defaultRuleSyntax | string | `""` | Can be used to use globally v2 router syntax See https://doc.traefik.io/traefik/v3.0/migration/v2-to-v3/#new-v3-syntax-notable-changes |
+| core.defaultRuleSyntax | string | `""` | Can be used to use globally v2 router syntax. Deprecated since v3.4 /!\. See https://doc.traefik.io/traefik/v3.0/migration/v2-to-v3/#new-v3-syntax-notable-changes |
 | deployment.additionalContainers | list | `[]` | Additional containers (e.g. for metric offloading sidecars) |
 | deployment.additionalVolumes | list | `[]` | Additional volumes available for use with initContainers and additionalContainers |
 | deployment.annotations | object | `{}` | Additional deployment annotations (e.g. for jaeger-operator sidecar injection) |
@@ -80,10 +79,14 @@ Kubernetes: `>=1.22.0-0`
 | gatewayClass.enabled | bool | `true` | When providers.kubernetesGateway.enabled and gateway.enabled, deploy a default gatewayClass |
 | gatewayClass.labels | object | `{}` | Additional gatewayClass labels (e.g. for filtering gateway objects by custom labels) |
 | gatewayClass.name | string | `""` | Set a custom name to GatewayClass |
+| global | object | `{"azure":{"enabled":false,"images":{"hub":{"image":"traefik-hub","registry":"ghcr.io/traefik","tag":"latest"},"proxy":{"image":"traefik","registry":"docker.io/library","tag":"latest"}}}}` | Required for Azure Marketplace integration. See https://learn.microsoft.com/en-us/partner-center/marketplace-offers/azure-container-technical-assets-kubernetes?tabs=linux,linux2#update-the-helm-chart |
+| global.azure.enabled | bool | `false` | Enable specific values for Azure Marketplace |
 | globalArguments | list | `["--global.checknewversion","--global.sendanonymoususage"]` | Global command arguments to be passed to all traefik's pods |
 | hostNetwork | bool | `false` | If hostNetwork is true, runs traefik in the host network namespace To prevent unschedulable pods due to port collisions, if hostNetwork=true and replicas>1, a pod anti-affinity is recommended and will be set if the affinity is left as default. |
+| hub.apimanagement.admission.customWebhookCertificate | object | `{}` | Set custom certificate for the WebHook admission server. The certificate should be specified with _tls.crt_ and _tls.key_ in base64 encoding. |
 | hub.apimanagement.admission.listenAddr | string | `""` | WebHook admission server listen address. Default: "0.0.0.0:9943". |
-| hub.apimanagement.admission.secretName | string | `""` | Certificate of the WebHook admission server. Default: "hub-agent-cert". |
+| hub.apimanagement.admission.restartOnCertificateChange | bool | `true` | Set it to false if you need to disable Traefik Hub pod restart when mutating webhook certificate is updated. It's done with a label update. |
+| hub.apimanagement.admission.secretName | string | `"hub-agent-cert"` | Certificate name of the WebHook admission server. Default: "hub-agent-cert". |
 | hub.apimanagement.enabled | bool | `false` | Set to true in order to enable API Management. Requires a valid license token. |
 | hub.apimanagement.openApi.validateRequestMethodAndPath | bool | `false` | When set to true, it will only accept paths and methods that are explicitly defined in its OpenAPI specification |
 | hub.experimental.aigateway | bool | `false` | Set to true in order to enable AI Gateway. Requires a valid license token. |
@@ -211,6 +214,7 @@ Kubernetes: `>=1.22.0-0`
 | metrics.otlp.http.tls.insecureSkipVerify | string | `nil` | When set to true, the TLS connection accepts any certificate presented by the server regardless of the hostnames it covers. |
 | metrics.otlp.http.tls.key | string | `""` | The path to the private key. When using this option, setting the cert option is required. |
 | metrics.otlp.pushInterval | string | `""` | Interval at which metrics are sent to the OpenTelemetry Collector. Default: 10s |
+| metrics.otlp.serviceName | string | `nil` | Service name used in OTLP backend. Default: traefik. |
 | metrics.prometheus.addEntryPointsLabels | string | `nil` | Enable metrics on entry points. Default: true |
 | metrics.prometheus.addRoutersLabels | string | `nil` | Enable metrics on routers. Default: false |
 | metrics.prometheus.addServicesLabels | string | `nil` | Enable metrics on services. Default: true |

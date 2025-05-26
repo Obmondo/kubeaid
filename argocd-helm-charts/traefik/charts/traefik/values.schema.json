@@ -244,6 +244,52 @@
             },
             "type": "object"
         },
+        "global": {
+            "properties": {
+                "azure": {
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "images": {
+                            "properties": {
+                                "hub": {
+                                    "properties": {
+                                        "image": {
+                                            "type": "string"
+                                        },
+                                        "registry": {
+                                            "type": "string"
+                                        },
+                                        "tag": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "proxy": {
+                                    "properties": {
+                                        "image": {
+                                            "type": "string"
+                                        },
+                                        "registry": {
+                                            "type": "string"
+                                        },
+                                        "tag": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
         "globalArguments": {
             "items": {
                 "type": "string"
@@ -259,8 +305,15 @@
                     "properties": {
                         "admission": {
                             "properties": {
+                                "customWebhookCertificate": {
+                                    "properties": {},
+                                    "type": "object"
+                                },
                                 "listenAddr": {
                                     "type": "string"
+                                },
+                                "restartOnCertificateChange": {
+                                    "type": "boolean"
                                 },
                                 "secretName": {
                                     "type": "string"
@@ -550,6 +603,9 @@
                     "type": "object"
                 }
             },
+            "required": [
+                "namespaces"
+            ],
             "type": "object"
         },
         "image": {
@@ -932,6 +988,12 @@
                         },
                         "pushInterval": {
                             "type": "string"
+                        },
+                        "serviceName": {
+                            "type": [
+                                "string",
+                                "null"
+                            ]
                         }
                     },
                     "type": "object"

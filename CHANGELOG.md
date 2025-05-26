@@ -2,6 +2,42 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 13.0.0
+### Major Version Upgrades
+- Updated velero from version 9.1.2 to 10.0.1
+- Updated gitea from version 11.0.1 to 12.0.0
+
+### Minor Version Upgrades
+- Updated traefik from version 35.2.0 to 35.4.0
+- Updated opentelemetry-collector from version 0.122.5 to 0.125.0
+- Updated hcloud-csi from version 2.13.0 to 2.14.0
+- Updated gitlab-runner from version 0.76.1 to 0.77.2
+- Updated crossplane from version 1.19.1 to 1.20.0
+- Updated cloudnative-pg from version 0.23.2 to 0.24.0
+- Updated cloud-provider-azure from version 1.32.4 to 1.33.0
+- Updated azuredisk-csi-driver from version 1.32.1 to 1.33.0
+- Updated aws-ebs-csi-driver from version 2.43.0 to 2.44.0
+
+### Patch Version Upgrades
+- Updated teleport-kube-agent from version 17.4.9 to 17.4.10
+- Updated teleport-cluster from version 17.4.9 to 17.4.10
+- Added rook-ceph from version v1.17.2 to v1.17.2
+- Updated redmine from version 32.2.4 to 32.2.5
+- Updated rabbitmq-cluster-operator from version 4.4.10 to 4.4.11
+- Added opentelemetry-operator from version 0.84.1 to 0.84.1
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated openobserve from version 0.14.71 to 0.14.73
+- Updated oncall from version 1.16.0 to 1.16.1
+- Updated metallb from version 6.4.12 to 6.4.13
+- Updated metal3 from version 0.11.1 to 0.11.3
+- Updated mattermost-team-edition from version 6.6.76 to 6.6.78
+- Updated keda from version 2.17.0 to 2.17.1
+- Updated external-dns from version 8.8.2 to 8.8.3
+- Updated erpnext from version 7.0.197 to 7.0.200
+- Updated cilium from version 1.17.3 to 1.17.4
+- Updated hcloud-cloud-controller-manager from version 1.25.0 to 1.25.1
+- Updated argo-cd from version 8.0.1 to 8.0.10
+
 ### Improvements
 - [`7b1d36f4`](../../commit/7b1d36f4) fix(graylog) : disabling opensearch and mongodb | increasing memory request and limit
 - [`f54794e6`](../../commit/f54794e6) Update yamllint to skip helm templates

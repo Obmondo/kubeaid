@@ -81,6 +81,14 @@ resources: {}
   #   cpu: 1000m
   #   memory: 512Mi
 
+# Configure hostAliases for Velero deployment. Optional
+# For more information, check: https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/
+hostAliases: []
+  # - ip: "127.0.0.1"
+  #   hostnames:
+  #     - "foo.local"
+  #     - "bar.local"
+
 # Resource requests/limits to specify for the upgradeCRDs job pod. Need to be adjusted by user accordingly.
 upgradeJobResources: {}
 # requests:
@@ -94,8 +102,18 @@ upgradeCRDsJob:
   extraVolumes: []
   # Extra volumeMounts for the Upgrade CRDs Job. Optional.
   extraVolumeMounts: []
-  # Extra key/value pairs to be used as environment variables. Optional.
-  extraEnvVars: {}
+  # Additional values to be used as environment variables. Optional.
+  extraEnvVars: []
+    # Simple value
+    # - name: SIMPLE_VAR
+    #   value: "simple-value"
+
+    # FieldRef example
+    # - name: MY_POD_LABEL
+    #   valueFrom:
+    #     fieldRef:
+    #       fieldPath: metadata.labels['my_label']
+
   # Configure if API credential for Service Account is automounted.
   automountServiceAccountToken: true
   # Configure the shell cmd in case you are using custom image
@@ -453,6 +471,8 @@ configuration:
   # Comma separated list of velero feature flags. default: empty
   # features: EnableCSI
   features:
+  # Configures the timeout for provisioning the volume created from the CSI snapshot. Default: 30m
+  dataMoverPrepareTimeout:
   # Resource requests/limits to specify for the repository-maintenance job. Optional.
   # https://velero.io/docs/v1.14/repository-maintenance/#resource-limitation
   repositoryMaintenanceJob:
@@ -470,8 +490,17 @@ configuration:
   # e.g.: extraArgs: ["--foo=bar"]
   extraArgs: []
 
-  # additional key/value pairs to be used as environment variables such as "AWS_CLUSTER_NAME: 'yourcluster.domain.tld'"
-  extraEnvVars: {}
+  # Additional values to be used as environment variables. Optional.
+  extraEnvVars: []
+    # Simple value
+    # - name: SIMPLE_VAR
+    #   value: "simple-value"
+
+    # FieldRef example
+    # - name: MY_POD_LABEL
+    #   valueFrom:
+    #     fieldRef:
+    #       fieldPath: metadata.labels['my_label']
 
   # Set true for backup all pod volumes without having to apply annotation on the pod when used file system backup Default: false.
   defaultVolumesToFsBackup:
@@ -590,8 +619,17 @@ nodeAgent:
   # Extra volumeMounts for the node-agent daemonset. Optional.
   extraVolumeMounts: []
 
-  # Key/value pairs to be used as environment variables for the node-agent daemonset. Optional.
-  extraEnvVars: {}
+  # Additional values to be used as environment variables for node-agent daemonset. Optional.
+  extraEnvVars: []
+    # Simple key/value
+    # - name: SIMPLE_VAR
+    #   value: "simple-value"
+
+    # FieldRef example
+    # - name: MY_POD_LABEL
+    #   valueFrom:
+    #     fieldRef:
+    #       fieldPath: metadata.labels['my_label']
 
   # Additional command-line arguments that will be passed to the node-agent. Optional.
   # e.g.: extraArgs: ["--foo=bar"]
@@ -600,6 +638,14 @@ nodeAgent:
   # Configure the dnsPolicy of the node-agent daemonset
   # See: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
   dnsPolicy: ClusterFirst
+
+  # Configure hostAliases for node-agent daemonset. Optional
+  # For more information, check: https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/
+  hostAliases: []
+    # - ip: "127.0.0.1"
+    #   hostnames:
+    #   - "foo.local"
+    #   - "bar.local"
 
   # SecurityContext to use for the Velero deployment. Optional.
   # Set fsGroup for `AWS IAM Roles for Service Accounts`

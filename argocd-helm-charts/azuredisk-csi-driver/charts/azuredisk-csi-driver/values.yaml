@@ -2,7 +2,7 @@ image:
   baseRepo: mcr.microsoft.com
   azuredisk:
     repository: /oss/kubernetes-csi/azuredisk-csi
-    tag: v1.32.1
+    tag: v1.33.0
     pullPolicy: IfNotPresent
   csiProvisioner:
     repository: /oss/kubernetes-csi/csi-provisioner
@@ -125,6 +125,7 @@ node:
   supportZone: true
   allowEmptyCloudConfig: true
   getNodeIDFromIMDS: false
+  removeNotReadyTaint: true
   maxUnavailable: 1
   logLevel: 5
   metricsPort: 29605
@@ -137,11 +138,11 @@ snapshot:
   image:
     csiSnapshotter:
       repository: /oss/kubernetes-csi/csi-snapshotter
-      tag: v8.2.0
+      tag: v8.2.1
       pullPolicy: IfNotPresent
     csiSnapshotController:
       repository: /oss/kubernetes-csi/snapshot-controller
-      tag: v8.2.0
+      tag: v8.2.1
       pullPolicy: IfNotPresent
   snapshotController:
     name: csi-snapshot-controller

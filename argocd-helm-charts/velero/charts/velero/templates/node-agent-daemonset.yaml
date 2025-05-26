@@ -49,6 +49,10 @@ spec:
       {{- end }}
     {{- end }}
     spec:
+      {{ with .Values.hostAliases -}}
+      hostAliases:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
     {{- if .Values.image.imagePullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.imagePullSecrets }}
@@ -110,6 +114,9 @@ spec:
             {{- with .features }}
             - --features={{ . }}
             {{- end }}
+            {{- with .dataMoverPrepareTimeout }}
+            - --data-mover-prepare-timeout={{ . }}
+            {{- end }}
             {{- with .logLevel }}
             - --log-level={{ . }}
             {{- end }}
@@ -165,10 +172,7 @@ spec:
               value: /credentials/cloud
           {{- end }}
           {{- with .Values.configuration.extraEnvVars }}
-          {{- range $key, $value := . }}
-            - name: {{ default "none" $key }}
-              value: {{ tpl (default "none" $value) $ | quote }}
-          {{- end }}
+          {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.credentials.extraEnvVars }}
           {{- range $key, $value := . }}
@@ -180,10 +184,7 @@ spec:
           {{- end }}
           {{- end }}
           {{- with .Values.nodeAgent.extraEnvVars }}
-          {{- range $key, $value := . }}
-            - name: {{ default "none" $key }}
-              value: {{ default "none" $value | quote }}
-          {{- end }}
+          {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- if .Values.lifecycle }}
           lifecycle: {{ toYaml .Values.nodeAgent.lifecycle | nindent 12 }}

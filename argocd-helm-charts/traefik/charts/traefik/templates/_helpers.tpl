@@ -24,6 +24,12 @@ Create the chart image name.
  {{- else -}}
 {{- printf "%s/%s:%s" .Values.oci_meta.repo .Values.oci_meta.images.proxy.image .Values.oci_meta.images.proxy.tag }}
  {{- end -}}
+{{- else if .Values.global.azure.enabled -}}
+ {{- if .Values.hub.token -}}
+{{- printf "%s/%s:%s" .Values.global.azure.images.hub.registry .Values.global.azure.images.hub.image .Values.global.azure.images.hub.tag }}
+ {{- else -}}
+{{- printf "%s/%s:%s" .Values.global.azure.images.proxy.registry .Values.global.azure.images.proxy.image .Values.global.azure.images.proxy.tag }}
+ {{- end -}}
 {{- else -}}
 {{- printf "%s/%s:%s" .Values.image.registry .Values.image.repository (.Values.image.tag | default .Chart.AppVersion) }}
 {{- end -}}
@@ -196,26 +202,36 @@ The version can comes many sources: appVersion, image.tag, override, marketplace
   {{- include "traefik.proxyVersionFromHub" (dict "Version" $.Values.versionOverride "Hub" $.Values.hub.token) }}
  {{- else if $.Values.hub.token -}}
   {{- $version := ($.Values.oci_meta.enabled | ternary $.Values.oci_meta.images.hub.tag $.Values.image.tag) -}}
+  {{- $version = ($.Values.global.azure.enabled | ternary $.Values.global.azure.images.hub.tag $version) -}}
   {{- include "traefik.proxyVersionFromHub" (dict "Version" $version "Hub" true) }}
  {{- else -}}
   {{- $imageVersion := ($.Values.oci_meta.enabled | ternary $.Values.oci_meta.images.proxy.tag $.Values.image.tag) -}}
+  {{- $imageVersion = ($.Values.global.azure.enabled | ternary $.Values.global.azure.images.proxy.tag $imageVersion) -}}
   {{- (split "@" (default $.Chart.AppVersion $imageVersion))._0 | replace "latest-" "" | replace "experimental-" "" }}
  {{- end -}}
 {{- end -}}
 
 {{/* Generate/load self-signed certificate for admission webhooks */}}
 {{- define "traefik-hub.webhook_cert" -}}
-{{- $cert := lookup "v1" "Secret" (include "traefik.namespace" .) "hub-agent-cert" -}}
-{{- if $cert -}}
-{{/* reusing value of existing cert */}}
+{{- if $.Values.hub.apimanagement.admission.customWebhookCertificate }}
+Cert: {{ index $.Values.hub.apimanagement.admission.customWebhookCertificate "tls.crt" }}
+Key: {{ index $.Values.hub.apimanagement.admission.customWebhookCertificate "tls.key" }}
+Hash: {{ sha1sum (index $.Values.hub.apimanagement.admission.customWebhookCertificate "tls.crt") }}
+{{- else -}}
+    {{- $cert := lookup "v1" "Secret" (include "traefik.namespace" .) $.Values.hub.apimanagement.admission.secretName -}}
+    {{- if $cert -}}
+    {{/* reusing value of existing cert */}}
 Cert: {{ index $cert.data "tls.crt" }}
 Key: {{ index $cert.data "tls.key" }}
-{{- else -}}
-{{/* generate a new one */}}
-{{- $altNames := list ( printf "admission.%s.svc" (include "traefik.namespace" .) ) -}}
-{{- $cert := genSelfSignedCert ( printf "admission.%s.svc" (include "traefik.namespace" .) ) (list) $altNames 3650 -}}
+Hash: {{ sha1sum (index $cert.data "tls.crt") }}
+    {{- else -}}
+    {{/* generate a new one */}}
+    {{- $altNames := list ( printf "admission.%s.svc" (include "traefik.namespace" .) ) -}}
+    {{- $cert := genSelfSignedCert ( printf "admission.%s.svc" (include "traefik.namespace" .) ) (list) $altNames 3650 -}}
 Cert: {{ $cert.Cert | b64enc }}
 Key: {{ $cert.Key | b64enc }}
+Hash: {{ sha1sum ($cert.Cert | b64enc) }}
+    {{- end -}}
 {{- end -}}
 {{- end -}}
 

@@ -1,10 +1,10 @@
 annotations:
-  artifacthub.io/changes: "- \"fix(Traefik Hub): really disable sendlogs when set
-    to false\"\n- \"fix(Traefik Hub): prefix mutating webhook by release name\"\n-
-    \"feat(Traefik Hub): option to set token in values\"\n- \"chore(release): \U0001F680
-    publish v35.1.1\"\n"
+  artifacthub.io/changes: |
+    - "fix(CRDs): validation check on RootCA for both servertransport"
+    - "feat(Traefik Hub): :sparkles: automatically restart API Management pods on admission certificate change"
+    - "chore(release): :rocket: publish v35.4.0 and CRDs v1.8.1"
 apiVersion: v2
-appVersion: v3.3.6
+appVersion: v3.4.0
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
 icon: https://raw.githubusercontent.com/traefik/traefik/v2.3/docs/content/assets/img/traefik.logo.png
@@ -16,8 +16,6 @@ kubeVersion: '>=1.22.0-0'
 maintainers:
 - email: michel.loiseleur@traefik.io
   name: mloiseleur
-- email: charlie.haley@traefik.io
-  name: charlie-haley
 - email: remi.buisson@traefik.io
   name: darkweaver87
 - name: jnoordsij
@@ -26,4 +24,4 @@ sources:
 - https://github.com/traefik/traefik-helm-chart
 - https://github.com/traefik/traefik
 type: application
-version: 35.2.0
+version: 35.4.0

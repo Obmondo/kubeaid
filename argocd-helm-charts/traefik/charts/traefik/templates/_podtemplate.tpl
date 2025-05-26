@@ -17,6 +17,13 @@
       {{- with .Values.deployment.podLabels }}
       {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.global.azure.enabled }}
+        azure-extensions-usage-release-identifier: {{ .Release.Name }}
+      {{- end }}
+      {{- if and .Values.hub.token .Values.hub.apimanagement.enabled .Values.hub.apimanagement.admission.restartOnCertificateChange }}
+        {{- $cert := include "traefik-hub.webhook_cert" . | fromYaml }}
+        hub-cert-hash: {{ $cert.Hash }}
+      {{- end }}
     spec:
       {{- with .Values.deployment.imagePullSecrets }}
       imagePullSecrets:
@@ -327,6 +334,9 @@
            {{- end }}
            {{- with .pushInterval }}
           - "--metrics.otlp.pushInterval={{ . }}"
+           {{- end }}
+           {{- with .serviceName }}
+          - "--metrics.otlp.serviceName={{ . }}"
            {{- end }}
            {{- with .http }}
             {{- if .enabled }}
@@ -860,7 +870,7 @@
           - name: HUB_TOKEN
             valueFrom:
               secretKeyRef:
-                name: {{ empty $.Values.hub.createSecret | ternary . "traefik-hub-license" }}
+                name: {{ le (len .) 64 | ternary . "traefik-hub-license" }}
                 key: token
           {{- end }}
         {{- with .Values.env }}
@@ -926,9 +936,6 @@
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- if .Values.topologySpreadConstraints }}
-      {{- if (semverCompare "<v1.19.0-0" .Capabilities.KubeVersion.Version) }}
-        {{- fail "ERROR: topologySpreadConstraints are supported only on kubernetes >= v1.19" -}}
-      {{- end }}
       topologySpreadConstraints:
         {{- tpl (toYaml .Values.topologySpreadConstraints) . | nindent 8 }}
       {{- end }}

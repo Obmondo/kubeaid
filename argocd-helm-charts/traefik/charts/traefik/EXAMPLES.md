@@ -453,7 +453,11 @@ PROXY protocol is a protocol for sending client connection information, such as 
 ```yaml
 .DOTrustedIPs: &DOTrustedIPs
   - 127.0.0.1/32
-  - 10.120.0.0/16
+  # IP range Load Balancer is on
+  - 10.0.0.0/8
+  # IP range of private (VPC) interface - CHANGE THIS TO YOUR NETWORK SETTINGS
+  # This is needed when "externalTrafficPolicy: Cluster" is specified, as inbound traffic from the load balancer to a Traefik instance could be redirected from another cluster node on the way through.
+  - 172.16.0.0/12
 
 service:
   enabled: true
@@ -1073,3 +1077,54 @@ pluginVersion: "v1.2.3"
 ```
 
 This configuration will mount the `plugin-volume` at `/plugins` with the `subPath` set to `v1.2.3`.
+
+# Use a custom certificate for Traefik Hub webhooks
+
+Some CD tools may regenerate Traefik Hub mutating webhooks continuously, when using helm template.
+This example demonstrates how to generate and use a custom certificate for Hub admission webhooks.
+
+First, generate a self-signed certificate:
+
+```bash
+# this generates a self-signed certificate with a 2048 bits key, valid for 10 years, on admission.traefik.svc DNS name
+openssl req -x509 -newkey rsa:2048 -sha256 -days 3650 -nodes -keyout /tmp/hub.key -out /tmp/hub.crt \
+            -subj "/CN=admission.traefik.svc" -addext "subjectAltName=DNS:admission.traefik.svc"
+cat /tmp/hub.crt | base64 -w0 > /tmp/hub.crt.b64
+cat /tmp/hub.key | base64 -w0 > /tmp/hub.key.b64
+```
+
+Now, it can be set in the `values.yaml`:
+
+```yaml
+hub:
+  apimanagement:
+    admission:
+      customWebhookCertificate:
+        tls.crt: xxxx # content of /tmp/hub.crt.b64
+        tls.key: xxxx # content of /tmp/hub.key.b64
+```
+
+> [!TIP]
+> When using the CLI, those parameters need to be escaped like this:
+>```bash 
+> --set 'hub.apimanagement.admission.customWebhookCertificate.tls\.crt'=$(cat /tmp/hub.crt.b64)
+> --set 'hub.apimanagement.admission.customWebhookCertificate.tls\.key'=$(cat /tmp/hub.key.b64)
+>```
+# Mount datadog DSD socket directly into traefik container (i.e. no more socat sidecar)
+
+This example demonstrates how to directly mount datadog apm socket into traefik container, thus avoiding the need of socat sidecar container.
+
+```yaml
+metrics:
+  datadog:
+    address: unix:///var/run/datadog/dsd.socket # https://doc.traefik.io/traefik/observability/metrics/datadog/#address
+additionalVolumeMounts:
+  - name: ddsocketdir
+    mountPath: /var/run/datadog
+    readOnly: false
+deployment:
+  additionalVolumes:
+    - hostPath:
+        path: /var/run/datadog/
+      name: ddsocketdir
+```

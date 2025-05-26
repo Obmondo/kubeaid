@@ -139,6 +139,7 @@ spec:
             - "--timeout=1200s"
             - "--extra-create-metadata=true"
             - "--retry-interval-max=30m"
+            - "--worker-threads=250"
           env:
             - name: ADDRESS
               value: /csi/csi.sock
@@ -200,7 +201,7 @@ spec:
               drop:
               - ALL
 {{- if eq .Values.controller.enableTrafficManager true }}
-        - image: mcr.microsoft.com/aks/ccp/ccp-auto-thrust:master.250108.7
+        - image: mcr.microsoft.com/aks/ccp/ccp-auto-thrust:master.250307.1
           imagePullPolicy: IfNotPresent
           name: proxy
           command:

@@ -1,6 +1,6 @@
 dependencies:
 - name: oncall
   repository: https://grafana.github.io/helm-charts
-  version: 1.16.0
-digest: sha256:e834f51fadc1207245c766e52e34b629c8aebe5a0eb37aafd41b75f36f4e6d86
-generated: "2025-05-13T02:02:56.033124088+05:30"
+  version: 1.16.1
+digest: sha256:fc919f55a46a1e4b5dffb289da35403195a8002cabbd5a98047000ede652fafb
+generated: "2025-05-27T00:10:50.712226569+05:30"

@@ -66,12 +66,6 @@ readinessProbe: {}
 ##
 # gitlabUrl: https://gitlab.your-domain.com/
 
-## DEPRECATED: The Registration Token for adding new Runners to the GitLab Server.
-##
-## ref: https://docs.gitlab.com/ee/ci/runners/new_creation_workflow.html
-##
-# runnerRegistrationToken: ""
-
 ## The Runner Token for adding new Runners to the GitLab Server. This must
 ## be retrieved from your GitLab instance. It is the token of an already registered runner.
 ## ref: (we don't have docs for that yet, but we want to use an existing token)
@@ -90,7 +84,6 @@ readinessProbe: {}
 ## - If the token is prefixed with `glrt-` (meaning the runner was created in the UI or API),
 ##   the unregisterRunners property deletes the runner manager, not the runner.
 ##   The runner manager is identified by the runner and the machine that contains the config.toml.
-## - If the runner was registered with a registration token (deprecated), the runner is deleted.
 unregisterRunners: true
 
 ## When stopping the runner, give it time to wait for its jobs to terminate.
@@ -316,6 +309,11 @@ metrics:
   serviceMonitor:
     enabled: false
 
+    ## Namespace where ServiceMonitor should be installed. Defaults to the
+    ## same namespace where the release will be installed.
+    ##
+    namespace: ""
+
     ## Provide additional labels to the service monitor resource
     ##
     ## labels: {}
@@ -451,39 +449,9 @@ runners:
   ##
   # executor: kubernetes
 
-  ## DEPRECATED: Specify whether the runner should be locked to a specific project: true, false.
-  ##
-  ## ref: https://docs.gitlab.com/ee/ci/runners/new_creation_workflow.html
-  ##
-  # locked: true
-
-  ## DEPRECATED: Specify the tags associated with the runner. Comma-separated list of tags.
-  ##
-  ## ref: https://docs.gitlab.com/ee/ci/runners/new_creation_workflow.html
-  ##
-  # tags: ""
-
   ## Specify the name for the runner.
   ##
   # name: ""
-
-  ## DEPRECATED: Specify the maximum timeout (in seconds) that will be set for job when using this Runner
-  ##
-  ## ref: https://docs.gitlab.com/ee/ci/runners/new_creation_workflow.html
-  ##
-  # maximumTimeout: ""
-
-  ## DEPRECATED: Specify if jobs without tags should be run.
-  ##
-  ## ref: https://docs.gitlab.com/ee/ci/runners/new_creation_workflow.html
-  ##
-  # runUntagged: true
-
-  ## DEPRECATED: Specify whether the runner should only run protected branches.
-  ##
-  ## ref: https://docs.gitlab.com/ee/ci/runners/new_creation_workflow.html
-  ##
-  # protected: true
 
   ## The name of the secret containing runner-token and runner-registration-token
   # secret: gitlab-runner

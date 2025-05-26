@@ -57,6 +57,10 @@ spec:
       {{- end }}
     {{- end }}
     spec:
+      {{ with .Values.hostAliases -}}
+      hostAliases:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
     {{- if .Values.image.imagePullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.imagePullSecrets }}
@@ -259,10 +263,7 @@ spec:
               value: /credentials/cloud
           {{- end }}
           {{- with .Values.configuration.extraEnvVars }}
-          {{- range $key, $value := . }}
-            - name: {{ default "none" $key }}
-              value: {{ tpl (default "none" $value) $ | quote }}
-          {{- end }}
+          {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.credentials.extraEnvVars }}
           {{- range $key, $value := . }}
