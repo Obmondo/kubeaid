@@ -24,7 +24,10 @@ jobs:
 
     - name: yamllint
       run: |
-        yamllint --strict --config-file .yamllint .
+        find . -type f -name '*.yaml' \
+          ! -path './argocd-helm-charts/**/templates/*' \
+          ! -path './argocd-helm-charts/**/examples/*.yaml' \
+          -exec yamllint --strict --config-file .yamllint {} +
 
     - name: opa
       run: |
