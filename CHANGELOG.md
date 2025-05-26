@@ -2,6 +2,40 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`7b1d36f4`](../../commit/7b1d36f4) fix(graylog) : disabling opensearch and mongodb | increasing memory request and limit
+- [`f54794e6`](../../commit/f54794e6) Update yamllint to skip helm templates
+- [`a6d7e26c`](../../commit/a6d7e26c) Add backup and Restore Document
+- [`1bdb248e`](../../commit/1bdb248e) doc: updated readme for ciso superuser account recovery
+- [`52d03023`](../../commit/52d03023) added a small readme and removed the annotations part from here
+- [`08572692`](../../commit/08572692) WIP
+- [`c029e53d`](../../commit/c029e53d) WIP
+- [`439e6ab7`](../../commit/439e6ab7) WIP
+- [`04f05bb2`](../../commit/04f05bb2) WIP: minor change
+- [`a566839b`](../../commit/a566839b) WIP: updated ingress
+- [`9acbdeec`](../../commit/9acbdeec) WIP: making change in port
+- [`d2978306`](../../commit/d2978306) chore: added zfs-localpv as storage class for vuls PV
+- [`95e8d0f0`](../../commit/95e8d0f0) fix: changed the PVC mode to RWM
+- [`699620ef`](../../commit/699620ef) fix: updated the value file for ciso-assitant based on the new chart
+- [`62f7b0c5`](../../commit/62f7b0c5) migrated the ciso helm chart to newer chart, since old one is deprecated
+- [`c172adb4`](../../commit/c172adb4) making KubePrometheus build script compatible with MacOS
+- [`0698f2e0`](../../commit/0698f2e0) Enable postgres wal backup on mattermost
+- [`a63c3845`](../../commit/a63c3845) chore: updated cve-dictionary verision
+- [`51edfbee`](../../commit/51edfbee) granting read allowance for resources in storage APIGroup to Cluster AutoScaler
+- [`363e6de8`](../../commit/363e6de8) shifting from Syself's to HCloud's CCM Helm chart
+- [`3ffe1324`](../../commit/3ffe1324) adding cnpg support to odoo
+- [`9f669d9e`](../../commit/9f669d9e) fix(capi-cluster/hetzner)
+- [`0a0554e7`](../../commit/0a0554e7) capi-cluster/hetzner subchart streamlining and fixes | adding hcloud-csi-driver chart
+- [`9e18088d`](../../commit/9e18088d) adding odoo helm chart
+- [`6b90c9b8`](../../commit/6b90c9b8) fix: the sealed secret for alertmanager, needs an empty hash for spec.encryptedData
+- [`e853fdb9`](../../commit/e853fdb9) readme on hrms module
+- [`75c16733`](../../commit/75c16733) adding hetzner capi templates
+- [`efef8e9d`](../../commit/efef8e9d) Ignore exported_certname label while ignoring the blacklist services from the service down alert
+- [`404f7599`](../../commit/404f7599) chore(capi-cluster) : updating versions
+- [`f9aa5ea6`](../../commit/f9aa5ea6) feat(capi-cluster/azure) : adding option to specify image ID
+- [`5076551f`](../../commit/5076551f) added azuredisk-csi-driver Helm chart
+- [`3065973a`](../../commit/3065973a) feat: add recommendation to back up prometheus data
+
 ## 12.0.0
 ### Major Version Upgrades
 - Updated opensearch-dashboards from version 2.28.0 to 3.0.0
