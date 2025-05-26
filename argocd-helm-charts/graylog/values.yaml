@@ -1,3 +1,7 @@
+tags:
+  install-opensearch: false
+  install-mongodb: false
+
 # leaving mongodb without resource definitions per recommendation in mongodb values - it uses so little so it should be okay for it to run on "available resources"
 graylog:
   graylog:
@@ -38,10 +42,6 @@ graylog:
       enabled: true
       serviceMonitor:
         enabled: true
-
-  tags:
-    install-opensearch: false
-    install-mongodb: false
 
   opensearch:
     enabled: false
