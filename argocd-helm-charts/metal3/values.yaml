@@ -8,7 +8,10 @@ metal3:
     enable_pxe_boot: false
     enable_tls: true
     enable_vmedia_tls: true
-    enable_basicAuth: true
+    enable_basicAuth: false
+    auth:
+      ironicUsername: "ironic"
+      ironicPassword: "secretpassword"
     ironicKernelParams: "console=tty1"
     additionalTrustedCAs: false
     vmediaTLSPort: 6185
@@ -26,10 +29,10 @@ metal3:
         tag: "0.9.0"
 
 bmh:
-## Example baremetalhost configuration
-#  host-0:
-#    mac: "00:00:00:00:00:00"
-#    os: "ubuntu:24.04.2"
-#    bmc: "10.10.10.10"
-#    secretName: "host-0-bmc"
-#    rootDeviceSerialNumber: ""
+  host-0:
+    mac: "00:00:00:00:00:00"
+    os: "noble"
+    bmc: "10.10.10.10"
+    secretName: "host-0-bmc"
+    rootDeviceSerialNumber: " "
+    rootDeviceName: ""

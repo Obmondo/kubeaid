@@ -1,8 +1,4 @@
 {{- range $name, $host := .Values.bmh }}
-  {{- $osParts := splitList ":" $host.os }}
-  {{- if eq (len $osParts) 2 }}
-    {{- $os := first $osParts }}
-    {{- $version := last $osParts }}
 ---
 apiVersion: metal3.io/v1alpha1
 kind: BareMetalHost
@@ -16,19 +12,21 @@ spec:
     address: redfish-virtualmedia://{{ $host.bmc }}/redfish/v1/Systems/1
     credentialsName: {{ $host.secretName }}
     disableCertificateVerification: true
-    preprovisioningNetworkDataName: {{ $name }}-network
-    networkData:
-      name: {{ $name }}-networkdata
-      namespace: metal3
-    rootDeviceHints:
-      serialNumber: {{ $host.rootDeviceSerialNumber }}
-  image:
-    {{- if eq $os "ubuntu" }}
-      {{- if eq $version "24.04.2" }}
-    checksum: https://cloud-images.ubuntu.com/noble/20250313/SHA256SUMS
-    url: https://cloud-images.ubuntu.com/noble/20250313/noble-server-cloudimg-amd64.img
-      {{- end }}
+  preprovisioningNetworkDataName: {{ $name }}-network
+  networkData:
+    name: {{ $name }}-networkdata
+    namespace: metal3
+  userData:
+    name: {{ $name }}-userdata
+  rootDeviceHints:
+    {{- if $host.rootDeviceSerialNumber }}
+    serialNumber: {{ $host.rootDeviceSerialNumber }}
     {{- end }}
+    {{- if $host.rootDeviceName }}
+    deviceName: {{ $host.rootDeviceName }}
+    {{- end }}
+  image:
+    checksum: https://cloud-images.ubuntu.com/{{ $host.os }}/current/SHA256SUMS
+    url: https://cloud-images.ubuntu.com/{{ $host.os }}/current/{{ $host.os }}-server-cloudimg-amd64.img
     checksumType: auto
-  {{- end }}
 {{- end }}
