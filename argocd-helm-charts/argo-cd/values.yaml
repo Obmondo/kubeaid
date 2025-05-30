@@ -21,7 +21,7 @@ argo-cd:
         helmfile:
           allowConcurrency: true
           discover:
-            fileName: helmfile.yaml
+            fileName: helmfile.yaml.gotmpl
           generate:
             command:
               - bash
