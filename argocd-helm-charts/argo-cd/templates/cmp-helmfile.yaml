@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: cmp-helmfile
+  name: helmfile
   namespace: argocd
 data:
   plugin.yaml: |
