@@ -36,6 +36,29 @@ argo-cd:
       enabled: true
       serviceMonitor:
         enabled: true
+    containers:
+    - name: cmp-helmfile
+      command: [/var/run/argocd/argocd-cmp-server]
+      image: ghcr.io/helmfile/helmfile:v0.157.0
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+      volumeMounts:
+        - mountPath: /var/run/argocd
+          name: var-files
+        - mountPath: /home/argocd/cmp-server/plugins
+          name: plugins
+        - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+          subPath: plugin.yaml
+          name: cmp-helmfile
+        - mountPath: /tmp
+          name: cmp-tmp
+    volumes:
+    - configMap:
+        name: cmp-helmfile
+      name: cmp-helmfile
+    - emptyDir: {}
+      name: cmp-tmp
   server:
     resources:
       limits:
@@ -90,29 +113,6 @@ argo-cd:
       enabled: true
       serviceMonitor:
         enabled: true
-  containers:
-  - name: cmp-helmfile
-    command: [/var/run/argocd/argocd-cmp-server]
-    image: ghcr.io/helmfile/helmfile:v0.157.0
-    securityContext:
-      runAsNonRoot: true
-      runAsUser: 999
-    volumeMounts:
-      - mountPath: /var/run/argocd
-        name: var-files
-      - mountPath: /home/argocd/cmp-server/plugins
-        name: plugins
-      - mountPath: /home/argocd/cmp-server/config/plugin.yaml
-        subPath: plugin.yaml
-        name: cmp-helmfile
-      - mountPath: /tmp
-        name: cmp-tmp
-  volumes:
-  - configMap:
-      name: cmp-helmfile
-    name: cmp-helmfile
-  - emptyDir: {}
-    name: cmp-tmp
 
 kubeaidAppProject:
   enabled: true
