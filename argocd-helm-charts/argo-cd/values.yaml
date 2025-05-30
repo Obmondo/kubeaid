@@ -48,9 +48,9 @@ argo-cd:
           name: var-files
         - mountPath: /home/argocd/cmp-server/plugins
           name: plugins
-        - mountPath: /home/argocd/cmp-server/config/plugin.yaml
-          subPath: helmfile.yaml
-          name: helmfile
+          # - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+          #subPath: helmfile.yaml
+          #name: helmfile
         - mountPath: /tmp
           name: cmp-tmp
     volumes:
