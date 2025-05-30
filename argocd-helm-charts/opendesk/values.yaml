@@ -1,0 +1,7 @@
+opendesk:
+  argo:
+    project: default
+    destination:
+      namespace: opendesk
+    source:
+      targetRevision: v1.4.0
