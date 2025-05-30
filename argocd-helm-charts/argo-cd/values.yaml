@@ -81,12 +81,15 @@ argo-cd:
             name: plugins
           # Register helmfile plugin into sidecar
           - mountPath: /home/argocd/cmp-server/config/plugin.yaml
-            subPath: helmfile.yaml.gotmp
+            subPath: helmfile.yaml.gotmpl
             name: argocd-cmp-cm
           # Starting with v2.4, do NOT mount the same tmp volume as the repo-server container. The filesystem separation helps mitigate path traversal attacks.
           - mountPath: /tmp
             name: helmfile-tmp
     volumes:
+      - configMap:
+          name: helmfile
+        name: helmfile
       - name: argocd-cmp-cm
         configMap:
           name: argocd-cmp-cm
