@@ -87,9 +87,6 @@ argo-cd:
           - mountPath: /tmp
             name: helmfile-tmp
     volumes:
-      - configMap:
-          name: helmfile
-        name: helmfile
       - name: argocd-cmp-cm
         configMap:
           name: argocd-cmp-cm
