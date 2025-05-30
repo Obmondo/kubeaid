@@ -50,7 +50,7 @@ argo-cd:
           name: plugins
         - mountPath: /home/argocd/cmp-server/config/plugin.yaml
           subPath: plugin.yaml
-          name: cmp-helmfile
+          name: helmfile
         - mountPath: /tmp
           name: cmp-tmp
     volumes:
