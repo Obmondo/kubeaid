@@ -8,7 +8,7 @@ data:
     apiVersion: argoproj.io/v1alpha1
     kind: ConfigManagementPlugin
     metadata:
-      name: cmp-helmfile
+      name: helmfile
     spec:
       version: v1.0
       init:
