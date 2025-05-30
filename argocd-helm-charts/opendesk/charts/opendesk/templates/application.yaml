@@ -7,8 +7,8 @@ SPDX-License-Identifier: Apache-2.0
 apiVersion: "argoproj.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: "{{ $.Values.argo.destination.namespace }}-opendesk-{{ .name }}{{ if .selector }}-{{.selector | regexFind "=(.+)" | trimPrefix "=" }}{{ end }}"
-  namespace: {{ $.Release.Namespace | quote }}
+  name: "argocd-opendesk-{{ .name }}{{ if .selector }}-{{.selector | regexFind "=(.+)" | trimPrefix "=" }}{{ end }}"
+  namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: {{ .syncWave | quote }}
   finalizers:
