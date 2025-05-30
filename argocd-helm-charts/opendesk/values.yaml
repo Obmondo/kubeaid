@@ -1,5 +1,6 @@
 opendesk:
   argo:
+    project: default
     destination:
       namespace: opendesk
     source:
