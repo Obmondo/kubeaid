@@ -1,0 +1,6 @@
+opendesk:
+  argo:
+    destination:
+      namespace: opendesk
+    source:
+      targetRevision: v1.4.0
