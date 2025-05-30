@@ -85,7 +85,7 @@ argo-cd:
             name: argocd-cmp-cm
           # Starting with v2.4, do NOT mount the same tmp volume as the repo-server container. The filesystem separation helps mitigate path traversal attacks.
           - mountPath: /tmp
-            name: cmp-tmp
+            name: helmfile-tmp
     volumes:
       - name: argocd-cmp-cm
         configMap:
