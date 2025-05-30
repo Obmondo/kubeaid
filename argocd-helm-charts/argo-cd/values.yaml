@@ -37,7 +37,7 @@ argo-cd:
       serviceMonitor:
         enabled: true
     extraContainers:
-    - name: cmp-helmfile
+    - name: helmfile
       command: [/var/run/argocd/argocd-cmp-server]
       image: ghcr.io/helmfile/helmfile:v1.1.0
       securityContext:
@@ -49,7 +49,7 @@ argo-cd:
         - mountPath: /home/argocd/cmp-server/plugins
           name: plugins
         - mountPath: /home/argocd/cmp-server/config/plugin.yaml
-          subPath: plugin.yaml
+          subPath: helmfile.yaml
           name: helmfile
         - mountPath: /tmp
           name: cmp-tmp
