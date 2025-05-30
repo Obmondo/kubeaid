@@ -39,7 +39,7 @@ argo-cd:
     extraContainers:
     - name: cmp-helmfile
       command: [/var/run/argocd/argocd-cmp-server]
-      image: ghcr.io/helmfile/helmfile:v0.157.0
+      image: ghcr.io/helmfile/helmfile:v1.1.0
       securityContext:
         runAsNonRoot: true
         runAsUser: 999
