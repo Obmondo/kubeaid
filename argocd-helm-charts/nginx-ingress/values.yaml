@@ -1,0 +1,5 @@
+---
+nginx-ingress:
+  controller:
+    image:
+      tag: 5.0.0
