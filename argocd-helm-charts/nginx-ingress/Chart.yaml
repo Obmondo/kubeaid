@@ -1,0 +1,9 @@
+iapiVersion: v1
+name: argo-cd
+version: 1.0.0
+dependencies:
+  - name: nginx-ingress
+    version: 2.2.0
+    # kubeaid does not support OCI for now
+    # once support is added, add the repo, for now manually added.
+    # repository: oci://ghcr.io/nginx/charts/nginx-ingress
