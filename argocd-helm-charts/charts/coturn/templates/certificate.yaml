@@ -1,0 +1,20 @@
+{{/* Create a cert-manager (https://cert-manager.io) Certificate resource. */}}
+{{- if .Values.certificate.enabled -}}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "coturn.fullname" . }}
+  labels:
+    {{- include "coturn.labels" . | nindent 4 }}
+spec:
+  dnsNames:
+    - {{ .Values.certificate.dnsName }}
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: {{ .Values.certificate.issuerName }}
+  secretName: {{ include "coturn.fullname" . }}
+  usages:
+    - digital signature
+    - key encipherment
+{{- end -}}

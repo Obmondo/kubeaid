@@ -1,0 +1,17 @@
+{{- if .Values.management.persistentVolume.enabled -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "netbird.fullname" . }}-management
+  labels:
+    {{- include "netbird.management.labels" . | nindent 4 }}
+spec:
+  accessModes:
+{{ toYaml .Values.management.persistentVolume.accessModes | indent 4 }}
+  resources:
+    requests:
+      storage: "{{ .Values.management.persistentVolume.size }}"
+  {{- if .Values.management.persistentVolume.storageClass }}
+  storageClassName: "{{ .Values.management.persistentVolume.storageClass }}"
+  {{- end }}
+{{- end -}}

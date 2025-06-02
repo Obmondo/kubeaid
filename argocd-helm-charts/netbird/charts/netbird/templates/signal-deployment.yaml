@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "netbird.fullname" . }}-signal
+  labels:
+    {{- include "netbird.signal.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.signal.autoscaling.enabled }}
+  replicas: {{ .Values.signal.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "netbird.signal.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.signal.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "netbird.signal.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.signal.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "netbird.signal.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}-signal
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.signal.image.repository }}:{{ .Values.signal.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.signal.image.pullPolicy }}
+          args: ["--port", "{{ .Values.signal.service.port }}", "--log-level", "{{ .Values.signal.logLevel }}", "--log-file", "console"]
+          ports:
+            - name: {{ .Values.signal.protocol }}
+              containerPort: {{ .Values.signal.service.port }}
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.signal.protocol }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.signal.protocol }}
+          resources:
+            {{- toYaml .Values.signal.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /var/lib/netbird
+              name: signal
+      {{- with .Values.signal.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.signal.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.signal.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: signal
+          {{- if .Values.signal.persistentVolume.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "netbird.fullname" . }}-signal
+          {{- else }}
+          emptyDir: {}
+          {{- end }}

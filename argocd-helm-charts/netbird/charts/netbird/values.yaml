@@ -1,0 +1,658 @@
+---
+## @section NetBird Parameters
+
+auth:
+  ## @param auth.audience
+  ##
+  audience: account
+
+  ## @param auth.authority
+  ##
+  authority: http://keycloak.localtest.me:9000/realms/helm-charts
+  # authority: https://<tenant-name>.us.auth0.com
+
+  device:
+    ## @param auth.device.provider
+    ##
+    provider: none
+    # provider: hosted
+    # audience: account
+    # authority: http://localhost
+    # clientID: netbird-management
+    # deviceAuthorizationEndpoint: http://localhost/auth/device
+    # tokenEndpoint: http://localhost/token
+    # scope: openid
+    # useIDToken: false
+
+idp:
+  ## @param idp.managerType none, keycloak, or auth0
+  ##
+  managerType: none
+  # clientID:
+  # secretKeyRef:
+  #   name: idp-credentials
+  #   key: secretkey
+  # grantType:
+
+  # Auth0
+  # audience:
+  # authIssuer:
+
+  # Keycloak
+  # adminEndpoint:
+  # tokenEndpoint:
+
+stun:
+  ## @param stun.uri
+  ##
+  uri: stun:localhost:3478
+
+turn:
+  ## @param turn.uri
+  ##
+  uri: turn:localhost:3478
+  # user: turn-user
+  # secretKeyRef:
+  #   name: turn-credentials
+  #   key: password
+
+## @param nameOverride
+##
+nameOverride: ""
+
+## @param fullnameOverride
+##
+fullnameOverride: ""
+
+## @param defaultLabels Defines default labels for all created resources.
+##
+defaultLabels: {}
+
+annotations:
+  ## @param annotations.grpc Defines ingress annotations for grpc handling
+  ##
+  grpc:
+    {}
+    # nginx.ingress.kubernetes.io/backend-protocol: GRPC
+
+## @section NetBird Management
+
+management:
+  ## @param management.logLevel
+  ##
+  logLevel: info
+
+  # yamllint disable-line rule:line-length
+  ## @param management.replicaCount note that scaling requires a shared filesystem
+  ##
+  replicaCount: 1
+
+  image:
+    ## @param management.image.repository
+    ##
+    repository: netbirdio/management
+
+    ## @param management.image.pullPolicy
+    ##
+    pullPolicy: IfNotPresent
+
+    # yamllint disable-line rule:line-length
+    ## @param management.image.tag Overrides the image tag whose default is the chart appVersion.
+    ##
+    tag: ""
+
+  ## @param management.imagePullSecrets
+  imagePullSecrets: []
+
+  serviceAccount:
+    # yamllint disable-line rule:line-length
+    ## @param management.serviceAccount.create Specifies whether a service account should be created.
+    ##
+    create: true
+
+    # yamllint disable-line rule:line-length
+    ## @param management.serviceAccount.annotations Annotations to add to the service account.
+    ##
+    annotations: {}
+
+    # yamllint disable-line rule:line-length
+    ## @param management.serviceAccount.name The name of the service account to use.
+    ##
+    name: ""
+
+  # yamllint disable-line rule:line-length
+  ## @param management.deploymentAnnotations Annotations to add to the management deployment.
+  ##
+  deploymentAnnotations: {}
+
+  # yamllint disable-line rule:line-length
+  ## @param management.podAnnotations Annotations to add to the management pod(s).
+  ##
+  podAnnotations: {}
+
+  ## @param management.podSecurityContext
+  ##
+  podSecurityContext:
+    {}
+    # fsGroup: 2000
+
+  ## @param management.securityContext
+  ##
+  securityContext:
+    {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    ## @param management.service.type
+    ##
+    type: ClusterIP
+
+    ## @param management.service.port
+    ##
+    port: 80
+
+  metrics:
+    ## @param management.metrics.port path is /metrics
+    ##
+    port: 9090
+
+  ingress:
+    ## @param management.ingress.enabled
+    ##
+    enabled: false
+
+    ## @param management.ingress.className
+    ##
+    className: ""
+
+    ## @param management.ingress.annotations
+    ##
+    annotations:
+      {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+
+    hosts:
+      api:
+        ## @param management.ingress.hosts.api.host Hostname to access the API.
+        ##
+        host: example.com
+        # yamllint disable-line rule:line-length
+        ## @param management.ingress.hosts.api.tls Optional TLS secret information
+        ##
+        tls:
+          {}
+          # secretName: chart-example-tls
+          #
+
+      grpc:
+        # yamllint disable-line rule:line-length
+        ## @param management.ingress.hosts.grpc.host Hostname to run GRPC calls againts.
+        ##
+        host: example.com
+        # yamllint disable-line rule:line-length
+        ## @param management.ingress.hosts.grpc.tls Optional TLS secret information
+        ##
+        tls:
+          {}
+          # secretName: chart-example-tls
+          #
+
+  ## @param management.resources
+  ##
+  resources:
+    {}
+    # We usually recommend not to specify default resources and to leave this as
+    # a conscious choice for the user. This also increases chances charts run on
+    # environments with little resources, such as Minikube. If you do want to
+    # specify resources, uncomment the following lines, adjust them as
+    # necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    ## @param management.autoscaling.enabled
+    ##
+    enabled: false
+
+    ## @param management.autoscaling.minReplicas
+    ##
+    minReplicas: 1
+
+    ## @param management.autoscaling.maxReplicas
+    ##
+    maxReplicas: 100
+
+    ## @param management.autoscaling.targetCPUUtilizationPercentage
+    ##
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  ## @param management.nodeSelector
+  ##
+  nodeSelector: {}
+
+  ## @param management.tolerations
+  ##
+  tolerations: []
+
+  ## @param management.affinity
+  ##
+  affinity: {}
+
+  persistentVolume:
+    ## @param management.persistentVolume.enabled
+    ##
+    enabled: true
+
+    ## @param management.persistentVolume.accessModes
+    ##
+    accessModes:
+      - ReadWriteOnce
+
+    ## @param management.persistentVolume.storageClass
+    ##
+    storageClass:
+
+    ## @param management.persistentVolume.size
+    ##
+    size: 100Mi
+
+  ## @param management.dnsDomain
+  ##
+  dnsDomain: netbird.selfhosted
+
+  ## @param management.database leave empty to use sqlite
+  ##
+  database:
+    {}
+    # yamllint disable rule:line-length
+    # Postgres secret requires the following format:
+    # host=<PG_HOST> user=<PG_USER> password=<PG_PASSWORD> dbname=<PG_DB_NAME> port=<PG_PORT>
+    # postgres:
+    #   dsnSecret:
+    #     name:
+    #     key:
+    #
+    # yamllint enable rule:line-length
+
+## @section NetBird Signal
+
+signal:
+  ## @param signal.logLevel
+  ##
+  logLevel: info
+
+  ## @param signal.uri
+  ##
+  uri: localhost:10000
+
+  ## @param signal.protocol grpc, http, https
+  ##
+  protocol: https
+
+  ## @param signal.replicaCount
+  ##
+  replicaCount: 1
+
+  image:
+    ## @param signal.image.repository
+    ##
+    repository: netbirdio/signal
+
+    ## @param signal.image.pullPolicy
+    ##
+    pullPolicy: IfNotPresent
+
+    # yamllint disable-line rule:line-length
+    ## @param signal.image.tag Overrides the image tag whose default is the chart appVersion.
+    ##
+    tag: ""
+
+  ## @param signal.imagePullSecrets
+  imagePullSecrets: []
+
+  serviceAccount:
+    # yamllint disable-line rule:line-length
+    ## @param signal.serviceAccount.create Specifies whether a service account should be created.
+    ##
+    create: true
+
+    # yamllint disable-line rule:line-length
+    ## @param signal.serviceAccount.annotations Annotations to add to the service account.
+    ##
+    annotations: {}
+
+    ## @param signal.serviceAccount.name The name of the service account to use.
+    ##
+    name: ""
+
+  # yamllint disable-line rule:line-length
+  ## @param signal.deploymentAnnotations Annotations to add to the signal deployment.
+  ##
+  deploymentAnnotations: {}
+
+  ## @param signal.podAnnotations Annotations to add to the signal pod(s).
+  ##
+  podAnnotations: {}
+
+  ## @param signal.podSecurityContext
+  ##
+  podSecurityContext:
+    {}
+    # fsGroup: 2000
+
+  ## @param signal.securityContext
+  ##
+  securityContext:
+    {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    ## @param signal.service.type
+    ##
+    type: ClusterIP
+
+    ## @param signal.service.port
+    ##
+    port: 80
+
+  metrics:
+    ## @param signal.metrics.port path is /metrics
+    ##
+    port: 9090
+
+  ingress:
+    ## @param signal.ingress.enabled
+    ##
+    enabled: false
+
+    ## @param signal.ingress.className
+    ##
+    className: ""
+
+    ## @param signal.ingress.annotations
+    ##
+    annotations:
+      {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+
+    hosts:
+      signal:
+
+        ## @param signal.ingress.hosts.signal.host
+        ##
+        host: example.com
+
+        ## @param signal.ingress.hosts.signal.tls
+        ##
+        tls:
+          {}
+          # secretName: chart-example-tls
+
+  ## @param signal.resources
+  ##
+  resources:
+    {}
+    # We usually recommend not to specify default resources and to leave this as
+    # a conscious choice for the user. This also increases chances charts run on
+    # environments with little resources, such as Minikube. If you do want to
+    # specify resources, uncomment the following lines, adjust them as
+    # necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    ## @param signal.autoscaling.enabled
+    ##
+    enabled: false
+
+    ## @param signal.autoscaling.minReplicas
+    ##
+    minReplicas: 1
+
+    ## @param signal.autoscaling.maxReplicas
+    ##
+    maxReplicas: 100
+
+    ## @param signal.autoscaling.targetCPUUtilizationPercentage
+    ##
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  ## @param signal.nodeSelector
+  ##
+  nodeSelector: {}
+
+  ## @param signal.tolerations
+  ##
+  tolerations: []
+
+  ## @param signal.affinity
+  ##
+  affinity: {}
+
+  persistentVolume:
+    ## @param signal.persistentVolume.enabled
+    ##
+    enabled: true
+
+    ## @param signal.persistentVolume.accessModes
+    ##
+    accessModes:
+      - ReadWriteOnce
+
+    ## @param signal.persistentVolume.storageClass
+    ##
+    storageClass:
+
+    ## @param signal.persistentVolume.size
+    ##
+    size: 100Mi
+
+## @section NetBird Relay
+
+relay:
+  ## @param relay.logLevel
+  ##
+  logLevel: info
+
+  ## @param relay.domainName
+  ##
+  domainName: relay.example.com
+
+  auth:
+    secret:
+      # yamllint disable-line rule:line-length
+      ## @param relay.auth.secret.name See https://github.com/netbirdio/netbird/releases/tag/v0.29.0
+      ##
+      name: netbird-relay-secret
+      # yamllint disable-line rule:line-length
+      ## @param relay.auth.secret.key See https://github.com/netbirdio/netbird/releases/tag/v0.29.0
+      ##
+      key: netbird-relay-secret-key
+
+  ## @param relay.replicaCount
+  ##
+  replicaCount: 1
+
+  image:
+    ## @param relay.image.repository
+    ##
+    repository: netbirdio/relay
+
+    ## @param relay.image.pullPolicy
+    ##
+    pullPolicy: IfNotPresent
+
+    # yamllint disable-line rule:line-length
+    ## @param relay.image.tag Overrides the image tag whose default is the chart appVersion.
+    ##
+    tag: ""
+
+  serviceAccount:
+    # yamllint disable-line rule:line-length
+    ## @param relay.serviceAccount.create Specifies whether a service account should be created.
+    ##
+    create: true
+
+    # yamllint disable-line rule:line-length
+    ## @param relay.serviceAccount.annotations Annotations to add to the service account.
+    ##
+    annotations: {}
+
+    # yamllint disable-line rule:line-length
+    ## @param relay.serviceAccount.name The name of the service account to use.
+    ##
+    name: ""
+
+  ## @param relay.imagePullSecrets
+  imagePullSecrets: []
+
+  # yamllint disable-line rule:line-length
+  ## @param relay.deploymentAnnotations Annotations to add to the relay deployment.
+  ##
+  deploymentAnnotations: {}
+
+  ## @param relay.podAnnotations Annotations to add to the relay pod(s).
+  ##
+  podAnnotations: {}
+
+  ## @param relay.podSecurityContext
+  ##
+  podSecurityContext:
+    {}
+    # fsGroup: 2000
+
+  ## @param relay.securityContext
+  ##
+  securityContext:
+    {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    ## @param relay.service.type
+    ##
+    type: ClusterIP
+
+    ## @param relay.service.port
+    ##
+    port: 33080
+
+    ## @param relay.service.annotations
+    ##
+    annotations:
+      {}
+      # external-dns.alpha.kubernetes.io/hostname: relay.example.com
+      #
+
+  metrics:
+    ## @param relay.metrics.port path is the base path /
+    ##
+    port: 9090
+
+  ingress:
+    ## @param relay.ingress.enabled
+    ##
+    enabled: false
+
+    ## @param relay.ingress.className
+    ##
+    className: ""
+
+    ## @param relay.ingress.annotations
+    ##
+    annotations:
+      {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+      # nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      # nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    hosts:
+      ## @param relay.ingress.hosts[0].host
+      ##
+      - host: example.com
+        paths:
+          ## @param relay.ingress.hosts[0].paths[0].path
+          ##
+          - path: /relay
+            ## @param relay.ingress.hosts[0].paths[0].pathType
+            ##
+            pathType: ImplementationSpecific
+
+    ## @param relay.ingress.tls
+    ##
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  ## @param relay.resources
+  ##
+  resources:
+    {}
+    # We usually recommend not to specify default resources and to leave this as
+    # a conscious choice for the user. This also increases chances charts run on
+    # environments with little resources, such as Minikube. If you do want to
+    # specify resources, uncomment the following lines, adjust them as
+    # necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  autoscaling:
+    ## @param relay.autoscaling.enabled
+    ##
+    enabled: false
+
+    ## @param relay.autoscaling.minReplicas
+    ##
+    minReplicas: 1
+
+    ## @param relay.autoscaling.maxReplicas
+    ##
+    maxReplicas: 100
+
+    ## @param relay.autoscaling.targetCPUUtilizationPercentage
+    ##
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  ## @param relay.nodeSelector
+  ##
+  nodeSelector: {}
+
+  ## @param relay.tolerations
+  ##
+  tolerations: []
+
+  ## @param relay.affinity
+  ##
+  affinity: {}

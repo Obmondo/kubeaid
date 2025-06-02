@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "netbird.fullname" . }}-management
+  labels:
+    {{- include "netbird.management.labels" . | nindent 4 }}
+data:
+  management.tmpl.json: |-
+    {{- .Files.Get "management.tmpl.json" | nindent 4 }}

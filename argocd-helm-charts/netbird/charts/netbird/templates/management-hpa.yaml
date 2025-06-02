@@ -1,0 +1,28 @@
+{{- if .Values.management.autoscaling.enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "netbird.fullname" . }}-management
+  labels:
+    {{- include "netbird.management.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "netbird.fullname" . }}-management
+  minReplicas: {{ .Values.management.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.management.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.management.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .Values.management.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.management.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .Values.management.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

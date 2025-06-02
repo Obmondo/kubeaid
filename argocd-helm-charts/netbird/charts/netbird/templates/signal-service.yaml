@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "netbird.fullname" . }}-signal
+  labels:
+    {{- include "netbird.signal.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.signal.service.type }}
+  ports:
+    - port: {{ .Values.signal.service.port }}
+      targetPort: {{ .Values.signal.protocol }}
+      protocol: TCP
+      name: {{ .Values.signal.protocol }}
+    - port: {{ .Values.signal.metrics.port }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    {{- include "netbird.signal.selectorLabels" . | nindent 4 }}
