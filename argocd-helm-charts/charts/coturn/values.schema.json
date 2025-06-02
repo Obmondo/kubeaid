@@ -1,0 +1,102 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "fingerprint": {
+            "type": "boolean"
+        },
+        "lt-cred-mech": {
+            "type": "boolean"
+        },
+        "realm": {
+            "type": "string"
+        },
+        "cert": {
+            "oneOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "null"
+                }
+            ]
+        },
+        "pkey": {
+            "oneOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "null"
+                }
+            ]
+        },
+        "extraOptions": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "users": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "secretKeyRef": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "key": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "certificate": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "dnsName": {
+                    "type": "string"
+                },
+                "issuerName": {
+                    "type": "string"
+                }
+            }
+        },
+        "traefik": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "entryPoints": {
+                    "type": "object",
+                    "properties": {
+                        "tcp": {
+                            "type": "string"
+                        },
+                        "tcp-tls": {
+                            "type": "string"
+                        },
+                        "udp": {
+                            "type": "string"
+                        },
+                        "udp-tls": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

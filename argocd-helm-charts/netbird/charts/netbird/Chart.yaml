@@ -1,0 +1,25 @@
+---
+apiVersion: v2
+name: netbird
+description: NetBird VPN management platform
+type: application
+version: 0.15.0
+appVersion: "0.45.1"
+icon: https://avatars.githubusercontent.com/u/100464677
+annotations:
+  artifacthub.io/category: networking
+  artifacthub.io/license: MIT
+  artifacthub.io/prerelease: "true"
+  artifacthub.io/changes: |
+    - kind: changed
+      description: Updated to Netbird 0.45.1
+    - kind: added
+      description: Support for postgres database
+    - kind: changed
+      description: Secret structure of relay secret
+    - kind: added
+      description: Support for default labels for all resources
+    - kind: changed
+      description: Set dedicated path mappings to ingress resources
+    - kind: added
+      description: Support for storage class definition on PVC

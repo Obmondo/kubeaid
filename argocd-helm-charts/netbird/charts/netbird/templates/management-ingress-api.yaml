@@ -1,0 +1,51 @@
+{{- if .Values.management.ingress.enabled -}}
+{{- $fullName := printf "%s-management-api" (include "netbird.fullname" .) -}}
+{{- $serviceName := printf "%s-management" (include "netbird.fullname" .) -}}
+{{- if and .Values.management.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.management.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.management.ingress.annotations "kubernetes.io/ingress.class" .Values.management.ingress.className}}
+  {{- end }}
+{{- end }}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "netbird.management.labels" . | nindent 4 }}
+  {{- with .Values.management.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if and .Values.management.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.management.ingress.className }}
+  {{- end }}
+  {{- if .Values.management.ingress.hosts.api.tls.secretName }}
+  tls:
+    - hosts:
+        - {{ .Values.management.ingress.hosts.api.host | quote }}
+      secretName: {{ .Values.management.ingress.hosts.api.tls.secretName }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.management.ingress.hosts.api.host | quote }}
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: {{ .Values.management.service.port }}
+              {{- else }}
+              serviceName: {{ $serviceName }}
+              servicePort: {{ .Values.management.service.port }}
+              {{- end }}
+{{- end }}

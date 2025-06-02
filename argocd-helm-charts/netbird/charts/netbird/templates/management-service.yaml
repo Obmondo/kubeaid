@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "netbird.fullname" . }}-management
+  labels:
+    {{- include "netbird.management.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.management.service.type }}
+  ports:
+    - port: {{ .Values.management.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.management.metrics.port }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    {{- include "netbird.management.selectorLabels" . | nindent 4 }}

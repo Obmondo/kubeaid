@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "netbird.fullname" . }}-relay
+  labels:
+    {{- include "netbird.relay.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.relay.autoscaling.enabled }}
+  replicas: {{ .Values.relay.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "netbird.relay.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.relay.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "netbird.relay.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.relay.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "netbird.relay.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}-relay
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.relay.image.repository }}:{{ .Values.relay.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.relay.image.pullPolicy }}
+          env:
+            - name: NB_LOG_LEVEL
+              value: {{ .Values.relay.logLevel }}
+            - name: NB_LISTEN_ADDRESS
+              value: ":{{ .Values.relay.service.port }}"
+            - name: NB_EXPOSED_ADDRESS
+              value: "{{ .Values.relay.domainName }}:{{ .Values.relay.service.port }}"
+            - name: NB_AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.relay.auth.secret.name }}
+                  key: {{ .Values.relay.auth.secret.key }}
+          args: ["--log-file", "console"]
+          ports:
+            - name: quic
+              containerPort: {{ .Values.relay.service.port }}
+              protocol: UDP
+            - name: websocket
+              containerPort: {{ .Values.relay.service.port }}
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.relay.service.port }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.relay.service.port }}
+          resources:
+            {{- toYaml .Values.relay.resources | nindent 12 }}
+      {{- with .Values.relay.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.relay.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.relay.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
