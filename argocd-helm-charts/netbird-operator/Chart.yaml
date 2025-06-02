@@ -1,0 +1,9 @@
+apiVersion: v2
+name: netbird-operator
+description: NetBird Kubernetes Operator
+type: application
+version: 0.1.10
+dependencies:
+  - name: kubernetes-operator
+    version: 0.1.10
+    repository: https://netbirdio.github.io/kubernetes-operator
