@@ -10,5 +10,6 @@ spec:
     url: blackbox-exporter.monitoring.svc.cluster.local:19115
   targets:
     staticConfig:
-      static: https://{{ (((((.Values).puppetserver).puppetserver).masters).fqdns).alternateServerNames }}
+      static:
+        - https://{{ (((((.Values).puppetserver).puppetserver).masters).fqdns).alternateServerNames }}
 {{- end}}
