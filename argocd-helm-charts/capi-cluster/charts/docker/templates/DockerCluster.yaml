@@ -1,0 +1,4 @@
+kind: DockerCluster
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+metadata:
+  name: {{ .Values.global.clusterName }}

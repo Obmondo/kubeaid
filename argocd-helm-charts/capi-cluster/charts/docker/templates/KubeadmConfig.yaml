@@ -1,0 +1,7 @@
+kind: KubeadmConfig
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+metadata:
+  name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
+spec:
+  initConfiguration:
+    nodeRegistration: {}

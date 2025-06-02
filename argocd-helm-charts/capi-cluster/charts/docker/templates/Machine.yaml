@@ -1,0 +1,19 @@
+kind: Machine
+apiVersion: cluster.x-k8s.io/v1beta1
+metadata:
+  name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
+  labels:
+    cluster.x-k8s.io/cluster-name: {{ .Values.global.clusterName }}
+    cluster.x-k8s.io/control-plane: "true"
+    set: controlplane
+spec:
+  bootstrap:
+    configRef:
+      kind: KubeadmConfig
+      apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+      name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
+  infrastructureRef:
+    kind: DockerMachine
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
+  version: {{ $.Values.global.kubernetes.version }}
