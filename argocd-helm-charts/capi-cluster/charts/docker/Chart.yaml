@@ -1,0 +1,5 @@
+apiVersion: v2
+name: docker
+version: 1.0.0
+description: Helm chart for deploying docker, converting a host into k8s node
+type: application
