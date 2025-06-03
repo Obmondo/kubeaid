@@ -2,6 +2,12 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`ed01bde7`](../../commit/ed01bde7) feat: added netbird operator helm chart
+- [`1705a6dc`](../../commit/1705a6dc) fix: change blackbox probe static config type from string to array
+- [`0db217e8`](../../commit/0db217e8) feat: added opendesk support, with helmfile and apps of apps pattern
+- [`f5c60858`](../../commit/f5c60858) adding opensearch-operator helm chart
+
 ## 13.0.0
 ### Major Version Upgrades
 - Updated velero from version 9.1.2 to 10.0.1
