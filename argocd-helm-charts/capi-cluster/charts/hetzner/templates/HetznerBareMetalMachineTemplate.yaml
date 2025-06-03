@@ -25,15 +25,15 @@ spec:
           echo "network: { config: disabled }" > /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
           apt-get update && apt-get install -y cloud-init apparmor apparmor-utils
           cloud-init clean --logs
-        swRaid: {{ .Values.installImage.controlPlane.swRaid }}
+        swraid: {{ .Values.installImage.controlPlane.swRaid }}
       sshSpec:
         portAfterCloudInit: 22
         portAfterInstallImage: 22
         secretRef:
           key:
-            name: name
-            privateKey: private-key
-            publicKey: public-key
+            name: sshkey-name
+            privateKey: ssh-privatekey
+            publicKey: ssh-publickey
           name: {{ .Values.rescueSSHKeyPairSecretName }}
 {{- end }}
 
@@ -66,7 +66,7 @@ spec:
           echo "network: { config: disabled }" > /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
           apt-get update && apt-get install -y cloud-init apparmor apparmor-utils
           cloud-init clean --logs
-        swRaid: {{ $.Values.installImage.worker.swRaid }}
+        swraid: {{ $.Values.installImage.worker.swRaid }}
       sshSpec:
         portAfterCloudInit: 22
         portAfterInstallImage: 22
@@ -75,6 +75,6 @@ spec:
             name: sshkey-name
             privateKey: ssh-privatekey
             publicKey: ssh-publickey
-          name: {{ .Values.rescueSSHKeyPairSecretName }}
+          name: {{ $.Values.rescueSSHKeyPairSecretName }}
 {{- end }}
 {{- end }}

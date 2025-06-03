@@ -70,27 +70,27 @@ spec:
           profiling: "false"
           secure-port: "10259"
     files:
-      {{- if eq .Values.mode "bare-metal" }}
-      - content: |
-          [Unit]
-          Description=Cilium BPF mounts
-          Documentation=https://docs.cilium.io/
-          DefaultDependencies=no
-          Before=local-fs.target umount.target
-          After=swap.target
+    {{- if eq .Values.mode "bare-metal" }}
+    - content: |
+        [Unit]
+        Description=Cilium BPF mounts
+        Documentation=https://docs.cilium.io/
+        DefaultDependencies=no
+        Before=local-fs.target umount.target
+        After=swap.target
 
-          [Mount]
-          What=bpffs
-          Where=/sys/fs/bpf
-          Type=bpf
-          Options=rw,nosuid,nodev,noexec,relatime,mode=700
+        [Mount]
+        What=bpffs
+        Where=/sys/fs/bpf
+        Type=bpf
+        Options=rw,nosuid,nodev,noexec,relatime,mode=700
 
-          [Install]
-          WantedBy=multi-user.target
-        owner: root:root
-        path: /etc/systemd/system/sys-fs-bpf.mount
-        permissions: "0744"
-      {{- end }}
+        [Install]
+        WantedBy=multi-user.target
+      owner: "root:root"
+      path: /etc/systemd/system/sys-fs-bpf.mount
+      permissions: "0744"
+    {{- end }}
     - content: |
         net.ipv4.conf.lxc*.rp_filter = 0
       owner: root:root

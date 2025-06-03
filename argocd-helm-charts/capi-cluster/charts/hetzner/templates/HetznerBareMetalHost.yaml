@@ -5,7 +5,7 @@
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: HetznerBareMetalHost
 metadata:
-  name: {{ $bareMetalHost.serverID }}
+  name: {{ $bareMetalHost.serverID | quote }}
   labels:
     role: {{ $.Values.global.clusterName }}-control-plane
 spec:
@@ -29,7 +29,7 @@ spec:
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: HetznerBareMetalHost
 metadata:
-  name: {{ $bareMetalHost.serverID }}
+  name: {{ $bareMetalHost.serverID | quote }}
   labels:
     role: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
 spec:
