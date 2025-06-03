@@ -17,6 +17,8 @@ spec:
       control-plane: controller-manager
   template:
     metadata:
+      annotations:
+        checksum/config-env: {{ include (print $.Template.BasePath "/configmap-ironic.yaml") . | sha256sum }}
       labels:
         {{- include "baremetal-operator.selectorLabels" . | nindent 8 }}
         control-plane: controller-manager

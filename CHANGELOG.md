@@ -2,6 +2,29 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 13.1.0
+### Minor Version Upgrades
+- Updated zfs-localpv from version 2.7.1 to 2.8.0
+- Updated sonarqube from version 2025.2.0 to 2025.3.0
+- Updated opentelemetry-collector from version 0.125.0 to 0.126.0
+- Updated kubernetes-dashboard from version 7.12.0 to 7.13.0
+- Updated cluster-api-operator from version 0.19.0 to 0.20.0
+
+### Patch Version Upgrades
+- Updated tigera-operator from version v3.30.0 to v3.30.1
+- Updated rook-ceph-cluster from version v1.17.2 to v1.17.3
+- Added rook-ceph from version v1.17.2 to v1.17.2
+- Updated rabbitmq-cluster-operator from version 4.4.11 to 4.4.15
+- Added opentelemetry-operator from version 0.84.1 to 0.84.1
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated opencost from version 2.1.2 to 2.1.3
+- Updated metal3 from version 0.11.3 to 0.11.4
+- Updated harbor from version 1.17.0 to 1.17.1
+- Updated erpnext from version 7.0.200 to 7.0.201
+- Updated azuredisk-csi-driver from version 1.33.0 to 1.33.1
+- Updated argocd-image-updater from version 0.12.1 to 0.12.2
+- Updated argo-cd from version 8.0.10 to 8.0.14
+
 ### Improvements
 - [`ed01bde7`](../../commit/ed01bde7) feat: added netbird operator helm chart
 - [`1705a6dc`](../../commit/1705a6dc) fix: change blackbox probe static config type from string to array

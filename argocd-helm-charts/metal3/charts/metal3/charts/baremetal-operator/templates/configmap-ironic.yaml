@@ -10,14 +10,15 @@
 apiVersion: v1
 data:
   IRONIC_ENDPOINT: "{{ $protocol }}://{{ $ironicApiHost }}/v1/"
-  RESTART_CONTAINER_CERTIFICATE_UPDATED: "false"
   # Switch VMedia to HTTP if enable_vmedia_tls is false
   {{- if and $enableTLS $enableVMediaTLS }}
     {{- $ironicBootHost = print $ironicIP ":" .Values.global.vmediaTLSPort }}
     {{- $ironicCacheHost = print $ironicIP ":" .Values.global.vmediaTLSPort }}
     {{- $protocol = "https" }}
+  RESTART_CONTAINER_CERTIFICATE_UPDATED: "true"
   {{- else }}
     {{- $protocol = "http" }}
+  RESTART_CONTAINER_CERTIFICATE_UPDATED: "false"
   {{- end }}
   CACHEURL: "{{ $protocol }}://{{ $ironicCacheHost }}/images"
   DEPLOY_KERNEL_URL: "{{ $protocol }}://{{ $ironicBootHost }}/images/ironic-python-agent-{{ $deployArch }}.kernel"

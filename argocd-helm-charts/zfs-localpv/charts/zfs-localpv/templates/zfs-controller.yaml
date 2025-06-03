@@ -19,9 +19,12 @@ spec:
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "zfslocalpv.zfsController.labels" . | nindent 8 }}
+        {{- include "zfslocalpv.zfsController.labels" . | nindent 8 -}}
         {{- with .Values.zfsController.podLabels}}
-        {{ toYaml . | nindent 8 }}
+        {{ toYaml . | nindent 8 -}}
+        {{- end}}
+        {{- with .Values.loggingLabels}}
+        {{ toYaml . | nindent 8 -}}
         {{- end}}
     spec:
 {{- if .Values.zfsController.priorityClass.create }}
@@ -129,6 +132,8 @@ spec:
             - name: GA_KEY
               value: {{ .Values.analytics.gaKey | quote }}
             {{- end }}
+            - name: OPENEBS_IO_ENABLE_BACKUP_GC
+              value: "{{ .Values.backupGC.enabled }}"
           args :
             - "--endpoint=$(OPENEBS_CSI_ENDPOINT)"
             - "--plugin=$(OPENEBS_CONTROLLER_DRIVER)"

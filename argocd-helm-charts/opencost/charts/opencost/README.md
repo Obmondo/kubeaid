@@ -2,9 +2,9 @@
 
 OpenCost and OpenCost UI
 
-![Version: 2.1.2](https://img.shields.io/badge/Version-2.1.2-informational?style=flat-square)
+![Version: 2.1.3](https://img.shields.io/badge/Version-2.1.3-informational?style=flat-square)
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
-![AppVersion: 1.114.0](https://img.shields.io/badge/AppVersion-1.114.0-informational?style=flat-square)
+![AppVersion: 1.115.0](https://img.shields.io/badge/AppVersion-1.115.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/opencost)](https://artifacthub.io/packages/search?repo=opencost)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/opencost-oci)](https://artifacthub.io/packages/search?repo=opencost-oci)
 
@@ -68,6 +68,12 @@ $ helm install opencost opencost/opencost
 | opencost.exporter.aws.access_key_id | string | `""` | AWS secret key id |
 | opencost.exporter.aws.secret_access_key | string | `""` | AWS secret access key |
 | opencost.exporter.cloudProviderApiKey | string | `""` | The GCP Pricing API requires a key. This is supplied just for evaluation. |
+| opencost.exporter.collectorDataSource.enabled | bool | `false` |  |
+| opencost.exporter.collectorDataSource.networkPort | int | `3001` | The port at which network pods are open to egress |
+| opencost.exporter.collectorDataSource.retentionResolution10m | int | `36` | The number of 10m intervals the Collector DataSource should maintain |
+| opencost.exporter.collectorDataSource.retentionResolution1d | int | `15` | The number of 1d intervals the Collector DataSource should maintain |
+| opencost.exporter.collectorDataSource.retentionResolution1h | int | `49` | The number of 1h intervals the Collector DataSource should maintain |
+| opencost.exporter.collectorDataSource.scrapeInterval | string | `"30s"` | define the interval at which the collector scrapes for data points (10s, 15s, 1m) |
 | opencost.exporter.csv_path | string | `""` |  |
 | opencost.exporter.defaultClusterId | string | `"default-cluster"` | Default cluster ID to use if cluster_id is not set in Prometheus metrics. |
 | opencost.exporter.env | list | `[]` | List of additional environment variables to set in the container |
@@ -87,6 +93,7 @@ $ helm install opencost opencost/opencost
 | opencost.exporter.persistence.accessMode | string | `""` | Access mode for persistent volume |
 | opencost.exporter.persistence.annotations | object | `{}` | Annotations for persistent volume |
 | opencost.exporter.persistence.enabled | bool | `false` |  |
+| opencost.exporter.persistence.mountPath | string | `"/mnt/export"` | The path that the PV will be mounted to the exporter at |
 | opencost.exporter.persistence.size | string | `""` | Size for persistent volume |
 | opencost.exporter.persistence.storageClass | string | `""` | Storage class for persistent volume |
 | opencost.exporter.readinessProbe.enabled | bool | `true` | Whether probe is enabled |

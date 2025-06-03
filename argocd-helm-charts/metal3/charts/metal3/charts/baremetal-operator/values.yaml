@@ -26,9 +26,9 @@ replicaCount: 1
 
 images:
   baremetalOperator:
-    repository: registry.opensuse.org/isv/suse/edge/metal3/containers/images/baremetal-operator
+    repository: registry.opensuse.org/isv/suse/edge/containers/images/baremetal-operator
     pullPolicy: IfNotPresent
-    tag: "0.9.1"
+    tag: "0.9.1.1"
 
 imagePullSecrets: []
 nameOverride: "manger"

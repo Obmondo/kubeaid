@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 # (DEPRECATED) If the deployment Type is set to Deployment SonarQube is deployed as a replica set.
-# This will be removed in a future release.
+# StatefulSet will be removed in a future release in favor of Deployment. Default to StatefulSet for backwards compatibility.
 deploymentType: "StatefulSet"
 
 # There should not be more than 1 SonarQube instance connected to the same database. Please set this value to 1 or 0 (in case you need to scale down programmatically).
@@ -54,7 +54,7 @@ OpenShift:
 # Set the chart to use the latest released SonarQube Community Build
 community:
   enabled: false
-  buildNumber: "25.1.0.102122"
+  buildNumber: "25.5.0.107428"
 
 image:
   repository: sonarqube
@@ -498,7 +498,7 @@ emptyDir: {}
 # A custom sonar.properties file can be provided via dictionary.
 # For example:
 # sonarProperties:
-#   sonar.forceAuthentication: true
+#   sonar.log.level: DEBUG
 #   sonar.security.realm: LDAP
 #   ldap.url: ldaps://organization.com
 
