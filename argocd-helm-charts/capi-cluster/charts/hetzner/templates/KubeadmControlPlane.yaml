@@ -256,19 +256,23 @@ spec:
 
       # Install Cilium.
       - kubectl create namespace cilium
-      - API_SERVER_URL=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
-      - API_SERVER_HOST=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $4}')
-      - API_SERVER_PORT=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $5}')
-      - |
-        helm template cilium kubeaid/argocd-helm-charts/cilium \
+      - helm template cilium kubeaid/argocd-helm-charts/cilium \
           --values kubeaid/argocd-helm-charts/cilium/values.yaml \
-          --set cilium.kubeProxyReplacement=true \
-          --set cilium.k8sServiceHost=${API_SERVER_HOST} \
-          --set cilium.k8sServicePort=${API_SERVER_PORT} \
           --namespace cilium | kubectl apply -f -
 
       # Install Hetzner Cloud Controller Manager.
-      - helm template ccm-hetzner kubeaid/argocd-helm-charts/ccm-hetzner --values kubeaid/argocd-helm-charts/ccm-hetzner/values.yaml --namespace kube-system | kubectl apply -f -
+      {{- if or (eq .Values.mode "hcloud") (eq .Values.mode "hybrid") }}
+      - helm template ccm-hcloud kubeaid/argocd-helm-charts/ccm-hcloud \
+          --values kubeaid/argocd-helm-charts/ccm-hcloud/values.yaml \
+          --namespace kube-system | kubectl apply -f -
+      {{- end }}
+
+
+      {{- if or (eq .Values.mode "bare-metal") (eq .Values.mode "hybrid") }}
+      - helm template ccm-hetzner kubeaid/argocd-helm-charts/ccm-hetzner \
+          --values kubeaid/argocd-helm-charts/ccm-hetzner/values.yaml \
+          --namespace kube-system | kubectl apply -f -
+      {{- end }}
 
       {{- if and (eq .Values.mode "bare-metal") (gt (len $.Values.controlPlane.bareMetalHosts) 1) }}
       # Install Hetzner Failover Script
