@@ -260,7 +260,7 @@ spec:
       - API_SERVER_HOST=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $4}')
       - API_SERVER_PORT=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $5}')
       - |
-        helm template kubeaid/argocd-helm-charts/cilium \
+        helm template cilium kubeaid/argocd-helm-charts/cilium \
           --values kubeaid/argocd-helm-charts/cilium/values.yaml \
           --set cilium.kubeProxyReplacement=true \
           --set cilium.k8sServiceHost=${API_SERVER_HOST} \
@@ -268,7 +268,7 @@ spec:
           --namespace cilium | kubectl apply -f -
 
       # Install Hetzner Cloud Controller Manager.
-      - helm template kubeaid/argocd-helm-charts/ccm-hetzner --values kubeaid/argocd-helm-charts/ccm-hetzner/values.yaml --namespace kube-system | kubectl apply -f -
+      - helm template ccm-hetzner kubeaid/argocd-helm-charts/ccm-hetzner --values kubeaid/argocd-helm-charts/ccm-hetzner/values.yaml --namespace kube-system | kubectl apply -f -
 
       {{- if and (eq .Values.mode "bare-metal") (gt (len $.Values.controlPlane.bareMetalHosts) 1) }}
       # Install Hetzner Failover Script
