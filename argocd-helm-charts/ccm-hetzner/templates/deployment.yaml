@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ccm-hetzner.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "ccm-hetzner.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      {{- include "ccm-hetzner.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ccm-hetzner.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      dnsPolicy: Default
+      serviceAccountName: {{ include "ccm-hetzner.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+      - name: hetzner-secret
+        secret:
+          secretName: {{ .Values.secret.name }}
+      tolerations:
+        # Introduced with CAPI v1.4, more info: https://cluster-api.sigs.k8s.io/developer/providers/bootstrap.html#taint-nodes-at-creation
+        - key: "node.cluster.x-k8s.io/uninitialized"
+          effect: "NoSchedule"
+        # Allow HCCM itself to schedule on nodes that have not yet been initialized by HCCM.
+        - key: "node.cloudprovider.kubernetes.io/uninitialized"
+          value: "true"
+          effect: "NoSchedule"
+        - key: "CriticalAddonsOnly"
+          operator: "Exists"
+        # cloud controller manages should be able to run on masters
+        - key: "node-role.kubernetes.io/master"
+          effect: NoSchedule
+          operator: Exists
+        - key: "node-role.kubernetes.io/control-plane"
+          effect: NoSchedule
+          operator: Exists
+        - key: "node.kubernetes.io/not-ready"
+          effect: "NoSchedule"
+      {{- with .Values.tolerations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- if .Values.privateNetwork.enabled }}
+      hostNetwork: true
+{{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - "/bin/hetzner-cloud-controller-manager"
+            - "--cloud-provider=hcloud"
+            - "--leader-elect={{ .Values.env.leaderElect }}"
+            - "--allow-untagged-cloud"
+{{- if .Values.privateNetwork.enabled }}
+            - "--allocate-node-cidrs=true"
+            - "--cluster-cidr={{ .Values.privateNetwork.clusterSubnet }}"
+{{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - mountPath: /etc/hetzner-secret
+            name: hetzner-secret
+            readOnly: true
+          env:
+            - name: HCLOUD_DEBUG
+              value: "{{ .Values.env.debug }}"
+            - name: HCLOUD_LOAD_BALANCERS_ENABLED
+              value: "{{ .Values.env.loadBalancers }}"
+            {{- if .Values.privateNetwork.enabled }}
+            - name: HCLOUD_NETWORK
+              valueFrom:
+                secretKeyRef:
+                  {{- if .Values.secret.create }}
+                  name: {{ include "ccm-hetzner.fullname" . }}
+                  {{- else }}
+                  name: {{ .Values.secret.name }}
+                  {{- end }}
+                  key: {{ .Values.secret.key.network }}
+            {{- end }}
+            {{- if .Values.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

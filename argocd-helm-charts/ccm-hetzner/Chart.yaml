@@ -1,7 +1,11 @@
 apiVersion: v2
 name: ccm-hetzner
-version: 1.0.0
-dependencies:
-  - name: hcloud-cloud-controller-manager
-    version: 1.25.1
-    repository: https://charts.hetzner.cloud
+description: Helm Chart for Hcloud Cloud Controller Manager
+type: application
+home: https://github.com/syself/charts/tree/main/charts/ccm-hetzner
+maintainers:
+  - name: Syself
+    email: info@syself.com
+    url: https://github.com/syself
+appVersion: "v2.0.1"
+version: 2.0.1

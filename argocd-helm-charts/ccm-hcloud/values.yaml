@@ -1,0 +1,7 @@
+hcloud-cloud-controller-manager:
+  env:
+    HCLOUD_TOKEN:
+      valueFrom:
+        secretKeyRef:
+          name: cloud-credentials
+          key: hcloud
