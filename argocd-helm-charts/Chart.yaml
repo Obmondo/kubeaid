@@ -1,9 +1,0 @@
-apiVersion: v2
-name: netbird
-version: 1.0.0
-dependencies:
-  # Manually copied from
-  # https://github.com/jaconi-io/helm-charts/tree/main@62bbba55c48f20e812d9622072778af9cc6a37d1
-  - name: netbird
-  - name: netbird-dashboard
-  - name: coturn
