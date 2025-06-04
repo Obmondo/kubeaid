@@ -34,7 +34,7 @@ privateNetwork:
 
 secret:
   create: false
-  name: hetzner # Name of an existing secret
+  name: cloud-credentials # Name of an existing secret
   key:
     network: network # Name of an existing key for the hcloud-network in the above specified secret
 
