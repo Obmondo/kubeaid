@@ -249,6 +249,9 @@ spec:
       # Clone KubeAid.
       - git clone https://github.com/Obmondo/kubeaid.git
 
+      # Checkout to latest tag
+      - git checkout $(git describe --tags `git rev-list --tags --max-count=1`)
+
       # Copy kubeconfig to ~/.kube/config
       - mkdir -p $HOME/.kube
       - sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config

@@ -6,6 +6,7 @@ cilium:
   ipam:
     mode: "kubernetes"
   rollOutCiliumPods: true
+  k8sServiceHost: "auto"
   priorityClassName: "system-node-critical"
   hubble:
     metrics:
