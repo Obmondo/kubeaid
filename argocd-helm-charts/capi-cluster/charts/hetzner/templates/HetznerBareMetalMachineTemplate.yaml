@@ -34,7 +34,7 @@ spec:
             name: sshkey-name
             privateKey: ssh-privatekey
             publicKey: ssh-publickey
-          name: {{ .Values.rescueSSHKeyPairSecretName }}
+          name: {{ $.Values.rescueSSHKeyPairSecretName }}
 {{- end }}
 
 {{- if or (eq .Values.mode "bare-metal") (eq .Values.mode "hybrid") }}

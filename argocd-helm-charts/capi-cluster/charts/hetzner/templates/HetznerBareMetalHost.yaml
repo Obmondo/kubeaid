@@ -8,12 +8,14 @@ metadata:
   name: {{ $bareMetalHost.serverID | quote }}
   labels:
     role: {{ $.Values.global.clusterName }}-control-plane
+  annotations:
+    capi.syself.com/wipe-disk: all
 spec:
   serverID: {{ $bareMetalHost.serverID }}
   rootDeviceHints:
     raid:
       wwn:
-      {{- range .wwn }}
+      {{- range .wwns }}
         - "{{ . }}"
       {{- end }}
   maintenanceMode: false
@@ -32,12 +34,14 @@ metadata:
   name: {{ $bareMetalHost.serverID | quote }}
   labels:
     role: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
+  annotations:
+    capi.syself.com/wipe-disk: all
 spec:
   serverID: {{ $bareMetalHost.serverID }}
   rootDeviceHints:
     raid:
       wwn:
-      {{- range .wwn }}
+      {{- range .wwns }}
         - "{{ . }}"
       {{- end }}
   maintenanceMode: false

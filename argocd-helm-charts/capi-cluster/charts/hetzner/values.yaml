@@ -15,11 +15,11 @@ imageName: ubuntu-24.04
 
 installImage:
   controlPlane:
-    imagePath: /root/.oldroot/nfs/images/Ubuntu-2204-jammy-amd64-base.tar.gz
+    imagePath: /root/.oldroot/nfs/images/Ubuntu-2404-noble-amd64-base.tar.gz
     rootPartitionSize: all
     swRaid: 1
   worker:
-    imagePath: /root/.oldroot/nfs/images/Ubuntu-2204-jammy-amd64-base.tar.gz
+    imagePath: /root/.oldroot/nfs/images/Ubuntu-2404-noble-amd64-base.tar.gz
     rootPartitionSize: all
     swRaid: 1
 
