@@ -4,13 +4,4 @@ opendesk:
     destination:
       namespace: opendesk
     source:
-      targetRevision: v1.4.0
-  openDesk:
-    overwrites:
-      element:
-        extraEnvVars:
-          - name: "UVS_ACCESS_TOKEN"
-            valueFrom:
-              secretKeyRef:
-                name: "opendesk-matrix-user-verification-service-account"
-                key: "password"
+      targetRevision: v1.4.1
