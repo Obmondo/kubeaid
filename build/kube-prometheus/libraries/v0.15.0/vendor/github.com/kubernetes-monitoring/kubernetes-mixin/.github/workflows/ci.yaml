@@ -1,0 +1,43 @@
+name: ci
+permissions: {}
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Lint Alerts
+            run: make --always-make alerts-lint
+          - name: Generate YAML
+            run: make --always-make generate && git diff --exit-code
+          - name: Lint Grafana Dashboards
+            run: make --always-make dashboards-lint
+          - name: Format JSONNET
+            run: make --always-make jsonnet-fmt && git diff --exit-code
+          - name: Lint JSONNET
+            run: make --always-make jsonnet-lint
+          - name: Format MD
+            run: make --always-make markdownfmt && git diff --exit-code
+          - name: Lint MD
+            run: make --always-make vale && git diff --exit-code
+          - name: Lint YAML
+            run: make --always-make pint-lint
+          - name: Run unit tests
+            run: make --always-make test
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version-file: scripts/go.mod
+          cache-dependency-path: scripts/go.sum
+      - run: ${{ matrix.run }}
