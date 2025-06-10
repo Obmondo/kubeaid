@@ -10,6 +10,26 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Patch Version Upgrades %%^^
 - Added localpv-provisioner from version 4.3.0-prerelease to 4.3.0-prerelease
 
+### Improvements
+- [`834453b0`](../../commit/834453b0) adding v0.15.0 of kube-prometheus-stack
+- [`8430762b`](../../commit/8430762b) fix: renamed the chart to follow the standard partice and added some sane default in values file
+- [`678e31b1`](../../commit/678e31b1) feat: added localpv support from openebs helm chart
+- [`33109399`](../../commit/33109399) fix: cilium can figure out the k8s service host by itself using a configmap and kubeaid clone should checkout to a latest tag of kubeaid
+- [`db36d5b7`](../../commit/db36d5b7) fix: removed the set commands for the cilium setup, since cilium can figure it out by reading the cluster-info configmap, and install the ccm chart based on the mode
+- [`4feabfdc`](../../commit/4feabfdc) Added the ingress nginx chart supported by Opendesk
+- [`f664df51`](../../commit/f664df51) Added the chartname for ccm-hetzner and cilium
+- [`d52afed2`](../../commit/d52afed2) Updated the secret name since thats what bootstrap script creates
+- [`defe6695`](../../commit/defe6695) Updated the chart for ccm-hetzner and renamed older ccm-hetzner chart to ccm-hcloud
+- [`8ca3168d`](../../commit/8ca3168d) added a default image.tag, since the helm chart is on master(When it was copied from), which is pointing to 5.1.0, for which image is not build yet
+- [`21722044`](../../commit/21722044) fix: added missing crds for nginx
+- [`b213cd7a`](../../commit/b213cd7a) feat: added nginx-ingress controller in kubeaid, manually
+- [`62040801`](../../commit/62040801) fix: hetzner-robot helm chart only if control plane is more then 1 and removed the Archi kubeaid clone
+- [`608bc259`](../../commit/608bc259) fix: renamed cluster-api to cluster-api-operator
+- [`0c475902`](../../commit/0c475902) added missing coturn helm chart
+- [`a3cf7451`](../../commit/a3cf7451) fixed bad Chart.yaml
+- [`9dcae2e2`](../../commit/9dcae2e2) feat: added netbid chart for setting up management server
+- [`83ccda69`](../../commit/83ccda69) adding support for Hetzner bare-metal
+
 ## 13.1.0
 ### Minor Version Upgrades
 - Updated zfs-localpv from version 2.7.1 to 2.8.0
