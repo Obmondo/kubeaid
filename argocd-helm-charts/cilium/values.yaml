@@ -1,5 +1,6 @@
 cilium:
   operator:
+    replicas: 1
     rollOutPods: true
     priorityClassName: "system-node-critical"
   kubeProxyReplacement: "true"
