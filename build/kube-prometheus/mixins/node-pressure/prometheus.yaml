@@ -1,0 +1,13 @@
+groups:
+- name: node-pressure
+  rules:
+  - alert: KubeNodePressure
+    annotations:
+      description: '{{ $labels.node }} on cluster {{ $labels.cluster }} has active Condition {{ $labels.condition }}. This is caused by resource usage exceeding eviction thresholds.'
+      runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubenodepressure
+      summary: Node has as active Condition.
+    expr: |
+      kube_node_status_condition{job="kube-state-metrics",condition=~"(MemoryPressure|DiskPressure|PIDPressure)",status="true"} == 1
+      and on (cluster, node)
+      kube_node_spec_unschedulable{job="kube-state-metrics"} == 0
+    for: 10m

@@ -157,6 +157,7 @@ local default_vars = {
   addMixins: {
     ceph: true,
     'argo-cd': true,
+    'node-pressure': true,
     sealedsecrets: true,
     etcd: true,
     velero: false,
@@ -228,6 +229,14 @@ local mixins = remove_nulls([
     'argo-cd',
     (import 'mixins/argo-cd/mixin.libsonnet'),
     vars,
+  ),
+  (
+    if std.objectHas(vars, 'kube_prometheus_version') && std.member(['v0.13.0', 'v0.14.0'], vars.kube_prometheus_version) then
+      addMixin(
+        'node-pressure',
+        (import 'mixins/node-pressure/mixin.libsonnet'),
+        vars,
+      )
   ),
   addMixin(
     'opensearch',
