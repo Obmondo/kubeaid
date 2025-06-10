@@ -3,5 +3,5 @@ name: metal3
 version: 1.0.0
 dependencies:
   - name: metal3
-    version: 0.11.4
+    version: 0.11.5
     repository: https://suse-edge.github.io/charts

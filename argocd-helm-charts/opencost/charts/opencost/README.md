@@ -2,7 +2,7 @@
 
 OpenCost and OpenCost UI
 
-![Version: 2.1.3](https://img.shields.io/badge/Version-2.1.3-informational?style=flat-square)
+![Version: 2.1.5](https://img.shields.io/badge/Version-2.1.5-informational?style=flat-square)
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 ![AppVersion: 1.115.0](https://img.shields.io/badge/AppVersion-1.115.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/opencost)](https://artifacthub.io/packages/search?repo=opencost)
@@ -84,7 +84,7 @@ $ helm install opencost opencost/opencost
 | opencost.exporter.image.pullPolicy | string | `"IfNotPresent"` | Exporter container image pull policy |
 | opencost.exporter.image.registry | string | `"ghcr.io"` | Exporter container image registry |
 | opencost.exporter.image.repository | string | `"opencost/opencost"` | Exporter container image name |
-| opencost.exporter.image.tag | string | `"1.114.0@sha256:e0e6d87827559544d19d0096f3a0c0a62e2bcac4479031f7849f3ee823ad19fb"` | Exporter container image tag |
+| opencost.exporter.image.tag | string | `"1.115.0@sha256:fb6468a1ef45dbd4a9e521122c8d306f882bb33d1657d28d21aeaef79412e9e1"` | Exporter container image tag |
 | opencost.exporter.livenessProbe.enabled | bool | `true` | Whether probe is enabled |
 | opencost.exporter.livenessProbe.failureThreshold | int | `3` | Number of failures for probe to be considered failed |
 | opencost.exporter.livenessProbe.initialDelaySeconds | int | `10` | Number of seconds before probe is initiated |

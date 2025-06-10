@@ -106,7 +106,7 @@ ingester:
     enabled: false
   persistence:
     enabled: true
-    size: 10Gi
+    size: 100Gi
     storageClass: ""
     accessModes:
       - ReadWriteOnce
@@ -234,6 +234,7 @@ config:
   ZO_GRPC_ADDR: ""
   ZO_GRPC_CONNECT_TIMEOUT: "600"
   ZO_GRPC_MAX_MESSAGE_SIZE: "16"
+  ZO_GRPC_CHANNEL_CACHE_DISABLED: "false"
   ZO_GRPC_ORG_HEADER_KEY: "organization"
   ZO_GRPC_STREAM_HEADER_KEY: "stream-name"
   ZO_INTERNAL_GRPC_TOKEN: ""
@@ -279,8 +280,8 @@ config:
   ZO_METRICS_CACHE_MAX_ENTRIES: "100000"
   ZO_CONSISTENT_HASH_VNODES: "1000"
   ZO_QUERY_OPTIMIZATION_NUM_FIELDS: "0"
-  ZO_SCHEMA_MAX_FIELDS_TO_ENABLE_UDS: "150"
-  ZO_USER_DEFINED_SCHEMA_MAX_FIELDS: "200"
+  ZO_SCHEMA_MAX_FIELDS_TO_ENABLE_UDS: "500"
+  ZO_USER_DEFINED_SCHEMA_MAX_FIELDS: "600"
   ZO_QUICK_MODE_ENABLED: "false"
   ZO_QUICK_MODE_FORCE_ENABLED: "true"
   ZO_QUICK_MODE_NUM_FIELDS: "500"
@@ -314,10 +315,11 @@ config:
   ZO_MEM_DUMP_THREAD_NUM: "0"
   ZO_MEM_TABLE_MAX_SIZE: "0"
   ZO_MEM_TABLE_BUCKET_NUM: "0"
-  ZO_MEM_PERSIST_INTERVAL: "5"
+  ZO_MEM_PERSIST_INTERVAL: "2"
   ZO_ENRICHMENT_TABLE_LIMIT: "10" # size in mb
   ZO_WAL_WRITE_BUFFER_SIZE: "16384"
   ZO_WAL_FSYNC_DISABLED: "false"
+  ZO_WAL_WRITE_QUEUE_ENABLED: "false"
   ZO_QUERY_THREAD_NUM: "0"
   ZO_QUERY_TIMEOUT: "600"
   ZO_QUERY_INGESTER_TIMEOUT: "0"
@@ -341,7 +343,7 @@ config:
   ZO_PROMETHEUS_HA_CLUSTER: "cluster"
   ZO_PROMETHEUS_HA_REPLICA: "__replica__"
   ZO_COMPACT_ENABLED: "true"
-  ZO_COMPACT_INTERVAL: "60"
+  ZO_COMPACT_INTERVAL: "10"
   ZO_COMPACT_SYNC_TO_DB_INTERVAL: "600"
   ZO_COMPACT_STRATEGY: "file_time"
   ZO_COMPACT_MAX_FILE_SIZE: "512"
@@ -349,7 +351,7 @@ config:
   ZO_COMPACT_DELETE_FILES_DELAY_HOURS: "2"
   ZO_COMPACT_BATCH_SIZE: "0"
   ZO_COMPACT_BLOCKED_ORGS: ""
-  ZO_MEMORY_CACHE_ENABLED: "true"
+  ZO_MEMORY_CACHE_ENABLED: "false"
   ZO_MEMORY_CACHE_STRATEGY: "lru" # lru, fifo, time_lru https://github.com/openobserve/openobserve/pull/6489
   ZO_MEMORY_CACHE_MAX_SIZE: "0"
   ZO_MEMORY_CACHE_SKIP_SIZE: "0"
@@ -476,6 +478,7 @@ config:
   ZO_SELF_METRIC_CONSUMPTION_ACCEPTLIST: "" # only these metrics will be self-consumed, comma separated
   ZO_SWAGGER_ENABLED: "true"
   ZO_WEBSOCKET_ENABLED: "true"
+  ZO_STREAMING_ENABLED: "true"
   ZO_FEATURE_QUERY_STREAMING_AGGS: "true"
   ZO_DATAFUSION_STREAMING_AGGS_CACHE_MAX_ENTRIES: "100000"
   ZO_MIN_AUTO_REFRESH_INTERVAL: "5"
@@ -484,6 +487,7 @@ config:
   RUST_BACKTRACE: "0"
   ZO_PROMETHEUS_ENABLED: "false"
   ZO_HISTOGRAM_ENABLED: "true" # show/hode histogram on logs page by default
+  ZO_STREAMING_ENABLED: "true" # enable streaming for logs page
 
 # Add extra environment variables to all pods, useful for overriding secrets
 extraEnv: []

@@ -2,12 +2,34 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## Unreleased Changes
-### Major Version Upgrades %%^^
+## 14.0.0
+### Major Version Upgrades
+- Updated traefik from version 35.4.0 to 36.0.0
 
-### Minor Version Upgrades %%^^
+### Minor Version Upgrades
+- Updated teleport-kube-agent from version 17.4.10 to 17.5.2
+- Updated teleport-cluster from version 17.4.10 to 17.5.2
+- Updated localpv-provisioner from version 4.3.0-prerelease to 4.4.0-develop
+- Updated hcloud-csi from version 2.14.0 to 2.15.0
+- Updated cert-manager from version v1.17.2 to v1.18.0
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
+- Updated velero from version 10.0.1 to 10.0.4
+- Updated rook-ceph-cluster from version v1.17.3 to v1.17.4
+- Added rook-ceph from version v1.17.2 to v1.17.2
+- Updated rabbitmq-cluster-operator from version 4.4.15 to 4.4.21
+- Added opentelemetry-operator from version 0.84.1 to 0.84.1
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated openobserve from version 0.14.73 to 0.14.75
+- Updated opencost from version 2.1.3 to 2.1.5
+- Updated odoo from version 28.2.4 to 28.2.6
+- Updated metallb from version 6.4.13 to 6.4.16
+- Updated metal3 from version 0.11.4 to 0.11.5
+- Updated graylog from version 2.3.10 to 2.3.11
+- Updated fluent-bit from version 0.49.0 to 0.49.1
+- Updated external-dns from version 8.8.3 to 8.8.4
+- Updated erpnext from version 7.0.201 to 7.0.204
+- Updated argo-cd from version 8.0.14 to 8.0.17
 - Added localpv-provisioner from version 4.3.0-prerelease to 4.3.0-prerelease
 
 ### Improvements

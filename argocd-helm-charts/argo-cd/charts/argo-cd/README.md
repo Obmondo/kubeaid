@@ -1308,7 +1308,7 @@ NOTE: Any values you put under `.Values.configs.cm` are passed to argocd-cm Conf
 | redis.exporter.env | list | `[]` | Environment variables to pass to the Redis exporter |
 | redis.exporter.image.imagePullPolicy | string | `""` (defaults to global.image.imagePullPolicy) | Image pull policy for the redis-exporter |
 | redis.exporter.image.repository | string | `"ghcr.io/oliver006/redis_exporter"` | Repository to use for the redis-exporter |
-| redis.exporter.image.tag | string | `"v1.73.0"` | Tag to use for the redis-exporter |
+| redis.exporter.image.tag | string | `"v1.74.0"` | Tag to use for the redis-exporter |
 | redis.exporter.livenessProbe.enabled | bool | `false` | Enable Kubernetes liveness probe for Redis exporter |
 | redis.exporter.livenessProbe.failureThreshold | int | `5` | Minimum consecutive failures for the [probe] to be considered failed after having succeeded |
 | redis.exporter.livenessProbe.initialDelaySeconds | int | `30` | Number of seconds after the container has started before [probe] is initiated |
@@ -1436,7 +1436,7 @@ If you want to use an existing Redis (eg. a managed service from a cloud provide
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| externalRedis.existingSecret | string | `""` | The name of an existing secret with Redis (must contain key `redis-password`) and Sentinel credentials. When it's set, the `externalRedis.password` parameter is ignored |
+| externalRedis.existingSecret | string | `""` | The name of an existing secret with Redis (must contain key `redis-password`. And should contain `redis-username` if username is not `default`) and Sentinel credentials. When it's set, the `externalRedis.username` and `externalRedis.password` parameters are ignored |
 | externalRedis.host | string | `""` | External Redis server host |
 | externalRedis.password | string | `""` | External Redis password |
 | externalRedis.port | int | `6379` | External Redis server port |

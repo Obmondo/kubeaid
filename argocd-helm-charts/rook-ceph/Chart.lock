@@ -4,6 +4,6 @@ dependencies:
   version: v1.17.2
 - name: rook-ceph-cluster
   repository: https://charts.rook.io/release
-  version: v1.17.3
-digest: sha256:b337f369356886186511a54428d9d21bfdb71cfada1f37d0a76dcc3f7e3f201b
-generated: "2025-06-03T14:57:36.942696866+05:30"
+  version: v1.17.4
+digest: sha256:2e678eb46fa6fd0f63bc914dd71cb7540d0847b1c8827c56afe5558f1e0b43c3
+generated: "2025-06-10T22:13:03.181520515+05:30"

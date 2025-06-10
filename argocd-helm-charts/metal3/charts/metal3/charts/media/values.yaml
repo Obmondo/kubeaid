@@ -24,7 +24,7 @@ replicaCount: 1
 image:
   repository: registry.opensuse.org/isv/suse/edge/metal3/containers/images/ironic
   pullPolicy: IfNotPresent
-  tag: 26.1.2.2
+  tag: 26.1.2.4
 
 imagePullSecrets: []
 nameOverride: ""
