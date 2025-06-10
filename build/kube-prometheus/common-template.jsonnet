@@ -167,7 +167,6 @@ local default_vars = {
     // Enable this when we move metrics generation into obmondo-k8s-agent
     // gitea/EnableIT/internal/issues/21
     'node-count-monthly-status': false,
-    'node-memory': true,
     'argo-cd-sync-state': true,
     rabbitmq: false,
     'monitor-prometheus-stack': false,
@@ -228,11 +227,6 @@ local mixins = remove_nulls([
   addMixin(
     'argo-cd',
     (import 'mixins/argo-cd/mixin.libsonnet'),
-    vars,
-  ),
-  addMixin(
-    'node-memory',
-    (import 'mixins/memory/mixin.libsonnet'),
     vars,
   ),
   addMixin(
