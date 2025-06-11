@@ -1,0 +1,18 @@
+{{- if and .Values.management.enabled .Values.management.useBackwardsGrpcService -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "netbird.fullname" . }}-management-grpc
+  namespace: {{ include "netbird.namespace" . }}
+  labels:
+    {{- include "netbird.management.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.management.serviceGrpc.type }}
+  ports:
+    - port: {{ .Values.management.serviceGrpc.port }}
+      targetPort: {{ .Values.management.serviceGrpc.name }}
+      protocol: TCP
+      name: {{ .Values.management.serviceGrpc.name }}
+  selector:
+    {{- include "netbird.management.selectorLabels" . | nindent 4 }}
+{{- end }}

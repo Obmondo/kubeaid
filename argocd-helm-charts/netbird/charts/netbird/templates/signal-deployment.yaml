@@ -1,13 +1,14 @@
+{{- if .Values.signal.enabled -}}
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "netbird.fullname" . }}-signal
+  namespace: {{ include "netbird.namespace" . }}
   labels:
     {{- include "netbird.signal.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.signal.autoscaling.enabled }}
   replicas: {{ .Values.signal.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "netbird.signal.selectorLabels" . | nindent 6 }}
@@ -26,32 +27,41 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "netbird.signal.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.signal.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}-signal
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.signal.securityContext | nindent 12 }}
           image: "{{ .Values.signal.image.repository }}:{{ .Values.signal.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.signal.image.pullPolicy }}
-          args: ["--port", "{{ .Values.signal.service.port }}", "--log-level", "{{ .Values.signal.logLevel }}", "--log-file", "console"]
+          args:
+            - "--port"
+            - "{{ .Values.signal.service.port }}"
+            - "--log-level"
+            - "{{ .Values.signal.logLevel }}"
+            - "--log-file"
+            - "console"
           ports:
-            - name: {{ .Values.signal.protocol }}
-              containerPort: {{ .Values.signal.service.port }}
+            - name: grpc
+              containerPort: {{ .Values.signal.containerPort }}
               protocol: TCP
             - name: metrics
-              containerPort: 9090
+              containerPort: {{ .Values.signal.metrics.port }}
               protocol: TCP
+          {{- if .Values.signal.livenessProbe }}
+            {{- with .Values.signal.livenessProbe }}
           livenessProbe:
-            tcpSocket:
-              port: {{ .Values.signal.protocol }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.signal.readinessProbe }}
+            {{- with .Values.signal.readinessProbe }}
           readinessProbe:
-            tcpSocket:
-              port: {{ .Values.signal.protocol }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           resources:
             {{- toYaml .Values.signal.resources | nindent 12 }}
-          volumeMounts:
-            - mountPath: /var/lib/netbird
-              name: signal
       {{- with .Values.signal.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -64,11 +74,5 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      volumes:
-        - name: signal
-          {{- if .Values.signal.persistentVolume.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ include "netbird.fullname" . }}-signal
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
+
+{{- end }}

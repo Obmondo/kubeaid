@@ -1,0 +1,48 @@
+{{- if .Values.metrics.serviceMonitor.enabled}}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "netbird.name" . }}
+  namespace: {{ default (include "netbird.namespace" .) .Values.metrics.serviceMonitor.namespace | quote }}
+  labels:
+    {{- include "netbird.common.labels" . | nindent 4 }}
+    {{- if .Values.metrics.serviceMonitor.labels }}
+    {{- toYaml .Values.metrics.serviceMonitor.labels | nindent 4 }}
+    {{- end }}
+    app.kubernetes.io/name: {{ include "netbird.name" . }}-monitor
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  {{- if .Values.metrics.serviceMonitor.annotations }}
+  annotations:
+    {{- toYaml .Values.metrics.serviceMonitor.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  jobLabel: {{ .Values.metrics.serviceMonitor.jobLabel | quote }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- if .Values.metrics.serviceMonitor.selector }}
+      {{- toYaml .Values.metrics.serviceMonitor.selector | nindent 6 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace | quote}}
+  endpoints:
+    - port: metrics
+      {{- if .Values.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.metrics.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.metrics.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- if .Values.metrics.serviceMonitor.honorLabels }}
+      honorLabels: {{ .Values.metrics.serviceMonitor.honorLabels }}
+      {{- end }}
+      {{- if .Values.metrics.serviceMonitor.metricRelabelings }}
+      metricRelabelings:
+        {{- toYaml .Values.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
+      {{- end }}
+      {{- if .Values.metrics.serviceMonitor.relabelings }}
+      relabelings:
+        {{- toYaml .Values.metrics.serviceMonitor.relabelings | nindent 6 }}
+      {{- end }}
+{{- end }}

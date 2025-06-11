@@ -1,24 +1,24 @@
-{{- if .Values.signal.enabled -}}
+{{- if .Values.dashboard.enabled -}}
+{{- if .Values.dashboard.ingress.enabled -}}
+{{- $fullName := printf "%s-dashboard" (include "netbird.fullname" .) -}}
+{{- $svcPort := .Values.dashboard.service.port -}}
 
-{{- if .Values.signal.ingress.enabled -}}
-{{- $fullName := printf "%s-signal" (include "netbird.fullname" .) -}}
-{{- $svcPort := .Values.signal.service.port -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $fullName }}
   namespace: {{ include "netbird.namespace" . }}
   labels:
-    {{- include "netbird.signal.labels" . | nindent 4 }}
-  {{- with .Values.signal.ingress.annotations }}
+    {{- include "netbird.dashboard.labels" . | nindent 4 }}
+  {{- with .Values.dashboard.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  ingressClassName: {{ .Values.signal.ingress.className }}
-  {{- if .Values.signal.ingress.tls }}
+  ingressClassName: {{ .Values.dashboard.ingress.className }}
+  {{- if .Values.dashboard.ingress.tls }}
   tls:
-    {{- range .Values.signal.ingress.tls }}
+    {{- range .Values.dashboard.ingress.tls }}
     - hosts:
         {{- range .hosts }}
         - {{ . | quote }}
@@ -27,7 +27,7 @@ spec:
     {{- end }}
   {{- end }}
   rules:
-    {{- range .Values.signal.ingress.hosts }}
+    {{- range .Values.dashboard.ingress.hosts }}
     - host: {{ .host | quote }}
       http:
         paths:

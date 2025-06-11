@@ -1,17 +1,18 @@
+{{- if .Values.management.enabled -}}
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "netbird.fullname" . }}-management
-  {{- with .Values.deploymentAnnotations }}
+  namespace: {{ include "netbird.namespace" . }}
+  {{- with .Values.management.deploymentAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
     {{- include "netbird.management.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.management.autoscaling.enabled }}
   replicas: {{ .Values.management.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "netbird.management.selectorLabels" . | nindent 6 }}
@@ -32,156 +33,62 @@ spec:
       serviceAccountName: {{ include "netbird.management.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.management.podSecurityContext | nindent 8 }}
-      initContainers:
-        - name: configure
-          image: golang:latest
-          imagePullPolicy: {{ .Values.management.image.pullPolicy }}
-          command: ["/bin/sh", "-c"]
-          args:
-            - >
-              go install github.com/drone/envsubst/cmd/envsubst@latest &&
-              envsubst < /tmp/netbird/management.tmpl.json > /etc/netbird/management.json &&
-              cat /etc/netbird/management.json
-          env:
-            - name: NETBIRD_SIGNAL_URI
-              value: {{ .Values.signal.uri }}
-            - name: NETBIRD_SIGNAL_PROTOCOL
-              value: {{ .Values.signal.protocol }}
-            - name: NETBIRD_STUN_URI
-              value: {{ .Values.stun.uri }}
-            - name: NETBIRD_TURN_URI
-              value: {{ .Values.turn.uri }}
-            {{- with .Values.turn.user }}
-            - name: NETBIRD_TURN_USER
-              value: {{ . }}
-            {{- end }}
-            {{- with .Values.turn.secretKeyRef }}
-            - name: NETBIRD_TURN_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .name }}
-                  key: {{ .key }}
-            {{- end }}
-            {{- if ne .Values.idp.managerType "none" }}
-            - name: NETBIRD_AUTH_OIDC_CONFIGURATION_ENDPOINT
-              value: "{{ .Values.auth.authority }}/.well-known/openid-configuration"
-            - name: NETBIRD_MGMT_API_CERT_FILE
-              value: ""
-            - name: NETBIRD_MGMT_API_CERT_KEY_FILE
-              value: ""
-            - name: NETBIRD_AUTH_AUDIENCE
-              value: {{ .Values.auth.audience }}
-            - name: NETBIRD_AUTH_USER_ID_CLAIM
-              value: {{ .Values.auth.userIDClaim }}
-
-            - name: NETBIRD_IDP_CLIENT_ID
-              value: "{{ .Values.idp.clientID }}"
-            {{- if .Values.idp.secretKeyRef }}
-            {{- with .Values.idp.secretKeyRef }}
-            - name: NETBIRD_IDP_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .name }}
-                  key: {{ .key }}
-            {{- end }}
-            {{- else }}
-            - name: NETBIRD_IDP_CLIENT_SECRET
-              value: "{{ .Values.idp.clientSecret }}"
-            {{- end }}
-            - name: NETBIRD_IDP_GRANT_TYPE
-              value: "{{ .Values.idp.grantType }}"
-            {{- end }}
-
-            # Device auth configuration.
-            {{- if eq .Values.auth.device.provider "hosted" }}
-            - name: NETBIRD_AUTH_DEVICE_AUTH_PROVIDER
-              value: {{ .Values.auth.device.provider }}
-            - name: NETBIRD_AUTH_DEVICE_AUTH_AUDIENCE
-              value: "{{ .Values.auth.device.audience }}"
-            - name: NETBIRD_AUTH_DEVICE_AUTH_AUTHORITY
-              value: "{{ .Values.auth.device.authority }}"
-            - name: NETBIRD_AUTH_DEVICE_AUTH_CLIENT_ID
-              value: "{{ .Values.auth.device.clientID }}"
-            - name: NETBIRD_AUTH_DEVICE_AUTH_DEVICE_AUTHORIZATION_ENDPOINT
-              value: "{{ .Values.auth.device.deviceAuthorizationEndpoint }}"
-            - name: NETBIRD_AUTH_DEVICE_AUTH_TOKEN_ENDPOINT
-              value: "{{ .Values.auth.device.tokenEndpoint }}"
-            - name: NETBIRD_AUTH_DEVICE_AUTH_SCOPE
-              value: "{{ default "openid" .Values.auth.device.scope }}"
-            - name: NETBIRD_AUTH_DEVICE_AUTH_USE_ID_TOKEN
-              value: "{{ default "false" .Values.auth.device.useIDToken }}"
-            - name: NETBIRD_AUTH_DEVICE_REDIRECT_URL
-              value: https://{{ .Values.management.ingress.hosts.api.host }}/
-            {{- end }}
-
-            # IDP configuration.
-            - name: NETBIRD_IDP_MANAGER_TYPE
-              value: "{{ .Values.idp.managerType }}"
-              
-            {{- if eq .Values.idp.managerType "auth0" }}
-            - name: NETBIRD_IDP_AUTH0_AUDIENCE
-              value: "{{ .Values.idp.audience }}"
-            - name: NETBIRD_IDP_AUTH0_AUTH_ISSUER
-              value: "{{ .Values.idp.authIssuer }}"
-            {{- end }}
-
-            {{- if eq .Values.idp.managerType "keycloak" }}
-            - name: NETBIRD_IDP_KEYCLOAK_ADMIN_ENDPOINT
-              value: "{{ .Values.idp.adminEndpoint }}"
-            - name: NETBIRD_IDP_KEYCLOAK_TOKEN_ENDPOINT
-              value: "{{ .Values.idp.tokenEndpoint }}"
-            {{- end }}
-            
-            # Database Configuration
-            {{- if .Values.management.database.postgres }}
-            - name: NETBIRD_STORE_CONFIG_ENGINE
-              value: postgres
-            {{- end }}
-              
-            # Relay Configuration
-            - name: NETBIRD_RELAY_DOMAIN
-              value: {{ .Values.relay.domainName }}
-            - name: NETBIRD_RELAY_PORT
-              value: "{{ .Values.relay.service.port }}"
-            - name: NETBIRD_RELAY_AUTH_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.relay.auth.secret.name }}
-                  key: {{ .Values.relay.auth.secret.key }}
-
-          volumeMounts:
-            - mountPath: /etc/netbird
-              name: config
-            - mountPath: /tmp/netbird
-              name: config-template
       containers:
         - name: {{ .Chart.Name }}-management
           securityContext:
             {{- toYaml .Values.management.securityContext | nindent 12 }}
           image: "{{ .Values.management.image.repository }}:{{ .Values.management.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.management.image.pullPolicy }}
+          {{- if hasKey .Values.management.podCommand "args" }}
           args:
-            - --log-level
-            - {{ .Values.management.logLevel }}
-            - --log-file
-            - console
-            - --dns-domain
-            - {{ .Values.management.dnsDomain }}
-          {{- if .Values.management.database.postgres }}
+            {{- range .Values.management.podCommand.args }}
+            - {{ . }}
+          {{- end }}
+          {{- end }}
+          {{- if or (.Values.management.env) (.Values.management.envRaw) (.Values.management.envFromSecret) }}
           env:
-            - name: NETBIRD_STORE_ENGINE_POSTGRES_DSN
+          {{- range $key, $val := .Values.management.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+          {{- end }}
+          {{- if .Values.management.envRaw }}
+            {{- with .Values.management.envRaw }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- range $key, $val := .Values.management.envFromSecret }}
+            - name: {{ $key }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.management.database.postgres.dsnSecret.name }}
-                  key: {{ .Values.management.database.postgres.dsnSecret.key }}
+                  name: {{ (split "/" $val)._0 }}
+                  key: {{ (split "/" $val)._1 }}
+          {{- end }}
+          {{- end }}
+          {{- with .Values.management.lifecycle }}
+          lifecycle: {{ toYaml . | nindent 12 }}
           {{- end }}
           ports:
             - name: http
-              containerPort: {{ .Values.management.service.port }}
+              containerPort: {{ .Values.management.containerPort }}
+              protocol: TCP
+            - name: grpc
+              containerPort: {{ .Values.management.grpcContainerPort }}
               protocol: TCP
             - name: metrics
-              containerPort: 9090
+              containerPort: {{ .Values.management.metrics.port }}
               protocol: TCP
+          {{- if .Values.management.livenessProbe }}
+            {{- with .Values.management.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.management.readinessProbe }}
+            {{- with .Values.management.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           resources:
             {{- toYaml .Values.management.resources | nindent 12 }}
           volumeMounts:
@@ -203,9 +110,6 @@ spec:
       {{- end }}
       volumes:
         - name: config
-          emptyDir:
-            medium: Memory
-        - name: config-template
           configMap:
             name: {{ include "netbird.fullname" . }}-management
         - name: management
@@ -215,3 +119,5 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+{{- end -}}
+

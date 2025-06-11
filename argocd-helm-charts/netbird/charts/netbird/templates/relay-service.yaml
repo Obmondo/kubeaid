@@ -1,19 +1,24 @@
+{{- if .Values.relay.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "netbird.fullname" . }}-relay
+  namespace: {{ include "netbird.namespace" . }}
   labels:
     {{- include "netbird.relay.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.relay.service.type }}
   ports:
     - port: {{ .Values.relay.service.port }}
-      targetPort: http
+      targetPort: {{ .Values.relay.service.name }}
       protocol: TCP
-      name: http
-    - port: {{ .Values.relay.metrics.port }}
+      name: {{ .Values.relay.service.name }}
+    {{- if .Values.relay.metrics.enabled }}
+    - port: {{ .Values.relay.metrics.port}}
       targetPort: metrics
       protocol: TCP
       name: metrics
+    {{- end}}
   selector:
     {{- include "netbird.relay.selectorLabels" . | nindent 4 }}
+{{- end }}

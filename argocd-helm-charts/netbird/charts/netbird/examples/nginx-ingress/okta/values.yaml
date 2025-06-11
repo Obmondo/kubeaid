@@ -1,0 +1,258 @@
+fullnameOverride: netbird
+management:
+  configmap: |-
+    {
+      "Stuns": [
+        {
+          "Proto": "udp",
+          "URI": "{{ .STUN_SERVER }}",
+          "Username": "",
+          "Password": null
+        }
+      ],
+      "TURNConfig": {
+        "Turns": [
+          {
+            "Proto": "udp",
+            "URI": "{{ .TURN_SERVER }}",
+            "Username": "{{ .TURN_SERVER_USER }}",
+            "Password": "{{ .TURN_SERVER_PASSWORD }}"
+          }
+        ],
+        "CredentialsTTL": "12h",
+        "Secret": "secret",
+        "TimeBasedCredentials": false
+      },
+      "Relay": {
+        "Addresses": [
+          "rels://netbird.example.com:443/relay"
+        ],
+        "CredentialsTTL": "24h",
+        "Secret": "{{ .RELAY_PASSWORD }}"
+      },
+      "Signal": {
+        "Proto": "https",
+        "URI": "netbird.example.com:443",
+        "Username": "",
+        "Password": null
+      },
+      "ReverseProxy": {
+        "TrustedHTTPProxies": [],
+        "TrustedHTTPProxiesCount": 0,
+        "TrustedPeers": [
+          "0.0.0.0/0"
+        ]
+      },
+      "Datadir": "",
+      "DataStoreEncryptionKey": "{{ .DATASTORE_ENCRYPTION_KEY }}",
+      "StoreConfig": {
+        "Engine": "sqlite"
+      },
+      "HttpConfig": {
+        "Address": "0.0.0.0:33073",
+        "AuthIssuer": "https://example.okta.com",
+        "AuthAudience": "{{ .IDP_CLIENT_ID }}",
+        "AuthKeysLocation": "https://example.okta.com/oauth2/v1/keys",
+        "AuthUserIDClaim": "",
+        "IdpSignKeyRefreshEnabled": false,
+        "OIDCConfigEndpoint": "https://example.okta.com/.well-known/openid-configuration"
+      },
+      "IdpManagerConfig": {
+        "ManagerType": "okta",
+        "ClientConfig": {
+          "Issuer": "https://example.okta.com",
+          "TokenEndpoint": "https://example.okta.com/oauth2/v1/token",
+          "ClientID": "{{ .IDP_CLIENT_ID }}",
+          "ClientSecret": "",
+          "GrantType": "client_credentials"
+        },
+        "ExtraConfig": {
+          "ApiToken": "{{ .OKTA_API_TOKEN }}"
+        },
+        "Auth0ClientCredentials": null,
+        "AzureClientCredentials": null,
+        "KeycloakClientCredentials": null,
+        "ZitadelClientCredentials": null
+      },
+      "DeviceAuthorizationFlow": {
+        "Provider": "hosted",
+        "ProviderConfig": {
+          "Audience": "{{ .IDP_NATIVEAPP_CLIENT_ID }}",
+          "AuthorizationEndpoint": "",
+          "Domain": "",
+          "ClientID": "nativeclientid",
+          "ClientSecret": "",
+          "TokenEndpoint": "https://example.okta.com/oauth2/v1/token",
+          "DeviceAuthEndpoint": "https://example.okta.com/oauth2/v1/device/authorize",
+          "Scope": "openid email groups",
+          "UseIDToken": true,
+          "RedirectURLs": null
+        }
+      },
+      "PKCEAuthorizationFlow": {
+        "ProviderConfig": {
+          "Audience": "{{ .IDP_CLIENT_ID }}",
+          "ClientID": "{{ .IDP_CLIENT_ID }}",
+          "ClientSecret": "",
+          "Domain": "",
+          "AuthorizationEndpoint": "https://example.okta.com/oauth2/v1/authorize",
+          "TokenEndpoint": "https://example.okta.com/oauth2/v1/token",
+          "Scope": "openid profile email groups",
+          "RedirectURLs": [
+            "http://localhost:53000"
+          ],
+          "UseIDToken": true
+        }
+      }
+    }
+
+  envFromSecret:
+    STUN_SERVER: netbird/stunServer
+    TURN_SERVER: netbird/turnServer
+    TURN_SERVER_USER: netbird/turnServerUser
+    TURN_SERVER_PASSWORD: netbird/turnServerPassword
+    RELAY_PASSWORD: netbird/relayPassword
+    DATASTORE_ENCRYPTION_KEY: netbird/datastoreEncryptionKey
+    IDP_CLIENT_ID: netbird/idpClientID
+    OKTA_API_TOKEN: netbird/oktaApiToken
+    IDP_NATIVEAPP_CLIENT_ID: netbird/idpNativeAppClientID`
+
+  podCommand:
+    args:
+      - --port=80
+      - --log-file=console
+      - --log-level=info
+      - --disable-anonymous-metrics=false
+      - --dns-domain=netbird.selfhosted"
+
+  image:
+    tag: 0.32.0
+
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: netbird.example.com
+        paths:
+          - path: /api
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: netbird-api-tls
+        hosts:
+          - netbird.example.com
+  ingressGrpc:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    hosts:
+      - host: netbird.example.com
+        paths:
+          - path: /management.ManagementService
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: netbird-grpc-tls
+        hosts:
+          - netbird.example.com
+  persistentVolume:
+    enabled: true
+  useBackwardsGrpcService: true
+signal:
+  image:
+    tag: 0.32.0
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    hosts:
+      - host: netbird.example.com
+        paths:
+          - path: /signalexchange.SignalExchange
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: netbird-signal-tls
+        hosts:
+          - netbird.example.com
+relay:
+  resources:
+    requests:
+      cpu: 300m
+      memory: 128Mi
+    limits:
+      cpu: 1000m
+      memory: 128Mi
+  image:
+    tag: 0.32.0
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: netbird.example.com
+        paths:
+          - path: /relay
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: netbird-relay-tls
+        hosts:
+          - netbird.example.com
+
+  envFromSecret:
+    NB_AUTH_SECRET: netbird/relayPassword
+
+  env:
+    NB_LOG_LEVEL: info
+    NB_LISTEN_ADDRESS: ":33080"
+    NB_EXPOSED_ADDRESS: rels://netbird.example.com:443/relay
+
+dashboard:
+  enabled: true
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: netbird-dashboard.example.com
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: netbird-dashboard-tls
+        hosts:
+          - netbird-dashboard.example.com
+  image:
+    tag: v2.9.0
+  env:
+    # Endpoints
+    NETBIRD_MGMT_API_ENDPOINT: https://netbird.example.com:443
+    NETBIRD_MGMT_GRPC_API_ENDPOINT: https://netbird.example.com:443
+    # OIDC
+    AUTH_CLIENT_SECRET:
+    AUTH_AUTHORITY: https://example.okta.com
+    USE_AUTH0: "false"
+    AUTH_SUPPORTED_SCOPES: openid profile email groups
+    AUTH_REDIRECT_URI: /auth
+    AUTH_SILENT_REDIRECT_URI: /silent-auth
+    NETBIRD_TOKEN_SOURCE: idToken
+    # SSL
+    NGINX_SSL_PORT:
+    #Letsencrypt
+    LETSENCRYPT_DOMAIN:
+    LETSENCRYPT_EMAIL:
+
+  envFromSecret:
+    AUTH_CLIENT_ID: netbird/idpClientID
+    AUTH_AUDIENCE: netbird/idpNativeAppClientID`

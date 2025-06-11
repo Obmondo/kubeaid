@@ -1,56 +1,48 @@
-{{- if .Values.management.ingress.enabled -}}
+{{- if .Values.management.enabled -}}
+{{- if .Values.management.ingressGrpc.enabled -}}
 {{- $fullName := printf "%s-management-grpc" (include "netbird.fullname" .) -}}
-{{- $serviceName := printf "%s-management" (include "netbird.fullname" .) -}}
-{{- if and .Values.management.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
-  {{- if not (hasKey .Values.management.ingress.annotations "kubernetes.io/ingress.class") }}
-  {{- $_ := set .Values.management.ingress.annotations "kubernetes.io/ingress.class" .Values.management.ingress.className}}
-  {{- end }}
-{{- end }}
-{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+{{- $useBackwardsGrpcService := .Values.management.useBackwardsGrpcService -}}
+{{- $svcNameGrpc := printf "%s-management-grpc" (include "netbird.fullname" .) -}}
+{{- $svcPortGrpc := .Values.management.serviceGrpc.port -}}
+{{- $svcName := printf "%s-management" (include "netbird.fullname" .) -}}
+{{- $svcPort := .Values.management.service.port -}}
 apiVersion: networking.k8s.io/v1
-{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
-apiVersion: networking.k8s.io/v1beta1
-{{- else -}}
-apiVersion: extensions/v1beta1
-{{- end }}
 kind: Ingress
 metadata:
   name: {{ $fullName }}
+  namespace: {{ include "netbird.namespace" . }}
   labels:
     {{- include "netbird.management.labels" . | nindent 4 }}
-  {{- if or (.Values.annotations.grpc) (.Values.management.ingress.annotations)}}
+  {{- with .Values.management.ingressGrpc.annotations }}
   annotations:
+    {{- toYaml . | nindent 4 }}
   {{- end }}
-    {{- with .Values.annotations.grpc }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
-    {{- with .Values.management.ingress.annotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
 spec:
-  {{- if and .Values.management.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
-  ingressClassName: {{ .Values.management.ingress.className }}
-  {{- end }}
-  {{- if .Values.management.ingress.hosts.grpc.tls.secretName }}
+  ingressClassName: {{ .Values.management.ingressGrpc.className }}
+  {{- if .Values.management.ingressGrpc.tls }}
   tls:
+    {{- range .Values.management.ingressGrpc.tls }}
     - hosts:
-        - {{ .Values.management.ingress.hosts.grpc.host | quote }}
-      secretName: {{ .Values.management.ingress.hosts.grpc.tls.secretName }}
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
   {{- end }}
   rules:
-    - host: {{ .Values.management.ingress.hosts.grpc.host | quote }}
+    {{- range .Values.management.ingressGrpc.hosts }}
+    - host: {{ .host | quote }}
       http:
         paths:
-          - path: /management.ManagementService/
-            pathType: ImplementationSpecific
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
             backend:
-              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
-                name: {{ $serviceName }}
+                name: {{ if $useBackwardsGrpcService }}{{ $svcNameGrpc }}{{ else }}{{ $svcName }}{{ end }}
                 port:
-                  number: {{ .Values.management.service.port }}
-              {{- else }}
-              serviceName: {{ $serviceName }}
-              servicePort: {{ .Values.management.service.port }}
-              {{- end }}
+                  number: {{ if $useBackwardsGrpcService }}{{ $svcPortGrpc }}{{ else }}{{ $svcPort }}{{ end }}
+          {{- end }}
+    {{- end }}
+{{- end }}
 {{- end }}

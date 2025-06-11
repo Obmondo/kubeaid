@@ -31,22 +31,22 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
-Common labels for all workloads
+Common labels
 */}}
-{{- define "netbird.defaultLabels" -}}
-{{- if .Values.defaultLabels }}
-{{- range $key, $val := .Values.defaultLabels }}
-{{ $key }}: {{ $val }}
-{{- end -}}
-{{- end -}}
-{{- end -}}
+{{- define "netbird.common.labels" -}}
+helm.sh/chart: {{ include "netbird.chart" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
 
 {{/*
 Common management labels
 */}}
 {{- define "netbird.management.labels" -}}
 helm.sh/chart: {{ include "netbird.chart" . }}
-{{ include "netbird.defaultLabels" . }}
 {{ include "netbird.management.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
@@ -59,7 +59,6 @@ Common signal labels
 */}}
 {{- define "netbird.signal.labels" -}}
 helm.sh/chart: {{ include "netbird.chart" . }}
-{{ include "netbird.defaultLabels" . }}
 {{ include "netbird.signal.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
@@ -72,11 +71,19 @@ Common relay labels
 */}}
 {{- define "netbird.relay.labels" -}}
 helm.sh/chart: {{ include "netbird.chart" . }}
-{{ include "netbird.defaultLabels" . }}
 {{ include "netbird.relay.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
+Common dashboard labels
+*/}}
+{{- define "netbird.dashboard.labels" -}}
+helm.sh/chart: {{ include "netbird.chart" . }}
+{{ include "netbird.dashboard.selectorLabels" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
@@ -103,6 +110,15 @@ Relay selector labels
 app.kubernetes.io/name: {{ include "netbird.name" . }}-relay
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Dashboard selector labels
+*/}}
+{{- define "netbird.dashboard.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "netbird.name" . }}-dashboard
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
 
 {{/*
 Create the name of the management service account to use
@@ -136,3 +152,22 @@ Create the name of the relay service account to use
 {{- default "default" .Values.relay.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create the name of the dashboard service account to use
+*/}}
+{{- define "netbird.dashboard.serviceAccountName" -}}
+{{- if .Values.dashboard.serviceAccount.create }}
+{{- default (printf "%s-dashboard" (include "netbird.fullname" .)) .Values.dashboard.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.dashboard.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Allow the release namespace to be overridden
+*/}}
+{{- define "netbird.namespace" -}}
+{{- default .Release.Namespace .Values.global.namespace -}}
+{{- end -}}
+

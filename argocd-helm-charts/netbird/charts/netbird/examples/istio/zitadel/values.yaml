@@ -1,0 +1,212 @@
+fullnameOverride: netbird
+management:
+  configmap: |-
+    {
+      "Stuns": [
+        {
+          "Proto": "udp",
+          "URI": "{{ .STUN_SERVER }}",
+          "Username": "",
+          "Password": ""
+        }
+      ],
+      "TURNConfig": {
+        "TimeBasedCredentials": false,
+        "CredentialsTTL": "12h0m0s",
+        "Secret": "secret",
+        "Turns": [
+          {
+            "Proto": "udp",
+            "URI": "{{ .TURN_SERVER }}",
+            "Username": "{{ .TURN_SERVER_USER }}",
+            "Password": "{{ .TURN_SERVER_PASSWORD }}"
+          }
+        ]
+      },
+      "Relay": {
+        "Addresses": ["rels://netbird.example.com:443/relay"],
+        "CredentialsTTL": "24h",
+        "Secret": "{{ .RELAY_PASSWORD }}"
+      },
+      "Signal": {
+        "Proto": "https",
+        "URI": "netbird.example.com:443",
+        "Username": "",
+        "Password": ""
+      },
+      "Datadir": "/var/lib/netbird/",
+      "DataStoreEncryptionKey": "{{ .DATASTORE_ENCRYPTION_KEY }}",
+      "HttpConfig": {
+        "AuthIssuer": "https://zitadel.example.com",
+        "AuthAudience": "{{ .IDP_CLIENT_ID }}",
+        "OIDCConfigEndpoint": "https://zitadel.example.com/.well-known/openid-configuration",
+        "AuthKeysLocation": "https://zitadel.example.com/oauth/v2/keys",
+        "LetsEncryptDomain": "",
+        "CertFile": "",
+        "CertKey": "",
+        "AuthUserIDClaim": "",
+        "IdpSignKeyRefreshEnabled": true,
+        "ExtraAuthAudience": "{{ .IDP_PROJECT_ID }}"
+      },
+      "IdpManagerConfig": {
+        "ManagerType": "zitadel",
+        "ClientConfig": {
+          "Issuer": "https://zitadel.example.com",
+          "TokenEndpoint": "https://zitadel.example.com/oauth/v2/token",
+          "ClientID": "{{ .IDP_SERVICE_USER }}",
+          "ClientSecret": "{{ .IDP_SERVICE_USER_SECRET }}",
+          "GrantType": "client_credentials"
+        },
+        "ExtraConfig": {
+          "ManagementEndpoint": "https://zitadel.example.com/management/v1"
+        }
+      },
+      "DeviceAuthorizationFlow": {
+        "Provider": "hosted",
+        "ProviderConfig": {
+          "ClientID": "{{ .IDP_CLIENT_ID }}",
+          "ClientSecret": "",
+          "Domain": "zitadel.example.com",
+          "Audience": "{{ .IDP_CLIENT_ID }}",
+          "TokenEndidpInteractiveClientIDpoint": "https://zitadel.example.com/oauth/v2/token",
+          "DeviceAuthEndpoint": "https://zitadel.example.com/oauth/v2/device_authorization",
+          "AuthorizationEndpoint": "",
+          "Scope": "openid",
+          "UseIDToken": false,
+          "RedirectURLs": null
+        }
+      },
+      "PKCEAuthorizationFlow": {
+        "ProviderConfig": {
+          "ClientID": "{{ .IDP_CLIENT_ID }}",
+          "ClientSecret": "",
+          "Domain": "",
+          "Audience": "{{ .IDP_CLIENT_ID }}",
+          "DeviceAuthEndpoint": "",
+          "Scope": "openid profile email offline_access api groups zitadel:grants",
+          "UseIDToken": false,
+          "RedirectURLs": ["http://localhost:53000/", "http://localhost:54000/"],
+          "TokenEndpoint": "https://zitadel.example.com/oauth/v2/token",
+          "AuthorizationEndpoint": "https://zitadel.example.com/oauth/v2/authorize"
+        }
+      },
+      "StoreConfig": {
+        "Engine": "sqlite"
+      },
+      "ReverseProxy": {
+        "TrustedHTTPProxies": null,
+        "TrustedHTTPProxiesCount": 0,
+        "TrustedPeers": null
+      }
+    }
+
+  image:
+    tag: 0.32.0
+  persistentVolume:
+    enabled: true
+    size: 5Gi
+  envFromSecret:
+    STUN_SERVER: netbird/stunServer
+    TURN_SERVER: netbird/turnServer
+    TURN_SERVER_USER: netbird/turnServerUser
+    TURN_SERVER_PASSWORD: netbird/turnServerPassword
+    RELAY_PASSWORD: netbird/relayPassword
+    DATASTORE_ENCRYPTION_KEY: netbird/datastoreEncryptionKey
+    IDP_SERVICE_USER: netbird/idpServiceUser
+    IDP_SERVICE_USER_SECRET: netbird/idpServiceUserSecret
+    IDP_PROJECT_ID: netbird/idpProjectID
+    IDP_CLIENT_ID: netbird/idpClientID
+
+signal:
+  image:
+    tag: 0.32.0
+
+relay:
+  image:
+    tag: 0.32.0
+  envFromSecret:
+    NB_AUTH_SECRET: netbird/relayPassword
+  env:
+    NB_LOG_LEVEL: info
+    NB_LISTEN_ADDRESS: ":33080"
+    NB_EXPOSED_ADDRESS: rels://netbird.example.com:443/relay
+
+dashboard:
+  enabled: true
+  image:
+    tag: v2.9.0
+  env:
+    # Endpoints
+    NETBIRD_MGMT_API_ENDPOINT: https://netbird.example.com:443
+    NETBIRD_MGMT_GRPC_API_ENDPOINT: https://netbird.example.com:443
+    # OIDC
+    AUTH_AUTHORITY: https://zitadel.example.com
+    USE_AUTH0: false
+    AUTH_SUPPORTED_SCOPES: openid profile email offline_access api groups
+    AUTH_REDIRECT_URI: /nb-auth
+    AUTH_SILENT_REDIRECT_URI: /nb-silent-auth
+  envFromSecret:
+    AUTH_CLIENT_ID: netbird/idpClientID
+    AUTH_CLIENT_SECRET: netbird/idpClientSecret
+extraManifests:
+  - apiVersion: networking.istio.io/v1
+    kind: VirtualService
+    metadata:
+      name: netbird-mgmt
+    spec:
+      gateways:
+        - istio-gw/ext-gw
+      hosts:
+        - "netbird.example.com"
+      http:
+        - match:
+            - uri:
+                prefix: /api
+          route:
+            - destination:
+                host: netbird-management
+                port:
+                  number: 80
+        - match:
+            - uri:
+                prefix: /management.ManagementService
+          route:
+            - destination:
+                host: netbird-management
+                port:
+                  number: 80
+        - match:
+            - uri:
+                prefix: /relay
+          route:
+            - destination:
+                host: netbird-relay
+                port:
+                  number: 33080
+        - match:
+            - uri:
+                prefix: /signalexchange.SignalExchange
+          route:
+            - destination:
+                host: netbird-signal
+                port:
+                  number: 80
+  - apiVersion: networking.istio.io/v1
+    kind: VirtualService
+    metadata:
+      name: netbird-dashboard-mgmt-vs
+      namespace: netbird
+    spec:
+      gateways:
+        - istio-gw/ext-gw
+      hosts:
+        - "netbird-dashboard.example.com"
+      http:
+        - match:
+            - uri:
+                prefix: /
+          route:
+            - destination:
+                host: netbird-dashboard
+                port:
+                  number: 80

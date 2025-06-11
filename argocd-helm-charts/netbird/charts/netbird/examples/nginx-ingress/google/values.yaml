@@ -1,0 +1,254 @@
+fullnameOverride: netbird
+management:
+  configmap: |-
+    {
+      "Stuns": [
+        {
+          "Proto": "udp",
+          "URI": "{{ .STUN_SERVER }}",
+          "Username": "",
+          "Password": null
+        }
+      ],
+      "Relay": {
+        "Addresses": ["rels://netbird.example.com:443/relay"],
+        "CredentialsTTL": "24h",
+        "Secret": "{{ .RELAY_PASSWORD }}"
+      },
+      "TURNConfig": {
+        "Turns": [
+          {
+            "Proto": "udp",
+            "URI": "{{ .TURN_SERVER }}",
+            "Username": "{{ .TURN_SERVER_USER }}",
+            "Password": "{{ .TURN_SERVER_PASSWORD }}"
+          }
+        ],
+        "CredentialsTTL": "12h",
+        "Secret": "secret",
+        "TimeBasedCredentials": false
+      },
+      "Signal": {
+        "Proto": "https",
+        "URI": "netbird.example.com:443",
+        "Username": "",
+        "Password": null
+      },
+      "ReverseProxy": {
+        "TrustedHTTPProxies": [],
+        "TrustedHTTPProxiesCount": 0,
+        "TrustedPeers": ["0.0.0.0/0"]
+      },
+      "Datadir": "/var/lib/netbird/",
+      "DataStoreEncryptionKey": "{{ .DATASTORE_ENCRYPTION_KEY }}",
+      "StoreConfig": {
+        "Engine": "sqlite"
+      },
+      "HttpConfig": {
+        "Address": "0.0.0.0:33073",
+        "AuthIssuer": "https://accounts.google.com",
+        "AuthAudience": "{{ .IDP_CLIENT_ID }}",
+        "AuthKeysLocation": "https://www.googleapis.com/oauth2/v3/certs",
+        "AuthUserIDClaim": "",
+        "CertFile": "",
+        "CertKey": "",
+        "IdpSignKeyRefreshEnabled": true,
+        "OIDCConfigEndpoint": "https://accounts.google.com/.well-known/openid-configuration"
+      },
+      "IdpManagerConfig": {
+        "ManagerType": "google",
+        "ClientConfig": {
+          "Issuer": "https://accounts.google.com",
+          "TokenEndpoint": "https://oauth2.googleapis.com/token",
+          "ClientID": "",
+          "ClientSecret": "",
+          "GrantType": "client_credentials"
+        },
+        "ExtraConfig": {
+          "CustomerId": "{{ .CUSTOMER_ID }}",
+          "ServiceAccountKey": "{{ .SERVICE_ACCOUNT_KEY }}"
+        },
+        "Auth0ClientCredentials": null,
+        "AzureClientCredentials": null,
+        "KeycloakClientCredentials": null,
+        "ZitadelClientCredentials": null
+      },
+      "DeviceAuthorizationFlow": {
+        "Provider": "hosted",
+        "ProviderConfig": {
+          "Audience": "{{ .IDP_CLIENT_ID }}",
+          "AuthorizationEndpoint": "",
+          "Domain": "",
+          "ClientID": "",
+          "ClientSecret": "",
+          "TokenEndpoint":  "https://oauth2.googleapis.com/token",
+          "DeviceAuthEndpoint": "https://oauth2.googleapis.com/device/code",
+          "Scope": "openid",
+          "UseIDToken": true,
+          "RedirectURLs": null
+        }
+      },
+      "PKCEAuthorizationFlow": {
+        "ProviderConfig": {
+          "Audience": "{{ .IDP_CLIENT_ID }}",
+          "ClientID": "{{ .IDP_CLIENT_ID }}",
+          "ClientSecret": "{{ .IDP_CLIENT_SECRET }}",
+          "Domain": "",
+          "AuthorizationEndpoint": "https://accounts.google.com/o/oauth2/v2/auth",
+          "TokenEndpoint": "https://oauth2.googleapis.com/token",
+          "Scope": "openid profile email",
+          "RedirectURLs": ["http://localhost:53000"],
+          "UseIDToken": true
+        }
+      }
+    }
+
+
+  envFromSecret:
+    STUN_SERVER: netbird/stunServer
+    TURN_SERVER: netbird/turnServer
+    TURN_SERVER_USER: netbird/turnServerUser
+    TURN_SERVER_PASSWORD: netbird/turnServerPassword
+    RELAY_PASSWORD: netbird/relayPassword
+    IDP_CLIENT_ID: netbird/idpClientID
+    IDP_CLIENT_SECRET: netbird/idpClientSecret
+    DATASTORE_ENCRYPTION_KEY: netbird/datastoreEncryptionKey
+    SERVICE_ACCOUNT_KEY: netbird-gcp-service-account/sa.json
+    CUSTOMER_ID: netbird/customerID
+
+  podCommand:
+    args:
+      - --port=80
+      - --log-file=console
+      - --log-level=error
+      - --disable-anonymous-metrics=false
+      - --dns-domain=netbird.selfhosted"
+
+  image:
+    tag: 0.36.5
+
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: netbird.example.com
+        paths:
+          - path: /api
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: netbird-api-tls
+        hosts:
+          - netbird.example.com
+  ingressGrpc:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    hosts:
+      - host: netbird.example.com
+        paths:
+          - path: /management.ManagementService
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: netbird-grpc-tls
+        hosts:
+          - netbird.example.com
+  persistentVolume:
+    enabled: true
+  useBackwardsGrpcService: true
+signal:
+  image:
+    tag: 0.36.5
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    hosts:
+      - host: netbird.example.com
+        paths:
+          - path: /signalexchange.SignalExchange
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: netbird-signal-tls
+        hosts:
+          - netbird.example.com
+relay:
+  resources:
+    requests:
+      cpu: 300m
+      memory: 128Mi
+    limits:
+      cpu: 1000m
+      memory: 256Mi
+  image:
+    tag: 0.36.5
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: netbird.example.com
+        paths:
+          - path: /relay
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: netbird-relay-tls
+        hosts:
+          - netbird.example.com
+
+  envFromSecret:
+    NB_AUTH_SECRET: netbird/relayPassword
+
+  env:
+    NB_LOG_LEVEL: info
+    NB_LISTEN_ADDRESS: ":33080"
+    NB_EXPOSED_ADDRESS: rels://netbird.example.com:443/relay
+
+dashboard:
+  enabled: true
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: netbird-dashboard.example.com
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: netbird-dashboard-tls
+        hosts:
+          - netbird-dashboard.example.com
+  image:
+    tag: v2.9.0
+  env:
+    # Endpoints
+    NETBIRD_MGMT_API_ENDPOINT: https://netbird.example.com:443
+    NETBIRD_MGMT_GRPC_API_ENDPOINT: https://netbird.example.com:443
+    # OIDC
+    AUTH_AUTHORITY: https://accounts.google.com
+    USE_AUTH0: "false"
+    AUTH_SUPPORTED_SCOPES: "openid profile email"
+    AUTH_REDIRECT_URI: /auth
+    AUTH_SILENT_REDIRECT_URI: /silent-auth
+    NETBIRD_TOKEN_SOURCE: idToken
+    NGINX_SSL_PORT: "443"
+    LETSENCRYPT_DOMAIN:
+    LETSENCRYPT_EMAIL:
+  envFromSecret:
+    AUTH_AUDIENCE: netbird/idpClientID
+    AUTH_CLIENT_ID: netbird/idpClientID
+    AUTH_CLIENT_SECRET: netbird/idpClientSecret

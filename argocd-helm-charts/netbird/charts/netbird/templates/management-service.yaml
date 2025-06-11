@@ -1,19 +1,24 @@
+{{- if .Values.management.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "netbird.fullname" . }}-management
+  namespace: {{ include "netbird.namespace" . }}
   labels:
     {{- include "netbird.management.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.management.service.type }}
   ports:
     - port: {{ .Values.management.service.port }}
-      targetPort: http
+      targetPort: {{ .Values.management.service.name }}
       protocol: TCP
-      name: http
+      name: {{ .Values.management.service.name }}
+    {{- if .Values.management.metrics.enabled }}
     - port: {{ .Values.management.metrics.port }}
       targetPort: metrics
       protocol: TCP
       name: metrics
+    {{- end }}
   selector:
     {{- include "netbird.management.selectorLabels" . | nindent 4 }}
+{{- end }}
