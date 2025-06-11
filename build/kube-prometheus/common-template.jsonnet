@@ -245,7 +245,7 @@ local mixins = remove_nulls([
   ),
   addMixin(
     'rabbitmq',
-    (import 'github.com/adinhodovic/rabbitmq-mixin/mixin.libsonnet'),
+    (import 'github.com/grafana/jsonnet-libs/rabbitmq-mixin/mixin.libsonnet'),
     vars,
   ),
   addMixin(
