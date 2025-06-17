@@ -1,15 +1,13 @@
 annotations:
-  artifacthub.io/changes: "- \"fix(notes): update condition to display certificate
-    persistence warning\"\n- \"fix(Traefik Proxy): supported `ingressRoute.*.annotations`
-    breaks templating\"\n- \"fix(Traefik Proxy)!: strict opt-in on data collection\"\n-
-    \"feat(deps): update traefik docker tag to v3.4.1\"\n- \"feat(Traefik Hub): add
-    offline flag\"\n- \"chore(schema): \U0001F527 update following latest upstream
-    release\"\n- \"chore(release): \U0001F680 publish v36.0.0\"\n"
+  artifacthub.io/changes: "- \"fix(schema): \U0001F41B allow additional properties
+    on `global`\"\n- \"fix(chart): update icon link to track upstream master branch\"\n-
+    \"fix(Traefik Hub): add strict check on admission cert\"\n- \"feat(Traefik Hub):
+    add v3.17 version mapping\"\n- \"chore(release): \U0001F680 publish v36.1.0\"\n"
 apiVersion: v2
 appVersion: v3.4.1
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
-icon: https://raw.githubusercontent.com/traefik/traefik/v2.3/docs/content/assets/img/traefik.logo.png
+icon: https://raw.githubusercontent.com/traefik/traefik/master/docs/content/assets/img/traefik.logo.png
 keywords:
 - traefik
 - ingress
@@ -26,4 +24,4 @@ sources:
 - https://github.com/traefik/traefik-helm-chart
 - https://github.com/traefik/traefik
 type: application
-version: 36.0.0
+version: 36.1.0

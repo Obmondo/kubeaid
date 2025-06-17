@@ -2,6 +2,26 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 14.1.0
+### Minor Version Upgrades
+- Updated traefik from version 36.0.0 to 36.1.0
+- Updated gitea from version 12.0.0 to 12.1.0
+- Updated argo-cd from version 8.0.17 to 8.1.0
+
+### Patch Version Upgrades
+- Updated velero from version 10.0.4 to 10.0.5
+- Added rook-ceph from version v1.17.2 to v1.17.2
+- Updated rabbitmq-cluster-operator from version 4.4.21 to 4.4.22
+- Added opentelemetry-operator from version 0.84.1 to 0.84.1
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated openobserve from version 0.14.75 to 0.14.78
+- Updated metallb from version 6.4.16 to 6.4.18
+- Updated mattermost-team-edition from version 6.6.78 to 6.6.79
+- Updated gitlab-runner from version 0.77.2 to 0.77.3
+- Updated external-dns from version 8.8.4 to 8.8.6
+- Updated erpnext from version 7.0.204 to 7.0.205
+- Updated workload-identity-webhook from version 1.5.0 to 1.5.1
+
 ### Improvements
 - [`2a48ca74`](../../commit/2a48ca74) fix: added chart.yaml for netbird, after migrating to official helm chart
 - [`af00f780`](../../commit/af00f780) chore: migrated netbird to official helm chart

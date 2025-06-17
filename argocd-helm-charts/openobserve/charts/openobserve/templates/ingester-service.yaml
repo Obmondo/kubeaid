@@ -7,14 +7,18 @@ metadata:
     {{- include "openobserve.labels" . | nindent 4 }}
     prometheus.io/scrape: "true"
     role: ingester
+  {{- with .Values.serviceIngester.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
-  # type: {{ .Values.service.type }}
+  type: {{ .Values.serviceIngester.type }}
   ports:
-    - port: {{ .Values.service.http_port }}
+    - port: {{ .Values.serviceIngester.http_port }}
       targetPort: http
       protocol: TCP
       name: http
-    - port: {{ .Values.service.grpc_port }}
+    - port: {{ .Values.serviceIngester.grpc_port }}
       targetPort: grpc
       protocol: TCP
       name: grpc

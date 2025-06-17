@@ -3,5 +3,5 @@ name: mattermost-team-edition
 version: 6.6.6
 dependencies:
   - name: mattermost-team-edition
-    version: 6.6.78
+    version: 6.6.79
     repository: https://helm.mattermost.com

@@ -457,8 +457,8 @@ config:
   ZO_ALLOW_USER_DEFINED_SCHEMAS: "true"
   ZO_MEM_TABLE_STREAMS: "" # Streams for which dedicated MemTable will be used as comma separated values
   ZO_DEFAULT_SCRAPE_INTERVAL: "15"
-  ZO_CIRCUIT_BREAKER_ENABLED: "false"
-  ZO_CIRCUIT_BREAKER_RATIO: "100"
+  ZO_MEMORY_CIRCUIT_BREAKER_ENABLED: "false"
+  ZO_MEMORY_CIRCUIT_BREAKER_RATIO: "90"
   ZO_MMDB_DISABLE_DOWNLOAD: "false"
   ZO_MMDB_UPDATE_DURATION_DAYS: "30" # 30 days
   ZO_MMDB_GEOLITE_CITYDB_URL: "https://geoip.zinclabs.dev/GeoLite2-City.mmdb"
@@ -487,7 +487,6 @@ config:
   RUST_BACKTRACE: "0"
   ZO_PROMETHEUS_ENABLED: "false"
   ZO_HISTOGRAM_ENABLED: "true" # show/hode histogram on logs page by default
-  ZO_STREAMING_ENABLED: "true" # enable streaming for logs page
 
 # Add extra environment variables to all pods, useful for overriding secrets
 extraEnv: []
@@ -497,7 +496,19 @@ extraEnv: []
 #       name: s3credentials-secret
 #       key: S3_KEY
 
+# This is for router
 service:
+  type: ClusterIP
+  # type: LoadBalancer
+  http_port: 5080
+  grpc_port: 5081
+  report_server_port: 5082
+  # if the type of service is LoadBalancer, you can config available annotations for Kubernetes load balancers by cloud provider.
+  # annotations:
+  #  service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+  #  service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+
+serviceIngester:
   type: ClusterIP
   # type: LoadBalancer
   http_port: 5080

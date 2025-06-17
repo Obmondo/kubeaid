@@ -361,16 +361,18 @@ https
   {{- if not .Values.gitea.config.server.SSH_PORT -}}
     {{- $_ := set .Values.gitea.config.server "SSH_PORT" .Values.service.ssh.port -}}
   {{- end -}}
-  {{- if not (hasKey .Values.gitea.config.server "SSH_LISTEN_PORT") -}}
-    {{- if not .Values.image.rootless -}}
-      {{- $_ := set .Values.gitea.config.server "SSH_LISTEN_PORT" .Values.gitea.config.server.SSH_PORT -}}
-    {{- else -}}
-      {{- $_ := set .Values.gitea.config.server "SSH_LISTEN_PORT" "2222" -}}
-    {{- end -}}
-  {{- end -}}
   {{- if not (hasKey .Values.gitea.config.server "START_SSH_SERVER") -}}
     {{- if .Values.image.rootless -}}
       {{- $_ := set .Values.gitea.config.server "START_SSH_SERVER" "true" -}}
+      {{- if not (hasKey .Values.gitea.config.server "SSH_LISTEN_PORT") -}}
+        {{- if not .Values.gitea.config.server.SSH_LISTEN_PORT -}}
+          {{- $_ := set .Values.gitea.config.server "SSH_LISTEN_PORT" .Values.gitea.config.server.SSH_PORT -}}
+        {{- else -}}
+          {{- $_ := set .Values.gitea.config.server "SSH_LISTEN_PORT" .Values.gitea.config.server.SSH_LISTEN_PORT -}}
+        {{- end -}}
+      {{- end -}}
+    {{- else -}}
+      {{- $_ := set .Values.gitea.config.server "START_SSH_SERVER" "false" -}}
     {{- end -}}
   {{- end -}}
   {{- if not (hasKey .Values.gitea.config.server "APP_DATA_PATH") -}}

@@ -1,22 +1,44 @@
+annotations:
+  artifacthub.io/changes: |
+    - kind: changed
+      description: remove comment
+    - kind: added
+      description: add Artifacthub annotation 'artifacthub.io/changes' (#881)
+    - kind: changed
+      description: bump helm version for tests
+    - kind: fixed
+      description: correct replicaCount comparison (#884)
+    - kind: changed
+      description: update subcharts (minor & patch) (#885)
+    - kind: changed
+      description: update dependency go-gitea/gitea to v1.24.0 (#886)
+    - kind: changed
+      description: 'update subcharts (minor & patch) (#879) Co-authored-by: Renovate Bot <renovate-bot@gitea.com> Co-committed-by: Renovate Bot <renovate-bot@gitea.com>'
+    - kind: changed
+      description: 'update unittests/bash/bats digest to 5ec2d81 (#878) Co-authored-by: Renovate Bot <renovate-bot@gitea.com> Co-committed-by: Renovate Bot <renovate-bot@gitea.com>'
+    - kind: changed
+      description: 'update subcharts (minor & patch) (#874) Co-authored-by: Renovate Bot <renovate-bot@gitea.com> Co-committed-by: Renovate Bot <renovate-bot@gitea.com>'
+    - kind: changed
+      description: fully re-enable release-workflow
 apiVersion: v2
-appVersion: 1.23.8
+appVersion: 1.24.0
 dependencies:
 - condition: postgresql.enabled
   name: postgresql
   repository: oci://registry-1.docker.io/bitnamicharts
-  version: 16.7.2
+  version: 16.7.11
 - condition: postgresql-ha.enabled
   name: postgresql-ha
   repository: oci://registry-1.docker.io/bitnamicharts
-  version: 16.0.3
+  version: 16.0.14
 - condition: valkey-cluster.enabled
   name: valkey-cluster
   repository: oci://registry-1.docker.io/bitnamicharts
-  version: 3.0.5
+  version: 3.0.14
 - condition: valkey.enabled
   name: valkey
   repository: oci://registry-1.docker.io/bitnamicharts
-  version: 3.0.4
+  version: 3.0.13
 description: Gitea Helm chart for Kubernetes
 icon: https://gitea.com/assets/img/logo.svg
 keywords:
@@ -45,4 +67,4 @@ sources:
 - https://github.com/go-gitea/gitea
 - https://docker.gitea.com/gitea
 type: application
-version: 12.0.0
+version: 12.1.0

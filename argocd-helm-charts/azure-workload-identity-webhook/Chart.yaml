@@ -3,5 +3,5 @@ name: azure-workload-identity-webhook
 version: 1.0.0
 dependencies:
   - name: workload-identity-webhook
-    version: 1.5.0
+    version: 1.5.1
     repository: https://azure.github.io/azure-workload-identity/charts
