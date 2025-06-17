@@ -2,6 +2,11 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`2a48ca74`](../../commit/2a48ca74) fix: added chart.yaml for netbird, after migrating to official helm chart
+- [`af00f780`](../../commit/af00f780) chore: migrated netbird to official helm chart
+- [`f385dadf`](../../commit/f385dadf) fix: kube-prom, the rabbitmq-mixin lib from the correct upstream
+
 ## 14.0.0
 ### Major Version Upgrades
 - Updated traefik from version 35.4.0 to 36.0.0
