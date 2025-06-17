@@ -2,37 +2,31 @@ mode: hybrid
 
 cloudCredentialsSecretName: cloud-credentials
 
-zone: eu-central
-location: hel1
+hcloud:
+  zone: eu-central
+  imageName: ubuntu-24.04
+  sshHKeyPairName: kubeaid
 
-hcloudSSHKeyPairName: kubeaid-demo
-rescueSSHKeyPairSecretName: rescue-ssh-keypair
-
-network:
-  enabled: true
-
-imageName: ubuntu-24.04
-
-installImage:
-  controlPlane:
+bareMetal:
+  wipeDisks: false
+  installImage:
     imagePath: /root/.oldroot/nfs/images/Ubuntu-2404-noble-amd64-base.tar.gz
-    rootPartitionSize: all
-    swRaid: 1
-  worker:
-    imagePath: /root/.oldroot/nfs/images/Ubuntu-2404-noble-amd64-base.tar.gz
-    rootPartitionSize: all
-    swRaid: 1
+  sshKeyPair:
+    name: kubeaid
+    secretName: hetzner-ssh-keypair
 
 controlPlane:
-  machineType: cax11
-  replicas: 3
   regions:
     - fsn1
     - nbg1
     - hel1
-  loadBalancer:
-    enabled: true
-    region: hel1
+
+  hcloud:
+    machineType: cax11
+    replicas: 3
+    loadBalancer:
+      enabled: true
+      region: hel1
 
 nodeGroups:
   bareMetal: []

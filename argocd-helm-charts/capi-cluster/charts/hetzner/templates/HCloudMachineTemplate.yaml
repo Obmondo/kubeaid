@@ -7,9 +7,9 @@ metadata:
 spec:
   template:
     spec:
-      imageName: {{ .Values.imageName }}
+      imageName: {{ .Values.hcloud.imageName }}
       placementGroupName: control-plane
-      type: {{ .Values.controlPlane.machineType }}
+      type: {{ .Values.controlPlane.hcloud.machineType }}
 {{- end }}
 
 {{/* Handling node-groups in HCloud. */}}
@@ -23,7 +23,7 @@ metadata:
 spec:
   template:
     spec:
-      imageName: {{ $.Values.imageName }}
+      imageName: {{ $.Values.hcloud.imageName }}
       placementGroupName: {{ $nodeGroup.name }}
       type: {{ $nodeGroup.machineType }}
 {{- end }}

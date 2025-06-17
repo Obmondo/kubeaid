@@ -147,6 +147,14 @@ spec:
       - echo 'source <(kubectl completion bash)' >>/root/.bashrc
       - echo 'export KUBECONFIG=/etc/kubernetes/admin.conf' >>/root/.bashrc
       - apt-get -y autoremove && apt-get -y clean all
+      {{- if (gt (len $.Values.global.additionalUsers) 0) }}
+      users:
+        {{- range $index, $additionalUser := $.Values.global.additionalUsers }}
+        - name: {{ $additionalUser.name }}
+          sshAuthorizedKeys:
+            - {{ $additionalUser.sshPublicKey }}
+        {{- end }}
+      {{- end }}
 {{- end }}
 {{- end }}
 
@@ -299,5 +307,13 @@ spec:
       - echo 'source <(kubectl completion bash)' >>/root/.bashrc
       - echo 'export KUBECONFIG=/etc/kubernetes/admin.conf' >>/root/.bashrc
       - apt-get -y autoremove && apt-get -y clean all
+      {{- if (gt (len $.Values.global.additionalUsers) 0) }}
+      users:
+        {{- range $index, $additionalUser := $.Values.global.additionalUsers }}
+        - name: {{ $additionalUser.name }}
+          sshAuthorizedKeys:
+            - {{ $additionalUser.sshPublicKey }}
+        {{- end }}
+      {{- end }}
 {{- end }}
 {{- end }}

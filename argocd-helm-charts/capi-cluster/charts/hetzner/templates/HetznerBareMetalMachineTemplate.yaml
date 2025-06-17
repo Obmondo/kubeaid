@@ -3,12 +3,19 @@ apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: HetznerBareMetalMachineTemplate
 metadata:
   name: {{ .Values.global.clusterName }}-control-plane
+  annotations:
+    # Use fixed node names for bare metal servers, since there are storage integrations that allow
+    # you to use the storage of the bare metal servers and that work with fixed node names.
+    capi.syself.com/constant-bare-metal-hostname: "true"
 spec:
   template:
     spec:
+      hostSelector:
+        matchLabels:
+          role: {{ $.Values.global.clusterName }}-control-plane
       installImage:
         image:
-          path: {{ .Values.installImage.controlPlane.imagePath }}
+          path: {{ .Values.bareMetal.installImage.imagePath }}
         partitions:
           - fileSystem: esp
             mount: /boot/efi
@@ -16,16 +23,42 @@ spec:
           - fileSystem: ext4
             mount: /boot
             size: 1024M
-          - fileSystem: ext4
+          # Logical Volume Group.
+          - fileSystem: vg0
+            mount: lvm
+            size: 100G
+        logicalVolumeDefinitions:
+          - vg: vg0
+            name: root
             mount: /
-            size: {{ .Values.installImage.controlPlane.rootPartitionSize }}
+            filesystem: ext4
+            size: 30G
         postInstallScript: |
           #!/bin/bash
+          {{- if (.Values.controlPlane.endpoint).host }}
+          wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          chmod a+x /usr/local/bin/yq
+          touch /etc/netplan/60-floating-ip.yaml && chmod 600 /etc/netplan/60-floating-ip.yaml
+          interface_name=$(/usr/local/bin/yq '.network.ethernets.[] | key' /etc/netplan/01-netcfg.yaml)
+          cat << EOT > /etc/netplan/60-floating-ip.yaml
+          # Floating IP from Hetzner
+          network:
+            version: 2
+            renderer: networkd
+            ethernets:
+              $interface_name:
+                addresses:
+                  - {{ (.Values.controlPlane.endpoint).host }}/32
+          EOT
+          {{- end }}
           mkdir -p /etc/cloud/cloud.cfg.d && touch /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
           echo "network: { config: disabled }" > /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
           apt-get update && apt-get install -y cloud-init apparmor apparmor-utils
           cloud-init clean --logs
-        swraid: {{ .Values.installImage.controlPlane.swRaid }}
+        {{- if (default true (.Values.controlPlane.bareMetal.raid).enabled) }}
+        swraid: 1
+        swraidLevel: {{ (.Values.controlPlane.bareMetal.raid).level | default 1 }}
+        {{- end }}
       sshSpec:
         portAfterCloudInit: 22
         portAfterInstallImage: 22
@@ -34,7 +67,7 @@ spec:
             name: sshkey-name
             privateKey: ssh-privatekey
             publicKey: ssh-publickey
-          name: {{ $.Values.rescueSSHKeyPairSecretName }}
+          name: {{ $.Values.bareMetal.sshKeyPair.secretName }}
 {{- end }}
 
 {{- if or (eq .Values.mode "bare-metal") (eq .Values.mode "hybrid") }}
@@ -44,29 +77,62 @@ apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
 kind: HetznerBareMetalMachineTemplate
 metadata:
   name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
+  annotations:
+    # Use fixed node names for bare metal servers, since there are storage integrations that allow
+    # you to use the storage of the bare metal servers and that work with fixed node names.
+    capi.syself.com/constant-bare-metal-hostname: "true"
 spec:
   template:
     spec:
+      hostSelector:
+        matchLabels:
+          role: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
       installImage:
         image:
-          path: {{ $.Values.installImage.worker.imagePath }}
+          path: {{ $.Values.bareMetal.installImage.imagePath }}
         partitions:
-        - fileSystem: esp
-          mount: /boot/efi
-          size: 512M
-        - fileSystem: ext4
-          mount: /boot
-          size: 1024M
-        - fileSystem: ext4
-          mount: /
-          size: {{ $.Values.installImage.worker.rootPartitionSize }}
+          - fileSystem: esp
+            mount: /boot/efi
+            size: 512M
+          - fileSystem: ext4
+            mount: /boot
+            size: 1024M
+          # Logical Volume Group.
+          - fileSystem: vg0
+            mount: lvm
+            size: 100G
+        logicalVolumeDefinitions:
+          - vg: vg0
+            name: root
+            mount: /
+            filesystem: ext4
+            size: 30G
         postInstallScript: |
           #!/bin/bash
+          {{- if (.Values.controlPlane.endpoint).host }}
+          wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          chmod a+x /usr/local/bin/yq
+          touch /etc/netplan/60-floating-ip.yaml && chmod 600 /etc/netplan/60-floating-ip.yaml
+          interface_name=$(/usr/local/bin/yq '.network.ethernets.[] | key' /etc/netplan/01-netcfg.yaml)
+          cat << EOT > /etc/netplan/60-floating-ip.yaml
+          # Floating IP from Hetzner
+          network:
+            version: 2
+            renderer: networkd
+            ethernets:
+              $interface_name:
+                addresses:
+                  - {{ (.Values.controlPlane.endpoint).host }}/32
+          EOT
+          {{- end }}
           mkdir -p /etc/cloud/cloud.cfg.d && touch /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
           echo "network: { config: disabled }" > /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
           apt-get update && apt-get install -y cloud-init apparmor apparmor-utils
           cloud-init clean --logs
-        swraid: {{ $.Values.installImage.worker.swRaid }}
+        {{- if (default true ($nodeGroup.raid).enabled) }}
+        swraid: 1
+        swraidLevel: {{ ($nodeGroup.raid).level | default 1 }}
+        {{- end }}
       sshSpec:
         portAfterCloudInit: 22
         portAfterInstallImage: 22
@@ -75,6 +141,6 @@ spec:
             name: sshkey-name
             privateKey: ssh-privatekey
             publicKey: ssh-publickey
-          name: {{ $.Values.rescueSSHKeyPairSecretName }}
+          name: {{ $.Values.bareMetal.sshKeyPair.secretName }}
 {{- end }}
 {{- end }}

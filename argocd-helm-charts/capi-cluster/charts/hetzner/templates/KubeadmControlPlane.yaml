@@ -200,6 +200,14 @@ spec:
           resolv-conf: /etc/kubernetes/resolv.conf
           rotate-server-certificates: "true"
           tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256
+    {{- if (gt (len $.Values.global.additionalUsers) 0) }}
+    users:
+      {{- range $index, $additionalUser := $.Values.global.additionalUsers }}
+      - name: {{ $additionalUser.name }}
+        sshAuthorizedKeys:
+          - {{ $additionalUser.sshPublicKey }}
+      {{- end }}
+    {{- end }}
     preKubeadmCommands:
       - set -x
       - export CONTAINERD=1.7.26
@@ -249,9 +257,6 @@ spec:
       # Clone KubeAid.
       - git clone https://github.com/Obmondo/kubeaid.git
 
-      # Checkout to latest tag
-      - git checkout $(git describe --tags `git rev-list --tags --max-count=1`)
-
       # Copy kubeconfig to ~/.kube/config
       - mkdir -p $HOME/.kube
       - sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
@@ -259,30 +264,39 @@ spec:
 
       # Install Cilium.
       - kubectl create namespace cilium
-      - helm template cilium kubeaid/argocd-helm-charts/cilium \
+      - API_SERVER_URL=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+      - API_SERVER_HOST=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $4}')
+      - API_SERVER_PORT=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $5}')
+      - |
+        helm template kubeaid/argocd-helm-charts/cilium \
           --values kubeaid/argocd-helm-charts/cilium/values.yaml \
+          --set cilium.kubeProxyReplacement=true \
+          --set cilium.k8sServiceHost=${API_SERVER_HOST} \
+          --set cilium.k8sServicePort=${API_SERVER_PORT} \
           --namespace cilium | kubectl apply -f -
 
       # Install Hetzner Cloud Controller Manager.
       {{- if or (eq .Values.mode "hcloud") (eq .Values.mode "hybrid") }}
-      - helm template ccm-hcloud kubeaid/argocd-helm-charts/ccm-hcloud \
+      - |
+        helm template ccm-hcloud kubeaid/argocd-helm-charts/ccm-hcloud \
           --values kubeaid/argocd-helm-charts/ccm-hcloud/values.yaml \
           --namespace kube-system | kubectl apply -f -
       {{- end }}
 
 
       {{- if or (eq .Values.mode "bare-metal") (eq .Values.mode "hybrid") }}
-      - helm template ccm-hetzner kubeaid/argocd-helm-charts/ccm-hetzner \
+      - |
+        helm template ccm-hetzner kubeaid/argocd-helm-charts/ccm-hetzner \
           --values kubeaid/argocd-helm-charts/ccm-hetzner/values.yaml \
           --namespace kube-system | kubectl apply -f -
       {{- end }}
 
-      {{- if and (eq .Values.mode "bare-metal") (gt (len $.Values.controlPlane.bareMetalHosts) 1) }}
-      # Install Hetzner Failover Script
+      {{- if and (eq .Values.mode "bare-metal") (.Values.controlPlane.bareMetal.endpoint.isFailoverIP) }}
+      # Install Hetzner Failover Script.
       - |
         helm template hetzner-robot kubeaid/argocd-helm-charts/hetzner-robot \
           --values kubeaid/argocd-helm-charts/hetzner-robot/values.yaml \
-          --set failoverIP={{ .Values.controlPlane.endpoint.host }} \
+          --set failoverIP={{ .Values.controlPlane.bareMetal.endpoint.host }} \
           --namespace kube-system | kubectl apply -f -
       {{- end }}
     {{- if and ($.Values.global.additionalUsers) (gt (len $.Values.global.additionalUsers) 0) }}
@@ -299,13 +313,13 @@ spec:
       apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
       kind: HetznerBareMetalMachineTemplate
       name: {{ .Values.global.clusterName }}-control-plane
-  replicas: {{ len .Values.controlPlane.bareMetalHosts }}
+  replicas: {{ len .Values.controlPlane.bareMetal.bareMetalHosts }}
   {{- else }}
   machineTemplate:
     infrastructureRef:
       apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
       kind: HCloudMachineTemplate
       name: {{ .Values.global.clusterName }}-control-plane
-  replicas: {{ .Values.controlPlane.replicas }}
+  replicas: {{ .Values.controlPlane.hcloud.replicas }}
   {{- end }}
   version: {{ .Values.global.kubernetes.version }}
