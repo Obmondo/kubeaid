@@ -35,7 +35,7 @@ spec:
             size: 30G
         postInstallScript: |
           #!/bin/bash
-          {{- if (.Values.controlPlane.endpoint).host }}
+          {{- if (.Values.controlPlane.bareMetal.endpoint).host }}
           wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
           chmod a+x /usr/local/bin/yq
           touch /etc/netplan/60-floating-ip.yaml && chmod 600 /etc/netplan/60-floating-ip.yaml
@@ -48,7 +48,7 @@ spec:
             ethernets:
               $interface_name:
                 addresses:
-                  - {{ (.Values.controlPlane.endpoint).host }}/32
+                  - {{ (.Values.controlPlane.bareMetal.endpoint).host }}/32
           EOT
           {{- end }}
           mkdir -p /etc/cloud/cloud.cfg.d && touch /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
@@ -109,7 +109,7 @@ spec:
             size: 30G
         postInstallScript: |
           #!/bin/bash
-          {{- if (.Values.controlPlane.endpoint).host }}
+          {{- if (.Values.controlPlane.bareMetal.endpoint).host }}
           wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
           chmod a+x /usr/local/bin/yq
           touch /etc/netplan/60-floating-ip.yaml && chmod 600 /etc/netplan/60-floating-ip.yaml
@@ -122,7 +122,7 @@ spec:
             ethernets:
               $interface_name:
                 addresses:
-                  - {{ (.Values.controlPlane.endpoint).host }}/32
+                  - {{ (.Values.controlPlane.bareMetal.endpoint).host }}/32
           EOT
           {{- end }}
           mkdir -p /etc/cloud/cloud.cfg.d && touch /etc/cloud/cloud.cfg.d/99-custom-networking.cfg
