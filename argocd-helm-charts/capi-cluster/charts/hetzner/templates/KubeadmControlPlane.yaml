@@ -297,7 +297,7 @@ spec:
         helm template hetzner-robot kubeaid/argocd-helm-charts/hetzner-robot \
           --values kubeaid/argocd-helm-charts/hetzner-robot/values.yaml \
           --set failoverIP={{ .Values.controlPlane.bareMetal.endpoint.host }} \
-          --namespace kube-system | kubectl apply -f -
+          --namespace kube-system | kubectl apply --namespace kube-system -f -
       {{- end }}
     {{- if and ($.Values.global.additionalUsers) (gt (len $.Values.global.additionalUsers) 0) }}
     users:
