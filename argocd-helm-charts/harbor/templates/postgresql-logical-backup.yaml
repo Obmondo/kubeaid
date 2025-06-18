@@ -57,8 +57,6 @@ spec:
                   value: {{ (.Values.postgres.logicalbackup).s3bucketscopesuffix | default "logicalbackup" }}
 
               {{- else if eq .Values.postgres.logicalbackup.provider "s3" }}
-                - name: LOGICAL_BACKUP_PROVIDER
-                  value: "s3"
                 - name: AWS_ACCESS_KEY_ID
                   valueFrom:
                     secretKeyRef:
