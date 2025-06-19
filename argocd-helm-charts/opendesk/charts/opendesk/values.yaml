@@ -83,7 +83,7 @@ argo:
     # -- Git repository used for Argo to fetch openDesk.
     repoURL: "https://gitlab.opencode.de/bmi/opendesk/deployment/opendesk.git"
     # -- Git revision.
-    targetRevision: "main"
+    targetRevision: "trossner/nc_31.0.5"
   # -- SyncPolicy settings.
   syncPolicy: {}
 ...
