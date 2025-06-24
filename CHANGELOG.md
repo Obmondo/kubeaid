@@ -2,6 +2,37 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 14.2.0
+### Minor Version Upgrades
+- Updated traefik from version 36.1.0 to 36.2.0
+- Updated snapshot-controller from version 4.0.2 to 4.1.0
+- Updated opentelemetry-collector from version 0.126.0 to 0.127.1
+- Updated hcloud-csi from version 2.15.0 to 2.16.0
+- Updated gitlab-runner from version 0.77.3 to 0.78.0
+- Updated aws-ebs-csi-driver from version 2.44.0 to 2.45.1
+
+### Patch Version Upgrades
+- Updated velero from version 10.0.5 to 10.0.7
+- Updated tigera-operator from version v3.30.1 to v3.30.2
+- Updated sonarqube from version 2025.3.0 to 2025.3.1
+- Updated prometheus-smartctl-exporter from version 0.15.1 to 0.15.3
+- Updated rook-ceph-cluster from version v1.17.4 to v1.17.5
+- Added rook-ceph from version v1.17.2 to v1.17.2
+- Updated reloader from version 2.1.3 to 2.1.4
+- Updated redmine from version 32.2.5 to 32.2.6
+- Added opentelemetry-operator from version 0.84.1 to 0.84.1
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated metal3 from version 0.11.5 to 0.11.6
+- Updated mattermost-team-edition from version 6.6.79 to 6.6.80
+- Updated keda from version 2.17.1 to 2.17.2
+- Updated graylog from version 2.3.11 to 2.3.14
+- Updated gatekeeper from version 3.19.1 to 3.19.2
+- Updated erpnext from version 7.0.205 to 7.0.208
+- Updated cilium from version 1.17.4 to 1.17.5
+- Updated cert-manager from version v1.18.0 to v1.18.1
+- Updated argocd-image-updater from version 0.12.2 to 0.12.3
+- Updated argo-cd from version 8.1.0 to 8.1.1
+
 ### Improvements
 - [`a5838310`](../../commit/a5838310) fix(cert-manager) : indentation issue in ClusterIssuer template
 - [`38d05a64`](../../commit/38d05a64) chore(capi-cluster/hetzner) : not installing Hetzner Failover Script using CAPI's postKubeadm hook

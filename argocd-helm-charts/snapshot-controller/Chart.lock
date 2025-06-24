@@ -1,6 +1,6 @@
 dependencies:
 - name: snapshot-controller
   repository: https://piraeus.io/helm-charts
-  version: 4.0.2
-digest: sha256:b3a6928557c4bfcc9f58319f9ca95c2376c0174772e27b0e3d476bda7aaff08a
-generated: "2025-04-01T12:21:20.438884305+05:30"
+  version: 4.1.0
+digest: sha256:cda9d9b96562989f1e299b07a48efc76cdd5cbc92f766a4196e42e85a4fde9e2
+generated: "2025-06-24T13:35:28.528878029+05:30"

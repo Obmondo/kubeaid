@@ -12,9 +12,9 @@ service:
     targetPort: 3306
 
 image:
-  repository: registry.opensuse.org/isv/suse/edge/metal3/containers/images/suse/mariadb
+  repository: registry.suse.com/suse/mariadb
   pullPolicy: IfNotPresent
-  tag: 10.6.15.1
+  tag: 10.11
 
 nameOverride: ""
 fullnameOverride: ""
@@ -31,8 +31,8 @@ serviceAccount:
 podAnnotations: {}
 
 podSecurityContext:
-  runAsUser: 10060
-  fsGroup: 10060
+  runAsUser: 60
+  fsGroup: 60
 
 securityContext:
   allowPrivilegeEscalation: false
@@ -60,6 +60,7 @@ persistence:
 volumeMounts:
   - name: mariadb-data-volume
     mountPath: /var/lib/mysql
+    subPath: data
 
 volumes:
   - name: mariadb-data-volume

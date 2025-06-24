@@ -597,7 +597,8 @@
         "mapDynamicSizeRatio": {
           "type": [
             "null",
-            "number"
+            "number",
+            "string"
           ]
         },
         "masquerade": {
@@ -1245,6 +1246,9 @@
                     "Local",
                     "Cluster"
                   ]
+                },
+                "labels": {
+                  "type": "object"
                 },
                 "loadBalancerClass": {
                   "type": [

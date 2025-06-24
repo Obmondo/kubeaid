@@ -5,4 +5,7 @@ metadata:
   labels:
     {{- include "mariadb.labels" . | nindent 4 }}
 data:
-  RESTART_CONTAINER_CERTIFICATE_UPDATED: "false"
+  MARIADB_USER: ironic
+  MARIADB_RANDOM_ROOT_PASSWORD: "yes"
+  MARIADB_DATABASE: ironic
+  MARIADB_AUTO_UPGRADE: "yes"

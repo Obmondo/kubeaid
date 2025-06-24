@@ -25,23 +25,50 @@ spec:
       serviceAccountName: {{ include "mariadb.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+      # This would run during entrypoint if run as root
+      - name: set-volume-owners
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        securityContext:
+            runAsUser: 0
+            allowPrivilegeEscalation: true
+            capabilities:
+              drop:
+              - ALL
+              add:
+              - CHOWN
+              - FOWNER
+              - DAC_OVERRIDE
+            seccompProfile:
+              type: RuntimeDefault
+        volumeMounts:
+          - name: mariadb-conf
+            mountPath: /etc/mysql/conf.d
+          - name: mariadb-run
+            mountPath: /run/mysql
+          {{- $volmounts }}
+        command: ['bash', '-c', 'source /usr/local/bin/docker-entrypoint.sh && docker_create_db_directories']
+        env:
+          - name: DATADIR
+            value: /var/lib/mysql
+          - name: SOCKET
+            value: /run/mysql/mysql.sock
       containers:
       - name: mariadb
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         securityContext:
           {{- toYaml .Values.securityContext | nindent 12 }}
+        envFrom:
+          - configMapRef:
+              name: mariadb-cm
         env:
           - name: MARIADB_PASSWORD
             valueFrom:
               secretKeyRef:
                 key: password
                 name: ironic-mariadb
-          - name: RESTART_CONTAINER_CERTIFICATE_UPDATED
-            valueFrom:
-              configMapKeyRef:
-                name: mariadb-cm
-                key: RESTART_CONTAINER_CERTIFICATE_UPDATED
         lifecycle:
           preStop:
             exec:
@@ -52,9 +79,9 @@ spec:
         livenessProbe:
           exec:
             command:
-              - sh
-              - -c
-              - mysqladmin status -uironic -p$(printenv MARIADB_PASSWORD)
+              - healthcheck.sh
+              - --connect
+              - --innodb_initialized
           failureThreshold: 10
           initialDelaySeconds: 30
           periodSeconds: 30
@@ -67,19 +94,29 @@ spec:
         readinessProbe:
           exec:
             command:
-              - sh
-              - -c
-              - mysqladmin status -uironic -p$(printenv MARIADB_PASSWORD)
+              - healthcheck.sh
+              - --connect
+              - --innodb_initialized
           failureThreshold: 10
           initialDelaySeconds: 30
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 10
         volumeMounts:
+            - name: mariadb-conf
+              mountPath: /etc/mysql/conf.d
+            - name: mariadb-run
+              mountPath: /run/mysql
             {{- $volmounts }}
       {{- with .Values.global.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
+        - name: mariadb-conf
+          configMap:
+            name: mariadb-config
+        - name: mariadb-run
+          emptyDir:
+            sizeLimit: 20Mi
         {{- $volumes }}

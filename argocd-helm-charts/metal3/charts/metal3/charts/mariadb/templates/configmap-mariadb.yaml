@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap 
+metadata:
+  name: mariadb-config
+  labels:
+    {{- include "mariadb.labels" . | nindent 4 }}
+data:
+  ironic.conf: |
+    [mariadb]
+    max_connections 64
+    max_heap_table_size 1M
+    innodb_buffer_pool_size 5M
+    innodb_log_buffer_size 512K

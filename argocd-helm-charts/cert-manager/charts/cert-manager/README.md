@@ -19,7 +19,7 @@ Before installing the chart, you must first install the cert-manager CustomResou
 This is performed in a separate step to allow you to easily uninstall and reinstall cert-manager without deleting your installed custom resources.
 
 ```bash
-$ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.18.0/cert-manager.crds.yaml
+$ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.18.1/cert-manager.crds.yaml
 ```
 
 To install the chart with the release name `cert-manager`:
@@ -29,7 +29,7 @@ To install the chart with the release name `cert-manager`:
 $ helm repo add jetstack https://charts.jetstack.io --force-update
 
 ## Install the cert-manager helm chart
-$ helm install cert-manager --namespace cert-manager --version v1.18.0 jetstack/cert-manager
+$ helm install cert-manager --namespace cert-manager --version v1.18.1 jetstack/cert-manager
 ```
 
 In order to begin issuing certificates, you will need to set up a ClusterIssuer
@@ -65,7 +65,7 @@ If you want to completely uninstall cert-manager from your cluster, you will als
 delete the previously installed CustomResourceDefinition resources:
 
 ```console
-$ kubectl delete -f https://github.com/cert-manager/cert-manager/releases/download/v1.18.0/cert-manager.crds.yaml
+$ kubectl delete -f https://github.com/cert-manager/cert-manager/releases/download/v1.18.1/cert-manager.crds.yaml
 ```
 
 ## Configuration
@@ -378,7 +378,7 @@ config:
   kubernetesAPIBurst: 9000
   numberOfConcurrentWorkers: 200
   enableGatewayAPI: true
-  # Feature gates as of v1.18.0. Listed with their default values.
+  # Feature gates as of v1.18.1. Listed with their default values.
   # See https://cert-manager.io/docs/cli/controller/
   featureGates:
     AdditionalCertificateOutputFormats: true # GA - default=true
@@ -395,6 +395,8 @@ config:
     UseCertificateRequestBasicConstraints: false # ALPHA - default=false
     UseDomainQualifiedFinalizer: true # GA - default=true
     ValidateCAA: false # ALPHA - default=false
+    DefaultPrivateKeyRotationPolicyAlways: true # BETA - default=true
+    ACMEHTTP01IngressPathTypeExact: true # BETA - default=true
   # Configure the metrics server for TLS
   # See https://cert-manager.io/docs/devops-tips/prometheus-metrics/#tls
   metricsTLSConfig:

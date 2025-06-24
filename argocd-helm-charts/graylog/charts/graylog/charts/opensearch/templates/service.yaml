@@ -12,6 +12,14 @@ metadata:
 {{ toYaml .Values.service.annotations | indent 4 }}
 spec:
   type: {{ .Values.service.type }}
+  {{- if (semverCompare ">= 1.23-0" .Capabilities.KubeVersion.Version) }}
+  {{- if .Values.service.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.service.ipFamilyPolicy }}
+  {{- end }}
+  {{- if .Values.service.ipFamilies }}
+  ipFamilies: {{ .Values.service.ipFamilies }}
+  {{- end }}
+  {{- end }}
   selector:
     {{- include "opensearch.selectorLabels" . | nindent 4 }}
   ports:
@@ -24,6 +32,9 @@ spec:
   - name: {{ .Values.service.transportPortName | default "transport" }}
     protocol: TCP
     port: {{ .Values.transportPort }}
+  - name: {{ .Values.service.metricsPortName | default "metrics" }}
+    protocol: TCP
+    port: {{ .Values.metricsPort }}
 {{- if .Values.service.loadBalancerIP }}
   loadBalancerIP: {{ .Values.service.loadBalancerIP }}
 {{- end }}
@@ -60,3 +71,5 @@ spec:
     port: {{ .Values.httpPort }}
   - name: {{ .Values.service.transportPortName | default "transport" }}
     port: {{ .Values.transportPort }}
+  - name: {{ .Values.service.metricsPortName | default "metrics" }}
+    port: {{ .Values.metricsPort }}

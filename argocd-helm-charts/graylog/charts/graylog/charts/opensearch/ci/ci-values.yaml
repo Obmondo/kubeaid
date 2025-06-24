@@ -51,53 +51,55 @@ config:
     # Setting network.host to a non-loopback address enables the annoying bootstrap checks. "Single-node" mode disables them again.
     # discovery.type: single-node
 
-    # Start OpenSearch Security Demo Configuration
-    # WARNING: revise all the lines below before you go into production
-    plugins:
-      security:
-        ssl:
-          transport:
-            pemcert_filepath: esnode.pem
-            pemkey_filepath: esnode-key.pem
-            pemtrustedcas_filepath: root-ca.pem
-            enforce_hostname_verification: false
-          http:
-            enabled: true
-            pemcert_filepath: esnode.pem
-            pemkey_filepath: esnode-key.pem
-            pemtrustedcas_filepath: root-ca.pem
-        allow_unsafe_democertificates: true
-        allow_default_init_securityindex: true
-        authcz:
-          admin_dn:
-            - CN=kirk,OU=client,O=client,L=test,C=de
-        audit.type: internal_opensearch
-        enable_snapshot_restore_privilege: true
-        check_snapshot_restore_write_privileges: true
-        restapi:
-          roles_enabled: ["all_access", "security_rest_api_access"]
-        system_indices:
-          enabled: true
-          indices:
-            [
-              ".opendistro-alerting-config",
-              ".opendistro-alerting-alert*",
-              ".opendistro-anomaly-results*",
-              ".opendistro-anomaly-detector*",
-              ".opendistro-anomaly-checkpoints",
-              ".opendistro-anomaly-detection-state",
-              ".opendistro-reports-*",
-              ".opendistro-notifications-*",
-              ".opendistro-notebooks",
-              ".opendistro-asynchronous-search-response*",
-            ]
-    ######## End OpenSearch Security Demo Configuration ########
+    # # Start OpenSearch Security Demo Configuration
+    # # WARNING: revise all the lines below before you go into production
+    # plugins:
+    #   security:
+    #     ssl:
+    #       transport:
+    #         pemcert_filepath: esnode.pem
+    #         pemkey_filepath: esnode-key.pem
+    #         pemtrustedcas_filepath: root-ca.pem
+    #         enforce_hostname_verification: false
+    #       http:
+    #         enabled: true
+    #         pemcert_filepath: esnode.pem
+    #         pemkey_filepath: esnode-key.pem
+    #         pemtrustedcas_filepath: root-ca.pem
+    #     allow_unsafe_democertificates: true
+    #     allow_default_init_securityindex: true
+    #     authcz:
+    #       admin_dn:
+    #         - CN=kirk,OU=client,O=client,L=test,C=de
+    #     audit.type: internal_opensearch
+    #     enable_snapshot_restore_privilege: true
+    #     check_snapshot_restore_write_privileges: true
+    #     restapi:
+    #       roles_enabled: ["all_access", "security_rest_api_access"]
+    #     system_indices:
+    #       enabled: true
+    #       indices:
+    #         [
+    #           ".opendistro-alerting-config",
+    #           ".opendistro-alerting-alert*",
+    #           ".opendistro-anomaly-results*",
+    #           ".opendistro-anomaly-detector*",
+    #           ".opendistro-anomaly-checkpoints",
+    #           ".opendistro-anomaly-detection-state",
+    #           ".opendistro-reports-*",
+    #           ".opendistro-notifications-*",
+    #           ".opendistro-notebooks",
+    #           ".opendistro-asynchronous-search-response*",
+    #         ]
+    # ######## End OpenSearch Security Demo Configuration ########
   # log4j2.properties:
 
 # Extra environment variables to append to this nodeGroup
 # This will be appended to the current 'env:' key. You can use any of the kubernetes env
 # syntax here
-extraEnvs: []
+extraEnvs:
+  - name: OPENSEARCH_INITIAL_ADMIN_PASSWORD
+    value: myStrongPassword123@456
 #  - name: MY_ENVIRONMENT_VAR
 #    value: the_value_goes_here
 
@@ -234,12 +236,22 @@ priorityClassName: ""
 antiAffinityTopologyKey: "kubernetes.io/hostname"
 
 # Hard means that by default pods will only be scheduled if there are enough nodes for them
-# and that they will never end up on the same node. Setting this to soft will do this "best effort"
+# and that they will never end up on the same node. Setting this to soft will do this "best effort".
+# Setting this to custom will use what is passed into customAntiAffinity.
 antiAffinity: "soft"
+
+# Allows passing in custom anti-affinity settings as defined in
+# https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#types-of-inter-pod-affinity-and-anti-affinity
+# Using this parameter requires setting antiAffinity to custom.
+customAntiAffinity: {}
 
 # This is the node affinity settings as defined in
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
 nodeAffinity: {}
+
+# This is the pod affinity settings as defined in
+# https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#types-of-inter-pod-affinity-and-anti-affinity
+podAffinity: {}
 
 # The default is to deploy all pods serially. By setting this to parallel all pods are started at
 # the same time when bootstrapping the cluster
@@ -253,6 +265,7 @@ enableServiceLinks: true
 protocol: https
 httpPort: 9200
 transportPort: 9300
+metricsPort: 9600
 
 service:
   labels: {}

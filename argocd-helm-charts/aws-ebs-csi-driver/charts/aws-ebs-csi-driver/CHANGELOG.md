@@ -1,5 +1,15 @@
 # Helm chart
 
+## v2.45.1
+- Bump csi-sidecars to new eksbuild versions to fix livenessprobe
+
+## v2.45.0
+
+### Feature
+
+- Bump driver version to `v1.45.0`.
+- Switch sidecar image repositories from deprecated `public.ecr.aws/eks-distro/kubernetes-csi` to `public.ecr.aws/csi-components/` ([#2518](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/2518), [@AndrewSirenko](https://github.com/AndrewSirenko))
+
 ## v2.44.0
 
 ### Feature

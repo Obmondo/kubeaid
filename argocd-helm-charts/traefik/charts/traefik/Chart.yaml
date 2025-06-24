@@ -1,8 +1,8 @@
 annotations:
-  artifacthub.io/changes: "- \"fix(schema): \U0001F41B allow additional properties
-    on `global`\"\n- \"fix(chart): update icon link to track upstream master branch\"\n-
-    \"fix(Traefik Hub): add strict check on admission cert\"\n- \"feat(Traefik Hub):
-    add v3.17 version mapping\"\n- \"chore(release): \U0001F680 publish v36.1.0\"\n"
+  artifacthub.io/changes: "- \"fix(CRDs): :bug: kustomization file for CRDs\"\n- \"feat(hub):
+    ✨ initial support for AI Gateway\"\n- \"feat(hub): update version mapping with
+    Proxy v3.4\"\n- \"feat(hpa): ✨ customizable scaleTargetRef\"\n- \"chore(schema):
+    update linter\"\n- \"chore(release): \U0001F680 publish v36.2.0 and CRDs v1.9.0\"\n"
 apiVersion: v2
 appVersion: v3.4.1
 description: A Traefik based Kubernetes ingress controller
@@ -24,4 +24,4 @@ sources:
 - https://github.com/traefik/traefik-helm-chart
 - https://github.com/traefik/traefik
 type: application
-version: 36.1.0
+version: 36.2.0

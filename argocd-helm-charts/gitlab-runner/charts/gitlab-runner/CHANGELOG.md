@@ -1,8 +1,36 @@
+## v0.78.0 (2025-06-19)
+
+### New features
+
+- Update GitLab Runner version to v18.1.0
+
+### Maintenance
+
+- Update CHANGELOG to take in account 0.76.x to 0.77.x releases [!517](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/merge_requests/517)
+
 ## v0.77.3 (2025-06-11)
 
 ### New features
 
 - Update GitLab Runner version to v18.0.3
+
+## v0.76.3 (2025-06-11)
+
+### New features
+
+- Update GitLab Runner version to v17.11.3
+
+## v0.75.2 (2025-06-11)
+
+### New features
+
+- Update GitLab Runner version to v17.10.2
+
+## v0.76.2 (2025-05-23)
+
+### New features
+
+- Update GitLab Runner version to v17.11.2
 
 ## v0.77.2 (2025-05-22)
 
@@ -38,6 +66,12 @@
 ### New features
 
 - Update GitLab Runner version to v17.11.0
+
+## v0.75.1 (2025-03-27)
+
+### New features
+
+- Update GitLab Runner version to v17.10.1
 
 ## v0.75.0 (2025-03-14)
 

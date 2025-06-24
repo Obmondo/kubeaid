@@ -600,6 +600,11 @@
           "description": "Enable SELinux-only optimizations on the EBS CSI Driver node pods. Must only be set true if all linux nodes in the DaemonSet have SELinux enabled",
           "default": false
         },
+        "metadataSources": {
+          "description": "Comma separated list of metadata sources that override the default used by the EBS CSI Driver. Valid sources include 'imds' and 'kubernetes'",
+          "type": ["string", "null"],
+          "default": null
+        },
         "reservedVolumeAttachments": {
           "type": ["integer", "null"],
           "description": "The number of attachment slots to reserve for system use (and not to be used for CSI volumes)\nWhen this parameter is not specified (or set to -1), the EBS CSI Driver will attempt to determine the number of reserved slots via heuristic",
@@ -747,7 +752,7 @@
             },
             "additionalClusterRoleRules": {
               "type": ["array", "null"],
-              "description": "Grant additional permissions to external-provisioner",
+              "description": "Grant additional permissions to csi-provisioner",
               "default": []
             },
             "logLevel": {
@@ -781,7 +786,7 @@
                 },
                 "repository": {
                   "type": "string",
-                  "default": "public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner"
+                  "default": "public.ecr.aws/csi-components/csi-provisioner"
                 }
               }
             }
@@ -827,7 +832,7 @@
             },
             "additionalClusterRoleRules": {
               "type": ["array", "null"],
-              "description": "Grant additional permissions to external-attacher",
+              "description": "Grant additional permissions to csi-attacher",
               "default": []
             },
             "image": {
@@ -843,7 +848,7 @@
                 },
                 "repository": {
                   "type": "string",
-                  "default": "public.ecr.aws/eks-distro/kubernetes-csi/external-attacher"
+                  "default": "public.ecr.aws/csi-components/csi-attacher"
                 }
               }
             }
@@ -855,7 +860,7 @@
           "properties": {
             "forceEnable": {
               "type": "boolean",
-              "description": "Enables/disables the external-snapshotter sidecar",
+              "description": "Enables/disables the csi-snapshotter sidecar",
               "default": true
             },
             "additionalArgs": {
@@ -868,7 +873,7 @@
             },
             "additionalClusterRoleRules": {
               "type": ["array", "null"],
-              "description": "Grant additional permissions to external-snapshotter",
+              "description": "Grant additional permissions to csi-snapshotter",
               "default": []
             },
             "logLevel": {
@@ -897,7 +902,7 @@
                 },
                 "repository": {
                   "type": "string",
-                  "default": "public.ecr.aws/eks-distro/kubernetes-csi/external-snapshotter/csi-snapshotter"
+                  "default": "public.ecr.aws/csi-components/csi-snapshotter"
                 }
               }
             },
@@ -939,7 +944,7 @@
             },
             "additionalClusterRoleRules": {
               "type": ["array", "null"],
-              "description": "Grant additional permissions to external-snapshotter",
+              "description": "Grant additional permissions to csi-snapshotter",
               "default": []
             },
             "env": {
@@ -959,7 +964,7 @@
                 },
                 "repository": {
                   "type": "string",
-                  "default": "public.ecr.aws/eks-distro/kubernetes-csi/external-resizer"
+                  "default": "public.ecr.aws/csi-components/csi-resizer"
                 }
               }
             },
@@ -985,7 +990,7 @@
                 },
                 "repository": {
                   "type": "string",
-                  "default": "public.ecr.aws/eks-distro/kubernetes-csi/livenessprobe"
+                  "default": "public.ecr.aws/csi-components/livenessprobe"
                 }
               }
             },
@@ -1036,7 +1041,7 @@
                 },
                 "repository": {
                   "type": "string",
-                  "default": "public.ecr.aws/eks-distro/kubernetes-csi/node-driver-registrar"
+                  "default": "public.ecr.aws/csi-components/csi-node-driver-registrar"
                 }
               }
             },
@@ -1147,15 +1152,13 @@
       "propertyNames": {
         "type": "string",
         "minLength": 1,
-        "maxLength": 128,
-        "pattern": "^[a-zA-Z0-9 _\\.:\\/=+\\-@]*$"
+        "maxLength": 128
       },
       "patternProperties": {
         "^.*$": {
           "type": "string",
           "minLength": 0,
-          "maxLength": 256,
-          "pattern": "^[a-zA-Z0-9 _\\.:\\/=+\\-@]*$"
+          "maxLength": 256
         }
       }
     }

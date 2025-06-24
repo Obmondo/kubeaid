@@ -7,6 +7,9 @@ metadata:
     {{- include "opensearch.labels" . | nindent 4 }}
   annotations:
     majorVersion: "{{ include "opensearch.majorVersion" . }}"
+    {{- with .Values.openSearchAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   serviceName: {{ template "opensearch.serviceName" . }}-headless
   selector:
@@ -24,9 +27,14 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: {{ template "opensearch.uname" . }}
-    {{- if .Values.persistence.labels.enabled }}
+    {{- if or .Values.persistence.labels.enabled .Values.persistence.labels.additionalLabels }}
       labels:
-        {{- include "opensearch.labels" . | nindent 8 }}
+        {{- if .Values.persistence.labels.enabled }}
+          {{- include "opensearch.labels" . | nindent 8 }}
+        {{- end }}
+        {{- with .Values.persistence.labels.additionalLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
     {{- end }}
     {{- with .Values.persistence.annotations  }}
       annotations:
@@ -80,8 +88,14 @@ spec:
         {{- end }}
       {{- if and .Values.rbac.create (eq .Values.rbac.serviceAccountName "") }}
       serviceAccountName: "{{ template "opensearch.uname" . }}"
-      {{- else }}
+      automountServiceAccountToken: {{ ne .Values.rbac.automountServiceAccountToken false }}
+      {{- else if and .Values.rbac.create (ne .Values.rbac.serviceAccountName "") }}
       serviceAccountName: {{ .Values.rbac.serviceAccountName | quote }}
+      automountServiceAccountToken: {{ ne .Values.rbac.automountServiceAccountToken false }}
+      {{- else }}
+      automountServiceAccountToken: {{ ne .Values.rbac.automountServiceAccountToken false }}
+      {{- end }}
+      {{- if .Values.imagePullSecrets }}
       {{- end }}
       {{- with .Values.tolerations }}
       tolerations:
@@ -91,7 +105,7 @@ spec:
       nodeSelector:
 {{ toYaml . | indent 8 }}
       {{- end }}
-      {{- if or (eq .Values.antiAffinity "hard") (eq .Values.antiAffinity "soft") .Values.nodeAffinity }}
+      {{- if or (eq .Values.antiAffinity "hard") (eq .Values.antiAffinity "soft") (eq .Values.antiAffinity "custom") .Values.nodeAffinity .Values.podAffinity }}
       {{- if .Values.priorityClassName }}
       priorityClassName: {{ .Values.priorityClassName }}
       {{- end }}
@@ -127,6 +141,15 @@ spec:
                   operator: In
                   values:
                   - {{ include "opensearch.name" . }}
+      {{- else if eq .Values.antiAffinity "custom" }}
+        {{- with .Values.customAntiAffinity }}
+        podAntiAffinity:
+{{ toYaml . | indent 10 }}
+        {{- end }}
+      {{- end }}
+      {{- with .Values.podAffinity }}
+        podAffinity:
+{{ toYaml . | indent 10 }}
       {{- end }}
       {{- with .Values.nodeAffinity }}
         nodeAffinity:
@@ -138,6 +161,13 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriod }}
       volumes:
+      {{- if .Values.config }}
+      - name: config
+        configMap:
+          name: {{ template "opensearch.uname" . }}-config
+      - emptyDir: {}
+        name: config-emptydir
+      {{- end }}
       {{- range .Values.secretMounts }}
       - name: {{ .name | required "secretMount .name is required" }}
         secret:
@@ -145,11 +175,6 @@ spec:
           {{- if .defaultMode }}
           defaultMode: {{ .defaultMode }}
           {{- end }}
-      {{- end }}
-      {{- if .Values.config }}
-      - name: config
-        configMap:
-          name: {{ template "opensearch.uname" . }}-config
       {{- end }}
       {{- if and .Values.securityConfig.config.data .Values.securityConfig.config.securityConfigSecret }}
       {{ fail "Only one of .Values.securityConfig.config.data and .Values.securityConfig.config.securityConfigSecret may be defined. Please see the comment in values.yaml describing usage." }}
@@ -220,18 +245,19 @@ spec:
       {{- if .Values.hostAliases }}
       hostAliases: {{ toYaml .Values.hostAliases | nindent 8 }}
       {{- end }}
-      {{- if or (.Values.extraInitContainers) (.Values.keystore) (.Values.persistence.enabled) (.Values.sysctlInit.enabled)  }}
+      {{- if or (.Values.extraInitContainers) (.Values.keystore) (.Values.persistence.enabled) (.Values.sysctlInit.enabled) (.Values.config)  }}
       initContainers:
 {{- if and .Values.persistence.enabled .Values.persistence.enableInitChown }}
       - name: fsgroup-volume
         image: "{{ template "opensearch.dockerRegistry" . }}{{ .Values.persistence.image | default "busybox" }}:{{ .Values.persistence.imageTag | default "latest" }}"
+        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
         command: ['sh', '-c']
         args:
           - 'chown -R 1000:1000 /usr/share/opensearch/data'
         securityContext:
           runAsUser: 0
-        resources: 
-           {{ toYaml .Values.initResources | nindent 10 }}
+        resources:
+          {{- toYaml .Values.initResources | nindent 10 }}
         volumeMounts:
           - name: "{{ template "opensearch.uname" . }}"
             mountPath: {{ .Values.opensearchHome }}/data
@@ -254,9 +280,30 @@ spec:
           runAsUser: 0
           privileged: true
         resources:
-           {{ toYaml .Values.initResources | nindent 10 }}
+          {{- toYaml .Values.initResources | nindent 10 }}
 {{- end }}
-{{ if .Values.keystore }}
+{{- if .Values.config }}
+      - name: configfile
+        image: "{{ template "opensearch.dockerRegistry" . }}{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        command:
+        - sh
+        - -c
+        - |
+          #!/usr/bin/env bash
+          cp -r /tmp/configfolder/*  /tmp/config/
+        resources:
+          {{- toYaml .Values.initResources | nindent 10 }}
+        volumeMounts:
+          - mountPath: /tmp/config/
+            name: config-emptydir
+        {{- range $path, $config := .Values.config }}
+          - name: config
+            mountPath: /tmp/configfolder/{{ $path }}
+            subPath: {{ $path }}
+        {{- end -}}
+{{- end }}
+{{- if .Values.keystore }}
       - name: keystore
         image: "{{ template "opensearch.dockerRegistry" . }}{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: "{{ .Values.image.pullPolicy }}"
@@ -270,6 +317,7 @@ spec:
           {{ .Values.opensearchHome }}/bin/opensearch-keystore create
 
           for i in /tmp/keystoreSecrets/*/*; do
+            [ -f "$i" ] || continue
             key=$(basename $i)
             echo "Adding file $i to keystore key $key"
             {{ .Values.opensearchHome }}/bin/opensearch-keystore add-file "$key" "$i"
@@ -284,8 +332,8 @@ spec:
           cp -a {{ .Values.opensearchHome }}/config/opensearch.keystore /tmp/keystore/
         env: {{ toYaml .Values.extraEnvs | nindent 10 }}
         envFrom: {{ toYaml .Values.envFrom | nindent 10 }}
-        resources: 
-           {{ toYaml .Values.initResources | nindent 10 }}
+        resources:
+          {{- toYaml .Values.initResources | nindent 10 }}
         volumeMounts:
         - name: keystore
           mountPath: /tmp/keystore
@@ -293,7 +341,7 @@ spec:
         - name: keystore-{{ .secretName }}
           mountPath: /tmp/keystoreSecrets/{{ .secretName }}
         {{- end }}
-{{ end }}
+{{- end }}
       {{- if .Values.extraInitContainers }}
       # Currently some extra blocks accept strings
       # to continue with backwards compatibility this is being kept
@@ -317,13 +365,19 @@ spec:
           #!/usr/bin/env bash
           set -euo pipefail
 
+          {{- range $plugin := .Values.plugins.removeList }}
+          if ./bin/opensearch-plugin list | grep -q {{ $plugin }}; then
+          ./bin/opensearch-plugin remove {{ $plugin }}
+          fi
+          {{- end }}
+
           {{- range $plugin := .Values.plugins.installList }}
           ./bin/opensearch-plugin install -b {{ $plugin }}
           {{- end }}
 
           bash opensearch-docker-entrypoint.sh
       {{- end }}
-  
+
         image: "{{ template "opensearch.dockerRegistry" . }}{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: "{{ .Values.image.pullPolicy }}"
         readinessProbe:
@@ -339,10 +393,18 @@ spec:
         ports:
         - name: http
           containerPort: {{ .Values.httpPort }}
+          {{- if .Values.httpHostPort }}
+          hostPort: {{ .Values.httpHostPort }}
+          {{- end }}
         - name: transport
           containerPort: {{ .Values.transportPort }}
+          {{- if .Values.transportHostPort }}
+          hostPort: {{ .Values.transportHostPort }}
+          {{- end }}
+        - name: metrics
+          containerPort: {{ .Values.metricsPort }}
         resources:
-{{ toYaml .Values.resources | indent 10 }}
+          {{- toYaml .Values.resources | nindent 10 }}
         env:
         - name: node.name
           valueFrom:
@@ -372,6 +434,10 @@ spec:
 {{- if .Values.envFrom }}
         envFrom:
 {{ toYaml .Values.envFrom | indent 8 }}
+{{- end }}
+{{- if .Values.opensearchLifecycle }}
+        lifecycle:
+{{ toYaml .Values.opensearchLifecycle | indent 10 }}
 {{- end }}
         volumeMounts:
         {{- if .Values.persistence.enabled }}
@@ -438,7 +504,7 @@ spec:
           {{- end }}
         {{- end }}
         {{- range $path, $config := .Values.config }}
-        - name: config
+        - name: config-emptydir
           mountPath: {{ $.Values.opensearchHome }}/config/{{ $path }}
           subPath: {{ $path }}
         {{- end -}}
@@ -494,7 +560,7 @@ spec:
           sleep infinity &
           wait $!
         resources:
-{{ toYaml .Values.sidecarResources | indent 10 }}
+          {{- toYaml .Values.sidecarResources | nindent 10 }}
         env:
         - name: NODE_NAME
           valueFrom:

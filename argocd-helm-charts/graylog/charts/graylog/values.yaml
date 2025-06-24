@@ -55,7 +55,7 @@ graylog:
   ##
   image:
     repository: "graylog/graylog"
-    tag: "6.2.2"
+    tag: "6.2.3"
     pullPolicy: "IfNotPresent"
 
   ## Graylog default Java option
@@ -203,7 +203,11 @@ graylog:
     port: 9000
     ## Add additional ports for the service/statefulset to expose
     ##
-    ports: []
+    ports:
+      - name: gelf
+        port: 12201
+        targetPort: 12201
+        protocol: TCP
 
     headless:
       ## Add suffix to headless service name
@@ -447,6 +451,8 @@ graylog:
     uriSecretName: ""
     uriSecretKey: ""
     uriSSL: false
+    # OpenSearch authentication
+    username: "admin"
 
   mongodb:
     ## MongoDB connection string
@@ -594,6 +600,8 @@ opensearch:
       value: "false"
     - name: plugins.security.disabled
       value: "true"
+    - name: OPENSEARCH_INITIAL_ADMIN_PASSWORD
+      value: "Graylog@2024"  # Strong password meeting requirements: uppercase, lowercase, number, special char, >8 chars
   ## Set default resource very low. This help reduce resources usage on GitHub Action when performing chart-testing.
   opensearchJavaOpts: "-Xmx128M -Xms128M"
   resources:
