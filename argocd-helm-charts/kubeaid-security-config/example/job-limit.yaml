@@ -1,0 +1,6 @@
+resourceQuota:
+  namespaces:
+    my-namespace-1:
+      count/jobs.batch: 100
+    my-namespace-2:
+      count/jobs.batch: 100

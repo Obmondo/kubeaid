@@ -1,0 +1,15 @@
+{{- if .Values.resourceQuota }}
+{{- range $namespace, $quotas := .Values.resourceQuota.namespaces }}
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: resource-quota
+  namespace: {{ $namespace }}
+spec:
+  hard:
+  {{- range $spec, $limit := $quotas }}
+    {{ $spec }}: {{ $limit }}
+  {{- end }}
+{{- end}}
+{{- end}}
