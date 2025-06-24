@@ -15,7 +15,7 @@ spec:
         spec:
           containers:
             - name: logical-backup
-              image: ghcr.io/obmondo/postgres-logical-backup:v1.0.6
+              image: ghcr.io/obmondo/postgres-logical-backup:v1.0.7
               imagePullPolicy: IfNotPresent
               env:
                 - name: POD_NAMESPACE
@@ -36,6 +36,8 @@ spec:
                   value: {{ .Values.postgresql.user | default "keycloak" }}
                 - name: PGDATABASE
                   value: {{ .Values.postgresql.db | default "keycloak" }}
+                - name: USE_PG_DUMP
+                  value: {{ (.Values.postgresql.logicalbackup).usePgDump | quote }}
                 - name: CLUSTER_NAME_LABEL
                   value: {{ (.Values.postgresql.logicalbackup).pgOperatorClusterName | default "keycloakx-pgsql" }}
 
