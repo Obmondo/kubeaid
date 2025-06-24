@@ -2,6 +2,15 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`a5838310`](../../commit/a5838310) fix(cert-manager) : indentation issue in ClusterIssuer template
+- [`38d05a64`](../../commit/38d05a64) chore(capi-cluster/hetzner) : not installing Hetzner Failover Script using CAPI's postKubeadm hook
+- [`cc7115a8`](../../commit/cc7115a8) chore: remove redundant logical backup provider env var
+- [`3ac189b8`](../../commit/3ac189b8) fix(capi-cluster/hetzner) : deploying hetzner-robot to kube-system namespace
+- [`299a4ebb`](../../commit/299a4ebb) bug fixes
+- [`84cbafc9`](../../commit/84cbafc9) adding parameter for wiping all disks | adding host selector for each HetznerBareMetalMachineTemplate | restructuring | bug fixes
+- [`b8fa20ce`](../../commit/b8fa20ce) fixes(capi-cluster/hetzner)
+
 ## 14.1.0
 ### Minor Version Upgrades
 - Updated traefik from version 36.0.0 to 36.1.0
