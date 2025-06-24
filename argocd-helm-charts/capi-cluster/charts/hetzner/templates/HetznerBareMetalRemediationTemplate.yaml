@@ -10,6 +10,6 @@ spec:
     spec:
       strategy:
         retryLimit: 1
-        timeout: 3m0s
+        timeout: 30m0s
         type: Reboot
 {{- end }}
