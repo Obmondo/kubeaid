@@ -25,21 +25,21 @@ spec:
           apiTokenSecretRef:
             name: {{ $v.cloudProviderSecretRef.name }}
             key: {{ $v.cloudProviderSecretRef.key }}
-        {{- if or $v.dnsNames $v.dnsZones }}
-        selector:
-          {{- if $v.dnsNames }}
-          dnsNames:
-            {{- range $v.dnsNames }}
-            - {{ . | quote }}
-            {{- end }}
-          {{- end }}
-          {{- if $v.dnsZones }}
-          dnsZones:
-            {{- range $v.dnsZones }}
-            - {{ . | quote }}
-            {{- end }}
+      {{- if or $v.dnsNames $v.dnsZones }}
+      selector:
+        {{- if $v.dnsNames }}
+        dnsNames:
+          {{- range $v.dnsNames }}
+          - {{ . | quote }}
           {{- end }}
         {{- end }}
+        {{- if $v.dnsZones }}
+        dnsZones:
+          {{- range $v.dnsZones }}
+          - {{ . | quote }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
     {{- else if eq (toString $v.cloudProvider) "route53" }}
     - dns01:
         {{ $v.cloudProvider }}:
