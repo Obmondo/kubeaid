@@ -1,0 +1,34 @@
+groups:
+  - name: monitor::system::service::gitlab_runner
+    rules:
+      - alert: monitor::system::service::gitlab_runner::failure
+        expr: |
+          rate(gitlab_runner_errors_total{level="error"}[5m]) > 0.1
+          and on(certname) obmondo_monitoring{alert_id="monitor::system::service::gitlab_runner::failure"} > 0
+        for: 5m
+        labels:
+          severity: critical
+          alert_id: monitor::system::service::gitlab_runner::failure
+          level: error
+        annotations:
+          summary: "High GitLab Runner Error Rate"
+          description: |
+            The rate of GitLab runner errors has increased (> 0.1 errors/sec)
+            over the last 5 minutes on server **{{ $labels.certname }}**.
+            This could indicate runners are failing or misconfigured.
+
+      - alert: monitor::system::service::gitlab_runner::failure
+        expr: |
+          rate(gitlab_runner_errors_total{level="warning"}[5m]) > 0.5
+          and on(certname) obmondo_monitoring{alert_id="monitor::system::service::gitlab_runner::failure"} > 0
+        for: 10m
+        labels:
+          severity: warning
+          alert_id: monitor::system::service::gitlab_runner::failure
+          level: warning
+        annotations:
+          summary: "High GitLab Runner Warning Rate"
+          description: |
+            The rate of GitLab runner warnings has increased (> 0.5 warnings/sec)
+            over the last 10 minutes on server **{{ $labels.certname }}**.
+            This could indicate potential issues that may escalate if not addressed.

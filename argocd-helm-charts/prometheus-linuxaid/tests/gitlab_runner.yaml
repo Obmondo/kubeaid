@@ -1,0 +1,45 @@
+evaluation_interval: 1m
+
+rule_files:
+  - "../rules/gitlab_runner.yaml"
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: gitlab_runner_errors_total{level="error", certname="test.abc"}
+        values: 0 10 20 30 40 50 60 70 80 90 100 110
+      - series: gitlab_runner_errors_total{level="warning", certname="test.abc"}
+        values: 0 100 200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600
+      - series: obmondo_monitoring{certname="test.abc", alert_id="monitor::system::service::gitlab_runner::failure"}
+        values: 1x17
+
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: monitor::system::service::gitlab_runner::failure
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              alert_id: monitor::system::service::gitlab_runner::failure
+              level: error
+              certname: test.abc
+            exp_annotations:
+              summary: "High GitLab Runner Error Rate"
+              description: |
+                The rate of GitLab runner errors has increased (> 0.1 errors/sec)
+                over the last 5 minutes on server **test.abc**.
+                This could indicate runners are failing or misconfigured.
+
+      - eval_time: 15m
+        alertname: monitor::system::service::gitlab_runner::failure
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              alert_id: monitor::system::service::gitlab_runner::failure
+              level: warning
+              certname: test.abc
+            exp_annotations:
+              summary: "High GitLab Runner Warning Rate"
+              description: |
+                The rate of GitLab runner warnings has increased (> 0.5 warnings/sec)
+                over the last 10 minutes on server **test.abc**.
+                This could indicate potential issues that may escalate if not addressed.
