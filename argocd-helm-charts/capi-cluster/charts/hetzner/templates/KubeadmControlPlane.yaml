@@ -210,7 +210,7 @@ spec:
     {{- end }}
     preKubeadmCommands:
       - set -x
-      - export CONTAINERD=1.7.26
+      - export CONTAINERD=2.1.3
       - export RUNC=1.2.5
       - export KUBERNETES_VERSION=$(echo {{ $.Values.global.kubernetes.version }} | sed 's/^v//')
       - export TRIMMED_KUBERNETES_VERSION=$(echo ${KUBERNETES_VERSION} | sed 's/^v//'
