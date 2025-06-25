@@ -1,0 +1,280 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-coturn
+  labels:
+{{ include "labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}-coturn
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}-coturn
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.podSecurityContext.enabled }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        runAsNonRoot: {{ .runAsNonRoot }}
+        runAsUser: {{ .runAsUser }}
+        runAsGroup: {{ .runAsGroup }}
+        fsGroup: {{ .fsGroup }}
+        seccompProfile: {{- .seccompProfile | toYaml | nindent 10 }}
+      {{- end }}
+      {{- end }}
+      initContainers:
+        {{- if or .Values.postgresql.enabled (and .Values.externalDatabase.enabled (eq .Values.externalDatabase.type "postgresql")) }}
+        - name: postgresql-isready
+          image: {{ include "db.isReady.image.repository" . }}:{{ include "db.isReady.image.tag" . }}
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "database.secretName" . }}
+                  {{- if and .Values.externalDatabase.enabled .Values.externalDatabase.secretKeys.username }}
+                  key: {{ .Values.externalDatabase.secretKeys.username }}
+                  {{ else }}
+                  key: {{ .Values.postgresql.global.postgresql.auth.secretKeys.username }}
+                  {{- end }}
+            - name: DATABASE_HOSTNAME
+            {{- if and .Values.externalDatabase.enabled .Values.externalDatabase.secretKeys.hostname }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "database.secretName" . }}
+                  key: {{ .Values.externalDatabase.secretKeys.hostname }}
+            {{ else }}
+              value: {{ template "postgresql.v1.primary.fullname" .Subcharts.postgresql }}
+            {{- end }}
+          command:
+            - "sh"
+            - "-c"
+            - "until pg_isready -h $DATABASE_HOSTNAME -U $POSTGRES_USER ; do sleep 2 ; done"
+          {{- if .Values.containerSecurityContext.enabled }}
+          {{- with .Values.containerSecurityContext }}
+          securityContext:
+            capabilities:
+              drop: {{- .capabilities.drop | toYaml | nindent 16 }}
+            readOnlyRootFilesystem: {{ .readOnlyRootFilesystem }}
+            allowPrivilegeEscalation: {{ .allowPrivilegeEscalation }}
+          {{- end }}
+          {{- end }}
+        {{- else if or .Values.mysql.enabled (and .Values.externalDatabase.enabled (eq .Values.externalDatabase.type "mysql")) }}
+        - name: mysql-isready
+          image: {{ include "db.isReady.image.repository" . }}:{{ include "db.isReady.image.tag" . }}
+          env:
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "database.secretName" . }}
+                  {{- if and .Values.externalDatabase.enabled .Values.externalDatabase.secretKeys.username }}
+                  key: {{ .Values.externalDatabase.secretKeys.username }}
+                  {{ else }}
+                  key: {{ .Values.mysql.auth.secretKeys.username }}
+                  {{ end }}
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "database.secretName" . }}
+                  {{- if and .Values.externalDatabase.enabled .Values.externalDatabase.secretKeys.password }}
+                  key: {{ .Values.externalDatabase.secretKeys.password }}
+                  {{ else }}
+                  key: {{ .Values.mysql.auth.secretKeys.password }}
+                  {{ end }}
+            - name: DATABASE_HOSTNAME
+            {{- if and .Values.externalDatabase.enabled .Values.externalDatabase.secretKeys.hostname }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "database.secretName" . }}
+                  key: {{ .Values.externalDatabase.secretKeys.hostname }}
+            {{ else }}
+              value: {{ template "mysql.primary.fullname" .Subcharts.mysql }}
+            {{- end }}
+          command:
+            - "sh"
+            - "-c"
+            - "until mysql -h $DATABASE_HOSTNAME -u $MYSQL_USER -p$MYSQL_PASSWORD -e 'SELECT VERSION();' ; do sleep 2 ; done"
+          {{- if .Values.containerSecurityContext.enabled }}
+          {{- with .Values.containerSecurityContext }}
+          securityContext:
+            capabilities:
+              drop: {{- .capabilities.drop | toYaml | nindent 16 }}
+            readOnlyRootFilesystem: {{ .readOnlyRootFilesystem }}
+            allowPrivilegeEscalation: {{ .allowPrivilegeEscalation }}
+          {{- end }}
+          {{- end }}
+        {{- end }}
+        - name: add-secret-values-to-config
+          image: {{ .Values.coturn.initContainer.image.repository }}:{{ .Values.coturn.initContainer.image.tag }}
+          imagePullPolicy: Always
+          env:
+            - name: USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "coturn.auth.secretName" . }}
+                  {{- if and .Values.coturn.auth.existingSecret .Values.coturn.auth.secretKeys.username }}
+                  key: {{ .Values.coturn.auth.secretKeys.username }}
+                  {{ else }}
+                  key: username
+                  {{- end }}
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "coturn.auth.secretName" . }}
+                  key: {{ .Values.coturn.auth.secretKeys.password }}
+            {{- if or .Values.externalDatabase.enabled .Values.postgresql.enabled .Values.mysql.enabled }}
+            - name: DATABASE_HOSTNAME
+            {{- if and .Values.externalDatabase.enabled .Values.externalDatabase.secretKeys.hostname }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "database.secretName" . }}
+                  key: {{ .Values.externalDatabase.secretKeys.hostname }}
+            {{ else if .Values.postgresql.enabled }}
+              value: {{ template "postgresql.v1.primary.fullname" .Subcharts.postgresql }}
+            {{ else if .Values.mysql.enabled }}
+              value: {{ template "mysql.primary.fullname" .Subcharts.mysql }}
+            {{- end }}
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "database.secretName" . }}
+                  {{- if and .Values.externalDatabase.enabled .Values.externalDatabase.secretKeys.username }}
+                  key: {{ .Values.externalDatabase.secretKeys.username }}
+                  {{ else if .Values.postgresql.enabled }}
+                  key: {{ .Values.postgresql.global.postgresql.auth.secretKeys.username }}
+                  {{ else if .Values.mysql.enabled }}
+                  key: username
+                  {{- end }}
+            - name: DATABASE_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "database.secretName" . }}
+                  {{- if and .Values.externalDatabase.enabled .Values.externalDatabase.secretKeys.password }}
+                  key: {{ .Values.externalDatabase.secretKeys.password }}
+                  {{ else if .Values.postgresql.enabled }}
+                  key: {{ .Values.postgresql.global.postgresql.auth.secretKeys.userPasswordKey }}
+                  {{ else if .Values.mysql.enabled }}
+                  key: password
+                  {{- end }}
+            - name: DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "database.secretName" . }}
+                  {{- if and .Values.externalDatabase.enabled .Values.externalDatabase.secretKeys.database }}
+                  key: {{ .Values.externalDatabase.secretKeys.database }}
+                  {{ else if .Values.postgresql.enabled }}
+                  key: {{ .Values.postgresql.global.postgresql.auth.secretKeys.database }}
+                  {{ else if .Values.mysql.enabled }}
+                  key: database
+                  {{- end }}
+            {{- end }}
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              cp /initial/turnserver.conf /data/turnserver.yaml && \
+              export USER_STR="$USER:$PASSWORD" && \
+              yq eval -i '.user = env(USER_STR)' /data/turnserver.yaml && \
+              {{- if or (and .Values.externalDatabase.enabled (eq .Values.externalDatabase.type "postgresql")) .Values.postgresql.enabled }}
+              export CONNECTION_STRING="host=$DATABASE_HOSTNAME dbname=$DATABASE user=$DATABASE_USER password=$DATABASE_PASS connect_timeout=30" && \
+              yq eval -i '.psql-userdb = env(CONNECTION_STRING)' /data/turnserver.yaml && \
+              {{- else if or (and .Values.externalDatabase.enabled (eq .Values.externalDatabase.type "mysql")) .Values.mysql.enabled }}
+              export CONNECTION_STRING="host=$DATABASE_HOSTNAME dbname=$DATABASE user=$DATABASE_USER password=$DATABASE_PASS port=3306 connect_timeout=10 read_timeout=10" && \
+              yq eval -i '.mysql-userdb = env(CONNECTION_STRING)' /data/turnserver.yaml && \
+              {{- end }}
+              sed -i 's/: /=/' /data/turnserver.yaml && \
+              cat /extra/turnserver.conf >> /data/turnserver.yaml && \
+              echo '' >> /data/turnserver.yaml && \
+              echo 'lt-cred-mech' >> /data/turnserver.yaml && \
+              mv /data/turnserver.yaml /data/turnserver.conf
+          volumeMounts:
+            - name: {{ .Release.Name }}-initial-config
+              mountPath: "/initial"
+            - name: {{ .Release.Name }}-extra-config
+              mountPath: /extra
+            - name: {{ .Release.Name }}-config
+              mountPath: /data
+          {{- if .Values.containerSecurityContext.enabled }}
+          {{- with .Values.containerSecurityContext }}
+          securityContext:
+            capabilities:
+              drop: {{- .capabilities.drop | toYaml | nindent 16 }}
+            readOnlyRootFilesystem: {{ .readOnlyRootFilesystem }}
+            allowPrivilegeEscalation: {{ .allowPrivilegeEscalation }}
+          {{- end }}
+          {{- end }}
+      containers:
+        - name: "coturn"
+          image: {{ include "coturn.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["-c", "/turnserver.conf"]
+          ports:
+            - name: turn-udp
+              containerPort: {{ .Values.coturn.ports.listening }}
+              protocol: UDP
+            - name: turn-tcp
+              containerPort: {{ .Values.coturn.ports.listening }}
+              protocol: TCP
+            - name: turn-tcp-tls
+              containerPort: {{ .Values.coturn.ports.tlsListening }}
+              protocol: TCP
+            - name: turn-udp-dtls
+              containerPort: {{ .Values.coturn.ports.tlsListening }}
+              protocol: UDP
+          volumeMounts:
+            - name: {{ .Release.Name }}-config
+              mountPath: "/turnserver.conf"
+              subPath: turnserver.conf
+              readOnly: true
+            {{- if .Values.certificate.enabled }}
+            - name: tls
+              mountPath: /tls
+              readOnly: true
+            {{- end }}
+            - name: var-tmp
+              mountPath: /var/tmp
+            {{- if and (not .Values.externalDatabase.enabled) (not .Values.postgresql.enabled) (not .Values.mysql.enabled) }}
+            - name: sqllite
+              mountPath: /var/db
+            {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.containerSecurityContext.enabled }}
+          {{- with .Values.containerSecurityContext }}
+          securityContext:
+            capabilities:
+              add: {{- .capabilities.add | toYaml | nindent 16 }}
+              drop: {{- .capabilities.drop | toYaml | nindent 16 }}
+            readOnlyRootFilesystem: {{ .readOnlyRootFilesystem }}
+            allowPrivilegeEscalation: {{ .allowPrivilegeEscalation }}
+          {{- end }}
+          {{- end }}
+      volumes:
+        {{- if .Values.certificate.enabled }}
+        - name: tls
+          secret:
+            secretName: {{ .Values.certificate.secret }}
+        {{- end }}
+        - name: {{ .Release.Name }}-initial-config
+          configMap:
+            name: {{ .Release.Name }}-initial-config
+        - name: {{ .Release.Name }}-extra-config
+          configMap:
+            name: {{ .Release.Name }}-extra-config
+        - name: {{ .Release.Name }}-config
+          emptyDir: {}
+        - name: var-tmp
+          emptyDir: {}
+        {{- if and (not .Values.externalDatabase.enabled) (not .Values.postgresql.enabled) (not .Values.mysql.enabled) }}
+        - name: sqllite
+          emptyDir: {}
+        {{- end }}

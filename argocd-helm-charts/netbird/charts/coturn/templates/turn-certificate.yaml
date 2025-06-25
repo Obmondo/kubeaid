@@ -1,0 +1,17 @@
+{{- if .Values.certificate.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name:  {{.Release.Name }}
+spec:
+  secretName:  {{ .Values.certificate.secret }}
+  issuerRef:
+    name: {{.Values.certificate.issuerName}}
+    kind: ClusterIssuer
+  commonName: {{ .Values.coturn.realm | quote }}
+  privateKey:
+    algorithm: "RSA"
+    size: 4096
+  dnsNames:
+    - {{ .Values.certificate.host | quote }}
+{{- end }}

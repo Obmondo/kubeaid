@@ -1,0 +1,22 @@
+apiVersion: v2
+appVersion: 4.7.0
+dependencies:
+- condition: postgresql.enabled
+  name: postgresql
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 16.7.10
+- condition: mysql.enabled
+  name: mysql
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 13.0.1
+description: A Helm chart to deploy coturn
+home: https://github.com/small-hack/coturn-chart
+maintainers:
+- email: jessebot@linux.com
+  name: jessebot
+  url: https://github.com/jessebot/
+name: coturn
+sources:
+- https://github.com/small-hack/coturn-chart
+type: application
+version: 9.1.0

@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-initial-config
+  labels:
+{{ include "labels" . | nindent 4 }}
+data:
+  turnserver.conf: |-
+    realm: {{ .Values.coturn.realm }}
+    listening-ip: {{ .Values.coturn.listeningIP }}
+    listening-port: {{ .Values.coturn.ports.listening }}
+    tls-listening-port: {{ .Values.coturn.ports.tlsListening }}
+    min-port: {{ .Values.coturn.ports.min }}
+    max-port: {{ .Values.coturn.ports.max }}
+    log-file: {{ .Values.coturn.logFile }}
+    pidfile: "/var/tmp/turnserver.pid"
+    pkey: "/tls/tls.key"
+    cert: "/tls/tls.crt"
+    {{- if and (not .Values.externalDatabase.enabled) (not .Values.postgresql.enabled) (not .Values.mysql.enabled) }}
+    userdb: "/var/db/turndb"
+    {{- end }}

@@ -9,6 +9,7 @@ All releases and the changes included in them (pulled from git commits added sin
 - Updated netbird from version 1.6.1 to 1.8.0
 
 ### Patch Version Upgrades %%^^
+- Added coturn from version 9.1.0 to 9.1.0
 
 ## 14.2.0
 ### Minor Version Upgrades

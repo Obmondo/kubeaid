@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-turn-tcp
+  annotations:
+    {{- range $key, $value := $.Values.service.annotations }}
+      "{{ $key }}": "{{ tpl $value $ }}"
+    {{- end }}
+spec:
+  {{- if .Values.service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{.Values.service.externalTrafficPolicy}}
+  {{- end }}
+  ports:
+    - name: turn-tcp
+      port: {{ .Values.coturn.ports.listening }}
+      protocol: TCP
+      targetPort: {{ .Values.coturn.ports.listening }}
+    - name: turn-tcp-tls
+      port: {{ .Values.coturn.ports.tlsListening }}
+      protocol: TCP
+      targetPort: {{ .Values.coturn.ports.tlsListening }}
+  selector:
+    app.kubernetes.io/name: {{ .Release.Name }}-coturn
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  type: {{ .Values.service.type }}
