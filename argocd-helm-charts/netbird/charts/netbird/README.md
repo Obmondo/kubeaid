@@ -1,7 +1,7 @@
 # netbird
 
 Forked from [TOT MICRO's Helm Repository](https://github.com/totmicro/helms).
-![Version: 1.6.1](https://img.shields.io/badge/Version-1.6.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.36.5](https://img.shields.io/badge/AppVersion-0.36.5-informational?style=flat-square)
+![Version: 1.8.0](https://img.shields.io/badge/Version-1.8.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.46.0](https://img.shields.io/badge/AppVersion-0.46.0-informational?style=flat-square)
 
 # NetBird Helm Chart
 
@@ -42,8 +42,12 @@ This will remove all the resources associated with the release.
 
 The following table lists the configurable parameters of the NetBird Helm chart and their default values.
 
+## Values
+
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| dashboard.volumeMounts | list | `[]` |  |
+| dashboard.volumes | list | `[]` |  |
 | dashboard.affinity | object | `{}` |  |
 | dashboard.containerPort | int | `80` |  |
 | dashboard.enabled | bool | `true` |  |
@@ -52,7 +56,7 @@ The following table lists the configurable parameters of the NetBird Helm chart 
 | dashboard.envRaw | list | `[]` |  |
 | dashboard.image.pullPolicy | string | `"IfNotPresent"` |  |
 | dashboard.image.repository | string | `"netbirdio/dashboard"` |  |
-| dashboard.image.tag | string | `"v2.9.0"` |  |
+| dashboard.image.tag | string | `"v2.13.1"` |  |
 | dashboard.imagePullSecrets | list | `[]` |  |
 | dashboard.ingress.annotations | object | `{}` |  |
 | dashboard.ingress.className | string | `""` |  |
@@ -86,11 +90,12 @@ The following table lists the configurable parameters of the NetBird Helm chart 
 | extraManifests | object | `{}` |  |
 | fullnameOverride | string | `""` |  |
 | global.namespace | string | `""` |  |
+| management.volumeMounts | list | `[]` |  |
+| management.volumes | list | `[]` |  |
 | management.affinity | object | `{}` |  |
 | management.configmap | string | `""` |  |
 | management.containerPort | int | `80` |  |
 | management.deploymentAnnotations | object | `{}` |  |
-| management.dnsDomain | string | `"netbird.selfhosted"` |  |
 | management.enabled | bool | `true` |  |
 | management.env | object | `{}` |  |
 | management.envFromSecret | object | `{}` |  |
@@ -125,15 +130,15 @@ The following table lists the configurable parameters of the NetBird Helm chart 
 | management.nodeSelector | object | `{}` |  |
 | management.persistentVolume.accessModes[0] | string | `"ReadWriteOnce"` |  |
 | management.persistentVolume.enabled | bool | `true` |  |
-| management.persistentVolume.size | string | `"10Mi"` |  |
-| management.persistentVolume.storageClass | string | `null` |  |
 | management.persistentVolume.existingPVName | string | `""` |  |
+| management.persistentVolume.size | string | `"10Mi"` |  |
+| management.persistentVolume.storageClass | string | `nil` |  |
 | management.podAnnotations | object | `{}` |  |
 | management.podCommand.args[0] | string | `"--port=80"` |  |
 | management.podCommand.args[1] | string | `"--log-file=console"` |  |
 | management.podCommand.args[2] | string | `"--log-level=info"` |  |
 | management.podCommand.args[3] | string | `"--disable-anonymous-metrics=false"` |  |
-| management.podCommand.args[4] | string | `"--single-account-mode-domain=netbird.example.com"` |  |
+| management.podCommand.args[4] | string | `"--single-account-mode-domain=netbird.selfhosted"` |  |
 | management.podCommand.args[5] | string | `"--dns-domain=netbird.selfhosted"` |  |
 | management.podSecurityContext | object | `{}` |  |
 | management.readinessProbe.failureThreshold | int | `3` |  |
@@ -167,7 +172,10 @@ The following table lists the configurable parameters of the NetBird Helm chart 
 | metrics.serviceMonitor.scrapeTimeout | string | `""` |  |
 | metrics.serviceMonitor.selector | object | `{}` |  |
 | nameOverride | string | `""` |  |
+| relay.volumeMounts | list | `[]` |  |
+| relay.volumes | list | `[]` |  |
 | relay.affinity | object | `{}` |  |
+| relay.containerPort | int | `33080` |  |
 | relay.deploymentAnnotations | object | `{}` |  |
 | relay.enabled | bool | `true` |  |
 | relay.env | object | `{}` |  |
@@ -188,7 +196,6 @@ The following table lists the configurable parameters of the NetBird Helm chart 
 | relay.livenessProbe.periodSeconds | int | `5` |  |
 | relay.livenessProbe.tcpSocket.port | string | `"http"` |  |
 | relay.logLevel | string | `"info"` |  |
-| relay.metrics.containerPort | int | `33080` |  |
 | relay.metrics.enabled | bool | `false` |  |
 | relay.metrics.port | int | `9090` |  |
 | relay.nodeSelector | object | `{}` |  |
@@ -207,6 +214,8 @@ The following table lists the configurable parameters of the NetBird Helm chart 
 | relay.serviceAccount.create | bool | `true` |  |
 | relay.serviceAccount.name | string | `""` |  |
 | relay.tolerations | list | `[]` |  |
+| signal.volumeMounts | list | `[]` |  |
+| signal.volumes | list | `[]` |  |
 | signal.affinity | object | `{}` |  |
 | signal.containerPort | int | `80` |  |
 | signal.deploymentAnnotations | object | `{}` |  |

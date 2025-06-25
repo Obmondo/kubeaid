@@ -3,5 +3,5 @@ name: netbird
 version: 1.0.0
 dependencies:
   - name: netbird
-    version: 1.6.1
-    repository: https://netbirdio.github.io/netbird
+    version: 1.8.0
+    repository: https://netbirdio.github.io/helms

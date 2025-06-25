@@ -2,6 +2,14 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## Unreleased Changes
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+- Updated netbird from version 1.6.1 to 1.8.0
+
+### Patch Version Upgrades %%^^
+
 ## 14.2.0
 ### Minor Version Upgrades
 - Updated traefik from version 36.1.0 to 36.2.0

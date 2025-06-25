@@ -91,6 +91,7 @@ management:
           "AuthorizationEndpoint": "https://idp.example.com/application/o/authorize/",
           "Scope": "openid profile email offline_access api",
           "UseIDToken": false,
+          "DisablePromptLogin": true,
           "RedirectURLs": ["http://localhost:53000"]
         }
       },
@@ -103,9 +104,6 @@ management:
         "TrustedPeers": null
       }
     }
-
-  image:
-    tag: 0.32.0
 
   ingress:
     enabled: true
@@ -156,8 +154,6 @@ management:
     IDP_SERVICE_ACCOUNT_PASSWORD: netbird/idpServiceAccountPassword
   useBackwardsGrpcService: true
 signal:
-  image:
-    tag: 0.32.0
   ingress:
     enabled: true
     className: public
@@ -178,8 +174,6 @@ signal:
           - netbird.example.com
 
 relay:
-  image:
-    tag: 0.32.0
   ingress:
     enabled: true
     className: public
@@ -219,8 +213,6 @@ dashboard:
       - secretName: netbird-dashboard-tls
         hosts:
           - netbird-dashboard.example.com
-  image:
-    tag: v2.9.0
   env:
     # Endpoints
     NETBIRD_MGMT_API_ENDPOINT: https://netbird.example.com:443

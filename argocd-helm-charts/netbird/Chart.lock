@@ -1,0 +1,6 @@
+dependencies:
+- name: netbird
+  repository: https://netbirdio.github.io/helms
+  version: 1.8.0
+digest: sha256:35a97ee48b69855e98bcdf2290635435b8543cb3e29c6428ddd9da2295339323
+generated: "2025-06-26T01:16:29.275682734+02:00"
