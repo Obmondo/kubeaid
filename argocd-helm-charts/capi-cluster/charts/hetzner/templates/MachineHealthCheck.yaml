@@ -7,7 +7,7 @@ metadata:
 spec:
   clusterName: {{ .Values.global.clusterName }}
   maxUnhealthy: 100%
-  nodeStartupTimeout: 15m0s
+  nodeStartupTimeout: 20m0s
   selector:
     matchLabels:
       cluster.x-k8s.io/control-plane: ""
@@ -29,7 +29,12 @@ metadata:
 spec:
   clusterName: {{ .Values.global.clusterName }}
   maxUnhealthy: 100%
-  nodeStartupTimeout: 15m0s
+  {{/*
+    Node startup takes about 30 minutes in Hetzner Bare Metal.
+    A major amount of time is eaten up by socat and mtr installation. We need them to be able to do
+    'kubectl port-forward'.
+  */}}
+  nodeStartupTimeout: 1h0m0s
   selector:
     matchLabels:
       cluster.x-k8s.io/control-plane: ""

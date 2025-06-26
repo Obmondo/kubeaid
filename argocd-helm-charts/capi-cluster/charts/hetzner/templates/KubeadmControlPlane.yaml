@@ -249,7 +249,7 @@ spec:
       - localectl set-locale LANG=en_US.UTF-8
       - localectl set-locale LANGUAGE=en_US.UTF-8
       - apt-get update -y
-      - apt-get -y install at jq unzip wget socat mtr logrotate apt-transport-https
+      - apt-get -y install at jq unzip wget logrotate apt-transport-https
 
       {{- if eq .Values.mode "bare-metal" }}
 
@@ -362,6 +362,9 @@ spec:
           --values kubeaid/argocd-helm-charts/ccm-hetzner/values.yaml \
           --namespace kube-system | kubectl apply -f -
       {{- end }}
+
+      - apt-get -y install socat mtr
+      - apt-get -y autoremove && apt-get -y clean all
     {{- if and ($.Values.global.additionalUsers) (gt (len $.Values.global.additionalUsers) 0) }}
     users:
       {{- range $index, $additionalUser := $.Values.global.additionalUsers }}
