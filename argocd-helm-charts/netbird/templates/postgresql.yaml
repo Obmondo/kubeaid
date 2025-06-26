@@ -1,0 +1,102 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  {{ if (.Values.postgresql).recover }}
+  name: netbird-pgsql-recover
+  {{ else }}
+  name: netbird-pgsql
+  {{ end }}
+spec:
+  instances: {{ ((.Values.postgresql).instance) | default 1 }}
+  {{ if (.Values.postgresql).recover }}
+  bootstrap:
+    recovery:
+      source: netbird-pgsql
+      database: netbird
+      owner: netbird
+      secret:
+        name: netbird-pgsql-app
+  {{ else }}
+  bootstrap:
+    initdb:
+      database: netbird
+      owner: netbird
+  {{ end }}
+  resources:
+    limits:
+      memory: {{ (((.Values.postgresql).resources).limits).memory | default "800Mi" }}
+    requests:
+      memory: {{ (((.Values.postgresql).resources).requests).memory | default "500Mi" }}
+      cpu: {{ (((.Values.postgresql).resources).requests).cpu | default "100m" }}
+  storage:
+    size: {{ (.Values.postgresql).size }}
+    {{- if (.Values.postgresql).storageClass }}
+    storageClass: {{ (.Values.postgresql).storageClass }}
+    {{- end }}
+  {{- if (.Values.postgresql).recover }}
+  externalClusters:
+    - name: netbird-pgsql
+      barmanObjectStore:
+        destinationPath: {{ ((.Values.postgresql).backup).destinationPath }}
+        endpointURL: {{ ((.Values.postgresql).backup).endpointURL }}
+        {{- if eq ((.Values.postgresql).backup).cloud "aws" }}
+        s3Credentials:
+          accessKeyId:
+            name: netbird-pgsql-postgres-pod-env
+            key: AWS_ACCESS_KEY_ID
+          secretAccessKey:
+            name: netbird-pgsql-postgres-pod-env
+            key: AWS_SECRET_ACCESS_KEY
+        {{- end }}
+        {{- if eq ((.Values.postgresql).backup).cloud "azure" }}
+        azureCredentials:
+          connectionString:
+            name: netbird-pgsql-postgres-pod-env
+            key: AZURE_CONNECTION_STRING
+          storageAccount:
+            name: netbird-pgsql-postgres-pod-env
+            key: AZURE_STORAGE_ACCOUNT
+          storageKey:
+            name: netbird-pgsql-postgres-pod-env
+            key: AZURE_STORAGE_KEY
+          storageSasToken:
+            name: netbird-pgsql-postgres-pod-env
+            key: AZURE_STORAGE_SAS_TOKEN
+        {{- end }}
+        wal:
+          maxParallel: 8
+  {{- end }}
+  {{- if (.Values.postgresql).backup }}
+  backup:
+    barmanObjectStore:
+      destinationPath: {{ ((.Values.postgresql).backup).destinationPath }}
+      endpointURL: {{ ((.Values.postgresql).backup).endpointURL }}
+      {{- if eq ((.Values.postgresql).backup).cloud "aws" }}
+      s3Credentials:
+        accessKeyId:
+          name: netbird-pgsql-postgres-pod-env
+          key: AWS_ACCESS_KEY_ID
+        secretAccessKey:
+          name: netbird-pgsql-postgres-pod-env
+          key: AWS_SECRET_ACCESS_KEY
+      {{- end }}
+      {{- if eq ((.Values.postgresql).backup).cloud "azure" }}
+      azureCredentials:
+        connectionString:
+          name: netbird-pgsql-postgres-pod-env
+          key: AZURE_CONNECTION_STRING
+        storageAccount:
+          name: netbird-pgsql-postgres-pod-env
+          key: AZURE_STORAGE_ACCOUNT
+        storageKey:
+          name: netbird-pgsql-postgres-pod-env
+          key: AZURE_STORAGE_KEY
+        storageSasToken:
+          name: netbird-pgsql-postgres-pod-env
+          key: AZURE_STORAGE_SAS_TOKEN
+      {{- end }}
+      wal:
+        compression: gzip
+        encryption: AES256
+    retentionPolicy: "30d"
+  {{ end  }}

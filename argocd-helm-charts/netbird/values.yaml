@@ -1,2 +1,6 @@
 postgresql:
-  enabled: true
+  size: 8Gi
+  recover: false
+  pass: mattermost-pgsql-app
+  logicalbackup:
+    enabled: true
