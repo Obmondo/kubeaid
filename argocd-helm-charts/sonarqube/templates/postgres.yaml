@@ -33,5 +33,5 @@ spec:
   databases:
     sonarqube: sonarqube
   postgresql:
-    version: "14"
+    version: "16"
   enableMasterLoadBalancer: false

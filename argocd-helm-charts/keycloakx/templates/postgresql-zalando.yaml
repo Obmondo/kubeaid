@@ -18,7 +18,7 @@ spec:
     limits:
       memory: {{ ((((.Values.postgresql).resources).requests).memory) | default "500Mi" }}
   postgresql:
-    version: "12"
+    version: "16"
   teamId: keycloakx
   users:
     keycloak:
