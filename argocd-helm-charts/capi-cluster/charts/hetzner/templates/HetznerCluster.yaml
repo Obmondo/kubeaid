@@ -61,13 +61,10 @@ spec:
     # ClusterAPI will access the VMs using these HCloud SSH Keys (before bootstrapping the
     # Kubernetes cluster).
     # NOTE : Each SSH Key is cluster wide.
+    {{- if or (eq .Values.mode "hcloud") (eq .Values.mode "hybrid") }}
     hcloud:
-      {{- if or (eq .Values.mode "hcloud") (eq .Values.mode "hybrid") }}
       - name: {{ .Values.hcloud.sshKeyPairName }}
-      {{- end }}
-      {{- if or (eq .Values.mode "bare-metal") (eq .Values.mode "hybrid") }}
-      - name: {{ .Values.bareMetal.sshKeyPair.name }}
-      {{- end }}
+    {{- end }}
     {{- if or (eq .Values.mode "bare-metal") (eq .Values.mode "hybrid") }}
     # Defines the reference to the secret where the SSH key for the rescue system is stored.
     # Make sure, that any other HCloud SSH Key with this name doesn't exist.
