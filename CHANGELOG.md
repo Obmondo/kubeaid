@@ -11,6 +11,23 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Patch Version Upgrades %%^^
 - Added coturn from version 9.1.0 to 9.1.0
 
+### Improvements
+- [`e7cff8b3`](../../commit/e7cff8b3) feat(capi-cluster/hetzner) : ClusterAPI managed cloud-provider label for each node
+- [`c5b55eb3`](../../commit/c5b55eb3) fix(capi-cluster/hetzner) : using specific routing device names for Cilium
+- [`ad4ad3dd`](../../commit/ad4ad3dd) fix(capi-cluster/hetzner) : considering Hetzner Bare Metal node-groups if mode is set to bare-metal or hybrid
+- [`9f61874e`](../../commit/9f61874e) fix(capi-cluster/hetzner) : not specifying Hetzner Bare Metal SSH Key in sshKeys.hcloud section
+- [`fb890f5f`](../../commit/fb890f5f) add release procedure doc
+- [`295411af`](../../commit/295411af) fix(capi-cluster/hetzner) : increasing node-startup timeout in MachineHealthChecks | Removing remediation | installing socat and mtr at last
+- [`2053a670`](../../commit/2053a670) fix(capi-cluster/hetzner) : in second or remainig master nodes, creating and applying the netplan config after 'kubeadm join' execution
+- [`323a513c`](../../commit/323a513c) chore: added coturn helm chart
+- [`c3694db5`](../../commit/c3694db5) chore: netbird helm chart update
+- [`5125d06b`](../../commit/5125d06b) create kubeaid-security-config chart and add resource quota template
+- [`1ce224ad`](../../commit/1ce224ad) chore(capi-cluster/hetzner) : Upgrade ContainerD and ClusterAPI components version
+- [`815b0471`](../../commit/815b0471) fix(capi-cluster/hetzner) : KubeadmConfigTemplates for Hetzner Bare Metal worker nodes
+- [`7b04245e`](../../commit/7b04245e) fix(capi-cluster/hetzner) : removing netplan config for worker nodes
+- [`6c4892ec`](../../commit/6c4892ec) feat(helm): add pg_dump toggle and backup CronJob config
+- [`c5243bc9`](../../commit/c5243bc9) fix(capi-cluster/hetzner) : increasing time-out to 30m for each Hetzner bare-metal machine
+
 ## 14.2.0
 ### Minor Version Upgrades
 - Updated traefik from version 36.1.0 to 36.2.0
