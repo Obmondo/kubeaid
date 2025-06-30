@@ -2,13 +2,23 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## Unreleased Changes
-### Major Version Upgrades %%^^
+## 15.0.0
+### Major Version Upgrades
+- Updated redmine from version 32.2.6 to 33.0.0
 
-### Minor Version Upgrades %%^^
+### Minor Version Upgrades
+- Updated opensearch-operator from version 2.7.0 to 2.8.0
+- Updated opensearch-dashboards from version 3.0.0 to 3.1.0
+- Updated opensearch from version 3.0.0 to 3.1.0
 - Updated netbird from version 1.6.1 to 1.8.0
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
+- Updated velero from version 10.0.7 to 10.0.8
+- Updated strimzi-kafka-operator from version 0.46.0 to 0.46.1
+- Added rook-ceph from version v1.17.2 to v1.17.2
+- Updated rabbitmq-cluster-operator from version 4.4.22 to 4.4.23
+- Updated opentelemetry-collector from version 0.127.1 to 0.127.2
+- Added openobserve-collector from version 0.3.22 to 0.3.22
 - Added coturn from version 9.1.0 to 9.1.0
 
 ### Improvements
