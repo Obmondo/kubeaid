@@ -6,6 +6,9 @@ metadata:
   name: {{ .Values.global.clusterName }}-control-plane
 spec:
   template:
+    metadata:
+      labels:
+        node.cluster.x-k8s.io/cloud-provider: hcloud
     spec:
       imageName: {{ .Values.hcloud.imageName }}
       placementGroupName: control-plane
@@ -22,6 +25,9 @@ metadata:
   name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
 spec:
   template:
+    metadata:
+      labels:
+        node.cluster.x-k8s.io/cloud-provider: hcloud
     spec:
       imageName: {{ $.Values.hcloud.imageName }}
       placementGroupName: {{ $nodeGroup.name }}

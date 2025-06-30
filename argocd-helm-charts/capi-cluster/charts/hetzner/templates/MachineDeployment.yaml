@@ -19,7 +19,6 @@ spec:
   clusterName: {{ $.Values.global.clusterName }}
   replicas: {{ $nodeGroup.replicas }}
   template:
-    {{- if $nodeGroup.labels }}
     metadata:
       # Label should meet one of the following criterias to propagate to Node :
       #
@@ -28,8 +27,11 @@ spec:
       # (3) Belongs to node.cluster.x-k8s.io domain.
       #
       # REFER : https://cluster-api.sigs.k8s.io/developer/architecture/controllers/metadata-propagation#machine
-      labels: {{- toYaml $nodeGroup.labels | nindent 8 }}
-    {{- end }}
+      labels:
+        node.cluster.x-k8s.io/cloud-provider: hcloud
+        {{- if $nodeGroup.labels }}
+        {{- toYaml $nodeGroup.labels | nindent 8 }}
+        {{- end }}
     spec:
       clusterName: {{ $.Values.global.clusterName }}
       version: {{ $.Values.global.kubernetes.version }}
@@ -58,7 +60,6 @@ spec:
   replicas: {{ len $nodeGroup.bareMetalHosts }}
 
   template:
-    {{- if $nodeGroup.labels }}
     metadata:
       # Label should meet one of the following criterias to propagate to Node :
       #
@@ -67,8 +68,11 @@ spec:
       # (3) Belongs to node.cluster.x-k8s.io domain.
       #
       # REFER : https://cluster-api.sigs.k8s.io/developer/architecture/controllers/metadata-propagation#machine
-      labels: {{- toYaml $nodeGroup.labels | nindent 8 }}
-    {{- end }}
+      labels:
+        node.cluster.x-k8s.io/cloud-provider: hetzner-bare-metal
+        {{- if $nodeGroup.labels }}
+        {{- toYaml $nodeGroup.labels | nindent 8 }}
+        {{- end }}
     spec:
       clusterName: {{ $.Values.global.clusterName }}
       version: {{ $.Values.global.kubernetes.version }}

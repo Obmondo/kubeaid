@@ -9,6 +9,9 @@ metadata:
     capi.syself.com/constant-bare-metal-hostname: "true"
 spec:
   template:
+    metadata:
+      labels:
+        node.cluster.x-k8s.io/cloud-provider: hetzner-bare-metal
     spec:
       hostSelector:
         matchLabels:
@@ -67,6 +70,9 @@ metadata:
     capi.syself.com/constant-bare-metal-hostname: "true"
 spec:
   template:
+    metadata:
+      labels:
+        node.cluster.x-k8s.io/cloud-provider: hetzner-bare-metal
     spec:
       hostSelector:
         matchLabels:
