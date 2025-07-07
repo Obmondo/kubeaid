@@ -2,6 +2,10 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 15.1.0
+### Improvements
+- [`df63ed62`](../../commit/df63ed62) feat(kyverno) : adding the Kyverno Helm chart
+
 ## 15.0.0
 ### Major Version Upgrades
 - Updated redmine from version 32.2.6 to 33.0.0
