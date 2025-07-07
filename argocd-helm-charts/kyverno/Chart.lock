@@ -1,0 +1,6 @@
+dependencies:
+- name: kyverno
+  repository: https://kyverno.github.io/kyverno
+  version: 3.4.4
+digest: sha256:932433da71fcee484e5d745052eee7313b3dc7bd251f169c200c3d0140664e43
+generated: "2025-07-07T11:14:09.546566+05:30"
