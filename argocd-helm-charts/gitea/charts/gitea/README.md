@@ -166,7 +166,7 @@ available. As this is a Golang application, this can be implemented using `GOMAX
 of defining `GOMAXPROCS` automatically based on the defined CPU limit like `1000m`. Please keep in mind, that the CFS
 rate of `100ms` - default on each kubernetes node, is also very important to avoid CPU throttling.
 
-Further information about this topic can be found [here](https://kanishk.io/posts/cpu-throttling-in-containerized-go-apps/).
+Further information about this topic can be found [under this link](https://kanishk.io/posts/cpu-throttling-in-containerized-go-apps/).
 
 > [!NOTE]
 > The environment variable `GOMAXPROCS` is set automatically, when a CPU limit is defined. An explicit configuration is
@@ -533,7 +533,7 @@ and the repository exists.
 ```
 
 To solve this problem add the capability `SYS_CHROOT` to the `securityContext`.
-More about this issue [here](https://gitea.com/gitea/helm-gitea/issues/161).
+More about this issue [under this link](https://gitea.com/gitea/helm-gitea/issues/161).
 
 ### Cache
 
@@ -693,7 +693,7 @@ Affected options:
 
 Like the admin user, OAuth2 settings can be updated and disabled but not deleted.
 Deleting OAuth2 settings has to be done in the ui.
-All OAuth2 values, which are documented [here](https://docs.gitea.com/administration/command-line#admin), are
+All OAuth2 values, which are documented [under this link](https://docs.gitea.com/administration/command-line#admin), are
 available.
 
 Multiple OAuth2 sources can be configured with additional OAuth list items.
@@ -1167,6 +1167,7 @@ Valkey and [Valkey cluster](#valkey-cluster) cannot be enabled at the same time.
 | `postgresql-ha.postgresql.repmgrPassword`   | Repmgr Password                                                  | `changeme2` |
 | `postgresql-ha.postgresql.postgresPassword` | postgres Password                                                | `changeme1` |
 | `postgresql-ha.pgpool.adminPassword`        | pgpool adminPassword                                             | `changeme3` |
+| `postgresql-ha.pgpool.srCheckPassword`      | pgpool srCheckPassword                                           | `changeme4` |
 | `postgresql-ha.service.ports.postgresql`    | PostgreSQL service port (overrides `service.ports.postgresql`)   | `5432`      |
 | `postgresql-ha.persistence.size`            | PVC Storage Request for PostgreSQL HA volume                     | `10Gi`      |
 

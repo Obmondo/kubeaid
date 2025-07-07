@@ -1,10 +1,9 @@
 annotations:
-  artifacthub.io/changes: "- \"fix(CRDs): :bug: kustomization file for CRDs\"\n- \"feat(hub):
-    ✨ initial support for AI Gateway\"\n- \"feat(hub): update version mapping with
-    Proxy v3.4\"\n- \"feat(hpa): ✨ customizable scaleTargetRef\"\n- \"chore(schema):
-    update linter\"\n- \"chore(release): \U0001F680 publish v36.2.0 and CRDs v1.9.0\"\n"
+  artifacthub.io/changes: "- \"feat(deps): update traefik docker tag to v3.4.3\"\n-
+    \"feat(deployment): allow null and 0 replicas\"\n- \"chore(release): \U0001F680
+    publish 36.3.0\"\n"
 apiVersion: v2
-appVersion: v3.4.1
+appVersion: v3.4.3
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
 icon: https://raw.githubusercontent.com/traefik/traefik/master/docs/content/assets/img/traefik.logo.png
@@ -24,4 +23,4 @@ sources:
 - https://github.com/traefik/traefik-helm-chart
 - https://github.com/traefik/traefik
 type: application
-version: 36.2.0
+version: 36.3.0

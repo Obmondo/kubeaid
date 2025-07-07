@@ -2,7 +2,7 @@
 
 OpenCost and OpenCost UI
 
-![Version: 2.1.5](https://img.shields.io/badge/Version-2.1.5-informational?style=flat-square)
+![Version: 2.1.6](https://img.shields.io/badge/Version-2.1.6-informational?style=flat-square)
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 ![AppVersion: 1.115.0](https://img.shields.io/badge/AppVersion-1.115.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/opencost)](https://artifacthub.io/packages/search?repo=opencost)
@@ -224,6 +224,7 @@ $ helm install opencost opencost/opencost
 | plugins.install.securityContext.runAsUser | int | `1000` |  |
 | plugins.install.securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | podAnnotations | object | `{}` | Annotations to add to the OpenCost Pod |
+| podAutomountServiceAccountToken | bool | `true` | Enable automounting of service account token at the pod level |
 | podLabels | object | `{}` | Labels to add to the OpenCost Pod |
 | podSecurityContext | object | `{}` | Holds pod-level security attributes and common container settings |
 | priorityClassName | string | `nil` | Pod priority |

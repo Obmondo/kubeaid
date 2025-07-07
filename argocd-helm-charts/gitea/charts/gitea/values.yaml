@@ -557,6 +557,7 @@ valkey:
 ## @param postgresql-ha.postgresql.repmgrPassword Repmgr Password
 ## @param postgresql-ha.postgresql.postgresPassword postgres Password
 ## @param postgresql-ha.pgpool.adminPassword pgpool adminPassword
+## @param postgresql-ha.pgpool.srCheckPassword pgpool srCheckPassword
 ## @param postgresql-ha.service.ports.postgresql PostgreSQL service port (overrides `service.ports.postgresql`)
 ## @param postgresql-ha.persistence.size PVC Storage Request for PostgreSQL HA volume
 postgresql-ha:
@@ -572,6 +573,7 @@ postgresql-ha:
     password: changeme4
   pgpool:
     adminPassword: changeme3
+    srCheckPassword: changeme4
   service:
     ports:
       postgresql: 5432

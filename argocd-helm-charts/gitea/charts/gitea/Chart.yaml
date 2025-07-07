@@ -1,32 +1,24 @@
 annotations:
   artifacthub.io/changes: |
-    - kind: changed
-      description: remove comment
-    - kind: added
-      description: add Artifacthub annotation 'artifacthub.io/changes' (#881)
-    - kind: changed
-      description: bump helm version for tests
     - kind: fixed
-      description: correct replicaCount comparison (#884)
+      description: add `srCheckPassword` param to support new postgresql-ha stream replication check requirements (#894)
     - kind: changed
-      description: update subcharts (minor & patch) (#885)
+      description: update workflow dependencies (minor & patch) (#892)
     - kind: changed
-      description: update dependency go-gitea/gitea to v1.24.0 (#886)
+      description: update subcharts (minor & patch) (#891)
     - kind: changed
-      description: 'update subcharts (minor & patch) (#879) Co-authored-by: Renovate Bot <renovate-bot@gitea.com> Co-committed-by: Renovate Bot <renovate-bot@gitea.com>'
+      description: update dependency go-gitea/gitea to v1.24.2 (#890)
     - kind: changed
-      description: 'update unittests/bash/bats digest to 5ec2d81 (#878) Co-authored-by: Renovate Bot <renovate-bot@gitea.com> Co-committed-by: Renovate Bot <renovate-bot@gitea.com>'
+      description: update bats testing framework (#889)
     - kind: changed
-      description: 'update subcharts (minor & patch) (#874) Co-authored-by: Renovate Bot <renovate-bot@gitea.com> Co-committed-by: Renovate Bot <renovate-bot@gitea.com>'
-    - kind: changed
-      description: fully re-enable release-workflow
+      description: update dependency go-gitea/gitea to v1.24.1 (#887)
 apiVersion: v2
-appVersion: 1.24.0
+appVersion: 1.24.2
 dependencies:
 - condition: postgresql.enabled
   name: postgresql
   repository: oci://registry-1.docker.io/bitnamicharts
-  version: 16.7.11
+  version: 16.7.13
 - condition: postgresql-ha.enabled
   name: postgresql-ha
   repository: oci://registry-1.docker.io/bitnamicharts
@@ -38,7 +30,7 @@ dependencies:
 - condition: valkey.enabled
   name: valkey
   repository: oci://registry-1.docker.io/bitnamicharts
-  version: 3.0.13
+  version: 3.0.15
 description: Gitea Helm chart for Kubernetes
 icon: https://gitea.com/assets/img/logo.svg
 keywords:
@@ -67,4 +59,4 @@ sources:
 - https://github.com/go-gitea/gitea
 - https://docker.gitea.com/gitea
 type: application
-version: 12.1.0
+version: 12.1.1

@@ -2,6 +2,35 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 16.0.0
+### Major Version Upgrades
+- Updated teleport-kube-agent from version 17.5.2 to 18.0.0
+- Updated teleport-cluster from version 17.5.2 to 18.0.0
+
+### Minor Version Upgrades
+- Updated traefik from version 36.2.0 to 36.3.0
+- Updated fluent-bit from version 0.49.1 to 0.50.0
+- Updated external-dns from version 8.8.6 to 8.9.1
+- Updated cluster-autoscaler from version 9.46.6 to 9.47.0
+- Updated cluster-api-operator from version 0.20.0 to 0.21.0
+- Updated hcloud-cloud-controller-manager from version 1.25.1 to 1.26.0
+- Updated aws-efs-csi-driver from version 3.1.9 to 3.2.0
+
+### Patch Version Upgrades
+- Added rook-ceph from version v1.17.2 to v1.17.2
+- Updated reloader from version 2.1.4 to 2.1.5
+- Updated rabbitmq-cluster-operator from version 4.4.23 to 4.4.24
+- Added opentelemetry-operator from version 0.84.1 to 0.84.1
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated opencost from version 2.1.5 to 2.1.6
+- Updated odoo from version 28.2.6 to 28.2.7
+- Updated graylog from version 2.3.14 to 2.3.15
+- Updated gitlab-runner from version 0.78.0 to 0.78.1
+- Updated gitea from version 12.1.0 to 12.1.1
+- Updated erpnext from version 7.0.208 to 7.0.211
+- Updated cert-manager from version v1.18.1 to v1.18.2
+- Updated argo-cd from version 8.1.1 to 8.1.2
+
 ## 15.1.0
 ### Improvements
 - [`df63ed62`](../../commit/df63ed62) feat(kyverno) : adding the Kyverno Helm chart

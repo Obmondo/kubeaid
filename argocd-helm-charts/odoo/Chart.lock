@@ -1,6 +1,6 @@
 dependencies:
 - name: odoo
   repository: https://charts.bitnami.com/bitnami
-  version: 28.2.6
-digest: sha256:b85c6bce6a0aacd293c28fb3071751ed6f5870c2496c05cef64fb09d5821760e
-generated: "2025-06-10T22:01:29.442130378+05:30"
+  version: 28.2.7
+digest: sha256:350697c3d4e7b9900cb8d272d83bffcc699d4db0296b486df67a640487a53324
+generated: "2025-07-08T01:01:09.72381556+05:30"

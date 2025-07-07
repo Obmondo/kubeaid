@@ -24,7 +24,9 @@ configures access monitoring when its values are set:
           workgroup: example_access_monitoring_workgroup
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-aws-cluster
@@ -101,7 +103,9 @@ keeps the session_recording type even when it's "off":
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: helm-lint
@@ -137,7 +141,9 @@ matches snapshot for acme-off.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-cluster-name
@@ -172,7 +178,9 @@ matches snapshot for acme-on.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-acme-cluster
@@ -207,7 +215,9 @@ matches snapshot for acme-uri-staging.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-acme-cluster
@@ -243,7 +253,9 @@ matches snapshot for auth-connector-name.yaml:
         authentication:
           connector_name: okta
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: helm-lint
@@ -312,7 +324,9 @@ matches snapshot for auth-locking-mode.yaml:
         authentication:
           local_auth: true
           locking_mode: strict
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: helm-lint
@@ -383,10 +397,9 @@ matches snapshot for auth-secondfactors-sso.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - sso
           type: local
-          webauthn:
-            rp_id: helm-lint
         cluster_name: helm-lint
         enabled: true
         proxy_listener_mode: separate
@@ -418,7 +431,9 @@ matches snapshot for auth-secondfactors-webauthn.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - sso
+          - webauthn
           type: local
           webauthn:
             attestation_allowed_cas:
@@ -457,7 +472,9 @@ matches snapshot for auth-type-legacy.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: github
           webauthn:
             rp_id: helm-lint
@@ -492,7 +509,9 @@ matches snapshot for auth-type.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: github
           webauthn:
             rp_id: helm-lint
@@ -605,7 +624,9 @@ matches snapshot for aws-dynamodb-autoscaling.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-aws-cluster
@@ -656,7 +677,9 @@ matches snapshot for aws-ha-acme.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-aws-cluster
@@ -702,7 +725,9 @@ matches snapshot for aws-ha-antiaffinity.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-aws-cluster
@@ -748,7 +773,9 @@ matches snapshot for aws-ha-log.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-aws-cluster
@@ -795,7 +822,9 @@ matches snapshot for aws-ha.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-aws-cluster
@@ -841,7 +870,9 @@ matches snapshot for aws.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-aws-cluster
@@ -887,7 +918,9 @@ matches snapshot for azure.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-azure-cluster
@@ -930,7 +963,9 @@ matches snapshot for azure.yaml without pool_max_conn:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-azure-cluster
@@ -973,7 +1008,9 @@ matches snapshot for existing-tls-secret-with-ca.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-cluster-name
@@ -1008,7 +1045,9 @@ matches snapshot for existing-tls-secret.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-cluster-name
@@ -1043,7 +1082,9 @@ matches snapshot for gcp-ha-acme.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-gcp-cluster
@@ -1088,7 +1129,9 @@ matches snapshot for gcp-ha-antiaffinity.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-gcp-cluster
@@ -1133,7 +1176,9 @@ matches snapshot for gcp-ha-log.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-gcp-cluster
@@ -1179,7 +1224,9 @@ matches snapshot for gcp.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-gcp-cluster
@@ -1224,7 +1271,9 @@ matches snapshot for initcontainers.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: helm-lint
@@ -1259,7 +1308,9 @@ matches snapshot for kube-cluster-name.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-aws-cluster
@@ -1294,7 +1345,9 @@ matches snapshot for log-basic.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-log-cluster
@@ -1329,7 +1382,9 @@ matches snapshot for log-extra.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-log-cluster
@@ -1364,7 +1419,9 @@ matches snapshot for log-legacy.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-log-cluster
@@ -1399,7 +1456,9 @@ matches snapshot for priority-class-name.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: helm-lint
@@ -1434,7 +1493,9 @@ matches snapshot for proxy-listener-mode-multiplex.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-proxy-listener-mode
@@ -1469,7 +1530,9 @@ matches snapshot for proxy-listener-mode-separate.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-proxy-listener-mode
@@ -1504,7 +1567,9 @@ matches snapshot for public-addresses.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: helm-lint
@@ -1539,7 +1604,9 @@ matches snapshot for separate-mongo-listener.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: helm-lint
@@ -1574,7 +1641,9 @@ matches snapshot for separate-postgres-listener.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: helm-lint
@@ -1609,7 +1678,9 @@ matches snapshot for service.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: helm-lint
@@ -1644,7 +1715,9 @@ matches snapshot for session-recording.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: helm-lint
@@ -1680,7 +1753,9 @@ matches snapshot for standalone-customsize.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-standalone-cluster
@@ -1717,7 +1792,9 @@ matches snapshot for standalone-existingpvc.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-standalone-cluster
@@ -1754,7 +1831,9 @@ matches snapshot for tolerations.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-aws-cluster
@@ -1798,7 +1877,9 @@ matches snapshot for version-override.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: test-cluster-name
@@ -1836,7 +1917,9 @@ matches snapshot for volumes.yaml:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: helm-lint
@@ -1919,7 +2002,9 @@ sets clusterDomain on Configmap:
         auth_service:
           authentication:
             local_auth: true
-            second_factor: "on"
+            second_factors:
+            - otp
+            - webauthn
             type: local
             webauthn:
               rp_id: teleport.example.com
@@ -1955,9 +2040,9 @@ sets clusterDomain on Configmap:
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: teleport-cluster
-        app.kubernetes.io/version: 17.5.2
-        helm.sh/chart: teleport-cluster-17.5.2
-        teleport.dev/majorVersion: "17"
+        app.kubernetes.io/version: 18.0.0
+        helm.sh/chart: teleport-cluster-18.0.0
+        teleport.dev/majorVersion: "18"
       name: RELEASE-NAME-auth
       namespace: NAMESPACE
 uses athena as primary backend when configured:
@@ -1966,7 +2051,9 @@ uses athena as primary backend when configured:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: teleport.example.com
@@ -2011,7 +2098,9 @@ uses athena, dynamo, and stdout when everything is on:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: teleport.example.com
@@ -2057,7 +2146,9 @@ uses dynamo as primary backend when configured:
       auth_service:
         authentication:
           local_auth: true
-          second_factor: "on"
+          second_factors:
+          - otp
+          - webauthn
           type: local
           webauthn:
             rp_id: teleport.example.com
