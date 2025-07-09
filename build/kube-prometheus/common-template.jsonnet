@@ -155,7 +155,7 @@ local default_vars = {
     'cert-manager.io/cluster-issuer': 'letsencrypt',
   },
   addMixins: {
-    ceph: true,
+    ceph: false,
     'argo-cd': true,
     'node-pressure': true,
     sealedsecrets: true,
