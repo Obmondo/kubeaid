@@ -2,6 +2,12 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 16.0.1
+### Improvements
+- b0aed250 chore(kube-prometheus) : we don't need the ceph mixin by default
+- 05157ec5 fix(capi-cluster/hetzner) : explicitly specifying the routing device to Cilium, only in case of HCloud control-plane
+- 74c8eb01 chore(capi-cluster/hetzner) : not having cloud-provider labels in control-plane nodes (for now)
+
 ## 16.0.0
 ### Major Version Upgrades
 - Updated teleport-kube-agent from version 17.5.2 to 18.0.0
