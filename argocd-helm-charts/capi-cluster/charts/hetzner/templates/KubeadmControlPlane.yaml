@@ -339,14 +339,25 @@ spec:
       - API_SERVER_URL=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
       - API_SERVER_HOST=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $4}')
       - API_SERVER_PORT=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $5}')
+      {{- if or (eq .Values.mode "hcloud") (eq .Values.mode "hybrid") }}
+      {{/* Cilium isn't able to detect the routing device atomatically, in HCloud :(. */}}
       - |
         helm template kubeaid/argocd-helm-charts/cilium \
           --values kubeaid/argocd-helm-charts/cilium/values.yaml \
           --set cilium.kubeProxyReplacement=true \
           --set cilium.k8sServiceHost=${API_SERVER_HOST} \
           --set cilium.k8sServicePort=${API_SERVER_PORT} \
-          --set cilium.extraArgs[0]="--devices=eth0,enp9s0" \
+          --set cilium.extraArgs[0]="--devices=eth0" \
           --namespace cilium | kubectl apply -f -
+      {{- else }}
+      - |
+        helm template kubeaid/argocd-helm-charts/cilium \
+          --values kubeaid/argocd-helm-charts/cilium/values.yaml \
+          --set cilium.kubeProxyReplacement=true \
+          --set cilium.k8sServiceHost=${API_SERVER_HOST} \
+          --set cilium.k8sServicePort=${API_SERVER_PORT} \
+          --namespace cilium | kubectl apply -f -
+      {{- end }}
 
       {{- if or (eq .Values.mode "hcloud") (eq .Values.mode "hybrid") }}
       # Install HCloud Cloud Controller Manager.
