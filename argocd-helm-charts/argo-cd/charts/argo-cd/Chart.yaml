@@ -1,12 +1,12 @@
 annotations:
   artifacthub.io/changes: |
-    - kind: fixed
-      description: Fix hardcoded commit server URL
+    - kind: changed
+      description: Bump argo-cd to v3.0.11
   artifacthub.io/signKey: |
     fingerprint: 2B8F22F57260EFA67BE1C5824B11F800CD9D2252
     url: https://argoproj.github.io/argo-helm/pgp_keys.asc
 apiVersion: v2
-appVersion: v3.0.6
+appVersion: v3.0.11
 dependencies:
 - condition: redis-ha.enabled
   name: redis-ha
@@ -28,4 +28,4 @@ name: argo-cd
 sources:
 - https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
 - https://github.com/argoproj/argo-cd
-version: 8.1.2
+version: 8.1.3

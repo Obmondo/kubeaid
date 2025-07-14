@@ -2,26 +2,26 @@ image:
   baseRepo: mcr.microsoft.com
   azuredisk:
     repository: /oss/kubernetes-csi/azuredisk-csi
-    tag: v1.33.1
+    tag: v1.33.2
     pullPolicy: IfNotPresent
   csiProvisioner:
-    repository: /oss/kubernetes-csi/csi-provisioner
+    repository: /oss/v2/kubernetes-csi/csi-provisioner
     tag: v5.2.0
     pullPolicy: IfNotPresent
   csiAttacher:
-    repository: /oss/kubernetes-csi/csi-attacher
+    repository: /oss/v2/kubernetes-csi/csi-attacher
     tag: v4.8.1
     pullPolicy: IfNotPresent
   csiResizer:
-    repository: /oss/kubernetes-csi/csi-resizer
+    repository: /oss/v2/kubernetes-csi/csi-resizer
     tag: v1.13.2
     pullPolicy: IfNotPresent
   livenessProbe:
-    repository: /oss/kubernetes-csi/livenessprobe
+    repository: /oss/v2/kubernetes-csi/livenessprobe
     tag: v2.15.0
     pullPolicy: IfNotPresent
   nodeDriverRegistrar:
-    repository: /oss/kubernetes-csi/csi-node-driver-registrar
+    repository: /oss/v2/kubernetes-csi/csi-node-driver-registrar
     tag: v2.13.0
     pullPolicy: IfNotPresent
 
@@ -138,11 +138,11 @@ snapshot:
   image:
     csiSnapshotter:
       repository: /oss/kubernetes-csi/csi-snapshotter
-      tag: v8.2.1
+      tag: v8.3.0
       pullPolicy: IfNotPresent
     csiSnapshotController:
       repository: /oss/kubernetes-csi/snapshot-controller
-      tag: v8.2.1
+      tag: v8.3.0
       pullPolicy: IfNotPresent
   snapshotController:
     name: csi-snapshot-controller

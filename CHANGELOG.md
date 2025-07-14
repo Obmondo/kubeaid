@@ -2,15 +2,34 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 16.1.0
+### Minor Version Upgrades
+- Updated cluster-autoscaler from version 9.47.0 to 9.48.0
+
+### Patch Version Upgrades
+- Updated velero from version 10.0.8 to 10.0.9
+- Updated rook-ceph-cluster from version v1.17.5 to v1.17.6
+- Added rook-ceph from version v1.17.2 to v1.17.2
+- Updated redmine from version 33.0.0 to 33.0.2
+- Updated rabbitmq-cluster-operator from version 4.4.24 to 4.4.25
+- Updated opentelemetry-collector from version 0.127.2 to 0.127.3
+- Added opentelemetry-operator from version 0.84.1 to 0.84.1
+- Added openobserve-collector from version 0.3.22 to 0.3.22
+- Updated metallb from version 6.4.18 to 6.4.19
+- Updated external-dns from version 8.9.1 to 8.9.2
+- Updated erpnext from version 7.0.211 to 7.0.214
+- Updated azuredisk-csi-driver from version 1.33.1 to 1.33.2
+- Updated argo-cd from version 8.1.2 to 8.1.3
+
 ### Improvements
 - [`f5ba05b2`](../../commit/f5ba05b2) chore: bump the hetzner failover script tag version to v1.1.0
 - [`8114c1d7`](../../commit/8114c1d7) fix: changed the image.tag and fixed env
 
 ## 16.0.1
 ### Improvements
-- b0aed250 chore(kube-prometheus) : we don't need the ceph mixin by default
-- 05157ec5 fix(capi-cluster/hetzner) : explicitly specifying the routing device to Cilium, only in case of HCloud control-plane
-- 74c8eb01 chore(capi-cluster/hetzner) : not having cloud-provider labels in control-plane nodes (for now)
+- [`b0aed250`](../../commit/b0aed250) chore(kube-prometheus) : we don't need the ceph mixin by default
+- [`05157ec5`](../../commit/05157ec5) fix(capi-cluster/hetzner) : explicitly specifying the routing device to Cilium, only in case of HCloud control-plane
+- [`74c8eb01`](../../commit/74c8eb01) chore(capi-cluster/hetzner) : not having cloud-provider labels in control-plane nodes (for now)
 
 ## 16.0.0
 ### Major Version Upgrades
