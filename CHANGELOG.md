@@ -2,6 +2,10 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`f5ba05b2`](../../commit/f5ba05b2) chore: bump the hetzner failover script tag version to v1.1.0
+- [`8114c1d7`](../../commit/8114c1d7) fix: changed the image.tag and fixed env
+
 ## 16.0.1
 ### Improvements
 - b0aed250 chore(kube-prometheus) : we don't need the ceph mixin by default
