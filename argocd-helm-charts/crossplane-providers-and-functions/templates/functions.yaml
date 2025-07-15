@@ -1,0 +1,10 @@
+# Function Patch and Transform allows you to write a Composition that specifies managed resource
+# (MR) templates, and uses “patch and transform” operations to fill them out. Crossplane fills the
+# templates out with values copied from a claim or composite resource (XR).
+
+apiVersion: pkg.crossplane.io/v1
+kind: Function
+metadata:
+  name: patch-and-transform
+spec:
+  package: xpkg.crossplane.io/crossplane-contrib/function-patch-and-transform:v0.8.2

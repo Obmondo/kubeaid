@@ -1,0 +1,7 @@
+azure:
+  enable: false
+  compositions:
+    workloadIdentityInfrastructure:
+      enable: true
+    disasterRecoveryInfrastructure:
+      enable: false
