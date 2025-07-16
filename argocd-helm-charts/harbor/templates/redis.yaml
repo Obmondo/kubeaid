@@ -1,5 +1,5 @@
 apiVersion: redis.redis.opstreelabs.in/v1beta2
-kind: RedisCluster
+kind: RedisReplication
 metadata:
   name: {{ .Values.redis.name }}
 spec:
