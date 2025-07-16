@@ -7,6 +7,53 @@ harbor:
         size: 20Gi
   core:
     revisionHistoryLimit: 0
+    initContainers:
+      - name: pgchecker
+        image: docker.io/busybox:latest
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 1000
+          runAsGroup: 1000
+          runAsNonRoot: true
+        command:
+          - sh
+          - -c
+          - |
+            echo 'Waiting for PostgreSQL to become ready...'
+            until printf "." && nc -z -w 2 harbor-pgsql-rw 5432; do
+                sleep 2;
+            done;
+            echo 'PostgreSQL OK ✓'
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "32Mi"
+          limits:
+            memory: "32Mi"
+      - name: redischecker
+        image: docker.io/busybox:latest
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 1000
+          runAsGroup: 1000
+          runAsNonRoot: true
+        command:
+          - sh
+          - -c
+          - |
+            echo 'Waiting for Redis master to become ready...'
+            until printf "." && nc -z -w 2 harbor-redis 6379; do
+                sleep 2;
+            done;
+            echo 'Redis master OK ✓'
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "32Mi"
+          limits:
+            memory: "32Mi"
   jobservice:
     revisionHistoryLimit: 0
   portal:
