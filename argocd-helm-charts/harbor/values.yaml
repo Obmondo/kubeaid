@@ -31,3 +31,8 @@ postgres:
     requests:
       memory: 500Mi
       cpu: 250m
+
+redis:
+  replicas: 1
+  name: harbor-redis
+  storage: 4Gi
