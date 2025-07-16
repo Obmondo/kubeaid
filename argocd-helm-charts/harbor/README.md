@@ -1,8 +1,42 @@
 # Harbor
 
+## Extra configurations for complete Harbor setup
+
+We need to create few configurations and save them in secrets.
+These are required for Harbor to run the core and jobservice successfully.
+
+1. Create a new password for harbor user
+
+    ```sh
+    htpasswd -B -c /tmp/htpasswd harbor_registry_user
+    ```
+
+    > NOTE: The default password is `harbor_registry_password`.
+
+2. Generate `16/32` chars passwords
+
+    ```sh
+    # 16 chars password
+    gopass pwgen 16
+
+    # 32 chars password
+    gopass pwgen 32
+    ```
+
+3. Generate `harbor-core-custom` secret and apply. Harbor creates its own certificates when it's deployed. So, we used that.
+
+    ```sh
+    kubectl create secret generic harbor-core-custom --namespace harbor --dry-run=client --from-literal=CSRF_KEY={32 chars password} --from-file=tls.crt=/tmp/tls.crt --from-file=tls.key=/tmp/tls.key --from-literal=secret={16 chars password} --from-literal=JOBSERVICE_SECRET={16 chars password} --from-literal=REGISTRY_HTTP_SECRET={16 chars password} --from-literal=REGISTRY_HTPASSWD="harbor_registry_user":'{harbor registry user password}' --from-literal=REGISTRY_PASSWD=harbor_registry_password --from-literal=oidc-config='{"auth_mode":"oidc_auth","oidc_name":"Obmondo Keycloak","oidc_endpoint":"https://keycloak.example.com/auth/realms/harbor","oidc_client_id":"harbor","oidc_client_secret":"{oidc client secret}","oidc_scope":"openid,profile,email,offline_access","oidc_verify_cert":"true","oidc_auto_onboard":"true","oidc_user_claim":"email","oidc_admin_group":"harborAdmins"}' -o yaml | kubeseal --controller-namespace system --controller-name sealed-secrets --format yaml > harbor-core-custom.yaml
+    ```
+
+4. In KeyCloak, create `harborAdmins` group.
+
+> NOTE: You don't need to worry about `HARBOR_ADMIN_PASSWORD` in secrets.
+> The updated password configs gets saved directly in the DB. This is a *cough* ~~bug~~ *cough* feature.
+
 ## Pushing images to Harbor
 
-Go to the Harbor dashboard and log in. On the top-right side, your name will be present, clicking on which you would see the option to access user profile. On user profile, you can copy your CLI secret. This will act as your registry password. You can save this CLI secret in an environment variable and call it $REGISTRY_PASSWORD. 
+Go to the Harbor dashboard and log in. On the top-right side, your name will be present, clicking on which you would see the option to access user profile. On user profile, you can copy your CLI secret. This will act as your registry password. You can save this CLI secret in an environment variable and call it $REGISTRY_PASSWORD.
 
 Now you can login to the registry using buildah or docker. There is a demo below
 
@@ -159,7 +193,7 @@ This issue generally persists because of bad caches that leads to troubles. In o
 
 When you delete images from Harbor, the space isn't automatically reclaimed. To free up space, you need to perform garbage collection, which removes unreferenced blobs from the file system.
 
-**Note**: You need admin privileges for running Garbage Collection. 
+**Note**: You need admin privileges for running Garbage Collection.
 
 ### Running Garbage Collection
 
