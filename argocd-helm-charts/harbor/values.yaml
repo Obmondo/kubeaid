@@ -22,7 +22,7 @@ harbor:
   redis:
     type: external
     external:
-      sentinelMasterSet: harbor-redis
+      addr: harbor-redis:6379
 
 postgres:
   size: 3Gi
@@ -37,6 +37,6 @@ postgres:
       cpu: 250m
 
 redis:
-  replicas: 1
+  replicas: 3
   name: harbor-redis
   storage: 4Gi
