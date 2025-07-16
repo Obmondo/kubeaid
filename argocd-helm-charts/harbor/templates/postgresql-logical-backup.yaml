@@ -78,7 +78,7 @@ spec:
                 - name: LOGICAL_BACKUP_S3_BUCKET
                   value: {{ (.Values.postgres.logicalbackup).s3bucket }}
                 - name: LOGICAL_BACKUP_S3_RETENTION_TIME
-                  value: {{ (.Values.postgres.logicalbackup).retention }}
+                  value: "{{ (.Values.postgres.logicalbackup).retention }}"
               {{- end }}
 
                 - name: PG_VERSION
