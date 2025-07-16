@@ -1,7 +1,7 @@
 apiVersion: redis.redis.opstreelabs.in/v1beta2
 kind: RedisCluster
 metadata:
-  name: harbor-redis-cluster
+  name: {{ .Values.redis.name }}
 spec:
   clusterSize: {{ .Values.redis.replicas }}
   clusterVersion: v7

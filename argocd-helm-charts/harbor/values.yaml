@@ -19,6 +19,10 @@ harbor:
       host: harbor-pgsql-rw
       username: harbor
       existingSecret: harbor-pgsql-app
+  redis:
+    type: external
+    external:
+      sentinelMasterSet: harbor-redis
 
 postgres:
   size: 3Gi
