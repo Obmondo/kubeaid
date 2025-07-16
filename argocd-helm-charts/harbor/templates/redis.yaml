@@ -1,9 +1,8 @@
 apiVersion: redis.redis.opstreelabs.in/v1beta2
-kind: RedisReplication
+kind: Redis
 metadata:
   name: {{ .Values.redis.name }}
 spec:
-  clusterSize: {{ .Values.redis.replicas }}
   podSecurityContext:
     runAsUser: 1000
     fsGroup: 1000
