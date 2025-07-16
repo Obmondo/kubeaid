@@ -27,10 +27,10 @@ harbor:
             echo 'PostgreSQL OK ✓'
         resources:
           requests:
-            cpu: "10m"
-            memory: "32Mi"
+            cpu: "2m"
+            memory: "5Mi"
           limits:
-            memory: "32Mi"
+            memory: "5Mi"
       - name: redischecker
         image: docker.io/busybox:latest
         imagePullPolicy: IfNotPresent
@@ -50,12 +50,36 @@ harbor:
             echo 'Redis master OK ✓'
         resources:
           requests:
-            cpu: "10m"
-            memory: "32Mi"
+            cpu: "2m"
+            memory: "5Mi"
           limits:
-            memory: "32Mi"
+            memory: "5Mi"
   jobservice:
     revisionHistoryLimit: 0
+    initContainers:
+      - name: harbor-core-checker
+        image: docker.io/busybox:latest
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 1000
+          runAsGroup: 1000
+          runAsNonRoot: true
+        command:
+          - sh
+          - -c
+          - |
+            echo 'Waiting for Harbor core service to become ready...'
+            until printf "." && nc -z -w 2 harbor-core 80; do
+                sleep 2;
+            done;
+            echo 'Harbor core service OK ✓'
+        resources:
+          requests:
+            cpu: "2m"
+            memory: "5Mi"
+          limits:
+            memory: "5Mi"
   portal:
     revisionHistoryLimit: 0
   registry:
