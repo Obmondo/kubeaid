@@ -1,0 +1,12 @@
+{{- if .Values.redirectToWWW.enabled }}
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ .Values.redirectToWWW.name | default "redirect-to-www" }}
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  redirectRegex:
+    regex: {{ .Values.redirectToWWW.regex | quote }}
+    replacement: {{ .Values.redirectToWWW.replacement | quote }}
+    permanent: {{ .Values.redirectToWWW.permanent | default true }}
+{{- end }}
