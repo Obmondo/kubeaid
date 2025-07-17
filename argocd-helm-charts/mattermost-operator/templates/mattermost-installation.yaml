@@ -1,0 +1,54 @@
+apiVersion: installation.mattermost.com/v1beta1
+kind: Mattermost
+metadata:
+  name: mattermost                   # Name of the Mattermost cluster as shown in Kubernetes.
+spec:
+  image: mattermost/mattermost-enterprise-edition
+  imagePullPolicy: IfNotPresent                   # Image Pull policy used by Mattermost deployment.
+  version: 10.9.4
+  size: 5000users
+  useServiceLoadBalancer: false
+  serviceAnnotations: {}                          # Service annotations to use with AWS or Azure load balancers.
+  ingress:
+    enabled: true                                 # If disabled Ingress will not be created by Mattermost Operator.
+    host: mattermost-staging.obmondo.com          # Hostname used for Ingress, e.g. example.mattermost-example.com. Required when Ingress is enabled.
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      kubernetes.io/tls-acme: "true"
+      cert-manager.io/cluster-issuer: letsencrypt
+      kubernetes.io/ingress.class: traefik-cert-manager                             # Custom annotations propagated to Ingress resource.
+  mattermostEnv:                                  # Custom environment variables that Mattermost installation should use.
+    - name: MM_FILESETTINGS_AMAZONS3SSE
+      value: "true"
+    - name: MM_FILESETTINGS_AMAZONS3SSL
+      value: "true"
+  licenseSecret: ""                              # Name of a Kubernetes secret that contains Mattermost license. Required only for enterprise installation.
+  database:
+    external:
+      secret: db-credentials                      # Name of a Kubernetes secret that contains connection string to external database.
+  fileStore:
+    external:
+      url: s3.obmondo.com                       # External File Storage URL.
+      bucket: kbm-postgres-backups                        # File Storage bucket name to use.
+      secret: mattermost-pgsql-filestore-creds             # Name of a Kubernetes secret that contains credentials to external database.
+
+# This is an example of secret containing configuration of external database.
+---
+apiVersion: v1
+data:
+  DB_CONNECTION_STRING: cG9zdGdyZXM6Ly9tYXR0ZXJtb3N0LXBnc3FsLXJ3Lm1hdHRlcm1vc3Qtb3BlcmF0b3I6NTQzMi9tYXR0ZXJtb3N0P3Bhc3N3b3JkPUJpVU9mR1lOVk1TZkxSQmRUYnNqd0s5QXVhR2dnejRHQklMdkNSQjYwem41dE8zbzBPOHNQY0hLdnljOHNQbDcmdXNlcj1tYXR0ZXJtb3N0
+kind: Secret
+metadata:
+  name: db-credentials
+type: Opaque
+---
+# This is an example of secret containing credentials for an external file storage.
+
+apiVersion: v1
+data:
+  accesskey: a2Jt
+  secretkey: Ym9vM0xhbmVlcDRjdWlsYWV6dWxvb0No
+kind: Secret
+metadata:
+  name: mattermost-pgsql-filestore-creds
+type: Opaque

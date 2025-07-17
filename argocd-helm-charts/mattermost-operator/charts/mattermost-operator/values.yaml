@@ -1,0 +1,24 @@
+mattermostOperator:
+  enabled: true
+  replicas: 1
+  rbac:
+    create: true
+  serviceAccount:
+    create: true
+  env:
+    maxReconcilingInstallations: 20
+    maxReconcilingConcurrency: 10
+    requeuOnLimitDelay: 20s
+  image:
+    repository: mattermost/mattermost-operator
+    tag: v1.24.0
+    pullPolicy: IfNotPresent
+  args:
+    - --enable-leader-election
+    - --metrics-addr=0.0.0.0:8383
+
+  ## Specify image pull secret for private repository
+  ##
+  privateRegistry:
+    enabled: false
+    imagePullSecret: <name of the secret>

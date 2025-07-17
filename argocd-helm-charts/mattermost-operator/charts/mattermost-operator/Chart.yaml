@@ -1,0 +1,14 @@
+apiVersion: v2
+appVersion: 1.23.0
+description: A Helm chart for Mattermost Operator
+keywords:
+- mattermost
+- operator
+maintainers:
+- name: stylianosrigas
+- name: gabrieljackson
+name: mattermost-operator
+sources:
+- https://github.com/mattermost/mattermost-helm/tree/master/charts/mattermost-operator
+type: application
+version: 1.0.3
