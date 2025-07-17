@@ -4,4 +4,4 @@ opendesk:
     destination:
       namespace: opendesk
     source:
-      targetRevision: v1.4.1
+      targetRevision: v1.6.0
