@@ -31,6 +31,11 @@ envVars:
   GIN_MODE: release
   PROMETHEUS_URL: http://prometheus-k8s.monitoring:9090
   API_URL: https://api.obmondo.com
+  AGENT_KEY_PATH: /opt/obmondo-k8s-agent/tls.key
+  AGENT_CERT_PATH: /opt/obmondo-k8s-agent/tls.crt
+  HTTP_CLIENT_TIMEOUT_DURATION: "30s"
+  ENDOFLIFEURL: https://endoflife.date/api/kubernetes.json
+
 
 # Add Values like this:
 #envVars:
