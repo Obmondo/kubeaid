@@ -8,7 +8,7 @@ image:
   repository: ghcr.io/obmondo/obmondo-k8s-agent
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1.1.0"
+  tag: "v1.1.2"
   volumeMounts:
   - mountPath: /opt/obmondo-k8s-agent/tls.crt
     name: k8s-agent-tls
