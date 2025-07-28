@@ -9,9 +9,6 @@ metadata:
     capi.syself.com/constant-bare-metal-hostname: "true"
 spec:
   template:
-    {{/* CAPH removes this metadata section. I need to take a look at why this is happening, later.
-         The control-plane nodes in Hetzner Bare Metal need to have these labels, to support
-         Hetzner 'hybrid' mode. */}}
     {{/* metadata: */}}
     {{/*   labels: */}}
     {{/*     node.cluster.x-k8s.io/cloud-provider: hetzner-bare-metal */}}
@@ -73,6 +70,9 @@ metadata:
     capi.syself.com/constant-bare-metal-hostname: "true"
 spec:
   template:
+    {{/* metadata: */}}
+    {{/*   labels: */}}
+    {{/*     node.cluster.x-k8s.io/cloud-provider: hetzner-bare-metal */}}
     spec:
       hostSelector:
         matchLabels:

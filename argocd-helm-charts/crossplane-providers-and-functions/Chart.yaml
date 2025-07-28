@@ -1,3 +1,9 @@
 apiVersion: v2
 name: crossplane-providers-and-functions
 version: 1.0.0
+
+dependencies:
+  - name: azure
+    version: 1.0.0
+    repository: "file://charts/azure"
+    condition: azure.enable

@@ -6,7 +6,7 @@ metadata:
     cluster.x-k8s.io/name: {{ .Values.global.clusterName }}
 spec:
   controlPlaneEndpoint:
-    host: {{ (.Values.controlPlane.bareMetal.endpoint).host | default "" }}
+    host: {{ (.Values.controlPlane.bareMetal).endpoint.host | default "" }}
     port: 6443
 
   controlPlaneRegions: {{ toYaml .Values.controlPlane.regions | nindent 4 }}

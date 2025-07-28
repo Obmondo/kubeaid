@@ -266,7 +266,7 @@ spec:
       preKubeadmCommands:
       - set -x
       - grep VERSION= /etc/os-release; uname -a
-      - export CONTAINERD=2.1.3
+      - export CONTAINERD=1.7.25
       - export RUNC=1.2.3
       - export KUBERNETES_VERSION=$(echo {{ $.Values.global.kubernetes.version }} | sed 's/^v//')
       - export TRIMMED_KUBERNETES_VERSION=$(echo {{ $.Values.global.kubernetes.version }} | sed 's/^v//'

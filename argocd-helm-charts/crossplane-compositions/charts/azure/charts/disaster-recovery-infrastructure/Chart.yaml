@@ -1,0 +1,3 @@
+apiVersion: v2
+name: disaster-recovery-infrastructure
+version: 1.0.0

@@ -6,12 +6,9 @@ metadata:
   name: {{ .Values.global.clusterName }}-control-plane
 spec:
   template:
-    {{/* CAPH removes this metadata section. I need to take a look at why this is happening, later.
-         The control-plane nodes in HCloud need to have these labels, to support Hetzner 'hybrid'
-         mode. */}}
-    {{/* metadata: */}}
-    {{/*   labels: */}}
-    {{/*     node.cluster.x-k8s.io/cloud-provider: hcloud */}}
+    metadata:
+      labels:
+        node.cluster.x-k8s.io/cloud-provider: hcloud
     spec:
       imageName: {{ .Values.hcloud.imageName }}
       placementGroupName: control-plane
@@ -28,6 +25,9 @@ metadata:
   name: {{ printf "%s-%s" $.Values.global.clusterName $nodeGroup.name }}
 spec:
   template:
+    metadata:
+      labels:
+        node.cluster.x-k8s.io/cloud-provider: hcloud
     spec:
       imageName: {{ $.Values.hcloud.imageName }}
       placementGroupName: {{ $nodeGroup.name }}

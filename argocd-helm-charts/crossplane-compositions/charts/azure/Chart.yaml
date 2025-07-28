@@ -1,0 +1,13 @@
+apiVersion: v2
+name: azure
+version: 1.0.0
+
+dependencies:
+  - name: workload-identity-infrastructure
+    version: 1.0.0
+    repository: "file://charts/workload-identity-infrastructure"
+    condition: azure.compositions.workloadIdentityInfrastructure.enable
+  - name: disaster-recovery-infrastructure
+    version: 1.0.0
+    repository: "file://charts/disaster-recovery-infrastructure"
+    condition: azure.compositions.disasterRecoveryInfrastructure.enable

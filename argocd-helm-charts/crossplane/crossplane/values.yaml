@@ -1,7 +1,0 @@
-crossplane:
-  resourcesCrossplane:
-    limits:
-      cpu: null
-  resourcesRBACManager:
-    limits:
-      cpu: null

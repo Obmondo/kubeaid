@@ -170,6 +170,11 @@ spec:
       owner: root:root
       path: /etc/systemd/system/containerd.service
       permissions: "0744"
+    {{/*
+      TODO : We need to apply the netplan config, only when using a Floating IP.
+             Otherwise, when using a single master node for the control-plane, we just provide
+             that master node's IP.
+    */}}
     {{- if eq .Values.mode "bare-metal" }}
     {{/*
       Netplan is the default network configuration utility on Ubuntu. It configures network
@@ -193,7 +198,7 @@ spec:
           ethernets:
             $interface_name:
               addresses:
-                - {{ (.Values.controlPlane.bareMetal.endpoint).host }}/32
+                - {{ .Values.controlPlane.bareMetal.endpoint.host }}/32
         EOT
 
         netplan apply
@@ -339,8 +344,8 @@ spec:
       - API_SERVER_URL=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
       - API_SERVER_HOST=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $4}')
       - API_SERVER_PORT=$(echo "$API_SERVER_URL" | awk -F[/:] '{print $5}')
+
       {{- if or (eq .Values.mode "hcloud") (eq .Values.mode "hybrid") }}
-      {{/* Cilium isn't able to detect the routing device atomatically, in HCloud :(. */}}
       - |
         helm template kubeaid/argocd-helm-charts/cilium \
           --values kubeaid/argocd-helm-charts/cilium/values.yaml \
