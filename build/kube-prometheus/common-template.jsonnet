@@ -379,7 +379,31 @@ local kp =
             },
           },
           ruleNamespaceSelector: {},
-        },
+        } + if std.objectHas(vars.prometheus, 'remoteWrite') then (
+          {
+            remoteWrite+: [
+              {
+                url: remoteWrite.url,
+                queueConfig: {
+                  maxSamplesPerSend: 10000,
+                },
+                basicAuth: {
+                  username: {
+                    name: remoteWrite.basicAuth.secret,
+                    // Field for username in secret
+                    key: 'username',
+                  },
+                  password: {
+                    name: remoteWrite.basicAuth.secret,
+                    // Field for password in secret
+                    key: 'password',
+                  },
+                },
+              }
+              for remoteWrite in vars.prometheus.remoteWrite
+            ],
+          }
+        ) else {},
       },
       networkPolicy+: {
         spec+: {
