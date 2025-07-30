@@ -1,10 +1,3 @@
-postgresql:
-  size: 8Gi
-  recover: false
-  pass: netbird-pgsql-app
-  logicalbackup:
-    enabled: true
-
 netbird:
   fullnameOverride: netbird
   management:
