@@ -35,6 +35,7 @@ envVars:
   AGENT_CERT_PATH: /opt/obmondo-k8s-agent/tls.crt
   HTTP_CLIENT_TIMEOUT_DURATION: "30s"
   ENDOFLIFEURL: https://endoflife.date/api/kubernetes.json
+  NODE_COUNT_ALERT_INTERVAL: "6h"
 
 
 # Add Values like this:
