@@ -100,3 +100,30 @@ spec:
         encryption: AES256
     retentionPolicy: "30d"
   {{ end  }}
+
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: mattermost-db-connection
+spec:
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: kubernetes
+    kind: SecretStore
+  target:
+    name: my-postgres-connection          # This is the secret Mattermost expects
+    creationPolicy: Replace
+  data:
+    - secretKey: DB_CONNECTION_STRING
+      remoteRef:
+        key: mattermost-pgsql-app         # Source secret from CNPG
+        property: uri                     # Or use username, password, host, and build with a template
+    - secretKey: DB_CONNECTION_CHECK_URL
+      remoteRef:
+        key: mattermost-pgsql-app
+        property: uri
+    - secretKey: MM_SQLSETTINGS_DATASOURCEREPLICAS
+      remoteRef:
+        key: mattermost-pgsql-app
+        property: uri
