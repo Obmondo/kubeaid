@@ -1,13 +1,13 @@
-{{ if (.Values.postgresql.logicalbackup).enabled  }}
+{{ if (.Values.externalDatabases.netbird.logicalbackup).enabled  }}
 ---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: postgres-logical-backup
+  name: postgres-netbird-logical-backup
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 1
-  schedule: {{ (.Values.postgresql.logicalbackup).schedule | default "30 00 * * *" }}
+  schedule: {{ (.Values.externalDatabases.netbird.logicalbackup).schedule | default "30 00 * * *" }}
   successfulJobsHistoryLimit: 3
   jobTemplate:
     spec:
@@ -24,66 +24,66 @@ spec:
                       apiVersion: v1
                       fieldPath: metadata.namespace
                 - name: PGHOST
-                  value: {{ .Values.postgresql.host | default "netbird-pgsql-rw" }}
+                  value: {{ .Values.externalDatabases.netbird.host | default "netbird-pgsql-rw" }}
                 - name: PGPASSWORD
                   valueFrom:
                     secretKeyRef:
-                      name: {{ .Values.postgresql.pass }}
+                      name: {{ .Values.externalDatabases.netbird.pass }}
                       key: password
                 - name: PGPORT
-                  value: "{{ .Values.postgresql.port | default 5432 }}"
+                  value: "{{ .Values.externalDatabases.netbird.port | default 5432 }}"
                 - name: PGUSER
-                  value: {{ .Values.postgresql.user | default "netbird" }}
+                  value: {{ .Values.externalDatabases.netbird.user | default "netbird" }}
                 - name: PGDATABASE
-                  value: {{ .Values.postgresql.db | default "netbird" }}
+                  value: {{ .Values.externalDatabases.netbird.db | default "netbird" }}
                 - name: USE_PG_DUMP
-                  value: {{ (.Values.postgresql.logicalbackup).usePgDump | quote }}
+                  value: {{ (.Values.externalDatabases.netbird.logicalbackup).usePgDump | quote }}
                 - name: CLUSTER_NAME_LABEL
-                  value: {{ (.Values.postgresql.logicalbackup).pgOperatorClusterName | default "netbird-pgsql" }}
+                  value: {{ (.Values.externalDatabases.netbird.logicalbackup).pgOperatorClusterName | default "netbird-pgsql" }}
 
-              {{- if eq .Values.postgresql.logicalbackup.provider "az" }}
+              {{- if eq .Values.externalDatabases.netbird.logicalbackup.provider "az" }}
                 - name: LOGICAL_BACKUP_PROVIDER
                   value: "az"
                 - name: LOGICAL_BACKUP_AZURE_STORAGE_ACCOUNT_NAME
-                  value: {{ (.Values.postgresql.logicalbackup).storeageaccount }}
+                  value: {{ (.Values.externalDatabases.netbird.logicalbackup).storeageaccount }}
                 - name: LOGICAL_BACKUP_AZURE_STORAGE_CONTAINER
-                  value: {{ (.Values.postgresql.logicalbackup).azurecontainer }}
+                  value: {{ (.Values.externalDatabases.netbird.logicalbackup).azurecontainer }}
                 - name: LOGICAL_BACKUP_AZURE_STORAGE_ACCOUNT_KEY
                   valueFrom:
                     secretKeyRef:
                       key: LOGICAL_BACKUP_AZURE_STORAGE_ACCOUNT_KEY
                       name: netbird-pgsql-postgres-pod-env
                 - name: LOGICAL_BACKUP_S3_BUCKET
-                  value: {{ (.Values.postgresql.logicalbackup).azurecontainer }}
+                  value: {{ (.Values.externalDatabases.netbird.logicalbackup).azurecontainer }}
                 - name: LOGICAL_BACKUP_S3_BUCKET_SCOPE_SUFFIX
-                  value: {{ (.Values.postgresql.logicalbackup).s3bucketscopesuffix | default "logicalbackup" }}
+                  value: {{ (.Values.externalDatabases.netbird.logicalbackup).s3bucketscopesuffix | default "logicalbackup" }}
 
-              {{- else if eq .Values.postgresql.logicalbackup.provider "s3" }}
+              {{- else if eq .Values.externalDatabases.netbird.logicalbackup.provider "s3" }}
                 - name: LOGICAL_BACKUP_PROVIDER
                   value: "s3"
                 - name: AWS_ACCESS_KEY_ID
-                  value: {{ (.Values.postgresql.logicalbackup).s3accesskeyid }}
+                  value: {{ (.Values.externalDatabases.netbird.logicalbackup).s3accesskeyid }}
                 - name: AWS_SECRET_ACCESS_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: {{ (.Values.postgresql.logicalbackup).s3accesssecretkey }}
+                      name: {{ (.Values.externalDatabases.netbird.logicalbackup).s3accesssecretkey }}
                       key: aws-secret-key
                 - name: LOGICAL_BACKUP_S3_ENDPOINT
-                  value: {{ (.Values.postgresql.logicalbackup).s3endpoint }}
+                  value: {{ (.Values.externalDatabases.netbird.logicalbackup).s3endpoint }}
                 - name: LOGICAL_BACKUP_PROVIDER
                   value: "s3"
                 - name: LOGICAL_BACKUP_S3_BUCKET_SCOPE_SUFFIX
-                  value: {{ (.Values.postgresql.logicalbackup).s3bucketscopesuffix | default "logicalbackup" }}
+                  value: {{ (.Values.externalDatabases.netbird.logicalbackup).s3bucketscopesuffix | default "logicalbackup" }}
                 - name: LOGICAL_BACKUP_S3_REGION
-                  value: {{ (.Values.postgresql.logicalbackup).s3region }}
+                  value: {{ (.Values.externalDatabases.netbird.logicalbackup).s3region }}
                 - name: LOGICAL_BACKUP_S3_BUCKET
-                  value: {{ (.Values.postgresql.logicalbackup).s3bucket }}
+                  value: {{ (.Values.externalDatabases.netbird.logicalbackup).s3bucket }}
                 - name: LOGICAL_BACKUP_S3_RETENTION_TIME
-                  value: {{ (.Values.postgresql.logicalbackup).retention }}
+                  value: {{ (.Values.externalDatabases.netbird.logicalbackup).retention }}
               {{- end }}
 
                 - name: PG_VERSION
-                  value: "{{ (.Values.postgresql.logicalbackup).pgversion | default 16 }}"
+                  value: "{{ (.Values.externalDatabases.netbird.logicalbackup).pgversion | default 16 }}"
                 - name: POSTGRES_OPERATOR
                   value: cngp
               resources:
