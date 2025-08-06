@@ -1,9 +1,16 @@
-postgresql:
-  size: 8Gi
-  recover: false
-  pass: netbird-pgsql-app
-  logicalbackup:
-    enabled: true
+externalDatabases:
+  netbird:
+    size: 8Gi
+    recover: false
+    pass: netbird-pgsql-app
+    logicalbackup:
+      enabled: true
+  coturn:
+    size: 4Gi
+    recover: false
+    pass: coturn-pgsql-app
+    logicalbackup:
+      enabled: true
 
 netbird:
   fullnameOverride: netbird
@@ -215,3 +222,15 @@ netbird:
             scheme: h2c
         tls:
           secretName: vpn.example.com
+
+coturn:
+  externalDatabase:
+    enabled: true
+    type: "postgresql"
+    existingSecret: coturn-pgsql-app
+    secretKeys:
+      username: "username"
+      password: "password"
+      database: "dbname"
+      hostname: "host"
+
