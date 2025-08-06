@@ -233,4 +233,3 @@ coturn:
       password: "password"
       database: "dbname"
       hostname: "host"
-
