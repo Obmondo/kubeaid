@@ -15,28 +15,19 @@ mattermost:
       cert-manager.io/cluster-issuer: letsencrypt
       kubernetes.io/ingress.class: traefik-cert-manager
   mattermostEnv:
-    - name: MM_DB_USERNAME
-      valueFrom:
-        secretKeyRef:
-          name: mattermost-pgsql-app
-          key: username
-    - name: MM_DB_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: mattermost-pgsql-app
-          key: password
-    - name: MM_SQLSETTINGS_DATASOURCE
-      value: postgres://$(MM_DB_USERNAME):$(MM_DB_PASSWORD)@mattermost-pgsql-rw:5432/mattermost?sslmode=require&connect_timeout=100
     - name: MM_FILESETTINGS_AMAZONS3SSE
       value: "true"
     - name: MM_FILESETTINGS_AMAZONS3SSL
       value: "true"
   licenseSecret: ""                      # Set your secret name if using enterprise license
+  database:
+    external:
+      secret: db-credentials             # Name of Kubernetes secret for DB connection string
   fileStore:
     external:
       url: s3.obmondo.com
       bucket: kbm-postgres-backups
-      secret: mattermost-pgsql-filestore-creds
+      secret: file-store-credentials          # Name of Kubernetes secret for file store credentials
 
 postgres:
   size: 8Gi
