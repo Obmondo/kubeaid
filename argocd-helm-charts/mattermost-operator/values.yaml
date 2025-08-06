@@ -1,5 +1,5 @@
 mattermost:
-  name: mattermost-staging
+  name: mattermost
   image: mattermost/mattermost-enterprise-edition
   imagePullPolicy: IfNotPresent
   version: 10.9.4
