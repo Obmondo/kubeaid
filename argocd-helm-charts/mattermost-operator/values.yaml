@@ -1,3 +1,34 @@
+mattermost:
+  name: mattermost-staging
+  image: mattermost/mattermost-enterprise-edition
+  imagePullPolicy: IfNotPresent
+  version: 10.9.4
+  size: 5000users
+  useServiceLoadBalancer: false
+  serviceAnnotations: {}
+  ingress:
+    enabled: true
+    host: mattermost-staging.obmondo.com
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      kubernetes.io/tls-acme: "true"
+      cert-manager.io/cluster-issuer: letsencrypt
+      kubernetes.io/ingress.class: traefik-cert-manager
+  mattermostEnv:
+    - name: MM_FILESETTINGS_AMAZONS3SSE
+      value: "true"
+    - name: MM_FILESETTINGS_AMAZONS3SSL
+      value: "true"
+  licenseSecret: ""                      # Set your secret name if using enterprise license
+  database:
+    external:
+      secret: db-credentials             # Name of Kubernetes secret for DB connection string
+  fileStore:
+    external:
+      url: s3.obmondo.com
+      bucket: kbm-postgres-backups
+      secret: mattermost-pgsql-filestore-creds
+
 postgres:
   size: 8Gi
   recover: false

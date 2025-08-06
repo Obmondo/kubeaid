@@ -1,54 +1,38 @@
 apiVersion: installation.mattermost.com/v1beta1
 kind: Mattermost
 metadata:
-  name: mattermost                   # Name of the Mattermost cluster as shown in Kubernetes.
+  name: {{ .Values.mattermost.name | default "mattermost" }}
 spec:
-  image: mattermost/mattermost-enterprise-edition
-  imagePullPolicy: IfNotPresent                   # Image Pull policy used by Mattermost deployment.
-  version: 10.9.4
-  size: 5000users
-  useServiceLoadBalancer: false
-  serviceAnnotations: {}                          # Service annotations to use with AWS or Azure load balancers.
+  image: {{ .Values.mattermost.image | default "mattermost/mattermost-enterprise-edition" }}
+  imagePullPolicy: {{ .Values.mattermost.imagePullPolicy | default "IfNotPresent" }}
+  version: {{ .Values.mattermost.version | default "10.9.4" }}
+  size: {{ .Values.mattermost.size | default "5000users" }}
+  useServiceLoadBalancer: {{ .Values.mattermost.useServiceLoadBalancer | default false }}
+  serviceAnnotations:
+    {{- if .Values.mattermost.serviceAnnotations }}
+{{ toYaml .Values.mattermost.serviceAnnotations | indent 4 }}
+    {{- else }}
+    {}
+    {{- end }}
   ingress:
-    enabled: true                                 # If disabled Ingress will not be created by Mattermost Operator.
-    host: mattermost-staging.obmondo.com          # Hostname used for Ingress, e.g. example.mattermost-example.com. Required when Ingress is enabled.
+    enabled: {{ .Values.mattermost.ingress.enabled | default true }}
+    {{- if .Values.mattermost.ingress.host }}
+    host: {{ .Values.mattermost.ingress.host }}
+    {{- end }}
+    {{- if .Values.mattermost.ingress.annotations }}
     annotations:
-      nginx.ingress.kubernetes.io/ssl-redirect: "true"
-      kubernetes.io/tls-acme: "true"
-      cert-manager.io/cluster-issuer: letsencrypt
-      kubernetes.io/ingress.class: traefik-cert-manager                             # Custom annotations propagated to Ingress resource.
-  mattermostEnv:                                  # Custom environment variables that Mattermost installation should use.
-    - name: MM_FILESETTINGS_AMAZONS3SSE
-      value: "true"
-    - name: MM_FILESETTINGS_AMAZONS3SSL
-      value: "true"
-  licenseSecret: ""                              # Name of a Kubernetes secret that contains Mattermost license. Required only for enterprise installation.
+{{ toYaml .Values.mattermost.ingress.annotations | indent 6 }}
+    {{- end }}
+  {{- if .Values.mattermost.mattermostEnv }}
+  mattermostEnv:
+{{ toYaml .Values.mattermost.mattermostEnv | indent 4 }}
+  {{- end }}
+  licenseSecret: {{ .Values.mattermost.licenseSecret | default "" }}
   database:
     external:
-      secret: db-credentials                      # Name of a Kubernetes secret that contains connection string to external database.
+      secret: {{ .Values.mattermost.database.external.secret | default "db-credentials" }}
   fileStore:
     external:
-      url: s3.obmondo.com                       # External File Storage URL.
-      bucket: kbm-postgres-backups                        # File Storage bucket name to use.
-      secret: mattermost-pgsql-filestore-creds             # Name of a Kubernetes secret that contains credentials to external database.
-
-# This is an example of secret containing configuration of external database.
----
-apiVersion: v1
-data:
-  DB_CONNECTION_STRING: cG9zdGdyZXM6Ly9tYXR0ZXJtb3N0LXBnc3FsLXJ3Lm1hdHRlcm1vc3Qtb3BlcmF0b3I6NTQzMi9tYXR0ZXJtb3N0P3Bhc3N3b3JkPUJpVU9mR1lOVk1TZkxSQmRUYnNqd0s5QXVhR2dnejRHQklMdkNSQjYwem41dE8zbzBPOHNQY0hLdnljOHNQbDcmdXNlcj1tYXR0ZXJtb3N0
-kind: Secret
-metadata:
-  name: db-credentials
-type: Opaque
----
-# This is an example of secret containing credentials for an external file storage.
-
-apiVersion: v1
-data:
-  accesskey: a2Jt
-  secretkey: Ym9vM0xhbmVlcDRjdWlsYWV6dWxvb0No
-kind: Secret
-metadata:
-  name: mattermost-pgsql-filestore-creds
-type: Opaque
+      url: {{ .Values.mattermost.fileStore.external.url | default "s3.obmondo.com" }}
+      bucket: {{ .Values.mattermost.fileStore.external.bucket | default "kbm-postgres-backups" }}
+      secret: {{ .Values.mattermost.fileStore.external.secret | default "mattermost-pgsql-filestore-creds" }}
