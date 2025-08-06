@@ -36,24 +36,3 @@ spec:
       url: {{ .Values.mattermost.fileStore.external.url | default "s3.obmondo.com" }}
       bucket: {{ .Values.mattermost.fileStore.external.bucket | default "kbm-postgres-backups" }}
       secret: {{ .Values.mattermost.fileStore.external.secret | default "mattermost-pgsql-filestore-creds" }}
-
-# This is an example of secret containing configuration of external database.
----
-apiVersion: v1
-data:
-  DB_CONNECTION_STRING: cG9zdGdyZXM6Ly9tYXR0ZXJtb3N0LXBnc3FsLXJ3Lm1hdHRlcm1vc3Qtb3BlcmF0b3I6NTQzMi9tYXR0ZXJtb3N0P3Bhc3N3b3JkPUJpVU9mR1lOVk1TZkxSQmRUYnNqd0s5QXVhR2dnejRHQklMdkNSQjYwem41dE8zbzBPOHNQY0hLdnljOHNQbDcmdXNlcj1tYXR0ZXJtb3N0
-kind: Secret
-metadata:
-  name: db-credentials
-type: Opaque
----
-# This is an example of secret containing credentials for an external file storage.
-
-apiVersion: v1
-data:
-  accesskey: a2Jt
-  secretkey: Ym9vM0xhbmVlcDRjdWlsYWV6dWxvb0No
-kind: Secret
-metadata:
-  name: mattermost-pgsql-filestore-creds
-type: Opaque
