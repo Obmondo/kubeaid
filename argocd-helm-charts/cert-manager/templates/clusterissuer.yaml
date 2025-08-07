@@ -4,6 +4,9 @@ kind: ClusterIssuer
 metadata:
   name: {{ .Values.issuer.name }}
 spec:
+  {{- if .Values.issuer.selfSigned }}
+    selfSigned: {}
+  {{- else }}
   acme:
     email: {{ .Values.issuer.issuerEmail }}
     preferredChain: {{ .Values.issuer.preferredChain }}
@@ -71,5 +74,6 @@ spec:
     {{- end }}
 {{- else }}
 {{- fail "Error: .Values.issuer.solvers should be of type slice (list)." }}
+{{- end }}
 {{- end }}
 {{- end }}
