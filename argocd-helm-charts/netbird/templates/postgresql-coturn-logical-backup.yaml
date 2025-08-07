@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: postgres-netbird-logical-backup
+  name: postgres-coturn-logical-backup
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 1
