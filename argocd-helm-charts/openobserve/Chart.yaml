@@ -1,10 +1,21 @@
 apiVersion: v2
 name: openobserve
 version: 0.13.4
-dependencies:
-  - name: openobserve
-    version: 0.14.78
-    repository: https://charts.openobserve.ai/
-  - name: openobserve-collector
-    version: 0.3.22
-    repository: https://charts.openobserve.ai/
+# We disabling the updates for openobserve, since there's no upstream
+# support for dex OIDC connector configurations for enterprise.
+# It expects all the configurations to be passed as configmap, but passing
+# secrets/credentials like that doesn't seem a good approach.
+#
+# In our case, we wanted to provide OIDC client secret via Sealed Secrets,
+# but as of now, we have to draft enterprise .Values.enterprise.dex.config
+# in secrets and then mount the same as file.
+#
+# In upstream @kayahk drafted a PR which solves a similar problem.
+# Ref: https://github.com/openobserve/openobserve-helm-chart/pull/143
+# dependencies:
+# - name: openobserve
+#   version: 0.14.78
+#   repository: https://charts.openobserve.ai/
+# - name: openobserve-collector
+#   version: 0.3.22
+#   repository: https://charts.openobserve.ai/
