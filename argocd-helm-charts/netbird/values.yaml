@@ -224,6 +224,8 @@ netbird:
           secretName: vpn.example.com
 
 coturn:
+  coturn:
+    realm: "turn.vpn.example.com"
   externalDatabase:
     enabled: true
     type: "postgresql"
