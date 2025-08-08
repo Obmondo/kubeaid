@@ -9,3 +9,6 @@ smtp:
         key: "dkim.key"
     selector: "default"
     useED25519: false
+apps:
+  dkimpy:
+    enabled: true
