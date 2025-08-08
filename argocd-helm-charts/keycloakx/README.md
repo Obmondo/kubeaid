@@ -52,7 +52,7 @@ Details about setup if you are interested:
 
 ## Basic Keycloak setup
 
-* Log into the keycloak server as admin: <https://keycloak.ops.bw7.io/auth/admin/>
+* Log into the keycloak server as admin: <https://keycloak.example.com/auth/admin/>
   * The password can be extracted from the `keycloak-admin` secret.
 * Make sure that you are in the `Master` realm
 * Create a personal admin user account
@@ -104,8 +104,8 @@ Details about setup if you are interested:
       ![azure](static/2.png)
       - Save the Client ID and Client Secret from Azure AD. This information will be needed later in Keycloak.
   2. Obtain Client ID and Client Secret
-      - After the registration is complete, go to the app's overview page and copy the "Application (client) ID". 
-      - Navigate to "Certificates & secrets" and create a new client secret. Copy the value of the client 
+      - After the registration is complete, go to the app's overview page and copy the "Application (client) ID".
+      - Navigate to "Certificates & secrets" and create a new client secret. Copy the value of the client
         secret as it will not be shown again.
 
       ![azure](static/3.png)
@@ -199,7 +199,7 @@ we can make the login flow faster, by setting it as default:
 
 ## Add normal users to the Keycloak setup
 
-* Have the user access <https://keycloak.ops.bw7.io/auth/realms/<customer_name>/account/>
+* Have the user access <https://keycloak.example.com/auth/realms/<customer_name>/account/>
   * Click `Personal Info` link
   * The user is now done, and the basic user account has been created
 * Add the user to the group, that that describe their access needs
@@ -389,7 +389,7 @@ we can make the login flow faster, by setting it as default:
 * For more customizations refer [here](https://www.keycloak.org/docs/latest/server_development/index.html#creating-a-theme)
 * Build and push the image to any image registry.
 * In the value files add the following
-  
+
   ```yaml
           extraInitContainers: |
             - name: custom-theme-provider
@@ -404,13 +404,13 @@ we can make the login flow faster, by setting it as default:
                   cp -R /custom/* /theme
               volumeMounts:
                 - name: theme
-                  mountPath: /theme        
+                  mountPath: /theme
           extraVolumeMounts: |
             - name: theme
-              mountPath: /opt/keycloak/themes/bw7    
+              mountPath: /opt/keycloak/themes/bw7
           extraVolumes: |
             - name: theme
-              emptyDir: {} 
+              emptyDir: {}
   ```
 
 * Apply the changes and you should see the custom login page.

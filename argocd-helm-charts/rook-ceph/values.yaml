@@ -17,7 +17,6 @@ rook-ceph-cluster:
     enabled: true
     resources:
       limits:
-        cpu: null
         memory: "100Mi"
       requests:
         cpu: "100m"
