@@ -23,10 +23,55 @@ These are required for Harbor to run the core and jobservice successfully.
     gopass pwgen 32
     ```
 
-3. Generate `harbor-core-custom` secret and apply. Harbor creates its own certificates when it's deployed. So, we used that.
+3. Generate `harbor-core-custom` secret and apply. cause helm chart generate random passowrd on each helm template
+   render. So have a static password encrypted with sealed-secrets, makes argocd diff happy
+   NOTE: Remember to restart the core pod after syncing the secret, so core pod can read the new secret
+   We can run a hook job to automate this later.
 
-    ```sh
-    kubectl create secret generic harbor-core-custom --namespace harbor --dry-run=client --from-literal=CSRF_KEY={32 chars password} --from-file=tls.crt=/tmp/tls.crt --from-file=tls.key=/tmp/tls.key --from-literal=secret={16 chars password} --from-literal=JOBSERVICE_SECRET={16 chars password} --from-literal=REGISTRY_HTTP_SECRET={16 chars password} --from-literal=REGISTRY_HTPASSWD="harbor_registry_user":'{harbor registry user password}' --from-literal=REGISTRY_PASSWD=harbor_registry_password --from-literal=oidc-config='{"auth_mode":"oidc_auth","oidc_name":"Obmondo Keycloak","oidc_endpoint":"https://keycloak.example.com/auth/realms/harbor","oidc_client_id":"harbor","oidc_client_secret":"{oidc client secret}","oidc_scope":"openid,profile,email,offline_access","oidc_verify_cert":"true","oidc_auto_onboard":"true","oidc_user_claim":"email","oidc_admin_group":"harborAdmins"}' -o yaml | kubeseal --controller-namespace system --controller-name sealed-secrets --format yaml > harbor-core-custom.yaml
+    ```raw
+    * Get the CSRF_KEY
+    # kubectl get secret -n harbor harbor-core -o yaml | yq '.data.CSRF_KEY' | base64 -d
+
+    * Get the secret
+    # kubectl get secret -n harbor harbor-core -o yaml | yq '.data.secret' | base64 -d
+
+    * Get the jobservice secret
+    # kubectl get secret -n harbor harbor-jobservice -o yaml | yq '.data.JOBSERVICE_SECRET' | base64 -d
+
+    * Get the harbor-registry secret
+    # kubectl get secret -n harbor harbor-registry -o yaml | yq '.data.REGISTRY_HTTP_SECRET' | base64 -d
+
+    * Get the harbor-registry htpasswd secret
+    # htpasswd -B -c /tmp/htpasswd harbor_registry_user
+    New password:
+    Re-type new password:
+    Adding password for user harbor_registry_user
+    root@caefd85b49a0:~# cat /tmp/htpasswd
+    harbor_registry_user:$2y$05$y3dVHpPFgp0kpT3hIwYBl./Zprrn6ZV5fJlAUDImshsz3n9u7gXJK
+
+    * Get the TLS cert and key
+    # kubectl get secret -n harbor harbor-core -o yaml | yq '.data."tls.crt"'  | base64 -d > /tmp/tls.crt
+    # kubectl get secret -n harbor harbor-core -o yaml | yq '.data."tls.key"'  | base64 -d > /tmp/tls.key
+
+    * Generate the secret
+    # NOTE: if you have OIDC client, then add the oidc-config section as well
+
+    # kubectl create secret generic harbor-core-custom \
+      --namespace harbor \
+      --dry-run=client \
+      --from-literal=CSRF_KEY={32 chars password} \
+      --from-file=tls.crt=/tmp/tls.crt \
+      --from-file=tls.key=/tmp/tls.key \
+      --from-literal=secret={16 chars password} \
+      --from-literal=JOBSERVICE_SECRET={16 chars password} \
+      --from-literal=REGISTRY_HTTP_SECRET={16 chars password} \
+      --from-literal=REGISTRY_HTPASSWD="harbor_registry_user":'{harbor registry user password}' \
+      --from-literal=REGISTRY_PASSWD=harbor_registry_password \
+      --from-literal=oidc-config='{"auth_mode":"oidc_auth","oidc_name":"Obmondo Keycloak","oidc_endpoint":"https://keycloak.example.com/auth/realms/harbor","oidc_client_id":"harbor","oidc_client_secret":"{oidc client secret}","oidc_scope":"openid,profile,email,offline_access","oidc_verify_cert":"true","oidc_auto_onboard":"true","oidc_user_claim":"email","oidc_admin_group":"harborAdmins"}'\
+      -o yaml | \
+      kubeseal --controller-namespace system \
+      --controller-name sealed-secrets \
+      --format yaml > harbor-core-custom.yaml
     ```
 
 4. In KeyCloak, create `harborAdmins` group.
