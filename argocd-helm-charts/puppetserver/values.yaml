@@ -5,8 +5,6 @@ puppetserver:
       PUPPET_REPORTS: puppetdb,prometheus
       PUPPETSERVER_ENVIRONMENT_TIMEOUT: 0
       PUPPETSERVER_ENC_PATH: /etc/puppetlabs/code/environments/master/puppet_enc.rb
-  storage:
-    storageClass: openebs-zfspv-shared
   puppetdb:
     persistence:
       size: 1Gi
