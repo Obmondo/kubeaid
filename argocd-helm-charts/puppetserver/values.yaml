@@ -1,28 +1,85 @@
 puppetserver:
+  global:
+    extraEnv:
+      AUTOSIGN: /etc/puppetlabs/code/environments/master/puppet_autosign.rb
+      PUPPET_REPORTS: puppetdb,prometheus
+      PUPPETSERVER_ENVIRONMENT_TIMEOUT: 0
+      PUPPETSERVER_ENC_PATH: /etc/puppetlabs/code/environments/master/puppet_enc.rb
+  storage:
+    storageClass: openebs-zfspv-shared
+  puppetdb:
+    persistence:
+      size: 1Gi
+    extraEnv:
+      PUPPETDB_JAVA_ARGS: "-Xms512m -Xmx2500m -XX:+HeapDumpOnOutOfMemoryError"
+
   puppetserver:
     name: puppetserver
     puppeturl: "https://github.com/Obmondo/LinuxAid.git"
     image: ghcr.io/voxpupuli/container-puppetserver
     tag: 7.17.0-v1.5.0
     masters:
+      extraEnv:
+        PUPPETSERVER_JAVA_ARGS: "-Xms512m -Xmx2500m -XX:+HeapDumpOnOutOfMemoryError"
+        PUPPETSERVER_MAX_ACTIVE_INSTANCES: 4
       resources:
         requests:
-          memory: 2048Mi
-          cpu: 500m
+          memory: 3096Mi
+          cpu: 1000m
         limits:
-          memory: 2048Mi
-
+          memory: 3096Mi
       ingress:
         enabled: false
       extraEnv:
         PUPPETDB_JAVA_ARGS: "-Xms256m -Xmx256m -XX:+HeapDumpOnOutOfMemoryError"
         PUPPETSERVER_MAX_ACTIVE_INSTANCES: 3
         PUPPETSERVER_MAX_REQUESTS_PER_INSTANCE: 10000
+    customentrypoints:
+      enabled: true
+      configmaps:
+        configure_external_nodes.sh: |-
+          #!/bin/bash
+
+          set -e
+          # Configure puppet to use a certificate autosign script (if it exists)
+          # AUTOSIGN=true|false|path_to_autosign.conf
+          if test -n "${PUPPETSERVER_ENC_PATH}" ; then
+            puppet config set external_nodes "$PUPPETSERVER_ENC_PATH" --section server
+            puppet config set node_terminus "exec" --section server
+          fi
+
+          puppet config set hostprivkey /etc/puppetlabs/puppet/ssl/private_keys/puppet.pem
+          puppet config set hostcert /etc/puppetlabs/puppet/ssl/certs/puppet.pem
+          puppet config set hostpubkey /etc/puppetlabs/puppet/ssl/public_keys/puppet.pem
+
+          puppetserver gem install fugit -v 1.9.0
+          puppetserver gem install tzinfo-data
+
+          cat <<EOL > "/etc/puppetlabs/puppet/prometheus.yaml"
+          ---
+          textfile_directory: /etc/puppetlabs/code/prometheus-dropzone
+          environments:
+            - master
+          stale_time: 30
+          EOL
+
+          mkdir -p /etc/puppetlabs/code/prometheus-dropzone
+          chown puppet:puppet /etc/puppetlabs/code/prometheus-dropzone
+    persistence:
+      code:
+        size: 8Gi
 
   r10k:
-    asSidecar: false
+    code:
+      cronJob:
+        schedule: "*/2 * * * *"
+    hiera:
+      cronJob:
+        schedule: "*/2 * * * *"
 
   hiera:
+    eyaml:
+      existingSecret: eyaml-keys
     name: hiera
     hieradataurl: "https://github.com/Obmondo/linuxaid-config-template.git"
 
