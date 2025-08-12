@@ -7,7 +7,7 @@ spec:
     - websecure
   routes:
   - kind: Rule
-    match: Host(`{{ .Values.customerid }}.puppetdb.obmondo.com`)
+    match: HostSNI(`{{ .Values.puppetserver.puppetserver.masters.fqdns.alternateServerNames }}`)
     priority: 10
     services:
     - kind: Service
