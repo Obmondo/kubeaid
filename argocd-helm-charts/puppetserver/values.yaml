@@ -135,7 +135,7 @@ postgresql:
       cpu: 100m
 
 puppetAgentExporter:
-  image: harbor.obmondo.com/obmondo/dockerfiles/puppet-agent-exporter
+  image: ghcr.io/obmondo/puppet-agent-exporter
   tag: v0.0.1
   imagePullPolicy: IfNotPresent
   extraEnv:
