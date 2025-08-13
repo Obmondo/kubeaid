@@ -4,5 +4,5 @@ version: 1.0.0
 type: application
 dependencies:
   - name: odoo
-    version: "28.2.7"
+    version: "28.2.10"
     repository: https://charts.bitnami.com/bitnami

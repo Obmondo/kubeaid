@@ -9,7 +9,7 @@ metadata:
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
   {{ if not .Values.rbac.clusterWideAccess -}}
-  namespace: {{ .Release.Namespace | quote }}
+  namespace: {{ default .Release.Namespace .Values.namespace | quote }}
   {{- end }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -18,5 +18,5 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ include "gitlab-runner.serviceAccountName" . }}
-  namespace: "{{ .Release.Namespace }}"
+  namespace: "{{ default .Release.Namespace .Values.namespace }}"
 {{- end -}}

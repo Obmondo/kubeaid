@@ -2,9 +2,9 @@
 
 OpenCost and OpenCost UI
 
-![Version: 2.1.6](https://img.shields.io/badge/Version-2.1.6-informational?style=flat-square)
+![Version: 2.2.0](https://img.shields.io/badge/Version-2.2.0-informational?style=flat-square)
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
-![AppVersion: 1.115.0](https://img.shields.io/badge/AppVersion-1.115.0-informational?style=flat-square)
+![AppVersion: 1.116.0](https://img.shields.io/badge/AppVersion-1.116.0-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/opencost)](https://artifacthub.io/packages/search?repo=opencost)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/opencost-oci)](https://artifacthub.io/packages/search?repo=opencost-oci)
 
@@ -74,6 +74,7 @@ $ helm install opencost opencost/opencost
 | opencost.exporter.collectorDataSource.retentionResolution1d | int | `15` | The number of 1d intervals the Collector DataSource should maintain |
 | opencost.exporter.collectorDataSource.retentionResolution1h | int | `49` | The number of 1h intervals the Collector DataSource should maintain |
 | opencost.exporter.collectorDataSource.scrapeInterval | string | `"30s"` | define the interval at which the collector scrapes for data points (10s, 15s, 1m) |
+| opencost.exporter.command | list | `[]` | Optional command to override the default container command |
 | opencost.exporter.csv_path | string | `""` |  |
 | opencost.exporter.defaultClusterId | string | `"default-cluster"` | Default cluster ID to use if cluster_id is not set in Prometheus metrics. |
 | opencost.exporter.env | list | `[]` | List of additional environment variables to set in the container |
@@ -84,7 +85,7 @@ $ helm install opencost opencost/opencost
 | opencost.exporter.image.pullPolicy | string | `"IfNotPresent"` | Exporter container image pull policy |
 | opencost.exporter.image.registry | string | `"ghcr.io"` | Exporter container image registry |
 | opencost.exporter.image.repository | string | `"opencost/opencost"` | Exporter container image name |
-| opencost.exporter.image.tag | string | `"1.115.0@sha256:fb6468a1ef45dbd4a9e521122c8d306f882bb33d1657d28d21aeaef79412e9e1"` | Exporter container image tag |
+| opencost.exporter.image.tag | string | `"1.116.0@sha256:e4658c3be1119f2ab57c5a57c3e19b785d525de63f4cc57111d0da3e0a6654c0"` | Exporter container image tag |
 | opencost.exporter.livenessProbe.enabled | bool | `true` | Whether probe is enabled |
 | opencost.exporter.livenessProbe.failureThreshold | int | `3` | Number of failures for probe to be considered failed |
 | opencost.exporter.livenessProbe.initialDelaySeconds | int | `10` | Number of seconds before probe is initiated |
@@ -96,6 +97,7 @@ $ helm install opencost opencost/opencost
 | opencost.exporter.persistence.mountPath | string | `"/mnt/export"` | The path that the PV will be mounted to the exporter at |
 | opencost.exporter.persistence.size | string | `""` | Size for persistent volume |
 | opencost.exporter.persistence.storageClass | string | `""` | Storage class for persistent volume |
+| opencost.exporter.prometheusDataSource.queryResolutionSeconds | int | `300` |  |
 | opencost.exporter.readinessProbe.enabled | bool | `true` | Whether probe is enabled |
 | opencost.exporter.readinessProbe.failureThreshold | int | `3` | Number of failures for probe to be considered failed |
 | opencost.exporter.readinessProbe.initialDelaySeconds | int | `10` | Number of seconds before probe is initiated |
@@ -212,6 +214,9 @@ $ helm install opencost opencost/opencost
 | opencost.ui.uiPort | int | `9090` |  |
 | opencost.ui.useDefaultFqdn | bool | `false` |  |
 | opencost.ui.useIPv6 | bool | `true` |  |
+| pdb.enabled | bool | `false` |  |
+| pdb.maxUnavailable | string | `nil` | Maximum number of pods that can be unavailable after the eviction |
+| pdb.minAvailable | string | `nil` | Minimum number of pods that must be available after the eviction |
 | plugins.configs | string | `nil` |  |
 | plugins.enabled | bool | `false` |  |
 | plugins.folder | string | `"/opt/opencost/plugin"` |  |

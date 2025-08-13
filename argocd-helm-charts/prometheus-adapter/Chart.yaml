@@ -3,6 +3,6 @@ name: prometheus-adapter
 version: 1.0.0
 dependencies:
   - name: prometheus-adapter
-    version: 4.14.1
+    version: 5.1.0
     repository: https://prometheus-community.github.io/helm-charts
     #repository: "oci://ghcr.io/Obmondo"

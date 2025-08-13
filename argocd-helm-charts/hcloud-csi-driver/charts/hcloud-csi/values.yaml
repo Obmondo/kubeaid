@@ -86,7 +86,7 @@ controller:
 
     csiResizer:
       name: registry.k8s.io/sig-storage/csi-resizer
-      tag: v1.13.2 # renovate: datasource=docker depName=registry.k8s.io/sig-storage/csi-resizer
+      tag: v1.14.0 # renovate: datasource=docker depName=registry.k8s.io/sig-storage/csi-resizer
       ## Specify a imagePullPolicy
       ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
       ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -751,6 +751,13 @@ storageClasses:
   - name: hcloud-volumes
     defaultStorageClass: true
     reclaimPolicy: Delete
+    ## @param storageClasses[].annotations Additional annotations for the StorageClass
+    ## Optionally, specify StorageClass annotations to be added.
+    ## e.g.:
+    ## annotations:
+    ##   resize.autoresize.io/enabled: "true"
+    ##
+    annotations: {}
     ## Optionally, specify StorageClass parameters to be added.
     ## e.g.:
     ## extraParameters:

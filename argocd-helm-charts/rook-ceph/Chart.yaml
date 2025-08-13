@@ -7,6 +7,6 @@ dependencies:
     repository: https://charts.rook.io/release
     #repository: "oci://ghcr.io/Obmondo"
   - name: rook-ceph-cluster
-    version: v1.17.6
+    version: v1.17.7
     repository: https://charts.rook.io/release
     #repository: "oci://ghcr.io/Obmondo"

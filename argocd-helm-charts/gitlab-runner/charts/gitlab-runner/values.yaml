@@ -1,3 +1,11 @@
+## Configure namespace where the GitLab Runner deployment will be created
+## By default, the runner deployment uses the Release namespace (.Release.Namespace)
+## Set this value to override and deploy the runner in a different namespace
+## This allows separation between runner management (this namespace) and job execution (runners.jobNamespace)
+##
+## Example: Deploy runner in "ops" namespace while jobs run in "gitlab" namespace
+# namespace: ""
+
 ## GitLab Runner Image
 ##
 ## By default it's using registry.gitlab.com/gitlab-org/gitlab-runner:alpine-v{VERSION}
@@ -429,6 +437,14 @@ service:
 ## Configuration for the Pods that the runner launches for each new job
 ##
 runners:
+  ## Configure namespace where GitLab Runner job pods will be created
+  ## By default, job pods use the Release namespace (.Release.Namespace)
+  ## Set this value to run jobs in a different namespace than the runner deployment
+  ## This enables separation between runner management and job execution
+  ##
+  ## Example: Runner in "ops" namespace, jobs in "gitlab" namespace
+  # jobNamespace: ""
+
   # runner configuration, where the multi line string is evaluated as a
   # template so you can specify helm values inside of it.
   #
@@ -437,7 +453,7 @@ runners:
   config: |
     [[runners]]
       [runners.kubernetes]
-        namespace = "{{.Release.Namespace}}"
+        namespace = "{{ default .Release.Namespace .Values.runners.jobNamespace }}"
         image = "alpine"
 
   ## Absolute path for an existing runner configuration file

@@ -68,6 +68,11 @@ spec:
         - name: {{ include "opencost.fullname" . }}
           image: {{ include "opencost.fullImageName" . }}
           imagePullPolicy: {{ .Values.opencost.exporter.image.pullPolicy }}
+          {{- with .Values.opencost.exporter.command }}
+          {{- if . }}
+          command: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
           args:
           {{- range .Values.opencost.exporter.extraArgs }}
           - --{{ . }}
@@ -111,8 +116,14 @@ spec:
               value: {{ .Values.loglevel }}
             - name: CUSTOM_COST_ENABLED
               value: {{ .Values.plugins.enabled | quote }}
-            - name: KUBECOST_NAMESPACE
+            - name: INSTALL_NAMESPACE
               value: {{ include "opencost.namespace" . }}
+            {{- with .Values.opencost.exporter.prometheusDataSource }}
+            {{- if .queryResolutionSeconds }}
+            - name: PROMETHEUS_QUERY_RESOLUTION_SECONDS
+              value: {{ .queryResolutionSeconds | quote }}
+            {{- end }}
+            {{- end }}
             {{- with .Values.opencost.exporter.collectorDataSource }}
             {{- if .enabled }}
             - name: COLLECTOR_DATA_SOURCE_ENABLED

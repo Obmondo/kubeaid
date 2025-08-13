@@ -1,6 +1,6 @@
 dependencies:
 - name: cerebro
   repository: https://wiremind.github.io/wiremind-helm-charts
-  version: 2.1.0
-digest: sha256:61629749e8ac52ee8d9d12cdccc23684c7ef96a14b928ae8fbef61b6bbb18cd0
-generated: "2024-08-23T23:46:16.675055342+05:30"
+  version: 2.2.0
+digest: sha256:2e6bcf32cd0fa831eae84e5956d7e81b96c06411360adc1648fce970e853227b
+generated: "2025-08-13T12:13:10.946778617+05:30"

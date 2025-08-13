@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "gitlab-runner.fullname" . }}-session-server
-  namespace: {{ .Release.Namespace | quote }}
+  namespace: {{ default .Release.Namespace .Values.namespace | quote }}
   {{- if .Values.sessionServer.annotations }}
   annotations:
     {{- toYaml .Values.sessionServer.annotations | nindent 4 }}

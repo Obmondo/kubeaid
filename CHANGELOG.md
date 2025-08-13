@@ -2,7 +2,80 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-### Patch Version Upgrades %%^^
+## 17.0.0
+### Major Version Upgrades
+- Updated whoami from version 5.3.0 to 6.0.0
+- Updated traefik from version 36.3.0 to 37.0.0
+- Updated prometheus-adapter from version 4.14.1 to 5.1.0
+- Updated mariadb-operator from version 0.38.1 to 25.8.3
+- Updated external-dns from version 8.9.2 to 9.0.2
+- Updated crossplane from version 1.20.0 to 2.0.2
+
+### Minor Version Upgrades
+- Updated velero from version 10.0.9 to 10.1.0
+- Updated teleport-kube-agent from version 18.0.0 to 18.1.4
+- Updated teleport-cluster from version 18.0.0 to 18.1.4
+- Updated strimzi-kafka-operator from version 0.46.1 to 0.47.0
+- Updated sonarqube from version 2025.3.1 to 2025.4.2
+- Updated reloader from version 2.1.5 to 2.2.0
+- Updated opentelemetry-collector from version 0.127.3 to 0.130.2
+- Updated opencost from version 2.1.6 to 2.2.0
+- Updated metrics-server from version 3.12.2 to 3.13.0
+- Updated kyverno from version 3.4.4 to 3.5.0
+- Updated keycloakx from version 7.0.1 to 7.1.1
+- Updated hcloud-csi from version 2.16.0 to 2.17.0
+- Updated gitlab-runner from version 0.78.1 to 0.79.1
+- Updated gatekeeper from version 3.19.2 to 3.20.0
+- Updated fluent-bit from version 0.50.0 to 0.51.0
+- Updated cluster-autoscaler from version 9.48.0 to 9.50.0
+- Updated cluster-api-operator from version 0.21.0 to 0.22.0
+- Updated cloudnative-pg from version 0.24.0 to 0.25.0
+- Updated cilium from version 1.17.5 to 1.18.0
+- Updated cerebro from version 2.1.0 to 2.2.0
+- Updated aws-ebs-csi-driver from version 2.45.1 to 2.47.0
+- Updated argo-cd from version 8.1.3 to 8.2.5
+
+### Patch Version Upgrades
+- Updated prometheus-smartctl-exporter from version 0.15.3 to 0.15.4
+- Updated rook-ceph-cluster from version v1.17.6 to v1.17.7
+- Added rook-ceph from version v1.17.2 to v1.17.2
+- Updated redmine from version 33.0.2 to 33.0.6
+- Updated rabbitmq-cluster-operator from version 4.4.25 to 4.4.31
+- Added opentelemetry-operator from version 0.84.1 to 0.84.1
+- Updated oncall from version 1.16.1 to 1.16.4
+- Updated odoo from version 28.2.7 to 28.2.10
+- Updated kubernetes-operator from version 0.1.10 to 0.1.13
+- Updated metallb from version 6.4.19 to 6.4.21
+- Updated mattermost-team-edition from version 6.6.80 to 6.6.81
+- Updated mattermost-operator from version 1.0.3 to 1.0.4
+- Updated harbor from version 1.17.1 to 1.17.2
+- Updated graylog from version 2.3.15 to 2.3.16
+- Updated gitea from version 12.1.1 to 12.1.3
+- Updated erpnext from version 7.0.214 to 7.0.227
+- Updated cloud-provider-azure from version 1.33.0 to 1.33.3
+- Updated aws-cloud-controller-manager from version 0.0.8 to 0.0.9
+- Updated aws-efs-csi-driver from version 3.2.0 to 3.2.1
+
+### Patch Version Upgrades
+- Updated prometheus-smartctl-exporter from version 0.15.3 to 0.15.4
+- Updated rook-ceph-cluster from version v1.17.6 to v1.17.7
+- Added rook-ceph from version v1.17.2 to v1.17.2
+- Updated redmine from version 33.0.2 to 33.0.6
+- Updated rabbitmq-cluster-operator from version 4.4.25 to 4.4.31
+- Added opentelemetry-operator from version 0.84.1 to 0.84.1
+- Updated oncall from version 1.16.1 to 1.16.4
+- Updated odoo from version 28.2.7 to 28.2.10
+- Updated kubernetes-operator from version 0.1.10 to 0.1.13
+- Updated metallb from version 6.4.19 to 6.4.21
+- Updated mattermost-team-edition from version 6.6.80 to 6.6.81
+- Updated mattermost-operator from version 1.0.3 to 1.0.4
+- Updated harbor from version 1.17.1 to 1.17.2
+- Updated graylog from version 2.3.15 to 2.3.16
+- Updated gitea from version 12.1.1 to 12.1.3
+- Updated erpnext from version 7.0.214 to 7.0.227
+- Updated cloud-provider-azure from version 1.33.0 to 1.33.3
+- Updated aws-cloud-controller-manager from version 0.0.8 to 0.0.9
+- Updated aws-efs-csi-driver from version 3.2.0 to 3.2.1
 - Added step-issuer from version 1.9.9 to 1.9.9
 
 ### Improvements

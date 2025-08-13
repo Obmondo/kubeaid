@@ -1,6 +1,6 @@
 dependencies:
 - name: prometheus-adapter
   repository: https://prometheus-community.github.io/helm-charts
-  version: 4.14.1
-digest: sha256:18eedbfb6913ff3df3ec0a450e6d7e62662bff66582d31a09708952c74b861bd
-generated: "2025-04-21T12:14:10.819871631+05:30"
+  version: 5.1.0
+digest: sha256:9128a7d5fa2617b7c01fc78aac61d58cfbd978b94b648741ca2a2275968c96c2
+generated: "2025-08-13T13:10:13.009076583+05:30"

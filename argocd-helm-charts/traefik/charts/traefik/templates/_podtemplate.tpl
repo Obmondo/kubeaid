@@ -135,10 +135,12 @@
          {{- end }}
         {{- end }}
         {{- if .Values.hub.token }}
+          {{- if not .Values.hub.offline }}
           {{- $listenAddr := default ":9943" .Values.hub.apimanagement.admission.listenAddr }}
         - name: admission
           containerPort: {{ last (mustRegexSplit ":" $listenAddr 2) }}
           protocol: TCP
+          {{- end }}
           {{- if .Values.hub.apimanagement.enabled }}
         - name: apiportal
           containerPort: 9903
@@ -173,6 +175,10 @@
           {{- end }}
           {{- if .Values.additionalVolumeMounts }}
             {{- tpl (toYaml .Values.additionalVolumeMounts) . | nindent 10 }}
+          {{- end }}
+          {{- range $localPluginName, $localPlugin := .Values.experimental.localPlugins }}
+          - name: {{ $localPluginName | replace "." "-" }}
+            mountPath: {{ $localPlugin.mountPath | quote }}
           {{- end }}
         args:
           {{- with .Values.global }}
@@ -402,8 +408,8 @@
           {{- end }}
 
           {{- with .Values.tracing }}
-            {{- with .sampleRate }}
-          - "--tracing.sampleRate={{ . }}"
+            {{- if ne .sampleRate nil }}
+          - "--tracing.sampleRate={{ .sampleRate }}"
             {{- end }}
 
             {{- with .serviceName }}
@@ -501,6 +507,12 @@
           - "--experimental.plugins.{{ $pluginName }}.moduleName={{ $plugin.moduleName }}"
           - "--experimental.plugins.{{ $pluginName }}.version={{ $plugin.version }}"
           {{- end }}
+          {{- range $localPluginName, $localPlugin := .Values.experimental.localPlugins }}
+          {{- if not (hasKey $localPlugin "moduleName") }}
+            {{- fail  (printf "ERROR: local plugin %s is missing moduleName !" $localPluginName) }}
+          {{- end }}
+          - "--experimental.localPlugins.{{ $localPluginName }}.moduleName={{ $localPlugin.moduleName }}"
+          {{- end }}
           {{- if and (semverCompare ">=v3.3.0-0" $version) (.Values.experimental.abortOnPluginFailure)}}
           - "--experimental.abortonpluginfailure={{ .Values.experimental.abortOnPluginFailure }}"
           {{- end }}
@@ -561,6 +573,9 @@
            {{- end }}
            {{- if .Values.providers.kubernetesIngress.nativeLBByDefault }}
           - "--providers.kubernetesingress.nativeLBByDefault=true"
+           {{- end }}
+           {{- if .Values.providers.kubernetesIngress.strictPrefixMatching }}
+          - "--providers.kubernetesingress.strictPrefixMatching=true"
            {{- end }}
           {{- end }}
           {{- if .Values.experimental.kubernetesGateway.enabled }}
@@ -625,7 +640,7 @@
                 {{- fail $errorMsg }}
               {{- end }}
               {{- $toPort := index $.Values.ports .to }}
-              {{- if and (($toPort.tls).enabled) (ne .scheme "https") }}
+              {{- if and (($toPort.tls).enabled) .scheme (ne .scheme "https") }}
                 {{- $errorMsg := printf "ERROR: Cannot redirect %s to %s without setting scheme to https" $entrypoint .to }}
                 {{- fail $errorMsg }}
               {{- end }}
@@ -787,8 +802,8 @@
             {{- if and (not .apimanagement.enabled) ($.Values.hub.apimanagement.admission.listenAddr) }}
                {{- fail "ERROR: Cannot configure admission without enabling hub.apimanagement" }}
             {{- end }}
-            {{- if .offline  }}
-          - "--hub.offline"
+            {{- if ne .offline nil }}
+          - "--hub.offline={{ .offline }}"
             {{- end }}
             {{- if .namespaces }}
           - "--hub.namespaces={{ join "," (uniq (concat (include "traefik.namespace" $ | list) .namespaces)) }}"
@@ -797,9 +812,11 @@
              {{- if .enabled }}
               {{- $listenAddr := default ":9943" .admission.listenAddr }}
           - "--hub.apimanagement"
+              {{- if not $.Values.hub.offline }}
           - "--hub.apimanagement.admission.listenAddr={{ $listenAddr }}"
-              {{- with .admission.secretName }}
+                {{- with .admission.secretName }}
           - "--hub.apimanagement.admission.secretName={{ . }}"
+                {{- end }}
               {{- end }}
               {{- if .openApi.validateRequestMethodAndPath }}
           - "--hub.apiManagement.openApi.validateRequestMethodAndPath=true"
@@ -814,9 +831,11 @@
               {{- end }}
              {{- end }}
             {{- end -}}
-            {{- with .platformUrl }}
+            {{- if not .offline }}
+              {{- with .platformUrl }}
           - "--hub.platformUrl={{ . }}"
-            {{- end -}}
+              {{- end -}}
+            {{- end }}
             {{- range $field, $value := .redis }}
              {{- if has $field (list "cluster" "database" "endpoints" "username" "password" "timeout") -}}
               {{- with $value }}
@@ -872,10 +891,7 @@
           {{- end }}
           {{- if ($.Values.resources.limits).memory }}
           - name: GOMEMLIMIT
-            valueFrom:
-              resourceFieldRef:
-                resource: limits.memory
-                divisor: '1'
+            value: {{ include "traefik.gomemlimit" (dict "memory" .Values.resources.limits.memory "percentage" .Values.deployment.goMemLimitPercentage) | quote }}
           {{- end }}
           {{- with .Values.hub.token }}
           - name: HUB_TOKEN
@@ -917,6 +933,11 @@
         {{- end }}
         {{- if .Values.deployment.additionalVolumes }}
           {{- toYaml .Values.deployment.additionalVolumes | nindent 8 }}
+        {{- end }}
+        {{- range $localPluginName, $localPlugin := .Values.experimental.localPlugins }}
+        - name: {{ $localPluginName | replace "." "-" }}
+          hostPath:
+            path: {{ $localPlugin.hostPath | quote }}
         {{- end }}
         {{- if and (gt (len .Values.experimental.plugins) 0) (ne (include "traefik.hasPluginsVolume" .Values.deployment.additionalVolumes) "true") }}
         - name: plugins

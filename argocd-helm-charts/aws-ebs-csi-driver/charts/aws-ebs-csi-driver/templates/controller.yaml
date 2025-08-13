@@ -134,6 +134,12 @@ spec:
                   name: aws-meta
                   key: endpoint
                   optional: true
+            - name: AWS_SAGEMAKER_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: aws-meta
+                  key: sagemaker_endpoint
+                  optional: true
             {{- with .Values.controller.region }}
             - name: AWS_REGION
               value: {{ . }}
@@ -266,7 +272,7 @@ spec:
           imagePullPolicy: {{ default .Values.image.pullPolicy .Values.sidecars.attacher.image.pullPolicy }}
           args:
             {{- if not (regexMatch "(-timeout)" (join " " .Values.sidecars.attacher.additionalArgs)) }}
-            - --timeout=60s
+            - --timeout=6m
             {{- end }}
             - --csi-address=$(ADDRESS)
             - --v={{ .Values.sidecars.attacher.logLevel }}

@@ -14,4 +14,4 @@ name: cerebro
 sources:
 - https://github.com/wiremind/wiremind-helm-charts/tree/main/charts/cerebro
 - https://github.com/lmenezes/cerebro-docker
-version: 2.1.0
+version: 2.2.0

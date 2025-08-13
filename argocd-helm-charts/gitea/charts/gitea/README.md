@@ -33,6 +33,7 @@
 - [Metrics and profiling](#metrics-and-profiling)
   - [Secure Metrics Endpoint](#secure-metrics-endpoint)
 - [Pod annotations](#pod-annotations)
+- [TLS certificate rotation](#tls-certificate-rotation)
 - [Themes](#themes)
 - [Renovate](#renovate)
 - [Parameters](#parameters)
@@ -101,8 +102,8 @@ These dependencies are enabled by default:
 
 Alternatively, the following non-HA replacements are available:
 
-- PostgreSQL ([Bitnami PostgreSQL](<Postgresql](https://github.com/bitnami/charts/blob/main/bitnami/postgresql/Chart.yaml)>))
-- Valkey ([Bitnami Valkey](<Valkey](https://github.com/bitnami/charts/blob/main/bitnami/valkey/Chart.yaml)>))
+- PostgreSQL ([Bitnami PostgreSQL](https://github.com/bitnami/charts/blob/main/bitnami/postgresql/Chart.yaml))
+- Valkey ([Bitnami Valkey](https://github.com/bitnami/charts/blob/main/bitnami/valkey/Chart.yaml))
 
 ### Dependency Versioning
 
@@ -816,6 +817,31 @@ gitea:
   podAnnotations: {}
 ```
 
+## TLS certificate rotation
+
+If Gitea uses TLS certificates that are mounted as a secret in the container file system, Gitea will not automatically apply them when the TLS certificates are rotated.
+Such a rotation can be for example triggered, when the cert-manager issues new TLS certificates before expiring. Further information is described as GitHub
+[issue](https://github.com/go-gitea/gitea/issues/27962).
+
+Until the issue is present, a workaround can be applied.
+For example stakater's [reloader](https://github.com/stakater/Reloader) controller can be used to trigger a rolling update.
+The following annotation must be added to instruct the reloader controller to trigger a rolling update, when the mounted `configMaps` and `secrets` have been changed.
+
+```yaml
+deployment:
+  annotations:
+    reloader.stakater.com/auto: "true"
+```
+
+Instead of triggering a rolling update for configMap and secret resources, this action can also be defined for individual items.
+For example, when the secret named `gitea-tls` is mounted and the reloader controller should only listen for changes of this secret:
+
+```yaml
+deployment:
+  annotations:
+    secret.reloader.stakater.com/reload: "gitea-tls"
+```
+
 ## Themes
 
 Custom themes can be added via k8s secrets and referencing them in `values.yaml`.
@@ -1217,7 +1243,7 @@ If you miss this, blindly upgrading may delete your Postgres instance and you ma
   To deploy and use "Actions", please see the new dedicated chart at <https://gitea.com/gitea/helm-actions>.
   It is maintained by a seperate maintainer group and hasn't seen a release yet (at the time of the 12.0 release).
   Feel encouraged to contribute if "Actions" is important to you!
-  
+
   This change was made to avoid overloading the existing helm chart, which is already quite large in size and configuration options.
   In addition, the existing maintainers team was not actively using "Actions" which slowed down development and community contributions.
   While the new chart is still young (and waiting for contributions! and maintainers), we believe that it is the best way moving forward for both parts.

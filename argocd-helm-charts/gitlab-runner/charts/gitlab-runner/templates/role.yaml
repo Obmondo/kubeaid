@@ -9,7 +9,7 @@ metadata:
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
   {{ if not .Values.rbac.clusterWideAccess -}}
-  namespace: {{ .Release.Namespace | quote }}
+  namespace: {{ default .Release.Namespace .Values.namespace | quote }}
   {{- end }}
 rules:
 {{- if .Values.rbac.podSecurityPolicy.enabled }}

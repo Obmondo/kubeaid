@@ -1,3 +1,19 @@
+## v0.79.1 (2025-07-28)
+
+### New features
+
+- Update GitLab Runner version to v18.2.1
+
+## v0.79.0 (2025-07-12)
+
+### New features
+
+- Update GitLab Runner version to v18.2.0
+
+### Bug fixes
+
+- Restore namespace separation capability for GitLab Runner [!519](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/merge_requests/519)
+
 ## v0.78.1 (2025-06-26)
 
 ### New features

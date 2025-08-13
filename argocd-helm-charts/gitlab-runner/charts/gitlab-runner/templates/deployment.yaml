@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "gitlab-runner.fullname" . }}
-  namespace: {{ .Release.Namespace | quote }}
+  namespace: {{ default .Release.Namespace .Values.namespace | quote }}
   labels:
     app: {{ include "gitlab-runner.fullname" . }}
     chart: {{ include "gitlab-runner.chart" . }}

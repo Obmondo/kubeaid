@@ -7,21 +7,18 @@ annotations:
     ciliumclusterwidenetworkpolicies.cilium.io\n  displayName: Cilium Clusterwide
     Network Policy\n  description: |\n    Cilium Clusterwide Network Policies support
     configuring network traffic\n    policiies across the entire cluster, including
-    applying node firewalls.\n- kind: CiliumExternalWorkload\n  version: v2\n  name:
-    ciliumexternalworkloads.cilium.io\n  displayName: Cilium External Workload\n  description:
-    |\n    Cilium External Workload supports configuring the ability for external\n
-    \   non-Kubernetes workloads to join the cluster.\n- kind: CiliumLocalRedirectPolicy\n
-    \ version: v2\n  name: ciliumlocalredirectpolicies.cilium.io\n  displayName: Cilium
-    Local Redirect Policy\n  description: |\n    Cilium Local Redirect Policy allows
-    local redirects to be configured\n    within a node to support use cases like
-    Node-Local DNS or KIAM.\n- kind: CiliumNode\n  version: v2\n  name: ciliumnodes.cilium.io\n
-    \ displayName: Cilium Node\n  description: |\n    Cilium Node represents a node
-    managed by Cilium. It contains a\n    specification to control various node specific
-    configuration aspects\n    and a status section to represent the status of the
-    node.\n- kind: CiliumIdentity\n  version: v2\n  name: ciliumidentities.cilium.io\n
-    \ displayName: Cilium Identity\n  description: |\n    Cilium Identity allows introspection
-    into security identities that\n    Cilium allocates which identify sets of labels
-    that are assigned to\n    individual endpoints in the cluster.\n- kind: CiliumEndpoint\n
+    applying node firewalls.\n- kind: CiliumLocalRedirectPolicy\n  version: v2\n  name:
+    ciliumlocalredirectpolicies.cilium.io\n  displayName: Cilium Local Redirect Policy\n
+    \ description: |\n    Cilium Local Redirect Policy allows local redirects to be
+    configured\n    within a node to support use cases like Node-Local DNS or KIAM.\n-
+    kind: CiliumNode\n  version: v2\n  name: ciliumnodes.cilium.io\n  displayName:
+    Cilium Node\n  description: |\n    Cilium Node represents a node managed by Cilium.
+    It contains a\n    specification to control various node specific configuration
+    aspects\n    and a status section to represent the status of the node.\n- kind:
+    CiliumIdentity\n  version: v2\n  name: ciliumidentities.cilium.io\n  displayName:
+    Cilium Identity\n  description: |\n    Cilium Identity allows introspection into
+    security identities that\n    Cilium allocates which identify sets of labels that
+    are assigned to\n    individual endpoints in the cluster.\n- kind: CiliumEndpoint\n
     \ version: v2\n  name: ciliumendpoints.cilium.io\n  displayName: Cilium Endpoint\n
     \ description: |\n    Cilium Endpoint represents the status of individual pods
     or nodes in\n    the cluster which are managed by Cilium, including enforcement
@@ -65,9 +62,9 @@ annotations:
     \ version: v2alpha1\n  name: ciliumbgpnodeconfigoverrides.cilium.io\n  displayName:
     Cilium BGP Node Config Override\n  description: |\n    CiliumBGPNodeConfigOverride
     can be used to override node specific BGP configuration.\n- kind: CiliumLoadBalancerIPPool\n
-    \ version: v2alpha1\n  name: ciliumloadbalancerippools.cilium.io\n  displayName:
-    Cilium Load Balancer IP Pool\n  description: |\n    Defining a Cilium Load Balancer
-    IP Pool instructs Cilium to assign IPs to LoadBalancer Services.\n- kind: CiliumCIDRGroup\n
+    \ version: v2\n  name: ciliumloadbalancerippools.cilium.io\n  displayName: Cilium
+    Load Balancer IP Pool\n  description: |\n    Defining a Cilium Load Balancer IP
+    Pool instructs Cilium to assign IPs to LoadBalancer Services.\n- kind: CiliumCIDRGroup\n
     \ version: v2alpha1\n  name: ciliumcidrgroups.cilium.io\n  displayName: Cilium
     CIDR Group\n  description: |\n    CiliumCIDRGroup is a list of CIDRs that can
     be referenced as a single entity from CiliumNetworkPolicies.\n- kind: CiliumL2AnnouncementPolicy\n
@@ -77,9 +74,12 @@ annotations:
     area network, by which nodes, and via which interfaces.\n- kind: CiliumPodIPPool\n
     \ version: v2alpha1\n  name: ciliumpodippools.cilium.io\n  displayName: Cilium
     Pod IP Pool\n  description: |\n    CiliumPodIPPool defines an IP pool that can
-    be used for pooled IPAM (i.e. the multi-pool IPAM mode).\n"
+    be used for pooled IPAM (i.e. the multi-pool IPAM mode).\n- kind: CiliumGatewayClassConfig\n
+    \ version: v2alpha1\n  name: ciliumgatewayclassconfigs.cilium.io\n  displayName:
+    Cilium Gateway Class Config\n  description: |\n    CiliumGatewayClassConfig defines
+    a configuration for Gateway API GatewayClass.\n"
 apiVersion: v2
-appVersion: 1.17.5
+appVersion: 1.18.0
 description: eBPF-based Networking, Security, and Observability
 home: https://cilium.io/
 icon: https://cdn.jsdelivr.net/gh/cilium/cilium@main/Documentation/images/logo-solo.svg
@@ -95,4 +95,4 @@ kubeVersion: '>= 1.21.0-0'
 name: cilium
 sources:
 - https://github.com/cilium/cilium
-version: 1.17.5
+version: 1.18.0

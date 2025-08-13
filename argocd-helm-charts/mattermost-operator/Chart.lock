@@ -1,6 +1,6 @@
 dependencies:
 - name: mattermost-operator
   repository: https://helm.mattermost.com
-  version: 1.0.3
-digest: sha256:6fc409a4c11a46221ce6578f80bd72ce2c71728e8fc73265f8e82e0b1420cd70
-generated: "2025-07-18T00:58:58.598498+05:30"
+  version: 1.0.4
+digest: sha256:9edf56707a5dd503715ba1a8e48981508622d6ca49c5013b831f63d71b53dd77
+generated: "2025-08-13T12:50:19.216918195+05:30"

@@ -1,36 +1,32 @@
 annotations:
   artifacthub.io/changes: |
-    - kind: fixed
-      description: add `srCheckPassword` param to support new postgresql-ha stream replication check requirements (#894)
     - kind: changed
-      description: update workflow dependencies (minor & patch) (#892)
+      description: remove pat-s from maintainers (#918)
     - kind: changed
-      description: update subcharts (minor & patch) (#891)
+      description: step down as maintainer (#917)
     - kind: changed
-      description: update dependency go-gitea/gitea to v1.24.2 (#890)
+      description: update alpine/helm docker tag to v3.18.4 (#913)
     - kind: changed
-      description: update bats testing framework (#889)
-    - kind: changed
-      description: update dependency go-gitea/gitea to v1.24.1 (#887)
+      description: update postgresql docker tag to v16.7.21 (#908)
 apiVersion: v2
-appVersion: 1.24.2
+appVersion: 1.24.3
 dependencies:
 - condition: postgresql.enabled
   name: postgresql
   repository: oci://registry-1.docker.io/bitnamicharts
-  version: 16.7.13
+  version: 16.7.21
 - condition: postgresql-ha.enabled
   name: postgresql-ha
   repository: oci://registry-1.docker.io/bitnamicharts
-  version: 16.0.14
+  version: 16.0.22
 - condition: valkey-cluster.enabled
   name: valkey-cluster
   repository: oci://registry-1.docker.io/bitnamicharts
-  version: 3.0.14
+  version: 3.0.18
 - condition: valkey.enabled
   name: valkey
   repository: oci://registry-1.docker.io/bitnamicharts
-  version: 3.0.15
+  version: 3.0.22
 description: Gitea Helm chart for Kubernetes
 icon: https://gitea.com/assets/img/logo.svg
 keywords:
@@ -49,14 +45,10 @@ maintainers:
   name: Konrad Lother
 - email: lucas.hahn@novum-rgi.de
   name: Lucas Hahn
-- email: sk.bunsenbrenner@gmail.com
-  name: Steven Kriegler
-- email: patrick.schratz@gmail.com
-  name: Patrick Schratz
 name: gitea
 sources:
 - https://gitea.com/gitea/helm-gitea
 - https://github.com/go-gitea/gitea
 - https://docker.gitea.com/gitea
 type: application
-version: 12.1.1
+version: 12.1.3

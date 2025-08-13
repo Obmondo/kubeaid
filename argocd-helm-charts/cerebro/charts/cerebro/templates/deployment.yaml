@@ -30,7 +30,7 @@ spec:
         {{- toYaml .Values.deployment.podLabels | nindent 8 }}
         {{- end }}
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/secret-app.yaml") . | sha256sum }}
         {{- if .Values.deployment.podAnnotations }}
         {{- toYaml .Values.deployment.podAnnotations | nindent 8 }}
         {{- end }}
@@ -77,11 +77,13 @@ spec:
             value: {{ $element | quote }}
           {{- end }}
           {{- end }}
-          {{- if .Values.envFromSecretRef }}
           envFrom:
             - secretRef:
+                name: {{ template "cerebro.fullname" . }}-vars
+            {{- if .Values.envFromSecretRef }}
+            - secretRef:
                 name: "{{ .Values.envFromSecretRef }}"
-          {{- end }}
+            {{- end }}
           {{- if .Values.deployment.livenessProbe.enabled}}
           livenessProbe:
             httpGet:
@@ -117,7 +119,7 @@ spec:
     {{- else }}
         - name: config
           secret:
-            secretName: {{ template "cerebro.fullname" . }}
+            secretName: {{ template "cerebro.fullname" . }}-app
     {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:

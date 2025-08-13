@@ -67,6 +67,9 @@ env: {}
   # AUTH_TYPE: "basic"
   # BASIC_AUTH_USER: "admin"
 
+secretEnv: {}
+  # BASIC_AUTH_PWD: "secretpass"
+
 # Reference to a Secret object with environment variables
 # envFromSecretRef: 'my-secret-ref'
 

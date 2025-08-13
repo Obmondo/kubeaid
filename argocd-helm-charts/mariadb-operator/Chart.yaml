@@ -3,5 +3,5 @@ name: mariadb-operator
 version: 0.19.0
 dependencies:
   - name: mariadb-operator
-    version: 0.38.1
+    version: 25.8.3
     repository: https://mariadb-operator.github.io/mariadb-operator
