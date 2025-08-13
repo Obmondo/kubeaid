@@ -1,0 +1,7 @@
+apiVersion: v1
+name: step-ca
+version: 1.0.0
+dependencies:
+  - name: step-issuer
+    version: 1.9.9
+    repository: https://smallstep.github.io/helm-charts

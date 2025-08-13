@@ -2,6 +2,9 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Patch Version Upgrades %%^^
+- Added step-issuer from version 1.9.9 to 1.9.9
+
 ## 16.1.0
 ### Minor Version Upgrades
 - Updated cluster-autoscaler from version 9.47.0 to 9.48.0

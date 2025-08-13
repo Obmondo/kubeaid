@@ -1,0 +1,131 @@
+# Default values for step-issuer.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: cr.step.sm/smallstep/step-issuer
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+kubeRBACproxy:
+  image:
+    repository: gcr.io/kubebuilder/kube-rbac-proxy
+    pullPolicy: IfNotPresent
+    tag: v0.15.0
+  # security context for container
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    # seccompProfile:
+    #   type: RuntimeDefault
+
+# List of secret keys used to pull images from private registries.
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+deployment:
+  # Configure arguments to pass to the step issuer
+  args:
+    enableLeaderElection: true
+    disableApprovalCheck: false
+  terminationGracePeriodSeconds: 10
+  # Strategy used for the deployment
+  strategy: {}
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 50Mi
+
+service:
+  type: ClusterIP
+  port: 8443
+  targetPorts: https
+  controlPlane: controller-manager
+  scrape: true
+  scrapePort: 8080
+
+# Security Context for the pod
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# security context for container
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  # seccompProfile:
+  #   type: RuntimeDefault
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# mandatory values to generate stepIssuer resource
+# please follow the https://github.com/smallstep/step-issuer#getting-started to setup step-ca and get step-issuer values
+stepIssuer:
+  create: false
+  caUrl: ""
+  caBundle: ""
+  provisioner:
+    name: ""
+    kid: ""
+    passwordRef:
+      name: ""
+      key: ""
+
+# mandatory values to generate stepClusterIssuer resource
+# please follow the https://github.com/smallstep/step-issuer#getting-started to setup step-ca and get step-issuer values
+stepClusterIssuer:
+  create: false
+  caUrl: ""
+  caBundle: ""
+  provisioner:
+    name: ""
+    kid: ""
+    passwordRef:
+      name: ""
+      namespace: ""
+      key: ""
+
+# For the cert-manager approver
+certManager:
+  serviceAccount:
+    name: cert-manager
+    namespace: cert-manager
+
+# Experimental support for the TLS-over-TLS tunnel in the step-ca client.
+# Do not enable this unless you know what to use.
+tunnel:
+  enabled: false
+  crt: "/opt/tunnel/tls.crt"
+  key: "/opt/tunnel/tls.key"
+  host: "" # host:port
+  root: "/opt/tunnel/ca.crt"
+  tlsCertsRef:
+    secret:
+      secretName: ""
+
+# Configure extra volumes and volume mounts as YAML expressions.
+volumes: false
+volumeMounts: false
+
+# nodeSelector contains the node labels for pod assignment.
+nodeSelector: {}
+
+# tolerations contains the toleration labels for pod assignment.
+tolerations: []
+
+# affinity contains the affinity settings for pod assignment.
+affinity: {}

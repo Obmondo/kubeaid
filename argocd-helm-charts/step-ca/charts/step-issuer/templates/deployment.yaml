@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ template "step-issuer.fullname" . }}"
+  namespace: {{ .Release.Namespace }}
+  labels:
+    control-plane: {{ .Values.service.controlPlane }}
+    {{- include "step-issuer.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.deployment.strategy }}
+  strategy: {{ toYaml .Values.deployment.strategy | nindent 4 }}
+  {{- end }}
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      control-plane: {{ .Values.service.controlPlane }}
+      {{- include "step-issuer.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        control-plane: {{ .Values.service.controlPlane }}
+        {{- include "step-issuer.labels" . | nindent 8 }}
+    spec:
+      {{- if $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- range $key := $.Values.imagePullSecrets }}
+        - name: {{ $key }}
+        {{- end }}
+      {{- end }}
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ include "step-issuer.serviceAccountName" . }}
+      {{- end }}
+      containers:
+      - image: "{{ .Values.kubeRBACproxy.image.repository }}:{{ .Values.kubeRBACproxy.image.tag }}"
+        imagePullPolicy: {{ .Values.kubeRBACproxy.image.pullPolicy }}
+        name: kube-rbac-proxy
+        args: ["--secure-listen-address=0.0.0.0:8443", "--upstream=http://127.0.0.1:8080/", "--logtostderr=true", "--v=10"]
+        ports:
+        - containerPort: {{ .Values.service.port }}
+          name: {{ .Values.service.targetPorts }}
+        securityContext:
+          {{- toYaml .Values.kubeRBACproxy.securityContext | nindent 10 }}
+      - image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: manager
+        args: [
+          "--metrics-addr=127.0.0.1:8080",
+          {{- if .Values.deployment.args.enableLeaderElection }}
+          "--enable-leader-election",
+          {{- end }}
+          {{- if .Values.deployment.args.disableApprovalCheck }}
+          "--disable-approval-check",
+          {{- end }}
+        ]
+        command: ["/manager"]
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        {{- if .Values.tunnel.enabled }}
+        env:
+          - name: STEP_TLS_TUNNEL
+            value: /opt/config/tunnel.json
+        {{- end }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        volumeMounts:
+          {{- if .Values.tunnel.enabled }}
+          # Tunnel configuration
+          - name: tunnel-config
+            mountPath: /opt/config
+            readOnly: true
+          - name: tunnel-tls
+            mountPath: /opt/tunnel
+            readOnly: true
+          {{- end }}
+{{- with .Values.volumeMounts }}
+           # Extra volumeMounts
+{{ toYaml . | indent 10 }}
+{{- end }}
+      volumes:
+        {{- if or .Values.tunnel.enabled }}
+        # Tunnel configuration
+        - name: tunnel-config
+          configMap:
+            name: {{ include "step-issuer.fullname" . }}-tunnel
+        - name: tunnel-tls
+{{ toYaml .Values.tunnel.tlsCertsRef | indent 10 }}
+        {{- end }}
+{{- with .Values.volumes }}
+        # Extra volumes
+{{ toYaml . | indent 8 }}
+{{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.deployment.terminationGracePeriodSeconds }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}

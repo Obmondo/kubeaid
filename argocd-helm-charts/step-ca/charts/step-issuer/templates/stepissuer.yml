@@ -1,0 +1,23 @@
+{{- if .Values.stepIssuer.create }}
+apiVersion: certmanager.step.sm/v1beta1
+kind: StepIssuer
+metadata:
+  name: "{{ template "step-issuer.fullname" . }}"
+  namespace: {{ .Release.Namespace }}
+spec:
+  # The CA URL.
+  {{- if .Values.stepIssuer.caUrl }}
+  url: {{ .Values.stepIssuer.caUrl }}
+  {{- else }}
+  url: https://step-certificates.{{ .Release.Namespace }}.svc.cluster.local
+  {{- end }}
+  # The base64 encoded version of the CA root certificate in PEM format.
+  caBundle: {{ .Values.stepIssuer.caBundle }}
+  # The provisioner name, kid, and a reference to the provisioner password secret.
+  provisioner:
+    name: {{ .Values.stepIssuer.provisioner.name }}
+    kid: {{ .Values.stepIssuer.provisioner.kid }}
+    passwordRef:
+      name: {{ .Values.stepIssuer.provisioner.passwordRef.name }}
+      key: {{ .Values.stepIssuer.provisioner.passwordRef.key }}
+{{- end }}
