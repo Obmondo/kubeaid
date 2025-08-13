@@ -5,3 +5,6 @@ dependencies:
   - name: step-issuer
     version: 1.9.9
     repository: https://smallstep.github.io/helm-charts
+  - name: step-certificates
+    version: 1.28.4
+    repository: https://smallstep.github.io/helm-charts

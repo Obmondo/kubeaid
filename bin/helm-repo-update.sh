@@ -19,12 +19,12 @@ fi
 function ARGFAIL() {
   echo -n "
 Usage $0 [OPTIONS]:
-  --update-helm-chart       Update specific helm chart  	  [Need path to specific helm chart]
-  --update-all              Update all the helm chart   	  [Default: false]
-  --pull-request            Raise Pull request         		  [Default: false] (Only in CI)
-  --actions           	    Run inside a GitHub or Gitea Action   [Default: false] (Only in CI)
-  --skip-charts             Skip updating certain charts 	  [Default: none]
-  --chart-version           Helm chart version          	  [Default: latest]
+  --update-helm-chart       Update specific helm chart      [Need path to specific helm chart]
+  --update-all              Update all the helm chart       [Default: false]
+  --pull-request            Raise Pull request              [Default: false] (Only in CI)
+  --actions                 Run inside a GitHub or Gitea Action   [Default: false] (Only in CI)
+  --skip-charts             Skip updating certain charts    [Default: none]
+  --chart-version           Helm chart version              [Default: latest]
   --add-commits             Add commits since last tag in changelog   [Default: false]
   -h|--help
 
@@ -180,7 +180,7 @@ function update_helm_chart {
   if [ "$HELM_CHART_DEP_PRESENT" -ne 0 ]; then
     # It support helm chart updation for multiple dependencies
     # Iterate over each dependency and extract the desired values
-    for ((i = 0; i < HELM_CHART_DEP_PRESENT; i++)); do
+    for ((i = 0; i < "$HELM_CHART_DEP_PRESENT"; i++)); do
         HELM_CHART_NAME=$(yq eval ".dependencies[$i].name" "$HELM_CHART_YAML")
         HELM_CHART_VERSION=$(yq eval ".dependencies[$i].version" "$HELM_CHART_YAML")
         HELM_REPOSITORY_URL=$(yq eval ".dependencies[$i].repository" "$HELM_CHART_YAML")
@@ -224,9 +224,9 @@ function update_helm_chart {
             }
 
             # rename the downloaded tar file so that it matches what we want during untar.
-            # For example for strimzi kafka operator downloaded tar file has name strimzi-kafka-operator-helm-3-chart-0.38.0.tgz 
+            # For example for strimzi kafka operator downloaded tar file has name strimzi-kafka-operator-helm-3-chart-0.38.0.tgz
             # while we look for strimzi-kafka-operator-0.38.0.tgz
-            tar_file=$(find "$HELM_CHART_DEP_PATH" -maxdepth 1 -type f -name "*.tgz" -print -quit)
+            tar_file=$(find "$HELM_CHART_DEP_PATH" -maxdepth 1 -type f -name "*${HELM_CHART_NAME}*.tgz" -print -quit)
             expected_tar_file="$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_UPSTREAM_CHART_VERSION.tgz"
 
             # Check if the downloaded tar file matches the expected name
@@ -249,6 +249,7 @@ function update_helm_chart {
             echo "Helm chart $HELM_REPO_NAME is already on latest version $HELM_CHART_VERSION"
           fi
         else
+          echo "asdadadadadadadasdadadad"
           echo "HELMING $HELM_CHART_NAME"
           # Go to helm chart, 1st layer
           helm dependencies update "$HELM_CHART_PATH" || {
@@ -261,9 +262,9 @@ function update_helm_chart {
           rm -rf "${HELM_CHART_DEP_PATH:?}/${HELM_CHART_NAME}"
 
           # rename the downloaded tar file so that it matches what we want during untar.
-          # For example for strimzi kafka operator downloaded tar file has name strimzi-kafka-operator-helm-3-chart-0.38.0.tgz 
+          # For example for strimzi kafka operator downloaded tar file has name strimzi-kafka-operator-helm-3-chart-0.38.0.tgz
           # while we look for strimzi-kafka-operator-0.38.0.tgz
-          tar_file=$(find "$HELM_CHART_DEP_PATH" -maxdepth 1 -type f -name "*.tgz" -print -quit)
+          tar_file=$(find "$HELM_CHART_DEP_PATH" -maxdepth 1 -type f -name "*${HELM_CHART_NAME}*.tgz" -print -quit)
           expected_tar_file="$HELM_CHART_DEP_PATH/$HELM_CHART_NAME-$HELM_CHART_VERSION.tgz"
 
           # Check if the downloaded tar file matches the expected name
@@ -274,14 +275,13 @@ function update_helm_chart {
               echo "The tar file is already named correctly: $tar_file"
           fi
 
-
           # Untar the tgz file
           tar -C "$HELM_CHART_DEP_PATH" -xvf "$expected_tar_file" || {
             echo "Failed to extract $expected_tar_file. Skipping."
             continue
           }
-          
-          # since there is no upstream chart already present passing HELM_CHART_VERSION in update_changelog 
+
+          # since there is no upstream chart already present passing HELM_CHART_VERSION in update_changelog
           # and determine_change_type instead of HELM_UPSTREAM_CHART_VERSION otherwise we get unbound variable
           # error for HELM_UPSTREAM_CHART_VERSION
           update_changelog "Added" "$HELM_CHART_NAME" "$HELM_CHART_VERSION" "$HELM_CHART_VERSION"
