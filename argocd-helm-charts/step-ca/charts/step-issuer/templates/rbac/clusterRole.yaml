@@ -1,0 +1,66 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "{{ template "step-issuer.fullname" . }}-manager-role"
+rules:
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create", "patch"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["cert-manager.io"]
+  resources: ["certificaterequests"]
+  verbs: ["get", "list", "update", "watch"]
+- apiGroups: ["cert-manager.io"]
+  resources: ["certificaterequests/status"]
+  verbs: ["get", "patch", "update"]
+- apiGroups: ["certmanager.step.sm"]
+  resources: ["stepissuers"]
+  verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+- apiGroups: ["certmanager.step.sm"]
+  resources: ["stepclusterissuers"]
+  verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+- apiGroups: ["certmanager.step.sm"]
+  resources: ["stepissuers/status"]
+  verbs: ["get", "patch", "update"]
+- apiGroups: ["certmanager.step.sm"]
+  resources: ["stepclusterissuers/status"]
+  verbs: ["get", "patch", "update"]
+- apiGroups: ["cert-manager.io"]
+  resources: ["signers"]
+  verbs: ["approve"]
+  resourceNames:
+    - stepissuers.certmanager.step.sm/*
+    - stepclusterissuers.certmanager.step.sm/*
+- apiGroups: [ "coordination.k8s.io" ]
+  resources: [ "leases" ]
+  verbs: [ "create", "get", "list", "update" ]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "{{ template "step-issuer.fullname" . }}-proxy-role"
+rules:
+- apiGroups: ["authentication.k8s.io"]
+  resources: ["tokenreviews"]
+  verbs: ["create"]
+- apiGroups: ["authorization.k8s.io"]
+  resources: ["subjectaccessreviews"]
+  verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "{{ template "step-issuer.fullname" . }}-approver-role"
+rules:
+- apiGroups:
+  - cert-manager.io
+  resources:
+  - signers
+  verbs:
+  - approve
+  resourceNames:
+  - stepissuers.certmanager.step.sm/*
+  - stepclusterissuers.certmanager.step.sm/*

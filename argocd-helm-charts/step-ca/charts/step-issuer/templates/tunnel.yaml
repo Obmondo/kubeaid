@@ -1,0 +1,18 @@
+{{- if .Values.tunnel.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "step-issuer.fullname" . }}-tunnel
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "step-issuer.labels" . | nindent 4 }}
+data:
+  tunnel.json: |-
+    {
+      "type": "tTLS",
+      "crt": "{{ .Values.tunnel.crt }}",
+      "key": "{{ .Values.tunnel.key }}",
+      "host": "{{ .Values.tunnel.host }}",
+      "root": "{{ .Values.tunnel.root }}"
+    }
+{{- end }}

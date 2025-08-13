@@ -1,0 +1,39 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: "{{ template "step-issuer.fullname" . }}-manager-rolebinding"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "{{ template "step-issuer.fullname" . }}-manager-role"
+subjects:
+- kind: ServiceAccount
+  name: {{ include "step-issuer.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: "{{ template "step-issuer.fullname" . }}-proxy-rolebinding"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "{{ template "step-issuer.fullname" . }}-proxy-role"
+subjects:
+- kind: ServiceAccount
+  name: {{ include "step-issuer.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: "{{ template "step-issuer.fullname" . }}-approver-rolebinding"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "{{ template "step-issuer.fullname" . }}-approver-role"
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.certManager.serviceAccount.name }}
+  namespace: {{ .Values.certManager.serviceAccount.namespace }}

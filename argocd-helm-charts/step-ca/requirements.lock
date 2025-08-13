@@ -1,0 +1,6 @@
+dependencies:
+- name: step-issuer
+  repository: https://smallstep.github.io/helm-charts
+  version: 1.9.9
+digest: sha256:0ff193bcef0d77487d3f9779114ed74da30cd44a82a67301137c361389d6f374
+generated: "2025-08-13T10:04:28.925979787+05:30"

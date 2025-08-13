@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ template "step-issuer.fullname" . }}"
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    prometheus.io/port: "{{ .Values.service.scrapePort }}"
+    prometheus.io/scheme: "{{ .Values.service.targetPorts }}"
+    prometheus.io/scrape: "{{ .Values.service.scrape }}"
+  labels:
+    control-plane: {{ .Values.service.controlPlane }}
+    {{- include "step-issuer.labels" . | nindent 4 }}
+spec:
+  ports:
+  - name: {{ .Values.service.targetPorts }}
+    port: {{ .Values.service.port }}
+    targetPort: {{ .Values.service.targetPorts }}
+  selector:
+    {{- include "step-issuer.selectorLabels" . | nindent 4 }}
+    control-plane: {{ .Values.service.controlPlane }}

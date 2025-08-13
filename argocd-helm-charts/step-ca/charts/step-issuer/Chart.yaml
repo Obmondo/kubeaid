@@ -1,0 +1,32 @@
+apiVersion: v2
+appVersion: 0.9.9
+description: Step-issuer helm chart for kubernetes.
+home: https://smallstep.com
+keywords:
+- authority
+- ca
+- cert-manager
+- certificate
+- certificate-authority
+- certificates
+- kubernetes
+- pki
+- security
+- security-tools
+- smallstep
+- ssh
+- step
+- step-ca
+- step-issuer
+- tls
+- x509
+maintainers:
+- email: mariano@smallstep.com
+  name: Mariano Cano
+- email: abigaelse2@gmail.com
+  name: Irwan Shofwan
+- email: muhammad.fauzan.razandi.16@gmail.com
+  name: Muhammad Fauzan Razandi
+name: step-issuer
+type: application
+version: 1.9.9
