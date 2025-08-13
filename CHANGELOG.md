@@ -5,6 +5,53 @@ All releases and the changes included in them (pulled from git commits added sin
 ### Patch Version Upgrades %%^^
 - Added step-issuer from version 1.9.9 to 1.9.9
 
+### Improvements
+- [`48b2d915`](../../commit/48b2d915) feat: added step-ca/step-issuer helm chart
+- [`0ef5efd7`](../../commit/0ef5efd7) feat: improved doc, readme for harbor and removed ceph tool cpu limit
+- [`f03eb805`](../../commit/f03eb805) feat: cert-manager clusterissue with self-signed support
+- [`b3c094da`](../../commit/b3c094da) doc: updated readme on how to generate eyaml keys and added it as a secret
+- [`12d28114`](../../commit/12d28114) fix: image for puppet-agent exporter is pointing to a public repo now
+- [`0dcb3f96`](../../commit/0dcb3f96) fix: removed storageclass which is specific for a user, so users can give their own storageclass for puppetserver
+- [`f3551d84`](../../commit/f3551d84) fix: HostSNI for puppetserver role, so it picks up the entire fqdns
+- [`3fdd367a`](../../commit/3fdd367a) feat: added sane defaults for puppetserver helm chart
+- [`88aeeff2`](../../commit/88aeeff2) Updated the README
+- [`d8639d36`](../../commit/d8639d36) chore: disable chart openobserve updates since it doesn't have support for client secrets
+- [`ecc562ed`](../../commit/ecc562ed) Added the wiki and script to build opendesk
+- [`f101927e`](../../commit/f101927e) update
+- [`ff271eaa`](../../commit/ff271eaa) update
+- [`6208f8db`](../../commit/6208f8db) update
+- [`70826070`](../../commit/70826070) update
+- [`9f8b5a52`](../../commit/9f8b5a52) enable
+- [`2c95a55c`](../../commit/2c95a55c) templatized mattermost
+- [`c4311342`](../../commit/c4311342) Add mattermost-operator
+- [`40126ed8`](../../commit/40126ed8) feat(kube-prometheus): add remoteWrite config
+- [`de03e52a`](../../commit/de03e52a) update node count alert interval to 24hr
+- [`012b83fe`](../../commit/012b83fe) update: obmondo-k8s-agent image tag to v1.1.5
+- [`c5168b0e`](../../commit/c5168b0e) feat(obmondo-k8s-agent): update image tag to v1.1.4
+- [`18d88e76`](../../commit/18d88e76) added postgres cluster
+- [`828fb058`](../../commit/828fb058) enabled postgres
+- [`1d557b29`](../../commit/1d557b29) added postgres
+- [`d726b682`](../../commit/d726b682) feat(obmondo-k8s-agent): update image tag to v1.1.2
+- [`a37cb3e7`](../../commit/a37cb3e7) chore(helm-charts): add and update few default values in argo-cd and sealed-secrets apps
+- [`ef474927`](../../commit/ef474927) feat : using subchart pattern for CrossPlane Helm charts | Making infrastructure provisioning using CrossPlane idempotent | Updating default version for Kubernetes and ClusterAPI components
+- [`246dd2dd`](../../commit/246dd2dd) feat(kubeaid-bootstrap-script/crossplane) : removing the crossplane-provider Helm chart | adding crossplane, crossplane-providers-and-functions and crossplane-compositions Helm charts for creating Azure workload-identity and disaster-recovery infrastructure
+- [`093c8727`](../../commit/093c8727) updating the ccm-azure KubeAid Helm chart
+- [`50d5a2a7`](../../commit/50d5a2a7) feat: update image tag to v1.1.0 and add additional environment variables
+- [`4cd8324c`](../../commit/4cd8324c) fix: correct image tag format in values.yaml
+- [`2e6839b1`](../../commit/2e6839b1) chore: update obmondo-k8s-agent image tag to 1.1.0
+- [`c334ffaf`](../../commit/c334ffaf) Updated opendesk version
+- [`531ce269`](../../commit/531ce269) increasing postgres instance to 2 for Odoo
+- [`b46098a1`](../../commit/b46098a1) fix: switch redis replication to singleton redis
+- [`5c3e8f07`](../../commit/5c3e8f07) chore: add documentation describing the extra configurations needed with secrets for setting up harbor
+- [`b9b0737d`](../../commit/b9b0737d) feat: add init container for harbor job service while checking for harbor core service
+- [`629b13f1`](../../commit/629b13f1) fix: clean the redis replication configurations
+- [`7352540f`](../../commit/7352540f) feat: add init containers for postgres and redis
+- [`fe98d590`](../../commit/fe98d590) fix: change redis cluster to redis replication
+- [`c1c87d89`](../../commit/c1c87d89) fix: update the redis service to attach with it
+- [`7002b5d9`](../../commit/7002b5d9) fix: enable external redis cluster for harbor
+- [`82f28104`](../../commit/82f28104) feat: add redis cluster to harbor
+- [`d2625f09`](../../commit/d2625f09) fix: change the harbor logical backup retention time type to string
+
 ## 16.1.0
 ### Minor Version Upgrades
 - Updated cluster-autoscaler from version 9.47.0 to 9.48.0
