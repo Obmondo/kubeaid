@@ -57,6 +57,8 @@ cnpg:
 
 postgresql:
   enabled: false
+  labels:
+    velero.io/exclude-from-backup: "true"
   size: 4Gi
   enableLogicalBackup: true
 

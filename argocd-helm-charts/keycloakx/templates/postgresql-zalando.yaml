@@ -4,8 +4,12 @@ apiVersion: acid.zalan.do/v1
 kind: postgresql
 metadata:
   name: keycloakx-pgsql
+  {{- if .Values.postgresql.labels }}
   labels:
-    velero.io/exclude-from-backup: "true"
+    {{- with .Values.postgresql.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- end }}
 spec:
   databases:
     keycloak: keycloak
