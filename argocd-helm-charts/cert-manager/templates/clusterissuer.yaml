@@ -14,6 +14,9 @@ spec:
       name: {{ .Values.issuer.secret }}
     {{- if .Values.issuer.production }}
     server: https://acme-v02.api.letsencrypt.org/directory
+    {{- else if .Values.issuer.stepCA }}
+    server: https://step-ca-step-certificates.step-ca.svc.cluster.local/acme/acme/directory
+    caBundle: {{ .Values.issuer.stepCA.caBundle }}
     {{- else }}
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     {{- end -}}
