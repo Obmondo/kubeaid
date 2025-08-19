@@ -1,0 +1,6 @@
+dependencies:
+- name: sftpgo
+  repository: oci://ghcr.io/sftpgo/helm-charts
+  version: 0.40.0
+digest: sha256:f6f178508ebb8a816f5632674a4e87b297831c22ac83a03eef096c892326900b
+generated: "2025-08-19T11:58:30.624391294+05:30"

@@ -1,9 +1,8 @@
 name: Weekly Helm Repo Update
 
-on:
+"on":
   schedule:
     - cron: "0 6 * * 1"
-  workflow_dispatch:
 
 jobs:
   helm-repo-update:

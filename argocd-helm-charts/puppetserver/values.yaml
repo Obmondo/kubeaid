@@ -5,11 +5,12 @@ puppetserver:
       PUPPET_REPORTS: puppetdb,prometheus
       PUPPETSERVER_ENVIRONMENT_TIMEOUT: 0
       PUPPETSERVER_ENC_PATH: /etc/puppetlabs/code/environments/master/puppet_enc.rb
-  puppetdb:
-    persistence:
-      size: 1Gi
-    extraEnv:
-      PUPPETDB_JAVA_ARGS: "-Xms512m -Xmx2500m -XX:+HeapDumpOnOutOfMemoryError"
+    postgresql:
+      auth:
+        existingSecret: puppetserver-pgsql-app
+        secretKeys:
+          usernameKey: username
+          userPasswordKey: password
 
   puppetserver:
     name: puppetserver
@@ -20,6 +21,8 @@ puppetserver:
       extraEnv:
         PUPPETSERVER_JAVA_ARGS: "-Xms512m -Xmx2500m -XX:+HeapDumpOnOutOfMemoryError"
         PUPPETSERVER_MAX_ACTIVE_INSTANCES: 4
+        PUPPETDB_JAVA_ARGS: "-Xms256m -Xmx256m -XX:+HeapDumpOnOutOfMemoryError"
+        PUPPETSERVER_MAX_REQUESTS_PER_INSTANCE: 10000
       resources:
         requests:
           memory: 3096Mi
@@ -28,10 +31,6 @@ puppetserver:
           memory: 3096Mi
       ingress:
         enabled: false
-      extraEnv:
-        PUPPETDB_JAVA_ARGS: "-Xms256m -Xmx256m -XX:+HeapDumpOnOutOfMemoryError"
-        PUPPETSERVER_MAX_ACTIVE_INSTANCES: 3
-        PUPPETSERVER_MAX_REQUESTS_PER_INSTANCE: 10000
     customentrypoints:
       enabled: true
       configmaps:
@@ -89,6 +88,8 @@ puppetserver:
     name: puppetdb
     image: ghcr.io/voxpupuli/container-puppetdb
     tag: 7.18.0-v1.5.0
+    persistence:
+      size: 1Gi
     resources:
       requests:
         memory: 1024Mi
@@ -97,7 +98,7 @@ puppetserver:
         memory: 1024Mi
     extraEnv:
       PUPPETDB_POSTGRES_HOSTNAME: puppetserver-pgsql-rw
-      PUPPETDB_JAVA_ARGS: "-Xms256m -Xmx256m -XX:+HeapDumpOnOutOfMemoryError"
+      PUPPETDB_JAVA_ARGS: "-Xms512m -Xmx2500m -XX:+HeapDumpOnOutOfMemoryError"
 
   puppetboard:
     enabled: true
@@ -114,14 +115,6 @@ puppetserver:
         enabled: true
       jmx:
         enabled: false
-
-  global:
-    postgresql:
-      auth:
-        existingSecret: puppetserver-pgsql-app
-        secretKeys:
-          usernameKey: username
-          userPasswordKey: password
 
 postgresql:
   instance: 1
