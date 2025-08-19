@@ -1,0 +1,16 @@
+apiVersion: trust.cert-manager.io/v1alpha1
+kind: Bundle
+metadata:
+  name: step-ca-bundle
+spec:
+  sources:
+  - configMap:
+      name: "step-ca-step-certificates-certs"
+      key: "root_ca.crt"
+      namespace: "step-ca"
+  target:
+    configMap:
+      key: "ca-certificates.crt"
+    namespaceSelector:
+      matchLabels:
+        name: "cert-manager"
