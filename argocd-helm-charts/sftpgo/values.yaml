@@ -1,1 +1,14 @@
----
+sftpgo:
+  image:
+    tag: v2.6.2
+
+  ftpd:
+    enabled: true
+
+  webdavd:
+    enabled: true
+
+  replicaCount: 1
+
+  persistence:
+    enabled: true
