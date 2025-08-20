@@ -94,15 +94,47 @@ Ensure your firewall allows the following traffic flows:
 
 **Note:** The BMC network is typically a separate management network and does not need the same ports as the provisioning network. The BMC only needs to be accessible via its management protocols (Redfish/IPMI) from the Metal3 Host. The BMC itself does not need to initiate connections to the Metal3 Host or Target Server, except for fetching Ironic Python Agent and other virtual media from `vmediaTLSPort`.
 
+## BareMetalHost Setup
+
+To set up ```BareMetalHost``` which is a custom resource provided by metal3
+
+```bash
+apiVersion: metal3.io/v1alpha1
+kind: BareMetalHost
+metadata:
+  name: host-0-baremetalhost
+  namespace: metal3
+spec:
+  online: true
+  bootMACAddress: "<mac-address>"
+  bmc:
+    address: redfish-virtualmedia://<bmc-ip-address>/redfish/v1/Systems/1
+    credentialsName: supermicro-bmc-credentials
+    disableCertificateVerification: true
+  image:
+    checksum: <checksum-link>
+    url: <img-download-link>
+    checksumType: auto  
+  preprovisioningNetworkDataName: host-0-preprovisioningnetworkdata
+  networkData:
+    name: host-0-networkdata
+    namespace: metal3
+  rootDeviceHints:
+    serialNumber: <serial-number>
+  userData:
+    name: host-0-userdata
+
+```
+
 ## Network Setup
 
-To set-up Ironic Python Agent networks you need to create a secret with the name `<baremetalhost>-network` which should look like:
+To set-up Ironic Python Agent networks you need to create a secret with the name `<baremetalhost>--preprovisioningnetworkdata` which should look like:
 
 ```bash
 apiVersion: v1
 kind: Secret
 metadata:
-  name: host-0-network
+  name: host-0-preprovisioningnetworkdata
   namespace: metal3
 type: Opaque
 stringData:
@@ -132,29 +164,38 @@ stringData:
 To set-up the provisioned server network you should create a secret with the name `<baremetalhost>-networkdata` which should look like:
 
 ```bash
-{
-  "links": [
+apiVersion: v1
+kind: Secret
+metadata:
+  name: host-0-networkdata
+  namespace: metal3
+type: Opaque
+stringData:
+  networkData: |
     {
-      "id": "<interface name>",
-      "type": "phy",
-      "ethernet_mac_address": "<mac-address>"
-    }
-  ],
-  "networks": [
-    {
-      "id": "<interface name>",
-      "link": "<interface name>",
-      "type": "ipv4",
-      "routes":
+      "links": [
         {
-          "network": "<network-interface-ip>",
-          "netmask":  "255.255.255.0",
-          "gateway": "<gateway-ip>"
+          "id": "<interface name>",
+          "type": "phy",
+          "ethernet_mac_address": ""<mac-address>"
         }
+      ],
+      "networks": [
+        {
+          "id": "<interface name>",
+          "link": "<interface name>",
+          "type": "ipv4",
+          "ip_address": "<ip-address>",
+          "netmask": "<netmask-address>",
+          "routes": {
+            "network": "0.0.0.0",
+            "netmask": "0.0.0.0",
+            "gateway": "<gateway-ip>"
+          }
+        }
+      ],
+      "services": []
     }
-  ],
-  "services": []
-}
 ```
 
 ## Userdata setup
@@ -163,24 +204,32 @@ If we want to configure the partion or create users or anything in the server on
 The below one assigns the hostname to the server, creates a sudo user and make sure the `/` partition is 50G.
 
 ```bash
-#cloud-config
+apiVersion: v1
+kind: Secret
+metadata:
+  name: host-0-userdata
+  namespace: metal3
+type: Opaque
+stringData:
+  userData: | 
+    #cloud-config
 
-hostname: tdkcphsmn01
+    hostname: host-0
 
-users:
-  - name: test
-    groups: [sudo]
-    shell: /bin/bash
-    sudo: ['ALL=(ALL) NOPASSWD:ALL']
-    lock_passwd: false
-    passwd: $6$4Ku44dv4Gh4vE/l/$hvcWyIb6SyL2huyQ/cPVNjya0g30tcpryiYSPNWavIVAxGMOFp2l7RHB0mBgAe.I149w1SloBmGNnjwICIx1M/
+    users:
+     - name: test
+       groups: [sudo]
+       shell: /bin/bash
+       sudo: ['ALL=(ALL) NOPASSWD:ALL']
+       lock_passwd: false
+       passwd: $6$4Ku44dv4Gh4vE/l/$hvcWyIb6SyL2huyQ/cPVNjya0g30tcpryiYSPNWavIVAxGMOFp2l7RHB0mBgAe.I149w1SloBmGNnjwICIx1M/
 
-growpart:
-  mode: 'off'
-
-runcmd:
-  - echo yes | parted /dev/nvme2n1 ---pretend-input-tty resizepart 1 50GB
-  - resize2fs /dev/nvme2n1p1
+   growpart:
+     mode: 'off'
+   
+   runcmd:
+     - echo yes | parted /dev/nvme2n1 ---pretend-input-tty resizepart 1 50GB
+     - resize2fs /dev/nvme2n1p1
 ```
 
 `/dev/nvme2n1` is the same disk where you have set the `rootDeviceHints` for.
