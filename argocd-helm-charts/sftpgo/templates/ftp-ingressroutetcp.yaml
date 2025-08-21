@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ftp
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - kind: Rule
+    match: HostSNI(`{{ .Values.puppetserver.puppetserver.masters.fqdns.alternateServerNames }}`)
+    priority: 10
+    services:
+    - kind: Service
+      name: puppetserver-{{ .Values.customerid }}-puppetdb
+      port: pdb-http
+  tls:
+    options:
+      name: prometheus-puppet-agent-tls-auth
+      namespace: traefik

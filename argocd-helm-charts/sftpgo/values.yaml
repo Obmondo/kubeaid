@@ -1,0 +1,14 @@
+sftpgo:
+  image:
+    tag: v2.6.2
+
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: sftpgo
+
+  volumeMounts:
+    - name: data
+      mountPath: /srv/sftpgo/ftp
+
+  replicaCount: 1
