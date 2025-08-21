@@ -4,10 +4,12 @@ metadata:
   name: step-ca-bundle
 spec:
   sources:
+  - useDefaultCAs: true
   - configMap:
       name: "step-ca-step-certificates-certs"
       key: "root_ca.crt"
       namespace: "step-ca"
   target:
-    configMap:
-      key: "ca-certificates.crt"
+    namespaceSelector: {}
+    secret:
+      key: "ca.crt"
