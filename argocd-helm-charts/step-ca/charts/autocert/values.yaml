@@ -1,0 +1,100 @@
+# Default values for autocert.
+# This is a YAML-formatted file.
+
+# replicaCount is the number of replicas of autocert.
+replicaCount: 1
+
+# nameOverride overrides the name of the chart.
+nameOverride: ""
+# fullnameOverride overrides the full name of the chart.
+fullnameOverride: ""
+
+# service contains configuration for the kubernetes service.
+service:
+  type: ClusterIP
+  port: 443
+  targetPort: 4443
+
+# Security Context for the pod
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# autocert contains the configuration for autocert.
+autocert:
+  # image contains the docker image for step-certificates.
+  image:
+    repository: cr.step.sm/smallstep/autocert-controller
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  # label is the label used used to enable autocert in a namespace.
+  # This value is rightnow hardcoded in autocert and it should not be changed.
+  label: autocert.step.sm
+  # logFormat is the format for autocert logs. Options are json or text.
+  logFormat: json
+  # restrictCertificatesToNamespace defines if certificate names are restricted to the namespace
+  restrictCertificatesToNamespace: false
+  # clusterDomain is the domain name for your kubernetes cluster.
+  clusterDomain: cluster.local
+  # certLifetime is the default certificate life time.
+  certLifetime: 24h
+  # resources contains the CPU/memory resource requests/limits.
+  resources: {requests: {cpu: 100m, memory: 20Mi}}
+  # nodeSelector contains the node labels for pod assignment.
+  nodeSelector: {}
+  # tolerations contains the toleration labels for pod assignment.
+  tolerations: []
+  # affinity contains the affinity settings for pod assignment.
+  affinity: {}
+  # security context for container
+  securityContext:
+    runAsUser: 1000
+    allowPrivilegeEscalation: false
+
+# bootstrapper contains the autocert-bootstrapper image and configuration.
+bootstrapper:
+  image:
+    repository: cr.step.sm/smallstep/autocert-bootstrapper
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  resources: {requests: {cpu: 10m, memory: 20Mi}}
+
+# renewer contains the autocert-renewer image and configuration.
+renewer:
+  image:
+    repository: cr.step.sm/smallstep/autocert-renewer
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  resources: {requests: {cpu: 10m, memory: 20Mi}}
+
+# Enables autocert in the step-certificates subchart.
+step-certificates:
+  enabled: true
+  autocert:
+    enabled: true
+
+# These values allow configuration of an existing step-certificates deployment
+# with autocert.
+#
+# Future version of the autocert helm-chart will not install step-certificates
+# by default and it will require these values.
+ca:
+  # url is the step-certificates url to use.
+  url: ""
+  # provisioner is the provisioner name and the plaintext password that autocert
+  # will use.
+  provisioner:
+    name: ""
+    password: ""
+  # certs is the configmap in yaml that should contain the CA root certificate.
+  certs:
+    root_ca.crt: |-
+      -----BEGIN CERTIFICATE-----
+      ...
+      -----END CERTIFICATE-----
+  # config is the configmap in yaml to use. This is currently optional only.
+  config:
+    defaults.json: |-
+      {}

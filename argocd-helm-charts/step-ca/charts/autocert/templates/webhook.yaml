@@ -1,0 +1,33 @@
+{{- if semverCompare ">=1.16-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: admissionregistration.k8s.io/v1
+{{- else -}}
+apiVersion: admissionregistration.k8s.io/v1beta1
+{{- end }}
+kind: MutatingWebhookConfiguration
+metadata:
+  name: {{ .Release.Name }}-autocert-webhook-config
+  labels:
+    {{- include "autocert.labels" . | nindent 4 }}
+webhooks:
+  - name: {{ .Values.autocert.label }}
+    clientConfig:
+      {{- if not (index .Values "step-certificates" "enabled") }}
+      caBundle: {{ index .Values.ca.certs "root_ca.crt" | b64enc }}
+      {{- end }}
+      service:
+        name: {{ include "autocert.fullname" .}}
+        namespace: {{ .Release.Namespace }}
+        path: "/mutate"
+{{- if semverCompare ">=1.16-0" .Capabilities.KubeVersion.GitVersion }}
+    sideEffects: None
+    admissionReviewVersions: ["v1beta1"]
+{{- end }}
+    rules:
+      - operations: ["CREATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+    failurePolicy: Ignore
+    namespaceSelector:
+      matchLabels:
+        {{ .Values.autocert.label }}: enabled

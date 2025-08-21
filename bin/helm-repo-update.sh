@@ -369,11 +369,11 @@ function pull_request() {
 }
 
 # Generate a unique branch name
-branch_name="Helm_Update"_$(date +"%Y%m%d")_$(echo $RANDOM | base64 | tr -d '/+' | head -c 8)
+branch_name="Helm_Update"_$(date +"%Y%m%d")_$(echo $RANDOM | base64)
 
 if [ -n "$UPDATE_HELM_CHART" ]; then
   if [ "$ACTIONS" = false ]; then
-    git switch -c "$branch_name" --track origin/master
+    git switch -c "$branch_name" --track $(git branch --show-current)
   fi
   update_helm_chart "$ARGOCD_CHART_PATH/$UPDATE_HELM_CHART" "$CHART_VERSION"
 fi

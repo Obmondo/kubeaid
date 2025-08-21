@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "autocert.fullname" . }}
+  labels: 
+    {{- include "autocert.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "autocert.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "autocert.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      {{- if and .Release.IsInstall (index .Values "step-certificates" "enabled") }}
+      initContainers:
+        - name: {{ .Chart.Name }}-init
+          image: busybox:latest
+          imagePullPolicy: {{ .Values.autocert.image.pullPolicy }}
+          command: ["sleep", "30"]
+      {{- end }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.autocert.image.repository }}:{{ .Values.autocert.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.autocert.image.pullPolicy }}
+        resources: 
+          {{- toYaml .Values.autocert.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.autocert.securityContext | nindent 10 }}
+        env:
+        - name: PROVISIONER_NAME
+          value: {{ .Values.ca.provisioner.name | default "admin" }}
+        - name: NAMESPACE
+          value: {{ .Release.Namespace }}
+        volumeMounts:
+        - name: config
+          mountPath: /home/step/config
+          readOnly: true
+        - name: certs
+          mountPath: /home/step/certs
+          readOnly: true
+        - name: autocert-password
+          mountPath: /home/step/password
+          readOnly: true
+        - name: autocert-config
+          mountPath: /home/step/autocert
+          readOnly: true
+        livenessProbe:
+          initialDelaySeconds: 5
+          httpGet:
+            path: /healthz
+            port: {{ .Values.service.targetPort }}
+            scheme: HTTPS
+        readinessProbe:
+          initialDelaySeconds: 5
+          httpGet:
+            path: /healthz
+            port: {{ .Values.service.targetPort }}
+            scheme: HTTPS
+      volumes:
+      - name: config
+        configMap:
+          name: {{ .Release.Name }}-step-certificates-config
+      - name: certs
+        configMap:
+          name: {{ .Release.Name }}-step-certificates-certs
+      - name: autocert-password
+        secret:
+          secretName: {{ .Release.Name }}-step-certificates-provisioner-password
+      - name: autocert-config
+        configMap:
+          name: {{ .Release.Name }}-autocert-config
+      {{- with .Values.autocert.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.autocert.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.autocert.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}

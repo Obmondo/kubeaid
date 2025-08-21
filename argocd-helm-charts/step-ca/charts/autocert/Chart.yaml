@@ -1,0 +1,36 @@
+apiVersion: v2
+appVersion: 0.20.2
+dependencies:
+- condition: step-certificates.enabled
+  name: step-certificates
+  repository: https://smallstep.github.io/helm-charts
+  tags:
+  - step-certificates
+  version: 1.28.4
+description: A kubernetes add-on that automatically injects TLS/HTTPS certificates
+  into your containers.
+home: https://smallstep.com
+icon: https://raw.githubusercontent.com/smallstep/autocert/master/icon.png
+keywords:
+- ca
+- tls
+- pki
+- x509
+- step
+- step-ca
+- step-certificates
+- smallstep
+- certificate
+- certificates
+- authority
+- security
+- security-tools
+- certificate-authority
+- kubernetes
+maintainers:
+- email: mariano@smallstep.com
+  name: Mariano Cano
+name: autocert
+sources:
+- https://github.com/smallstep/autocert
+version: 1.20.2
