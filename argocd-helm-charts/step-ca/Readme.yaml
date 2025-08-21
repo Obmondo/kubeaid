@@ -1,4 +1,18 @@
-# Step-CA Setup
+# Smallstep Setup
+
+## Introduction
+
+Smallstep with cert-manager to setup internal CA with acme as a provisioner.
+trust-manager will trust the cert when pod(client) wants to talk ingress(Traefik/Nginx)
+
+### Steps
+
+> NOTE: you need cert-manager to be installed on your k8s cluster.
+
+* Deploy step-ca app from [kubeaid/step-ca](https://github.com/Obmondo/kubeaid/tree/master/argocd-helm-charts/step-ca) which will deploy step-certificate, step-issuer and trust-manager
+
+* Fix values.yaml in your kubeaid-config repo
+
 
 * Deploy step-ca app
 

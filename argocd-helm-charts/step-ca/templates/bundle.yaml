@@ -11,6 +11,3 @@ spec:
   target:
     configMap:
       key: "ca-certificates.crt"
-    namespaceSelector:
-      matchLabels:
-        name: "cert-manager"
