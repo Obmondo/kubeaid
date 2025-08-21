@@ -1,0 +1,179 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sftpgo.fullname" . }}
+  labels:
+    {{- include "sftpgo.labels" . | nindent 4 }}
+    {{- if .Values.deploymentLabels }}
+    {{ toYaml .Values.deploymentLabels | nindent 4 }}
+    {{- end }}
+  {{- with .Values.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  {{- with .Values.deploymentStrategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "sftpgo.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "sftpgo.selectorLabels" . | nindent 8 }}
+        {{- if .Values.podLabels }}
+        {{ toYaml .Values.podLabels | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "sftpgo.serviceAccountName" . }}
+      hostNetwork: {{ .Values.hostNetwork }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default (printf "v%s" .Chart.AppVersion) }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - sftpgo
+            - serve
+          env:
+            {{- if .Values.sftpd.enabled }}
+            - name: SFTPGO_SFTPD__BINDINGS__0__PORT
+              value: "{{ .Values.sftpd.port}}"
+            {{- else}}
+            - name: SFTPGO_SFTPD__BINDINGS__0__PORT
+              value: "0"
+            {{- end }}
+            {{- if .Values.ftpd.enabled }}
+            - name: SFTPGO_FTPD__BINDINGS__0__PORT
+              value: "{{ .Values.ftpd.port}}"
+            - name: SFTPGO_FTPD__PASSIVE_PORT_RANGE__START
+              value: "{{ .Values.service.ports.ftp.passiveRange.start }}"
+            - name: SFTPGO_FTPD__PASSIVE_PORT_RANGE__END
+              value: "{{ .Values.service.ports.ftp.passiveRange.end }}"
+            {{- end }}
+            {{- if .Values.webdavd.enabled }}
+            - name: SFTPGO_WEBDAVD__BINDINGS__0__PORT
+              value: "{{ .Values.webdavd.port}}"
+            {{- end }}
+            {{- if .Values.httpd.enabled }}
+            - name: SFTPGO_HTTPD__BINDINGS__0__PORT
+              value: "{{ .Values.httpd.port}}"
+            {{- else }}
+            - name: SFTPGO_HTTPD__BINDINGS__0__PORT
+              value: "0"
+            {{- end }}
+            - name: SFTPGO_TELEMETRY__BIND_PORT
+              value: "10000"
+            - name: SFTPGO_TELEMETRY__BIND_ADDRESS
+              value: ""
+            {{- with .Values.envVars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          {{- with .Values.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            {{- if .Values.sftpd.enabled }}
+            - name: sftp
+              containerPort: {{ .Values.sftpd.port}}
+              protocol: TCP
+            {{- end }}
+            {{- if .Values.ftpd.enabled }}
+            - name: ftp
+              containerPort: {{ .Values.ftpd.port}}
+              protocol: TCP
+            {{- end }}
+            {{- if .Values.webdavd.enabled }}
+            - name: webdav
+              containerPort: {{ .Values.webdavd.port}}
+              protocol: TCP
+            {{- end }}
+            {{- if .Values.httpd.enabled }}
+            - name: http
+              containerPort: {{ .Values.httpd.port}}
+              protocol: TCP
+            {{- end }}
+            - name: telemetry
+              containerPort: 10000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: telemetry
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: telemetry
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/sftpgo/sftpgo.json
+              subPath: sftpgo.json
+              readOnly: true
+          {{- if .Values.persistence.enabled }}
+            - mountPath: /var/lib/sftpgo
+              name: sftpgo-volume
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "sftpgo.fullname" . }}
+      {{- if .Values.persistence.enabled }}
+        - name: sftpgo-volume
+          persistentVolumeClaim:
+            claimName: {{ include "sftpgo.fullname" . }}
+      {{- end }}
+      {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.topologySpreadConstraints.enabled }}
+      topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              {{- include "sftpgo.selectorLabels" . | nindent 14 }}
+          maxSkew: {{ .Values.topologySpreadConstraints.maxSkew }}
+          topologyKey: {{ .Values.topologySpreadConstraints.topologyKey }}
+          whenUnsatisfiable: {{ .Values.topologySpreadConstraints.whenUnsatisfiable }}
+      {{- end }}

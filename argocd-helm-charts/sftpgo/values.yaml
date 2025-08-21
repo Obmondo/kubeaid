@@ -1,0 +1,24 @@
+sftpgo:
+  image:
+    tag: v2.6.2
+
+  ftpd:
+    enabled: true
+  
+  webdavd:
+    enabled: true
+
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: sftpgo
+
+  volumeMounts:
+    - name: data
+      mountPath: /srv/sftpgo/ftp
+
+  replicaCount: 1
+
+  persistence:
+    enabled: true
+    storageClassName: "rook-ceph-block"
