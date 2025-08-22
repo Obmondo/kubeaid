@@ -149,8 +149,6 @@ netbird:
       hosts:
         - host: vpn.example.com
           paths:
-            - path: /api
-              pathType: ImplementationSpecific
             - path: /management
               pathType: ImplementationSpecific
     ingress:
@@ -166,8 +164,6 @@ netbird:
         - host: vpn.example.com
           paths:
             - path: /api
-              pathType: ImplementationSpecific
-            - path: /management
               pathType: ImplementationSpecific
 
   signal:
