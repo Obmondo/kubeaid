@@ -1,4 +1,4 @@
-{{ if (.Values.externalDatabases.netbird.logicalbackup).enabled  }}
+{{- if (.Values.externalDatabases.netbird.logicalbackup).enabled  }}
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -101,4 +101,4 @@ spec:
           dnsPolicy: ClusterFirst
           restartPolicy: Never
           terminationGracePeriodSeconds: 300
-{{ end }}
+{{- end }}

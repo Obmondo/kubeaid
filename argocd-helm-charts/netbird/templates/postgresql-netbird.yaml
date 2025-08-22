@@ -1,14 +1,14 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  {{ if (.Values.externalDatabases.netbird).recover }}
+  {{- if (.Values.externalDatabases.netbird).recover }}
   name: netbird-pgsql-recover
-  {{ else }}
+  {{- else }}
   name: netbird-pgsql
-  {{ end }}
+  {{- end }}
 spec:
   instances: {{ ((.Values.externalDatabases.netbird).instance) | default 1 }}
-  {{ if (.Values.externalDatabases.netbird).recover }}
+  {{- if (.Values.externalDatabases.netbird).recover }}
   bootstrap:
     recovery:
       source: netbird-pgsql
@@ -16,12 +16,12 @@ spec:
       owner: netbird
       secret:
         name: netbird-pgsql-app
-  {{ else }}
+  {{- else }}
   bootstrap:
     initdb:
       database: netbird
       owner: netbird
-  {{ end }}
+  {{- end }}
   resources:
     limits:
       memory: {{ (((.Values.externalDatabases.netbird).resources).limits).memory | default "800Mi" }}
