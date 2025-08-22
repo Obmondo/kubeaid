@@ -136,10 +136,9 @@ netbird:
       IDP_SERVICE_ACCOUNT_USER: netbird/idpServiceAccountUser
       IDP_SERVICE_ACCOUNT_PASSWORD: netbird/idpServiceAccountPassword
       DATASTORE_ENCRYPTION_KEY: netbird/datastoreEncryptionKey
-    useBackwardsGrpcService: true
-    serviceGrpc:
+    service:
       port: 80
-    ingressGrpc:
+    ingress:
       enabled: true
       annotations:
         traefik.ingress.kubernetes.io/service.serversscheme: h2c

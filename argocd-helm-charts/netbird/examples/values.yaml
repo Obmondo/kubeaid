@@ -112,7 +112,7 @@ netbird:
         - --single-account-mode-domain=vpn.example.com
         - --dns-domain=netbird.selfhosted
 
-    ingressGrpc:
+    ingress:
       tls:
         - hosts:
             - vpn.example.com
