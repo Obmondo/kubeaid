@@ -29,6 +29,11 @@ autocert:
       enabled: false
 
 trust-manager:
+  app:
+    trust:
+      # step-ca is the default namespace
+      # user can change namespace, but need to update it here as well.
+      namespace: step-ca
   secretTargets:
     enabled: true
     authorizedSecrets:
