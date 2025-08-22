@@ -113,7 +113,7 @@ netbird:
         - --dns-domain=netbird.selfhosted
 
     image:
-      tag: 0.46.0
+      tag: 0.55.1
     persistentVolume:
       enabled: false
     envFromSecret:
@@ -154,7 +154,7 @@ netbird:
 
   signal:
     image:
-      tag: 0.46.0
+      tag: 0.55.1
 
     service:
       port: 80
@@ -176,7 +176,7 @@ netbird:
 
   relay:
     image:
-      tag: 0.46.0
+      tag: 0.55.1
     envFromSecret:
       NB_AUTH_SECRET: netbird/relayPassword
     env:
