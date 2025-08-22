@@ -1,0 +1,253 @@
+netbird:
+  fullnameOverride: netbird
+  management:
+    configmap: |-
+      {
+        "Stuns": [
+          {
+            "Proto": "udp",
+            "URI": "{{ .STUN_SERVER }}",
+            "Username": "",
+            "Password": ""
+          }
+        ],
+        "TURNConfig": {
+          "TimeBasedCredentials": false,
+          "CredentialsTTL": "12h0m0s",
+          "Secret": "secret",
+          "Turns": [
+            {
+              "Proto": "udp",
+              "URI": "{{ .TURN_SERVER }}",
+              "Username": "{{ .TURN_SERVER_USER }}",
+              "Password": "{{ .TURN_SERVER_PASSWORD }}"
+            }
+          ]
+        },
+        "Relay": {
+          "Addresses": ["rels://vpn.example.com:443/relay"],
+          "CredentialsTTL": "24h",
+          "Secret": "{{ .RELAY_PASSWORD }}"
+        },
+        "Signal": {
+          "Proto": "https",
+          "URI": "vpn.example.com:443",
+          "Username": "",
+          "Password": ""
+        },
+        "Datadir": "/var/lib/netbird/",
+        "DataStoreEncryptionKey": "{{ .DATASTORE_ENCRYPTION_KEY }}",
+        "HttpConfig": {
+          "LetsEncryptDomain": "",
+          "CertFile": "",
+          "CertKey": "",
+          "AuthAudience": "{{ .IDP_CLIENT_ID }}",
+          "AuthIssuer": "https://keycloak.obmondo.com/auth/realms/Obmondo",
+          "AuthUserIDClaim": "",
+          "AuthKeysLocation": "https://keycloak.obmondo.com/auth/realms/Obmondo/protocol/openid-connect/certs",
+          "OIDCConfigEndpoint": "https://keycloak.obmondo.com/auth/realms/Obmondo/.well-known/openid-configuration",
+          "IdpSignKeyRefreshEnabled": false
+        },
+        "IdpManagerConfig": {
+          "ManagerType": "keycloak",
+          "ClientConfig": {
+            "Issuer": "https://keycloak.obmondo.com/auth/realms/Obmondo/.well-known/openid-configuration",
+            "TokenEndpoint": "https://keycloak.obmondo.com/auth/realms/Obmondo/protocol/openid-connect/token",
+            "ClientID": "{{ .IDP_CLIENT_MGMT_ID }}",
+            "ClientSecret": "{{ .IDP_CLIENT_MGMT_SECRET }}",
+            "GrantType": "client_credentials"
+          },
+          "ExtraConfig": {
+            "Password": "{{ .IDP_SERVICE_ACCOUNT_PASSWORD }}",
+            "Username": "{{ .IDP_SERVICE_ACCOUNT_USER }}",
+            "AdminEndpoint": "https://keycloak.obmondo.com/auth/admin/realms/Obmondo"
+          },
+          "KeycloakClientCredentials": null
+        },
+        "DeviceAuthorizationFlow": {
+          "Provider": "hosted",
+          "ProviderConfig": {
+            "ClientID": "{{ .IDP_CLIENT_ID }}",
+            "ClientSecret": "",
+            "Domain": "keycloak.obmondo.com",
+            "Audience": "{{ .IDP_CLIENT_ID }}",
+            "TokenEndpoint": "https://keycloak.obmondo.com/auth/realms/Obmondo/protocol/openid-connect/token",
+            "DeviceAuthEndpoint": "https://keycloak.obmondo.com/auth/realms/Obmondo/protocol/openid-connect/auth/device",
+            "AuthorizationEndpoint": "",
+            "Scope": "openid",
+            "UseIDToken": false,
+            "RedirectURLs": null
+          }
+        },
+        "PKCEAuthorizationFlow": {
+          "ProviderConfig": {
+            "ClientID": "{{ .IDP_CLIENT_ID }}",
+            "ClientSecret": "",
+            "Domain": "keycloak.obmondo.com",
+            "Audience": "{{ .IDP_CLIENT_ID }}",
+            "TokenEndpoint": "https://keycloak.obmondo.com/auth/realms/Obmondo/protocol/openid-connect/token",
+            "DeviceAuthEndpoint": "",
+            "AuthorizationEndpoint": "",
+            "Scope": "openid profile email offline_access netbird-vpn-api",
+            "UseIDToken": false,
+            "RedirectURLs": null
+          }
+        },
+        "StoreConfig": {
+          "Engine": "postgres"
+        },
+        "ReverseProxy": {
+          "TrustedHTTPProxies": null,
+          "TrustedHTTPProxiesCount": 0,
+          "TrustedPeers": null
+        }
+      }
+
+    podCommand:
+      args:
+        - --port=80
+        - --log-file=console
+        - --log-level=debug
+        - --disable-anonymous-metrics=false
+        - --single-account-mode-domain=vpn.example.com
+        - --dns-domain=netbird.selfhosted
+
+    image:
+      tag: 0.46.0
+    persistentVolume:
+      enabled: false
+    envFromSecret:
+      NETBIRD_STORE_ENGINE_POSTGRES_DSN: netbird/postgresDSN
+      STUN_SERVER: netbird/stunServer
+      TURN_SERVER: netbird/turnServer
+      TURN_SERVER_USER: netbird/turnServerUser
+      TURN_SERVER_PASSWORD: netbird/turnServerPassword
+      RELAY_PASSWORD: netbird/relayPassword
+      IDP_CLIENT_ID: netbird/idpClientID
+      IDP_CLIENT_MGMT_ID: netbird/idpClientMgmtID
+      IDP_CLIENT_MGMT_SECRET: netbird/idpClientMgmtSecret
+      IDP_SERVICE_ACCOUNT_USER: netbird/idpServiceAccountUser
+      IDP_SERVICE_ACCOUNT_PASSWORD: netbird/idpServiceAccountPassword
+      DATASTORE_ENCRYPTION_KEY: netbird/datastoreEncryptionKey
+
+    useBackwardsGrpcService: true
+
+    serviceGrpc:
+      port: 80
+
+    ingressGrpc:
+      enabled: true
+      annotations:
+        traefik.ingress.kubernetes.io/service.serversscheme: h2c
+      className: traefik-cert-manager
+      tls:
+        - hosts:
+            - vpn.example.com
+          secretName: vpn.example.com
+      hosts:
+        - host: vpn.example.com
+          paths:
+            - path: /api
+              pathType: ImplementationSpecific
+            - path: /management
+              pathType: ImplementationSpecific
+
+  signal:
+    image:
+      tag: 0.46.0
+
+    service:
+      port: 80
+
+    ingress:
+      enabled: true
+      annotations:
+        traefik.ingress.kubernetes.io/service.serversscheme: h2c
+      className: traefik-cert-manager
+      tls:
+        - hosts:
+            - vpn.example.com
+          secretName: vpn.example.com
+      hosts:
+        - host: vpn.example.com
+          paths:
+            - path: /signal
+              pathType: ImplementationSpecific
+
+  relay:
+    image:
+      tag: 0.46.0
+    envFromSecret:
+      NB_AUTH_SECRET: netbird/relayPassword
+    env:
+      NB_LOG_LEVEL: info
+      NB_LISTEN_ADDRESS: ":33080"
+      NB_EXPOSED_ADDRESS: rels://vpn.example.com:443/relay
+
+    service:
+      port: 80
+
+    ingress:
+      enabled: true
+      annotations:
+        traefik.ingress.kubernetes.io/service.serversscheme: h2c
+      className: traefik-cert-manager
+      tls:
+        - hosts:
+            - vpn.example.com
+          secretName: vpn.example.com
+      hosts:
+        - host: vpn.example.com
+          paths:
+            - path: /relay
+              pathType: ImplementationSpecific
+
+  dashboard:
+    enabled: true
+    image:
+      tag: v2.9.0
+    env:
+      # Endpoints
+      NETBIRD_MGMT_API_ENDPOINT: https://vpn.example.com:443
+      NETBIRD_MGMT_GRPC_API_ENDPOINT: https://vpn.example.com:443
+      # OIDC
+      AUTH_CLIENT_SECRET:
+      AUTH_AUTHORITY: https://keycloak.obmondo.com/auth/realms/Obmondo
+      USE_AUTH0: false
+      AUTH_SUPPORTED_SCOPES: openid profile email offline_access netbird-vpn-api
+      AUTH_REDIRECT_URI:
+      AUTH_SILENT_REDIRECT_URI:
+      NETBIRD_TOKEN_SOURCE: accessToken
+      NGINX_SSL_PORT:
+      LETSENCRYPT_DOMAIN:
+      LETSENCRYPT_EMAIL:
+    envFromSecret:
+      AUTH_CLIENT_ID: netbird/idpClientID
+      AUTH_AUDIENCE: netbird/idpClientID
+
+    service:
+      port: 80
+
+    ingress:
+      enabled: true
+      annotations:
+        traefik.ingress.kubernetes.io/service.serversscheme: h2c
+      className: traefik-cert-manager
+      tls:
+        - hosts:
+            - vpn.example.com
+          secretName: vpn.example.com
+      hosts:
+        - host: vpn.example.com
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+
+coturn:
+  coturn:
+    realm: "turn.vpn.example.com"
+  service:
+    type: NodePort
+    externalTrafficPolicy: Cluster
+  externalDatabase:
+    enabled: false
