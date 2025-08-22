@@ -5,22 +5,21 @@ step-issuer:
 step-certificates:
   inject:
     enabled: false
+  autocert:
+    enabled: false
   ca:
     name: Kubeaid
     dns: k8sdemo.kubeaid.io,step-ca-step-certificates.step-ca.svc.cluster.local,127.0.0.1
     url: https://step-ca-step-certificates.step-ca.svc.cluster.local
-    provisioner:
-      name: acme
-  autocert:
-    enabled: false
-  bootstrap:
-    # 90 days
-    postInitHook: |
-      step ca provisioner update acme \
-      --max-tls-cert-duration 2160h \
-      --default-tls-cert-duration 2160h
+    bootstrap:
+      # 90 days
+      postInitHook: |
+        step ca provisioner update admin \
+        --max-tls-cert-duration 2160h \
+        --default-tls-cert-duration 2160h
 
 autocert:
+  enabled: false
   autocert:
     # 90 days
     certLifetime: 2160h
