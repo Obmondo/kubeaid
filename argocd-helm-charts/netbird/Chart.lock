@@ -1,9 +1,9 @@
 dependencies:
-- name: netbird
-  repository: https://netbirdio.github.io/helms
-  version: 1.9.0
-- name: coturn
-  repository: https://small-hack.github.io/coturn-chart/
-  version: 9.1.0
+  - name: netbird
+    repository: https://netbirdio.github.io/helms
+    version: 1.9.0
+  - name: coturn
+    repository: https://small-hack.github.io/coturn-chart/
+    version: 9.1.0
 digest: sha256:95e0af4a295d087e5408ca0a5a0bd80952936cd6eeadf9ff15e385486b09b3ef
-generated: "2025-08-27T16:29:31.460521108+05:30"
+generated: "2025-08-27T14:25:44.243276031+05:30"
