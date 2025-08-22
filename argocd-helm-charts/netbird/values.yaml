@@ -137,8 +137,6 @@ netbird:
       IDP_SERVICE_ACCOUNT_PASSWORD: netbird/idpServiceAccountPassword
       DATASTORE_ENCRYPTION_KEY: netbird/datastoreEncryptionKey
     useBackwardsGrpcService: true
-    serviceGrpc:
-      port: 80
     ingressGrpc:
       enabled: true
       annotations:
@@ -155,8 +153,6 @@ netbird:
               pathType: ImplementationSpecific
             - path: /management
               pathType: ImplementationSpecific
-    service:
-      port: 80
     ingress:
       enabled: true
       annotations:
@@ -177,8 +173,6 @@ netbird:
   signal:
     image:
       tag: 0.55.1
-    service:
-      port: 80
     ingress:
       enabled: true
       annotations:
@@ -203,8 +197,6 @@ netbird:
       NB_EXPOSED_ADDRESS: rels://vpn.example.com:443/relay
     envFromSecret:
       NB_AUTH_SECRET: netbird/relayPassword
-    service:
-      port: 33080
     ingress:
       enabled: true
       annotations:
@@ -227,8 +219,6 @@ netbird:
     envFromSecret:
       AUTH_CLIENT_ID: netbird/idpClientID
       AUTH_AUDIENCE: netbird/idpClientID
-    service:
-      port: 80
     env:
       # Endpoints
       NETBIRD_MGMT_API_ENDPOINT: https://vpn.example.com:443
