@@ -205,7 +205,7 @@ netbird:
   dashboard:
     enabled: true
     image:
-      tag: v2.9.0
+      tag: v2.17.0
     env:
       # Endpoints
       NETBIRD_MGMT_API_ENDPOINT: https://vpn.example.com:443
