@@ -136,6 +136,25 @@ netbird:
       IDP_SERVICE_ACCOUNT_USER: netbird/idpServiceAccountUser
       IDP_SERVICE_ACCOUNT_PASSWORD: netbird/idpServiceAccountPassword
       DATASTORE_ENCRYPTION_KEY: netbird/datastoreEncryptionKey
+    useBackwardsGrpcService: true
+    serviceGrpc:
+      port: 80
+    ingressGrpc:
+      enabled: true
+      annotations:
+        traefik.ingress.kubernetes.io/service.serversscheme: h2c
+      className: traefik-cert-manager
+      tls:
+        - hosts:
+            - vpn.example.com
+          secretName: vpn.example.com
+      hosts:
+        - host: vpn.example.com
+          paths:
+            - path: /api
+              pathType: ImplementationSpecific
+            - path: /management
+              pathType: ImplementationSpecific
     service:
       port: 80
     ingress:
