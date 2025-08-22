@@ -153,8 +153,6 @@ netbird:
               pathType: ImplementationSpecific
     ingress:
       enabled: true
-      annotations:
-        traefik.ingress.kubernetes.io/service.serversscheme: h2c
       className: traefik-cert-manager
       tls:
         - hosts:
@@ -181,7 +179,7 @@ netbird:
       hosts:
         - host: vpn.example.com
           paths:
-            - path: /signal
+            - path: /signalexchange
               pathType: ImplementationSpecific
 
   relay:
@@ -195,8 +193,6 @@ netbird:
       NB_AUTH_SECRET: netbird/relayPassword
     ingress:
       enabled: true
-      annotations:
-        traefik.ingress.kubernetes.io/service.serversscheme: h2c
       className: traefik-cert-manager
       tls:
         - hosts:
@@ -232,8 +228,6 @@ netbird:
       LETSENCRYPT_EMAIL:
     ingress:
       enabled: true
-      annotations:
-        traefik.ingress.kubernetes.io/service.serversscheme: h2c
       className: traefik-cert-manager
       tls:
         - hosts:
