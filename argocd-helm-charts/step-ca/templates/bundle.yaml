@@ -8,7 +8,6 @@ spec:
   - configMap:
       name: "step-ca-step-certificates-certs"
       key: "root_ca.crt"
-      namespace: "step-ca"
   target:
     namespaceSelector: {}
     secret:
