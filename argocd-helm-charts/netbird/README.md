@@ -1,11 +1,11 @@
 # Netbird Installation
 
-This document outlines the steps to customize the Helm installation for Coturn and Netbird services.
-This installation comes up KeyCloak auth integration.
-The modifications include changing the Coturn service type and setting up ingress for all Netbird services.
+This Helm chart is for self hosting [Netbird](https://netbird.io).
+
+This document outlines the steps to customize the Helm installation for Coturn and Netbird services with KeyCloak IdP.
 
 Refer the example [values.yaml](./examples/values.yaml) for additional configurations.
-You can simply copy-paste the values file in your kubeaid-config, and replace the necessary values to get netbird working.
+You can simply copy-paste the values file in your kubeaid-config, and replace the necessary values to get Netbird working.
 
 ## Modify Coturn Service Configuration
 
@@ -26,7 +26,7 @@ This will use gRPC protocol.
 netbird:
   <service-name>:
     service:
-      port: 80
+      port: <service-port>
     ingress:
       enabled: true
       annotations:
@@ -105,7 +105,7 @@ Relays:
   [rels://vpn.example.com:443/relay] is Available
 Nameservers: 
 FQDN: viljkid.netbird.selfhosted
-NetBird IP: 100.94.110.131/16
+NetBird IP: <sensitive>
 Interface type: Kernel
 Quantum resistance: false
 Lazy connection: false
@@ -113,3 +113,28 @@ Networks: 10.96.0.0/16
 Forwarding rules: 0
 Peers count: 1/2 Connected
 ```
+
+## Troubleshooting
+
+### GET /api/users status 401
+
+Netbird caches the Keycloak users locally. If it is not able to fetch the users from Keycloak, it throws an error with
+
+```log
+unable to get keycloak token, statusCode 401
+```
+
+**Solution:**
+
+- Set the log level to Debug for the netbird-management pod with `--log-level=debug` as the container arg
+- Check the pod logs about token not found
+- Check if the service account `netbird-backend` has the permission to `view-users` in Keycloak
+- Check if the `AdminEndpoint` in the IdPManagerConfig is correct `https://keycloak.example.com/auth/admin/realms/netbird`
+
+Once this is correct, Netbird pod should be able to warm up the cache and fetch user IDs.
+
+## References and External Links
+
+- https://docs.netbird.io/about-netbird/how-netbird-works
+- https://docs.netbird.io/selfhosted/identity-providers#keycloak
+- https://docs.netbird.io/selfhosted/troubleshooting

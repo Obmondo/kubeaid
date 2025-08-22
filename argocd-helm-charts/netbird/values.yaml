@@ -5,12 +5,6 @@ externalDatabases:
     pass: netbird-pgsql-app
     logicalbackup:
       enabled: true
-  coturn:
-    size: 4Gi
-    recover: false
-    pass: coturn-pgsql-app
-    logicalbackup:
-      enabled: true
 
 netbird:
   fullnameOverride: netbird
@@ -117,8 +111,16 @@ netbird:
         }
       }
 
+    podCommand:
+      args:
+        - --port=80
+        - --log-file=console
+        - --log-level=debug
+        - --disable-anonymous-metrics=false
+        - --single-account-mode-domain=vpn.example.com
+        - --dns-domain=netbird.selfhosted
     image:
-      tag: 0.46.0
+      tag: 0.55.1
     persistentVolume:
       enabled: false
     envFromSecret:
@@ -134,104 +136,110 @@ netbird:
       IDP_SERVICE_ACCOUNT_USER: netbird/idpServiceAccountUser
       IDP_SERVICE_ACCOUNT_PASSWORD: netbird/idpServiceAccountPassword
       DATASTORE_ENCRYPTION_KEY: netbird/datastoreEncryptionKey
+    useBackwardsGrpcService: true
+    serviceGrpc:
+      annotations:
+        traefik.ingress.kubernetes.io/service.serversscheme: h2c
+    ingressGrpc:
+      enabled: true
+      className: traefik-cert-manager
+      tls:
+        - hosts:
+            - vpn.example.com
+          secretName: vpn.example.com
+      hosts:
+        - host: vpn.example.com
+          paths:
+            - path: /management
+              pathType: ImplementationSpecific
+    ingress:
+      enabled: true
+      className: traefik-cert-manager
+      tls:
+        - hosts:
+            - vpn.example.com
+          secretName: vpn.example.com
+      hosts:
+        - host: vpn.example.com
+          paths:
+            - path: /api
+              pathType: ImplementationSpecific
 
   signal:
     image:
-      tag: 0.46.0
+      tag: 0.55.1
+    service:
+      annotations:
+        traefik.ingress.kubernetes.io/service.serversscheme: h2c
+    ingress:
+      enabled: true
+      className: traefik-cert-manager
+      tls:
+        - hosts:
+            - vpn.example.com
+          secretName: vpn.example.com
+      hosts:
+        - host: vpn.example.com
+          paths:
+            - path: /signalexchange
+              pathType: ImplementationSpecific
 
   relay:
     image:
-      tag: 0.46.0
-    envFromSecret:
-      NB_AUTH_SECRET: netbird/relayPassword
+      tag: 0.55.1
     env:
       NB_LOG_LEVEL: info
       NB_LISTEN_ADDRESS: ":33080"
       NB_EXPOSED_ADDRESS: rels://vpn.example.com:443/relay
+    envFromSecret:
+      NB_AUTH_SECRET: netbird/relayPassword
+    ingress:
+      enabled: true
+      className: traefik-cert-manager
+      tls:
+        - hosts:
+            - vpn.example.com
+          secretName: vpn.example.com
+      hosts:
+        - host: vpn.example.com
+          paths:
+            - path: /relay
+              pathType: ImplementationSpecific
 
   dashboard:
     enabled: true
     image:
-      tag: v2.9.0
+      tag: v2.17.0
+    envFromSecret:
+      AUTH_CLIENT_ID: netbird/idpClientID
+      AUTH_AUDIENCE: netbird/idpClientID
     env:
       # Endpoints
       NETBIRD_MGMT_API_ENDPOINT: https://vpn.example.com:443
       NETBIRD_MGMT_GRPC_API_ENDPOINT: https://vpn.example.com:443
       # OIDC
-      AUTH_CLIENT_SECRET:
-      AUTH_AUTHORITY: https://keycloak.example.com/auth/realms/netbird
+      AUTH_AUTHORITY: https://keycloak.example.com/auth/realms/Obmondo
       USE_AUTH0: false
-      AUTH_SUPPORTED_SCOPES: openid profile email offline_access api
-      AUTH_REDIRECT_URI:
-      AUTH_SILENT_REDIRECT_URI:
+      AUTH_SUPPORTED_SCOPES: openid profile email offline_access netbird-vpn-api
       NETBIRD_TOKEN_SOURCE: accessToken
-      NGINX_SSL_PORT:
-      LETSENCRYPT_DOMAIN:
-      LETSENCRYPT_EMAIL:
-    envFromSecret:
-      AUTH_CLIENT_ID: netbird/idpClientID
-      AUTH_AUDIENCE: netbird/idpClientID
-
-  extraManifests:
-    - apiVersion: traefik.io/v1alpha1
-      kind: IngressRoute
-      metadata:
-        name: netbird-traefik
-        labels:
-          argocd.argoproj.io/instance: netbird-traefik
-      spec:
-        entryPoints:
-        - websecure
-        routes:
-        - kind: Rule
-          match: Host(`vpn.example.com`) && !PathPrefix(`/api`) && !PathPrefix(`/management`) && !PathPrefix(`/signalexchange`) && !PathPrefix(`/relay`)
-          services:
-          - name: netbird-dashboard
-            namespace: netbird
-            passHostHeader: true
-            port: 80
-        - kind: Rule
-          match: Host(`vpn.example.com`) && PathPrefix(`/api`)
-          services:
-          - name: netbird-management
-            namespace: netbird
-            passHostHeader: true
-            port: 80
-        - kind: Rule
-          match: Host(`vpn.example.com`) && PathPrefix(`/relay`)
-          services:
-          - name: netbird-relay
-            namespace: netbird
-            passHostHeader: true
-            port: 33080
-        - kind: Rule
-          match: Host(`vpn.example.com`) && PathPrefix(`/management`)
-          services:
-          - name: netbird-management
-            namespace: netbird
-            passHostHeader: true
-            port: 80
-            scheme: h2c
-        - kind: Rule
-          match: Host(`vpn.example.com`) && PathPrefix(`/signalexchange`)
-          services:
-          - name: netbird-signal
-            namespace: netbird
-            passHostHeader: true
-            port: 80
-            scheme: h2c
-        tls:
+    ingress:
+      enabled: true
+      className: traefik-cert-manager
+      tls:
+        - hosts:
+            - vpn.example.com
           secretName: vpn.example.com
+      hosts:
+        - host: vpn.example.com
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
 
 coturn:
   coturn:
     realm: "turn.vpn.example.com"
+  service:
+    type: NodePort
+    externalTrafficPolicy: Cluster
   externalDatabase:
-    enabled: true
-    type: "postgresql"
-    existingSecret: coturn-pgsql-app
-    secretKeys:
-      username: "username"
-      password: "password"
-      database: "dbname"
-      hostname: "host"
+    enabled: false
