@@ -8,7 +8,7 @@ act-runner:
     runAsGroup: 1000
   image:
     repository: vegardit/gitea-act-runner
-    tag: dind-0.2.6
+    tag: dind-0.2.12
     pullPolicy: Always
   act_runner:
     parallel_jobs: 2
