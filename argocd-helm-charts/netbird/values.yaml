@@ -136,51 +136,10 @@ netbird:
       IDP_SERVICE_ACCOUNT_USER: netbird/idpServiceAccountUser
       IDP_SERVICE_ACCOUNT_PASSWORD: netbird/idpServiceAccountPassword
       DATASTORE_ENCRYPTION_KEY: netbird/datastoreEncryptionKey
-    useBackwardsGrpcService: true
-    ingressGrpc:
-      enabled: true
-      annotations:
-        traefik.ingress.kubernetes.io/service.serversscheme: h2c
-      className: traefik-cert-manager
-      tls:
-        - hosts:
-            - vpn.example.com
-          secretName: vpn.example.com
-      hosts:
-        - host: vpn.example.com
-          paths:
-            - path: /management
-              pathType: ImplementationSpecific
-    ingress:
-      enabled: true
-      className: traefik-cert-manager
-      tls:
-        - hosts:
-            - vpn.example.com
-          secretName: vpn.example.com
-      hosts:
-        - host: vpn.example.com
-          paths:
-            - path: /api
-              pathType: ImplementationSpecific
 
   signal:
     image:
       tag: 0.55.1
-    ingress:
-      enabled: true
-      annotations:
-        traefik.ingress.kubernetes.io/service.serversscheme: h2c
-      className: traefik-cert-manager
-      tls:
-        - hosts:
-            - vpn.example.com
-          secretName: vpn.example.com
-      hosts:
-        - host: vpn.example.com
-          paths:
-            - path: /signalexchange
-              pathType: ImplementationSpecific
 
   relay:
     image:
@@ -191,18 +150,6 @@ netbird:
       NB_EXPOSED_ADDRESS: rels://vpn.example.com:443/relay
     envFromSecret:
       NB_AUTH_SECRET: netbird/relayPassword
-    ingress:
-      enabled: true
-      className: traefik-cert-manager
-      tls:
-        - hosts:
-            - vpn.example.com
-          secretName: vpn.example.com
-      hosts:
-        - host: vpn.example.com
-          paths:
-            - path: /relay
-              pathType: ImplementationSpecific
 
   dashboard:
     enabled: true
@@ -220,24 +167,7 @@ netbird:
       AUTH_AUTHORITY: https://keycloak.example.com/auth/realms/Obmondo
       USE_AUTH0: false
       AUTH_SUPPORTED_SCOPES: openid profile email offline_access netbird-vpn-api
-      AUTH_REDIRECT_URI:
-      AUTH_SILENT_REDIRECT_URI:
       NETBIRD_TOKEN_SOURCE: accessToken
-      NGINX_SSL_PORT:
-      LETSENCRYPT_DOMAIN:
-      LETSENCRYPT_EMAIL:
-    ingress:
-      enabled: true
-      className: traefik-cert-manager
-      tls:
-        - hosts:
-            - vpn.example.com
-          secretName: vpn.example.com
-      hosts:
-        - host: vpn.example.com
-          paths:
-            - path: /
-              pathType: ImplementationSpecific
 
 coturn:
   coturn:
