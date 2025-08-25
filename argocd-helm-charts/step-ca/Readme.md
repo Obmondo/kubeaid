@@ -19,7 +19,7 @@ trust-manager will trust the cert when pod(client) wants to talk ingress(Traefik
   NOTE: you can only access the step certificate once the step-certificate pod is ready
 
 ```sh
-kubectl get -n step-ca -o jsonpath="{.data['root_ca\.crt']}" configmaps/step-ca-step-certificates-certs | base64
+kubectl get -n step-ca -o jsonpath="{.data['root_ca\.crt']}" configmaps/step-ca-step-certificates-certs | base64 | tr -d '\n'
 
 kubectl get -n step-ca -o jsonpath="{.data['ca\.json']}" configmaps/step-ca-step-certificates-config | jq -r .authority.provisioners[0].key.kid)
 ```

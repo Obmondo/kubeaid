@@ -14,9 +14,7 @@ step-certificates:
     bootstrap:
       # 90 days
       postInitHook: |
-        step ca provisioner update admin \
-        --max-tls-cert-duration 2160h \
-        --default-tls-cert-duration 2160h
+        step ca provisioner update admin --x509-max-dur 2160h --x509-default-dur 2160h
 
 autocert:
   enabled: false
