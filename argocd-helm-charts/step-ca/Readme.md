@@ -11,18 +11,18 @@ trust-manager will trust the cert when pod(client) wants to talk ingress(Traefik
 
 * Deploy step-ca app from [kubeaid/step-ca](https://github.com/Obmondo/kubeaid/tree/master/argocd-helm-charts/step-ca) which will deploy step-certificate, step-issuer, autocert (tls between services) and trust-manager
 
-* Fix values.yaml in your kubeaid-config repo
-
-(example values file)[./examples/values.yaml]
-
 * Set up stepClusterIssuer and add in the values file
   NOTE: you can only access the step certificate once the step-certificate pod is ready
 
 ```sh
 kubectl get -n step-ca -o jsonpath="{.data['root_ca\.crt']}" configmaps/step-ca-step-certificates-certs | base64 | tr -d '\n'
 
-kubectl get -n step-ca -o jsonpath="{.data['ca\.json']}" configmaps/step-ca-step-certificates-config | jq -r .authority.provisioners[0].key.kid)
+kubectl get -n step-ca -o jsonpath="{.data['ca\.json']}" configmaps/step-ca-step-certificates-config | jq -r .authority.provisioners[0].key.kid
 ```
+
+* Fix values.yaml in your kubeaid-config repo, based on the above output
+
+(example values file)[./examples/values.yaml]
 
 * Expose the root CA inside a POD.
   NOTE: you can achieve this in multiple way.
@@ -31,3 +31,8 @@ kubectl get -n step-ca -o jsonpath="{.data['ca\.json']}" configmaps/step-ca-step
   * Inject the root ca directly via webhook (k8s)
 
   Golang can read `SSL_CERT_FILE` in which root_ca is present, so client can accept tls when its is signed by an internal CA.
+
+* Imp Notes:
+
+The job created the provisioner password automatically from the helm chart, without the provisioner
+password the step-certificate pod won't start, since its waiting for the secret
