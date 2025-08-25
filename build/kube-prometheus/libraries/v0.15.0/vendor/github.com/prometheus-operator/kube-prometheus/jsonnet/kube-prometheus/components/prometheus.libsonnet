@@ -13,7 +13,7 @@ local defaults = {
   alertmanagerName:: '',
   alerting: {},
   namespaces:: ['default', 'kube-system', defaults.namespace],
-  replicas: 2,
+  replicas: 1,
   externalLabels: {},
   enableFeatures: [],
   ruleSelector: {},

@@ -363,7 +363,7 @@ local kp =
           externalUrl: if std.objectHas(vars, 'prometheus_ingress_host') then (
             'https://' + vars.prometheus_ingress_host
           ) else '',
-          replicas: 1,
+          replicas: if std.objectHas(vars.prometheus, 'replicas') then vars.prometheus.replicas else 1,
           resources: vars.prometheus_resources,
           retention: vars.prometheus.retention,
           storage: {
