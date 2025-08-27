@@ -136,10 +136,53 @@ netbird:
       IDP_SERVICE_ACCOUNT_USER: netbird/idpServiceAccountUser
       IDP_SERVICE_ACCOUNT_PASSWORD: netbird/idpServiceAccountPassword
       DATASTORE_ENCRYPTION_KEY: netbird/datastoreEncryptionKey
+    useBackwardsGrpcService: true
+    serviceGrpc:
+      annotations:
+        traefik.ingress.kubernetes.io/service.serversscheme: h2c
+    ingressGrpc:
+      enabled: true
+      className: traefik-cert-manager
+      tls:
+        - hosts:
+            - vpn.example.com
+          secretName: vpn.example.com
+      hosts:
+        - host: vpn.example.com
+          paths:
+            - path: /management
+              pathType: ImplementationSpecific
+    ingress:
+      enabled: true
+      className: traefik-cert-manager
+      tls:
+        - hosts:
+            - vpn.example.com
+          secretName: vpn.example.com
+      hosts:
+        - host: vpn.example.com
+          paths:
+            - path: /api
+              pathType: ImplementationSpecific
 
   signal:
     image:
       tag: 0.55.1
+    service:
+      annotations:
+        traefik.ingress.kubernetes.io/service.serversscheme: h2c
+    ingress:
+      enabled: true
+      className: traefik-cert-manager
+      tls:
+        - hosts:
+            - vpn.example.com
+          secretName: vpn.example.com
+      hosts:
+        - host: vpn.example.com
+          paths:
+            - path: /signalexchange
+              pathType: ImplementationSpecific
 
   relay:
     image:
@@ -150,6 +193,18 @@ netbird:
       NB_EXPOSED_ADDRESS: rels://vpn.example.com:443/relay
     envFromSecret:
       NB_AUTH_SECRET: netbird/relayPassword
+    ingress:
+      enabled: true
+      className: traefik-cert-manager
+      tls:
+        - hosts:
+            - vpn.example.com
+          secretName: vpn.example.com
+      hosts:
+        - host: vpn.example.com
+          paths:
+            - path: /relay
+              pathType: ImplementationSpecific
 
   dashboard:
     enabled: true
@@ -163,11 +218,22 @@ netbird:
       NETBIRD_MGMT_API_ENDPOINT: https://vpn.example.com:443
       NETBIRD_MGMT_GRPC_API_ENDPOINT: https://vpn.example.com:443
       # OIDC
-      AUTH_CLIENT_SECRET:
       AUTH_AUTHORITY: https://keycloak.example.com/auth/realms/Obmondo
       USE_AUTH0: false
       AUTH_SUPPORTED_SCOPES: openid profile email offline_access netbird-vpn-api
       NETBIRD_TOKEN_SOURCE: accessToken
+    ingress:
+      enabled: true
+      className: traefik-cert-manager
+      tls:
+        - hosts:
+            - vpn.example.com
+          secretName: vpn.example.com
+      hosts:
+        - host: vpn.example.com
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
 
 coturn:
   coturn:
