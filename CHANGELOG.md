@@ -2,6 +2,37 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`3cfe6bc5`](../../commit/3cfe6bc5) Adding sftpgo helm chart default values in KubeAid.
+- [`3c3ca94e`](../../commit/3c3ca94e) feat: add support for configuring Prometheus replicas fix: set replicas to 1 to conditionally disable PodDisruptionBudget creation
+- [`524e9c99`](../../commit/524e9c99) doc: updated readme with correct steps and added an example values file as well
+- [`5132d839`](../../commit/5132d839) fix: max duration of the cert issued via step-issuer
+- [`dab5ff28`](../../commit/dab5ff28) fix: removed default cluster-issuer, since it can be any other cluster issuer
+- [`9d5cd235`](../../commit/9d5cd235) fix: changed the trust.namespace for trust manager
+- [`015f071a`](../../commit/015f071a) fix: removed namespace from the step-ca-bundle, since that is not supported by the crd
+- [`cbe6c066`](../../commit/cbe6c066) fix: yaml structure for step-ca values file, so it takes correct input
+- [`cac8d8dc`](../../commit/cac8d8dc) fix: removed extra chart, which got added in the kubeaid, and its already present in the kubeaid
+- [`df2cbf13`](../../commit/df2cbf13) fix: url for stepclusterissuer and get namespace from release.name in step-ca, so one can deploy in a diff namespace
+- [`28c82829`](../../commit/28c82829) fix: updated act_runner image to current latest to 0.2.12 again in the kubeaid values file
+- [`7625cabf`](../../commit/7625cabf) fix: updated act_runner image to current latest to 0.2.12
+- [`9e1222ea`](../../commit/9e1222ea) feat: Added Guide for Odoo
+- [`dc82208a`](../../commit/dc82208a) chore(netbird-dashboard): bump version to v2.17.0
+- [`8e7c4913`](../../commit/8e7c4913) fix: shell check fix for git branch command in the helm-repo update
+- [`642ec92e`](../../commit/642ec92e) fix: readme.yaml should have been readme.md
+- [`e2ee70f1`](../../commit/e2ee70f1) feat: added some sane default for autocert, in step-ca doc: Updated readme with some instruction to setup the step-ca feat: added support for bundle and stepclusterissuer from values file feat: added a posthook to create cert with 90 days expiry fix: enabled secret target for trust manager, since cert-manager can inject the root ca in the pod, and it can read only secret
+- [`c6ecc167`](../../commit/c6ecc167) feat: added autocert helm chart
+- [`150fa8ea`](../../commit/150fa8ea) feat: enabled autocert helm chart and added a WIP readme
+- [`df4c5aa3`](../../commit/df4c5aa3) feat: added bundle object for default step-ca setup, and didnt templatized it yet
+- [`67329969`](../../commit/67329969) feat: added trust-manager helm chart as dependency, since its required when one is doing a step-ca setup on their cluster
+- [`544bf24c`](../../commit/544bf24c) feat: added step-ca readme, and support for step-ca in cert-manager
+- [`c9878e8f`](../../commit/c9878e8f) chore(netbird): add installation tips to replicate the same configs
+- [`80802c78`](../../commit/80802c78) chore(netbird): add installation tips to replicate the same configs
+- [`6a15f6d7`](../../commit/6a15f6d7) adding redirect-to-www middleware in Odoo
+- [`b09fedda`](../../commit/b09fedda) adding sftpgo helm chart to kubeaid
+- [`93925b76`](../../commit/93925b76) feat: added step-certificates helm chart
+- [`9f94ab63`](../../commit/9f94ab63) fix: helm update script when there is more then 1 dependencies and added stepca-certificates in the chart.yaml for step-ca helm chart
+- [`1526cb17`](../../commit/1526cb17) Allow adding labels to keycloak zalando postgres db
+
 ## 17.0.0
 ### Major Version Upgrades
 - Updated whoami from version 5.3.0 to 6.0.0
