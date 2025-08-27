@@ -130,32 +130,46 @@ management:
     ##
     type: ClusterIP
 
-
     ## @param management.service.port Port for the management service.
     ##
     port: 80
 
-    ## @param management.service.name Name for the management service.
+    ## @param management.service.name Name for the management service port.
     ##
     name: http
+
+    ## @param management.service.externalIPs External IPs for the management service.
+    ##
+    externalIPs: []
+
+    ## @param management.service.annotations Annotations for the management service.
+    ##
+    annotations: {}
 
   ## @param management.grpcContainerPort Container port for the management service.
   ##
   grpcContainerPort: 33073
 
   serviceGrpc:
-    ## @param management.serviceGrpc.type Service type for the management component.
+    ## @param management.serviceGrpc.type Service type for the management GRPC component.
     ##
     type: ClusterIP
 
-
-    ## @param management.serviceGrpc.port Port for the management service.
+    ## @param management.serviceGrpc.port Port for the management GRPC service.
     ##
     port: 33073
 
-    ## @param management.serviceGrpc.name Name for the management service.
+    ## @param management.serviceGrpc.name Name for the management GRPC service port.
     ##
     name: grpc
+
+    ## @param management.serviceGrpc.externalIPs External IPs for the management GRPC service.
+    ##
+    externalIPs: []
+
+    ## @param management.serviceGrpc.annotations Annotations for the management service.
+    ##
+    annotations: {}
 
   ingress:
     ## @param management.ingress.enabled Enable or disable ingress for the management component.
@@ -361,6 +375,7 @@ signal:
     ## @param signal.metrics.enabled enables/disables metrics
     ##
     enabled: false
+
     ## @param signal.metrics.port target metrics port
     ##
     port: 9090
@@ -373,10 +388,22 @@ signal:
     ## @param signal.service.type Service type for the signal component.
     ##
     type: ClusterIP
-    name: grpc
+
     ## @param signal.service.port Port for the signal service.
     ##
     port: 80
+
+    ## @param signal.service.name Name for the signal service port.
+    ##
+    name: grpc
+
+    ## @param signal.service.externalIPs External IPs for the signal service.
+    ##
+    externalIPs: []
+
+    ## @param signal.service.annotations Annotations for the signal service.
+    ##
+    annotations: {}
 
   ingress:
     ## @param signal.ingress.enabled Enable or disable ingress for the signal component.
@@ -555,14 +582,21 @@ relay:
     ##
     type: ClusterIP
 
-
     ## @param relay.service.port Port for the relay service.
     ##
     port: 33080
 
-    ## @param relay.service.name Name for the relay service.
+    ## @param relay.service.name Name for the relay service port.
     ##
     name: http
+
+    ## @param relay.service.externalIPs External IPs for the relay service.
+    ##
+    externalIPs: []
+
+    ## @param relay.service.annotations Annotations for the relay service.
+    ##
+    annotations: {}
 
   ingress:
     ## @param relay.ingress.enabled Enable or disable ingress for the relay component.
@@ -709,15 +743,25 @@ dashboard:
   containerPort: 80
 
   service:
-    ## @param dashboard.service.type
+    ## @param dashboard.service.type Service type for the dashboard component.
+    ##
     type: ClusterIP
 
-
-    ## @param dashboard.service.port
+    ## @param dashboard.service.port Port for the dashboard service.
+    ##
     port: 80
 
-    ## @param dashboard.service.name
+    ## @param dashboard.service.name Name for the dashboard service port.
+    ##
     name: http
+
+    ## @param dashboard.service.externalIPs External IPs for the dashboard service.
+    ##
+    externalIPs: []
+    
+    ## @param dashboard.service.annotations Annotations for the dashboard service.
+    ##
+    annotations: {}
 
   ingress:
     ## @param dashboard.ingress.enabled

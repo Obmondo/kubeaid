@@ -1,5 +1,4 @@
 {{- if .Values.signal.enabled -}}
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -7,6 +6,10 @@ metadata:
   namespace: {{ include "netbird.namespace" . }}
   labels:
     {{- include "netbird.signal.labels" . | nindent 4 }}
+  {{- with .Values.signal.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.signal.service.type }}
   ports:
@@ -22,5 +25,8 @@ spec:
     {{- end }}
   selector:
     {{- include "netbird.signal.selectorLabels" . | nindent 4 }}
-
+  {{- with .Values.signal.service.externalIPs }}
+  externalIPs:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 {{- end }}
