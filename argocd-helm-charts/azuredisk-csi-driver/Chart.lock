@@ -1,6 +1,6 @@
 dependencies:
 - name: azuredisk-csi-driver
   repository: https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/master/charts
-  version: 1.33.2
-digest: sha256:d6785ff2ac3ce596e05dfb73a347e9d767460557469fa6e2822adab3d588544e
-generated: "2025-07-14T16:33:38.441931314+05:30"
+  version: 1.33.4
+digest: sha256:7fdfea2bc6aa846f2d7cffa9b29bf3a7d27a7b16a417d18f2ac16aa397e09d66
+generated: "2025-08-27T15:16:46.578059427+05:30"

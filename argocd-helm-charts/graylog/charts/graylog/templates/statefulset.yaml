@@ -268,7 +268,9 @@ spec:
 {{- if or .Values.graylog.persistence.enabled .Values.graylog.extraVolumeClaimTemplates }}
   volumeClaimTemplates:
     {{- if .Values.graylog.persistence.enabled }}
-    - metadata:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
         name: journal
       spec:
         accessModes:

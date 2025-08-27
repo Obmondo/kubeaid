@@ -3,5 +3,5 @@ name: rabbitmq-operator
 version: 1.0.0
 dependencies:
   - name: rabbitmq-cluster-operator
-    version: 4.4.31
+    version: 4.4.34
     repository: https://charts.bitnami.com/bitnami

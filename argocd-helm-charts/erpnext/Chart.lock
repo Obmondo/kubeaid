@@ -1,6 +1,6 @@
 dependencies:
 - name: erpnext
   repository: https://helm.erpnext.com
-  version: 7.0.227
-digest: sha256:fca16c1af4fd2679fa68e64fdf5aad0c2b278f42d61ab3145ba4e8f591351556
-generated: "2025-08-13T12:25:14.314135192+05:30"
+  version: 7.0.230
+digest: sha256:3db9a9c739860e3f96d3e9d6add294f0bdc7c5014661eea0d69564a9307919c6
+generated: "2025-08-27T15:27:45.547525462+05:30"

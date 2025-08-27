@@ -3,5 +3,5 @@ name: redmine
 version: 1.0.0
 dependencies:
   - name: redmine
-    version: 33.0.6
+    version: 34.0.0
     repository: https://charts.bitnami.com/bitnami

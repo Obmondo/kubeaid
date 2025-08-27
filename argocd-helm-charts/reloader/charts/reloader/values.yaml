@@ -17,7 +17,7 @@ fullnameOverride: ""
 image:
   name: stakater/reloader
   repository: ghcr.io/stakater/reloader
-  tag: v1.4.6
+  tag: v1.4.7
   # digest: sha256:1234567
   pullPolicy: IfNotPresent
 
@@ -53,6 +53,19 @@ reloader:
   # Set to true to expose a prometheus counter of reloads by namespace (this metric may have high cardinality in clusters with many namespaces)
   enableMetricsByNamespace: false
   deployment:
+    # Specifies the deployment DNS configuration.
+    dnsConfig: {}
+    # nameservers:
+    #   - 1.2.3.4
+    # searches:
+    #   - ns1.svc.cluster-domain.example
+    #   - my.dns.search.suffix
+    # options:
+    #   - name: ndots
+    #     value: "1"
+    #   - name: attempts
+    #     value: "3"
+
     # If you wish to run multiple replicas set reloader.enableHA = true
     replicas: 1
 
@@ -71,6 +84,9 @@ reloader:
     #           - key: "node-role.kubernetes.io/infra-worker"
     #             operator: "Exists"
     affinity: {}
+    
+    volumeMounts: []
+    volumes: []
 
     securityContext:
       runAsNonRoot: true
@@ -110,7 +126,7 @@ reloader:
     labels:
       provider: stakater
       group: com.stakater.platform
-      version: v1.4.6
+      version: v1.4.7
     # Support for extra environment variables.
     env:
       # Open supports Key value pair as environment variables.
@@ -340,9 +356,5 @@ reloader:
       # Specifies whether recommended updates are applied when a Pod is started and whether recommended updates
       # are applied during the life of a Pod. Possible values are "Off", "Initial", "Recreate", and "Auto".
       updateMode: Auto
-
-  volumeMounts: []
-
-  volumes: []
 
   webhookUrl: ""

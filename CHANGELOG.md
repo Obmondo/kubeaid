@@ -2,6 +2,43 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 17.1.0
+### Minor Version Upgrades
+- Updated redmine from version 33.0.6 to 34.0.0
+- Updated rook-ceph-cluster from version v1.17.7 to v1.18.0
+- Updated opentelemetry-collector from version 0.130.2 to 0.131.0
+- Updated opentelemetry-operator from version 0.84.1 to 0.93.0
+- Updated opensearch-dashboards from version 3.1.0 to 3.2.1
+- Updated opensearch from version 3.1.0 to 3.2.1
+- Updated gitlab-runner from version 0.79.1 to 0.80.0
+- Updated gitea from version 12.1.3 to 12.2.0
+- Updated fluent-bit from version 0.51.0 to 0.52.0
+- Updated cluster-api-operator from version 0.22.0 to 0.23.0
+- Updated cloudnative-pg from version 0.25.0 to 0.26.0
+- Updated aws-ebs-csi-driver from version 2.47.0 to 2.48.0
+- Updated argo-cd from version 8.2.5 to 8.3.0
+
+### Patch Version Upgrades
+- Updated tigera-operator from version v3.30.2 to v3.30.3
+- Updated teleport-kube-agent from version 18.1.4 to 18.1.6
+- Updated teleport-cluster from version 18.1.4 to 18.1.6
+- Added rook-ceph from version v1.17.2 to v1.17.2
+- Updated reloader from version 2.2.0 to 2.2.2
+- Updated rabbitmq-cluster-operator from version 4.4.31 to 4.4.34
+- Updated opencost from version 2.2.0 to 2.2.4
+- Updated oncall from version 1.16.4 to 1.16.5
+- Updated metallb from version 6.4.21 to 6.4.22
+- Updated mattermost-team-edition from version 6.6.81 to 6.6.83
+- Updated kyverno from version 3.5.0 to 3.5.1
+- Updated keycloakx from version 7.1.1 to 7.1.3
+- Updated graylog from version 2.3.16 to 2.3.17
+- Updated external-dns from version 9.0.2 to 9.0.3
+- Updated erpnext from version 7.0.227 to 7.0.230
+- Updated cluster-autoscaler from version 9.50.0 to 9.50.1
+- Updated cilium from version 1.18.0 to 1.18.1
+- Updated azuredisk-csi-driver from version 1.33.2 to 1.33.4
+- Updated aws-efs-csi-driver from version 3.2.1 to 3.2.2
+
 ### Improvements
 - [`3cfe6bc5`](../../commit/3cfe6bc5) Adding sftpgo helm chart default values in KubeAid.
 - [`3c3ca94e`](../../commit/3c3ca94e) feat: add support for configuring Prometheus replicas fix: set replicas to 1 to conditionally disable PodDisruptionBudget creation

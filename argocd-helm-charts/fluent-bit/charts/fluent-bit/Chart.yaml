@@ -1,9 +1,7 @@
 annotations:
   artifacthub.io/changes: |
     - kind: changed
-      description: "Update Fluent Bit OCI image to 4.0.7."
-    - kind: changed
-      description: "Update ConfigMap Reloader OCI image to 0.15.0."
+      description: "Add optional automountServiceAccountToken to pod spec and service account"
 apiVersion: v1
 appVersion: 4.0.7
 description: Fast and lightweight log processor and forwarder or Linux, OSX and BSD
@@ -26,4 +24,4 @@ maintainers:
 name: fluent-bit
 sources:
 - https://github.com/fluent/fluent-bit/
-version: 0.51.0
+version: 0.52.0

@@ -11,7 +11,7 @@ image:
   # The Keycloak image repository
   repository: quay.io/keycloak/keycloak
   # Overrides the Keycloak image tag whose default is the chart appVersion
-  tag: "26.3.2"
+  tag: "26.3.3"
   # Overrides the Keycloak image tag with a specific digest
   digest: ""
   # The Keycloak image pull policy
@@ -203,6 +203,17 @@ resources: {}
 # Add additional volumes, e. g. for custom themes
 extraVolumes: ""
 
+# Add volume claim templates to the StatefulSet, e. g. for dynamic provisioning
+volumeClaimTemplates: ""
+  # - metadata:
+  #     name: themes
+  #   spec:
+  #     accessModes: [ "ReadWriteOncePod" ]
+  #     storageClassName: "my-storage-class"
+  #     resources:
+  #       requests:
+  #         storage: 1Gi
+
 # Add additional volumes mounts, e. g. for custom themes
 extraVolumeMounts: ""
 
@@ -266,6 +277,8 @@ service:
 serviceHeadless:
   # Annotations for headless service
   annotations: {}
+  # Add additional ports to the headless service, e. g. for admin console or exposing JGroups ports
+  extraPorts: []
 
 ingress:
   # If `true`, an Ingress is created

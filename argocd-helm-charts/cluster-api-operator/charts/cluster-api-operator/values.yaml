@@ -54,7 +54,7 @@ leaderElection:
 image:
   manager:
     repository: registry.k8s.io/capi-operator/cluster-api-operator
-    tag: v0.22.0
+    tag: v0.23.0
     pullPolicy: IfNotPresent
 env:
   manager: []
@@ -64,6 +64,7 @@ profilerAddress: ":6060"
 contentionProfiling: false
 insecureDiagnostics: false
 watchConfigSecret: false
+watchConfigMap: false
 imagePullSecrets: {}
 resources:
   manager:

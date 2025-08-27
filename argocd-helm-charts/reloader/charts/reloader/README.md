@@ -5,6 +5,7 @@ If you have configured helm on your cluster, you can add Reloader to helm from o
 ## Installation
 
 ```bash
+# Add stakater helm repoository
 helm repo add stakater https://stakater.github.io/stakater-charts
 
 helm repo update
@@ -84,7 +85,10 @@ helm uninstall {{RELEASE_NAME}} -n {{NAMESPACE}}
 | `reloader.deployment.resources`                 | Set container requests and limits (e.g. CPU or memory)                                                                                                      | map    | `{}`              |
 | `reloader.deployment.pod.annotations`           | Set annotations for pod                                                                                                                                     | map    | `{}`              |
 | `reloader.deployment.priorityClassName`         | Set priority class for pod in cluster                                                                                                                       | string | `""`              |
+| `reloader.deployment.volumeMounts`              | Mount volume                                                                                                                                                | array  | `[]`              |
+| `reloader.deployment.volumes`                   | Add volume to a pod                                                                                                                                         | array  | `[]`              |
 
+| `reloader.deployment.dnsConfig`                 | dns configuration for pods                                                                                                                                  | map    | `{}`              |
 ### Other Reloader Parameters
 
 | Parameter                              | Description                                                     | Type    | Default |
