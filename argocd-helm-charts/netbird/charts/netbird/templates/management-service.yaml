@@ -6,6 +6,10 @@ metadata:
   namespace: {{ include "netbird.namespace" . }}
   labels:
     {{- include "netbird.management.labels" . | nindent 4 }}
+  {{- with .Values.management.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.management.service.type }}
   ports:
@@ -21,4 +25,8 @@ spec:
     {{- end }}
   selector:
     {{- include "netbird.management.selectorLabels" . | nindent 4 }}
+  {{- with .Values.management.service.externalIPs }}
+  externalIPs:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 {{- end }}
