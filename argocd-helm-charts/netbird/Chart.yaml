@@ -3,7 +3,7 @@ name: netbird
 version: 1.0.0
 dependencies:
   - name: netbird
-    version: 1.8.0
+    version: 1.9.0
     repository: https://netbirdio.github.io/helms
   - name: coturn
     version: 9.1.0
