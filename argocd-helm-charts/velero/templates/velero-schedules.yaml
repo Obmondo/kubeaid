@@ -17,7 +17,7 @@ spec:
     {{- else }}
       - "*"
     {{- end }}
-    ttl: 720h0m0s
+    ttl: {{ .Values.schedule.dailyTTL | default "720h0m0s" }}
     metadata:
       labels:
         argocd.argoproj.io/instance: velero
