@@ -1,9 +1,8 @@
 external-dns:
   policy: sync
-  livenessProbe:
-    httpGet:
-      port: 7979
   txtPrefix: _owner.
   podAnnotations:
     cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+  serviceMonitor:
+    enabled: true
 networkpolicies: false

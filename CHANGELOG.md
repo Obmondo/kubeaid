@@ -2,6 +2,15 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## Unreleased Changes
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+
+### Patch Version Upgrades %%^^
+- Added external-dns from version 1.18.0 to 1.18.0
+- Added external-dns from version 1.8.0 to 1.8.0
+
 ## 17.1.0
 ### Minor Version Upgrades
 - Updated redmine from version 33.0.6 to 34.0.0
