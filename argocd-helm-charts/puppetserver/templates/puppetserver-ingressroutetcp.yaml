@@ -1,7 +1,7 @@
 apiVersion: traefik.io/v1alpha1
 kind: IngressRouteTCP
 metadata:
-  name: puppetserver-{{ .Values.customerid }}
+  name: {{ include "puppetserver.name" . }}
 spec:
   entryPoints:
     - websecure
@@ -9,7 +9,7 @@ spec:
   - match: HostSNI(`{{ .Values.puppetserver.puppetserver.masters.fqdns.alternateServerNames }}`)
     priority: 10
     services:
-    - name: puppetserver-{{ .Values.customerid }}-puppet
+    - name: {{ include "puppetserver.serviceName" (dict "root" . "service" "puppet") }}
       port: puppetserver
   tls:
     passthrough: true
