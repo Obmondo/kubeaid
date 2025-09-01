@@ -7,5 +7,8 @@ cluster-autoscaler:
 # If true, allows the Cluster AutoScaler related ServiceAccount to `get`, `list` and `watch` the
 # infrastructure machine template types.
 # REFER : https://cluster-api.sigs.k8s.io/tasks/automated-machine-management/autoscaling#rbac-changes-for-scaling-from-zero.
-enableClusterAPIScaleFromZeroSupport:
+clusterAPIScaleFromZeroSupport:
+  enabled: false
   aws: false
+  azure: false
+  hcloud: false

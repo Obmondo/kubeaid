@@ -1,4 +1,4 @@
-{{- if .Values.enableClusterAPIScaleFromZeroSupport -}}
+{{- if .Values.clusterAPIScaleFromZeroSupport.enabled -}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -9,11 +9,11 @@ rules:
   - apiGroups:
     - infrastructure.cluster.x-k8s.io
     resources:
-    {{- if .Values.enableClusterAPIScaleFromZeroSupport.aws }}
+    {{- if .Values.clusterAPIScaleFromZeroSupport.aws }}
     - awsmachinetemplates
-    {{- else if .Values.enableClusterAPIScaleFromZeroSupport.azure }}
+    {{- else if .Values.clusterAPIScaleFromZeroSupport.azure }}
     - azuremachinetemplates
-    {{- else if .Values.enableClusterAPIScaleFromZeroSupport.hcloud }}
+    {{- else if .Values.clusterAPIScaleFromZeroSupport.hcloud }}
     - hcloudmachinetemplates
     {{- end }}
     verbs:
