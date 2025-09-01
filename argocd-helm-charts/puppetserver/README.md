@@ -44,3 +44,40 @@ sudo chmod 775  /tmp/private_key.pkcs7.pem
 sudo chmod 775  /tmp/public_key.pkcs7.pem
 kubectl create secret generic eyaml-keys --namespace puppetserver --dry-run=client --from-file=private_key.pkcs7.pem=/tmp/private_key.pkcs7.pem --from-file=public_key.pkcs7.pem=/tmp/public_key.pkcs7.pem -o yaml | kubeseal --controller-namespace system --controller-name sealed-secrets --format yaml > eyaml-keys.yaml
 ```
+
+## Add PuppetCA cert as a tlsoption (traefik)
+
+* Create a secret, which will be consumed by tlsOption (Traefik), this is needed to 2 reasons.
+
+1. prometheus agent on linux server sending metrics gets validated by traefik, since they send the metrics using the puppet client cert
+2. puppetdb can be access only by using the puppet client cert.
+
+If you are not setting up prometheus agent or dont want to talk to puppetdb, you can skip this step.
+
+```raw
+# take shell inside the puppetserver pod and copy the ca_crt.pem
+
+root@puppet:/etc/puppetlabs/puppetserver/ca# cat ca_crt.pem
+-----BEGIN CERTIFICATE-----
+MIIFgTCCA2mgAwIBAgIBAjANBgkqhkiG9w0BAQsFADApMScwJQYDVQQDDB5QdXBw
+ZXQgUm9vdCBDQTogZDc0ZWQyZTFjYzE1OWYwHhcNMjUwODEyMDE1OTUxWhcNNDAw
+ODA5MDE1OTU1WjBFMUMwQQYDVQQDDDpQdXBwZXQgQ0EgZ2VuZXJhdGVkIG9uIHB1
+```
+
+Copy the above cert locally on your workstation and create the cert.
+
+```sh
+kubectl create secret generic puppetca-cert --dry-run=client --namespace traefik  --from-file=ca.crt=/tmp/kds.pem -o yaml | kubeseal --controller-namespace sealed-secrets --controller-name sealed-secrets-controller --format yaml > puppetca-cert.yaml
+```
+
+Add the tlsoption in the values-traefik.yaml
+
+```yaml
+    prometheus-puppet-agent-tls-auth:
+      maxVersion: VersionTLS13
+      minVersion: VersionTLS12
+      clientAuth:
+        clientAuthType: RequireAndVerifyClientCert
+        secretNames:
+          - puppetca-cert
+```
