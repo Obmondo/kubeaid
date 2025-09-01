@@ -9,7 +9,7 @@ spec:
   - match: HostSNI(`{{ .Values.puppetserver.puppetserver.masters.fqdns.alternateServerNames }}`)
     priority: 10
     services:
-    - name: {{ include "puppetserver.serviceName" . }}
+    - name: {{ include "puppetserver.serviceName" (dict "root" . "service" "puppet") }}
       port: puppetserver
   tls:
     passthrough: true
