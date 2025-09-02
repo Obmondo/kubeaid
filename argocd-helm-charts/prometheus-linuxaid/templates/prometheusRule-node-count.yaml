@@ -1,9 +1,0 @@
-{{- if .Values.prometheusRule.node_count }}
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  name: node-count-rules
-  namespace: monitoring-{{ .Values.customerid }}
-spec:
-  {{- $.Files.Get "rules/node_count.yaml" | nindent 4 }}
-{{- end }}
