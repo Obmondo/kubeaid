@@ -1,4 +1,4 @@
-{{ if .Values.backup }}
+{{ if (.Values.backup).enabled }}
 apiVersion: v1
 data:
   script: |-

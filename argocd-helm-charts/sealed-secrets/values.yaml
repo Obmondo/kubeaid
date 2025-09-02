@@ -17,6 +17,7 @@ sealed-secrets:
   fullnameOverride: sealed-secrets-controller
 networkpolicies: false
 backup:
+  enabled: false
   schedule: "5 4 * * *"
   image: ghcr.io/obmondo/backup-sealed-secrets-keys@sha256:7e409526cd68d09ccb7519cfbd92120e9425d6c459d11b2e6af1c20c7f177c17
   namespace: system

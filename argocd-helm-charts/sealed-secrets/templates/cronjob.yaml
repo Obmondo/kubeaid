@@ -1,4 +1,4 @@
-{{ if .Values.backup }}
+{{ if (.Values.backup).enabled }}
 ---
 apiVersion: batch/v1
 kind: CronJob
