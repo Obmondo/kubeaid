@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: host-0-userdata
+  namespace: metal3
+type: Opaque
+stringData:
+  userData: |
+    #cloud-config
+
+    hostname: host-0
+
+    disable_root: false
+
+    users:
+      - name: root
+        shell: /bin/bash
+        lock_passwd: false
+        passwd: 4096$v1yl4/x2ZMCYN0Z9$FqjWqR9l.r.NgeSQvL0YdCNzeQV8ap3sm9ehpJLrGeioTPs/QjV/y0REEScHT2zLuWs4xeCd.xx.15TadHxi3
+
+    growpart:
+      mode: 'off'
+  
+    runcmd:
+      - echo yes | parted /dev/nvme2n1 ---pretend-input-tty resizepart 1 50GB
+      - resize2fs /dev/nvme2n1p1

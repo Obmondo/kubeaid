@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: host-0-networkdata
+  namespace: metal3
+type: Opaque
+stringData:
+  networkData: |
+    {
+      "links": [
+        {
+          "id": "enp1s0f0",
+          "type": "phy",
+          "ethernet_mac_address": "00:00:00:00:00:00"
+        }
+      ],
+      "networks": [
+        {
+          "id": "enp1s0f0",
+          "link": "enp1s0f0",
+          "type": "ipv4",
+          "ip_address": "10.132.22.11",
+          "netmask": "255.255.255.0",
+          "routes": {
+            "network": "0.0.0.0",
+            "netmask": "0.0.0.0",
+            "gateway": "10.132.22.1"
+          }
+        }
+      ],
+      "services": []
+    }

@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: host-0-preprovisioningnetworkdata
+  namespace: metal3
+type: Opaque
+stringData:
+  networkData: |
+    interfaces:
+    - name: enp1s0f0
+      type: ethernet
+      state: up
+      mac-address: "00:00:00:00:00:00"
+      ipv4:
+        address:
+        - ip: enp1s0f0
+          prefix-length: 24
+        enabled: true
+        dhcp: false
+    dns-resolver:
+      config:
+        server:
+        - 10.0.0.1
+    routes:
+      config:
+      - destination: 0.0.0.0/0
+        next-hop-address: 10.132.22.1
+        next-hop-interface: enp1s0f0

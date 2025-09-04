@@ -1,0 +1,24 @@
+apiVersion: metal3.io/v1alpha1
+kind: BareMetalHost
+metadata:
+  name: host-0-baremetalhost
+  namespace: metal3
+spec:
+  online: true
+  bootMACAddress: "00:00:00:00:00:00"
+  bmc:
+    address: redfish-virtualmedia://10.10.10.10/redfish/v1/Systems/1
+    credentialsName: supermicro-bmc-credentials
+    disableCertificateVerification: true
+  image:
+    checksum: https://cloud-images.ubuntu.com/noble/current/SHA256SUMS
+    url: https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
+    checksumType: auto  
+  preprovisioningNetworkDataName: host-0-preprovisioningnetworkdata
+  networkData:
+    name: host-0-networkdata
+    namespace: metal3
+  rootDeviceHints:
+    serialNumber: ABCDEEFG
+  userData:
+    name: host-0-userdata
