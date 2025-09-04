@@ -81,3 +81,19 @@ Add the tlsoption in the values-traefik.yaml
         secretNames:
           - puppetca-cert
 ```
+
+### Connect the self hosted puppetserver to Obmondo
+
+* Ask for a certificate from Obmondo
+* Create the required secret
+
+```sh
+kubectl create secret tls obmondo-clientcert --namespace puppetserver --dry-run=client --key=./certs/puppetserver-private.key --cert=./certs/puppetserver-cert.pem --output=yaml | kubeseal --controller-namespace sealed-secrets --controller-name sealed-secrets-controller --format yaml - > k8s/kubeaid-kds-demo/sealed-secrets/puppetserver/obmondo-clientcert.yaml
+```
+
+* Replace the AUTOSIGN env variable, in the values file of puppetserver
+
+```yaml
+AUTOSIGN_CLIENT_CERT: /opt/obmondo/ssl/puppetserver-cert.crt
+AUTOSIGN_CLIENT_KEY: /opt/obmondo/ssl/puppetserver-priv.key
+```

@@ -23,6 +23,8 @@ puppetserver:
         PUPPETSERVER_MAX_ACTIVE_INSTANCES: 4
         PUPPETDB_JAVA_ARGS: "-Xms256m -Xmx256m -XX:+HeapDumpOnOutOfMemoryError"
         PUPPETSERVER_MAX_REQUESTS_PER_INSTANCE: 10000
+        AUTOSIGN_CLIENT_CERT: /etc/puppetlabs/puppet/ssl/certs/puppet.pem
+        AUTOSIGN_CLIENT_KEY: /etc/puppetlabs/puppet/ssl/private_keys/puppet.pem
       resources:
         requests:
           memory: 3096Mi
