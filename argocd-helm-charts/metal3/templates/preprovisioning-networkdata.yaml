@@ -1,0 +1,31 @@
+{{- range $name, $host := .Values.bmh }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $name }}-preprovisioningnetworkdata
+  namespace: metal3
+type: Opaque
+stringData:
+  networkData: |
+    interfaces:
+    - name: {{ $host.network.interface }}
+      type: ethernet
+      state: up
+      mac-address: {{ $host.mac | quote }}
+      ipv4:
+        address:
+        - ip: {{ $host.network.ipaddress }}
+          prefix-length: 24
+        enabled: true
+        dhcp: false
+    dns-resolver:
+      config:
+        server:
+        - {{ $host.network.dnsserver }}
+    routes:
+      config:
+      - destination: 0.0.0.0/0
+        next-hop-address: {{ $host.network.gatewayIP }}
+        next-hop-interface: {{ $host.network.interface }}
+{{- end }}

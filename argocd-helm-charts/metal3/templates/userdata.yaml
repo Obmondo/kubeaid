@@ -1,0 +1,31 @@
+{{- range $name, $host := .Values.bmh }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $name }}-userdata
+  namespace: metal3
+type: Opaque
+stringData:
+  userData: |
+    #cloud-config
+
+    hostname: {{ $name }}
+
+    disable_root: false
+
+    users:
+      - name: root
+        shell: /bin/bash
+        lock_passwd: false
+        passwd: {{ $host.rootPassword }}
+
+    {{- if $host.createpartition }}
+    growpart:
+      mode: 'off'
+   
+    runcmd:
+      - echo yes | parted {{ $host.partition.diskname }} ---pretend-input-tty resizepart {{ $host.partition.number }} {{ default "50GB" $host.partition.size }}
+      - resize2fs {{ $host.partition.diskname }}p{{ $host.partition.number }}
+    {{- end }}
+{{- end }}

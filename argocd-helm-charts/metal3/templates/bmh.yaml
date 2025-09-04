@@ -1,8 +1,4 @@
 {{- range $name, $host := .Values.bmh }}
-  {{- $osParts := splitList ":" $host.os }}
-  {{- if eq (len $osParts) 2 }}
-    {{- $os := first $osParts }}
-    {{- $version := last $osParts }}
 ---
 apiVersion: metal3.io/v1alpha1
 kind: BareMetalHost
@@ -23,12 +19,15 @@ spec:
     rootDeviceHints:
       serialNumber: {{ $host.rootDeviceSerialNumber }}
   image:
-    {{- if eq $os "ubuntu" }}
-      {{- if eq $version "24.04.2" }}
+    {{- if eq $host.os.name "ubuntu" }}
+      {{- if eq $host.os.version "24.04.2" }}
     checksum: https://cloud-images.ubuntu.com/noble/20250313/SHA256SUMS
     url: https://cloud-images.ubuntu.com/noble/20250313/noble-server-cloudimg-amd64.img
       {{- end }}
     {{- end }}
+    {{- if eq $host.os.name "rhel" }}
+    checksum: {{ $host.os.checksum }}
+    url: {{ $host.os.url }}
+    {{- end }}
     checksumType: auto
-  {{- end }}
 {{- end }}

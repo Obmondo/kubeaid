@@ -29,7 +29,21 @@ bmh:
 ## Example baremetalhost configuration
 #  host-0:
 #    mac: "00:00:00:00:00:00"
-#    os: "ubuntu:24.04.2"
+#    network:
+#     interface: enp1s0f0
+#     ipaddress: 10.132.22.11
+#     dnsserver: 10.0.0.1
+#     gatewayIP: 10.132.22.1
+#     netmask: 255.255.255.0
+#    os:
+#      name: "ubuntu"
+#      version: "24.04.2"
 #    bmc: "10.10.10.10"
-#    secretName: "host-0-bmc"
-#    rootDeviceSerialNumber: ""
+#    secretName: "supermicro-bmc-credentials"
+#    rootPassword: "4096$v1yl4/x2ZMCYN0Z9$FqjWqR9l.r.NgeSQvL0YdCNzeQV8ap3sm9ehpJLrGeioTPs/QjV/y0REEScHT2zLuWs4xeCd.xx.15TadHxi3."
+#    rootDeviceSerialNumber: "abcd"
+#    createpartition: true
+#    partition:
+#      diskname: /dev/nvmen1
+#      size: 50GB
+#      number: 1

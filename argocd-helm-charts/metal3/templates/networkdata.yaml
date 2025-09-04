@@ -1,0 +1,35 @@
+{{- range $name, $host := .Values.bmh }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $name }}-networkdata
+  namespace: metal3
+type: Opaque
+stringData:
+  networkData: |
+    {
+      "links": [
+        {
+          "id": {{ $host.network.interface | quote }},
+          "type": "phy",
+          "ethernet_mac_address": {{ $host.mac | quote }}
+        }
+      ],
+      "networks": [
+        {
+          "id": {{ $host.network.interface | quote }},
+          "link": {{ $host.network.interface | quote }},
+          "type": "ipv4",
+          "ip_address": {{ $host.network.ipaddress | quote }},
+          "netmask": {{ default "255.255.255.0" $host.network.netmask | quote }},
+          "routes": {
+            "network": "0.0.0.0",
+            "netmask": "0.0.0.0",
+            "gateway": {{ $host.network.gatewayIP | quote }}
+          }
+        }
+      ],
+      "services": []
+    }
+{{- end }}
