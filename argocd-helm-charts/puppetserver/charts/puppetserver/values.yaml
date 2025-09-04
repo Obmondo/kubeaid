@@ -573,7 +573,14 @@ puppetserver:
     #    #!/bin/sh
     #    echo hi
 
-  ## Optional Secrets to mount in puppetserver container
+  ## Optional Secrets to mount in puppetserver container. Each secret is defined by its desired
+  ##   volumeMounts properties
+  ##
+  ## Sample:
+  ## extraSecrets:
+  ##   - name: myBigSecret
+  ##     mountPath: /custom/path/secret
+  ##     readOnly: true
   ##
   extraSecrets: []
 

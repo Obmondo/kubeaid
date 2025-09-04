@@ -126,7 +126,6 @@ spec:
               chown puppet:puppet /etc/puppetlabs/puppet/hiera.yaml;
               {{- end }}
               {{- end }}
-              {{- end }}
               cp /tmp/puppet/configmap/site.pp /etc/puppetlabs/puppet/manifests/site.pp;
               chown puppet:puppet /etc/puppetlabs/puppet/manifests/site.pp;
               {{- if .Values.puppetserver.extraInitArgs }}
@@ -202,7 +201,8 @@ spec:
             {{- end }}
             {{- if and (or (.Values.hiera.eyaml.existingMap) (.Values.hiera.eyaml.existingSecret)) (not .Values.hiera.eyaml.public_key) (not .Values.hiera.eyaml.private_key)  }}
             - name: eyaml-volume
-              mountPath: /tmp/puppet/configmap/eyaml
+              mountPath: /tmp/puppet/configmap/eyaml/keys
+            {{- end }}
             {{- end }}
             {{- if and (or (.Values.hiera.eyaml.public_key) (.Values.hiera.eyaml.private_key)) (not .Values.hiera.eyaml.existingSecret)}}
             - name: eyamlpub-volume
@@ -225,6 +225,7 @@ spec:
             - name: puppet-serverdata-storage
               mountPath: /opt/puppetlabs/server/data/puppetserver/
             {{- end }}
+            {{- include "puppetserver.extraSecrets.volumeMounts" . | nindent 12 }}
       {{- end }}
       containers:
         - name: {{ template "puppetserver.fullname" . }}
@@ -338,6 +339,7 @@ spec:
               mountPath: /tmp/puppet/configmap/eyaml/keys
             {{- end }}
             {{- end }}
+            {{- include "puppetserver.extraSecrets.volumeMounts" . | nindent 12 }}
           securityContext:
             {{- if .Values.global.runAsNonRoot }}
             runAsUser: {{ .Values.global.securityContext.runAsUser }}
@@ -422,6 +424,7 @@ spec:
           - name: r10k-code-volume
             mountPath: /etc/puppetlabs/puppet/r10k_code.yaml
             subPath: r10k_code.yaml
+          {{- include "puppetserver.extraSecrets.volumeMounts" . | nindent 10 }}
           readinessProbe:
             exec:
               command:
@@ -481,6 +484,7 @@ spec:
             mountPath: /etc/puppetlabs/code/
           - name: puppet-puppet-storage
             mountPath: /etc/puppetlabs/puppet/
+          {{- include "puppetserver.extraSecrets.volumeMounts" . | nindent 10 }}
           readinessProbe:
             exec:
               command: ["/bin/sh", "-ec", "test -f {{ .Values.r10k.hiera.cronJob.successFile }}"]
@@ -747,11 +751,7 @@ spec:
             claimName: {{ template "puppetserver.persistence.confd.claimName" . }}
         {{- end }}
         {{- end }}
-        {{- range $extraSecret := .Values.puppetserver.extraSecrets }}
-        - name: {{ $extraSecret.name }}
-          secret:
-            secretName: {{ $extraSecret.name }}
-        {{- end }}
+        {{- include "puppetserver.extraSecrets.volumes" . | nindent 8 }}
       {{- if .Values.nodeSelector }}
       nodeSelector:
         {{ toYaml .Values.nodeSelector | nindent 10 }}
