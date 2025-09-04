@@ -99,6 +99,7 @@ spec:
           - name: r10k-code-volume
             mountPath: /etc/puppetlabs/puppet/r10k_code.yaml
             subPath: r10k_code.yaml
+          {{- include "puppetserver.extraSecrets.volumeMounts" . | nindent 10 }}
           readinessProbe:
             exec:
               command:
@@ -176,6 +177,7 @@ spec:
               mountPath: /etc/puppetlabs/puppet/eyaml/keys/private_key.pkcs7.pem
               subPath: private_key.pkcs7.pem
             {{- end }}
+            {{- include "puppetserver.extraSecrets.volumeMounts" . | nindent 12 }}
           readinessProbe:
             exec:
               command: ["/bin/sh", "-ec", "test -f {{ .Values.r10k.hiera.cronJob.successFile }}"]
@@ -271,9 +273,5 @@ spec:
             name: {{ .Values.hiera.eyaml.existingMap }}
         {{- end }}
         {{- end }}
-        {{- range $extraSecret := .Values.puppetserver.extraSecrets }}
-        - name: {{ $extraSecret.name }}
-          secret:
-            secretName: {{ $extraSecret.name }}
-        {{- end }}
+        {{- include "puppetserver.extraSecrets.volumes" . | nindent 8 }}
 {{- end }}

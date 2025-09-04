@@ -600,3 +600,4 @@ kill %[job_numbers_above]
 * [Julien Godin](https://github.com/JGodin-C2C), Contributor
 * [Diego Abelenda](https://github.com/dabelenda), Contributor
 * [Johann Agnarsson](https://github.com/johannagnarsson), Contributor
+* [Ashish Jaiswal](https://github.com/ashish1099), Contributor

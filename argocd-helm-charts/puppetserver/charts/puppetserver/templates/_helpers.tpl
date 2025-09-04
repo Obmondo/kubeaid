@@ -742,6 +742,39 @@ Return puppetdb certificate name without extension
 {{- end -}}
 {{- end -}}
 
+{{/*
+Return unique list of volumes from puppetserver.extraSecrets
+*/}}
+{{- define "puppetserver.extraSecrets.volumes" -}}
+{{- $secretList := list -}}
+{{- range $secret := .Values.puppetserver.extraSecrets -}}
+{{- if not (has $secret.name $secretList) -}}
+{{- $secretList = append $secretList $secret.name -}}
+{{- end -}}
+{{- end -}}
+{{- range $secretName := $secretList }}
+- name: {{ $secretName }}-volume
+  secret:
+    secretName: {{ $secretName }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return volumeMounts from puppetserver.extraSecrets
+*/}}
+{{- define "puppetserver.extraSecrets.volumeMounts" -}}
+{{- range $secret := .Values.puppetserver.extraSecrets }}
+- name: {{ $secret.name }}-volume
+{{- range $k, $v := $secret }}
+{{- if not (eq $k "name") }}
+  {{ $k }}: {{ $v }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+
+
 {{/* *************************************************************************************
 The following definitions were more complex and necessary during part of this development.
 Now they are essentially just stubs but left here in case they might be needed again soon.

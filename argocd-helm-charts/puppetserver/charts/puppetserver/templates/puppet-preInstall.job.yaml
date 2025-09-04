@@ -97,6 +97,7 @@ spec:
             - name: puppet-serverdata-storage
               mountPath: /opt/puppetlabs/server/data/puppetserver/
             {{- end}}
+            {{- include "puppetserver.extraSecrets.volumeMounts" . | nindent 12 }}
           securityContext:
             runAsUser: 0
             runAsNonRoot: false
@@ -169,6 +170,7 @@ spec:
               mountPath: /crl
             {{- end }}
             {{- end }}
+            {{- include "puppetserver.extraSecrets.volumeMounts" . | nindent 12 }}
           {{- if .Values.global.runAsNonRoot }}
           securityContext:
             runAsUser: {{ .Values.global.securityContext.runAsUser }}
@@ -227,6 +229,7 @@ spec:
               mountPath: /crl
             {{- end }}
             {{- end }}
+            {{- include "puppetserver.extraSecrets.volumeMounts" . | nindent 12 }}
           {{- if .Values.global.runAsNonRoot }}
           securityContext:
             runAsUser: {{ .Values.global.securityContext.runAsUser }}
@@ -303,6 +306,7 @@ spec:
               mountPath: /docker-custom-entrypoint.d/{{ $key }}
               subPath: {{ $key }}
             {{- end }}
+            {{- include "puppetserver.extraSecrets.volumeMounts" . | nindent 12 }}
           securityContext:
             runAsUser: 0
             runAsNonRoot: false
@@ -374,11 +378,7 @@ spec:
             secretName: {{ template "puppetserver.hiera.privateSecret" . }}
         {{- end }}
         {{- end }}
-        {{- range $extraSecret := .Values.puppetserver.extraSecrets }}
-        - name: {{ $extraSecret.name }}
-          secret:
-            secretName: {{ $extraSecret.name }}
-        {{- end }}
+        {{- include "puppetserver.extraSecrets.volumes" . | nindent 8 }}
         {{- if or .Values.puppetserver.preGeneratedCertsJob.enabled .Values.singleCA.enabled }}
         - name: puppetserver-certs
         {{- if not .Values.singleCA.enabled }}
