@@ -45,6 +45,7 @@ Only basic permissions like `Run Analysis` to CI users.
 
 ## Upgrading SonarQube
 
+- Check out the more comprehensive upgrade guide at [upgrading.md](./upgrading.md). 
 - First check the [release notes](https://github.com/SonarSource/helm-chart-sonarqube/releases) for any specific upgrade
     guide for the new version
 
