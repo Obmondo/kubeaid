@@ -1,7 +1,8 @@
 sonarqube:
+  community:
+    enabled: true
   revisionHistoryLimit: 0
-  nginx:
-    enabled: false
+  monitoringPasscode: "define_it"
   postgresql:
     enabled: false
   resources:
