@@ -2,7 +2,6 @@ apiVersion: "acid.zalan.do/v1"
 kind: postgresql
 metadata:
   name: sonarqube-pgsql
-  namespace: sonarqube
   labels:
     velero.io/exclude-from-backup: "true"
 spec:
