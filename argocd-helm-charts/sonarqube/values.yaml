@@ -10,7 +10,9 @@ sonarqube:
       cpu: null
   plugins:
     install:
-      - "https://github.com/vaulttec/sonar-auth-oidc/releases/download/v2.1.1/sonar-auth-oidc-plugin-2.1.1.jar"
+      # See this https://community.sonarsource.com/t/sonar-auth-oidc-plugin-version-compatibility/134941/11
+      # before enabling this oidc plugin
+      - "https://github.com/sonar-auth-oidc/sonar-auth-oidc/releases/download/v3.0.0/sonar-auth-oidc-plugin-3.0.0.jar"
   account:
     adminPasswordSecretName: sonarqube-admin-credentials
   jdbcOverwrite:
