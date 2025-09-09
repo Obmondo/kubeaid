@@ -1,0 +1,9 @@
+{{- if .Values.prometheusRule.gitlab_runner }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: gitlab-runner-rules
+  namespace: monitoring-{{ .Values.customerid }}
+spec:
+  {{- $.Files.Get "rules/gitlab_runner.yaml" | nindent 4 }}
+{{- end }}

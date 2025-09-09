@@ -57,6 +57,7 @@ prometheusRule:
   zfsExporter: true
   zfs: true
   smartmon: true
+  gitlab_runner: true
 alertmanager:
   version: v0.27.0
   config:
