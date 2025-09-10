@@ -81,7 +81,9 @@ These are required for Harbor to run the core and jobservice successfully.
 
 ## Pushing images to Harbor
 
-Go to the Harbor dashboard and log in. On the top-right side, your name will be present, clicking on which you would see the option to access user profile. On user profile, you can copy your CLI secret. This will act as your registry password. You can save this CLI secret in an environment variable and call it $REGISTRY_PASSWORD.
+Go to the Harbor dashboard and log in. On the top-right side, your name will be present.
+Clicking on which you would see the option to access user profile. On user profile, you can copy your CLI secret.
+This will act as your registry password. You can save this CLI secret in an environment variable and call it $REGISTRY_PASSWORD.
 
 Now you can login to the registry using buildah or docker. There is a demo below
 
@@ -117,7 +119,10 @@ docker push "<registry_url>/<project_name>/<image_name>:<tag>"
 
 ## Giving Image Push Access
 
-Harbor allows role based access management. To give an user some specific perms, you need to go to harbor, and in the Projects dashboard, go to the particular project name add user and select group that needs to be assigned to that particular user. Here is a link that elaborately explains what roles gives what permission to a particular user - https://goharbor.io/docs/2.1.0/administration/managing-users/user-permissions-by-role/
+Harbor allows role based access management. To give an user some specific perms, you need to go to harbor.
+In the Projects dashboard, go to the particular project name.
+Add user and select group that needs to be assigned to that particular user.
+Here is a link that elaborately explains what roles gives what permission to a particular user - https://goharbor.io/docs/2.1.0/administration/managing-users/user-permissions-by-role/
 
 ## Debugging Harbor OIDC Issues
 
@@ -179,7 +184,9 @@ Now we need to get inside the pod corresponding to the 'harbor-database' statefu
 kubectl exec -it pod/harbor-database-0 -n harbor -- /bin/bash
 ```
 
-After getting inside the pod, you would be able to access the Postgres container, and thus would be able to perform operations manually on the database. In order to access the database corresponding to the Harbor registry, run the command
+After getting inside the pod, you would be able to access the Postgres container.
+Thus would be able to perform operations manually on the database.
+In order to access the database corresponding to the Harbor registry, run the command
 
 ```bash
 psql -U postgres -d registry
@@ -193,7 +200,7 @@ select * from harbor_user;
 
 ### Accessing Harbor admin dashboard
 
-In order to access Harbor admin dashboard we first need to reset the existing Harbor password from inside the database usign the following command
+In order to access Harbor admin dashboard we first need to reset the existing Harbor password from inside the database
 
 ```sql
 update harbor_user set salt='', password='' where user_id = 1;
@@ -206,7 +213,7 @@ This will reset the Harbor admin credential to its initial form. Now exit the da
 exit
 ```
 
-Restart the Harbor core pod by deleting the pod using the command given below and replicaset will take care of restarting the pod again
+Restart the Harbor core pod by deleting the pod and replicaset will take care of restarting the pod again
 
 ```bash
 kubectl delete pod -n harbor -l component=core
@@ -224,19 +231,27 @@ After getting inside the pod, access the admin credentials using the following c
 env | grep -i admin
 ```
 
-Use the username 'admin' and the found out credential to log into the Harbor as an admin and then you can manually delete the older users from there which will fix the persisting issue.
+Use the username 'admin' and the found out credential to log into the Harbor as an admin.
+Then you can manually delete the older users from there which will fix the persisting issue.
 
 ### Deleting existing users directly via database
 
-After running this command you would be able to get a list of all the Harbor users. Now in order to fix the persisting issue, you simply delete all the older users and this issue will be fixed. Before manually performing any operations on Database, always consult your senior as it may have unwanted consequences and you might lose your data.
+After running this command you would be able to get a list of all the Harbor users.
+Now in order to fix the persisting issue, you simply delete all the older users and this issue will be fixed.
+Before manually performing any operations on Database, always consult your senior.
+It may have unwanted consequences and you might lose your data.
 
 ## Debugging Harbor State Mismatch Issues
 
-This issue generally persists because of bad caches that leads to troubles. In order to fix this issue you simply need to delete all the existing Harbor deployment and statefulsets and resync them using Argo CD that will lead to a complete clean-up of all the previous session cache and will help you get rid of this issue.
+This issue generally persists because of bad caches that leads to troubles.
+In order to fix this issue you simply need to delete all the existing Harbor deployment and statefulsets.
+Resync them using Argo CD that will lead to a complete clean-up of all the previous session cache.
+Thi will help you get rid of this issue.
 
 ## Clean Up of Harbour
 
-When you delete images from Harbor, the space isn't automatically reclaimed. To free up space, you need to perform garbage collection, which removes unreferenced blobs from the file system.
+When you delete images from Harbor, the space isn't automatically reclaimed.
+To free up space, you need to perform garbage collection, which removes unreferenced blobs from the file system.
 
 **Note**: You need admin privileges for running Garbage Collection.
 
@@ -248,7 +263,8 @@ When you delete images from Harbor, the space isn't automatically reclaimed. To 
    - To remove untagged artifacts, check the `Delete Untagged Artifacts` box.
    - To start garbage collection, click `GC Now`.
 
-**Note**: During garbage collection, Harbor enters read-only mode, preventing any modifications to the registry. The `GC Now` button is limited to being used once per minute to prevent frequent triggering.
+**Note**: During garbage collection, Harbor enters read-only mode, preventing any modifications to the registry.
+The `GC Now` button is limited to being used once per minute to prevent frequent triggering.
 
 ### Scheduling Garbage Collection
 
@@ -269,7 +285,7 @@ When you delete images from Harbor, the space isn't automatically reclaimed. To 
 
 ### Log Deletion
 
-1. **Log Retention**: By default, Harbor retains garbage collection logs. However, you may need to delete old logs to free up space.
+1. **Log Retention**: By default, Harbor retains GC logs. However, you may need to delete old logs to free up space.
 2. **Navigate**: Go to `Administration` > `Garbage Collection` > `History` tab.
 3. **Delete Logs**: Select the logs you wish to delete and click the `Delete` button.
 4. **Confirm**: Confirm the deletion to remove the selected logs from the system.
