@@ -293,3 +293,31 @@ The `GC Now` button is limited to being used once per minute to prevent frequent
 By managing garbage collection and log deletion, you can maintain optimal storage space and system performance in Harbor.
 
 For more Detailed information you can also checkout - [Harbor Doc](https://goharbor.io/docs/2.0.0/administration/garbage-collection/)
+
+## Multi Platform Images
+
+We're using [Docker build action](https://github.com/docker/build-push-action) to create container images.
+These support multi-platform image generation.
+
+### Building Multi Platform Images
+
+Specify for which platforms you want to build image in `platforms` workflow input.
+If specifying multiple platforms, use `,` as separator, and NOT space.
+
+### Verify Multi Platform Images
+
+You can check if the image has multi-platform layers using docker buildx.
+
+```sh
+docker buildx imagetools inspect harbor.obmondo.com/obmondo/obmondo-k8s-agent:v1.1.6
+```
+
+Multi-platform images has the information about supported multiple platforms in manifest.
+
+### Push Multi-Platform Images to Another Registry
+
+We usually do this for `obmondo-k8s-agent` to upload from Harbor registry to GitHub registry.
+
+```sh
+docker buildx imagetools create --tag ghcr.io/obmondo/obmondo-k8s-agent:v1.1.6 harbor.obmondo.com/obmondo/obmondo-k8s-agent:v1.1.6
+```
