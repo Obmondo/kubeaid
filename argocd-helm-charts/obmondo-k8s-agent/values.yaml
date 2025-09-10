@@ -8,24 +8,23 @@ image:
   repository: ghcr.io/obmondo/obmondo-k8s-agent
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1.1.5"
+  # tag: "v1.1.6"
   volumeMounts:
-  - mountPath: /opt/obmondo-k8s-agent/tls.crt
-    name: k8s-agent-tls
-    subPath: tls.crt
-  - mountPath: /opt/obmondo-k8s-agent/tls.key
-    name: k8s-agent-tls
-    subPath: tls.key
-  - mountPath: /opt/obmondo-k8s-agent/k8s-agent-config.yaml
-    name: k8s-agent-config
-    subPath: k8s-agent-config.yaml
-  - mountPath: /opt/obmondo-k8s-agent/white_listed_apps.yaml
-    name: white-listed-apps-config
-    subPath: white_listed_apps.yaml
-
+    - mountPath: /opt/obmondo-k8s-agent/tls.crt
+      name: k8s-agent-tls
+      subPath: tls.crt
+    - mountPath: /opt/obmondo-k8s-agent/tls.key
+      name: k8s-agent-tls
+      subPath: tls.key
+    - mountPath: /opt/obmondo-k8s-agent/k8s-agent-config.yaml
+      name: k8s-agent-config
+      subPath: k8s-agent-config.yaml
+    - mountPath: /opt/obmondo-k8s-agent/white_listed_apps.yaml
+      name: white-listed-apps-config
+      subPath: white_listed_apps.yaml
 
 imagePullSecrets:
-    - name: accesstoken-4obmondoagentregistry-customer-enableit
+  - name: accesstoken-4obmondoagentregistry-customer-enableit
 
 envVars:
   GIN_MODE: release
@@ -36,7 +35,6 @@ envVars:
   HTTP_CLIENT_TIMEOUT_DURATION: "30s"
   ENDOFLIFEURL: https://endoflife.date/api/kubernetes.json
   NODE_COUNT_ALERT_INTERVAL: "6h"
-
 
 # Add Values like this:
 #envVars:
