@@ -23,8 +23,7 @@ image:
       name: white-listed-apps-config
       subPath: white_listed_apps.yaml
 
-imagePullSecrets:
-  - name: accesstoken-4obmondoagentregistry-customer-enableit
+imagePullSecrets: []
 
 envVars:
   GIN_MODE: release
