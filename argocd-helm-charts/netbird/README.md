@@ -18,6 +18,10 @@ coturn:
     externalTrafficPolicy: Cluster
 ```
 
+> NOTE: We need to manually add public IP as `externalIPs` for the both tcp and udp services.
+> Currently they're not tracked by ArgoCD, and we can't specify the same in the chart.
+> The template doesn't have that support, yet.
+
 ## Set Up Ingress for Netbird Services
 
 This will use gRPC protocol.
