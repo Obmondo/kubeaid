@@ -388,7 +388,14 @@ local kp =
               ) else {},
             },
           },
-          ruleNamespaceSelector: {},
+          ruleNamespaceSelector+: {
+            matchExpressions:
+              [{
+                key: 'kubernetes.io/metadata.name',
+                operator: 'In',
+                values: scrape_namespaces,
+              }],
+          },
         } + if std.objectHas(vars.prometheus, 'remoteWrite') then (
           {
             remoteWrite+: [
