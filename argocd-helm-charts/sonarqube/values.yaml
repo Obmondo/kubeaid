@@ -2,6 +2,11 @@ sonarqube:
   community:
     enabled: true
   revisionHistoryLimit: 0
+  # This monitoringPasscode is for Prometheus to scrape Sonarqube metrics
+  # This needs to be set for the helm chart to work as this is a validation rule.
+  # See https://github.com/Obmondo/kubeaid/blob/master/argocd-helm-charts/sonarqube/charts/sonarqube/templates/validation.yaml#L9-L14
+  # This should be set as a sealed secret and not kept in plaintext in git, if the podmonitor is enabled.
+  # See https://github.com/Obmondo/kubeaid/blob/master/argocd-helm-charts/sonarqube/charts/sonarqube/templates/prometheus-podmonitor.yaml#L36
   monitoringPasscode: "define_it"
   postgresql:
     enabled: false
