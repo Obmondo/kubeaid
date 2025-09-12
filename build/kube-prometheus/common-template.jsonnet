@@ -616,9 +616,10 @@ local kp =
         plugins: vars.grafana_plugins,
         resources: vars.grafana_resources,
         dashboards+: {
-          [mixin.name]: mixin.grafanaDashboards
+          [mixin.name + '-' + dashboard]: mixin.grafanaDashboards[dashboard]
           for mixin in mixins
           if mixin.grafanaDashboards != null
+          for dashboard in std.objectFields(mixin.grafanaDashboards)
         },
         folderDashboards+:: vars.grafana_dashboards,
         analytics+: {
