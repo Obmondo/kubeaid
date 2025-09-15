@@ -17,7 +17,7 @@ fullnameOverride: ""
 image:
   name: stakater/reloader
   repository: ghcr.io/stakater/reloader
-  tag: v1.4.7
+  tag: v1.4.8
   # digest: sha256:1234567
   pullPolicy: IfNotPresent
 
@@ -27,7 +27,11 @@ reloader:
   isOpenshift: false
   ignoreSecrets: false
   ignoreConfigMaps: false
+  # Set to true to exclude Job workloads from automatic reload monitoring
+  # Useful when you don't want Jobs to be restarted when their referenced ConfigMaps/Secrets change
   ignoreJobs: false
+  # Set to true to exclude CronJob workloads from automatic reload monitoring
+  # Useful when you don't want CronJobs to be restarted when their referenced ConfigMaps/Secrets change
   ignoreCronJobs: false
   reloadOnCreate: false
   reloadOnDelete: false
@@ -84,7 +88,7 @@ reloader:
     #           - key: "node-role.kubernetes.io/infra-worker"
     #             operator: "Exists"
     affinity: {}
-    
+
     volumeMounts: []
     volumes: []
 
@@ -126,7 +130,7 @@ reloader:
     labels:
       provider: stakater
       group: com.stakater.platform
-      version: v1.4.7
+      version: v1.4.8
     # Support for extra environment variables.
     env:
       # Open supports Key value pair as environment variables.

@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: 6.3.1
+appVersion: 6.3.3
 dependencies:
 - name: mongodb
   repository: https://charts.bitnami.com/bitnami
@@ -31,4 +31,4 @@ name: graylog
 sources:
 - https://github.com/KongZ/charts
 type: application
-version: 2.3.17
+version: 2.4.1

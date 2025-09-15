@@ -1,19 +1,10 @@
 annotations:
-  artifacthub.io/changes: |
-    - "fix(observability): allow `tracing.sampleRate` to be set to zero"
-    - "fix(entryPoint): allow scheme to be unset on redirect"
-    - "fix(Deployment): revision history should be disableable"
-    - "feat(podtemplate): add support for localPlugins"
-    - "feat(podtemplate): add capacity to set GOMEMLIMIT with default at 90% of user-set memory limit"
-    - "feat(hub): offline mode"
-    - "feat(gateway-api)!: support selector for namespace policy"
-    - "feat(deps): update traefik docker tag to v3.5.0"
-    - "feat(CRDs): update for Traefik Proxy v3.5 and Gateway API v1.3.0"
-    - "feat(CRDs): update Traefik Hub to v1.21.0"
-    - "docs(plugins): improve wording and sync with `VALUES.md`"
-    - "chore(release): :rocket: publish 37.0.0 and 1.10.0"
+  artifacthub.io/changes: "- \"feat(hub): allow to specify admission controller certificate
+    from existing secret\"\n- \"feat(deps): update traefik docker tag to v3.5.2\"\n-
+    \"feat(accesslog): ✨ add genericCLF format\"\n- \"chore(release): \U0001F680 publish
+    v37.1.1\"\n"
 apiVersion: v2
-appVersion: v3.5.0
+appVersion: v3.5.2
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
 icon: https://raw.githubusercontent.com/traefik/traefik/master/docs/content/assets/img/traefik.logo.png
@@ -33,4 +24,4 @@ sources:
 - https://github.com/traefik/traefik-helm-chart
 - https://github.com/traefik/traefik
 type: application
-version: 37.0.0
+version: 37.1.1

@@ -1,7 +1,7 @@
 annotations:
   artifacthub.io/changes: |
     - kind: changed
-      description: "Add optional automountServiceAccountToken to pod spec and service account"
+      description: "Make securityContext of hot reload container configurable in fluent-bit chart"
 apiVersion: v1
 appVersion: 4.0.7
 description: Fast and lightweight log processor and forwarder or Linux, OSX and BSD
@@ -24,4 +24,4 @@ maintainers:
 name: fluent-bit
 sources:
 - https://github.com/fluent/fluent-bit/
-version: 0.52.0
+version: 0.53.0

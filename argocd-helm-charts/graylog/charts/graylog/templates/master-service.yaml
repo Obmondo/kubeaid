@@ -37,7 +37,7 @@ spec:
   selector:
     app.kubernetes.io/name: {{ template "graylog.name" . }}
     app.kubernetes.io/instance: "{{ .Release.Name }}"
-    graylog-role: "master"
+    statefulset.kubernetes.io/pod-name: {{ template "graylog.fullname" . }}-0
   type: "{{ .Values.graylog.service.type }}"
 {{- if eq "LoadBalancer" .Values.graylog.service.master.type }}
   {{- if .Values.graylog.service.master.loadBalancerIP }}

@@ -2,9 +2,9 @@
 
 OpenCost and OpenCost UI
 
-![Version: 2.2.4](https://img.shields.io/badge/Version-2.2.4-informational?style=flat-square)
+![Version: 2.2.7](https://img.shields.io/badge/Version-2.2.7-informational?style=flat-square)
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
-![AppVersion: 1.117.2](https://img.shields.io/badge/AppVersion-1.117.2-informational?style=flat-square)
+![AppVersion: 1.117.3](https://img.shields.io/badge/AppVersion-1.117.3-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/opencost)](https://artifacthub.io/packages/search?repo=opencost)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/opencost-oci)](https://artifacthub.io/packages/search?repo=opencost-oci)
 
@@ -84,7 +84,7 @@ $ helm install opencost opencost/opencost
 | opencost.exporter.image.pullPolicy | string | `"IfNotPresent"` | Exporter container image pull policy |
 | opencost.exporter.image.registry | string | `"ghcr.io"` | Exporter container image registry |
 | opencost.exporter.image.repository | string | `"opencost/opencost"` | Exporter container image name |
-| opencost.exporter.image.tag | string | `"1.117.2@sha256:c8a8362a654d113566fac5d6063a6eab06dfe20d52525a55f51989a7744c43bc"` | Exporter container image tag |
+| opencost.exporter.image.tag | string | `"1.117.3@sha256:09fae89c4544ec2a891e2902e88ce3137d7032c6edbe0fd97441aaee7bdbea54"` | Exporter container image tag |
 | opencost.exporter.livenessProbe.enabled | bool | `true` | Whether probe is enabled |
 | opencost.exporter.livenessProbe.failureThreshold | int | `3` | Number of failures for probe to be considered failed |
 | opencost.exporter.livenessProbe.initialDelaySeconds | int | `10` | Number of seconds before probe is initiated |
@@ -148,6 +148,7 @@ $ helm install opencost opencost/opencost
 | opencost.prometheus.insecureSkipVerify | bool | `false` | Whether to disable SSL certificate verification |
 | opencost.prometheus.internal.enabled | bool | `true` | Use in-cluster Prometheus |
 | opencost.prometheus.internal.namespaceName | string | `"prometheus-system"` | Namespace of in-cluster Prometheus |
+| opencost.prometheus.internal.path | string | `""` | Path to access the Prometheus API, this is neccesary if the Prometheus server is behind a reverse proxy(mimir) or has a different path. |
 | opencost.prometheus.internal.port | int | `80` | Service port of in-cluster Prometheus |
 | opencost.prometheus.internal.scheme | string | `"http"` | Scheme to use for in-cluster Prometheus |
 | opencost.prometheus.internal.serviceName | string | `"prometheus-server"` | Service name of in-cluster Prometheus |
@@ -213,6 +214,7 @@ $ helm install opencost opencost/opencost
 | opencost.ui.route.targetPort | string | `"http-ui"` | Redirect ingress to an extraPort defined on the service such as oauth-proxy |
 | opencost.ui.route.tls | list | `[]` | Ingress TLS configuration |
 | opencost.ui.securityContext | object | `{}` | The security options the container should be run with |
+| opencost.ui.uiPath | string | `"/"` |  |
 | opencost.ui.uiPort | int | `9090` |  |
 | opencost.ui.useDefaultFqdn | bool | `false` |  |
 | opencost.ui.useIPv6 | bool | `true` |  |

@@ -79,6 +79,7 @@ data:
     root_username = {{ .Values.graylog.rootUsername }}
     root_email = {{ .Values.graylog.rootEmail }}
     root_timezone = {{ default "UTC" .Values.graylog.rootTimezone }}
+    http_enable_cors = {{ .Values.graylog.httpEnableCors }}
   {{- $externalUri := include "graylog.url" . }}
   {{ $graylogVersion := .Values.graylog.image.tag | default .Chart.AppVersion }}
   {{- if semverCompare "~2" ( $graylogVersion ) }}
@@ -114,10 +115,13 @@ data:
     inputbuffer_ring_size = {{ .Values.graylog.options.inputBufferRingSize | default 65536 }}
     inputbuffer_processors = {{ .Values.graylog.options.inputbufferProcessors | default 2 }}
     inputbuffer_wait_strategy = blocking
-    message_journal_enabled = true
+    message_journal_enabled = {{ .Values.graylog.journal.enabled }}
     # Do not change `message_journal_dir` location
     message_journal_dir = /usr/share/graylog/data/journal
     message_journal_max_size = {{ .Values.graylog.journal.maxSize }}
+    message_journal_max_age = {{ .Values.graylog.journal.maxAge }}
+    message_journal_segment_age = {{ .Values.graylog.journal.segmentAge }}
+    message_journal_segment_size = {{ .Values.graylog.journal.segmentSize }}
     lb_recognition_period_seconds = 3
     # Use a replica set instead of a single host
     mongodb_uri = {{ template "graylog.mongodb.uri" . }}

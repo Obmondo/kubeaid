@@ -75,6 +75,14 @@ resources: {}
   #   cpu: 1000m
   #   memory: 512Mi
 
+# Container resize policy for the Velero deployment.
+# See: https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/
+resizePolicy: []
+  # - resourceName: cpu
+  #   restartPolicy: NotRequired
+  # - resourceName: memory
+  #   restartPolicy: RestartContainer
+
 # Configure hostAliases for Velero deployment. Optional
 # For more information, check: https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/
 hostAliases: []
@@ -330,7 +338,7 @@ metrics:
 
 kubectl:
   image:
-    repository: docker.io/bitnami/kubectl
+    repository: docker.io/bitnamilegacy/kubectl
     # Digest value example: sha256:d238835e151cec91c6a811fe3a89a66d3231d9f64d09e5f3c49552672d271f38.
     # If used, it will take precedence over the kubectl.image.tag.
     # digest:
@@ -663,6 +671,13 @@ nodeAgent:
     # limits:
     #   cpu: 1000m
     #   memory: 1024Mi
+  # Container resize policy for the node-agent daemonset.
+  # See: https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/
+  resizePolicy: []
+    # - resourceName: cpu
+    #   restartPolicy: NotRequired
+    # - resourceName: memory
+    #   restartPolicy: RestartContainer
 
   # Tolerations to use for the node-agent daemonset. Optional.
   tolerations: []

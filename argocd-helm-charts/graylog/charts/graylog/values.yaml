@@ -55,7 +55,7 @@ graylog:
   ##
   image:
     repository: "graylog/graylog"
-    tag: "6.3.1"
+    tag: "6.3.3"
     pullPolicy: "IfNotPresent"
 
   ## Graylog default Java option
@@ -434,6 +434,10 @@ graylog:
   ##
   existingRootSecret: ""
 
+  ## Enable CORS support
+  ##
+  httpEnableCors: false
+
   opensearch:
     ## Major version of the Elasticsearch version used.
     ## It is required by Graylog 4. See https://docs.graylog.org/en/4.0/pages/configuration/elasticsearch.html#available-elasticsearch-configuration-tunables
@@ -494,6 +498,10 @@ graylog:
   #   elasticsearch_idle_timeout = -1s
 
   journal:
+    ## Enable the disk-based message journal.
+    ##
+    enabled: true
+
     ## Sometime Graylog journal continually grow up or corrupt and cause Graylog unable to start.
     ## You need to clean up all journal files in order to run the Graylog.
     ## Change `graylog.journal.deleteBeforeStart` to `true` to delete all journal files before start
@@ -504,6 +512,20 @@ graylog:
     ## Maximum size of the graylog journal.
     ##
     maxSize: 5gb
+
+    ## The maximum time the journal holds messages before they are written to the search backend.
+    ## Works with message_journal_max_size so that message writes are triggered by whichever property is hit first.
+    ##
+    maxAge: 12h
+
+    ## Controls the period of time after which Graylog forces the log to roll
+    ## even if the segment file isn’t full to ensure that retention can delete or compact old data.
+    ##
+    segmentAge: 1h
+
+    ## Sets the size of the journal segment.
+    ##
+    segmentSize: 100mb
 
   init:
     ## Init Container image
@@ -602,7 +624,11 @@ opensearch:
       value: "true"
     - name: OPENSEARCH_INITIAL_ADMIN_PASSWORD
       value: "Graylog@2024"  # Strong password meeting requirements: uppercase, lowercase, number, special char, >8 chars
+  ## Set number of OpenSearch nodes
+  ##
+  replicas: 3
   ## Set default resource very low. This help reduce resources usage on GitHub Action when performing chart-testing.
+  ##
   opensearchJavaOpts: "-Xmx128M -Xms128M"
   resources:
     requests:
@@ -617,7 +643,17 @@ opensearch:
   #       storage: 30Gi # default 30Gi
 
 # Specify Mongodb settings. Ignore this section if you install MongoDB manually.
+#
 mongodb:
+  ## Default Bitnami MongoDB image in the chart does not support Arm64 architecture.
+  ## Uncomment the following section `image` and `global.security.allowInsecureImages` to use another Bitnami MongoDB image.
+  ##
+  # image:
+  #   repository: bitnamisecure/mongodb
+  #   tag: latest
+  # global:
+  #   security:
+  #     allowInsecureImages: true
   architecture: "replicaset"
   useStatefulSet: true
   replicaCount: 1

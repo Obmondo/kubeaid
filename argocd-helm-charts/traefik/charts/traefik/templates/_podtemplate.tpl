@@ -159,9 +159,8 @@
             {{- end }}
           - name: tmp
             mountPath: /tmp
-          {{- $root := . }}
           {{- range .Values.volumes }}
-          - name: {{ tpl (.name) $root | replace "." "-" }}
+          - name: {{ tpl (.name) $ | replace "." "-" }}
             mountPath: {{ .mountPath }}
             readOnly: true
           {{- end }}
@@ -182,8 +181,8 @@
           {{- end }}
         args:
           {{- with .Values.global }}
-           {{- if .checkNewVersion }}
-          - "--global.checkNewVersion"
+           {{- if not .checkNewVersion }}
+          - "--global.checkNewVersion=false"
            {{- end }}
            {{- if .sendAnonymousUsage }}
           - "--global.sendAnonymousUsage"
@@ -403,6 +402,13 @@
           {{- end }}
           {{- end }}
 
+          {{- if .Values.ocsp.enabled }}
+          - "--ocsp=true"
+          {{- if $.Values.ocsp.responderOverrides -}}
+          {{- include "traefik.yaml2CommandLineArgs" (dict "path" "ocsp.responderOverrides" "content" $.Values.ocsp.responderOverrides) | nindent 10 }}
+          {{- end }}
+          {{- end }}
+
           {{- if .Values.tracing.addInternals }}
           - "--tracing.addinternals"
           {{- end }}
@@ -506,12 +512,22 @@
           {{- end }}
           - "--experimental.plugins.{{ $pluginName }}.moduleName={{ $plugin.moduleName }}"
           - "--experimental.plugins.{{ $pluginName }}.version={{ $plugin.version }}"
+           {{- $settings := (get $plugin "settings") | default dict }}
+           {{- $useUnsafe := (get $settings "useUnsafe") | default false }}
+           {{- if $useUnsafe }}
+          - "--experimental.plugins.{{ $pluginName }}.settings.useUnsafe=true"
+           {{- end }}
           {{- end }}
           {{- range $localPluginName, $localPlugin := .Values.experimental.localPlugins }}
           {{- if not (hasKey $localPlugin "moduleName") }}
             {{- fail  (printf "ERROR: local plugin %s is missing moduleName !" $localPluginName) }}
           {{- end }}
           - "--experimental.localPlugins.{{ $localPluginName }}.moduleName={{ $localPlugin.moduleName }}"
+           {{- $settings := (get $localPlugin "settings") | default dict }}
+           {{- $useUnsafe := (get $settings "useUnsafe") | default false }}
+           {{- if $useUnsafe }}
+          - "--experimental.localPlugins.{{ $localPluginName }}.settings.useUnsafe=true"
+           {{- end }}
           {{- end }}
           {{- if and (semverCompare ">=v3.3.0-0" $version) (.Values.experimental.abortOnPluginFailure)}}
           - "--experimental.abortonpluginfailure={{ .Values.experimental.abortOnPluginFailure }}"
@@ -740,9 +756,6 @@
           {{- end }}
           {{- end }}
           {{- with .Values.logs }}
-            {{- if and .general.format (not (has .general.format (list "common" "json"))) }}
-              {{- fail "ERROR: .Values.logs.general.format must be either common or json"  }}
-            {{- end }}
             {{- with .general.format }}
           - "--log.format={{ . }}"
             {{- end }}
@@ -769,6 +782,9 @@
               {{- with .access.bufferingSize }}
           - "--accesslog.bufferingsize={{ . }}"
               {{- end }}
+              {{- if .access.timezone }}
+          - "--accesslog.fields.names.StartUTC=drop"
+              {{- end }}
               {{- with .access.filters }}
                 {{- with .statuscodes }}
           - "--accesslog.filters.statuscodes={{ . }}"
@@ -790,7 +806,9 @@
               {{- end }}
             {{- end }}
           {{- end }}
+          {{- if $.Values.certificatesResolvers -}}
           {{- include "traefik.yaml2CommandLineArgs" (dict "path" "certificatesresolvers" "content" $.Values.certificatesResolvers) | nindent 10 }}
+          {{- end }}
           {{- with .Values.additionalArguments }}
           {{- range . }}
           - {{ . | quote }}
@@ -809,7 +827,7 @@
           - "--hub.namespaces={{ join "," (uniq (concat (include "traefik.namespace" $ | list) .namespaces)) }}"
             {{- end }}
             {{- with .apimanagement }}
-             {{- if .enabled }}
+            {{- if .enabled }}
               {{- $listenAddr := default ":9943" .admission.listenAddr }}
           - "--hub.apimanagement"
               {{- if not $.Values.hub.offline }}
@@ -900,6 +918,10 @@
                 name: {{ le (len .) 64 | ternary . "traefik-hub-license" }}
                 key: token
           {{- end }}
+          {{- if .Values.logs.access.timezone }}
+          - name: TZ
+            value: {{ .Values.logs.access.timezone }}
+          {{- end }}
         {{- with .Values.env }}
           {{- toYaml . | nindent 10 }}
         {{- end }}
@@ -920,15 +942,14 @@
           {{- end }}
         - name: tmp
           emptyDir: {}
-        {{- $root := . }}
         {{- range .Values.volumes }}
-        - name: {{ tpl (.name) $root | replace "." "-" }}
+        - name: {{ tpl (.name) $ | replace "." "-" }}
           {{- if eq .type "secret" }}
           secret:
-            secretName: {{ tpl (.name) $root }}
+            secretName: {{ tpl (.name) $ }}
           {{- else if eq .type "configMap" }}
           configMap:
-            name: {{ tpl (.name) $root }}
+            name: {{ tpl (.name) $ }}
           {{- end }}
         {{- end }}
         {{- if .Values.deployment.additionalVolumes }}

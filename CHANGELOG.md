@@ -2,12 +2,27 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## Unreleased Changes
-### Major Version Upgrades %%^^
+## 17.2.0
+### Minor Version Upgrades
+- Updated traefik from version 37.0.0 to 37.1.1
+- Updated teleport-kube-agent from version 18.1.6 to 18.2.1
+- Updated teleport-cluster from version 18.1.6 to 18.2.1
+- Updated opentelemetry-collector from version 0.131.0 to 0.133.0
+- Updated opentelemetry-operator from version 0.93.0 to 0.95.0
+- Updated graylog from version 2.3.17 to 2.4.1
+- Updated fluent-bit from version 0.52.0 to 0.53.0
 
-### Minor Version Upgrades %%^^
-
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
+- Updated velero from version 10.1.0 to 10.1.2
+- Updated rook-ceph-cluster from version v1.18.0 to v1.18.2
+- Added rook-ceph from version v1.17.2 to v1.17.2
+- Updated reloader from version 2.2.2 to 2.2.3
+- Updated opensearch-dashboards from version 3.2.1 to 3.2.2
+- Updated opencost from version 2.2.4 to 2.2.7
+- Updated gitlab-runner from version 0.80.0 to 0.80.1
+- Updated gatekeeper from version 3.20.0 to 3.20.1
+- Updated erpnext from version 7.0.230 to 7.0.232
+- Updated argo-cd from version 8.3.0 to 8.3.7
 - Added external-dns from version 1.18.0 to 1.18.0
 - Added external-dns from version 1.8.0 to 1.8.0
 
