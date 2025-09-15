@@ -21,7 +21,15 @@ KubeAid feature goals:
 - Major cluster upgrades, via a shadow Kubernetes setup utilizing the recovery and live-migration features
 - Supply chain attack protection and discovery - and security scans of all software used in cluster
 
-An operations team, typicly has 2 hugely important tasks:
+
+## Installation
+
+For detailed installation steps and cluster setup guides, please refer to our 
+**[documentation](./docs/Readme.md)**
+
+## The Problem KubeAid Solves
+
+An operations team, typically has 2 hugely important tasks:
 
 1. Developing a setup that enables as high availability for the companies applications as possible.
    This is a very difficult task, and it constantly evolves, as the software used in the setup, evolves.
