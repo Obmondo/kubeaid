@@ -11,6 +11,44 @@ All releases and the changes included in them (pulled from git commits added sin
 - Added external-dns from version 1.18.0 to 1.18.0
 - Added external-dns from version 1.8.0 to 1.8.0
 
+### Improvements
+- [`704be0b5`](../../commit/704be0b5) updating docs acc. to kubeaid cli and removing old procedures
+- [`123cd7c9`](../../commit/123cd7c9) Add docs on monitoringPasscode in Sonarqube
+- [`0d630359`](../../commit/0d630359) set pgsql to 14 to maintain compatibility
+- [`8008b2d8`](../../commit/8008b2d8) chore: add external ip handling for tcp and dup services for netbird setup
+- [`8ad0fd1d`](../../commit/8ad0fd1d) chore: add steps for multi platform container images
+- [`b77475fb`](../../commit/b77475fb) chore: format the readme to address lint issues
+- [`429c53f8`](../../commit/429c53f8) chore: remove deprecated image pull secrets configuration
+- [`7420741d`](../../commit/7420741d) chore: update obmondo-k8s-agent app version to v1.1.6
+- [`9ef4dfcd`](../../commit/9ef4dfcd) removed awk and used more verbose commands now
+- [`91149771`](../../commit/91149771) init
+- [`29e3784d`](../../commit/29e3784d) feat: added a default env variable for autosign to get the client cert and private key and updated relevant doc as well
+- [`6e91d759`](../../commit/6e91d759) docs: moving user guide for KubeAid CLI here
+- [`e9bdc204`](../../commit/e9bdc204) Make TTL for velero weekly schedules configurable
+- [`649ed239`](../../commit/649ed239) Added the promethues rule for gitlab runner alert
+- [`35add591`](../../commit/35add591) Added the alerts for gitlab runners failing
+- [`d435ff36`](../../commit/d435ff36) Updated the readme to explain the variables
+- [`b0552b25`](../../commit/b0552b25) Added the examples for the templates
+- [`c1a5d045`](../../commit/c1a5d045) Added the templates for secrets required by metal3 for server provisioning
+- [`d76f3b09`](../../commit/d76f3b09) fixup! fix: updated puppetserver helm chart, based on custom fixes, which is present in Obmondo git repo, and respective PR has been raised already
+- [`c76f751a`](../../commit/c76f751a) chore: removed unwanted postgres chart from puppetserver, since we are using cnpg postgres operator to setup postgres
+- [`3ac2fe4c`](../../commit/3ac2fe4c) fix: updated puppetserver helm chart, based on custom fixes, which is present in Obmondo git repo, and respective PR has been raised already
+- [`28749b7d`](../../commit/28749b7d) chore: added a comment to NOTE, that upstream puppetserver helm chart is quite behind and PR are not getting merged, so will wait for the upstream guys to do that, for now manual changes from the Obmondo git repos to get going
+- [`6da5826f`](../../commit/6da5826f) feat: updated metal3 documentation
+- [`73da157a`](../../commit/73da157a) doc: updated readme, on how to create the tlsoption and add puppetca cert, so we can verify the client request coming on to puppetdb
+- [`e0668838`](../../commit/e0668838) feat: added support to setup ingressroute without customerid
+- [`1caf77ea`](../../commit/1caf77ea) Remove misplaced alert rule from LinuxAid
+- [`89f93149`](../../commit/89f93149) feat: set netbird default chart values with examples and setup ingress
+- [`9abd4322`](../../commit/9abd4322) add coturn realm support
+- [`edd656e0`](../../commit/edd656e0) fix name of coturn pgsql backup
+- [`7e9b0de4`](../../commit/7e9b0de4) fix lint
+- [`f1cf3134`](../../commit/f1cf3134) Add coturn pgqsl and logical backup Fix minor issues in helm chart
+- [`34ea4c01`](../../commit/34ea4c01) Improve readme of netbird and add examples
+- [`87de6fd0`](../../commit/87de6fd0) chore(sealed-secrets): having an enabled field in the backup section
+- [`2113f858`](../../commit/2113f858) fix(cluster-autoscaler): disabling clusterAPIScaleToZeroSupport by default
+- [`11c41d41`](../../commit/11c41d41) Move external-dns helm chart to k8s repo from bitnami
+- [`078245e1`](../../commit/078245e1) fix(velero): override daily schedule TTL to prevent snapshot accumulation
+
 ## 17.1.0
 ### Minor Version Upgrades
 - Updated redmine from version 33.0.6 to 34.0.0
