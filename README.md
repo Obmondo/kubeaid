@@ -21,7 +21,9 @@ KubeAid feature goals:
 - Major cluster upgrades, via a shadow Kubernetes setup utilizing the recovery and live-migration features
 - Supply chain attack protection and discovery - and security scans of all software used in cluster
 
-An operations team, typicly has 2 hugely important tasks:
+## The Problem KubeAid Solves
+
+An operations team, typically has 2 hugely important tasks:
 
 1. Developing a setup that enables as high availability for the companies applications as possible.
    This is a very difficult task, and it constantly evolves, as the software used in the setup, evolves.
@@ -64,6 +66,11 @@ this repository.
 
 All customizations happens in your `kubeaid-config` repo.
 
+## Installation
+
+For detailed installation steps and cluster setup guides, please refer to our 
+**[documentation](./docs/Readme.md)**
+
 ## Support
 
 Besides the community support, the primary developers of this project offers support via services on
@@ -96,13 +103,6 @@ project, namely to allow everyone to work on a level playing ground.
 ## Technical details on the features
 
 Read here for current status on all features of kubeaid
-
-### Setup of k8s clusters on physical servers and in cloud providers
-
-KubeAid support both physical server (on-premise or at e.g. [Hetzner.com](https://hetzner.com)) and cloud providers like
-Azure AKS, Amazon AWS or Google GCE.
-
-We currently integrate Terraform, for setting up AKS cluster in Azure, and use kOPS for k8s in AWS and GCP
 
 ### GitOps setup and change detection
 

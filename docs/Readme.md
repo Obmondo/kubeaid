@@ -2,8 +2,7 @@
 
 ## Overview
 
-* Configure your kubernetes cluster on Azure (AKS) or on AWS (Kops) for now
-  (more cloud provider support are coming soon) with one single command.
+* Configure your Kubernetes cluster on AWS, Azure, Hetzner (Bare Metal, HCloud or Hybrid), Bare Metal or Local K3D, with the KubeAid CLI.
 
 * The cluster are private and terragrunt can also setup a wireguard instance,
   which will be the only gateway to access your kubernetes (You can skip the wireguard part as well)
@@ -29,16 +28,28 @@
 
 ## Installations
 
-* Clusters
+- [AWS Cluster Setup](./aws-cluster-setup.md)
 
-  * [AWS Kops Cluster Setup](./aws/kops/cluster.md)
-  * [AWS self-managed CAPI Cluster Setup](./aws/capi/cluster.md)
-  * [Hetzner Bare Metal Setup](./hetzner/server-setup.md)
-  * [AKS Cluster Setup](./azure/aks/cluster.md)
+- [Azure AKS Cluster Setup](./azure-cluster-setup.md)
+
+- **Hetzner:**
+  * [Hetzner Bare Metal](./hetzner-setup/bare-metal-cluster-setup.md)
+  * [Hetzner HCloud](./hetzner-setup/hcloud-cluster-setup.md)
+  * [Hetzner Hybrid](./hetzner-setup/hybrid-cluster-setup.md)
+
+- [Bare Metal Cluster Setup](./bare-metal-cluster-setup.md)
+
+- [Local K3D Cluster Setup](./local-k3d-cluster-setup.md) - No cluster upgrades and disaster recovery support, only for testing purposes.
 
 * Helm
 
-  * [Update Helm chart](./helm/update_helm_chart.md)
+  * [Update Helm chart](./update_helm_chart.md)
+
+## Support
+
+For general questions, bug reports, and feature requests, please use our **[GitHub Issues](https://github.com/Obmondo/kubeaid/issues)**.
+
+Besides the community support, the primary developers of this project offer support via services on [Obmondo.com](https://obmondo.com) - where you can opt to have us observe your world and react to your alerts, and/or help you with developing new features or other tasks on clusters using this project.
 
 ## Feature and Security Updates
 
