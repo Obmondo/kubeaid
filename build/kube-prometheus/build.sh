@@ -146,7 +146,11 @@ function build_for_tag() {
   jb_install cert-manager-mixin "gitlab.com/uneeq-oss/cert-manager-mixin@master"
   jb_install opensearch-mixin "github.com/grafana/jsonnet-libs/opensearch-mixin@master"
   jb_install opencost-mixin "github.com/adinhodovic/opencost-mixin@main"
-  jb_install rabbitmq-mixin "github.com/grafana/jsonnet-libs/rabbitmq-mixin@master"
+  if [ "$kube_prometheus_release" == "v0.13.0" ]; then
+    jb_install rabbitmq-mixin "github.com/adinhodovic/rabbitmq-mixin@master"
+  else
+    jb_install rabbitmq-mixin "github.com/grafana/jsonnet-libs/rabbitmq-mixin@master"
+  fi
   jb_install mixin-utils "github.com/grafana/jsonnet-libs/mixin-utils@master"
 
   mkdir -p "${basedir}/libraries/${kube_prometheus_release_tag}"

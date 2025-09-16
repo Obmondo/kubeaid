@@ -243,10 +243,20 @@ local mixins = remove_nulls([
     (import 'github.com/grafana/jsonnet-libs/opensearch-mixin/mixin.libsonnet'),
     vars,
   ),
-  addMixin(
-    'rabbitmq',
-    (import 'github.com/grafana/jsonnet-libs/rabbitmq-mixin/mixin.libsonnet'),
-    vars,
+  (
+    if std.objectHas(vars, 'kube_prometheus_version') && std.assertEqual(vars.kube_prometheus_version, 'v0.13.0') then (
+      addMixin(
+        'rabbitmq',
+        (import 'github.com/adinhodovic/rabbitmq-mixin/mixin.libsonnet'),
+        vars,
+      )
+    ) else (
+      addMixin(
+        'rabbitmq',
+        (import 'github.com/grafana/jsonnet-libs/rabbitmq-mixin/mixin.libsonnet'),
+        vars,
+      )
+    )
   ),
   addMixin(
     'smartmon',
