@@ -244,7 +244,7 @@ local mixins = remove_nulls([
     vars,
   ),
   (
-    if std.objectHas(vars, 'kube_prometheus_version') && std.assertEqual(vars.kube_prometheus_version, 'v0.13.0') then (
+    if std.objectHas(vars, 'kube_prometheus_version') && vars.kube_prometheus_version == 'v0.13.0' then (
       addMixin(
         'rabbitmq',
         (import 'github.com/adinhodovic/rabbitmq-mixin/mixin.libsonnet'),
