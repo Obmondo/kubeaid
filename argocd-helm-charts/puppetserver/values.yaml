@@ -1,10 +1,9 @@
 puppetserver:
   global:
     extraEnv:
-      AUTOSIGN: /etc/puppetlabs/code/environments/master/puppet_autosign.rb
       PUPPET_REPORTS: puppetdb,prometheus
       PUPPETSERVER_ENVIRONMENT_TIMEOUT: 0
-      PUPPETSERVER_ENC_PATH: /etc/puppetlabs/code/environments/master/puppet_enc.rb
+      AUTOSIGN: /etc/puppetlabs/code/autosign.conf
     postgresql:
       auth:
         existingSecret: puppetserver-pgsql-app
@@ -20,11 +19,9 @@ puppetserver:
     masters:
       extraEnv:
         PUPPETSERVER_JAVA_ARGS: "-Xms512m -Xmx2500m -XX:+HeapDumpOnOutOfMemoryError"
-        PUPPETSERVER_MAX_ACTIVE_INSTANCES: 4
         PUPPETDB_JAVA_ARGS: "-Xms256m -Xmx256m -XX:+HeapDumpOnOutOfMemoryError"
         PUPPETSERVER_MAX_REQUESTS_PER_INSTANCE: 10000
-        AUTOSIGN_CLIENT_CERT: /etc/puppetlabs/puppet/ssl/certs/puppet.pem
-        AUTOSIGN_CLIENT_KEY: /etc/puppetlabs/puppet/ssl/private_keys/puppet.pem
+        PUPPETSERVER_MAX_ACTIVE_INSTANCES: 4
       resources:
         requests:
           memory: 3096Mi
@@ -36,20 +33,27 @@ puppetserver:
     customentrypoints:
       enabled: true
       configmaps:
-        configure_external_nodes.sh: |-
+        configure_autosign.sh: |-
           #!/bin/bash
-
           set -e
-          # Configure puppet to use a certificate autosign script (if it exists)
-          # AUTOSIGN=true|false|path_to_autosign.conf
-          if test -n "${PUPPETSERVER_ENC_PATH}" ; then
-            puppet config set external_nodes "$PUPPETSERVER_ENC_PATH" --section server
-            puppet config set node_terminus "exec" --section server
+
+          # ALLOWED_CLIENT=*.myinternal.domain
+          if ${ALLOWED_CLIENT}; then
+            cat <<EOL > "/etc/puppetlabs/puppet/autosign.conf"
+            "*.${ALLOWED_CLIENT}"
+            EOL
           fi
+        configure_puppet_conf.sh: |-
+          #!/bin/bash
+          set -e
 
           puppet config set hostprivkey /etc/puppetlabs/puppet/ssl/private_keys/puppet.pem
           puppet config set hostcert /etc/puppetlabs/puppet/ssl/certs/puppet.pem
           puppet config set hostpubkey /etc/puppetlabs/puppet/ssl/public_keys/puppet.pem
+
+        configure_prometheus_exporter.sh: |-
+          #!/bin/bash
+          set -e
 
           puppetserver gem install fugit -v 1.9.0
           puppetserver gem install tzinfo-data
@@ -67,7 +71,6 @@ puppetserver:
     persistence:
       code:
         size: 8Gi
-
   r10k:
     code:
       cronJob:
