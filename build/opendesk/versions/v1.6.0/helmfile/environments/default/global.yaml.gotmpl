@@ -1,0 +1,75 @@
+# SPDX-FileCopyrightText: 2024-2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+## The global properties are used to configure multiple charts at once.
+#
+global:
+
+  ## Define host
+  #
+  domain: {{ env "DOMAIN" | default "opendesk.internal" | quote }}
+
+  ## Define mail host
+  ## If this is unset the "domain" value above should be used in all references
+  #
+  mailDomain: {{ env "MAIL_DOMAIN" | quote }}
+
+  ## Define additional mail domains, comma separated, e.g. domain1.de,domain2.de
+  #
+  additionalMailDomains: []
+
+  ## Define synapse host
+  ## If this is unset the "domain" value above should be used in all references
+  #
+  matrixDomain: {{ env "MATRIX_DOMAIN" | quote }}
+
+  ## Define docker registry address.
+  #
+  helmRegistry: {{ env "PRIVATE_HELM_REGISTRY_URL" | quote }}
+  imageRegistry: {{ env "PRIVATE_IMAGE_REGISTRY_URL" | quote }}
+
+  ## Define ingress host.
+  # Beware: Changing hostnames on an existing deployment will break links the users may already make use of.
+  #         Also some links are used directly in the portal and do not get updated after the initial
+  #         deployment.
+  # Attention: When adding hosts here, please make sure to also add them in
+  #            /helmfile/apps/opendesk-services/values-certificates.yaml.gotmpl
+  #
+  hosts:
+    adminBot: "adminbot"
+    collabora: "office"
+    cryptpad: "pad"
+    element: "chat"
+    intercomService: "ics"
+    jitsi: "meet"
+    keycloak: "id"
+    matrixNeoBoardWidget: "matrix-neoboard-widget"
+    matrixNeoChoiceWidget: "matrix-neochoice-widget"
+    matrixNeoDateFixBot: "matrix-neodatefix-bot"
+    matrixNeoDateFixWidget: "matrix-neodatefix-widget"
+    minioApi: "objectstore"
+    minioConsole: "objectstore-ui"
+    nextcloud: "files"
+    notes: "notes"
+    nubus: "portal"
+    openproject: "projects"
+    openxchange: "webmail"
+    openxchangeDav: "dav"
+    static: "static"
+    synapse: "matrix"
+    synapseAdmin: "synapse-admin"
+    synapseFederation: "matrix-federation"
+    whiteboard: "whiteboard"
+    xwiki: "wiki"
+
+  ## Credentials to fetch images from private registry
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  #
+  imagePullSecrets: []
+
+  ## Define the policy to pull container images.
+  ## Ref: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
+  #
+  imagePullPolicy: "IfNotPresent"
+...

@@ -1,0 +1,131 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+additionalAnnotations:
+  {{ .Values.annotations.opendeskServicesStaticFiles.additional | toYaml | nindent 2 }}
+
+assets:
+  element:
+    subdomain: {{ .Values.global.hosts.element }}
+    paths:
+      - path: "/vector-icons/favicon.........ico"
+        data: {{ .Values.theme.imagery.chat.faviconIco }}
+  jitsi:
+    subdomain: {{ .Values.global.hosts.jitsi }}
+    paths:
+      - path: "/images/favicon.svg"
+        data: {{ .Values.theme.imagery.videoconference.faviconSvg }}
+  keycloak:
+    subdomain: {{ .Values.global.hosts.keycloak }}
+    paths:
+      - path: "/resources/...../login/UCS/img/favicon.ico"
+        data: {{ .Values.theme.imagery.login.faviconIco }}
+      - path: "/static-files/login/logo.svg"
+        data: {{ .Values.theme.imagery.login.logoSvg }}
+  nextcloud:
+    subdomain: {{ .Values.global.hosts.nextcloud }}
+    paths:
+      - path: "/core/img/favicon-touch.png"
+        data: {{ .Values.theme.imagery.files.faviconPng }}
+      - path: "/core/img/favicon.ico"
+        data: {{ .Values.theme.imagery.files.faviconIco }}
+  notes:
+    subdomain: {{ .Values.global.hosts.notes }}
+    paths:
+      - path: "/favicon.ico"
+        data: {{ .Values.theme.imagery.notes.faviconIco }}
+  openproject:
+    subdomain: {{ .Values.global.hosts.openproject }}
+    paths:
+      - path: "/custom_style/........../favicon/favicon.svg"
+        data: {{ .Values.theme.imagery.projects.faviconSvg }}
+  openxchange:
+    subdomain: {{ .Values.global.hosts.openxchange }}
+    paths:
+      - path: "/appsuite/favicon.ico"
+        data: {{ .Values.theme.imagery.groupware.faviconIco }}
+      - path: "/appsuite/favicon.svg"
+        data: {{ .Values.theme.imagery.groupware.faviconSvg }}
+  portal:
+    subdomain: {{ .Values.global.hosts.nubus }}
+    paths:
+      - path: "/favicon.ico"
+        data: {{ .Values.theme.imagery.portal.faviconIco }}
+      - path: "/static-files/portal/background.svg"
+        data: {{ .Values.theme.imagery.portal.backgroundSvg }}
+      - path: "/static-files/portal/waiting-spinner.svg"
+        data: {{ .Values.theme.imagery.portal.waitingSpinnerSvg }}
+      - path: "/static-files/login/background.jpg"
+        data: {{ .Values.theme.imagery.login.backgroundJpg }}
+
+  xwiki:
+    subdomain: {{ .Values.global.hosts.xwiki }}
+    paths:
+      - path: "/resources/icons/xwiki/favicon.svg"
+        data: {{ .Values.theme.imagery.knowledge.faviconSvg }}
+      - path: "/resources/icons/xwiki/favicon16.png"
+        data: {{ .Values.theme.imagery.knowledge.faviconPng }}
+
+cleanup:
+  deletePodsOnSuccess: {{ .Values.debug.cleanup.deletePodsOnSuccess }}
+  deletePodsOnSuccessTimeout: {{ .Values.debug.cleanup.deletePodsOnSuccessTimeout }}
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  enabled: true
+  runAsUser: 101
+  runAsGroup: 101
+  seccompProfile:
+    type: "RuntimeDefault"
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.opendeskStaticFiles | toYaml | nindent 4 }}
+
+ingress:
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  host: "{{ .Values.global.hosts.static }}.{{ .Values.global.domain }}"
+  tls:
+    secretName: {{ .Values.ingress.tls.secretName | quote }}
+  annotations:
+    {{ .Values.annotations.opendeskServicesStaticFiles.ingress | toYaml | nindent 4 }}
+
+image:
+  registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.opendeskStaticFiles.registry | quote }}
+  repository: {{ .Values.images.opendeskStaticFiles.repository | quote }}
+  tag: {{ .Values.images.opendeskStaticFiles.tag | quote }}
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+
+podAnnotations:
+  {{ .Values.annotations.opendeskServicesStaticFiles.pod | toYaml | nindent 2 }}
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 101
+  fsGroupChangePolicy: "Always"
+
+replicaCount: {{ .Values.replicas.opendeskStaticFiles }}
+
+resources:
+  {{ .Values.resources.opendeskStaticFiles | toYaml | nindent 2 }}
+
+service:
+  type: "ClusterIP"
+  annotations:
+    {{ .Values.annotations.opendeskServicesStaticFiles.service | toYaml | nindent 4 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.opendeskServicesStaticFiles.serviceAccount | toYaml | nindent 4 }}
+
+...

@@ -1,0 +1,317 @@
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+repositories:
+  # openDesk Element
+  # Source: https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-element
+  - name: "element-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.element.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.element.registry }}/{{ .Values.charts.element.repository }}"
+  - name: "element-well-known-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.elementWellKnown.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.elementWellKnown.registry }}/{{ .Values.charts.elementWellKnown.repository }}"
+  - name: "synapse-web-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.synapseWeb.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.synapseWeb.registry }}/{{ .Values.charts.synapseWeb.repository }}"
+  - name: "synapse-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.synapse.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.synapse.registry }}/{{ .Values.charts.synapse.repository }}"
+  - name: "synapse-create-account-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.synapseCreateAccount.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.synapseCreateAccount.registry }}/{{ .Values.charts.synapseCreateAccount.repository }}"
+
+  # openDesk Matrix Widgets
+  # Source: https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-matrix-widgets
+  - name: "matrix-user-verification-service-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.matrixUserVerificationService.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.matrixUserVerificationService.registry }}/{{ .Values.charts.matrixUserVerificationService.repository }}"
+  - name: "matrix-neoboard-widget-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.matrixNeoboardWidget.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.matrixNeoboardWidget.registry }}/{{ .Values.charts.matrixNeoboardWidget.repository }}"
+  - name: "matrix-neochoice-widget-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.matrixNeoboardWidget.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.matrixNeoboardWidget.registry }}/{{ .Values.charts.matrixNeoboardWidget.repository }}"
+  - name: "matrix-neodatefix-widget-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.matrixNeodatefixWidget.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.matrixNeodatefixWidget.registry }}/{{ .Values.charts.matrixNeodatefixWidget.repository }}"
+  - name: "matrix-neodatefix-bot-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.matrixNeodatefixBot.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.matrixNeodatefixBot.registry }}/{{ .Values.charts.matrixNeodatefixBot.repository }}"
+
+  # openDesk Enterprise Repositories
+
+  # openDesk Element
+  # Source: https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-element
+  - name: "synapse-admin-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.synapseAdmin.verify }}
+    username: {{ env "OD_ENTERPRISE_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_ENTERPRISE_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDeEnterprise .Values.global.helmRegistry | default .Values.charts.synapseAdmin.registry }}/{{ .Values.charts.synapseAdmin.repository }}"
+  - name: "synapse-adminbot-web-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.synapseAdminbotWeb.verify }}
+    username: {{ env "OD_ENTERPRISE_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_ENTERPRISE_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDeEnterprise .Values.global.helmRegistry | default .Values.charts.synapseAdminbotWeb.registry }}/{{ .Values.charts.synapseAdminbotWeb.repository }}"
+  - name: "synapse-groupsync-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.synapseGroupsync.verify }}
+    username: {{ env "OD_ENTERPRISE_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_ENTERPRISE_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDeEnterprise .Values.global.helmRegistry | default .Values.charts.synapseGroupsync.registry }}/{{ .Values.charts.synapseGroupsync.repository }}"
+  - name: "synapse-pipe-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.synapsePipe.verify }}
+    username: {{ env "OD_ENTERPRISE_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_ENTERPRISE_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDeEnterprise .Values.global.helmRegistry | default .Values.charts.synapsePipe.registry }}/{{ .Values.charts.synapsePipe.repository }}"
+
+releases:
+  - name: "opendesk-element"
+    chart: "element-repo/{{ .Values.charts.element.name }}"
+    version: "{{ .Values.charts.element.version }}"
+    values:
+      - "values-element.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskElement }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.element.enabled }}
+    timeout: 900
+
+  - name: "opendesk-well-known"
+    chart: "element-well-known-repo/{{ .Values.charts.elementWellKnown.name }}"
+    version: "{{ .Values.charts.elementWellKnown.version }}"
+    values:
+      - "values-well-known.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskWellKnown }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.element.enabled }}
+    timeout: 900
+
+  - name: "opendesk-synapse-web"
+    chart: "synapse-web-repo/{{ .Values.charts.synapseWeb.name }}"
+    version: "{{ .Values.charts.synapseWeb.version }}"
+    values:
+      - "values-synapse-web.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskSynapseWeb }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.element.enabled }}
+    timeout: 900
+
+  - name: "opendesk-synapse"
+    chart: "synapse-repo/{{ .Values.charts.synapse.name }}"
+    version: "{{ .Values.charts.synapse.version }}"
+    values:
+      - "values-synapse.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskSynapse }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.element.enabled }}
+    timeout: 900
+
+  - name: "opendesk-matrix-user-verification-service-bootstrap"
+    chart: "synapse-create-account-repo/{{ .Values.charts.synapseCreateAccount.name }}"
+    version: "{{ .Values.charts.synapseCreateAccount.version }}"
+    values:
+      - "values-matrix-user-verification-service-bootstrap.yaml.gotmpl"
+      {{- range .Values.customization.release.matrixUserVerificationServiceBootstrap }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.element.enabled }}
+    timeout: 900
+
+  - name: "opendesk-matrix-user-verification-service"
+    chart: "matrix-user-verification-service-repo/{{ .Values.charts.matrixUserVerificationService.name }}"
+    version: "{{ .Values.charts.matrixUserVerificationService.version }}"
+    values:
+      - "values-matrix-user-verification-service.yaml.gotmpl"
+      {{- range .Values.customization.release.matrixUserVerificationService }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.element.enabled }}
+    timeout: 900
+
+  - name: "matrix-neoboard-widget"
+    chart: "matrix-neoboard-widget-repo/{{ .Values.charts.matrixNeoboardWidget.name }}"
+    version: "{{ .Values.charts.matrixNeoboardWidget.version }}"
+    values:
+      - "values-matrix-neoboard-widget.yaml.gotmpl"
+      {{- range .Values.customization.release.matrixNeoboardWidget }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.element.enabled }}
+    timeout: 900
+
+  - name: "matrix-neochoice-widget"
+    chart: "matrix-neochoice-widget-repo/{{ .Values.charts.matrixNeochoiceWidget.name }}"
+    version: "{{ .Values.charts.matrixNeochoiceWidget.version }}"
+    values:
+      - "values-matrix-neochoice-widget.yaml.gotmpl"
+      {{- range .Values.customization.release.matrixNeochoiceWidget }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.element.enabled }}
+    timeout: 900
+
+  - name: "matrix-neodatefix-widget"
+    chart: "matrix-neodatefix-widget-repo/{{ .Values.charts.matrixNeodatefixWidget.name }}"
+    version: "{{ .Values.charts.matrixNeodatefixWidget.version }}"
+    values:
+      - "values-matrix-neodatefix-widget.yaml.gotmpl"
+      {{- range .Values.customization.release.matrixNeodatefixWidget }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.element.enabled }}
+    timeout: 900
+
+  - name: "matrix-neodatefix-bot-bootstrap"
+    chart: "synapse-create-account-repo/{{ .Values.charts.synapseCreateAccount.name }}"
+    version: "{{ .Values.charts.synapseCreateAccount.version }}"
+    values:
+      - "values-matrix-neodatefix-bot-bootstrap.yaml.gotmpl"
+      {{- range .Values.customization.release.matrixNeodatefixBotBootstrap }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.element.enabled }}
+    timeout: 900
+
+  - name: "matrix-neodatefix-bot"
+    chart: "matrix-neodatefix-bot-repo/{{ .Values.charts.matrixNeodatefixBot.name }}"
+    version: "{{ .Values.charts.matrixNeodatefixBot.version }}"
+    values:
+      - "values-matrix-neodatefix-bot.yaml.gotmpl"
+      {{- range .Values.customization.release.matrixNeodatefixBot }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.element.enabled }}
+    timeout: 900
+
+  # openDesk Enterprise Releases
+  - name: "opendesk-synapse-admin"
+    chart: "synapse-admin-repo/{{ .Values.charts.synapseAdmin.name }}"
+    version: "{{ .Values.charts.synapseAdmin.version }}"
+    values:
+      - "values-synapse-admin.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskSynapseAdmin }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.elementAdmin.enabled }}
+    timeout: 900
+
+  - name: "opendesk-synapse-adminbot-bootstrap"
+    chart: "synapse-create-account-repo/{{ .Values.charts.synapseCreateAccount.name }}"
+    version: "{{ .Values.charts.synapseCreateAccount.version }}"
+    values:
+      - "values-synapse-adminbot-bootstrap.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskSynapseAdminbotBootstrap }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.elementAdmin.enabled }}
+    timeout: 900
+
+  - name: "opendesk-synapse-adminbot-pipe"
+    chart: "synapse-pipe-repo/{{ .Values.charts.synapsePipe.name }}"
+    version: "{{ .Values.charts.synapsePipe.version }}"
+    values:
+      - "values-synapse-adminbot-pipe.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskSynapseAdminbotPipe }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.elementAdmin.enabled }}
+    timeout: 900
+
+  - name: "opendesk-synapse-adminbot-web"
+    chart: "synapse-adminbot-web-repo/{{ .Values.charts.synapseAdminbotWeb.name }}"
+    version: "{{ .Values.charts.synapseAdminbotWeb.version }}"
+    values:
+      - "values-synapse-adminbot-web.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskSynapseAdminbotWeb }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.elementAdmin.enabled }}
+    timeout: 900
+
+  - name: "opendesk-synapse-auditbot-bootstrap"
+    chart: "synapse-create-account-repo/{{ .Values.charts.synapseCreateAccount.name }}"
+    version: "{{ .Values.charts.synapseCreateAccount.version }}"
+    values:
+      - "values-synapse-auditbot-bootstrap.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskSynapseAuditbotBootstrap }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.elementAdmin.enabled }}
+    timeout: 900
+
+  - name: "opendesk-synapse-auditbot-pipe"
+    chart: "synapse-pipe-repo/{{ .Values.charts.synapsePipe.name }}"
+    version: "{{ .Values.charts.synapsePipe.version }}"
+    values:
+      - "values-synapse-auditbot-pipe.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskSynapseAuditbotPipe }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.elementAdmin.enabled }}
+    timeout: 900
+
+  - name: "opendesk-synapse-groupsync"
+    chart: "synapse-groupsync-repo/{{ .Values.charts.synapseGroupsync.name }}"
+    version: "{{ .Values.charts.synapseGroupsync.version }}"
+    values:
+      - "values-synapse-groupsync.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskSynapseGroupsync }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.elementGroupsync.enabled }}
+    timeout: 900
+
+commonLabels:
+  deployStage: "050-components"
+  component: "element"
+...

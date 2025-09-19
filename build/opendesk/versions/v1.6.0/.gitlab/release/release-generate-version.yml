@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+generate-release-version:
+  rules:
+    - if: >
+        $JOB_RELEASE_ENABLED != 'false' &&
+        $CI_COMMIT_BRANCH == $RELEASE_BRANCH &&
+        $CI_PIPELINE_SOURCE =~ "push|merge_request_event"
+      when: "on_success"
+...

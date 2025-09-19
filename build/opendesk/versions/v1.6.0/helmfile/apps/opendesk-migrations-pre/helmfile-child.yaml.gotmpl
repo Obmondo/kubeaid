@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+repositories:
+  # openDesk Migrations
+  # Source:
+  - name: "openproject-migrations-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.migrations.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.migrations.registry }}/{{ .Values.charts.migrations.repository }}"
+
+releases:
+  - name: "opendesk-migrations-pre"
+    chart: "openproject-migrations-repo/{{ .Values.charts.migrations.name }}"
+    version: "{{ .Values.charts.migrations.version }}"
+    wait: true
+    waitForJobs: true
+    values:
+      - "values.yaml.gotmpl"
+      - "../../shared/migrations.yaml.gotmpl"
+      {{- range .Values.customization.release.migrationsPre }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.migrations.enabled }}
+    timeout: 900
+
+commonLabels:
+  deployStage: "010-migrations-pre"
+  component: "migrations-pre"
+...

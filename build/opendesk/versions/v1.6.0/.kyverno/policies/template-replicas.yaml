@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: 2024 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+apiVersion: "kyverno.io/v1"
+kind: "ClusterPolicy"
+metadata:
+  name: "template-replicas"
+  annotations:
+    policies.kyverno.io/title: "Validate openDesk Pod replicas templating"
+    policies.kyverno.io/subject: "Pod"
+    policies.kyverno.io/description: >-
+      This policy verifies that `.Values.replicas.<app>` variables are templated.
+spec:
+  background: true
+  rules:
+    - match:
+        resources:
+          kinds:
+            - "Deployment"
+            - "StatefulSet"
+      name: "template-replicas"
+      validate:
+        message: "Verifies that replica count can be customized by `.Values.replicas.<app>` variable."
+        pattern:
+          spec:
+            replicas: 42
+
+  validationFailureAction: "audit"
+...

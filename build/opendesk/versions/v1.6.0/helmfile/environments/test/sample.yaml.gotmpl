@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+#
+# NOTE: Do not overwrite this file!
+# Place `.yaml.gotmpl` file(s) with your test environment specific settings into this folder.
+# As shown in the example you can even use templating.
+---
+sample:
+  withTemplating: {{ env "YOUR_ENV_VARIABLE_FOR_TEMPLATING" | quote }}
+  withoutTemplating: "my_value"
+...

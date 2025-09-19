@@ -1,0 +1,99 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+# The following structure allows customization of Helmfile releases by loading custom value files.
+#
+# The keys, like the example key `collaboraOnline` below can be chosen freely.
+#
+# **Note:** You have to reference a file and cannot just template additional yaml structure below
+# the key.
+#
+# **Warning:** Customizations are a very powerful tool to apply individual changes to your
+# openDesk installation. As there are no limits set for what you use it, openDesk cannot
+# support the configurations you are about to create using the customization-option. If you
+# have the demand for a specific configuration, try to get it into the openDesk standard
+# by creating a ticket at https://gitlab.opencode.de/bmi/opendesk/deployment/opendesk/-/issues
+#
+# Example:
+# ```
+# customization:
+#   release:
+#     collaboraOnline:
+#       myCustomConfig: '{{ env "PWD" }}/path/to/additional/file.yaml.gotmpl'
+# ```
+customization:
+  release:
+    # collabora
+    collaboraOnline: {}
+    # cryptpad
+    cryptpad: {}
+    # element
+    opendeskElement: {}
+    opendeskWellKnown: {}
+    opendeskSynapseWeb: {}
+    opendeskSynapse: {}
+    matrixUserVerificationServiceBootstrap: {}
+    matrixUserVerificationService: {}
+    matrixNeoboardWidget: {}
+    matrixNeochoiceWidget: {}
+    matrixNeodatefixWidget: {}
+    matrixNeodatefixBotBootstrap: {}
+    matrixNeodatefixBot: {}
+    # jitsi
+    jitsi: {}
+    # migrations-post
+    migrationsPost: {}
+    # migrations-pre
+    migrationsPre: {}
+    # nextcloud
+    opendeskNextcloud: {}
+    opendeskNextcloudManagement: {}
+    opendeskNextcloudNotifyPush: {}
+    # notes
+    notes: {}
+    # nubus
+    ums: {}
+    intercomService: {}
+    opendeskKeycloakBootstrap: {}
+    nginxS3Gateway: {}
+    # open-xchange
+    dovecot: {}
+    openxchange: {}
+    opendeskOpenxchangeBootstrap: {}
+    oxConnector: {}
+    # openproject
+    openproject: {}
+    # openproject-bootstrap
+    opendeskOpenprojectBootstrap: {}
+    # xwiki
+    xwiki: {}
+    # openDesk services
+    opendeskOtterize: {}
+    opendeskHome: {}
+    opendeskCertificates: {}
+    opendeskAlerts: {}
+    opendeskDashboards: {}
+    opendeskStaticFiles: {}
+    # external services
+    redis: {}
+    memcached: {}
+    postgresql: {}
+    mariadb: {}
+    postfix: {}
+    opendeskDkimpyMilter: {}
+    clamav: {}
+    clamavSimple: {}
+    minio: {}
+
+    # openDesk Enterprise Components
+    cassandra: {}
+    collaboraController: {}
+    opendeskSynapseAdmin: {}
+    opendeskSynapseAdminbotBootstrap: {}
+    opendeskSynapseAdminbotPipe: {}
+    opendeskSynapseAdminbotWeb: {}
+    opendeskSynapseAuditbotBootstrap: {}
+    opendeskSynapseAuditbotPipe: {}
+    opendeskSynapseGroupsync: {}
+
+...

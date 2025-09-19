@@ -1,0 +1,60 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+additionalAnnotations:
+  {{ .Values.annotations.nubusNginxS3Gateway.additional | toYaml | nindent 2 }}
+
+image:
+  registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.nginxS3Gateway.registry | quote }}
+  repository: {{ .Values.images.nginxS3Gateway.repository | quote }}
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  tag: {{ .Values.images.nginxS3Gateway.tag | quote }}
+
+ingress:
+  enabled: {{ .Values.ingress.enabled }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  host: "{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: "/portal-assets/icons/$2/$3"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    {{- with .Values.annotations.nubusNginxS3Gateway.ingress }}
+    {{. | toYaml | nindent 4 }}
+    {{- end }}
+
+  path: "/univention/(portal|selfservice)/icons/(logos|entries)/(.*)$"
+  tls:
+    secretName: {{ .Values.ingress.tls.secretName | quote }}
+
+configuration:
+  bucket: {{ .Values.objectstores.nubus.bucket | quote }}
+  endpoint: {{ .Values.objectstores.nubus.endpoint | default (printf "%s.%s" .Values.global.hosts.minioApi .Values.global.domain) | quote }}
+  port: 443
+  region: {{ .Values.objectstores.nubus.region | quote }}
+  style: "path"
+  credentials:
+    accessKey:
+      value: {{ .Values.objectstores.nubus.username | quote }}
+    secretKey:
+      value: {{ .Values.objectstores.nubus.secretKey | default .Values.secrets.minio.umsUser | quote }}
+
+podAnnotations:
+  {{ .Values.annotations.nubusNginxS3Gateway.pod | toYaml | nindent 2 }}
+
+resources:
+  {{ .Values.resources.nginxS3Gateway | toYaml | nindent 2 }}
+
+replicaCount: {{ .Values.replicas.nginxS3Gateway }}
+
+service:
+  annotations:
+    {{ .Values.annotations.nubusNginxS3Gateway.service | toYaml | nindent 4 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.nubusNginxS3Gateway.serviceAccount | toYaml | nindent 4 }}
+
+...

@@ -1,0 +1,67 @@
+# SPDX-FileCopyrightText: 2024 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+apiVersion: "kyverno.io/v1"
+kind: "ClusterPolicy"
+metadata:
+  name: "template-storage"
+  annotations:
+    policies.kyverno.io/title: "Validate storageClass and size templates."
+    policies.kyverno.io/subject: "Pod"
+    policies.kyverno.io/description: >-
+      This policy validates if `.Values.persistence.storageClassNames` variables are used in templates and if the size
+      of volumes can be customized by `.Values.persistence.storages.<COMPONENT>.size` variable.
+spec:
+  background: true
+  rules:
+    - match:
+        resources:
+          kinds:
+            - "StatefulSet"
+      name: "template-storageClassName-pod"
+      validate:
+        message: "VolumeClaims inside pods needs to have storageClass set when templated."
+        pattern:
+          spec:
+            (volumeClaimTemplates):
+              - spec:
+                  storageClassName: "kyverno-test"
+    - match:
+        resources:
+          kinds:
+            - "PersistentVolumeClaim"
+      name: "template-storageClassName-pvc"
+      validate:
+        message: "PersistentVolumeClaim needs to have storageClassName set when templated."
+        pattern:
+          spec:
+            storageClassName: "kyverno-test"
+
+    - match:
+        resources:
+          kinds:
+            - "StatefulSet"
+      name: "template-requests-storage-pod"
+      validate:
+        message: "VolumeClaims inside pods needs to have storageClass set when templated."
+        pattern:
+          spec:
+            (volumeClaimTemplates):
+              - spec:
+                  resources:
+                    requests:
+                      storage: "42Gi"
+    - match:
+        resources:
+          kinds:
+            - "PersistentVolumeClaim"
+      name: "template-requests-storage-pvc"
+      validate:
+        message: "PersistentVolumeClaim needs to have storageClassName set when templated."
+        pattern:
+          spec:
+            resources:
+              requests:
+                storage: "42Gi"
+  validationFailureAction: "audit"
+...

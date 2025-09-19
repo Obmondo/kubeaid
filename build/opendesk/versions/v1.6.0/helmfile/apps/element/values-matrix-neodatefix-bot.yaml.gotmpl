@@ -1,0 +1,115 @@
+# SPDX-FileCopyrightText: 2024 Center for Digital Sovereignty of Public Administration (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Federal Ministry of the Interior and Community, PG ZenDiS "Project group for the development of ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+additionalAnnotations:
+  {{ .Values.annotations.elementMatrixNeodatefixBot.additional | toYaml | nindent 2 }}
+
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+configuration:
+  bot:
+    username: "meetings-bot"
+    display name: "Terminplaner Bot"
+  openxchangeBaseUrl: "https://{{ .Values.global.hosts.openxchange }}.{{ .Values.global.domain }}"
+  strings:
+    breakoutSessionWidgetName: "Breakoutsessions"
+    calendarRoomName: "Terminplaner"
+    calendarWidgetName: "Terminplaner"
+    cockpitWidgetName: "Meeting Steuerung"
+    jitsiWidgetName: "Videokonferenz"
+    matrixNeoBoardWidgetName: "Whiteboard"
+    matrixNeoChoiceWidgetName: "Abstimmungen"
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  enabled: true
+  privileged: false
+  readOnlyRootFilesystem: true
+  runAsGroup: 101
+  runAsNonRoot: true
+  runAsUser: 101
+  seccompProfile:
+    type: "RuntimeDefault"
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.matrixNeoDateFixBot | toYaml | nindent 4 }}
+
+extraEnvVars:
+  - name: "ACCESS_TOKEN"
+    valueFrom:
+      secretKeyRef:
+        name: "matrix-neodatefix-bot-account"
+        key: "access_token"
+{{- if .Values.certificate.selfSigned }}
+  - name: "NODE_EXTRA_CA_CERTS"
+    value: "/etc/ssl/certs/ca-certificates.crt"
+
+extraVolumes:
+  - name: "trusted-cert-secret-volume"
+    secret:
+      secretName: "opendesk-certificates-ca-tls"
+      items:
+        - key: "ca.crt"
+          path: "ca-certificates.crt"
+extraVolumeMounts:
+  - name: "trusted-cert-secret-volume"
+    mountPath: "/etc/ssl/certs/ca-certificates.crt"
+    subPath: "ca-certificates.crt"
+{{- end }}
+
+image:
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.matrixNeoDateFixBot.registry | quote }}
+  repository: {{ .Values.images.matrixNeoDateFixBot.repository | quote }}
+  tag: {{ .Values.images.matrixNeoDateFixBot.tag | quote }}
+
+ingress:
+  enabled: {{ .Values.ingress.enabled }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  tls:
+    enabled: {{ .Values.ingress.tls.enabled }}
+    secretName: {{ .Values.ingress.tls.secretName | quote }}
+  annotations:
+    {{ .Values.annotations.elementMatrixNeodatefixBot.ingress | toYaml | nindent 4 }}
+
+liveness sample:
+  enabled: true
+
+persistence:
+  size: {{ .Values.persistence.storages.matrixNeoDateFixBot.size | quote }}
+  storageClass: {{ coalesce .Values.persistence.storages.matrixNeoDateFixBot.storageClassName .Values.persistence.storageClassNames.RWO | quote }}
+  annotations:
+    {{ .Values.annotations.elementMatrixNeodatefixBot.persistence | toYaml | nindent 4 }}
+
+podAnnotations:
+  {{ .Values.annotations.elementMatrixNeodatefixBot.pod | toYaml | nindent 2 }}
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 101
+
+readinessProbe:
+  enabled: true
+
+replicaCount: {{ .Values.replicas.matrixNeoDateFixBot }}
+
+resources:
+  {{ .Values.resources.matrixNeoDateFixBot | toYaml | nindent 2 }}
+
+service:
+  annotations:
+    {{ .Values.annotations.elementMatrixNeodatefixBot.service | toYaml | nindent 4 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.elementMatrixNeodatefixBot.serviceAccount | toYaml | nindent 4 }}
+
+...

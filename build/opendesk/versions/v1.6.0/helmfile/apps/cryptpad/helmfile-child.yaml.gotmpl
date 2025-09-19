@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+repositories:
+  # CryptPad
+  # Source: https://github.com/cryptpad/helm
+  - name: "cryptpad-repo"
+    keyring: "../../files/gpg-pubkeys/xwiki-com.gpg"
+    verify: {{ .Values.charts.cryptpad.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.cryptpad.registry }}/{{ .Values.charts.cryptpad.repository }}"
+
+releases:
+  - name: "cryptpad"
+    chart: "cryptpad-repo/{{ .Values.charts.cryptpad.name }}"
+    version: "{{ .Values.charts.cryptpad.version }}"
+    values:
+      - "values.yaml.gotmpl"
+      {{- range .Values.customization.release.cryptpad }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.cryptpad.enabled }}
+
+commonLabels:
+  deployStage: "050-components"
+  component: "cryptpad"
+...

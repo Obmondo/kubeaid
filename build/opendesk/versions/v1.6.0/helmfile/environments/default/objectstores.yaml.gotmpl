@@ -1,0 +1,68 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+objectstores:
+  dovecot:
+    bucket: "dovecot"
+    endpoint: ""
+    region: "eu-west-1"
+    secretKey: ""
+    username: "dovecot_user"
+    storageClass: "STANDARD"
+    useSSL: true
+    pathStyle: true
+    port: 443
+  migrations:
+    bucket: "migrations"
+    endpoint: ""
+    region: "eu-west-1"
+    secretKey: ""
+    username: "migration_user"
+    storageClass: "STANDARD"
+    useSSL: true
+    pathStyle: true
+    port: 443
+  nextcloud:
+    bucket: "nextcloud"
+    endpoint: ""
+    region: "eu-west-1"
+    secretKey: ""
+    username: "nextcloud_user"
+    storageClass: "STANDARD"
+    useSSL: true
+    pathStyle: true
+    port: 443
+  notes:
+    bucket: "notes"
+    endpoint: ""
+    secretKey: ""
+    username: "notes_user"
+    port: 443
+  nubus:
+    bucket: "ums"
+    endpoint: ""
+    region: "eu-west-1"
+    secretKey: ""
+    username: "ums_user"
+  openproject:
+    bucket: "openproject"
+    directUploads: true
+    enableSignatureV4Streaming: true
+    endpoint: ""
+    region: "eu-west-1"
+    secretKey: ""
+    username: "openproject_user"
+    pathStyle: true
+    useIamProfile: false
+  openxchange:
+    bucket: "openxchange"
+    endpoint: ""
+    # Size in MB
+    maxSize: 100000
+    region: ""
+    secretKey: ""
+    storageClass: "STANDARD"
+    username: "openxchange_user"
+    useSSL: true
+...

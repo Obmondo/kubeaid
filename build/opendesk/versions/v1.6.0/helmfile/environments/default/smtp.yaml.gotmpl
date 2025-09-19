@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+smtp:
+  host: ""
+  port: 587
+  username: ""
+  password: {{ env "SMTP_PASSWORD" | quote }}
+  localpartNoReply: "no-reply"
+
+  # For the following settings to have effect `apps.dkimpy.enabled` must be `true`.
+  dkim:
+    key:
+      # DKIM private key as plaintext value.
+      value: ""
+
+      # DKIM private key from existing secret. As a higher precedence than the plain `value`.
+      secret:
+        name: ""
+        key: ""
+    selector: "rsa"
+    useED25519: false
+...

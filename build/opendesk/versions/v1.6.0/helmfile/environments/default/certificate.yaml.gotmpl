@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+certificate:
+  issuerRef:
+    name: "letsencrypt-prod"
+    kind: "ClusterIssuer"
+  # When using `wildcard: true` please ensure you configure the cert-manager accordingly, e.g. using DNS
+  # validation (`DNS-01`) in case of letsencrypt.
+  wildcard: false
+  selfSigned: false
+...

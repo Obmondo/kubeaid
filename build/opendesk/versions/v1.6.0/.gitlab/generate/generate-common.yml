@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2024 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+include:
+  - local: "/.gitlab/common/common.yml"
+
+.generate-common:
+  extends: ".common"
+  stage: ".post"
+  tags: []
+...

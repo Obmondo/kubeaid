@@ -1,0 +1,73 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+repositories:
+  # Nextcloud
+  # Source: https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-nextcloud
+  - name: "nextcloud-management-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.nextcloudManagement.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.nextcloudManagement.registry }}/{{ .Values.charts.nextcloudManagement.repository }}"
+  - name: "nextcloud-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.nextcloud.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.nextcloud.registry }}/{{ .Values.charts.nextcloud.repository }}"
+
+releases:
+  - name: "opendesk-nextcloud-management"
+    chart: "nextcloud-repo/{{ .Values.charts.nextcloudManagement.name }}"
+    version: "{{ .Values.charts.nextcloudManagement.version }}"
+    values:
+      - "values-nextcloud-management.yaml.gotmpl"
+      {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+      - "values-nextcloud-management-ee.yaml.gotmpl"
+      {{- end }}
+      {{- range .Values.customization.release.opendeskNextcloudManagement }}
+      - {{ . }}
+      {{- end }}
+    waitForJobs: true
+    wait: true
+    installed: {{ .Values.apps.nextcloud.enabled }}
+    timeout: 1800
+  - name: "opendesk-nextcloud"
+    chart: "nextcloud-repo/{{ .Values.charts.nextcloud.name }}"
+    version: "{{ .Values.charts.nextcloud.version }}"
+    values:
+      - "values-nextcloud.yaml.gotmpl"
+      {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+      - "values-nextcloud-ee.yaml.gotmpl"
+      {{- end }}
+      {{- range .Values.customization.release.opendeskNextcloud }}
+      - {{ . }}
+      {{- end }}
+    needs:
+      - "opendesk-nextcloud-management"
+    installed: {{ .Values.apps.nextcloud.enabled }}
+    timeout: 1800
+  - name: "opendesk-nextcloud-notifypush"
+    chart: "nextcloud-repo/{{ .Values.charts.nextcloudNotifyPush.name }}"
+    version: "{{ .Values.charts.nextcloudNotifyPush.version }}"
+    values:
+      - "values-nextcloud-notifypush.yaml.gotmpl"
+      {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+      - "values-nextcloud-notifypush-ee.yaml.gotmpl"
+      {{- end }}
+      {{- range .Values.customization.release.opendeskNextcloudNotifyPush }}
+      - {{ . }}
+      {{- end }}
+    wait: true
+    needs:
+      - "opendesk-nextcloud"
+    installed: {{ and .Values.apps.nextcloud.enabled (gt .Values.replicas.nextcloudNotifyPush 0) }}
+    timeout: 1800
+
+commonLabels:
+  deployStage: "050-components"
+  component: "nextcloud"
+...

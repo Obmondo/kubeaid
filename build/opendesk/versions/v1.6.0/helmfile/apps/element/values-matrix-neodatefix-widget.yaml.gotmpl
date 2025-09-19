@@ -1,0 +1,77 @@
+# SPDX-FileCopyrightText: 2024 Center for Digital Sovereignty of Public Administration (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Federal Ministry of the Interior and Community, PG ZenDiS "Project group for the development of ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+additionalAnnotations:
+  {{ .Values.annotations.elementMatrixNeodatefixWidget.additional | toYaml | nindent 2 }}
+
+configuration:
+  bot:
+    username: "meetings-bot"
+    homeserver: {{ .Values.global.matrixDomain | default .Values.global.domain }}
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  enabled: true
+  privileged: false
+  readOnlyRootFilesystem: true
+  runAsGroup: 101
+  runAsNonRoot: true
+  runAsUser: 101
+  seccompProfile:
+    type: "RuntimeDefault"
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.matrixNeoDateFixWidget | toYaml | nindent 4 }}
+
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+image:
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.matrixNeoDateFixWidget.registry | quote }}
+  repository: {{ .Values.images.matrixNeoDateFixWidget.repository | quote }}
+  tag: {{ .Values.images.matrixNeoDateFixWidget.tag | quote }}
+
+ingress:
+  enabled: {{ .Values.ingress.enabled }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  tls:
+    enabled: {{ .Values.ingress.tls.enabled }}
+    secretName: {{ .Values.ingress.tls.secretName | quote }}
+  annotations:
+    {{ .Values.annotations.elementMatrixNeodatefixWidget.ingress | toYaml | nindent 4 }}
+
+podAnnotations:
+  {{ .Values.annotations.elementMatrixNeodatefixWidget.pod | toYaml | nindent 2 }}
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 101
+
+replicaCount: {{ .Values.replicas.matrixNeoDateFixWidget }}
+
+resources:
+  {{ .Values.resources.matrixNeoDateFixWidget | toYaml | nindent 2 }}
+
+theme:
+  {{ .Values.theme | toYaml | nindent 2 }}
+
+service:
+  annotations:
+    {{ .Values.annotations.elementMatrixNeodatefixWidget.service | toYaml | nindent 4 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.elementMatrixNeodatefixWidget.serviceAccount | toYaml | nindent 4 }}
+
+nginx:
+  ipv4Only: {{ if eq .Values.cluster.networking.ipFamilies "IPv4" }}true{{ else }}false{{ end }}
+
+...

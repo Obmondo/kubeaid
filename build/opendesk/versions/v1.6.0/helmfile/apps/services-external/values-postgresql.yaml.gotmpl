@@ -1,0 +1,139 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+cleanup:
+  deletePodsOnSuccess: {{ .Values.debug.cleanup.deletePodsOnSuccess }}
+  deletePodsOnSuccessTimeout: {{ .Values.debug.cleanup.deletePodsOnSuccessTimeout }}
+
+commonAnnotations:
+  {{ .Values.annotations.servicesExternalPostgresql.common | toYaml | nindent 2 }}
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  enabled: true
+  privileged: false
+  runAsUser: 1001
+  runAsGroup: 1001
+  seccompProfile:
+    type: "RuntimeDefault"
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.postgresql | toYaml | nindent 4 }}
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 1001
+  fsGroupChangePolicy: "OnRootMismatch"
+
+replicaCount: {{ .Values.replicas.postgres }}
+
+global:
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+image:
+  registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.postgresql.registry | quote }}
+  repository: {{ .Values.images.postgresql.repository | quote }}
+  tag: {{ .Values.images.postgresql.tag | quote }}
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  image:
+    digest: "sha256:de7451b563ef79eb6acb2851dbadd18388e6436cd757b65d275a3dc60dbb0b73"
+
+job:
+  users:
+    - username: {{ .Values.databases.keycloak.username | quote }}
+      password: {{ .Values.secrets.postgresql.keycloakUser | quote }}
+      connectionLimit: {{ .Values.databases.keycloak.connectionLimit | default .Values.databases.defaults.userConnectionLimit }}
+    - username: {{ .Values.databases.notes.username | quote }}
+      password: {{ .Values.secrets.postgresql.notesUser | quote }}
+      connectionLimit: {{ .Values.databases.notes.connectionLimit | default .Values.databases.defaults.userConnectionLimit }}
+    - username: {{ .Values.databases.openproject.username | quote }}
+      password: {{ .Values.secrets.postgresql.openprojectUser | quote }}
+      connectionLimit: {{ .Values.databases.openproject.connectionLimit | default .Values.databases.defaults.userConnectionLimit }}
+    - username: {{ .Values.databases.keycloakExtension.username | quote }}
+      password: {{ .Values.secrets.postgresql.keycloakExtensionUser | quote }}
+      connectionLimit: {{ .Values.databases.keycloakExtension.connectionLimit | default .Values.databases.defaults.userConnectionLimit }}
+    - username: {{ .Values.databases.synapse.username | quote }}
+      password: {{ .Values.secrets.postgresql.matrixUser | quote }}
+      connectionLimit: {{ .Values.databases.synapse.connectionLimit | default .Values.databases.defaults.userConnectionLimit }}
+    - username: {{ .Values.databases.umsNotificationsApi.username | quote }}
+      password: {{ .Values.secrets.postgresql.umsNotificationsApiUser | quote }}
+      connectionLimit: {{ .Values.databases.umsNotificationsApi.connectionLimit | default .Values.databases.defaults.userConnectionLimit }}
+    - username: {{ .Values.databases.umsGuardianManagementApi.username | quote }}
+      password: {{ .Values.secrets.postgresql.umsGuardianManagementApiUser | quote }}
+      connectionLimit: {{ .Values.databases.umsGuardianManagementApi.connectionLimit | default .Values.databases.defaults.userConnectionLimit }}
+    - username: {{ .Values.databases.umsSelfservice.username | quote }}
+      password: {{ .Values.secrets.postgresql.umsSelfserviceUser | quote }}
+      connectionLimit: {{ .Values.databases.umsSelfservice.connectionLimit | default .Values.databases.defaults.userConnectionLimit }}
+{{ if or (eq .Values.databases.nextcloud.type "postgresql") (eq .Values.databases.nextcloud.type "psql") }}
+    - username: {{ .Values.databases.nextcloud.username | quote }}
+      password: {{ .Values.secrets.postgresql.nextcloudUser | quote }}
+      connectionLimit: {{ .Values.databases.nextcloud.connectionLimit | default .Values.databases.defaults.userConnectionLimit }}
+{{ end }}
+{{ if eq .Values.databases.xwiki.type "postgresql" }}
+    - username: {{ .Values.databases.xwiki.username | quote }}
+      password: {{ .Values.secrets.postgresql.xwikiUser | quote }}
+      connectionLimit: {{ .Values.databases.xwiki.connectionLimit | default .Values.databases.defaults.userConnectionLimit }}
+{{ end }}
+  databases:
+    - name: {{ .Values.databases.keycloak.name | quote }}
+      user: {{ .Values.databases.keycloak.username | quote }}
+    - name: {{ .Values.databases.keycloakExtension.name | quote }}
+      user: {{ .Values.databases.keycloakExtension.username | quote }}
+    - name: {{ .Values.databases.notes.name | quote }}
+      user: {{ .Values.databases.notes.username | quote }}
+    - name: {{ .Values.databases.openproject.name | quote }}
+      user: {{ .Values.databases.openproject.username | quote }}
+    - name: {{ .Values.databases.synapse.name | quote }}
+      user: {{ .Values.databases.synapse.username | quote }}
+      additionalParams: "ENCODING 'UTF8' LC_COLLATE='C' LC_CTYPE='C' template=template0"
+    - name: {{ .Values.databases.umsGuardianManagementApi.name | quote }}
+      user: {{ .Values.databases.umsGuardianManagementApi.username | quote }}
+    - name: {{ .Values.databases.umsNotificationsApi.name | quote }}
+      user: {{ .Values.databases.umsNotificationsApi.username | quote }}
+    - name: {{ .Values.databases.umsSelfservice.name | quote }}
+      user: {{ .Values.databases.umsSelfservice.username | quote }}
+{{ if or (eq .Values.databases.nextcloud.type "postgresql") (eq .Values.databases.nextcloud.type "psql") }}
+    - name: {{ .Values.databases.nextcloud.name | quote }}
+      user: {{ .Values.databases.nextcloud.username | quote }}
+{{ end }}
+{{ if eq .Values.databases.xwiki.type "postgresql" }}
+    - name: {{ .Values.databases.xwiki.name | quote }}
+      user: {{ .Values.databases.xwiki.username | quote }}
+      additionalParams: "ENCODING 'UNICODE' template=template0"
+{{ end }}
+
+persistence:
+  size: {{ .Values.persistence.storages.postgresql.size | quote }}
+  storageClass: {{ coalesce .Values.persistence.storages.postgresql.storageClassName .Values.persistence.storageClassNames.RWO | quote }}
+  annotations:
+    {{ .Values.annotations.servicesExternalPostgresql.persistence | toYaml | nindent 4 }}
+
+podAnnotations:
+  argocd.argoproj.io/hook: "PostSync"
+  argocd.argoproj.io/hook-delete-policy: "BeforeHookCreation"
+  {{- with .Values.annotations.servicesExternalPostgresql.pod}}
+  {{ . | toYaml | nindent 2 }}
+  {{- end }}
+
+postgres:
+  user: "postgres"
+  password: {{ .Values.secrets.postgresql.postgresUser | quote }}
+
+resources:
+  {{ .Values.resources.postgresql | toYaml | nindent 2 }}
+
+service:
+  annotations:
+    {{ .Values.annotations.servicesExternalPostgresql.service | toYaml | nindent 4 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.servicesExternalPostgresql.serviceAccount | toYaml | nindent 4 }}
+
+...

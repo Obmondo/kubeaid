@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+renovate:
+  rules:
+    - if: >
+        $RUN_RENOVATE == "yes"
+      when: "on_success"
+  # The `-full` image does not install the dependencies on the fly, that is our preferred approach
+  image: "${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/renovate/renovate:37.356-full"
+  variables:
+    RENOVATE_CONFIG_FILE: "${CI_PROJECT_DIR}/.renovate/config.yaml"
+    RENOVATE_ENDPOINT: "${CI_API_V4_URL}"
+    # Increase the renovatebot log level on stdout
+    LOG_LEVEL: "DEBUG"
+  script:
+    - "renovate ${RENOVATE_EXTRA_FLAGS}"
+  stage: "renovate"
+...

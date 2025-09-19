@@ -1,0 +1,51 @@
+# SPDX-FileCopyrightText: 2024 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+apiVersion: "kyverno.io/v1"
+kind: "ClusterPolicy"
+metadata:
+  name: "require-imagepullpolicy"
+  annotations:
+    policies.kyverno.io/title: "Disallow usage of latest tag"
+    policies.kyverno.io/subject: "Pod"
+    policies.kyverno.io/description: >-
+      If the `latest` tag is allowed for images, it is a good idea to have the imagePullPolicy field set to `Always` to
+      ensure later pulls get an updated image in case the latest tag gets updated.
+      This policy validates the imagePullPolicy is set to `Always` when the `latest` tag is specified explicitly or
+      where a tag is not defined at all.
+      Additionally this policy checks if the variable `.Values.global.imagePullPolicy` is used in templates.
+spec:
+  background: true
+  rules:
+    - match:
+        resources:
+          kinds:
+            - "Pod"
+      name: "require-imagePullPolicy"
+      validate:
+        message: >-
+          The imagePullPolicy must be set to `Always` when the `latest` tag is used, otherwise the value from
+          `.Values.global.imagePullPolicy` has to be used.
+        anyPattern:
+          - spec:
+              =(ephemeralContainers):
+                - (image): "*:latest | !*:*"
+                  imagePullPolicy: "Always"
+              =(initContainers):
+                - (image): "*:latest | !*:*"
+                  imagePullPolicy: "Always"
+              containers:
+                - (image): "*:latest | !*:*"
+                  imagePullPolicy: "Always"
+          - spec:
+              =(ephemeralContainers):
+                - (image): "!*:latest"
+                  imagePullPolicy: "kyverno"
+              =(initContainers):
+                - (image): "!*:latest"
+                  imagePullPolicy: "kyverno"
+              containers:
+                - (image): "!*:latest"
+                  imagePullPolicy: "kyverno"
+  validationFailureAction: "audit"
+...

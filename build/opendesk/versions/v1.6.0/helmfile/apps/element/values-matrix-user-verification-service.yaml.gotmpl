@@ -1,0 +1,66 @@
+# SPDX-FileCopyrightText: 2024 Center for Digital Sovereignty of Public Administration (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Federal Ministry of the Interior and Community, PG ZenDiS "Project group for the development of ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+additionalAnnotations:
+  {{ .Values.annotations.elementMatrixUserVerificationService.additional | toYaml | nindent 2 }}
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  enabled: true
+  privileged: false
+  readOnlyRootFilesystem: false
+  runAsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+  seccompProfile:
+    type: "RuntimeDefault"
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.matrixUserVerificationService | toYaml | nindent 4 }}
+
+extraEnvVars:
+  - name: "UVS_ACCESS_TOKEN"
+    valueFrom:
+      secretKeyRef:
+        name: "opendesk-matrix-user-verification-service-account"
+        key: "access_token"
+  - name: "UVS_DISABLE_IP_BLACKLIST"
+    value: "true"
+
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+image:
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.matrixUserVerificationService.registry | quote }}
+  repository: {{ .Values.images.matrixUserVerificationService.repository | quote }}
+  tag: {{ .Values.images.matrixUserVerificationService.tag | quote }}
+
+podAnnotations:
+  {{ .Values.annotations.elementMatrixUserVerificationService.pod | toYaml | nindent 2 }}
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 101
+
+replicaCount: {{ .Values.replicas.matrixUserVerificationService }}
+
+resources:
+  {{ .Values.resources.matrixUserVerificationService | toYaml | nindent 2 }}
+
+service:
+  annotations:
+    {{ .Values.annotations.elementMatrixUserVerificationService.service | toYaml | nindent 4 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.elementMatrixUserVerificationService.serviceAccount | toYaml | nindent 4 }}
+
+...

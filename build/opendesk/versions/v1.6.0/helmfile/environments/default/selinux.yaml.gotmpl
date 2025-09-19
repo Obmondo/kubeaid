@@ -1,0 +1,97 @@
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+#
+# Disclaimer:
+# We assume that you are very aware of what you are doing when working wih SELinux settings and that you can easily
+# break the affected components with these settings.
+---
+seLinuxOptions:
+  cassandra: ~
+  clamavSimple: ~
+  clamav: ~
+  clamd: ~
+  collabora: ~
+  collaboraController: ~
+  cryptpad: ~
+  dkimpy: ~
+  dovecot: ~
+  element: ~
+  freshclam: ~
+  icap: ~
+  intercom: ~
+  # The Jibri Helm chart does not support setting the securityContext externally.
+  # jibri: ~
+  jicofo: ~
+  jigasi: ~
+  jitsi: ~
+  jitsiKeycloakAdapter: ~
+  jitsiPatchJVB: ~
+  jvb: ~
+  mariadb: ~
+  matrixNeoBoardWidget: ~
+  matrixNeoChoiceWidget: ~
+  matrixNeoDateFixBot: ~
+  matrixNeoDateFixWidget: ~
+  matrixUserVerificationService: ~
+  memcached: ~
+  migrations: ~
+  milter: ~
+  minio: ~
+  nextcloud: ~
+  nextcloudExporter: ~
+  nextcloudManagement: ~
+  notesBackend: ~
+  notesFrontend: ~
+  notesYProvider: ~
+  opendeskKeycloakBootstrap: ~
+  opendeskStaticFiles: ~
+  openproject: ~
+  openprojectBootstrap: ~
+  openprojectDbInit: ~
+  openxchangeBootstrap: ~
+  openxchangeCoreGuidedtours: ~
+  openxchangeCoreMW: ~
+  openxchangeCoreUI: ~
+  openxchangeCoreUIMiddleware: ~
+  openxchangeCoreUserGuide: ~
+  openxchangeDocumentConverter: ~
+  openxchangeGotenberg: ~
+  openxchangeGuardUI: ~
+  openxchangeImageConverter: ~
+  openxchangeNextcloudIntegrationUI: ~
+  openxchangePluginsUI: ~
+  openxchangePublicSectorUI: ~
+  oxConnector: ~
+  postfix: ~
+  postgresql: ~
+  prosody: ~
+  redis: ~
+  synapse: ~
+  synapseCreateUser: ~
+  synapseGuestModule: ~
+  synapseWeb: ~
+  umsGuardianAuthorizationApi: ~
+  umsGuardianManagementApi: ~
+  umsGuardianManagementUi: ~
+  umsGuardianOpenPolicyAgent: ~
+  umsKeycloak: ~
+  umsKeycloakBootstrap: ~
+  umsKeycloakExtensionHandler: ~
+  umsKeycloakExtensionProxy: ~
+  umsLdapNotifier: ~
+  umsLdapServer: ~
+  umsNotificationsApi: ~
+  umsPortalFrontend: ~
+  umsPortalConsumer: ~
+  umsPortalServer: ~
+  umsProvisioning: ~
+  umsProvisioningNats: ~
+  umsSelfserviceConsumer: ~
+  umsStackDataUms: ~
+  umsUdmListener: ~
+  umsUdmRestApi: ~
+  umsUmcGateway: ~
+  umsUmcServer: ~
+  wellKnown: ~
+  xwiki: ~
+...

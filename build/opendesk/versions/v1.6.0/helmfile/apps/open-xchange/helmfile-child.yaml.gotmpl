@@ -1,0 +1,131 @@
+# SPDX-FileCopyrightText: 2024-2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+repositories:
+  # openDesk Dovecot
+  # Source: https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-dovecot
+  - name: "dovecot-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.dovecot.verify }}
+    oci: true
+  {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+    username: {{ env "OD_ENTERPRISE_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_ENTERPRISE_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDeEnterprise .Values.global.helmRegistry | default .Values.charts.dovecot.registry }}/{{ .Values.charts.dovecot.repository }}"
+  {{- else }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.dovecot.registry }}/{{ .Values.charts.dovecot.repository }}"
+  {{- end }}
+
+  # Open-Xchange
+  - name: "open-xchange-repo"
+    keyring: "../../files/gpg-pubkeys/open-xchange-com.gpg"
+    verify: {{ .Values.charts.oxAppSuite.verify }}
+    oci: true
+  {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+    username: {{ env "OD_ENTERPRISE_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_ENTERPRISE_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDeEnterprise .Values.global.helmRegistry | default .Values.charts.oxAppSuite.registry }}/{{ .Values.charts.oxAppSuite.repository }}"
+  {{- else }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.oxAppSuite.registry }}/{{ .Values.charts.oxAppSuite.repository }}"
+  {{- end }}
+
+  # openDesk Open-Xchange Bootstrap
+  # Source:
+  # https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-open-xchange-bootstrap
+  - name: "open-xchange-bootstrap-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.oxAppSuiteBootstrap.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.oxAppSuiteBootstrap.registry }}/{{ .Values.charts.oxAppSuiteBootstrap.repository }}"
+
+  # OX Connector
+  - name: "ox-connector-repo"
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.oxConnector.registry }}/{{ .Values.charts.oxConnector.repository }}"
+
+  # openDesk Postfix
+  # https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-postfix
+  - name: "postfix-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.postfix.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.postfix.registry }}/{{ .Values.charts.postfix.repository }}"
+
+releases:
+  - name: "dovecot"
+    chart: "dovecot-repo/{{ .Values.charts.dovecot.name }}"
+    version: "{{ .Values.charts.dovecot.version }}"
+    values:
+      - "values-dovecot.yaml.gotmpl"
+      {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+      - "values-dovecot-enterprise.yaml.gotmpl"
+      {{- end }}
+      {{- range .Values.customization.release.dovecot }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.dovecot.enabled }}
+    timeout: 900
+
+  - name: "postfix-ox"
+    chart: "postfix-repo/{{ .Values.charts.postfix.name }}"
+    version: "{{ .Values.charts.postfix.version }}"
+    values:
+      - "values-postfix.yaml.gotmpl"
+      {{- range .Values.customization.release.postfix }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.postfix.enabled }}
+    timeout: 900
+
+  - name: "open-xchange"
+    chart: "open-xchange-repo/{{ .Values.charts.oxAppSuite.name }}"
+    version: "{{ .Values.charts.oxAppSuite.version }}"
+    values:
+      - "values-openxchange.yaml.gotmpl"
+      - "values-openxchange-contact-picker.yaml.gotmpl"
+      {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+      - "values-openxchange-enterprise.yaml.gotmpl"
+      {{- end }}
+      {{- range .Values.customization.release.openxchange }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.oxAppSuite.enabled }}
+    timeout: 900
+
+  - name: "opendesk-open-xchange-bootstrap"
+    chart: "open-xchange-bootstrap-repo/{{ .Values.charts.oxAppSuiteBootstrap.name }}"
+    version: "{{ .Values.charts.oxAppSuiteBootstrap.version }}"
+    values:
+      - "values-openxchange-bootstrap.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskOpenxchangeBootstrap }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.oxAppSuite.enabled }}
+    timeout: 900
+
+  - name: "ox-connector"
+    chart: "ox-connector-repo/{{ .Values.charts.oxConnector.name }}"
+    version: "{{ .Values.charts.oxConnector.version }}"
+    values:
+      - "values-oxconnector.yaml.gotmpl"
+      {{- range .Values.customization.release.oxConnector }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.oxAppSuite.enabled }}
+    needs:
+      - "open-xchange"
+
+commonLabels:
+  deployStage: "050-components"
+  component: "open-xchange"
+...

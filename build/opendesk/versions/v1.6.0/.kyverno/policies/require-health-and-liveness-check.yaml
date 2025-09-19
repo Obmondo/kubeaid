@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: 2024 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+apiVersion: "kyverno.io/v1"
+kind: "ClusterPolicy"
+metadata:
+  name: "require-health-and-liveness-check"
+  annotations:
+    policies.kyverno.io/title: "Disallow usage of latest tag"
+    policies.kyverno.io/subject: "Pod"
+    policies.kyverno.io/description: >-
+      Liveness and readiness probes need to be configured to correctly manage a Pod's lifecycle during deployments,
+      restarts, and upgrades.
+      For each Pod, a periodic `livenessProbe` is performed by the kubelet to determine if the Pod's containers are
+      running or need to be restarted.
+      A `readinessProbe` is used by Services and Pods to determine if the Pod is ready to receive network traffic.
+      This policy validates that all containers have livenessProbe and readinessProbe defined.
+spec:
+  background: true
+  rules:
+    - match:
+        resources:
+          kinds:
+            - "Pod"
+      name: "require-health-and-liveness-check"
+      validate:
+        message: >-
+          Liveness and readiness probes are required. spec.containers[*].livenessProbe.periodSeconds must be set to a
+          value greater than 0.
+        pattern:
+          spec:
+            containers:
+              - livenessProbe:
+                  periodSeconds: ">0"
+                readinessProbe:
+                  periodSeconds: ">0"
+  validationFailureAction: "audit"
+...

@@ -1,0 +1,42 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+#
+# Advanced Configuration: Nested States
+#
+helmfiles:
+  # Path to the helmfile state file being processed BEFORE releases in this state file
+  - path: "helmfile/apps/opendesk-migrations-pre/helmfile-child.yaml.gotmpl"
+    values: &values
+      - "helmfile/environments/default/*.yaml.gotmpl"
+      - {{ toYaml .Values | nindent 8 }}
+  - path: "helmfile/apps/opendesk-services/helmfile-child.yaml.gotmpl"
+    values: *values
+  - path: "helmfile/apps/services-external/helmfile-child.yaml.gotmpl"
+    values: *values
+  - path: "helmfile/apps/nubus/helmfile-child.yaml.gotmpl"
+    values: *values
+  - path: "helmfile/apps/open-xchange/helmfile-child.yaml.gotmpl"
+    values: *values
+  - path: "helmfile/apps/nextcloud/helmfile-child.yaml.gotmpl"
+    values: *values
+  - path: "helmfile/apps/collabora/helmfile-child.yaml.gotmpl"
+    values: *values
+  - path: "helmfile/apps/cryptpad/helmfile-child.yaml.gotmpl"
+    values: *values
+  - path: "helmfile/apps/jitsi/helmfile-child.yaml.gotmpl"
+    values: *values
+  - path: "helmfile/apps/element/helmfile-child.yaml.gotmpl"
+    values: *values
+  - path: "helmfile/apps/openproject/helmfile-child.yaml.gotmpl"
+    values: *values
+  - path: "helmfile/apps/xwiki/helmfile-child.yaml.gotmpl"
+    values: *values
+  - path: "helmfile/apps/notes/helmfile-child.yaml.gotmpl"
+    values: *values
+  - path: "helmfile/apps/opendesk-openproject-bootstrap/helmfile-child.yaml.gotmpl"
+    values: *values
+  - path: "helmfile/apps/opendesk-migrations-post/helmfile-child.yaml.gotmpl"
+    values: *values
+missingFileHandler: "Error"
+...

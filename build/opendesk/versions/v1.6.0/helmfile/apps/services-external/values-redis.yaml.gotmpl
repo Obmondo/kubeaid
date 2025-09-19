@@ -1,0 +1,81 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+architecture: "standalone"
+
+auth:
+  password: {{ .Values.secrets.redis.password | quote }}
+
+commonAnnotations:
+  {{ .Values.annotations.servicesExternalRedis.common | toYaml | nindent 2 }}
+
+global:
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+  storageClass: {{ coalesce .Values.persistence.storages.redis.storageClassName .Values.persistence.storageClassNames.RWO | quote }}
+
+image:
+  registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.redis.registry | quote }}
+  repository: {{ .Values.images.redis.repository | quote }}
+  tag: {{ .Values.images.redis.tag | quote }}
+  pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+
+master:
+  annotations:
+    {{ .Values.annotations.servicesExternalRedis.masterMaster | toYaml | nindent 4 }}
+  containerSecurityContext:
+    privileged: false
+    readOnlyRootFilesystem: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+    seccompProfile:
+      type: "RuntimeDefault"
+    capabilities:
+      drop:
+        - "ALL"
+    seLinuxOptions:
+      {{ .Values.seLinuxOptions.redis | toYaml | nindent 6 }}
+  count: {{ .Values.replicas.redis }}
+  persistence:
+    size: {{ .Values.persistence.storages.redis.size | quote }}
+    annotations:
+      {{ .Values.annotations.servicesExternalRedis.masterPersistence | toYaml | nindent 6 }}
+  podAnnotations:
+    {{ .Values.annotations.servicesExternalRedis.masterPod | toYaml | nindent 4 }}
+  resources:
+    {{ .Values.resources.redis | toYaml | nindent 4 }}
+  service:
+    annotations:
+      {{ .Values.annotations.servicesExternalRedis.masterService | toYaml | nindent 6 }}
+  serviceAccount:
+    annotations:
+      {{ .Values.annotations.servicesExternalRedis.masterServiceAccount | toYaml | nindent 6 }}
+
+metrics:
+  enabled: false
+
+replica:
+  annotations:
+    {{ .Values.annotations.servicesExternalRedis.replicaReplica | toYaml | nindent 4 }}
+  persistence:
+    annotations:
+      {{ .Values.annotations.servicesExternalRedis.replicaPersistence | toYaml | nindent 6 }}
+  podAnnotations:
+    {{ .Values.annotations.servicesExternalRedis.replicaPod | toYaml | nindent 4 }}
+  service:
+    annotations:
+      {{ .Values.annotations.servicesExternalRedis.replicaService | toYaml | nindent 6 }}
+  serviceAccount:
+    annotations:
+      {{ .Values.annotations.servicesExternalRedis.replicaServiceAccount | toYaml | nindent 6 }}
+
+secretAnnotations:
+  {{ .Values.annotations.servicesExternalRedis.secret | toYaml | nindent 2 }}
+
+sentinel:
+  enabled: false
+
+...

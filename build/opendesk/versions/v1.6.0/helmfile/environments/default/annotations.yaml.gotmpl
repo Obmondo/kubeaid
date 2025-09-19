@@ -1,0 +1,448 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+annotations:
+  cassandra:
+    ingress: ~
+    pod: ~
+    serviceAccount: ~
+  coco:
+    ingress: ~
+    pod: ~
+    serviceAccount: ~
+  collabora:
+    ingress: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  cryptpad:
+    ingress: ~
+    pod: ~
+    serviceAccount: ~
+  element:
+    common: ~
+    ingress: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  elementMatrixNeoboardWidget:
+    additional: ~
+    ingress: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  elementMatrixNeochoiceWidget:
+    additional: ~
+    ingress: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  elementMatrixNeodatefixBot:
+    additional: ~
+    ingress: ~
+    persistence: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  elementMatrixNeodatefixBotBootstrap:
+    pod: ~
+    serviceAccount: ~
+  elementMatrixNeodatefixWidget:
+    additional: ~
+    ingress: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  elementMatrixUserVerificationService:
+    additional: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  elementMatrixUserVerificationServiceBootstrap:
+    pod: ~
+    serviceAccount: ~
+  elementSynapse:
+    common: ~
+    federationIngress: ~
+    persistence: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  elementSynapseWeb:
+    common: ~
+    ingress: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  elementWellKnown:
+    common: ~
+    ingress: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  jitsi:
+    pod: ~
+    serviceAccount: ~
+  jitsiGlobal:
+    pod: ~
+  jitsiJibri:
+    pod: ~
+  jitsiJicofo:
+    pod: ~
+  jitsiJigasi:
+    pod: ~
+  jitsiJitsiPatchJVB:
+    serviceAccount: ~
+  jitsiJvb:
+    pod: ~
+    service: ~
+    metricsPrometheus: ~
+    metricsGrafana: ~
+  jitsiProsody:
+    pod: ~
+  jitsiWeb:
+    ingress: ~
+    pod: ~
+  nextcloudAio:
+    additional: ~
+    ingress: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  nextcloudExporter:
+    additional: ~
+    ingress: ~
+    pod: ~
+    serviceAccount: ~
+  nextcloudNextcloudMgmt:
+    additional: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  nextcloudNotifyPush:
+    additional: ~
+    ingress: ~
+    pod: ~
+    service: ~
+    serviceMetrics: ~
+    serviceAccount: ~
+  notes:
+    ingressAdmin: ~
+    ingressCollaborationWS: ~
+    ingressCollaborationAPI: ~
+    ingressMedia: ~
+    serviceMedia: ~
+  notesBackend:
+    migrateJob: ~
+    pod: ~
+    service: ~
+  notesFrontend:
+    pod: ~
+    service: ~
+  notesYProvider:
+    pod: ~
+    service: ~
+  nubus:
+    additional: ~
+    ingress: ~
+  nubusGuardian:
+    authorizationApiPod: ~
+    globalPod: ~
+    ingressIngress: ~
+    ingressManagementUi: ~
+    ingressManagementApi: ~
+    ingressAuthorizationApi: ~
+    managementApiPod: ~
+    managementUiPod: ~
+    serviceAccount: ~
+  nubusIntercomService:
+    additional: ~
+    ingress: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  nubusKeycloak:
+    common: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  nubusKeycloakBootstrap:
+    additional: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  nubusKeycloakBootstrapNubus:
+    additional: ~
+    pod: ~
+    serviceAccount: ~
+  nubusKeycloakExtensions:
+    handlerAdditional: ~
+    handlerPod: ~
+    handlerService: ~
+    handlerServiceAccount: ~
+    proxyAdditional: ~
+    proxyIngress: ~
+    proxyPod: ~
+    proxyService: ~
+    proxyServiceAccount: ~
+  nubusLdapNotifier:
+    additional: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  nubusLdapServer:
+    additional: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  nubusNotificationsApi:
+    additional: ~
+    ingress: ~
+    persistence: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  nubusOxConnector:
+    pod: ~
+    serviceAccount: ~
+  nubusPortalConsumer:
+    pod: ~
+  nubusPortalFrontend:
+    additional: ~
+    ingressIngress: ~
+    ingressRewrites: ~
+    ingressRedirects: ~
+    persistence: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  nubusPortalServer:
+    additional: ~
+    ingress: ~
+    persistence: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  nubusProvisioning:
+    additional: ~
+    apiAdditional: ~
+    apiPod: ~
+    dispatcherAdditional: ~
+    dispatcherPod: ~
+    natsAdditional: ~
+    natsPod: ~
+    udmTransformerAdditional: ~
+    udmTransformerPod: ~
+    pod: ~
+    prefillAdditional: ~
+    prefillPod: ~
+    registerConsumersAdditional: ~
+    registerConsumersPod: ~
+    service: ~
+    serviceAccount: ~
+  nubusNginxS3Gateway:
+    additional: ~
+    ingress: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  nubusSelfserviceConsumer:
+    pod: ~
+    serviceAccount: ~
+  nubusStackDataUms:
+    additional: ~
+    pod: ~
+    serviceAccount: ~
+  nubusUdmListener:
+    pod: ~
+    serviceAccount: ~
+  nubusUdmRestApi:
+    additional: ~
+    ingress: ~
+    persistence: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  nubusUmcGateway:
+    ingress: ~
+    pod: ~
+    serviceAccount: ~
+  nubusUmcServer:
+    additional: ~
+    ingress: ~
+    pod: ~
+    serviceAccount: ~
+  opendeskMigrationsPost:
+    additional: ~
+    pod: ~
+    serviceAccount: ~
+  opendeskMigrationsPre:
+    additional: ~
+    pod: ~
+    serviceAccount: ~
+  opendeskServicesHome:
+    additional: ~
+    ingress: ~
+  opendeskServicesOtterize:
+    additional: ~
+  opendeskServicesStaticFiles:
+    additional: ~
+    ingress: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  openproject:
+    ingress: ~
+    pod: ~
+    openprojectTempVolumes: ~
+    serviceAccount: ~
+    seederJob: ~
+  openprojectBootstrap:
+    additional: ~
+    pod: ~
+  openxchangeAppsuiteCoreDocumentconverter:
+    pod: ~
+  openxchangeAppsuiteCoreGuidedtours:
+    pod: ~
+  openxchangeAppsuiteCoreImageconverter:
+    pod: ~
+  openxchangeAppsuiteCoreUi:
+    pod: ~
+  openxchangeAppsuiteCoreUiMiddleware:
+    pod: ~
+  openxchangeAppsuiteCoreMw:
+    gotenbergPod: ~
+    pod: ~
+    serviceAccount: ~
+    updatePod: ~
+  openxchangeAppsuiteCoreUserGuide:
+    pod: ~
+  openxchangeAppsuiteIngress:
+    appsuitebase: ~
+    ingress: ~
+    rootredirect: ~
+    trailslash: ~
+    restRoutesAdmin: ~
+    restRoutesAdvertisement: ~
+    restRoutesChronos: ~
+    restRoutesPreliminary: ~
+    restRoutesUserfeedback: ~
+    staticRoutesServlet: ~
+    staticRoutesRealtime: ~
+    staticRoutesInfostore: ~
+    staticRoutesWebservices: ~
+    driveClientWindowsOxRoute: ~
+    guardApiRoute: ~
+    guardSupportApiRoute: ~
+    guardPgpRoute: ~
+    httpApiRoutesApi: ~
+    httpApiRoutesAjax: ~
+    httpApiRoutesAppsuiteApi: ~
+    httpApiRoutesAppRootApi: ~
+    rt2Route: ~
+    documentsHelpRoute: ~
+    driveHelpRoute: ~
+    coreHelpRoute: ~
+    officeWebRoute: ~
+    caldavWellKnownRedirect: ~
+    carddavWellKnownRedirect: ~
+    davInfostoreRoute: ~
+    davRootRoute: ~
+    wopiServerRoute: ~
+  openxchangeBootstrap:
+    additional: ~
+    serviceAccount: ~
+  openxchangeDovecot:
+    common: ~
+    persistence: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  openxchangeEnterpriseContactPicker:
+    appsuiteCoreMw:
+    appsuiteCoreMwPod: ~
+    appsuiteCoreMwServiceAccount: ~
+  openxchangeNextcloudIntegrationUi:
+    pod: ~
+  openxchangePostfix:
+    pod: ~
+    service: ~
+  openxchangePublicSectorUi:
+    pod: ~
+  servicesExternalClamavDistributed:
+    clamdCommon: ~
+    clamdPod: ~
+    clamdService: ~
+    clamdServiceAccount: ~
+    freshclamCommon: ~
+    freshclamService: ~
+    freshclamServiceAccount: ~
+    milterCommon: ~
+    milterPod: ~
+    milterService: ~
+    milterServiceAccount: ~
+    persistence: ~
+  servicesExternalClamavSimple:
+    common: ~
+    persistence: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  servicesExternalDkimpy:
+    additional: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  servicesExternalMariadb:
+    common: ~
+    persistence: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  servicesExternalMemcached:
+    common: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  servicesExternalMinio:
+    apiIngress: ~
+    common:
+    ingress: ~
+    persistence: ~
+    provisioningPod: ~
+    pod: ~
+    serviceService: ~
+    serviceHeadless: ~
+    serviceAccount: ~
+  servicesExternalPostfix:
+    common: ~
+    persistence: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  servicesExternalPostgresql:
+    common: ~
+    persistence: ~
+    pod: ~
+    service: ~
+    serviceAccount: ~
+  servicesExternalRedis:
+    common: ~
+    masterMaster: ~
+    masterPersistence: ~
+    masterPod: ~
+    masterService: ~
+    masterServiceAccount: ~
+    replicaReplica: ~
+    replicaPersistence: ~
+    replicaPod: ~
+    replicaService: ~
+    replicaServiceAccount: ~
+    secret: ~
+  xwiki:
+    common: ~
+    ingress: ~
+    persistence: ~
+    service: ~
+    serviceAccount: ~
+...

@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: 2024 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+apiVersion: "kyverno.io/v1"
+kind: "ClusterPolicy"
+metadata:
+  name: "template-ingress"
+  annotations:
+    policies.kyverno.io/title: "Validate openDesk Ingress templating"
+    policies.kyverno.io/subject: "Pod"
+    policies.kyverno.io/description: >-
+      This policy verifies that ingress variables are templated.
+spec:
+  background: true
+  rules:
+    - match:
+        resources:
+          kinds:
+            - "Ingress"
+      name: "template-ingressClassName"
+      validate:
+        message: "Verifies that ingressClassName can be customized by `.Values.ingress.ingressClassName` variable."
+        pattern:
+          spec:
+            ingressClassName: "kyverno"
+    - match:
+        resources:
+          kinds:
+            - "Ingress"
+      name: "template-tls-secretName"
+      validate:
+        message: "Verifies that tls.secretName can be customized by `.Values.ingress.tls.secretName` variable."
+        pattern:
+          spec:
+            tls:
+              - secretName: "kyverno-tls"
+  validationFailureAction: "audit"
+...

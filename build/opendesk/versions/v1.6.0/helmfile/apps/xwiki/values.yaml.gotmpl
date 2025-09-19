@@ -1,0 +1,253 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+commonAnnotations:
+  {{ .Values.annotations.xwiki.common | toYaml | nindent 2 }}
+
+image:
+  {{- if eq .Values.databases.xwiki.type "mariadb" }}
+  name: "{{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.xwikiMariadb.registry }}/{{ .Values.images.xwikiMariadb.repository }}"
+  tag: {{ .Values.images.xwikiMariadb.tag | quote }}
+  {{- else if eq .Values.databases.xwiki.type "postgresql" }}
+  name: "{{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.xwikiPostgres.registry }}/{{ .Values.images.xwikiPostgres.repository }}"
+  tag: {{ .Values.images.xwikiPostgres.tag | quote }}
+  {{- else }}
+  {{- fail "Unsupported value for .Values.databases.xwiki.type, supported values are 'mariadb' or 'postgresql'" }}
+  {{- end }}
+  pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+imagePullSecrets: {{ .Values.global.imagePullSecrets }}
+
+javaOpts:
+  {{- if and (eq (env "OPENDESK_ENTERPRISE") "true") .Values.enterpriseKeys.xwiki.opendeskEnterpriseLicense .Values.enterpriseKeys.xwiki.proApplicationslicense }}
+  - "-Dlicenses={{ .Values.enterpriseKeys.xwiki.opendeskEnterpriseLicense }},{{ .Values.enterpriseKeys.xwiki.proApplicationslicense }}"
+  {{- end }}
+  {{- if .Values.certificate.selfSigned }}
+  - "-Djavax.net.ssl.trustStore=/etc/ssl/certs/truststore.jks"
+  - "-Djavax.net.ssl.trustStoreType=jks"
+  - {{ printf "%s=%s" "-Djavax.net.ssl.trustStorePassword" .Values.secrets.certificates.password | quote }}
+  {{- end }}
+
+externalDB:
+  {{- if eq .Values.databases.xwiki.type "mariadb" }}
+  password: {{ .Values.databases.xwiki.password | default .Values.secrets.mariadb.rootPassword | quote }}
+  {{- else }}
+  password: {{ .Values.databases.xwiki.password | default .Values.secrets.postgresql.xwikiUser | quote }}
+  {{- end }}
+  database: {{ .Values.databases.xwiki.name | quote }}
+  user: {{ .Values.databases.xwiki.username | quote }}
+  host: {{ printf "%s:%d" .Values.databases.xwiki.host .Values.databases.xwiki.port | quote }}
+  customKeyRef:
+    enabled: false
+
+securityContext:
+  enabled: true
+  fsGroup: 101
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  enabled: true
+  privileged: false
+  runAsUser: 100
+  runAsGroup: 101
+  runAsNonRoot: true
+  capabilities:
+    drop:
+      - "ALL"
+  seccompProfile:
+    type: "RuntimeDefault"
+  readOnlyRootFilesystem: false
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.xwiki | toYaml | nindent 4 }}
+
+customConfigs:
+  xwiki.cfg:
+    xwiki.url.protocol: "https"
+    ## Indicate the LDAP field defining the user UID
+    xwiki.authentication.ldap.UID_attr: "uid"
+    ## Indicate the LDAP field defining the user profile picture
+    xwiki.authentication.ldap.photo_attribute: "jpegPhoto"
+    ## Enable the synchronization of the LDAP profile picture
+    xwiki.authentication.ldap.update_photo: 1
+    {{ if .Values.debug.enabled }}
+    ## Password of "superadmin" user, disables account if not password is set
+    xwiki.superadminpassword: {{ .Values.secrets.xwiki.superadminpassword | quote }}
+    {{ end }}
+    ## LDAP Server configuration
+    xwiki.authentication.ldap.server: {{ .Values.ldap.host | quote }}
+    xwiki.authentication.ldap.port: 389
+    ## Authentication to the LDAP server
+    xwiki.authentication.ldap.bind_DN: "uid=ldapsearch_xwiki,cn=users,{{ .Values.ldap.baseDn }}"
+    xwiki.authentication.ldap.bind_pass: {{ .Values.secrets.nubus.ldapSearch.xwiki | quote }}
+    ## Base DN used for searching for users
+    xwiki.authentication.ldap.base_DN: "{{ .Values.ldap.baseDn }}"
+    ## Allow short update cycles of the LDAP group cache
+    xwiki.authentication.ldap.groupcache_expiration: 300
+    ## Mapping for XWiki attributes to the respective LDAP attributes
+    xwiki.authentication.ldap.fields_mapping: "last_name=sn,first_name=givenName,email=mailPrimaryAddress"
+
+  xwiki.properties:
+    {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+    distribution.defaultUI: "com.xwiki.projects.swp:xwiki-swp-flavor-enterprise-main"
+    {{- end }}
+    wikiInitializer.initialRequest.xwiki.url: "https://{{ .Values.global.hosts.xwiki }}.{{ .Values.global.domain }}/distribution/"
+    wikiInitializer.initialRequest.xwiki.contextPath: "/"
+    wikiInitializer.initialRequest.xwiki.remoteAddress: "{{ .Values.global.hosts.xwiki }}.{{ .Values.global.domain }}"
+    oidc.clientid: "opendesk-xwiki"
+    oidc.endpoint.token.auth_method: "client_secret_basic"
+    oidc.endpoint.userinfo.method: "GET"
+    oidc.logoutMechanism: "rpInitiated"
+    oidc.provider: "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/opendesk"
+    oidc.scope: "openid,opendesk-xwiki-scope"
+    oidc.secret: {{ .Values.secrets.keycloak.clientSecret.xwiki | quote }}
+    oidc.skipped: false
+    oidc.user.nameFormater: "${oidc.user.opendesk_username._clean._lowerCase}"
+    oidc.user.subjectFormater: "${oidc.user.opendesk_username._lowerCase}"
+    # Using the claims below some user based information can be passed through OIDC to XWiki that partitially has an
+    # impact on the user experience. E.g. you can define the default editor for the user `xwiki_user_editor` or if
+    # the `xwiki_user_usertype` is advanced or simple.
+    # yamllint disable-line rule:line-length
+    oidc.userinfoclaims: "xwiki_user_accessibility,xwiki_user_company,xwiki_user_displayHiddenDocuments,xwiki_user_editor,xwiki_user_usertype"
+    url.trustedDomains: "{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}"
+    workplaceServices.navigationEndpoint: "https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}/univention/portal/navigation.json"
+    workplaceServices.base: "https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}"
+    workplaceServices.portalSecret: {{ .Values.secrets.centralnavigation.apiKey | quote }}
+    openoffice.serverType: "0"
+    openoffice.autoStart: "false"
+    openoffice.homePath: "/tmp"
+    notifications.emails.live.graceTime: "5"
+
+ingress:
+  enabled: {{ .Values.ingress.enabled }}
+  className: {{ .Values.ingress.ingressClassName | quote }}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "{{ .Values.ingress.parameters.bodySize.xwiki }}"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "{{ .Values.ingress.parameters.bodyTimeout.xwiki }}"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "{{ .Values.ingress.parameters.bodyTimeout.xwiki }}"
+    nginx.org/client-max-body-size: "{{ .Values.ingress.parameters.bodySize.xwiki }}"
+    nginx.org/proxy-read-timeout: "{{ .Values.ingress.parameters.bodyTimeout.xwiki }}s"
+    nginx.org/proxy-send-timeout: "{{ .Values.ingress.parameters.bodyTimeout.xwiki }}s"
+    haproxy-ingress.github.io/headers: "X-Forwarded-Host {{ .Values.global.hosts.xwiki }}.{{ .Values.global.domain }}"
+    {{- with .Values.annotations.xwiki.ingress }}
+    {{ . | toYaml | nindent 4 }}
+    {{- end }}
+  hosts:
+    - host: "{{ .Values.global.hosts.xwiki }}.{{ .Values.global.domain }}"
+      paths:
+        - path: /
+          pathType: "ImplementationSpecific"
+  tls:
+    - secretName: {{ .Values.ingress.tls.secretName | quote }}
+      hosts:
+        - "{{ .Values.global.hosts.xwiki }}.{{ .Values.global.domain }}"
+
+istio:
+  enabled: false
+
+mariadb:
+  enabled: false
+
+mysql:
+  enabled: false
+
+persistence:
+  annotations:
+    {{ .Values.annotations.xwiki.persistence | toYaml | nindent 4 }}
+  size: {{ .Values.persistence.storages.xwiki.size | quote }}
+  storageClass: {{ coalesce .Values.persistence.storages.xwiki.storageClassName .Values.persistence.storageClassNames.RWO | quote }}
+
+postgresql:
+  enabled: false
+
+properties:
+  "attachment:xwiki:FlamingoThemes.Iceberg@logo.svg": "data:image/svg+xml;base64,{{ .Values.theme.imagery.logoHeaderSvgB64 }}"
+  "property:xwiki:XWiki.XWikiServerXwiki^XWiki.XWikiServerClass.secure": 1
+  "property:xwiki:XWiki.XWikiServerXwiki^XWiki.XWikiServerClass.server": "{{ .Values.global.hosts.xwiki }}.{{ .Values.global.domain }}"
+  "property:xwiki:XWiki.XWikiServerXwiki^XWiki.XWikiServerClass.port": 443
+
+  ## This option overwrites the LDAP group mappings including all dynamically created mappings,
+  # therefore on XWiki restart an LDAP sync is triggered to load the dynamic mapping.
+  "property:xwiki:XWiki.XWikiPreferences^XWiki.XWikiPreferences.ldap_group_mapping": "xwiki:XWiki.XWikiAdminGroup=cn=managed-by-attribute-KnowledgemanagementAdmin,cn=groups,{{ .Values.ldap.baseDn }}"
+  ## SMTP settings
+  "property:xwiki:Mail.MailConfig^Mail.SendMailConfigClass.from": "{{ .Values.smtp.localpartNoReply }}@{{ .Values.global.domain }}"
+  "property:xwiki:Mail.MailConfig^Mail.SendMailConfigClass.host": {{ printf "%s.%s.svc.%s" "postfix" (.Values.apps.postfix.namespace | default .Release.Namespace) .Values.cluster.networking.domain | quote }}
+  "property:xwiki:Mail.MailConfig^Mail.SendMailConfigClass.port": 587
+  "property:xwiki:Mail.MailConfig^Mail.SendMailConfigClass.properties": "mail.smtp.starttls.enable=true"
+  "property:xwiki:Mail.MailConfig^Mail.SendMailConfigClass.username": {{ printf "%s@%s" "opendesk-system" ( .Values.global.mailDomain | default .Values.global.domain ) }}
+  "property:xwiki:Mail.MailConfig^Mail.SendMailConfigClass.password": {{ .Values.secrets.postfix.opendeskSystemPassword | quote }}
+  ## Link LDAP users and users authenticated through OIDC
+  "property:xwiki:LDAPUserImport.WebHome^LDAPUserImport.LDAPUserImportConfigClass.addOIDCObject": 1
+  "property:xwiki:LDAPUserImport.WebHome^LDAPUserImport.LDAPUserImportConfigClass.OIDCIssuer": "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/{{ .Values.platform.realm }}"
+  "property:xwiki:XWiki.XWikiPreferences^XWiki.XWikiPreferences.colorTheme": "FlamingoThemes.Iceberg"
+  "property:xwiki:XWiki.XWikiPreferences^XWiki.XWikiPreferences.default_language": "de_DE"
+  "property:xwiki:XWiki.XWikiPreferences^XWiki.XWikiPreferences.timezone": "Europe/Berlin"
+  "property:xwiki:XWiki.XWikiPreferences^XWiki.XWikiPreferences.languages": "de_DE"
+  "property:xwiki:FlamingoThemes.Iceberg^FlamingoThemesCode.ThemeClass.link-color": "@brand-primary"
+  "property:xwiki:FlamingoThemes.Iceberg^FlamingoThemesCode.ThemeClass.btn-primary-bg": "@brand-primary"
+  "property:xwiki:FlamingoThemes.Iceberg^FlamingoThemesCode.ThemeClass.navbar-default-color": "@brand-primary"
+  "property:xwiki:FlamingoThemes.Iceberg^FlamingoThemesCode.ThemeClass.navbar-default-link-color": "@brand-primary"
+  "property:xwiki:FlamingoThemes.Iceberg^FlamingoThemesCode.ThemeClass.navbar-default-link-hover-color":
+    "@brand-primary"
+  "property:xwiki:FlamingoThemes.Iceberg^FlamingoThemesCode.ThemeClass.navbar-default-link-active-color":
+    "@brand-primary"
+  "property:xwiki:FlamingoThemes.Iceberg^FlamingoThemesCode.ThemeClass.brand-primary": {{ .Values.theme.colors.primary | quote }}
+  "property:xwiki:FlamingoThemes.Iceberg^FlamingoThemesCode.ThemeClass.navbar-default-bg": {{ .Values.theme.colors.white | quote }}
+  "property:xwiki:FlamingoThemes.Iceberg^FlamingoThemesCode.ThemeClass.navbar-default-link-hover-bg": {{ .Values.theme.colors.secondaryGreyLight | quote }}
+  # yamllint disable-line rule:line-length
+  "property:xwiki:FlamingoThemes.Iceberg^FlamingoThemesCode.ThemeClass.lessCode": "li#tmWorkplaceServices { padding-left: 16px; padding-top: 5px; } .navbar-right { padding-top: 8px; } .navbar { border-bottom: 1px solid #ddd !important; height: 64px; } div#companylogo { width: 90px; padding-top: 7px; padding-left: 9px; margin-top: auto; margin-bottom: auto; } div#companylogo a { display: contents; }"
+  "property:xwiki:XWiki.AuthService.Configuration^XWiki.AuthService.ConfigurationClass.authService": "keycloak-bridge-auth"
+  ## Fields to search in when importing users from the administration UI (not completely in scope for now)
+  "property:xwiki:LDAPUserImport.WebHome^LDAPUserImport.LDAPUserImportConfigClass.ldapUserAttributes":
+    "sn,givenname,uid,mailPrimaryAddress"
+  ## Restrict user import in the UI to global administrators
+  "property:xwiki:LDAPUserImport.WebHome^LDAPUserImport.LDAPUserImportConfigClass.usersAllowedToImport": "globalAdmin"
+  ## Enable group and user synchronization
+  "property:xwiki:LDAPUserImport.WebHome^LDAPUserImport.LDAPUserImportConfigClass.triggerGroupsUpdate": 1
+  "property:xwiki:LDAPUserImport.WebHome^LDAPUserImport.LDAPUserImportConfigClass.triggerGroupImport": 1
+  "property:xwiki:LDAPUserImport.WebHome^LDAPUserImport.LDAPUserImportConfigClass.forceXWikiUsersGroupMembershipUpdate":
+    1
+  ## Base DN under which groups should be searched for
+  "property:xwiki:LDAPUserImport.WebHome^LDAPUserImport.LDAPUserImportConfigClass.ldapGroupImportSearchDN":
+    "{{ .Values.ldap.baseDn }}"
+  ## LDAP filter to only synchronize some groups
+  "property:xwiki:LDAPUserImport.WebHome^LDAPUserImport.LDAPUserImportConfigClass.ldapGroupImportSearchFilter":
+    "(&(objectClass=opendeskKnowledgemanagementGroup)(opendeskKnowledgemanagementEnabled=TRUE))"
+  "property:xwiki:XWiki.XWikiPreferences^XWiki.XWikiPreferences.title": "Wissen - $!tdoc.displayTitle - {{ .Values.theme.texts.productName }}"
+
+cluster:
+  replicas: {{ .Values.replicas.xwiki }}
+
+resources:
+  {{ .Values.resources.xwiki | toYaml | nindent 2 }}
+
+service:
+  annotations:
+    {{ .Values.annotations.xwiki.service | toYaml | nindent 4 }}
+  externalPort: 80
+  enabled: true
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.xwiki.serviceAccount | toYaml | nindent 4 }}
+
+volumePermissions:
+  enabled: true
+
+{{- if .Values.certificate.selfSigned }}
+extraVolumes:
+  - name: "trusted-cert-secret-volume"
+    secret:
+      secretName: "opendesk-certificates-ca-tls"
+      items:
+        - key: "truststore.jks"
+          path: "truststore.jks"
+        - key: "ca.crt"
+          path: "ca-certificates.crt"
+extraVolumeMounts:
+  - name: "trusted-cert-secret-volume"
+    mountPath: "/etc/ssl/certs"
+{{- end }}
+
+...

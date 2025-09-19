@@ -1,0 +1,121 @@
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+## The theme properties will be used to set the installations color an images.
+## This is currently not supported by most of the components, but we still
+## want to collect and provide the related information based on the attributes
+## defined in this file.
+#
+theme:
+  ## Define texts
+  #
+  texts:
+    productName: "openDesk"
+
+  ## Define colors
+  #
+  colors:
+    # Element, OX AppSuite, Xwiki, Jitsi
+    primary: "#571EFA"
+    # OX AppSuite
+    primary15: "#e7dffa"
+    # OX AppSuite
+    black: "#000000"
+    # OX AppSuite, Xwiki
+    white: "#ffffff"
+    # OX AppSuite, Xwiki, Jitsi
+    secondaryGreyLight: "#f5f5f5"
+
+    # Not in use yet
+    primary65: "#9673e9"
+    primary35: "#c7b3f3"
+    secondaryBlue: "#52c1ff"
+    secondaryBlueHighcontrast: "#0c3ff3"
+    secondaryRed: "#ff529e"
+    secondaryYellow: "#ffc700"
+    secondaryGreen: "#00ffcd"
+    secondaryGrey: "#adb3bc"
+
+  ## Define imagery
+  #
+  imagery:
+    logoHeaderSvgB64: {{ readFile "./../../files/theme/logoHeader.svg" | b64enc | quote }}
+    logoHeaderInvertedSvgB64: {{ readFile "./../../files/theme/logoHeaderInverted.svg" | b64enc | quote }}
+
+    chat:
+      faviconIco: {{ readFile "./../../files/theme/chat/favicon.ico" | b64enc | quote }}
+
+    files:
+      faviconIco: {{ readFile "./../../files/theme/files/favicon.ico" | b64enc | quote }}
+      faviconPng: {{ readFile "./../../files/theme/files/favicon.png" | b64enc | quote }}
+
+    login:
+      faviconIco: {{ readFile "./../../files/theme/login/favicon.ico" | b64enc | quote }}
+      backgroundJpg: {{ readFile "./../../files/theme/login/background.jpg" | b64enc | quote }}
+      logoSvg: {{ readFile "./../../files/theme/login/logo.svg" | b64enc | quote }}
+
+    groupware:
+      faviconIco: {{ readFile "./../../files/theme/groupware_mail/favicon.ico" | b64enc | quote }}
+      faviconSvg: {{ readFile "./../../files/theme/groupware_mail/favicon.svg" | b64enc | quote }}
+
+    knowledge:
+      faviconSvg: {{ readFile "./../../files/theme/knowledge/favicon.svg" | b64enc | quote }}
+      faviconPng: {{ readFile "./../../files/theme/knowledge/favicon.png" | b64enc | quote }}
+
+    notes:
+      faviconIco: {{ readFile "./../../files/theme/notes/favicon.ico" | b64enc | quote }}
+
+    portal:
+      faviconIco: {{ readFile "./../../files/theme/portal/favicon/favicon.ico" | b64enc | quote }}
+      faviconSvg: {{ readFile "./../../files/theme/portal/favicon/favicon.svg" | b64enc | quote }}
+      favicon96Png: {{ readFile "./../../files/theme/portal/favicon/favicon-96x96.png" | b64enc | quote }}
+      appleTouchIcon: {{ readFile "./../../files/theme/portal/favicon/apple-touch-icon.png" | b64enc | quote }}
+      webManifestIcon192: {{ readFile "./../../files/theme/portal/favicon/web-app-manifest-192x192.png" | b64enc | quote }}
+      webManifestIcon512: {{ readFile "./../../files/theme/portal/favicon/web-app-manifest-512x512.png" | b64enc | quote }}
+
+      waitingSpinnerSvg: {{ readFile "./../../files/theme/portal/waiting-spinner.svg" | b64enc | quote }}
+      backgroundSvg: {{ readFile "./../../files/theme/portal/background.svg" | b64enc | quote }}
+    portalTiles:
+      adminAnnouncement: {{ readFile "./../../files/theme/admin_announcements/favicon.svg" | b64enc | quote }}
+      adminFunctionalmailbox: {{ readFile "./../../files/theme/admin_functionalmailbox/favicon.svg" | b64enc | quote }}
+      adminGroup: {{ readFile "./../../files/theme/admin_groups/favicon.svg" | b64enc | quote }}
+      adminResource: {{ readFile "./../../files/theme/admin_resource/favicon.svg" | b64enc | quote }}
+      adminUser: {{ readFile "./../../files/theme/admin_user/favicon.svg" | b64enc | quote }}
+      anonymousLogin: {{ readFile "./../../files/theme/login/favicon.svg" | b64enc | quote }}
+      fileshareDirectdocOdp: {{ readFile "./../../files/theme/directdocs_odp/favicon.svg" | b64enc | quote }}
+      fileshareDirectdocOds: {{ readFile "./../../files/theme/directdocs_ods/favicon.svg" | b64enc | quote }}
+      fileshareDirectdocOdt: {{ readFile "./../../files/theme/directdocs_odt/favicon.svg" | b64enc | quote }}
+      fileshareFiles: {{ readFile "./../../files/theme/files/favicon.svg" | b64enc | quote }}
+      groupwareCalendar: {{ readFile "./../../files/theme/groupware_calendar/favicon.svg" | b64enc | quote }}
+      groupwareContacts: {{ readFile "./../../files/theme/groupware_contacts/favicon.svg" | b64enc | quote }}
+      groupwareMail: {{ readFile "./../../files/theme/groupware_mail/favicon.svg" | b64enc | quote }}
+      groupwareTasks: {{ readFile "./../../files/theme/groupware_tasks/favicon.svg" | b64enc | quote }}
+      managementKnowledge: {{ readFile "./../../files/theme/knowledge/favicon.svg" | b64enc | quote }}
+      managementProject: {{ readFile "./../../files/theme/projects/favicon.svg" | b64enc | quote }}
+      notes: {{ readFile "./../../files/theme/notes/favicon.svg" | b64enc | quote }}
+      realtimeCollaboration: {{ readFile "./../../files/theme/chat/favicon.svg" | b64enc | quote }}
+      realtimeVideoconference: {{ readFile "./../../files/theme/videoconference/favicon.svg" | b64enc | quote }}
+      # links
+      documentation: {{ readFile "./../../files/theme/link_documentation/favicon.svg" | b64enc | quote }}
+      feedback: {{ readFile "./../../files/theme/link_feedback/favicon.svg" | b64enc | quote }}
+      support: {{ readFile "./../../files/theme/link_support/favicon.svg" | b64enc | quote }}
+      # empty.svg
+      empty: {{ readFile "./../../files/theme/_dev/empty.svg" | b64enc | quote }}
+      fileshareActivity: {{ readFile "./../../files/theme/_dev/empty.svg" | b64enc | quote }}
+      adminContext: {{ readFile "./../../files/theme/_dev/empty.svg" | b64enc | quote }}
+      selfserviceChangepassword: {{ readFile "./../../files/theme/_dev/empty.svg" | b64enc | quote }}
+      selfserviceEditprofile: {{ readFile "./../../files/theme/_dev/empty.svg" | b64enc | quote }}
+      selfserviceProtectaccount: {{ readFile "./../../files/theme/_dev/empty.svg" | b64enc | quote }}
+
+    projects:
+      faviconSvg: {{ readFile "./../../files/theme/projects/favicon.svg" | b64enc | quote }}
+
+    videoconference:
+      faviconSvg: {{ readFile "./../../files/theme/videoconference/favicon.svg" | b64enc | quote }}
+
+  ## Where required define complete Stylesheets
+  #
+  styles:
+    portal:
+      main: {{ readFile "./../../files/theme/portal/stylesheet.css" | b64enc }}
+...

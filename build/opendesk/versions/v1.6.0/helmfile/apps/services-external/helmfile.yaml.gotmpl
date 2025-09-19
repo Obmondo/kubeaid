@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+bases:
+  - "../../bases/environments.yaml.gotmpl"
+---
+helmfiles:
+  - path: "./helmfile-child.yaml.gotmpl"
+    values:
+      - {{ toYaml .Values | nindent 8 }}
+...

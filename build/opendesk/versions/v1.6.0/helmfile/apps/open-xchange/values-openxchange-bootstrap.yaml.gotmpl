@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+additionalAnnotations:
+  argocd.argoproj.io/hook: "Sync"
+  argocd.argoproj.io/hook-delete-policy: "HookSucceeded"
+  {{- with .Values.annotations.openxchangeBootstrap.additional }}
+  {{ . | toYaml | nindent 2 }}
+  {{- end }}
+
+cleanup:
+  deletePodsOnSuccess: {{ .Values.debug.cleanup.deletePodsOnSuccess }}
+  deletePodsOnSuccessTimeout: {{ .Values.debug.cleanup.deletePodsOnSuccessTimeout }}
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: "RuntimeDefault"
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.openxchangeBootstrap | toYaml | nindent 4 }}
+
+image:
+  registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.openxchangeBootstrap.registry | quote }}
+  url: {{ .Values.images.openxchangeBootstrap.repository | quote }}
+  tag: {{ .Values.images.openxchangeBootstrap.tag | quote }}
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+
+imagePullSecrets:
+  {{ .Values.global.imagePullSecrets | toYaml | nindent 2 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.openxchangeBootstrap.serviceAccount | toYaml | nindent 4 }}
+
+filestore:
+  # identifier must match identifier in /opt/open-xchange/etc/filestore-s3.properties
+  identifier: "ox-filestore-s3"
+  size: {{ .Values.objectstores.openxchange.maxSize }}
+...

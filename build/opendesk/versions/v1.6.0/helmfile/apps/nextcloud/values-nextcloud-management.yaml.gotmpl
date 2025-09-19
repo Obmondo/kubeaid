@@ -1,0 +1,237 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+additionalAnnotations:
+  intents.otterize.com/service-name: "opendesk-nextcloud-php"
+  {{- with .Values.annotations.nextcloudNextcloudMgmt.additional }}
+  {{ . | toYaml | nindent 2}}
+  {{- end }}
+
+cleanup:
+  deletePodsOnSuccess: {{ .Values.debug.cleanup.deletePodsOnSuccess }}
+  deletePodsOnSuccessTimeout: {{ .Values.debug.cleanup.deletePodsOnSuccessTimeout }}
+  keepPVCOnDelete: {{ .Values.debug.cleanup.keepPVCOnDelete }}
+
+configuration:
+  administrator:
+    # The admin user is (currently) required to bootstrap the OpenProject <> Nextcloud integration.
+    enabled: true
+    username:
+      value: "nextcloud"
+    password:
+      value: {{ .Values.secrets.nextcloud.adminPassword | quote }}
+
+  antivirus:
+    {{- if .Values.antivirus.icap.host }}
+    host: {{ .Values.antivirus.icap.host | quote }}
+    port: {{ .Values.antivirus.icap.port | quote }}
+    {{- else }}
+    {{- if .Values.apps.clamavDistributed.enabled }}
+    host: "clamav-icap"
+    {{- else if .Values.apps.clamavSimple.enabled }}
+    host: "clamav-simple"
+    {{- end }}
+    port: 1344
+    {{- end }}
+
+  cache:
+    auth:
+      enabled: true
+      username:
+        value: {{ .Values.cache.nextcloud.username }}
+      password:
+        value: {{ .Values.cache.nextcloud.password | default .Values.secrets.redis.password | quote }}
+    host: {{ .Values.cache.nextcloud.host | quote }}
+    port: {{ .Values.cache.nextcloud.port | quote }}
+    tls: {{ .Values.cache.nextcloud.tls }}
+
+  feature:
+    apps:
+      contacts:
+        enabled: false
+      cryptpad:
+        enabled: {{ .Values.apps.cryptpad.enabled }}
+      filesZip:
+        enabled: true
+      groupfolders:
+        enabled: true
+      integrationOpenproject:
+        enabled: {{ .Values.apps.openproject.enabled }}
+      notifyPush:
+        enabled: {{ gt .Values.replicas.nextcloudNotifyPush 0 }}
+      spreed:
+        enabled: true
+    circles:
+      enabled: false
+
+  collabora:
+    # internalWopiUrl: ""
+    wopiAllowlist: {{ join ", " ( concat .Values.cluster.networking.cidr .Values.cluster.networking.incomingCIDR ) | quote }}
+    defaultFormat: {{ .Values.functional.weboffice.defaultFormat | quote }}
+
+  database:
+    {{ if eq .Values.databases.nextcloud.type "mariadb" }}
+    type: "mysql"
+    {{ else if eq .Values.databases.nextcloud.type "postgresql" }}
+    type: "pgsql"
+    {{ else }}
+    {{ .Values.databases.nextcloud.type | quote }}
+    {{ end }}
+    host: {{ .Values.databases.nextcloud.host | quote }}
+    port: {{ .Values.databases.nextcloud.port | quote }}
+    name: {{ .Values.databases.nextcloud.name | quote }}
+    auth:
+      username:
+        value: {{ .Values.databases.nextcloud.username | quote }}
+      password:
+        {{- if or (eq .Values.databases.nextcloud.type "mariadb") (eq .Values.databases.nextcloud.type "mysql") }}
+        value: {{ .Values.databases.nextcloud.password | default .Values.secrets.mariadb.nextcloudUser | quote }}
+        {{- else if or (eq .Values.databases.nextcloud.type "postgresql") (eq .Values.databases.nextcloud.type "psql") }}
+        value: {{ .Values.databases.nextcloud.password | default .Values.secrets.postgresql.nextcloudUser | quote }}
+        {{- else }}
+        value: {{ .Values.databases.nextcloud.password | quote }}
+        {{- end }}
+
+  ldap:
+    base: {{ .Values.ldap.baseDn | quote }}
+    host: {{ .Values.ldap.host | quote }}
+    dn: "uid=ldapsearch_nextcloud,cn=users,{{ .Values.ldap.baseDn }}"
+    password:
+      value: {{ .Values.secrets.nubus.ldapSearch.nextcloud | quote }}
+    adminGroupName: "managed-by-attribute-FileshareAdmin"
+
+  objectstore:
+    auth:
+      accessKey:
+        value: {{ .Values.objectstores.nextcloud.username | quote }}
+      secretKey:
+        value: {{ .Values.objectstores.nextcloud.secretKey | default .Values.secrets.minio.nextcloudUser | quote }}
+    bucket: {{ .Values.objectstores.nextcloud.bucket | quote }}
+    host: {{ .Values.objectstores.nextcloud.endpoint | quote }}
+    region: {{ .Values.objectstores.nextcloud.region | quote }}
+    storageClass: {{ .Values.objectstores.nextcloud.storageClass | quote }}
+    port: {{ .Values.objectstores.nextcloud.port | quote }}
+    pathStyle: {{ .Values.objectstores.nextcloud.pathStyle | quote }}
+    useSSL: {{ .Values.objectstores.nextcloud.useSSL | quote }}
+
+  oidc:
+    username:
+      value: "opendesk-nextcloud"
+    password:
+      value: {{ .Values.secrets.keycloak.clientSecret.ncoidc | quote }}
+
+  opendeskIntegration:
+    centralNavigation:
+      username:
+        value: "opendesk_username"
+      password:
+        value: {{ .Values.secrets.centralnavigation.apiKey | quote }}
+    oxAppSuite:
+      enabled: {{ .Values.apps.oxAppSuite.enabled }}
+
+  sharing:
+    allowLinks: {{ .Values.functional.filestore.sharing.external.enabled }}
+    allowMailNotification: {{ .Values.functional.filestore.sharing.external.enabled }}
+    allowPublicUpload: {{ .Values.functional.filestore.sharing.external.enabled }}
+    enforceLinksPassword: {{ .Values.functional.filestore.sharing.external.enforcePasswords }}
+    enforcePasswordProtection: {{ .Values.functional.filestore.sharing.external.enforcePasswords }}
+    defaultInternalExpireEnabled: {{ .Values.functional.filestore.sharing.internal.expiry.activeByDefault }}
+    defaultInternalExpireEnforced: {{ .Values.functional.filestore.sharing.internal.expiry.enforced }}
+    defaultInternalExpireDays: {{ .Values.functional.filestore.sharing.internal.expiry.defaultDays | quote }}
+    defaultExternalExpireEnabled: {{ .Values.functional.filestore.sharing.external.expiry.activeByDefault }}
+    defaultExternalExpireEnforced: {{ .Values.functional.filestore.sharing.external.expiry.enforced }}
+    defaultExternalExpireDays: {{ .Values.functional.filestore.sharing.external.expiry.defaultDays | quote }}
+    sendPasswordMail: {{ .Values.functional.filestore.sharing.external.sendPasswordMail | quote }}
+
+  smtp:
+    auth:
+      enabled: true
+      username:
+        value: {{ printf "%s@%s" "opendesk-system" ( .Values.global.mailDomain | default .Values.global.domain ) }}
+      password:
+        value: {{ .Values.secrets.postfix.opendeskSystemPassword | quote }}
+    host: {{ printf "%s.%s.svc.%s" "postfix" (.Values.apps.postfix.namespace | default .Release.Namespace) .Values.cluster.networking.domain | quote }}
+    port: 587
+    fromAddress: {{ .Values.smtp.localpartNoReply | quote }}
+    mailDomain: "{{ .Values.global.domain }}"
+    security: "tls"
+    skipVerifyPeer: true
+
+  quota:
+    default: "{{ .Values.functional.filestore.quota.default }} GB"
+    retentionObligation:
+      trashbin: {{ .Values.functional.filestore.nextcloud.retentionObligation.trashbin | quote }}
+      versions: {{ .Values.functional.filestore.nextcloud.retentionObligation.versions | quote }}
+
+  serverinfo:
+    token:
+      value: {{ .Values.secrets.nextcloud.metricsToken | quote }}
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  enabled: true
+  privileged: false
+  runAsUser: 101
+  runAsGroup: 101
+  seccompProfile:
+    type: "RuntimeDefault"
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.nextcloudManagement | toYaml | nindent 4 }}
+
+debug:
+  loglevel: {{ if .Values.debug.enabled }}"0"{{ else }}"2"{{ end }}
+  bootstrap: {{ .Values.debug.enabled }}
+
+{{- if .Values.certificate.selfSigned }}
+extraEnvVars:
+  - name: "FS_IMPORT_CA_CERTIFICATES"
+    value: "true"
+extraVolumes:
+  - name: "trusted-cert-secret-volume"
+    secret:
+      secretName: "opendesk-certificates-ca-tls"
+      items:
+        - key: "ca.crt"
+          path: "ca-certificates.crt"
+extraVolumeMounts:
+  - name: "trusted-cert-secret-volume"
+    mountPath: "/etc/ssl/certs/ca-certificates.crt"
+    subPath: "ca-certificates.crt"
+{{- end }}
+
+image:
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.nextcloud.registry | quote }}
+  repository: {{ .Values.images.nextcloud.repository | quote }}
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  tag: {{ .Values.images.nextcloud.tag | quote }}
+
+podAnnotations:
+  {{ .Values.annotations.nextcloudNextcloudMgmt.pod | toYaml | nindent 2 }}
+
+podSecurityContext:
+  fsGroup: 101
+
+resources:
+  {{ .Values.resources.nextcloud | toYaml | nindent 4 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.nextcloudNextcloudMgmt.serviceAccount | toYaml | nindent 4 }}
+
+theme:
+  {{ .Values.theme | toYaml | nindent 2 }}
+
+...

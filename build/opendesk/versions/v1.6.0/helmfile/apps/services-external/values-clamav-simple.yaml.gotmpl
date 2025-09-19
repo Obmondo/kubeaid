@@ -1,0 +1,78 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+commonAnnotations:
+  {{ .Values.annotations.servicesExternalClamavSimple.common | toYaml | nindent 2 }}
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  enabled: true
+  privileged: false
+  runAsUser: 100
+  runAsGroup: 101
+  seccompProfile:
+    type: "RuntimeDefault"
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.clamavSimple | toYaml | nindent 4 }}
+
+global:
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+image:
+  clamav:
+    registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.clamd.registry | quote }}
+    repository: {{ .Values.images.clamd.repository | quote }}
+    tag: {{ .Values.images.clamd.tag | quote }}
+    imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  icap:
+    registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.icap.registry | quote }}
+    repository: {{ .Values.images.icap.repository | quote }}
+    tag: {{ .Values.images.icap.tag | quote }}
+    imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+
+persistence:
+  size: {{ .Values.persistence.storages.clamav.size | quote }}
+  storageClass: {{ coalesce .Values.persistence.storages.clamav.storageClassName .Values.persistence.storageClassNames.RWO | quote }}
+  annotations:
+    {{ .Values.annotations.servicesExternalClamavSimple.persistence | toYaml | nindent 4 }}
+
+podAnnotations:
+  {{ .Values.annotations.servicesExternalClamavSimple.pod | toYaml | nindent 2 }}
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 101
+  fsGroupChangePolicy: "Always"
+
+replicaCount: {{ .Values.replicas.clamav }}
+
+resources:
+  {{ .Values.resources.clamd | toYaml | nindent 4 }}
+
+settings:
+  freshclam:
+    database:
+      auth:
+        {{ .Values.repositories.clamav.auth | toYaml | nindent 8 }}
+      mirror:
+        scheme: {{ .Values.repositories.clamav.mirror.scheme | quote }}
+        url: {{ .Values.repositories.clamav.mirror.url | quote }}
+      customURLs:
+        {{ .Values.repositories.clamav.customURLs | toYaml | nindent 8 }}
+
+service:
+  annotations:
+    {{ .Values.annotations.servicesExternalClamavSimple.service | toYaml | nindent 4 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.servicesExternalClamavSimple.serviceAccount | toYaml | nindent 4 }}
+
+...

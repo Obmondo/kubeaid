@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: 2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2024 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+include:
+  - local: "/.gitlab/common/common.yml"
+
+.lint-common:
+  extends: ".common"
+  stage: "lint"
+
+common-yaml-linter:
+  rules:
+    - if: "$JOB_COMMON_YAML_LINTER_ENABLED == 'false' || $CI_PIPELINE_SOURCE =~ 'tags|web|merge_request_event'"
+      when: "never"
+    - when: "always"
+
+conventional-commits-linter:
+  rules:
+    - if: >
+          $RUN_RENOVATE == "yes" ||
+          $JOB_CONVENTIONAL_COMMITS_LINTER_ENABLED == 'false' ||
+          $CI_PIPELINE_SOURCE =~ 'tags|merge_request_event'
+      when: "never"
+    - when: "always"
+...

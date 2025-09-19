@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+configuration:
+  homeserver:
+    serverName: {{ .Values.global.matrixDomain | default .Values.global.domain }}
+image:
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDeEnterprise .Values.global.imageRegistry .Values.images.elementAdminBot.registry | quote }}
+  repository: {{ .Values.images.elementAdminBot.repository | quote }}
+  tag: {{ .Values.images.elementAdminBot.tag | quote }}
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+ingress:
+  enabled: {{ .Values.ingress.enabled }}
+  tls:
+    secretName: {{ .Values.ingress.tls.secretName | quote }}
+...

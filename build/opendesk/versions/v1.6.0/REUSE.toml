@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: 2024 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+
+version = 1
+
+[[annotations]]
+path = "cspell.json"
+SPDX-FileCopyrightText = "2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "helmfile/files/gpg-pubkeys/*"
+SPDX-FileCopyrightText = "2023 Bundesministerium des Innern und für Heimat, PG ZenDiS \"Projektgruppe für Aufbau ZenDiS\""
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "helmfile/files/theme/**"
+SPDX-FileCopyrightText = "2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "docs/architecture/apis_images/*"
+SPDX-FileCopyrightText = "2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ".opencode/openDesk-logo-rgb-color.svg"
+SPDX-FileCopyrightText = "2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+[[annotations]]
+path = ".opencode/screenshots/*"
+SPDX-FileCopyrightText = "2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+[[annotations]]
+path = ".gitlab/merge_request_templates/*.md"
+SPDX-FileCopyrightText = "2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH"
+SPDX-License-Identifier = "Apache-2.0"

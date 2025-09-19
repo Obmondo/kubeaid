@@ -1,0 +1,92 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+repositories:
+  # Univention Management Stack Umbrella Chart
+  - name: "nubus"
+    keyring: "../../files/gpg-pubkeys/univention-de.gpg"
+    verify: {{ .Values.charts.nubus.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url:
+      "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.nubus.registry }}/{{ .Values.charts.nubus.repository }}"
+  # Intercom Service
+  # Source: https://gitlab.souvap-univention.de/souvap/tooling/charts/intercom-service
+  - name: "intercom-service-repo"
+    keyring: "../../files/gpg-pubkeys/univention-de.gpg"
+    verify: {{ .Values.charts.intercomService.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.intercomService.registry }}/{{ .Values.charts.intercomService.repository }}"
+  # openDesk Keycloak Bootstrap Chart
+  - name: "opendesk-keycloak-bootstrap-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.opendeskKeycloakBootstrap.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.opendeskKeycloakBootstrap.registry }}/{{ .Values.charts.opendeskKeycloakBootstrap.repository }}"
+  # NGINX S3 Gateway Chart
+  - name: "nginx-s3-gateway-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.nginxS3Gateway.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.nginxS3Gateway.registry }}/{{ .Values.charts.nginxS3Gateway.repository }}"
+
+releases:
+  # Univention Management Stack Umbrella Chart
+  - name: "ums"
+    chart: "nubus/{{ .Values.charts.nubus.name }}"
+    version: "{{ .Values.charts.nubus.version }}"
+    values:
+      - "values-nubus.yaml.gotmpl"
+      {{- range .Values.customization.release.ums }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.nubus.enabled }}
+    timeout: 900
+  # Intercom-Service
+  - name: "intercom-service"
+    chart: "intercom-service-repo/{{ .Values.charts.intercomService.name }}"
+    version: "{{ .Values.charts.intercomService.version }}"
+    values:
+      - "values-intercom-service.yaml.gotmpl"
+      {{- range .Values.customization.release.intercomService }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.nubus.enabled }}
+
+  # openDesk Keycloak Bootstrap Chart
+  - name: "opendesk-keycloak-bootstrap"
+    chart: "opendesk-keycloak-bootstrap-repo/{{ .Values.charts.opendeskKeycloakBootstrap.name }}"
+    version: "{{ .Values.charts.opendeskKeycloakBootstrap.version }}"
+    values:
+      - "values-opendesk-keycloak-bootstrap.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskKeycloakBootstrap }}
+      - {{ . }}
+      {{- end }}
+    needs:
+      - "ums"
+    installed: {{ .Values.apps.nubus.enabled }}
+    timeout: 900
+
+  # NGINX S3 Gateway
+  - name: "nubus"
+    chart: "nginx-s3-gateway-repo/{{ .Values.charts.nginxS3Gateway.name }}"
+    version: "{{ .Values.charts.nginxS3Gateway.version }}"
+    values:
+      - "values-nginx-s3-gateway.yaml.gotmpl"
+      {{- range .Values.customization.release.nginxS3Gateway }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.nubus.enabled }}
+    timeout: 900
+
+commonLabels:
+  deployStage: "050-components"
+  component: "nubus"
+...

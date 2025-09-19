@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+configuration:
+  username: "adminbot"
+  pod: "opendesk-synapse-0"
+  secretName: "matrix-adminbot-account"
+  password: {{ .Values.secrets.matrixAdminBot.password | quote }}
+  pipeConfig:
+    enabled: true
+    type: "admin"
+    secretName: "matrix-adminbot-config"
+    asToken: {{ .Values.secrets.matrixAdminBot.synapseAsToken | quote }}
+    hsToken: {{ .Values.secrets.matrixAdminBot.synapseAsToken | quote }}
+    serviceUrl: "http://opendesk-synapse-web:8008"
+    backupPassphrase: {{ .Values.secrets.matrixAdminBot.backupPassphrase | quote }}
+    homeserverName: {{ .Values.global.matrixDomain | default .Values.global.domain | quote }}
+image:
+  registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.synapseCreateUser.registry | quote }}
+  url: {{ .Values.images.synapseCreateUser.repository | quote }}
+  tag: {{ .Values.images.synapseCreateUser.tag | quote }}
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+fullnameOverride: "matrix-adminbot-bootstrap"
+...

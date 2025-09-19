@@ -1,0 +1,32 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+repositories:
+  # OpenProject
+  # Source: https://github.com/opf/helm-charts
+  - name: "openproject-repo"
+    keyring: "../../files/gpg-pubkeys/openproject-com.gpg"
+    verify: {{ .Values.charts.openproject.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.openproject.registry }}/{{ .Values.charts.openproject.repository }}"
+
+releases:
+  - name: "openproject"
+    chart: "openproject-repo/{{ .Values.charts.openproject.name }}"
+    version: "{{ .Values.charts.openproject.version }}"
+    wait: true
+    waitForJobs: true
+    values:
+      - "values.yaml.gotmpl"
+      {{- range .Values.customization.release.openproject }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.openproject.enabled }}
+    timeout: 1800
+
+commonLabels:
+  deployStage: "050-components"
+  component: "openproject"
+...

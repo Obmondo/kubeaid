@@ -1,0 +1,317 @@
+# SPDX-FileCopyrightText: 2024-2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+apiIngress:
+  enabled: {{ .Values.ingress.enabled }}
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  hostname: "{{ .Values.global.hosts.minioApi }}.{{ .Values.global.domain }}"
+  extraTls:
+    - hosts:
+      - "{{ .Values.global.hosts.minioApi }}.{{ .Values.global.domain }}"
+      secretName: "{{ .Values.ingress.tls.secretName }}"
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "4G"
+    nginx.org/client-max-body-size: "4G"
+    {{- with .Values.annotations.servicesExternalMinio.apiIngress }}
+    {{ . | toYaml | nindent 4 }}
+    {{- end }}
+
+auth:
+  rootPassword: {{ .Values.secrets.minio.rootPassword | quote }}
+
+commonAnnotations:
+  {{ .Values.annotations.servicesExternalMinio.common | toYaml | nindent 2 }}
+
+containerSecurityContext:
+  enabled: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  privileged: false
+  runAsUser: 1001
+  runAsGroup: 1001
+  runAsNonRoot: true
+  readOnlyRootFilesystem: true
+  seccompProfile:
+    type: "RuntimeDefault"
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.minio | toYaml | nindent 4 }}
+
+global:
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+  security:
+    allowInsecureImages: true
+
+image:
+  registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.minio.registry | quote }}
+  repository: {{ .Values.images.minio.repository | quote }}
+  tag: {{ .Values.images.minio.tag | quote }}
+  pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+
+volumePermissions:
+  enabled: true
+  image:
+    registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.minio.registry | quote }}
+    repository: {{ .Values.images.bitnamiOSShell.repository | quote }}
+    tag: {{ .Values.images.bitnamiOSShell.tag | quote }}
+    pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+
+{{- if .Values.debug.enabled }}
+ingress:
+  enabled: {{ .Values.ingress.enabled }}
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  hostname: "{{ .Values.global.hosts.minioConsole }}.{{ .Values.global.domain }}"
+  extraTls:
+    - hosts:
+      - "{{ .Values.global.hosts.minioConsole }}.{{ .Values.global.domain }}"
+      secretName: "{{ .Values.ingress.tls.secretName }}"
+  annotations:
+    nginx.org/websocket-services: "minio"
+    {{- with .Values.annotations.servicesExternalMinio.ingress }}
+    {{ . | toYaml | nindent 4 }}
+    {{- end }}
+{{- end }}
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 10
+
+mode: {{ if gt .Values.replicas.minio 1 }}"distributed"{{ else }}"standalone"{{ end }}
+
+metrics:
+  serviceMonitor:
+    enabled: {{ .Values.monitoring.prometheus.serviceMonitors.enabled }}
+    additionalLabels:
+      {{ .Values.monitoring.prometheus.serviceMonitors.labels | toYaml | nindent 6 }}
+
+networkPolicy:
+  enabled: false
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 1001
+
+persistence:
+  size: {{ .Values.persistence.storages.minio.size | quote }}
+  storageClass: {{ coalesce .Values.persistence.storages.minio.storageClassName .Values.persistence.storageClassNames.RWO | quote }}
+  annotations:
+    {{ .Values.annotations.servicesExternalMinio.persistence | toYaml | nindent 4 }}
+
+provisioning:
+  enabled: true
+  cleanupAfterFinished:
+    enabled: {{ .Values.debug.cleanup.deletePodsOnSuccess }}
+    seconds: {{ .Values.debug.cleanup.deletePodsOnSuccessTimeout }}
+  extraCommands:
+    - "mc anonymous set download provisioning/ums/portal-assets"
+  buckets:
+    - name: {{ .Values.objectstores.migrations.bucket | quote }}
+      versioning: "Suspended"
+      withLock: false
+    - name: {{ .Values.objectstores.nextcloud.bucket | quote }}
+      versioning: "Suspended"
+      withLock: false
+    - name: {{ .Values.objectstores.notes.bucket | quote }}
+      versioning: "Versioned"
+      withLock: false
+    - name: {{ .Values.objectstores.openproject.bucket | quote }}
+      versioning: "Suspended"
+      withLock: false
+    - name: {{ .Values.objectstores.openxchange.bucket | quote }}
+      versioning: "Suspended"
+      withLock: false
+    - name: {{ .Values.objectstores.nubus.bucket | quote }}
+      versioning: "Suspended"
+      withLock: false
+    {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+    - name: {{ .Values.objectstores.dovecot.bucket | quote }}
+      versioning: "Suspended"
+      withLock: false
+    {{- end }}
+  podAnnotations:
+    {{ .Values.annotations.servicesExternalMinio.provisioningPod | toYaml | nindent 4 }}
+  policies:
+    - name: "migrations-bucket-policy"
+      statements:
+        - resources:
+            - "arn:aws:s3:::migrations"
+          effect: "Allow"
+          actions:
+            - "s3:*"
+        - resources:
+            - "arn:aws:s3:::migrations/*"
+          effect: "Allow"
+          actions:
+            - "s3:*"
+    - name: "nextcloud-bucket-policy"
+      statements:
+        - resources:
+            - "arn:aws:s3:::nextcloud"
+          effect: "Allow"
+          actions:
+            - "s3:*"
+        - resources:
+            - "arn:aws:s3:::nextcloud/*"
+          effect: "Allow"
+          actions:
+            - "s3:*"
+    - name: "notes-bucket-policy"
+      statements:
+        - resources:
+            - "arn:aws:s3:::notes"
+          effect: "Allow"
+          actions:
+            - "s3:*"
+        - resources:
+            - "arn:aws:s3:::notes/*"
+          effect: "Allow"
+          actions:
+            - "s3:*"
+    - name: "openproject-bucket-policy"
+      statements:
+        - resources:
+            - "arn:aws:s3:::openproject"
+          effect: "Allow"
+          actions:
+            - "s3:*"
+        - resources:
+            - "arn:aws:s3:::openproject/*"
+          effect: "Allow"
+          actions:
+            - "s3:*"
+    - name: "openxchange-bucket-policy"
+      statements:
+        - resources:
+            - "arn:aws:s3:::openxchange"
+          effect: "Allow"
+          actions:
+            - "s3:*"
+        - resources:
+            - "arn:aws:s3:::openxchange/*"
+          effect: "Allow"
+          actions:
+            - "s3:*"
+    - name: "ums-bucket-policy"
+      statements:
+        - resources:
+            - "arn:aws:s3:::ums"
+          effect: "Allow"
+          actions:
+            - "s3:*"
+        - resources:
+            - "arn:aws:s3:::ums/*"
+          effect: "Allow"
+          actions:
+            - "s3:*"
+    {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+    - name: "dovecot-bucket-policy"
+      statements:
+        - resources:
+            - "arn:aws:s3:::dovecot"
+          effect: "Allow"
+          actions:
+            - "s3:*"
+        - resources:
+            - "arn:aws:s3:::dovecot/*"
+          effect: "Allow"
+          actions:
+            - "s3:*"
+    {{- end }}
+  users:
+    - username: {{ .Values.objectstores.migrations.username | quote }}
+      password: {{ .Values.secrets.minio.migrationsUser | quote }}
+      disabled: false
+      policies:
+        - "migrations-bucket-policy"
+      setPolicies: true
+    - username: {{ .Values.objectstores.nextcloud.username | quote }}
+      password: {{ .Values.secrets.minio.nextcloudUser | quote }}
+      disabled: false
+      policies:
+        - "nextcloud-bucket-policy"
+      setPolicies: true
+    - username: {{ .Values.objectstores.notes.username | quote }}
+      password: {{ .Values.secrets.minio.notesUser | quote }}
+      disabled: false
+      policies:
+        - "notes-bucket-policy"
+      setPolicies: true
+    - username: {{ .Values.objectstores.openproject.username | quote }}
+      password: {{ .Values.secrets.minio.openprojectUser | quote }}
+      disabled: false
+      policies:
+        - "openproject-bucket-policy"
+      setPolicies: true
+    - username: {{ .Values.objectstores.openxchange.username | quote }}
+      password: {{ .Values.secrets.minio.openxchangeUser | quote }}
+      disabled: false
+      policies:
+        - "openxchange-bucket-policy"
+      setPolicies: true
+    - username: {{ .Values.objectstores.nubus.username | quote }}
+      password: {{ .Values.secrets.minio.umsUser | quote }}
+      disabled: false
+      policies:
+        - "ums-bucket-policy"
+      setPolicies: true
+    {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+    - username: {{ .Values.objectstores.dovecot.username | quote }}
+      password: {{ .Values.secrets.minio.dovecotUser | quote }}
+      disabled: false
+      policies:
+        - "dovecot-bucket-policy"
+      setPolicies: true
+    {{- end }}
+  resources:
+    {{ .Values.resources.minio | toYaml | nindent 4 }}
+
+podAnnotations:
+  {{ .Values.annotations.servicesExternalMinio.pod | toYaml | nindent 2 }}
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 10
+
+resources:
+  {{ .Values.resources.minio | toYaml | nindent 2 }}
+
+service:
+  annotations:
+    {{ .Values.annotations.servicesExternalMinio.serviceService | toYaml | nindent 4 }}
+  headless:
+    annotations:
+      {{ .Values.annotations.servicesExternalMinio.serviceHeadless | toYaml | nindent 6 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.servicesExternalMinio.serviceAccount | toYaml | nindent 4 }}
+
+startupProbe:
+  enabled: true
+  periodSeconds: 10
+  timeoutSeconds: 10
+
+statefulset:
+  replicaCount: {{ .Values.replicas.minio }}
+  drivesPerNode: {{ if gt .Values.replicas.minio 1 }}2{{ else }}1{{ end }}
+
+{{- if .Values.certificate.selfSigned }}
+extraVolumes:
+  - name: "trusted-cert-secret-volume"
+    secret:
+      secretName: "opendesk-certificates-ca-tls"
+      items:
+        - key: "ca.crt"
+          path: "public.crt"
+extraVolumeMounts:
+  - name: "trusted-cert-secret-volume"
+    mountPath: "/certs/CAs"
+{{- end }}
+...

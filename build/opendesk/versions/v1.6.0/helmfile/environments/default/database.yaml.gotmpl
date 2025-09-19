@@ -1,0 +1,134 @@
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+#
+# See `external-services.md` for more details on the database configuration
+---
+databases:
+  defaults:
+    userConnectionLimit: 100
+  dovecotDictmap:
+    type: "cassandra"
+    name: "dovecot_dictmap"
+    host: "cassandra"
+    port: 9042
+    username: "dovecot_dictmap_user"
+    password: ""
+    connectionLimit: ~
+  dovecotACL:
+    type: "cassandra"
+    name: "dovecot_acl"
+    host: "cassandra"
+    port: 9042
+    username: "dovecot_acl_user"
+    password: ""
+    connectionLimit: ~
+  keycloak:
+    type: "postgresql"
+    name: "keycloak"
+    host: "postgresql"
+    port: 5432
+    username: "keycloak_user"
+    password: ""
+    connectionLimit: ~
+  keycloakExtension:
+    type: "postgresql"
+    name: "keycloak_extensions"
+    host: "postgresql"
+    port: 5432
+    ssl: "false"
+    username: "keycloak_extensions_user"
+    password: ""
+    connectionLimit: ~
+  nextcloud:
+    type: "postgresql"
+    name: "nextcloud"
+    host: "postgresql"
+    port: 5432
+    username: "nextcloud_user"
+    password: ""
+    connectionLimit: ~
+  notes:
+    type: "postgresql"
+    name: "notes"
+    host: "postgresql"
+    port: 5432
+    username: "notes_user"
+    password: ""
+    connectionLimit: ~
+  openproject:
+    type: "postgresql"
+    name: "openproject"
+    host: "postgresql"
+    port: 5432
+    username: "openproject_user"
+    password: ""
+    connectionLimit: ~
+  oxAppSuite:
+    type: "mariadb"
+    name: "configdb"
+    host: "mariadb"
+    port: 3306
+    username: "root"
+    password: ""
+    # Optional settings: Route read queries to a different host.
+    readHost: ~
+    # If provided, uses a different set of credentials for read queries. By default oxAppSuite.username and oxAppsuite.password are used.
+    readUser: ~
+    readPassword: ~
+    connectionLimit: ~
+  synapse:
+    type: "postgresql"
+    name: "matrix"
+    host: "postgresql"
+    port: 5432
+    username: "matrix_user"
+    password: ""
+    requireAuth: []
+    channelBinding: "prefer"
+    connectTimeout: 10
+    clientEncoding: "auto"
+    keepalives: 1
+    keepalivesIdle: 10
+    keepalivesInterval: 10
+    keepalivesCount: 3
+    replication: false
+    gssencmode: "prefer"
+    sslmode: "prefer"
+    sslcompression: 0
+    sslMinProtocolVersion: "TLSv1.2"
+    connectionPoolMin: "3"
+    connectionPoolMax: "5"
+    connectionLimit: ~
+  umsGuardianManagementApi:
+    type: "postgresql"
+    name: "guardianmanagementapi"
+    host: "postgresql"
+    port: 5432
+    username: "guardianmanagementapi_user"
+    password: ""
+    connectionLimit: ~
+  umsNotificationsApi:
+    type: "postgresql"
+    name: "notificationsapi"
+    host: "postgresql"
+    port: 5432
+    username: "notificationsapi_user"
+    password: ""
+    connectionLimit: ~
+  umsSelfservice:
+    type: "postgresql"
+    name: "selfservice"
+    host: "postgresql"
+    port: 5432
+    username: "selfservice_user"
+    password: ""
+    connectionLimit: 10
+  xwiki:
+    type: "postgresql"
+    name: "xwiki"
+    host: "postgresql"
+    port: 5432
+    username: "xwiki_user"
+    password: ""
+    connectionLimit: ~
+...

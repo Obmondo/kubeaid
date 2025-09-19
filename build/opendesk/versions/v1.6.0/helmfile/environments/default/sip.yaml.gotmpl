@@ -1,0 +1,46 @@
+# SPDX-FileCopyrightText: 2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+sip:
+  # When Jigasi is called, it expects to find a "Jitsi-Conference-Room" header
+  # in the invite with the name of the Jitsi Meet conference. If no header is
+  # present, it will join the room specified under "JIGASI_SIP_DEFAULT_ROOM".
+  # In openDesk, this default room is "siptest"
+  #
+  # While there are many different ways to do this, the typical flow is as
+  # follows:
+  #
+  # - The conference mapper provides PIN for the related meeting room. An
+  #   application can get it from the conference mapper and puts it into an
+  #   invite message or the meeting participants can get it from Jitsi UI
+  #   during the meeting and sends it to SIP participant.
+  #
+  # - SIP participant calls the dial-in phone number
+  #   jitsi.web.extraConfig.dialinPhoneNumbers
+  #
+  # - IVR accepts the call and asks for PIN.
+  #
+  # - SIP participant enters PIN
+  #
+  # - IVR gets the related meeting room from the conference mapper using PIN.
+  #
+  # - IVR redirects the call to Jigasi SIP account with "Jitsi-Conference-Room"
+  #   header.
+  #
+  # - Jigasi attaches SIP participant to the meeting room.
+  #
+  # IVR solution depends on the SIP server. For a reference implementation for
+  # FreeSwitch, see https://github.com/nordeck/jigasi-recepta
+  #
+  # See also:
+  # - https://github.com/jitsi/jigasi (incoming calls)
+  jigasi:
+    enabled: false
+    port: "5060"
+    # e.g. sip.mydomain.tld
+    server: ""
+    transport: "TCP"
+    # e.g. jigasi@sip.mydomain.tld
+    uri: ""
+    password: ~
+...

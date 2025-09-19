@@ -1,0 +1,50 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+additionalAnnotations:
+  {{ .Values.monitoring.prometheus.prometheusRules.annotations | toYaml | nindent 2 }}
+additionalLabels:
+  {{ .Values.monitoring.prometheus.prometheusRules.labels | toYaml | nindent 2 }}
+
+config:
+  collabora:
+    enable: {{ .Values.apps.collabora.enabled }}
+    selectors:
+      namespace: {{ .Values.apps.collabora.namespace | quote }}
+  matrix:
+    enable: {{ .Values.apps.element.enabled }}
+    selectors:
+      namespace: {{ .Values.apps.element.namespace | quote }}
+  diagrams:
+    enable: {{ .Values.apps.cryptpad.enabled }}
+    selectors:
+      namespace: {{ .Values.apps.cryptpad.namespace | quote }}
+  nextcloud:
+    enable: {{ .Values.apps.nextcloud.enabled }}
+    selectors:
+      namespace: {{ .Values.apps.nextcloud.namespace | quote }}
+  openXChange:
+    enable: {{ .Values.apps.oxAppSuite.enabled }}
+    selectors:
+      namespace: {{ .Values.apps.oxAppSuite.namespace | quote }}
+  xwiki:
+    enable: {{ .Values.apps.xwiki.enabled }}
+    selectors:
+      namespace: {{ .Values.apps.xwiki.namespace | quote }}
+  nubus:
+    enable: {{ .Values.apps.nubus.enabled }}
+    selectors:
+      namespace: {{ .Values.apps.nubus.namespace | quote }}
+  openProject:
+    enable: {{ .Values.apps.openproject.enabled }}
+    selectors:
+      namespace: {{ .Values.apps.openproject.namespace | quote }}
+  jitsi:
+    enable: {{ .Values.apps.jitsi.enabled }}
+    selectors:
+      namespace: {{ .Values.apps.jitsi.namespace | quote }}
+  collabora:
+    enable: {{ .Values.apps.collabora.enabled }}
+    selectors:
+      namespace: {{ .Values.apps.collabora.namespace | quote }}
+

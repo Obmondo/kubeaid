@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+.vscode
+.idea
+.yamllint
+
+# Ignore changes to sample environments
+helmfile/environments/dev/*.yaml.gotmpl
+helmfile/environments/test/*.yaml.gotmpl
+helmfile/environments/prod/*.yaml.gotmpl
+helmfile/environments/dev/*/
+helmfile/environments/test/*/
+helmfile/environments/prod/*/
+!helmfile/environments/dev/sample.yaml.gotmpl
+!helmfile/environments/test/sample.yaml.gotmpl
+!helmfile/environments/prod/sample.yaml.gotmpl
+
+# Ignore in CI generated files
+.kyverno/opendesk.yaml
+.kyverno/kyverno-test.yaml
+
+# Ignore editor backup files
+*~
+
+# Ignore ./log directory and *.log files
+logs
+*.log
+
+# Ignore backup files, e.g. created by the script that eases the local chart development
+*.bak

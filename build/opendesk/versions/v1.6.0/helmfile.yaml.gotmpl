@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+environments:
+  dev:
+    values:
+      - "helmfile/environments/dev/*.yaml.gotmpl"
+  test:
+    values:
+      - "helmfile/environments/test/*.yaml.gotmpl"
+  prod:
+    values:
+      - "helmfile/environments/prod/*.yaml.gotmpl"
+---
+# yamllint disable
+helmfiles:
+  - path: "./helmfile_generic.yaml.gotmpl"
+    values:
+      - {{ toYaml .Values | nindent 8 }}
+# {{/*
+#
+#   Use this format from a remote repository
+#
+#   - path: "git::https://gitlab.opencode.de/bmi/opendesk/deployment/opendesk.git@helmfile_generic.yaml.gotmpl?ref=v0.7.1"
+#     values:
+#       - {{ toYaml .Values | nindent 8 }}
+# */}}
+...

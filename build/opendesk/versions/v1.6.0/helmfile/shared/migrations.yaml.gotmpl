@@ -1,0 +1,58 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+additionalAnnotations:
+  argocd.argoproj.io/hook: "Sync"
+  argocd.argoproj.io/hook-delete-policy: "BeforeHookCreation"
+
+cleanup:
+  deletePodsOnSuccess: {{ .Values.debug.cleanup.deletePodsOnSuccess }}
+  deletePodsOnSuccessTimeout: {{ .Values.debug.cleanup.deletePodsOnSuccessTimeout }}
+
+migrations:
+  runId: 5
+  namespace: {{ .Values.apps.migrations.namespace | default .Release.Namespace | quote }}
+  loglevel: {{ if .Values.debug.enabled }}"DEBUG"{{ else }}"INFO"{{ end }}
+  failOnUnexpectedState: true
+  environmentDetails:
+    {{ ( omit .Values "theme" ) | toYaml | nindent 4 }}
+  cleanup: false
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  enabled: true
+  privileged: false
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: "RuntimeDefault"
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.migrations | toYaml | nindent 4 }}
+
+image:
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.migrations.registry | quote }}
+  repository: {{ .Values.images.migrations.repository | quote }}
+  tag: {{ .Values.images.migrations.tag | quote }}
+  imagePullPolicy: {{ .Values.global.imagePullPolicy |quote }}
+
+job:
+  enabled: true
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 1000
+  fsGroupChangePolicy: "OnRootMismatch"
+
+...

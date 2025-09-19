@@ -1,0 +1,285 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+image:
+  repository: {{ printf "%s/%s" (coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.notesBackend.registry) (.Values.images.notesBackend.repository) | quote }}
+  pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  tag: {{ .Values.images.notesBackend.tag }}
+  credentials:
+    name: {{ .Values.global.imagePullSecrets | first | quote }}
+
+ingress:
+  enabled: {{ .Values.ingress.enabled }}
+  className: {{ .Values.ingress.ingressClassName }}
+  host: "{{ .Values.global.hosts.notes }}.{{ .Values.global.domain }}"
+  tls:
+    enabled: "{{ .Values.ingress.tls.enabled }}"
+    secretName: {{ .Values.ingress.tls.secretName | quote }}
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "{{ .Values.ingress.parameters.bodySize.notes }}"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "{{ .Values.ingress.parameters.bodyTimeout.notes }}"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "{{ .Values.ingress.parameters.bodyTimeout.notes }}"
+    nginx.org/client-max-body-size: "{{ .Values.ingress.parameters.bodySize.notes }}"
+    nginx.org/proxy-read-timeout: "{{ .Values.ingress.parameters.bodyTimeout.notes }}s"
+    nginx.org/proxy-send-timeout: "{{ .Values.ingress.parameters.bodyTimeout.notes }}s"
+
+ingressCollaborationWS:
+  enabled: {{ .Values.ingress.enabled }}
+  className: {{ .Values.ingress.ingressClassName }}
+  host: "{{ .Values.global.hosts.notes }}.{{ .Values.global.domain }}"
+  path: "/collaboration/ws/"
+  tls:
+    enabled: "{{ .Values.ingress.tls.enabled }}"
+    secretName: {{ .Values.ingress.tls.secretName | quote }}
+  annotations:
+    nginx.ingress.kubernetes.io/enable-websocket: "true"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "86400"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "86400"
+    nginx.ingress.kubernetes.io/upstream-hash-by: $arg_room
+    nginx.ingress.kubernetes.io/auth-response-headers: null
+    nginx.ingress.kubernetes.io/auth-url: null
+    {{- with .Values.annotations.notes.ingressCollaborationWS }}
+    {{ . | toYaml | nindent 4 }}
+    {{- end }}
+
+ingressAdmin:
+  enabled: {{ .Values.ingress.enabled }}
+  className: {{ .Values.ingress.ingressClassName }}
+  host: "{{ .Values.global.hosts.notes }}.{{ .Values.global.domain }}"
+  tls:
+    enabled: "{{ .Values.ingress.tls.enabled }}"
+    secretName: {{ .Values.ingress.tls.secretName | quote }}
+  annotations:
+    {{ .Values.annotations.notes.ingressAdmin | toYaml | nindent 4 }}
+
+ingressMedia:
+  enabled: {{ .Values.ingress.enabled }}
+  className: {{ .Values.ingress.ingressClassName }}
+  host: "{{ .Values.global.hosts.notes }}.{{ .Values.global.domain }}"
+  annotations:
+    nginx.ingress.kubernetes.io/auth-response-headers: "Authorization, X-Amz-Date, X-Amz-Content-SHA256"
+    nginx.ingress.kubernetes.io/auth-url: "https://{{ .Values.global.hosts.notes }}.{{ .Values.global.domain }}/api/v1.0/documents/media-auth/"
+    nginx.ingress.kubernetes.io/upstream-vhost: {{ .Values.objectstores.notes.endpoint | default (printf "%s.%s" .Values.global.hosts.minioApi .Values.global.domain) | quote }}
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /{{ .Values.objectstores.notes.bucket }}/$1
+    nginx.ingress.kubernetes.io/session-cookie-path: /media
+    {{- with .Values.annotations.notes.ingressMedia }}
+    {{ . | toYaml | nindent 4 }}
+    {{- end }}
+  tls:
+    enabled: "{{ .Values.ingress.tls.enabled }}"
+    secretName: {{ .Values.ingress.tls.secretName | quote }}
+
+ingressCollaborationApi:
+  enabled: {{ .Values.ingress.enabled }}
+  className: {{ .Values.ingress.ingressClassName }}
+  host: "{{ .Values.global.hosts.notes }}.{{ .Values.global.domain }}"
+  path: /collaboration/api/
+  tls:
+    enabled: "{{ .Values.ingress.tls.enabled }}"
+    secretName: {{ .Values.ingress.tls.secretName | quote }}
+  annotations:
+    {{ .Values.annotations.notes.ingressCollaborationAPI | toYaml | nindent 4 }}
+
+serviceMedia:
+  host: {{ .Values.objectstores.notes.endpoint | default (printf "%s.%s" .Values.global.hosts.minioApi .Values.global.domain) | quote }}
+  port: {{ .Values.objectstores.notes.port | default 443 }}
+  annotations:
+    {{ .Values.annotations.notes.serviceMedia | toYaml | nindent 4 }}
+
+frontend:
+  image:
+    repository: {{ printf "%s/%s" (coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.notesFrontend.registry) (.Values.images.notesFrontend.repository) | quote }}
+    pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    tag: {{ .Values.images.notesFrontend.tag }}
+  envVars:
+    PORT: 8080
+    NEXT_PUBLIC_API_ORIGIN: {{ printf "https://%s.%s" .Values.global.hosts.notes .Values.global.domain | quote }}
+    NEXT_PUBLIC_MEDIA_URL: {{ printf "https://%s" (.Values.objectstores.notes.endpoint | default (printf "%s.%s" .Values.global.hosts.minioApi .Values.global.domain)) | quote }}
+  runtimeEnvs:
+    ICS_BASE_URL: {{ printf "https://%s.%s" .Values.global.hosts.intercomService .Values.global.domain | quote }}
+    PORTAL_BASE_URL: {{ printf "https://%s.%s" .Values.global.hosts.nubus .Values.global.domain | quote }}
+  replicas: {{ .Values.replicas.notesFrontend }}
+  resources:
+    {{ .Values.resources.notesFrontend | toYaml | nindent 4 }}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - "ALL"
+    privileged: false
+    runAsUser: 1001
+    runAsGroup: 1001
+    seccompProfile:
+      type: "RuntimeDefault"
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    seLinuxOptions:
+      {{ .Values.seLinuxOptions.notesFrontend | toYaml | nindent 6 }}
+
+  podAnnotations:
+    {{ .Values.annotations.notesFrontend.pod | toYaml | nindent 4 }}
+
+  service:
+    annotations:
+      {{ .Values.annotations.notesFrontend.service | toYaml | nindent 6 }}
+
+yProvider:
+  image:
+    repository: {{ printf "%s/%s" (coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.notesYProvider.registry) (.Values.images.notesYProvider.repository) | quote }}
+    pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    tag: {{ .Values.images.notesYProvider.tag }}
+  resources:
+    {{ .Values.resources.notesYProvider | toYaml | nindent 4 }}
+  replicas: {{ .Values.replicas.notesYProvider }}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - "ALL"
+    privileged: false
+    runAsUser: 1001
+    runAsGroup: 1001
+    seccompProfile:
+      type: "RuntimeDefault"
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    seLinuxOptions:
+      {{ .Values.seLinuxOptions.notesBackend | toYaml | nindent 6 }}
+  envVars:
+    COLLABORATION_BACKEND_BASE_URL: {{ printf "https://%s.%s" .Values.global.hosts.notes .Values.global.domain | quote }}
+    COLLABORATION_LOGGING: {{ if .Values.debug.enabled }}"true"{{ else }}"false"{{ end }}
+    COLLABORATION_SERVER_ORIGIN: {{ printf "https://%s.%s" .Values.global.hosts.notes .Values.global.domain | quote }}
+    COLLABORATION_SERVER_SECRET: {{ .Values.secrets.notes.collaborationSecret | quote }}
+    Y_PROVIDER_API_KEY: {{ .Values.secrets.notes.collaborationSecret | quote }}
+
+  podAnnotations:
+    {{ .Values.annotations.notesYProvider.pod | toYaml | nindent 4 }}
+
+  service:
+    annotations:
+      {{ .Values.annotations.notesYProvider.service | toYaml | nindent 6 }}
+
+oidc:
+  clientId: "opendesk-notes"
+  clientSecret: {{ .Values.secrets.keycloak.clientSecret.notes | quote }}
+
+aiApiKey: {{ .Values.ai.apiKey }}
+aiBaseUrl: {{ .Values.ai.endpoint }}
+
+djangoSuperUserEmail: "default.admin@{{ .Values.global.domain }}"
+djangoSuperUserPass: {{ .Values.secrets.notes.superuser }}
+djangoSecretKey: {{ .Values.secrets.notes.djangoSecretKey }}
+
+backend:
+  image:
+    repository: {{ printf "%s/%s" (coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.notesBackend.registry) (.Values.images.notesBackend.repository) | quote }}
+    pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    tag: {{ .Values.images.notesBackend.tag }}
+  replicas: {{ .Values.replicas.notesBackend }}
+  envVars:
+    DB_HOST: {{ .Values.databases.notes.host | quote }}
+    DB_NAME: {{ .Values.databases.notes.name | quote }}
+    DB_USER: {{ .Values.databases.notes.username | quote }}
+    DB_PASSWORD: {{ .Values.databases.notes.password | default .Values.secrets.postgresql.notesUser | quote }}
+    DB_PORT: {{ .Values.databases.notes.port | quote }}
+    POSTGRES_DB: {{ .Values.databases.notes.name | quote }}
+    POSTGRES_USER: {{ .Values.databases.notes.username | quote }}
+    POSTGRES_PASSWORD: {{ .Values.databases.notes.password | default .Values.secrets.postgresql.notesUser | quote }}
+    FRONTEND_THEME: "openDesk"
+    REDIS_URL: "redis://default:{{ .Values.cache.notes.password | default .Values.secrets.redis.password }}@{{ .Values.cache.notes.host }}:{{ .Values.cache.notes.port }}/7"
+    AWS_S3_ENDPOINT_URL: {{ printf "https://%s" (.Values.objectstores.notes.endpoint | default (printf "%s.%s" .Values.global.hosts.minioApi .Values.global.domain)) | quote }}
+    AWS_S3_ACCESS_KEY_ID: {{ .Values.objectstores.notes.username }}
+    AWS_S3_SECRET_ACCESS_KEY: {{ .Values.objectstores.notes.secretKey | default .Values.secrets.minio.notesUser | quote }}
+    AWS_STORAGE_BUCKET_NAME: {{ .Values.objectstores.notes.bucket }}
+    DJANGO_CSRF_TRUSTED_ORIGINS: {{ printf "https://%s.%s" .Values.global.hosts.notes .Values.global.domain | quote }}
+    DJANGO_SITE_DOMAIN: {{ printf "%s.%s" .Values.global.hosts.notes .Values.global.domain | quote }}
+    DJANGO_SITE_NAME: {{ printf "%s.%s" .Values.global.hosts.notes .Values.global.domain | quote }}
+    DJANGO_CONFIGURATION: Production
+    DJANGO_ALLOWED_HOSTS: "*"
+    DJANGO_SECRET_KEY: {{ .Values.secrets.notes.djangoSecretKey }}
+    DJANGO_SETTINGS_MODULE: impress.settings
+    DJANGO_SUPERUSER_PASSWORD: {{ .Values.secrets.notes.superuser }}
+    DJANGO_EMAIL_BRAND_NAME: "openDesk"
+    DJANGO_EMAIL_LOGO_IMG: {{ printf "https://%s.%s/univention/portal/icons/entries/swp.notes.svg" .Values.global.hosts.nubus .Values.global.domain | quote }}
+    DJANGO_EMAIL_FROM: "{{ .Values.smtp.localpartNoReply }}@{{ .Values.global.domain }}"
+    DJANGO_EMAIL_HOST: "postfix"
+    DJANGO_EMAIL_PORT: 25
+    DJANGO_EMAIL_USE_SSL: False
+    DJANGO_EMAIL_HOST_USER: {{ printf "%s@%s" "opendesk-system" ( .Values.global.mailDomain | default .Values.global.domain ) }}
+    DJANGO_EMAIL_HOST_PASSWORD: {{ .Values.secrets.postfix.opendeskSystemPassword | quote }}
+    DJANGO_EMAIL_USE_TLS: False
+    OIDC_RP_CLIENT_ID: "opendesk-notes"
+    OIDC_RP_CLIENT_SECRET: {{ .Values.secrets.keycloak.clientSecret.notes | quote }}
+    OIDC_OP_JWKS_ENDPOINT: "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/{{ .Values.platform.realm }}/protocol/openid-connect/certs"
+    OIDC_OP_AUTHORIZATION_ENDPOINT: "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/{{ .Values.platform.realm }}/protocol/openid-connect/auth"
+    OIDC_OP_TOKEN_ENDPOINT: "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/{{ .Values.platform.realm }}/protocol/openid-connect/token"
+    OIDC_OP_USER_ENDPOINT: "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/{{ .Values.platform.realm }}/protocol/openid-connect/userinfo"
+    OIDC_OP_LOGOUT_ENDPOINT: "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/{{ .Values.platform.realm }}/protocol/openid-connect/logout"
+    OIDC_RP_SIGN_ALGO: RS256
+    OIDC_RP_SCOPES: "openid opendesk-notes-scope"
+    OIDC_USERINFO_SHORTNAME_FIELD: "given_name"
+    OIDC_USERINFO_FULLNAME_FIELDS: "given_name,family_name"
+    USER_OIDC_ESSENTIAL_CLAIMS: "email"
+    OIDC_REDIRECT_ALLOWED_HOSTS: {{ printf "https://%s.%s/*" .Values.global.hosts.notes .Values.global.domain | quote }}
+    OIDC_AUTH_REQUEST_EXTRA_PARAMS: "{}"
+    OIDC_RENEW_ID_TOKEN: "False"
+    LOGIN_REDIRECT_URL: {{ printf "https://%s.%s" .Values.global.hosts.notes .Values.global.domain | quote }}
+    LOGIN_REDIRECT_URL_FAILURE: {{ printf "https://%s.%s" .Values.global.hosts.nubus .Values.global.domain | quote }}
+    LOGOUT_REDIRECT_URL: {{ printf "https://%s.%s" .Values.global.hosts.nubus .Values.global.domain | quote }}
+    AI_BASE_URL: {{ .Values.ai.endpoint | quote }}
+    AI_API_KEY: {{ .Values.ai.apiKey | quote }}
+    AI_MODEL: {{ .Values.ai.model | quote }}
+    Y_PROVIDER_API_KEY: {{ .Values.secrets.notes.collaborationSecret | quote }}
+    Y_PROVIDER_API_BASE_URL: {{ printf "https://%s.%s/api/" .Values.global.hosts.notes .Values.global.domain | quote }}
+    COLLABORATION_API_URL: {{ printf "https://%s.%s/collaboration/api/" .Values.global.hosts.notes .Values.global.domain | quote }}
+    COLLABORATION_SERVER_ORIGIN: {{ printf "https://%s.%s" .Values.global.hosts.notes .Values.global.domain | quote }}
+    COLLABORATION_SERVER_SECRET: {{ .Values.secrets.notes.collaborationSecret | quote }}
+    COLLABORATION_WS_URL:  {{ printf "wss://%s.%s/collaboration/ws/" .Values.global.hosts.notes .Values.global.domain | quote }}
+    FRONTEND_HOMEPAGE_FEATURE_ENABLED: False
+    FRONTEND_FOOTER_FEATURE_ENABLED: False
+  migrate:
+    command:
+      - "/bin/sh"
+      - "-c"
+      - |
+        python manage.py migrate --no-input
+    restartPolicy: Never
+
+  migrateJobAnnotations:
+    {{ .Values.annotations.notesBackend.migrateJob | toYaml | nindent 4 }}
+
+  createsuperuser:
+    command:
+      - "/bin/sh"
+      - "-c"
+      - |
+        python manage.py createsuperuser --email default.admin@{{ .Values.global.domain }} --password {{ .Values.secrets.notes.superuser }}
+    restartPolicy: Never
+
+  podAnnotations:
+    {{ .Values.annotations.notesBackend.pod | toYaml | nindent 4 }}
+
+  resources:
+    {{ .Values.resources.notesBackend | toYaml | nindent 4 }}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - "ALL"
+    privileged: false
+    runAsUser: 1001
+    runAsGroup: 1001
+    seccompProfile:
+      type: "RuntimeDefault"
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    seLinuxOptions:
+      {{ .Values.seLinuxOptions.notesBackend | toYaml | nindent 6 }}
+
+  service:
+    annotations:
+      {{ .Values.annotations.notesBackend.service | toYaml | nindent 6 }}
+
+...

@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2025 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+reuse-linter:
+  allow_failure: false
+  rules:
+    - if: "$JOB_REUSE_LINTER_ENABLED == 'false' || $CI_PIPELINE_SOURCE =~ 'tags|web|merge_request_event'"
+      when: "never"
+    - when: "always"
+...

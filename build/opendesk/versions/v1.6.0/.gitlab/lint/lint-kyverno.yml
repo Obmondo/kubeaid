@@ -1,0 +1,60 @@
+# SPDX-FileCopyrightText: 2024 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+include:
+  - local: "/.gitlab/lint/lint-common.yml"
+
+lint-kyverno:
+  allow_failure: false
+  extends: ".lint-common"
+  image: "${OPENDESK_LINT_IMAGE}"
+  parallel:
+    matrix:
+      - APP:
+          - "collabora"
+          - "cryptpad"
+          - "element"
+          - "jitsi"
+          - "nextcloud"
+          - "notes"
+          - "nubus"
+          - "open-xchange"
+          - "opendesk-migrations-post"
+          - "opendesk-migrations-pre"
+          - "opendesk-openproject-bootstrap"
+          - "opendesk-services"
+          - "openproject"
+          - "services-external"
+          - "xwiki"
+  script:
+    - "cd ${CI_PROJECT_DIR}/helmfile/apps/${APP}"
+    - >
+      node /app/opendesk-ci-cli/src/index.js generate-kyverno-env
+      -d ${CI_PROJECT_DIR}/helmfile/environments
+      -x ${CI_PROJECT_DIR}/.kyverno/_overwrite.yaml
+    - "helmfile template -e test --include-needs --skip-tests > ${CI_PROJECT_DIR}/.kyverno/opendesk.yaml"
+    - >
+      node /app/opendesk-ci-cli/src/index.js remove-empty-keys
+      -f ${CI_PROJECT_DIR}/.kyverno/opendesk.yaml
+    - "cd ${CI_PROJECT_DIR}/.kyverno"
+    # Test optional
+    - >
+      node /app/opendesk-ci-cli/src/index.js generate-kyverno-tests
+      -d ${CI_PROJECT_DIR}/.kyverno
+      -t optional
+      -s manifest
+      -f opendesk.yaml
+      --skip-tests true
+      ${APP}
+    - "kyverno test . || true"
+    # Test required
+    - >
+      node /app/opendesk-ci-cli/src/index.js generate-kyverno-tests
+      -d ${CI_PROJECT_DIR}/.kyverno
+      -t required
+      -s manifest
+      -f opendesk.yaml
+      --skip-tests true
+      ${APP}
+    - "kyverno test ."
+...

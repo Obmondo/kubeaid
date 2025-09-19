@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+repositories:
+  # Notes
+  # Source: https://github.com/numerique-gouv/impress
+  - name: "notes-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.notes.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.notes.registry }}/{{ .Values.charts.notes.repository }}"
+
+releases:
+  - name: "impress"
+    chart: "notes-repo/{{ .Values.charts.notes.name }}"
+    version: "{{ .Values.charts.notes.version }}"
+    wait: true
+    values:
+      - "values.yaml.gotmpl"
+      {{- range .Values.customization.release.notes }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.notes.enabled }}
+    timeout: 1800
+
+commonLabels:
+  deploy-stage: "component-1"
+  component: "notes"
+...

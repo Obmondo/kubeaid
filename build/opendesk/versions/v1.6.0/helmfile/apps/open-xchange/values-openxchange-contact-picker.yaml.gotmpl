@@ -1,0 +1,411 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+appsuite:
+  core-mw:
+    podAnnotations:
+      logging.open-xchange.com/format: "appsuite-json"
+      {{- with .Values.annotations.openxchangeEnterpriseContactPicker.appsuiteCoreMwPod }}
+      {{ . | toYaml | nindent 6 }}
+      {{- end }}
+    properties:
+      # Enterprise contact picker
+      com.openexchange.contacts.ldap.accounts: "opendesk,other,functional"
+      com.openexchange.admin.bypassAccessCombinationChecks: "true"
+      ENABLE_INTERNAL_USER_EDIT: "false"
+
+    # Enterprise contact picker (see also gotmpl)
+    secretYAMLFiles:
+      ldap-client-config.yml:
+        contactsLdapClient:
+          pool:
+            type: "simple"
+            host:
+              address: {{ .Values.ldap.host | quote }}
+              port: 389
+          auth:
+            type: "adminDN"
+            adminDN:
+              dn: "uid=ldapsearch_ox,cn=users,{{ .Values.ldap.baseDn }}"
+              password: {{ .Values.secrets.nubus.ldapSearch.ox | quote }}
+
+    serviceAccount:
+      annotations:
+        {{ .Values.annotations.openxchangeEnterpriseContactPicker.appsuiteCoreMwServiceAccount | toYaml | nindent 8 }}
+
+    uiSettings:
+      # Enterprise contact picker
+      io.ox/core//features/enterprisePicker/enabled: "true"
+      io.ox/contacts//search/fields: 'email1,email2'
+
+    yamlFiles:
+      contacts-provider-ldap.yml:
+        # Example definitions of available LDAP contact providers, together with their corresponding configuration,
+        # referenced LDAP client connection settings and attribute mappings.
+        #
+        # This template contains examples and will be overwritten during updates. To use, copy this file to
+        # /opt/open-xchange/etc/contacts-provider-ldap.yml and configure as needed.
+        #
+        # Each configured contacts provider can be enabled for users using the corresponding identifier used in this
+        # .yml file. For this purpose, the config-cascade-enabled setting "com.openexchange.contacts.provider.ldap"
+        # is available.
+        #
+        # Besides the provider configuration in this file, also accompanying LDAP client and contact property mappings
+        # need to be referenced.
+        #
+        # See also https://documentation.open-xchange.com/latest/middleware/contacts/contacts_provider_ldap.html
+        # for further details and a complete list of available configuration options.
+        #
+
+        # Key will be used as identifier for the contact provider
+        opendesk:
+
+          # The display name of this contacts provider.
+          name: "Example Address Lists"
+
+          # Configures the identifier of the LDAP client configuration settings to use, as defined in
+          # 'ldap-client-config.yml'. There, all further connection-related properties to access the LDAP server can
+          # be specified.
+          ldapClientId: "contactsLdapClient"
+
+          # A reference to the contact property <-> LDAP attribute mapping definitions to use, referencing the
+          # corresponding entry in the file 'contact-provider-ldap-mappings.yml'.
+          mappings: "ucs"
+
+          # Specifies if support for querying deleted objects is enabled or not. When enabled, deleted objects are
+          # identified with the filter 'isDeleted=TRUE', which is usually only available in Active Directory (as
+          # control with OID 1.2.840.113556.1.4.417). If disabled, no results are available for folders from this
+          # provider for the 'deleted' API call, and therefore no incremental synchronizations are possible. See also
+          # 'usedForSync' folders property. Defaults to "false".
+          isDeletedSupport: false
+
+          # Specifies the requested maximum size for paged results. "0" disables paged results. This should be
+          #  configured, especially when the there are server-side restrictions towards the maximum result size.
+          # Defaults to "500".
+          maxPageSize: 500
+
+          # Optionally enables a local cache that holds certain properties of all of the provider's contacts in
+          # memory to speed up access. Can only be used if no individual authentication is used to access the
+          # LDAP server.
+          cache:
+            useCache: false
+
+          # Definition of addressbook folders of the contacts provider. Different folder modes are possible, each
+          # one with its specific configuration settings. The template contains examples for all possible modes,
+          # however, only the one specified through 'mode' property is actually used.
+          folders:
+
+            # Configures in which mode addressbook folders are provided by the contacts provider. Possible modes
+            # are "fixedAttributes" to have a common search filter per folder that varies by a fixed set of possible
+            # attribute values, "dynamicAttributes" to use a common filter and retrieve all possible values
+            # dynamically, or "static" to have a static search filter associated with each contact folder.
+            # The corresponding mode-specific section needs to be configured as well.
+            mode: "dynamicAttributes"
+
+            # Configures if the addressbook folders can be synchronized to external clients via CardDAV or not.
+            # If set to "false", the folders are only available in the web client. If set to "true", folders can
+            # be activated for synchronization. Should only be enabled if attribute mappings for the 'changing_date'
+            # and 'uid' contact properties are available, and the LDAP server supports the special
+            # "LDAP Show Deleted Control" to query tombstone entries via 'isDeleted=TRUE'. The 'protected' flag
+            # controls whether the default value can be changed by the client or not.
+            usedForSync:
+              protected: true
+              defaultValue: false
+
+            # Defines whether addressbook folders will be available in the contact picker dialog of App Suite.
+            # If enabled, contacts from this provider can be looked up through this dialog, otherwise they are
+            # hidden. The 'protected' flag controls whether the default value can be changed by the client or not.
+            usedInPicker:
+              protected: false
+              defaultValue: true
+
+            # Defines whether addressbook folders will be shown as 'subscribed' folders in the tree or not.
+            # If enabled, the folders will appear in the contacts module of App Suite as regular, subscribed folder.
+            # Otherwise, they're treated as hidden, unsubscribed folders. The 'protected' flag controls whether
+            # the default value can be changed by the client or not.
+            shownInTree:
+              protected: false
+              defaultValue: true
+
+            # In "static" folder mode, a fixed list of folder definitions is used, each one with its own contact
+            # filter and name (the names must be unique). Additionally, a "commonContactFilter" needs to be
+            # defined, which is used for operations that are not bound to
+            # a specific folder, like lookups across all visible folders.
+            # The filter's search scopes relative to the LDAP client's 'baseDN' can be configured as "one"
+            # (only immediate subordinates) or "sub" (base entry itself and any subordinate entries to any depth),
+            # and all default to "sub" unless specified otherwise.
+            static:
+              commonContactFilter: "(|(objectClass=person)(objectClass=groupOfNames))"
+              commonContactSearchScope: "sub"
+              folders:
+                - name: "Cupertino"
+                  contactFilter: "(&(|(objectClass=person)(objectClass=groupOfNames))(l=Cupertino))"
+                  contactSearchScope: "sub"
+                - name: "San Mateo"
+                  contactFilter: "(&(|(objectClass=person)(objectClass=groupOfNames))(l=San Mateo))"
+                  contactSearchScope: "sub"
+                - name: "Redwood Shores"
+                  contactFilter: "(&(|(objectClass=person)(objectClass=groupOfNames))(l=Redwood Shores))"
+                  contactSearchScope: "sub"
+                - name: "Armonk"
+                  contactFilter: "(&(|(objectClass=person)(objectClass=groupOfNames))(l=Armonk))"
+                  contactSearchScope: "sub"
+
+            # With mode "dynamic attributes", all possible values for one attribute are fetched periodically and
+            # serve as folders. The list of values is fetched by querying all entries that match the
+            # "contactFilterTemplate" (with the wildcard "*" as value) and "contactSearchScope" ("one"/"sub").
+            # Then, the folders are derived based on all distinct attribute values found, with the value as name.
+            # Depending on the configured authentication mode, this is either done per user individually, or globally.
+            # Therefore, per-user authentication is not recommend in this mode.
+            # The "refreshInterval" determines how often the list of attributes is refreshed, and can be defined
+            # using units of measurement:
+            # "D" (=days), "W" (=weeks), "H" (=hours) and "m" (=minutes). Defaults to "1h". The optional "sortOrder"
+            # allows to sort the attributes lexicographically, either "ascending" or "descending".
+            dynamicAttributes:
+              attributeName: "o"
+              contactFilterTemplate: "(&(univentionObjectType=users/user)(isOxUser=OK)(o=[value]))"
+              contactSearchScope: "sub"
+              # refreshInterval: 1h
+              refreshInterval: "5m"
+              sortOrder: "ascending"
+
+            # With mode "fixed attributes", all entries matching a filter and having an attribute set to one of the
+            # defined values do form a folder. Works similar to "dynamic attributes", but with a static list of
+            # possible values.
+            # All items defined in the "attributeValues" array are used as folder (with the value as name). When
+            # listing the contents of a specific folder, this folder's specific attribute value is inserted in the
+            # configured "contactFilterTemplate", using the "contactSearchScope" ("one"/"sub").
+            fixedAttributes:
+              contactFilterTemplate: "(&(|(objectClass=person)(objectClass=groupOfNames))(ou=[value]))"
+              contactSearchScope: "sub"
+              attributeValues:
+                - "Janitorial"
+                - "Product Development"
+                - "Management"
+                - "Human Resources"
+
+        other:
+          name: "Other contacts"
+          ldapClientId: "contactsLdapClient"
+          mappings: "ucs"
+          folders:
+            mode: "static"
+            usedForSync:
+              protected: true
+              defaultValue: false
+            usedInPicker:
+              protected: false
+              defaultValue: true
+            shownInTree:
+              protected: false
+              defaultValue: true
+            static:
+              commonContactFilter: "(&(univentionObjectType=users/user)(isOxUser=OK)(!(o=*)))"
+              folders:
+                - name: "Ohne Organisation"
+                  contactFilter: "(&(univentionObjectType=users/user)(isOxUser=OK)(!(o=*)))"
+
+        functional:
+          name: "Functional mailboxes"
+          ldapClientId: "contactsLdapClient"
+          mappings: "functional"
+          folders:
+            mode: "static"
+            usedForSync:
+              protected: true
+              defaultValue: false
+            usedInPicker:
+              protected: false
+              defaultValue: true
+            shownInTree:
+              protected: false
+              defaultValue: true
+            static:
+              commonContactFilter: "(univentionObjectType=oxmail/functional_account)"
+              folders:
+                - name: "Funktionale Postfächer"
+                  contactFilter: "(univentionObjectType=oxmail/functional_account)"
+
+      contacts-provider-ldap-mappings.yml:
+        # Example definitions of contact property <-> LDAP attribute mappings.
+        #
+        # This template contains examples and will be overwritten during updates. To use, copy this file to
+        # /opt/open-xchange/etc/contacts-provider-ldap-mappings.yml and configure as needed.
+        #
+        # Each configured set of mappings can be used for an LDAP contact provider (as defined through separate
+        # file contacts-provider-ldap.yml), by using the corresponding identifier used in this .yml file.
+        #
+        # Generally, contact properties are set based on an entry's value of the mapped LDAP attribute name.
+        # Empty mappings are ignored. It's possible to define a second LDAP attribute name for a property that is
+        # used as fall-back if the first one is empty in an LDAP result, e.g. to define multiple attributes for a
+        # display name, or to have multiple mappings for contacts and distribution lists.
+        #
+        # For the data-types, each LDAP attribute value is converted/parsed to the type necessary on the server
+        # (Strings, Numbers, Booleans). Dates are assumed to be in UTC and parsed using the pattern 'yyyyMMddHHmmss'.
+        # Binary properties may be indicated by appending ';binary' to the LDAP attribute name. In order to assign
+        # the internal user- and context identifier based on attributes yielding the corresponding
+        # login information (username / contextname), the special appendix ';logininfo' can be used.
+        # Boolean properties may also be set based on a comparison with the LDAP attribute value, which is defined
+        # by the syntax '[LDAP_ATTRIBUTE_NAME]=[EXPECTED_VALUE]', e.g. to set the 'mark_as_distribution_list'
+        # property based on a specific 'objectClass' value.
+        # Alternatively, a Boolean value may also be assigned based on the the existence of any attribute value
+        # using '*'.
+        #
+        # See also https://documentation.open-xchange.com/latest/middleware/contacts/contacts_provider_ldap.html
+        # for further details and a complete list of available configuration options.
+        #
+
+        # Mappings for a typical OpenLDAP server.
+        ucs:
+          # == ID Mappings =======================================================
+          # The object ID is always required and must be unique for the LDAP server. Will use the DN of the entry
+          # unless overridden.
+          # The 'guid' flag can be passed along to properly decode a Microsoft GUID. For 'regular' UUIDs, the
+          # flag 'binary' should be used.
+          objectid: "uidNumber,gidNumber"
+          # The user and context identifiers can be mapped to certain LDAP attributes to aid resolving contact
+          # entries to internal users, e.g. in scenarios where the default global addressbook folder is disabled.
+          # Will only be considered if an entry's context identifier matches the one from the actual session of
+          # the requesting operation.
+          # If used, they should be mapped to attributes that provide the matching rules "integerMatch" for
+          # "EQUALITY" as well as "integerOrderingMatch" for "ORDERING".
+          # Alternatively, if no internal context- or user identifier is available, also attributes yielding
+          # the corresponding login information (username / contextname) can be used by appending ';logininfo'
+          # to the attribute name.
+          internal_userid: "uid;logininfo"
+          contextid: "oxContextIDNum"
+          # The 'guid' flag can be passed along properly decode a Microsoft GUID. For 'regular' UUIDs in binary
+          # format, the flag 'binary' should be used.
+          # uid                   : entryUUID;binary;logininfo
+
+          # == String Mappings ===================================================
+          displayname: "oxDisplayName,displayName,name"
+          file_as: "oxDisplayName,displayName,name"
+          givenname: "givenName"
+          surname: "sn"
+          email1: "mailPrimaryAddress"
+          email2: "mailAlternativeAddress"
+          department: "oxDepartment,department"
+          company: "oxCompany,o"
+          branches: "oxBranches"
+          # business_category     :
+          postal_code_business: "postalCode"
+          state_business: "oxStateBusiness,st"
+          street_business: "streetAddress"
+          # telephone_callback    :
+          city_home: "oxCityHome"
+          commercial_register: "oxCommercialRegister"
+          country_home: "oxCountryHome"
+          employeetype: "employeeType"
+          fax_business: "oxFaxBusiness,facsimileTelehoneNumber"
+          fax_home: "oxFaxHome"
+          fax_other: "oxFaxOther"
+          instant_messenger1: "oxInstantMessenger1"
+          instant_messenger2: "oxInstantMessenger2"
+          telephone_ip: "oxTelephoneIp"
+          telephone_isdn: "internationaliSDNNumber"
+          marital_status: "oxMaritalStatus"
+          cellular_telephone1: "mobile"
+          # cellular_telephone2   :
+          nickname: "oxNickName"
+          number_of_children: "oxNumOfChildren"
+          number_of_employee: "employeeNumber"
+          note: "oxNote,description"
+          telephone_pager: "oxTelephonePager,pager"
+          telephone_assistant: "oxTelephoneAssistant"
+          telephone_business1: "oxTelephoneBusiness1,telephoneNumber"
+          telephone_business2: "oxTelephoneBusiness2"
+          telephone_car: "oxTelephoneCar"
+          telephone_company: "oxTelephoneCompany"
+          telephone_home1: "oxTelephoneHome1,homePhone"
+          telephone_home2: "oxTelephoneHome2"
+          telephone_other: "oxTelephoneOther"
+          postal_code_home: "oxPostalCodeHome"
+          # telephone_radio       :
+          room_number: "roomNumber"
+          sales_volume: "oxSalesVolume"
+          city_other: "oxCityOther"
+          country_other: "oxCountryOther"
+          middle_name: "oxMiddleName,middleName"
+          postal_code_other: "oxPostalCodeOther"
+          state_other: "oxStateOther"
+          street_other: "oxStreetOther"
+          spouse_name: "oxSpouseName"
+          state_home: "oxStateHome"
+          street_home: "oxStreetHome"
+          suffix: "oxSuffix"
+          tax_id: "oxTaxId"
+          telephone_telex: "oxTelephoneTelex,telexNumber"
+          telephone_ttytdd: "oxTelephoneTtydd"
+          url: "oxUrl,wWWHome"
+          userfield01: "oxUserfiels01"
+          userfield02: "oxUserfiels02"
+          userfield03: "oxUserfiels03"
+          userfield04: "oxUserfiels04"
+          userfield05: "oxUserfiels05"
+          userfield06: "oxUserfiels06"
+          userfield07: "oxUserfiels07"
+          userfield08: "oxUserfiels08"
+          userfield09: "oxUserfiels09"
+          userfield10: "oxUserfiels10"
+          userfield11: "oxUserfiels11"
+          userfield12: "oxUserfiels12"
+          userfield13: "oxUserfiels13"
+          userfield14: "oxUserfiels14"
+          userfield15: "oxUserfiels15"
+          userfield16: "oxUserfiels16"
+          userfield17: "oxUserfiels17"
+          userfield18: "oxUserfiels18"
+          userfield19: "oxUserfiels19"
+          userfield20: "oxUserfiels20"
+          city_business: "l"
+          country_business: "oxCountryBusiness,country"
+          # telephone_primary     :
+          # categories            :
+          title: "title"
+          position: "oxPosition"
+          profession: "oxProfession"
+
+          # == Date Mappings =====================================================
+          birthday: "oxBirthday"
+          anniversary: "oxAnniversary"
+          # The last-modified and creation dates are required by the groupware server, therefore an implicit
+          # default date is assumed when no LDAP attribute is mapped here, and no results are available for this
+          # folder for the 'modified' and 'deleted' API calls. Therefore, any synchronization-based usage will
+          # not be available.
+          lastmodified: "modifyTimestamp"
+          creationdate: "createTimestamp"
+
+          # == Misc Mappings =====================================================
+          # Distribution list members are resolved dynamically using the DNs found in the mapped LDAP attribute.
+          # Alternatively, if the attribute value does not denote a DN reference, the value is assumed to be the
+          # plain email address of the member.
+          distributionlist: "memberUid"
+          # Special mapping where the value is evaluated using a string comparison with, or the existence of
+          # the attribute value.
+          markasdistributionlist: "objectClass=posixGroup"
+          # The values for the for assistant- and manager name mappings are either used as-is, or get resolved
+          # dynamically using the DNs found
+          # in the mapped LDAP attribute.
+
+          # Due to the Univention bug https://forge.univention.org/bugzilla/show_bug.cgi?id=53741
+          # we disable `assistant_name` contact picker attribute and use `secretary` for manager information.
+          # assistant_name: "secretary"
+          manager_name: "secretary,oxManagerName"
+
+          # Contact image, binary format is expected.
+          image1: "jpegPhoto"
+          # Special mapping where the value is evaluated using a string comparison with, or the existence of
+          # the attribute value.
+          number_of_images: "jpegPhoto=*"
+          # Will be set internally if not defined.
+          # image_last_modified   :
+          # Will be set automatically to "image/jpeg" if not defined.
+          # image1_content_type   :
+
+        functional:
+          objectid: "mailPrimaryAddress"
+          displayname: "oxPersonal,cn,mailPrimaryAddress"
+          file_as: "oxPersonal,cn,mailPrimaryAddress"
+          email1: "mailPrimaryAddress"

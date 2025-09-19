@@ -1,0 +1,57 @@
+# SPDX-FileCopyrightText: 2024 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+apiVersion: "kyverno.io/v1"
+kind: "ClusterPolicy"
+metadata:
+  name: "disallow-latest-tag"
+  annotations:
+    policies.kyverno.io/title: "Disallow usage of latest tag"
+    policies.kyverno.io/subject: "Pod"
+    policies.kyverno.io/description: >-
+      The ':latest' tag is mutable and can lead to unexpected errors if the image changes.
+      A best practice is to use an immutable tag that maps to a specific version of an application Pod.
+      This policy validates that the image specifies a tag and that it is not called `latest`.
+      Defining no image tag or digest result in the container engine retrieving the latest tag.
+spec:
+  background: true
+  rules:
+    - match:
+        resources:
+          kinds:
+            - "Pod"
+      name: "disallow-latest-tag"
+      validate:
+        message: "Using a mutable image tag e.g. 'latest' is not allowed."
+        pattern:
+          spec:
+            =(ephemeralContainers):
+              - image: "!*:latest"
+            =(initContainers):
+              - image: "!*:latest"
+            containers:
+              - image: "!*:latest"
+    - match:
+        resources:
+          kinds:
+            - "Pod"
+      name: "require-image-tag-or-digest"
+      validate:
+        message: "A image tag or a digest is required, otherwise latest tag is chosen."
+        anyPattern:
+          - spec:
+              =(ephemeralContainers):
+                - image: "*:*"
+              =(initContainers):
+                - image: "*:*"
+              containers:
+                - image: "*:*"
+          - spec:
+              =(ephemeralContainers):
+                - image: "*@*"
+              =(initContainers):
+                - image: "*@*"
+              containers:
+                - image: "*@*"
+  validationFailureAction: "audit"
+...

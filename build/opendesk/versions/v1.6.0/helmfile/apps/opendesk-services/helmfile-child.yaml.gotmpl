@@ -1,0 +1,134 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+repositories:
+  # openDesk Otterize
+  # Source: https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-otterize
+  - name: "otterize-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.otterize.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.otterize.registry }}/{{ .Values.charts.otterize.repository }}"
+
+  # openDesk Home
+  # Source: https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-home
+  - name: "home-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.home.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.home.registry }}/{{ .Values.charts.home.repository }}"
+
+  # openDesk Certificates
+  # Source: https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-certificates
+  - name: "certificates-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.certificates.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.certificates.registry }}/{{ .Values.charts.certificates.repository }}"
+
+    # openDesk Alerts
+  # https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-alerts
+  - name: "opendesk-alerts-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.opendeskAlerts.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.opendeskAlerts.registry }}/{{ .Values.charts.opendeskAlerts.repository }}"
+
+    # openDesk Grafana Dashboards
+    # https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-dashboards
+  - name: "opendesk-dashboards-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.opendeskDashboards.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.opendeskDashboards.registry }}/{{ .Values.charts.opendeskDashboards.repository }}"
+
+    # openDesk Static Files
+  # https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-static-files
+  - name: "opendesk-static-files-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.opendeskStaticFiles.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.opendeskStaticFiles.registry }}/{{ .Values.charts.opendeskStaticFiles.repository }}"
+
+releases:
+  - name: "opendesk-otterize"
+    chart: "otterize-repo/{{ .Values.charts.otterize.name }}"
+    version: "{{ .Values.charts.otterize.version }}"
+    values:
+      - "values-otterize.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskOtterize }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.security.otterizeIntents.enabled }}
+    timeout: 900
+
+  - name: "opendesk-home"
+    chart: "home-repo/{{ .Values.charts.home.name }}"
+    version: "{{ .Values.charts.home.version }}"
+    values:
+      - "values-home.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskHome }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.home.enabled }}
+
+  - name: "opendesk-certificates"
+    chart: "certificates-repo/{{ .Values.charts.certificates.name }}"
+    version: "{{ .Values.charts.certificates.version }}"
+    values:
+      - "values-certificates.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskCertificates }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.certificates.enabled }}
+    timeout: 900
+
+  - name: "opendesk-alerts"
+    chart: "opendesk-alerts-repo/{{ .Values.charts.opendeskAlerts.name }}"
+    version: "{{ .Values.charts.opendeskAlerts.version }}"
+    values:
+      - "values-opendesk-alerts.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskAlerts }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.monitoring.prometheus.prometheusRules.enabled }}
+    timeout: 900
+
+  - name: "opendesk-dashboards"
+    chart: "opendesk-dashboards-repo/{{ .Values.charts.opendeskDashboards.name }}"
+    version: "{{ .Values.charts.opendeskDashboards.version }}"
+    values:
+      - "values-opendesk-dashboards.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskDashboards }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.monitoring.grafana.dashboards.enabled }}
+    timeout: 900
+
+  - name: "opendesk-static-files"
+    chart: "opendesk-static-files-repo/{{ .Values.charts.opendeskStaticFiles.name }}"
+    version: "{{ .Values.charts.opendeskStaticFiles.version }}"
+    values:
+      - "values-opendesk-static-files.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskStaticFiles }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.staticFiles.enabled }}
+    timeout: 900
+
+commonLabels:
+  deployStage: "030-opendesk-services"
+  component: "opendesk-services"
+...

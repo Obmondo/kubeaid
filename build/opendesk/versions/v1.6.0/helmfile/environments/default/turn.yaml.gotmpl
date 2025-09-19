@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+turn:
+  transport: "udp"
+  credentials: {{ env "TURN_CREDENTIALS" | quote }}
+  server:
+    host: ""
+    port: "3478"
+  tls:
+    host: ""
+    port: "5349"
+...

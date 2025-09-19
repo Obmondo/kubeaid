@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+cache:
+  intercomService:
+    host: "redis-headless"
+    port: 6379
+    username: "default"
+    password: ""
+  nextcloud:
+    host: "redis-headless"
+    port: 6379
+    username: "default"
+    password: ""
+    tls: false
+  notes:
+    host: "redis-headless"
+    port: 6379
+    password: ""
+  openproject:
+    host: "memcached"
+    port: 11211
+  oxAppSuite:
+    host: "redis-headless"
+    port: 6379
+    username: "default"
+    password: ""
+  umsSelfservice:
+    host: "memcached"
+    port: 11211
+...

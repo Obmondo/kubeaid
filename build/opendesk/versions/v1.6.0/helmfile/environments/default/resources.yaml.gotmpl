@@ -1,0 +1,650 @@
+# SPDX-FileCopyrightText: 2024-2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+# Some charts do not support null or ~ values, because they use their default values.
+# To not limit the CPU, we set all CPU limits to 99.
+resources:
+  cassandra:
+    limits:
+      cpu: 99
+      memory: "4Gi"
+    requests:
+      cpu: 0.1
+      memory: "1Gi"
+  clamd:
+    limits:
+      cpu: 99
+      memory: "4Gi"
+    requests:
+      cpu: 0.1
+      memory: "1.5Gi"
+  collabora:
+    limits:
+      cpu: 99
+      memory: "4Gi"
+    requests:
+      cpu: 0.5
+      memory: "512Mi"
+  collaboraController:
+    limits:
+      cpu: 99
+      memory: "128Mi"
+    requests:
+      cpu: 0.1
+      memory: "32Mi"
+  cryptpad:
+    limits:
+      cpu: 99
+      memory: "2Gi"
+    requests:
+      cpu: 0.1
+      memory: "512Mi"
+  dkimpy:
+    limits:
+      cpu: 99
+      memory: "256Mi"
+    requests:
+      cpu: 0.1
+      memory: "128Mi"
+  dovecot:
+    limits:
+      cpu: 99
+      memory: "256Mi"
+    requests:
+      cpu: 0.1
+      memory: "32Mi"
+  element:
+    limits:
+      cpu: 99
+      memory: "256Mi"
+    requests:
+      cpu: 0.1
+      memory: "32Mi"
+  freshclam:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "96Mi"
+  icap:
+    limits:
+      cpu: 99
+      memory: "128Mi"
+    requests:
+      cpu: 0.1
+      memory: "16Mi"
+  intercomService:
+    limits:
+      cpu: 99
+      memory: "128Mi"
+    requests:
+      cpu: 0.1
+      memory: "64Mi"
+  # The Jibri container requires 2Gi /dev/shm so we need a limit based on the expected memory consumption of the
+  # service plus the 2Gi /dev/shm
+  jibri:
+    limits:
+      cpu: 99
+      memory: "3Gi"
+    requests:
+      cpu: 0.1
+      memory: "384Mi"
+  # The jicofo, jvb and jigasi containers require 3GB memory for the Java process, so we limit it to 3.5Gi overall consumption.
+  jicofo:
+    limits:
+      cpu: 99
+      memory: "3584Mi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  # The jicofo, jvb and jigasi containers require 3GB memory for the Java process, so we limit it to 3.5Gi overall consumption.
+  jigasi:
+    limits:
+      cpu: 99
+      memory: "3584Mi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  jitsi:
+    limits:
+      cpu: 99
+      memory: "512Mi"
+    requests:
+      cpu: 0.1
+      memory: "32Mi"
+  jitsiKeycloakAdapter:
+    limits:
+      cpu: 99
+      memory: "128Mi"
+    requests:
+      cpu: 0.01
+      memory: "48Mi"
+  # The jicofo, jvb and jigasi containers require 3GB memory for the Java process, so we limit it to 3.5Gi overall consumption.
+  jvb:
+    limits:
+      cpu: 99
+      memory: "3584Mi"
+    requests:
+      cpu: 0.1
+      memory: "384Mi"
+  notesBackend:
+    limits:
+      cpu: 99
+      memory: "768Mi"
+    requests:
+      cpu: 0.1
+      memory: "512Mi"
+  notesFrontend:
+    limits:
+      cpu: 99
+      memory: "128Mi"
+    requests:
+      cpu: 0.1
+      memory: "32Mi"
+  notesYProvider:
+    limits:
+      cpu: 99
+      memory: "256Mi"
+    requests:
+      cpu: 0.1
+      memory: "128Mi"
+  opendeskKeycloakBootstrap:
+    limits:
+      cpu: 99
+      memory: "512Mi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  opendeskStaticFiles:
+    limits:
+      cpu: 99
+      memory: "64Mi"
+    requests:
+      cpu: 0.01
+      memory: "16Mi"
+  umsKeycloak:
+    limits:
+      cpu: 99
+      memory: "2Gi"
+    requests:
+      cpu: 0.1
+      memory: "512Mi"
+  umsKeycloakBootstrap:
+    limits:
+      cpu: 99
+      memory: "512Mi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsKeycloakExtensionHandler:
+    limits:
+      cpu: 99
+      memory: "256Mi"
+    requests:
+      cpu: 0.1
+      memory: "48Mi"
+  umsKeycloakExtensionProxy:
+    limits:
+      cpu: 99
+      memory: "256Mi"
+    requests:
+      cpu: 0.1
+      memory: "48Mi"
+  mariadb:
+    limits:
+      cpu: 99
+      memory: "2Gi"
+    requests:
+      cpu: 0.1
+      memory: "384Mi"
+  matrixNeoBoardWidget:
+    limits:
+      cpu: 99
+      memory: "128Mi"
+    requests:
+      cpu: 0.1
+      memory: "48Mi"
+  matrixNeoChoiceWidget:
+    limits:
+      cpu: 99
+      memory: "256Mi"
+    requests:
+      cpu: 0.1
+      memory: "48Mi"
+  matrixNeoDateFixBot:
+    limits:
+      cpu: 99
+      memory: "512Mi"
+    requests:
+      cpu: 0.1
+      memory: "128Mi"
+  matrixNeoDateFixWidget:
+    limits:
+      cpu: 99
+      memory: "256Mi"
+    requests:
+      cpu: 0.1
+      memory: "48Mi"
+  matrixUserVerificationService:
+    limits:
+      cpu: 99
+      memory: "256Mi"
+    requests:
+      cpu: 0.1
+      memory: "128Mi"
+  memcached:
+    limits:
+      cpu: 99
+      memory: "256Mi"
+    requests:
+      cpu: 0.1
+      memory: "32Mi"
+  milter:
+    limits:
+      cpu: 99
+      memory: "96Mi"
+    requests:
+      cpu: 0.1
+      memory: "16Mi"
+  minio:
+    limits:
+      cpu: 99
+      memory: "2Gi"
+    requests:
+      cpu: 0.25
+      memory: "256Mi"
+  nextcloud:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "512Mi"
+  nextcloudCron:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "512Mi"
+  nextcloudExporter:
+    limits:
+      cpu: 99
+      memory: "128Mi"
+    requests:
+      cpu: 0.1
+      memory: "32Mi"
+  nextcloudNotifyPush:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "512Mi"
+  nginxS3Gateway:
+    limits:
+      cpu: 99
+      memory: "64Mi"
+    requests:
+      cpu: "100m"
+      memory: "16Mi"
+  openproject:
+    limits:
+      cpu: 99
+      memory: "2Gi"
+    requests:
+      cpu: 0.1
+      memory: "768Mi"
+  openprojectDbInit:
+    limits:
+      cpu: 99
+      memory: "768Mi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  openprojectAppInit:
+    limits:
+      cpu: 99
+      memory: "768Mi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  openprojectSeederJob:
+    limits:
+      cpu: 99
+      memory: "768Mi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  openprojectWorkers:
+    limits:
+      cpu: 99
+      memory: "4Gi"
+    requests:
+      cpu: 0.25
+      memory: "512Mi"
+  openxchangeCoreDocumentConverter:
+    limits:
+      cpu: 99
+      memory: "2Gi"
+    requests:
+      cpu: 0.25
+      memory: "1.25Gi"
+  openxchangeCoreGuidedtours:
+    limits:
+      cpu: 99
+      memory: "96Mi"
+    requests:
+      cpu: 0.01
+      memory: "32Mi"
+  openxchangeCoreImageConverter:
+    limits:
+      cpu: 99
+      memory: "2Gi"
+    requests:
+      cpu: 0.5
+      memory: "1.25Gi"
+  openxchangeCoreMW:
+    limits:
+      cpu: 99
+      memory: "8Gi"
+    requests:
+      cpu: 1
+      memory: "1.25Gi"
+  openxchangeCoreUI:
+    limits:
+      cpu: 99
+      memory: "96Mi"
+    requests:
+      cpu: 0.01
+      memory: "32Mi"
+  openxchangeCoreUIMiddleware:
+    limits:
+      cpu: 99
+      memory: "768Mi"
+    requests:
+      cpu: 0.5
+      memory: "192Mi"
+  openxchangeCoreUIMiddlewareUpdater:
+    limits:
+      cpu: 99
+      memory: "768Mi"
+    requests:
+      cpu: 0.5
+      memory: "192Mi"
+  openxchangeCoreUserGuide:
+    limits:
+      cpu: 99
+      memory: "96Mi"
+    requests:
+      cpu: 0.02
+      memory: "32Mi"
+  openxchangeGotenberg:
+    limits:
+      cpu: 99
+      memory: "96Mi"
+    requests:
+      cpu: 0.05
+      memory: "32Mi"
+  openxchangeGuardUI:
+    limits:
+      cpu: 99
+      memory: "96Mi"
+    requests:
+      cpu: 0.01
+      memory: "32Mi"
+  openxchangeNextcloudIntegrationUI:
+    limits:
+      cpu: 99
+      memory: "96Mi"
+    requests:
+      cpu: 0.01
+      memory: "32Mi"
+  openxchangePluginsUI:
+    limits:
+      cpu: 99
+      memory: "256Mi"
+    requests:
+      cpu: 0.05
+      memory: "32Mi"
+  openxchangePublicSectorUI:
+    limits:
+      cpu: 99
+      memory: "96Mi"
+    requests:
+      cpu: 0.01
+      memory: "32Mi"
+  oxConnector:
+    limits:
+      cpu: 99
+      memory: "512Mi"
+    requests:
+      cpu: 0.1
+      memory: "64Mi"
+  postfix:
+    limits:
+      cpu: 99
+      memory: "128Mi"
+    requests:
+      cpu: 0.1
+      memory: "16Mi"
+  postgresql:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  prosody:
+    limits:
+      cpu: 99
+      memory: "512Mi"
+    requests:
+      cpu: 0.1
+      memory: "32Mi"
+  redis:
+    limits:
+      cpu: 99
+      memory: "256Mi"
+    requests:
+      cpu: 0.1
+      memory: "32Mi"
+  synapse:
+    limits:
+      cpu: 99
+      memory: "4Gi"
+    requests:
+      cpu: 0.5
+      memory: "256Mi"
+  synapseWeb:
+    limits:
+      cpu: 99
+      memory: "256Mi"
+    requests:
+      cpu: 0.1
+      memory: "64Mi"
+  umsGuardianManagementApi:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsGuardianManagementUi:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsGuardianAuthorizationApi:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsOpenPolicyAgent:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsLdapNotifier:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsLdapServer:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsNotificationsApi:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsPortalFrontend:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsPortalConsumer:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsPortalConsumerDependencies:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsPortalServer:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsProvisioningApi:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "100Mi"
+  umsProvisioningDispatcher:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsProvisioningPrefill:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsProvisioningRegisterConsumers:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "64Mi"
+  umsProvisioningUdmTransformer:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "64Mi"
+  umsProvisioningNats:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "128Mi"
+  umsSelfserviceConsumer:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsStackDataUms:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsUdmListener:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsUdmRestApi:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsUdmRestApiInit:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsUmcGateway:
+    limits:
+      cpu: 99
+      memory: "1Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  umsUmcServer:
+    limits:
+      cpu: 99
+      memory: "2Gi"
+    requests:
+      cpu: 0.1
+      memory: "256Mi"
+  wellKnown:
+    limits:
+      cpu: 99
+      memory: "256Mi"
+    requests:
+      cpu: 0.1
+      memory: "32Mi"
+  xwiki:
+    limits:
+      cpu: 99
+      memory: "8Gi"
+    requests:
+      cpu: 0.1
+      memory: "1.5Gi"
+...

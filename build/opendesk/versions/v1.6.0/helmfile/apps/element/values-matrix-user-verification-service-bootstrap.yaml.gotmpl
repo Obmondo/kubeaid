@@ -1,0 +1,50 @@
+# SPDX-FileCopyrightText: 2024 Center for Digital Sovereignty of Public Administration (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Federal Ministry of the Interior and Community, PG ZenDiS "Project group for the development of ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+cleanup:
+  deletePodsOnSuccess: {{ .Values.debug.cleanup.deletePodsOnSuccess }}
+  deletePodsOnSuccessTimeout: {{ .Values.debug.cleanup.deletePodsOnSuccessTimeout }}
+
+configuration:
+  username: "uvs"
+  pod: "opendesk-synapse-0"
+  secretName: "opendesk-matrix-user-verification-service-account"
+  password: {{ .Values.secrets.matrixUserVerificationService.password | quote }}
+
+global:
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+image:
+  registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.synapseCreateUser.registry | quote }}
+  url: {{ .Values.images.synapseCreateUser.repository | quote }}
+  tag: {{ .Values.images.synapseCreateUser.tag | quote }}
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+
+fullnameOverride: "opendesk-matrix-user-verification-service-bootstrap"
+
+podAnnotations:
+  {{ .Values.annotations.elementMatrixUserVerificationServiceBootstrap.pod | toYaml | nindent 2 }}
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  privileged: false
+  readOnlyRootFilesystem: true
+  runAsGroup: 101
+  runAsNonRoot: true
+  runAsUser: 101
+  seccompProfile:
+    type: "RuntimeDefault"
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.synapseCreateUser | toYaml | nindent 4 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.elementMatrixUserVerificationServiceBootstrap.serviceAccount | toYaml | nindent 4 }}
+
+
+...

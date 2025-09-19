@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: 2024 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+include:
+  - local: "/.gitlab/generate/generate-common.yml"
+
+generate-docs:
+  cache:
+    - key: "generate-docs-${CI_COMMIT_REF_SLUG}"
+      paths:
+        - "${CI_PROJECT_DIR}/docs"
+      policy: "push"
+  extends: ".generate-common"
+  image: "${OPENDESK_CI_CLI_IMAGE}"
+  rules:
+    - if: "$JOB_RELEASE_ENABLED != 'false' && $CI_COMMIT_BRANCH == $RELEASE_BRANCH"
+      when: "on_success"
+  script:
+    - "node /app/src/index.js generate-docs -d ${CI_PROJECT_DIR}"
+...

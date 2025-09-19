@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2024-2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+resources:
+  collabora:
+    # When using CollaboraController for autoscaling, `targetMemoryUtilizationPercentage` and
+    # `targetCPUUtilizationPercentage` defined at `enterpriseFeatures.collabora.autoscaling`
+    # are checked against the `requests` values defined, so please ensure you set these
+    # appropriately to avoid unnecessary scaling.
+    requests:
+      cpu: 3
+      memory: "3Gi"
+...

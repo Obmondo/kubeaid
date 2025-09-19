@@ -1,0 +1,853 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  hostname: "{{ .Values.global.hosts.openxchange }}.{{ .Values.global.domain }}"
+  appsuite:
+    cookieHashSalt: {{ .Values.secrets.oxAppSuite.cookieHashSalt }}
+    shareCryptKey: {{ .Values.secrets.oxAppSuite.shareCryptKey }}
+    sessiondEncryptionKey: {{ .Values.secrets.oxAppSuite.sessiondEncryptionKey }}
+  mysql:
+    host: {{ .Values.databases.oxAppSuite.host | quote }}
+    database: {{ .Values.databases.oxAppSuite.name | quote }}
+    readHost: {{ .Values.databases.oxAppSuite.readHost | quote }}
+    readDatabase: {{ .Values.databases.oxAppSuite.name | quote }}
+    auth:
+      user: {{ .Values.databases.oxAppSuite.username | quote }}
+      password: {{ .Values.databases.oxAppSuite.password | default .Values.secrets.mariadb.rootPassword | quote }}
+      rootPassword: {{ .Values.databases.oxAppSuite.password | default .Values.secrets.mariadb.rootPassword | quote }}
+      readUser: {{ .Values.databases.oxAppSuite.readUser | default .Values.databases.oxAppSuite.username | quote }}
+      readPassword: {{ .Values.databases.oxAppSuite.readPassword | default .Values.databases.oxAppSuite.password | quote}}
+
+nextcloud-integration-ui:
+  image:
+    registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.openxchangeNextcloudIntegrationUI.registry | quote }}
+    repository: {{ .Values.images.openxchangeNextcloudIntegrationUI.repository | quote }}
+    tag: {{ .Values.images.openxchangeNextcloudIntegrationUI.tag | quote }}
+    pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  imagePullSecrets:
+  {{- range .Values.global.imagePullSecrets }}
+    - name: {{ . | quote }}
+  {{- end }}
+  podAnnotations:
+    {{ .Values.annotations.openxchangeNextcloudIntegrationUi.pod | toYaml | nindent 4 }}
+  replicaCount: {{ .Values.replicas.openxchangeNextcloudIntegrationUI }}
+  resources:
+    {{ .Values.resources.openxchangeNextcloudIntegrationUI | toYaml | nindent 4 }}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - "ALL"
+    privileged: false
+    readOnlyRootFilesystem: false
+    runAsGroup: 1000
+    runAsNonRoot: true
+    runAsUser: 1000
+    privileged: false
+    seccompProfile:
+      type: "RuntimeDefault"
+    seLinuxOptions:
+      {{ .Values.seLinuxOptions.openxchangeNextcloudIntegrationUI | toYaml | nindent 6 }}
+  serviceAccount:
+    create: false
+
+public-sector-ui:
+  image:
+    registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.openxchangePublicSectorUI.registry | quote }}
+    repository: {{ .Values.images.openxchangePublicSectorUI.repository | quote }}
+    tag: {{ .Values.images.openxchangePublicSectorUI.tag | quote }}
+    pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  imagePullSecrets:
+  {{- range .Values.global.imagePullSecrets }}
+    - name: {{ . | quote }}
+  {{- end }}
+  pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  replicaCount: {{ .Values.replicas.openxchangePublicSectorUI }}
+  podAnnotations:
+    {{ .Values.annotations.openxchangePublicSectorUi.pod | toYaml | nindent 4 }}
+  resources:
+    {{ .Values.resources.openxchangePublicSectorUI | toYaml | nindent 4 }}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - "ALL"
+    privileged: false
+    readOnlyRootFilesystem: true
+    runAsGroup: 1000
+    runAsNonRoot: true
+    runAsUser: 1000
+    privileged: false
+    seccompProfile:
+      type: "RuntimeDefault"
+    seLinuxOptions:
+      {{ .Values.seLinuxOptions.openxchangePublicSectorUI | toYaml | nindent 6 }}
+  serviceAccount:
+    create: false
+
+appsuite:
+  appsuite-toolkit:
+    enabled: false
+  switchboard:
+    enabled: false
+  istio:
+    enabled: false
+  ingress:
+    annotations:
+      {{ .Values.annotations.openxchangeAppsuiteIngress.ingress | toYaml | nindent 6 }}
+    enabled: {{ .Values.ingress.enabled }}
+    ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+    tls:
+      enabled: true
+      existingSecret: {{ .Values.ingress.tls.secretName | quote }}
+    appsuite:
+      hosts:
+        - "{{ .Values.global.hosts.openxchange }}.{{ .Values.global.domain }}"
+    dav:
+      enabled: {{ .Values.functional.groupware.davSupport.enabled }}
+      hosts:
+        - "{{ .Values.global.hosts.openxchangeDav }}.{{ .Values.global.domain }}"
+    routes:
+      appsuite-base:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.appsuitebase | toYaml | nindent 10 }}
+      rootredirect:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.rootredirect | toYaml | nindent 10 }}
+      trailslash:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.trailslash | toYaml | nindent 10 }}
+      rest-routes-admin:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.restRoutesAdmin | toYaml | nindent 10 }}
+      rest-routes-advertisement:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.restRoutesAdvertisement | toYaml | nindent 10 }}
+      rest-routes-chronos:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.restRoutesChronos | toYaml | nindent 10 }}
+      rest-routes-preliminary:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.restRoutesPreliminary | toYaml | nindent 10 }}
+      rest-routes-userfeedback:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.restRoutesUserfeedback | toYaml | nindent 10 }}
+      static-routes-servlet:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.staticRoutesServlet | toYaml | nindent 10 }}
+      static-routes-realtime:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.staticRoutesRealtime | toYaml | nindent 10 }}
+      static-routes-infostore:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.staticRoutesInfostore | toYaml | nindent 10 }}
+      static-routes-webservices:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.staticRoutesWebservices | toYaml | nindent 10 }}
+      drive-client-windows-ox-route:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.driveClientWindowsOxRoute | toYaml | nindent 10 }}
+      guard-api-route:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.guardApiRoute | toYaml | nindent 10 }}
+      guard-support-api-route:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.guardSupportApiRoute | toYaml | nindent 10 }}
+      guard-pgp-route:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.guardPgpRoute | toYaml | nindent 10 }}
+      http-api-routes-api:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.httpApiRoutesApi | toYaml | nindent 10 }}
+      http-api-routes-ajax:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.httpApiRoutesAjax | toYaml | nindent 10 }}
+      http-api-routes-appsuite-api:
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-body-size: "{{ .Values.ingress.parameters.bodySize.oxAppSuite }}"
+          nginx.ingress.kubernetes.io/proxy-read-timeout: "{{ .Values.ingress.parameters.bodyTimeout.oxAppSuite }}"
+          nginx.ingress.kubernetes.io/proxy-send-timeout: "{{ .Values.ingress.parameters.bodyTimeout.oxAppSuite }}"
+          {{- with .Values.annotations.openxchangeAppsuiteIngress.httpApiRoutesAppsuiteApi }}
+          {{ . | toYaml | nindent 10 }}
+          {{- end }}
+      http-api-routes-app-root-api:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.httpApiRoutesAppRootApi | toYaml | nindent 10 }}
+      rt2-route:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.rt2Route | toYaml | nindent 10 }}
+      documents-help-route:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.documentsHelpRoute | toYaml | nindent 10 }}
+      drive-help-route:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.driveHelpRoute | toYaml | nindent 10 }}
+      core-help-route:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.coreHelpRoute | toYaml | nindent 10 }}
+      office-web-route:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.officeWebRoute | toYaml | nindent 10 }}
+      caldav-well-known-redirect:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.caldavWellKnownRedirect | toYaml | nindent 10 }}
+      carddav-well-known-redirect:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.carddavWellKnownRedirect | toYaml | nindent 10 }}
+      dav-infostore-route:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.davInfostoreRoute | toYaml | nindent 10 }}
+      dav-root-route:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.davRootRoute | toYaml | nindent 10 }}
+      wopi-server-route:
+        annotations:
+          {{ .Values.annotations.openxchangeAppsuiteIngress.wopiServerRoute | toYaml | nindent 10 }}
+      trailslash:
+        enabled: false
+  core-mw:
+    enabled: true
+    asConfig:
+      default:
+        host: "all"
+        productName: {{ .Values.theme.texts.productName | quote }}
+        oidcLogin: true
+        oidcPath: "/oidc/"
+    masterAdmin: "admin"
+    masterPassword: {{ .Values.secrets.oxAppSuite.adminPassword | quote }}
+    hzGroupName: "hzgroup"
+    hzGroupPassword: {{ .Values.secrets.oxAppSuite.hzGroupPassword | quote }}
+    basicAuthLogin: "oxlogin"
+    basicAuthPassword: {{ .Values.secrets.oxAppSuite.basicAuthPassword | quote }}
+    jolokiaLogin: "jolokia"
+    jolokiaPassword: {{ .Values.secrets.oxAppSuite.jolokiaPassword | quote }}
+    hostname: "{{ .Values.global.hosts.openxchange }}.{{ .Values.global.domain }}"
+    podAnnotations:
+      {{ .Values.annotations.openxchangeAppsuiteCoreMw.pod | toYaml | nindent 6 }}
+    serviceAccount:
+      annotations:
+        {{ .Values.annotations.openxchangeAppsuiteCoreMw.serviceAccount | toYaml | nindent 8 }}
+      create: true
+    features:
+      status:
+        # enable admin pack
+        # admin: enabled
+        documents: "disabled"
+        guard: "enabled"
+    gotenberg:
+      enabled: true
+      imagePullSecrets:
+      {{- range .Values.global.imagePullSecrets }}
+        - name: {{ . | quote }}
+      {{- end }}
+      image:
+        repository: "{{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.openxchangeGotenberg.registry }}/{{ .Values.images.openxchangeGotenberg.repository }}"
+        tag: {{ .Values.images.openxchangeGotenberg.tag | quote }}
+        pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+      replicaCount: {{ .Values.replicas.openxchangeGotenberg }}
+      podAnnotations:
+        {{ .Values.annotations.openxchangeAppsuiteCoreMw.gotenbergPod | toYaml | nindent 8 }}
+      resources:
+        {{ .Values.resources.openxchangeGotenberg | toYaml | nindent 8 }}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - "ALL"
+        privileged: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        privileged: false
+        seccompProfile:
+          type: "RuntimeDefault"
+        seLinuxOptions:
+          {{ .Values.seLinuxOptions.openxchangeGotenberg | toYaml | nindent 10 }}
+      serviceAccount:
+        create: false
+    hooks:
+      beforeAppsuiteStart:
+        create-guard-dir.sh: |
+          mkdir -p /opt/open-xchange/guard-files
+          chown open-xchange:open-xchange /opt/open-xchange/guard-files
+    packages:
+      status:
+        {{- if .Values.functional.migration.oxAppSuite.enabled }}
+        open-xchange-oidc: "disabled"
+        open-xchange-authentication-masterpassword: "enabled"
+        {{- else }}
+        open-xchange-oidc: "enabled"
+        open-xchange-authentication-masterpassword: "disabled"
+        {{- end }}
+        open-xchange-authentication-oauth: "disabled"
+        open-xchange-authentication-database: "disabled"
+        open-xchange-authentication-ldap: "disabled"
+        # OX Documents (office-web) is not used in openDesk
+        open-xchange-documents-backend: "disabled"
+        open-xchange-documents-monitoring: "disabled"
+        open-xchange-documents-templates: "disabled"
+        # Required for the central contacts integration
+        open-xchange-oauth-provider: "enabled"
+        # Needed to set com.openexchange.hostname
+        open-xchange-hostname-config-cascade: "enabled"
+        # Enable s3 storage
+        open-xchange-filestore-s3: "enabled"
+    properties:
+      com.openexchange.hostname: {{ printf "%s.%s" .Values.global.hosts.openxchange .Values.global.domain }}
+      com.openexchange.UIWebPath: "/appsuite/"
+      com.openexchange.showAdmin: "false"
+      # PDF Export
+      com.openexchange.capability.mail_export_pdf: "true"
+      com.openexchange.mail.exportpdf.gotenberg.enabled: "true"
+      com.openexchange.mail.exportpdf.collabora.enabled: "true"
+      com.openexchange.mail.exportpdf.pdfa.collabora.enabled: "true"
+      com.openexchange.mail.exportpdf.collabora.url: "http://collabora:9980"
+      com.openexchange.mail.exportpdf.gotenberg.url: "http://open-xchange-gotenberg:3000"
+      # OIDC
+      com.openexchange.oidc.enabled: "true"
+      com.openexchange.oidc.autologinCookieMode: "ox_direct"
+      com.openexchange.oidc.backchannelLogoutEnabled: "true"
+      com.openexchange.oidc.clientId: "opendesk-oxappsuite"
+      com.openexchange.oidc.clientSecret: {{ .Values.secrets.keycloak.clientSecret.as8oidc | quote }}
+      com.openexchange.oidc.contextLookupClaim: "context"
+      com.openexchange.oidc.contextLookupNamePart: "full"
+      com.openexchange.oidc.opAuthorizationEndpoint: "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/{{ .Values.platform.realm }}/protocol/openid-connect/auth"
+      com.openexchange.oidc.opIssuer: "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/{{ .Values.platform.realm }}"
+      com.openexchange.oidc.opJwkSetEndpoint: "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/{{ .Values.platform.realm }}/protocol/openid-connect/certs"
+      com.openexchange.oidc.opLogoutEndpoint: "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/{{ .Values.platform.realm }}/protocol/openid-connect/logout"
+      com.openexchange.oidc.opTokenEndpoint: "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/{{ .Values.platform.realm }}/protocol/openid-connect/token"
+      com.openexchange.oidc.rpRedirectURIAuth: "https://{{ .Values.global.hosts.openxchange }}.{{ .Values.global.domain }}/appsuite/api/oidc/auth"
+      com.openexchange.oidc.rpRedirectURILogout: "https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}"
+      com.openexchange.oidc.rpRedirectURIPostSSOLogout: "https://{{ .Values.global.hosts.openxchange }}.{{ .Values.global.domain }}/appsuite/api/oidc/logout"
+      com.openexchange.oidc.ssoLogout: "true"
+      com.openexchange.oidc.startDefaultBackend: "true"
+      com.openexchange.oidc.userLookupClaim: "opendesk_username"
+      com.openexchange.oidc.userLookupNamePart: "full"
+      com.openexchange.oidc.enablePasswordGrant: "true"
+      com.openexchange.oidc.passwordGrantUserNamePart: "local-part"
+      # OAUTH
+      com.openexchange.oauth.provider.enabled: "true"
+      com.openexchange.oauth.provider.allowedIssuer: "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/{{ .Values.platform.realm }}"
+      com.openexchange.oauth.provider.contextLookupClaim: "context"
+      com.openexchange.oauth.provider.contextLookupNamePart: "full"
+      com.openexchange.oauth.provider.jwt.jwksUri: "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/{{ .Values.platform.realm }}/protocol/openid-connect/certs"
+      com.openexchange.oauth.provider.mode: "expect_jwt"
+      com.openexchange.oauth.provider.userLookupNamePart: "full"
+      com.openexchange.oauth.provider.userLookupClaim: "opendesk_username"
+      # MAIL
+      com.openexchange.mail.authType: "xoauth2"
+      com.openexchange.mail.loginSource: "name"
+      com.openexchange.mail.mailServer: "dovecot"
+      com.openexchange.mail.mailServerSource: "global"
+      com.openexchange.mail.transport.authType: "xoauth2"
+      com.openexchange.mail.transportServer: "postfix-ox"
+      com.openexchange.mail.transportServerSource: "global"
+      # Mail Login Resolver
+      com.openexchange.mail.login.resolver.enabled: "true"
+      com.openexchange.mail.login.resolver.ldap.enabled: "true"
+      com.openexchange.mail.login.resolver.ldap.clientId: "contactsLdapClient"
+      com.openexchange.mail.login.resolver.ldap.mailLoginSearchFilter: "(entryUUID=[mailLogin])"
+      com.openexchange.mail.login.resolver.ldap.userNameAttribute: "uid"
+      com.openexchange.mail.login.resolver.ldap.contextNameAttribute: "oxContextIDNum"
+      com.openexchange.mail.login.resolver.ldap.entitySearchFilter: "(&(oxContextIDNum=[cid])(uid=[uname]))"
+      com.openexchange.mail.login.resolver.ldap.mailLoginAttribute: "entryUUID"
+      # Requirements for OX-Connector
+      com.openexchange.user.enforceUniqueDisplayName: "false"
+      com.openexchange.folderstorage.database.preferDisplayName: "false"
+      # Mailfilter
+      com.openexchange.mail.filter.loginType: "global"
+      com.openexchange.mail.filter.credentialSource: "mail"
+      com.openexchange.mail.filter.server: "dovecot"
+      com.openexchange.mail.filter.preferredSaslMech: "XOAUTH2"
+      # Dovecot
+      com.openexchange.imap.attachmentMarker.enabled: "true"
+      # Capabilities
+      # Old capability can be used to toggle all integrations with a single switch
+      com.openexchange.capability.public-sector: "true"
+      # New capabilities in 2.0
+      com.openexchange.capability.public-sector-element: "true"
+      com.openexchange.capability.public-sector-navigation: "true"
+      com.openexchange.capability.client-onboarding: "true"
+      com.openexchange.capability.dynamic-theme: "true"
+      com.openexchange.capability.filestorage_nextcloud: "true"
+      com.openexchange.capability.filestorage_nextcloud_oauth: "true"
+      com.openexchange.capability.guard: "true"
+      com.openexchange.capability.guard-mail: "true"
+      com.openexchange.capability.smime: "true"
+      com.openexchange.capability.share_links: "false"
+      com.openexchange.capability.invite_guests: "false"
+      com.openexchange.capability.document_preview: "true"
+      # Secondary Accounts
+      com.openexchange.mail.secondary.authType: "XOAUTH2"
+      com.openexchange.mail.transport.secondary.authType: "xoauth2"
+      # Nextcloud integration
+      com.openexchange.file.storage.nextcloud.oauth.url: "http://opendesk-nextcloud-aio/"
+      com.openexchange.file.storage.nextcloud.oauth.webdav.username.strategy: "user"
+      com.openexchange.nextcloud.filepicker.includeAccessToken: "false"
+      # Element integration
+      com.openexchange.conference.element.enabled: "true"
+      com.openexchange.conference.element.meetingHostUrl: http://matrix-neodatefix-bot
+      com.openexchange.conference.element.matrixLoginUrl: http://opendesk-synapse-web:8008/_matrix/client/v3/login
+      com.openexchange.conference.element.matrixUuidClaimName: {{ if .Values.functional.chat.matrix.profile.useImmutableIdentifierForLocalpart }}"opendesk_useruuid"{{ else }}"opendesk_username"{{ end }}
+      # GDPR
+      com.openexchange.gdpr.dataexport.enabled: "false"
+      com.openexchange.gdpr.dataexport.active: "false"
+      # Guard
+      com.openexchange.guard.storage.file.fileStorageType: "file"
+      com.openexchange.guard.storage.file.uploadDirectory: "/opt/open-xchange/guard-files/"
+      com.openexchange.guard.guestSMTPMailFrom: {{ printf "%s@%s" "opendesk-system" ( .Values.global.mailDomain | default .Values.global.domain ) }}
+      com.openexchange.guard.guestSMTPPassword: {{ .Values.secrets.postfix.opendeskSystemPassword | quote }}
+      com.openexchange.guard.guestSMTPPort: "25"
+      com.openexchange.guard.guestSMTPServer: "postfix"
+      com.openexchange.guard.guestSMTPUsername: {{ printf "%s@%s" "opendesk-system" ( .Values.global.mailDomain | default .Values.global.domain ) }}
+      com.openexchange.guard.useStartTLS: "false"
+      # S/MIME
+      # Usage (in browser console after login):
+      # http = (await import('./io.ox/core/http.js')).default
+      # await http.POST({ module: 'oxguard/smime', params: { action: 'test' } })
+      com.openexchange.smime.test: {{ .Values.debug.enabled | quote }}
+      # DAV
+      {{- if .Values.functional.groupware.davSupport.enabled }}
+      com.openexchange.caldav.enabled: "true"
+      com.openexchange.caldav.url: {{ printf "https://%s.%s/caldav/[folderId]" .Values.global.hosts.openxchangeDav .Values.global.domain }}
+      com.openexchange.carddav.enabled: "true"
+      com.openexchange.carddav.url: {{ printf "https://%s.%s/carddav/[folderId]" .Values.global.hosts.openxchangeDav .Values.global.domain }}
+      com.openexchange.client.onboarding.caldav.url: {{ printf "https://%s.%s/" .Values.global.hosts.openxchangeDav .Values.global.domain }}
+      com.openexchange.client.onboarding.carddav.url: {{ printf "https://%s.%s/" .Values.global.hosts.openxchangeDav .Values.global.domain }}
+      {{- end }}
+      # Other
+      com.openexchange.secret.secretSource: "\"<user-id> + '@' + <context-id> + '/' + <random>\""
+      {{- if .Values.certificate.selfSigned }}
+      # Selfsigned
+      com.openexchange.net.ssl.default.truststore.enabled: "false"
+      com.openexchange.net.ssl.custom.truststore.enabled: "true"
+      com.openexchange.net.ssl.custom.truststore.path: "/etc/ssl/certs/truststore.jks"
+      com.openexchange.net.ssl.custom.truststore.password: {{ .Values.secrets.certificates.password | quote }}
+      {{- end }}
+    {{- if .Values.certificate.selfSigned }}
+    extraEnv:
+    - name: "JAVA_OPTS_APPEND"
+      value: {{ printf "%s %s=%s" "-Djavax.net.ssl.trustStore=/etc/ssl/certs/truststore.jks -Djavax.net.ssl.trustStoreType=jks" "-Djavax.net.ssl.trustStorePassword" .Values.secrets.certificates.password | quote }}
+    extraVolumes:
+      - name: "trusted-cert-secret-volume"
+        secret:
+          secretName: "opendesk-certificates-ca-tls"
+          items:
+            - key: "truststore.jks"
+              path: "truststore.jks"
+            - key: "ca.crt"
+              path: "ca-certificates.crt"
+    extraMounts:
+      - name: "trusted-cert-secret-volume"
+        mountPath: "/etc/ssl/certs/"
+    {{- end }}
+    secretProperties:
+      com.openexchange.cookie.hash.salt: {{ .Values.secrets.oxAppSuite.cookieHashSalt | quote }}
+      com.openexchange.sessiond.encryptionKey: {{ .Values.secrets.oxAppSuite.sessiondEncryptionKey | quote }}
+      com.openexchange.share.cryptKey: {{ .Values.secrets.oxAppSuite.shareCryptKey | quote }}
+      com.openexchange.conference.element.authToken: {{ .Values.secrets.oxAppSuite.synapseAsToken | quote }}
+    propertiesFiles:
+      {{- if .Values.functional.migration.oxAppSuite.enabled }}
+      /opt/open-xchange/etc/masterpassword-authentication.properties:
+        com.openexchange.authentication.masterpassword.password: {{ .Values.secrets.oxAppSuite.migrationsMasterPassword | quote }}
+      {{- end }}
+      /opt/open-xchange/etc/AdminDaemon.properties:
+        MASTER_ACCOUNT_OVERRIDE: "true"
+      /opt/open-xchange/etc/AdminUser.properties:
+        USERNAME_CHANGEABLE: "true"
+      /opt/open-xchange/etc/system.properties:
+        SERVER_NAME: "oxserver"
+      /opt/open-xchange/etc/ldapauth.properties:
+        java.naming.provider.url: "ldap://{{ .Values.ldap.host }}:389/{{ .Values.ldap.baseDn }}"
+        bindDN: "uid=ldapsearch_ox,cn=users,{{ .Values.ldap.baseDn }}"
+        bindDNPassword: {{ .Values.secrets.nubus.ldapSearch.ox | quote }}
+        bindOnly: "false"
+      /opt/open-xchange/etc/antivirus.properties:
+        com.openexchange.antivirus.enabled: "true"
+        {{- if .Values.antivirus.icap.host }}
+        com.openexchange.antivirus.server: {{ .Values.antivirus.icap.host | quote }}
+        com.openexchange.antivirus.port: {{ .Values.antivirus.icap.port | quote }}
+        {{- else }}
+        {{- if .Values.apps.clamavDistributed.enabled }}
+        com.openexchange.antivirus.server: "clamav-icap"
+        {{- else if .Values.apps.clamavSimple.enabled }}
+        com.openexchange.antivirus.server: "clamav-simple"
+        {{- end }}
+        com.openexchange.antivirus.port: "1344"
+        {{- end }}
+        com.openexchange.antivirus.maxFileSize: "1024"
+      /opt/open-xchange/etc/filestore-s3.properties:
+        com.openexchange.filestore.s3.ox-filestore-s3.endpoint: {{ .Values.objectstores.openxchange.endpoint | default (printf "https://%s.%s" .Values.global.hosts.minioApi .Values.global.domain) | quote }}
+        com.openexchange.filestore.s3.ox-filestore-s3.bucketName: {{ .Values.objectstores.openxchange.bucket | quote }}
+        com.openexchange.filestore.s3.ox-filestore-s3.accessKey: {{ .Values.objectstores.openxchange.username | quote }}
+        com.openexchange.filestore.s3.ox-filestore-s3.secretKey: {{ .Values.objectstores.openxchange.secretKey | default .Values.secrets.minio.openxchangeUser | quote }}
+    uiSettings:
+      io.ox.nextcloud//server: "https://{{ .Values.global.hosts.intercomService }}.{{ .Values.global.domain }}/fs/"
+      io.ox.public-sector//ics/url: "https://{{ .Values.global.hosts.intercomService }}.{{ .Values.global.domain }}/"
+      # Show the Enterprise Picker in the top right corner instead of the launcher drop-down
+      io.ox/core//features/enterprisePicker/showLauncher: "false"
+      io.ox/core//features/enterprisePicker/showTopRightLauncher: "true"
+      # Text and icon color in the topbar
+      io.ox/dynamic-theme//topbarColor: "#000"
+      io.ox/dynamic-theme//logoWidth: "82"
+      io.ox/dynamic-theme//topbarHover: "rgba(0, 0, 0, 0.1)"
+      # Resources
+      io.ox/core//features/resourceCalendars: "true"
+      io.ox/core//features/managedResources: "true"
+      # Categories
+      io.ox/core//features/categories: "true"
+      io.ox/core//categories/predefined: >
+        [{ "name": "Predefined", "color": "orange", "icon": "bi/exclamation-circle.svg" }]
+      # Nextcloud integration
+      # io.ox.nextcloud//server: "https://ics.<DOMAIN>/fs/"
+      # Central navigation
+      io.ox.public-sector//navigation/oxtabname: "tab_groupware"
+      # io.ox.public-sector//ics/url: "https://ics.<DOMAIN>/"
+      io.ox/core//apps/quickLaunchCount: "0"
+      io.ox/core//coloredIcons: "false"
+      # Mail templates
+      io.ox/core//features/templates: "true"
+      # Contact Collector
+      io.ox/mail//contactCollectOnMailTransport: "true"
+      # io.ox/mail//contactCollectOnMailAccess: "true"
+      # Dynamic theme
+      io.ox/dynamic-theme//mainColor: {{ .Values.theme.colors.primary | quote }}
+      io.ox/dynamic-theme//logoURL: "https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}/univention/portal/icons/logos/domain.svg"
+      io.ox/dynamic-theme//topbarBackground: {{ .Values.theme.colors.white | quote }}
+      io.ox/dynamic-theme//topbarColor: {{ .Values.theme.colors.black | quote }}
+      io.ox/dynamic-theme//listSelected: {{ .Values.theme.colors.primary15 | quote }}
+      io.ox/dynamic-theme//listHover: {{ .Values.theme.colors.secondaryGreyLight | quote }}
+      io.ox/dynamic-theme//folderBackground: {{ .Values.theme.colors.white | quote }}
+      io.ox/dynamic-theme//folderSelected: {{ .Values.theme.colors.primary15 | quote }}
+      io.ox/dynamic-theme//folderHover: {{ .Values.theme.colors.secondaryGreyLight | quote }}
+    secretETCFiles:
+      # Format of the OX Guard master key:
+      # MC+base64(20 random bytes)
+      # RC+base64(20 random bytes)
+      oxguardpass: |
+        {{ .Values.secrets.oxAppSuite.oxguardMC }}
+        {{ .Values.secrets.oxAppSuite.oxguardRC }}
+    redis: &redisConfiguration
+      enabled: true
+      mode: "standalone"
+      hosts:
+        - {{ printf "%s:%v" .Values.cache.oxAppSuite.host .Values.cache.oxAppSuite.port | quote }}
+      auth:
+        enabled: true
+        username: {{ .Values.cache.oxAppSuite.username | quote }}
+        password: {{ .Values.cache.oxAppSuite.password | default .Values.secrets.redis.password | quote }}
+    image:
+      registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.openxchangeCoreMW.registry | quote }}
+      repository: {{ .Values.images.openxchangeCoreMW.repository | quote }}
+      tag: {{ .Values.images.openxchangeCoreMW.tag | quote }}
+      pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    # Security context for core-mw has no effect yet
+    # podSecurityContext: {}
+    # securityContext: {}
+    update:
+      podAnnotations:
+        {{ .Values.annotations.openxchangeAppsuiteCoreMw.updatePod | toYaml | nindent 8 }}
+      image:
+        repository: {{ .Values.images.openxchangeCoreMW.repository | quote }}
+        tag: {{ .Values.images.openxchangeCoreMW.tag | quote }}
+    imagePullSecrets:
+    {{- range .Values.global.imagePullSecrets }}
+      - name: {{ . | quote }}
+    {{- end }}
+    replicas: {{ .Values.replicas.openxchangeCoreMW }}
+    resources:
+      {{ .Values.resources.openxchangeCoreMW | toYaml | nindent 6 }}
+    initContainer:
+      resources:
+        {{ .Values.resources.openxchangeCoreMW | toYaml | nindent 8 }}
+
+  core-ui:
+    enabled: true
+    imagePullSecrets:
+    {{- range .Values.global.imagePullSecrets }}
+      - name: {{ . | quote }}
+    {{- end }}
+    image:
+      registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.openxchangeCoreUI.registry | quote }}
+      repository: {{ .Values.images.openxchangeCoreUI.repository | quote }}
+      tag: {{ .Values.images.openxchangeCoreUI.tag | quote }}
+      pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    replicaCount: {{ .Values.replicas.openxchangeCoreUI }}
+    podAnnotations:
+      {{ .Values.annotations.openxchangeAppsuiteCoreUi.pod | toYaml | nindent 6 }}
+    resources:
+      {{ .Values.resources.openxchangeCoreUI | toYaml | nindent 6 }}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - "ALL"
+      readOnlyRootFilesystem: true
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+      privileged: false
+      seccompProfile:
+        type: "RuntimeDefault"
+      seLinuxOptions:
+        {{ .Values.seLinuxOptions.openxchangeCoreUI | toYaml | nindent 8 }}
+    serviceAccount:
+      create: false
+
+  core-ui-middleware:
+    enabled: true
+    ingress:
+      hosts:
+        - host: "{{ .Values.global.hosts.openxchange }}.{{ .Values.global.domain }}"
+      enabled: false
+    imagePullSecrets:
+    {{- range .Values.global.imagePullSecrets }}
+      - name: {{ . | quote }}
+    {{- end }}
+    image:
+      registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.openxchangeCoreUIMiddleware.registry | quote }}
+      repository: {{ .Values.images.openxchangeCoreUIMiddleware.repository | quote }}
+      tag: {{ .Values.images.openxchangeCoreUIMiddleware.tag | quote }}
+      pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    overrides: {}
+    podAnnotations:
+      {{ .Values.annotations.openxchangeAppsuiteCoreUiMiddleware.pod | toYaml | nindent 6 }}
+    redis: *redisConfiguration
+    replicaCount: {{ .Values.replicas.openxchangeCoreUIMiddleware }}
+    resources:
+      {{ .Values.resources.openxchangeCoreUIMiddleware | toYaml | nindent 6 }}
+    updater:
+      resources:
+        {{ .Values.resources.openxchangeCoreUIMiddlewareUpdater | toYaml | nindent 8 }}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - "ALL"
+      readOnlyRootFilesystem: true
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+      privileged: false
+      seccompProfile:
+        type: "RuntimeDefault"
+      seLinuxOptions:
+        {{ .Values.seLinuxOptions.openxchangeCoreUIMiddleware | toYaml | nindent 8 }}
+    serviceAccount:
+      create: false
+
+  core-cacheservice:
+    enabled: false
+
+  core-documentconverter:
+    adminUser: "admin"
+    adminPassword: {{ .Values.secrets.oxAppSuite.adminPassword | quote }}
+    basicAuthLogin: "oxlogin"
+    basicAuthPassword: {{ .Values.secrets.oxAppSuite.basicAuthPassword | quote }}
+    enabled: true
+    documentConverter:
+      cache:
+        remoteCache:
+          enabled: false
+    imagePullSecrets:
+    {{- range .Values.global.imagePullSecrets }}
+      - name: {{ . | quote }}
+    {{- end }}
+    image:
+      registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.openxchangeDocumentConverter.registry | quote }}
+      repository: {{ .Values.images.openxchangeDocumentConverter.repository | quote }}
+      tag: {{ .Values.images.openxchangeDocumentConverter.tag | quote }}
+      pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    {{- if .Values.annotations.openxchangeAppsuiteCoreDocumentconverter.pod }}
+    podAnnotations:
+      {{ .Values.annotations.openxchangeAppsuiteCoreDocumentconverter.pod | toYaml | nindent 6 }}
+    {{- end }}
+    redis: *redisConfiguration
+    replicaCount: {{ .Values.replicas.openxchangeCoreDocumentConverter }}
+    resources:
+      {{- .Values.resources.openxchangeCoreDocumentConverter | toYaml | nindent 6 }}
+    securityContext:
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 987
+      seccompProfile:
+        type: "RuntimeDefault"
+      readOnlyRootFilesystem: false
+      allowPrivilegeEscalation: false
+      privileged: false
+      capabilities:
+        drop:
+          - "ALL"
+      seccompProfile:
+        type: "RuntimeDefault"
+      seLinuxOptions:
+        {{ .Values.seLinuxOptions.openxchangeDocumentConverter | toYaml | nindent 8 }}
+    serviceAccount:
+      create: false
+
+  core-documents-collaboration:
+    enabled: false
+  office-web:
+    enabled: false
+  office-user-guide:
+    enabled: false
+  plugins-ui:
+    enabled: false
+  cloud-plugins-ui:
+    enabled: false
+  drive-client-windows-ox:
+    enabled: false
+  core-drive-help:
+    enabled: false
+
+  core-guidedtours:
+    enabled: true
+    imagePullSecrets:
+    {{- range .Values.global.imagePullSecrets }}
+      - name: {{ . | quote }}
+    {{- end }}
+    image:
+      registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.openxchangeCoreGuidedtours.registry | quote }}
+      repository: {{ .Values.images.openxchangeCoreGuidedtours.repository | quote }}
+      tag: {{ .Values.images.openxchangeCoreGuidedtours.tag | quote }}
+      pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    podAnnotations:
+      {{ .Values.annotations.openxchangeAppsuiteCoreGuidedtours.pod | toYaml | nindent 6 }}
+    replicaCount: {{ .Values.replicas.openxchangeCoreGuidedtours }}
+    resources:
+      {{- .Values.resources.openxchangeCoreGuidedtours | toYaml | nindent 6 }}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - "ALL"
+      readOnlyRootFilesystem: true
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+      privileged: false
+      seccompProfile:
+        type: "RuntimeDefault"
+      seLinuxOptions:
+        {{ .Values.seLinuxOptions.openxchangeCoreGuidedtours | toYaml | nindent 8 }}
+    serviceAccount:
+      create: false
+
+  core-imageconverter:
+    enabled: true
+    adminUser: "admin"
+    adminPassword: {{ .Values.secrets.oxAppSuite.adminPassword | quote }}
+    basicAuthLogin: "oxlogin"
+    basicAuthPassword: {{ .Values.secrets.oxAppSuite.basicAuthPassword | quote }}
+    imagePullSecrets:
+    {{- range .Values.global.imagePullSecrets }}
+      - name: {{ . | quote }}
+    {{- end }}
+    image:
+      registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.openxchangeImageConverter.registry | quote }}
+      repository: {{ .Values.images.openxchangeImageConverter.repository | quote }}
+      tag: {{ .Values.images.openxchangeImageConverter.tag | quote }}
+      pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    objectCache:
+      s3ObjectStores:
+        - id: -1
+          endpoint: "."
+          accessKey: "."
+          secretKey: "."
+    {{- if .Values.annotations.openxchangeAppsuiteCoreImageconverter.pod }}
+    podAnnotations:
+      {{ .Values.annotations.openxchangeAppsuiteCoreImageconverter.pod | toYaml | nindent 6 }}
+    {{- end }}
+    redis: *redisConfiguration
+    replicaCount: {{ .Values.replicas.openxchangeCoreImageConverter }}
+    resources:
+      {{- .Values.resources.openxchangeCoreImageConverter | toYaml | nindent 6 }}
+    securityContext:
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 987
+      seccompProfile:
+        type: "RuntimeDefault"
+      readOnlyRootFilesystem: false
+      allowPrivilegeEscalation: false
+      privileged: false
+      capabilities:
+        drop:
+          - "ALL"
+      seccompProfile:
+        type: "RuntimeDefault"
+      seLinuxOptions:
+        {{ .Values.seLinuxOptions.openxchangeImageConverter | toYaml | nindent 8 }}
+    serviceAccount:
+      create: false
+
+  guard-ui:
+    enabled: true
+    imagePullSecrets:
+    {{- range .Values.global.imagePullSecrets }}
+      - name: {{ . | quote }}
+    {{- end }}
+    image:
+      registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.openxchangeGuardUI.registry | quote }}
+      repository: {{ .Values.images.openxchangeGuardUI.repository | quote }}
+      tag: {{ .Values.images.openxchangeGuardUI.tag | quote }}
+      pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    podAnnotations: {}
+    replicaCount: {{ .Values.replicas.openxchangeGuardUI }}
+    resources:
+      {{- .Values.resources.openxchangeGuardUI | toYaml | nindent 6 }}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - "ALL"
+      readOnlyRootFilesystem: true
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+      privileged: false
+      seccompProfile:
+        type: "RuntimeDefault"
+      seLinuxOptions:
+        {{ .Values.seLinuxOptions.openxchangeGuardUI | toYaml | nindent 8 }}
+    serviceAccount:
+      create: false
+  core-spellcheck:
+    enabled: false
+
+  core-user-guide:
+    enabled: true
+    image:
+      registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.openxchangeCoreUserGuide.registry | quote }}
+      repository: {{ .Values.images.openxchangeCoreUserGuide.repository | quote }}
+      tag: {{ .Values.images.openxchangeCoreUserGuide.tag | quote }}
+      pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    imagePullSecrets:
+    {{- range .Values.global.imagePullSecrets }}
+      - name: {{ . | quote }}
+    {{- end }}
+    podAnnotations:
+      {{ .Values.annotations.openxchangeAppsuiteCoreUserGuide.pod | toYaml | nindent 6 }}
+    replicaCount: {{ .Values.replicas.openxchangeCoreUserGuide }}
+    resources:
+      {{- .Values.resources.openxchangeCoreUserGuide | toYaml | nindent 6 }}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - "ALL"
+      readOnlyRootFilesystem: true
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+      privileged: false
+      seccompProfile:
+        type: "RuntimeDefault"
+      seLinuxOptions:
+        {{ .Values.seLinuxOptions.openxchangeCoreUserGuide | toYaml | nindent 8 }}
+    serviceAccount:
+      create: false
+...

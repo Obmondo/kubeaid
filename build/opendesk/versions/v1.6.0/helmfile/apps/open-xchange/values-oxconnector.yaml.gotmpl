@@ -1,0 +1,98 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+{{- if .Values.certificate.selfSigned }}
+extraVolumes:
+  - name: "trusted-cert-secret-volume"
+    secret:
+      secretName: "opendesk-certificates-ca-tls"
+      items:
+        - key: "ca.crt"
+          path: "ca-certificates.crt"
+extraVolumeMounts:
+  - name: "trusted-cert-secret-volume"
+    mountPath: "/etc/ssl/certs/ca-certificates.crt"
+    subPath: "ca-certificates.crt"
+{{- end }}
+
+image:
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.oxConnector.registry | quote }}
+  repository: {{ .Values.images.oxConnector.repository | quote }}
+  pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  tag: {{ .Values.images.oxConnector.tag | quote }}
+  waitForDependency:
+    registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.nubusWaitForDependency.registry | quote }}
+    repository: {{ .Values.images.nubusWaitForDependency.repository }}
+    imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+    pullSecrets:
+    {{- range .Values.global.imagePullSecrets }}
+    - name: {{ . | quote }}
+    {{- end }}
+    tag: {{ .Values.images.nubusWaitForDependency.tag | quote }}
+
+imagePullSecrets:
+{{- range .Values.global.imagePullSecrets }}
+  - name: {{ . | quote }}
+{{- end }}
+
+ingress:
+  enabled: false
+
+oxConnector:
+  domainName: {{ .Values.global.domain | quote }}
+  logLevel: {{ if .Values.debug.enabled }}"DEBUG"{{ else }}"INFO"{{ end }}
+  oxDefaultContext: "1"
+  oxImapServer: "imap://127.0.0.1:143"
+  oxLocalTimezone: "Europe/Berlin"
+  oxLanguage: "de_DE"
+  oxMasterAdmin: "admin"
+  oxMasterPassword: {{ .Values.secrets.oxAppSuite.adminPassword | quote }}
+  oxSmtpServer: "smtp://127.0.0.1:587"
+  oxSoapServer: "https://{{ .Values.global.hosts.openxchange }}.{{ .Values.global.domain }}"
+
+provisioningApi:
+  connection:
+    baseUrl: "http://ums-provisioning-api"
+  auth:
+    username: "ox-connector"
+    password: {{ .Values.secrets.oxConnector.provisioningApiPassword | quote }}
+
+resources:
+  {{ .Values.resources.oxConnector | toYaml | nindent 2 }}
+resourcesWaitForDependency:
+  {{ .Values.resources.oxConnector | toYaml | nindent 2 }}
+
+persistence:
+  size: {{ .Values.persistence.storages.oxConnector.size | quote }}
+  storageClass: {{ coalesce .Values.persistence.storages.oxConnector.storageClassName .Values.persistence.storageClassNames.RWO | quote }}
+
+podAnnotations:
+  {{ .Values.annotations.nubusOxConnector.pod | toYaml | nindent 2 }}
+
+replicaCount: {{ .Values.replicas.oxConnector }}
+
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  privileged: false
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: "RuntimeDefault"
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.oxConnector | toYaml | nindent 4 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.nubusOxConnector.serviceAccount | toYaml | nindent 4 }}
+  create: true
+
+...

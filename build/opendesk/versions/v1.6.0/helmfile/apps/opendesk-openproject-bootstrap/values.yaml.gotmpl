@@ -1,0 +1,84 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+additionalAnnotations:
+  {{ .Values.annotations.openprojectBootstrap.additional | toYaml | nindent 2 }}
+
+cleanup:
+  deletePodsOnSuccess: {{ .Values.debug.cleanup.deletePodsOnSuccess }}
+  deletePodsOnSuccessTimeout: {{ .Values.debug.cleanup.deletePodsOnSuccessTimeout }}
+  keepPVCOnDelete: {{ .Values.debug.cleanup.keepPVCOnDelete }}
+
+config:
+  debug:
+    enabled: {{ .Values.debug.enabled }}
+  openproject:
+    fileshareName: "Nextcloud at {{ .Values.global.domain }}"
+    admin:
+      username:
+        value: {{ .Values.secrets.openproject.apiAdminUsername | quote }}
+      password:
+        value: {{ .Values.secrets.openproject.apiAdminPassword | quote }}
+  nextcloud:
+    admin:
+      username:
+        value: "nextcloud"
+      password:
+        value: {{ .Values.secrets.nextcloud.adminPassword | quote }}
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  enabled: true
+  privileged: false
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: "RuntimeDefault"
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.openprojectBootstrap | toYaml | nindent 4 }}
+
+{{- if .Values.certificate.selfSigned }}
+extraVolumes:
+  - name: "trusted-cert-secret-volume"
+    secret:
+      secretName: "opendesk-certificates-ca-tls"
+      items:
+        - key: "ca.crt"
+          path: "ca-certificates.crt"
+extraVolumeMounts:
+  - name: "trusted-cert-secret-volume"
+    mountPath: "/etc/ssl/certs/ca-certificates.crt"
+    subPath: "ca-certificates.crt"
+{{- end }}
+
+image:
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.openprojectBootstrap.registry | quote }}
+  repository: {{ .Values.images.openprojectBootstrap.repository | quote }}
+  tag: {{ .Values.images.openprojectBootstrap.tag | quote }}
+  imagePullPolicy: {{ .Values.global.imagePullPolicy |quote }}
+
+job:
+  enabled: true
+
+podAnnotations:
+  {{ .Values.annotations.openprojectBootstrap.pod | toYaml | nindent 2 }}
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 1000
+  fsGroupChangePolicy: "OnRootMismatch"
+
+...

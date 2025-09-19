@@ -1,0 +1,233 @@
+# SPDX-FileCopyrightText: 2024-2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+#
+# This file is currently optional for customizing purposes only. It will be a mandatory part of Nubus in a later release.
+#
+nubusGuardian:
+  authorizationApi:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+      seccompProfile:
+        type: RuntimeDefault
+      seLinuxOptions:
+        {{ .Values.seLinuxOptions.umsGuardianAuthorizationApi | toYaml | nindent 8 }}
+    image:
+      registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.nubusGuardianAuthorizationApi.registry | quote }}
+      repository: {{ .Values.images.nubusGuardianAuthorizationApi.repository }}
+      tag: {{ .Values.images.nubusGuardianAuthorizationApi.tag }}
+      imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    imagePullSecrets:
+      {{ .Values.global.imagePullSecrets | toYaml | nindent 6 }}
+    podAnnotations:
+      intents.otterize.com/service-name: "ums-guardian-authorization-api"
+      {{- with .Values.annotations.nubusGuardian.authorizationApiPod }}
+      {{ . | toYaml | nindent 6 }}
+      {{- end }}
+    podSecurityContext:
+      fsGroup: 1000
+      fsGroupChangePolicy: "Always"
+    replicaCount: {{ .Values.replicas.umsGuardianAuthorizationApi }}
+    resources:
+      {{ .Values.resources.umsGuardianAuthorizationApi | toYaml | nindent 6 }}
+  global:
+    podAnnotations:
+      {{ .Values.annotations.nubusGuardian.globalPod | toYaml | nindent 6 }}
+  ingress:
+    annotations:
+      {{ .Values.annotations.nubusGuardian.ingressIngress | toYaml | nindent 6 }}
+    certManager:
+      enabled: false
+    tls:
+      enabled: {{ .Values.ingress.tls.enabled }}
+      secretName: {{ .Values.ingress.tls.secretName | quote }}
+    items:
+      - name: management-ui
+        host: ""
+        # -- Define the Ingress paths.
+        paths:
+          - path: /univention/guardian/management-ui
+            pathType: Prefix
+            backend:
+              service:
+                name: guardian-management-ui
+                port:
+                  number: 80
+        ingressClassName: ""
+        annotations:
+          {{ .Values.annotations.nubusGuardian.ingressManagementUi | toYaml | nindent 10 }}
+        tls:
+          # enabled: true
+          secretName: ""
+      - name: management-api
+        host: ""
+        paths:
+          - path: /guardian/management
+            pathType: Prefix
+            backend:
+              service:
+                name: guardian-management-api
+                port:
+                  number: 80
+        ingressClassName: ""
+        annotations:
+          {{ .Values.annotations.nubusGuardian.ingressManagementApi | toYaml | nindent 10 }}
+        tls:
+          # enabled: true
+          secretName: ""
+      - name: authorization-api
+        host: ""
+        paths:
+          - path: /guardian/authorization
+            pathType: Prefix
+            backend:
+              service:
+                name: guardian-authorization-api
+                port:
+                  number: 80
+        ingressClassName: ""
+        annotations:
+          {{ .Values.annotations.nubusGuardian.ingressAuthorizationApi | toYaml | nindent 10 }}
+        tls:
+          # enabled: true
+          secretName: ""
+  managementApi:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+      seccompProfile:
+        type: RuntimeDefault
+      seLinuxOptions:
+        {{ .Values.seLinuxOptions.umsGuardianManagementApi | toYaml | nindent 8 }}
+    image:
+      registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.nubusGuardianManagementApi.registry | quote }}
+      repository: {{ .Values.images.nubusGuardianManagementApi.repository }}
+      tag: {{ .Values.images.nubusGuardianManagementApi.tag }}
+      imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    imagePullSecrets:
+      {{ .Values.global.imagePullSecrets | toYaml | nindent 6 }}
+    podAnnotations:
+      intents.otterize.com/service-name: "ums-guardian-management-api"
+      {{- with .Values.annotations.nubusGuardian.managementApiPod }}
+      {{ . | toYaml | nindent 6 }}
+      {{- end }}
+    podSecurityContext:
+      fsGroup: 1000
+      fsGroupChangePolicy: "Always"
+    replicaCount: {{ .Values.replicas.umsGuardianManagementApi }}
+    resources:
+      {{ .Values.resources.umsGuardianManagementApi | toYaml | nindent 6 }}
+  managementUi:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+      seccompProfile:
+        type: RuntimeDefault
+      seLinuxOptions:
+        {{ .Values.seLinuxOptions.umsGuardianManagementUi | toYaml | nindent 8 }}
+    image:
+      registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.nubusGuardianManagementUi.registry | quote }}
+      repository: {{ .Values.images.nubusGuardianManagementUi.repository }}
+      tag: {{ .Values.images.nubusGuardianManagementUi.tag }}
+      imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    imagePullSecrets:
+      {{ .Values.global.imagePullSecrets | toYaml | nindent 6 }}
+    podAnnotations:
+      intents.otterize.com/service-name: "ums-guardian-management-ui"
+      {{- with .Values.annotations.nubusGuardian.managementUiPod }}
+      {{ . | toYaml | nindent 6 }}
+      {{- end }}
+    replicaCount: {{ .Values.replicas.umsGuardianManagementUi }}
+    resources:
+      {{ .Values.resources.umsGuardianManagementUi | toYaml | nindent 6 }}
+  openPolicyAgent:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+      seccompProfile:
+        type: RuntimeDefault
+    seLinuxOptions:
+      {{ .Values.seLinuxOptions.umsGuardianOpenPolicyAgent | toYaml | nindent 8 }}
+    image:
+      registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.nubusOpenPolicyAgent.registry | quote }}
+      repository: {{ .Values.images.nubusOpenPolicyAgent.repository }}
+      tag: {{ .Values.images.nubusOpenPolicyAgent.tag }}
+      imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    imagePullSecrets:
+      {{ .Values.global.imagePullSecrets | toYaml | nindent 6 }}
+    podSecurityContext:
+      fsGroup: 1000
+      fsGroupChangePolicy: "Always"
+    podAnnotations:
+      intents.otterize.com/service-name: "ums-ums-open-policy-agent"
+    replicaCount: {{ .Values.replicas.umsGuardianOpenPolicyAgent }}
+    resources:
+      {{ .Values.resources.umsOpenPolicyAgent | toYaml | nindent 6 }}
+  postgresql:
+    connection:
+      host: {{ .Values.databases.umsGuardianManagementApi.host | quote }}
+      port: {{ .Values.databases.umsGuardianManagementApi.port | quote }}
+    auth:
+      username: {{ .Values.databases.umsGuardianManagementApi.username | quote }}
+      database: {{ .Values.databases.umsGuardianManagementApi.name | quote }}
+      existingSecret:
+        name: "ums-guardian-postgresql-opendesk-credentials"
+        keyMapping:
+          password: "guardianDatabasePassword"
+  provisioning:
+    enabled: false
+    config:
+      nubusBaseUrl: {{ printf "https://%s.%s" .Values.global.hosts.nubus .Values.global.domain }}
+      keycloak:
+        credentialSecret:
+          name: "ums-opendesk-keycloak-credentials"
+          key: "admin_password"
+      realm: {{ .Values.platform.realm | quote }}
+      username: "kcadmin"
+    keycloak:
+      auth:
+        existingSecret:
+          name: "ums-opendesk-guardian-client-secret"
+          keyMapping:
+            password: "managementApiClientSecret"
+      connection:
+        host: "{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}"
+        baseUrl: "http://ums-keycloak:8080"
+    image:
+      registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.nubusGuardianProvisioning.registry | quote }}
+      repository: {{ .Values.images.nubusGuardianProvisioning.repository }}
+      tag: {{ .Values.images.nubusGuardianProvisioning.tag }}
+      imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  serviceAccount:
+    annotations:
+      {{ .Values.annotations.nubusGuardian.serviceAccount | toYaml | nindent 6 }}
+---

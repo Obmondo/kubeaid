@@ -1,0 +1,78 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+commonAnnotations:
+  {{ .Values.annotations.elementSynapseWeb.common | toYaml | nindent 2 }}
+
+clusterDomain: {{ .Values.cluster.networking.domain }}
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  enabled: true
+  privileged: false
+  readOnlyRootFilesystem: true
+  runAsGroup: 101
+  runAsNonRoot: true
+  runAsUser: 101
+  seccompProfile:
+    type: "RuntimeDefault"
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.synapseWeb | toYaml | nindent 4 }}
+
+global:
+  domain: {{ .Values.global.domain | quote }}
+  clusterDomain: {{ .Values.cluster.networking.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+image:
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.synapseWeb.registry | quote }}
+  repository: {{ .Values.images.synapseWeb.repository | quote }}
+  tag: {{ .Values.images.synapseWeb.tag | quote }}
+
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "{{ .Values.ingress.parameters.bodySize.element }}"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "{{ .Values.ingress.parameters.bodyTimeout.element }}"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "{{ .Values.ingress.parameters.bodyTimeout.element }}"
+    nginx.org/client-max-body-size: "{{ .Values.ingress.parameters.bodySize.element }}"
+    nginx.org/proxy-read-timeout: "{{ .Values.ingress.parameters.bodyTimeout.element }}s"
+    nginx.org/proxy-send-timeout: "{{ .Values.ingress.parameters.bodyTimeout.element }}s"
+    {{- with .Values.annotations.elementSynapseWeb.ingress }}
+    {{ . | toYaml | nindent 4 }}
+    {{- end }}
+  host: "{{ .Values.global.hosts.synapse }}.{{ .Values.global.domain }}"
+  enabled: {{ .Values.ingress.enabled }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  tls:
+    enabled: {{ .Values.ingress.tls.enabled }}
+    secretName: {{ .Values.ingress.tls.secretName | quote }}
+
+podAnnotations:
+  {{ .Values.annotations.elementSynapseWeb.pod | toYaml | nindent 2 }}
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 101
+
+replicaCount: {{ .Values.replicas.synapseWeb }}
+
+resources:
+  {{ .Values.resources.synapseWeb | toYaml | nindent 2 }}
+
+service:
+  annotations:
+    {{ .Values.annotations.elementSynapseWeb.service | toYaml | nindent 4 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.elementSynapseWeb.serviceAccount | toYaml | nindent 4 }}
+
+...

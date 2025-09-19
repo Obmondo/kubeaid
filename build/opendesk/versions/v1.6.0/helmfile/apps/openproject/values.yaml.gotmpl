@@ -1,0 +1,243 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+appInit:
+  resources:
+    {{ .Values.resources.openprojectAppInit | toYaml | nindent 4 }}
+
+containerSecurityContext:
+  enabled: true
+  privileged: false
+  runAsUser: 1000
+  runAsGroup: 1000
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  seccompProfile:
+    type: "RuntimeDefault"
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.openproject | toYaml | nindent 4 }}
+
+dbInit:
+  image:
+    registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.openprojectDbInit.registry | quote }}
+    repository: {{ .Values.images.openprojectDbInit.repository | quote }}
+    tag: {{ .Values.images.openprojectDbInit.tag | quote }}
+    imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  resources:
+    {{ .Values.resources.openprojectDbInit | toYaml | nindent 4 }}
+
+environment:
+  {{- if and (eq (env "OPENDESK_ENTERPRISE") "true") .Values.enterpriseKeys.openproject.token }}
+  OPENPROJECT_SEED__ENTERPRISE__TOKEN: {{ .Values.enterpriseKeys.openproject.token | quote }}
+  {{- end }}
+# For more details and more options see
+# https://www.openproject.org/docs/installation-and-operations/configuration/environment/
+  OPENPROJECT_APP__TITLE: "Projekte - {{ .Values.theme.texts.productName }}"
+  OPENPROJECT_LOG__LEVEL: {{ if .Values.debug.enabled }}"debug"{{ else }}"info"{{ end }}
+  OPENPROJECT_LOGIN__REQUIRED: "true"
+  OPENPROJECT_USER__DEFAULT__TIMEZONE: "Europe/Berlin"
+  OPENPROJECT_OAUTH__ALLOW__REMAPPING__OF__EXISTING__USERS: "true"
+  OPENPROJECT_OMNIAUTH__DIRECT__LOGIN__PROVIDER: "keycloak"
+  OPENPROJECT_EMAIL__DELIVERY__METHOD: "smtp"
+  OPENPROJECT_DEFAULT__COMMENT__SORT__ORDER: "desc"
+  # Details: https://www.openproject-edge.com/docs/installation-and-operations/configuration/#seeding-ldap-connections
+  OPENPROJECT_SEED_LDAP_OPENDESK_HOST: {{ .Values.ldap.host | quote }}
+  OPENPROJECT_SEED_LDAP_OPENDESK_PORT: "389"
+  OPENPROJECT_SEED_LDAP_OPENDESK_BINDPASSWORD: {{ .Values.secrets.nubus.ldapSearch.openproject | quote }}
+  OPENPROJECT_SEED_LDAP_OPENDESK_SECURITY: "plain_ldap"
+  OPENPROJECT_SEED_LDAP_OPENDESK_BINDUSER: "uid=ldapsearch_openproject,cn=users,{{ .Values.ldap.baseDn }}"
+  OPENPROJECT_SEED_LDAP_OPENDESK_BASEDN: "{{ .Values.ldap.baseDn }}"
+  OPENPROJECT_SEED_LDAP_OPENDESK_FILTER:
+    "(&(objectClass=opendeskProjectmanagementUser)(opendeskProjectmanagementEnabled=TRUE))"
+  OPENPROJECT_SEED_LDAP_OPENDESK_SYNC__USERS: "true"
+  OPENPROJECT_SEED_LDAP_OPENDESK_LOGIN__MAPPING: "uid"
+  OPENPROJECT_SEED_LDAP_OPENDESK_FIRSTNAME__MAPPING: "givenName"
+  OPENPROJECT_SEED_LDAP_OPENDESK_LASTNAME__MAPPING: "sn"
+  OPENPROJECT_SEED_LDAP_OPENDESK_MAIL__MAPPING: "mailPrimaryAddress"
+  OPENPROJECT_SEED_LDAP_OPENDESK_ADMIN__MAPPING: "opendeskProjectmanagementAdmin"
+  OPENPROJECT_SEED_LDAP_OPENDESK_GROUPFILTER_OPENDESK_BASE: "{{ .Values.ldap.baseDn }}"
+  OPENPROJECT_SEED_LDAP_OPENDESK_GROUPFILTER_OPENDESK_FILTER:
+    "(&(objectClass=opendeskProjectmanagementGroup)(opendeskProjectmanagementEnabled=TRUE))"
+  OPENPROJECT_SEED_LDAP_OPENDESK_GROUPFILTER_OPENDESK_SYNC__USERS: "true"
+  OPENPROJECT_SEED_LDAP_OPENDESK_GROUPFILTER_OPENDESK_GROUP__ATTRIBUTE: "cn"
+  OPENPROJECT_AUTHENTICATION_GLOBAL__BASIC__AUTH_USER: {{ .Values.secrets.openproject.apiAdminUsername | quote }}
+  OPENPROJECT_AUTHENTICATION_GLOBAL__BASIC__AUTH_PASSWORD: {{ .Values.secrets.openproject.apiAdminPassword | quote }}
+  OPENPROJECT_SOUVAP__NAVIGATION__SECRET: {{ .Values.secrets.centralnavigation.apiKey | quote }}
+  OPENPROJECT_SOUVAP__NAVIGATION__URL: "https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}/univention/portal/navigation.json?base=https%3A//{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}"
+  OPENPROJECT_SMTP__DOMAIN: {{ .Values.global.mailDomain | default .Values.global.domain | quote }}
+  OPENPROJECT_SMTP__USER__NAME: {{ printf "%s@%s" "opendesk-system" ( .Values.global.mailDomain | default .Values.global.domain ) }}
+  OPENPROJECT_SMTP__PASSWORD: {{ .Values.secrets.postfix.opendeskSystemPassword | quote }}
+  OPENPROJECT_SMTP__PORT: 587
+  OPENPROJECT_SMTP__SSL: "false" # (default=false)
+  OPENPROJECT_SMTP__ADDRESS: {{ printf "%s.%s.svc.%s" "postfix" (.Values.apps.postfix.namespace | default .Release.Namespace) .Values.cluster.networking.domain | quote }}
+  OPENPROJECT_SMTP__AUTHENTICATION: "cram_md5"
+  OPENPROJECT_SMTP__ENABLE__STARTTLS__AUTO: "true"
+  OPENPROJECT_SMTP__OPENSSL__VERIFY__MODE: "none"
+  OPENPROJECT_MAIL__FROM: "{{ .Values.smtp.localpartNoReply }}@{{ .Values.global.domain }}"
+  OPENPROJECT_HOME__URL: {{ printf "https://%s.%s/" .Values.global.hosts.nubus .Values.global.domain | quote }}
+  OPENPROJECT_OPENID__CONNECT_KEYCLOAK_ISSUER: "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/{{ .Values.platform.realm }}"
+  OPENPROJECT_OPENID__CONNECT_KEYCLOAK_POST__LOGOUT__REDIRECT__URI: "https://{{ .Values.global.hosts.openproject }}.{{ .Values.global.domain }}/"
+  OPENPROJECT_SEED_DESIGN_PRIMARY__BUTTON__COLOR: {{ .Values.theme.colors.primary | quote }}
+  OPENPROJECT_SEED_DESIGN_ACCENT__COLOR: {{ .Values.theme.colors.primary | quote }}
+  OPENPROJECT_SEED_DESIGN_HEADER__BG__COLOR: {{ .Values.theme.colors.white | quote }}
+  OPENPROJECT_SEED_DESIGN_HEADER__ITEM__BG__HOVER__COLOR: {{ .Values.theme.colors.secondaryGreyLight | quote }}
+  OPENPROJECT_SEED_DESIGN_MAIN__MENU__BG__COLOR: {{ .Values.theme.colors.white | quote }}
+  OPENPROJECT_SEED_DESIGN_MAIN__MENU__BG__SELECTED__BACKGROUND: {{ .Values.theme.colors.primary | quote }}
+  OPENPROJECT_SEED_DESIGN_MAIN__MENU__BG__HOVER__BACKGROUND: {{ .Values.theme.colors.secondaryGreyLight | quote }}
+  OPENPROJECT_SEED_DESIGN_LOGO: "data:image/svg+xml;base64,{{ .Values.theme.imagery.logoHeaderSvgB64 }}"
+  OPENPROJECT_SEED_DESIGN_FAVICON: "data:image/svg+xml;base64,{{ .Values.theme.imagery.projects.faviconSvg }}"
+
+  {{- if .Values.certificate.selfSigned }}
+  SSL_CERT_FILE: "/etc/ssl/certs/ca-certificates.crt"
+  {{- end }}
+
+{{- if .Values.certificate.selfSigned }}
+extraVolumes:
+  - name: "trusted-cert-secret-volume"
+    secret:
+      secretName: "opendesk-certificates-ca-tls"
+      items:
+        - key: "ca.crt"
+          path: "ca-certificates.crt"
+extraVolumeMounts:
+  - name: "trusted-cert-secret-volume"
+    mountPath: "/etc/ssl/certs/ca-certificates.crt"
+    subPath: "ca-certificates.crt"
+{{- end }}
+
+image:
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.openproject.registry | quote }}
+  repository: {{ .Values.images.openproject.repository | quote }}
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  tag: {{ .Values.images.openproject.tag | quote }}
+
+memcached:
+  bundled: false
+  connection:
+    host: {{ .Values.cache.openproject.host | quote }}
+    port: {{ .Values.cache.openproject.port }}
+
+persistence:
+  enabled: false
+
+podAnnotations:
+  {{ .Values.annotations.openproject.pod | toYaml | nindent 2 }}
+
+postgresql:
+  bundled: false
+  auth:
+    password: {{ .Values.databases.openproject.password | default .Values.secrets.postgresql.openprojectUser | quote }}
+    username: {{ .Values.databases.openproject.username | quote }}
+    database: {{ .Values.databases.openproject.name | quote }}
+  connection:
+    host: {{ .Values.databases.openproject.host | quote }}
+    port: {{ .Values.databases.openproject.port }}
+
+probes:
+  liveness:
+    initialDelaySeconds: 300
+    failureThreshold: 30
+  readiness:
+    initialDelaySeconds: 150
+    failureThreshold: 30
+
+openproject:
+  # seed will only be executed on initial installation
+  seed_locale: "de"
+  host: "{{ .Values.global.hosts.openproject }}.{{ .Values.global.domain }}"
+  # Will only be set on initial seed / installation
+  admin_user:
+    name: "OpenProject Internal Admin"
+    mail: "openproject-admin@swp-domain.internal"
+    password_reset: "false"
+    password: {{ .Values.secrets.openproject.adminPassword | quote }}
+    # Lock the admin user, preventing internal logins.
+    # Switch to true once the NC filestore bootstrapping is optimized.
+    locked: false
+  oidc:
+    enabled: true
+    authorizationEndpoint: "/realms/{{ .Values.platform.realm }}/protocol/openid-connect/auth"
+    endSessionEndpoint : "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/{{ .Values.platform.realm }}/protocol/openid-connect/logout"
+    host: "{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}"
+    identifier: "opendesk-openproject"
+    provider: "keycloak"
+    scope: "[openid,opendesk-openproject-scope]"
+    secret: {{ .Values.secrets.keycloak.clientSecret.openproject | quote }}
+    tokenEndpoint: "/realms/{{ .Values.platform.realm }}/protocol/openid-connect/token"
+    userinfoEndpoint: "/realms/{{ .Values.platform.realm }}/protocol/openid-connect/userinfo"
+    attribute_map:
+      login: "opendesk_username"
+      admin: "openproject_admin"
+  useTmpVolumes: true
+  tmpVolumesAnnotations:
+    {{ .Values.annotations.openproject.openprojectTempVolumes | toYaml | nindent 4 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.openproject.serviceAccount | toYaml | nindent 4 }}
+
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "{{ .Values.ingress.parameters.bodySize.openproject }}"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "{{ .Values.ingress.parameters.bodyTimeout.openproject }}"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "{{ .Values.ingress.parameters.bodyTimeout.openproject }}"
+    nginx.org/client-max-body-size: "{{ .Values.ingress.parameters.bodySize.openproject }}"
+    nginx.org/proxy-read-timeout: "{{ .Values.ingress.parameters.bodyTimeout.openproject }}s"
+    nginx.org/proxy-send-timeout: "{{ .Values.ingress.parameters.bodyTimeout.openproject }}s"
+    {{- with .Values.annotations.openproject.ingress }}
+    {{ . | toYaml | nindent 4 }}
+    {{- end }}
+  host: "{{ .Values.global.hosts.openproject }}.{{ .Values.global.domain }}"
+  enabled: {{ .Values.ingress.enabled }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  tls:
+    enabled: {{ .Values.ingress.tls.enabled }}
+    secretName: {{ .Values.ingress.tls.secretName | quote }}
+
+backgroundReplicaCount: {{ .Values.replicas.openprojectWorker }}
+
+replicaCount: {{ .Values.replicas.openprojectWeb }}
+
+resources:
+  {{ .Values.resources.openproject | toYaml | nindent 2 }}
+
+s3:
+  enabled: true
+  directUploads: {{ .Values.objectstores.openproject.directUploads }}
+  enableSignatureV4Streaming: {{ .Values.objectstores.openproject.enableSignatureV4Streaming }}
+  endpoint: {{ printf "https://%s" (.Values.objectstores.openproject.endpoint | default (printf "%s.%s" .Values.global.hosts.minioApi .Values.global.domain)) | quote }}
+  host: {{ printf "https://%s" (.Values.objectstores.openproject.endpoint | default (printf "%s.%s" .Values.global.hosts.minioApi .Values.global.domain)) | quote }}
+  pathStyle: {{ .Values.objectstores.openproject.pathStyle }}
+  region: {{ .Values.objectstores.openproject.region | quote }}
+  bucketName: {{ .Values.objectstores.openproject.bucket | quote }}
+  useIamProfile: {{ .Values.objectstores.openproject.useIamProfile }}
+  auth:
+    accessKeyId: {{ .Values.objectstores.openproject.username | quote }}
+    secretAccessKey: {{ .Values.objectstores.openproject.secretKey | default .Values.secrets.minio.openprojectUser | quote }}
+
+seederJob:
+  annotations:
+    intents.otterize.com/service-name: "openproject-seeder"
+    argocd.argoproj.io/hook: "Sync"
+    argocd.argoproj.io/hook-delete-policy: "HookSucceeded"
+    {{- with .Values.annotations.openproject.seederJob }}
+    {{ . | toYaml | nindent 4 }}
+    {{- end }}
+  resources:
+    {{ .Values.resources.openprojectSeederJob | toYaml | nindent 4 }}
+
+workers:
+  default:
+    resources:
+      {{ .Values.resources.openprojectWorkers | toYaml | nindent 6 }}
+
+...

@@ -1,0 +1,212 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+repositories:
+  # openDesk PostgreSQL
+  # Source: https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-postgresql
+  - name: "postgresql-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.postgresql.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.postgresql.registry }}/{{ .Values.charts.postgresql.repository }}"
+
+  # openDesk MariaDB
+  # Source: https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-mariadb
+  - name: "mariadb-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.mariadb.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.mariadb.registry }}/{{ .Values.charts.mariadb.repository }}"
+
+  # openDesk dkimpy-milter
+  # https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-dkimpy-milter
+  - name: "dkimpy-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.dkimpy.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.dkimpy.registry }}/{{ .Values.charts.dkimpy.repository }}"
+
+  # openDesk Postfix
+  # https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-postfix
+  - name: "postfix-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.postfix.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.postfix.registry }}/{{ .Values.charts.postfix.repository }}"
+
+  # openDesk ClamAV
+  # https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-clamav
+  - name: "clamav-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.clamav.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.clamav.registry }}/{{ .Values.charts.clamav.repository }}"
+  - name: "clamav-simple-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.clamavSimple.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.clamavSimple.registry }}/{{ .Values.charts.clamavSimple.repository }}"
+
+  # VMWare Bitnami
+  # Source: https://github.com/bitnami/charts/
+  - name: "memcached-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.memcached.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.memcached.registry }}/{{ .Values.charts.memcached.repository }}"
+  - name: "redis-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.redis.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.redis.registry }}/{{ .Values.charts.redis.repository }}"
+  - name: "minio-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.minio.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.minio.registry }}/{{ .Values.charts.minio.repository }}"
+
+  # openDesk Enterprise
+  # Cassandra
+  # Source: https://github.com/bitnami/charts/
+  - name: "cassandra-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.cassandra.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.cassandra.registry }}/{{ .Values.charts.cassandra.repository }}"
+
+releases:
+  - name: "redis"
+    chart: "redis-repo/{{ .Values.charts.redis.name }}"
+    version: "{{ .Values.charts.redis.version }}"
+    values:
+      - "values-redis.yaml.gotmpl"
+      {{- range .Values.customization.release.redis }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.redis.enabled }}
+    timeout: 900
+
+  - name: "memcached"
+    chart: "memcached-repo/{{ .Values.charts.memcached.name }}"
+    version: "{{ .Values.charts.memcached.version }}"
+    values:
+      - "values-memcached.yaml.gotmpl"
+      {{- range .Values.customization.release.memcached }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.memcached.enabled }}
+    timeout: 900
+
+  - name: "postgresql"
+    chart: "postgresql-repo/{{ .Values.charts.postgresql.name }}"
+    version: "{{ .Values.charts.postgresql.version }}"
+    values:
+      - "values-postgresql.yaml.gotmpl"
+      {{- range .Values.customization.release.postgresql }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.postgresql.enabled }}
+    timeout: 900
+
+  - name: "mariadb"
+    chart: "mariadb-repo/{{ .Values.charts.mariadb.name }}"
+    version: "{{ .Values.charts.mariadb.version }}"
+    values:
+      - "values-mariadb.yaml.gotmpl"
+      {{- range .Values.customization.release.mariadb }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.mariadb.enabled }}
+    timeout: 900
+
+  - name: "postfix"
+    chart: "postfix-repo/{{ .Values.charts.postfix.name }}"
+    version: "{{ .Values.charts.postfix.version }}"
+    values:
+      - "values-postfix.yaml.gotmpl"
+      {{- range .Values.customization.release.postfix }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.postfix.enabled }}
+    timeout: 900
+
+  - name: "opendesk-dkimpy-milter"
+    chart: "dkimpy-repo/{{ .Values.charts.dkimpy.name }}"
+    version: "{{ .Values.charts.dkimpy.version }}"
+    values:
+      - "values-dkimpy.yaml.gotmpl"
+      {{- range .Values.customization.release.opendeskDkimpyMilter }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.dkimpy.enabled }}
+    timeout: 900
+
+  - name: "clamav"
+    chart: "clamav-repo/{{ .Values.charts.clamav.name }}"
+    version: "{{ .Values.charts.clamav.version }}"
+    values:
+      - "values-clamav-distributed.yaml.gotmpl"
+      {{- range .Values.customization.release.clamav }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.clamavDistributed.enabled }}
+    timeout: 900
+
+  - name: "clamav-simple"
+    chart: "clamav-simple-repo/{{ .Values.charts.clamavSimple.name }}"
+    version: "{{ .Values.charts.clamavSimple.version }}"
+    values:
+      - "values-clamav-simple.yaml.gotmpl"
+      {{- range .Values.customization.release.clamavSimple }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.clamavSimple.enabled }}
+    timeout: 900
+
+  - name: "minio"
+    chart: "minio-repo/{{ .Values.charts.minio.name }}"
+    version: "{{ .Values.charts.minio.version }}"
+    values:
+      - "values-minio.yaml.gotmpl"
+      {{- range .Values.customization.release.minio }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.minio.enabled }}
+    timeout: 900
+
+  # openDesk Enterprise Releases
+  - name: "cassandra"
+    chart: "cassandra-repo/{{ .Values.charts.cassandra.name }}"
+    version: "{{ .Values.charts.cassandra.version }}"
+    values:
+      - "values-cassandra.yaml.gotmpl"
+      {{- range .Values.customization.release.cassandra }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.cassandra.enabled }}
+    timeout: 900
+
+commonLabels:
+  deployStage: "030-services-external"
+  component: "services-external"
+...

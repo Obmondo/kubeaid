@@ -1,0 +1,85 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+configuration:
+  adminBot:
+    backupPhrase: {{ .Values.secrets.matrixAdminBot.backupPassphrase | quote }}
+    #name: "adminbot"
+    #secretName: "matrix-adminbot-account"
+    #secretKey: "access_token"
+  auditBot:
+    backupPhrase: {{ .Values.secrets.matrixAuditBot.backupPassphrase | quote }}
+    #name: "auditbot"
+  database:
+    host: {{ .Values.databases.synapse.host | quote }}
+    port: {{ .Values.databases.synapse.port }}
+    name: {{ .Values.databases.synapse.name | quote }}
+    user: {{ .Values.databases.synapse.username | quote }}
+    password:
+      value: {{ .Values.databases.synapse.password | default .Values.secrets.postgresql.matrixUser | quote }}
+    requireAuth: {{ .Values.databases.synapse.requireAuth }}
+    channelBinding: {{ .Values.databases.synapse.channelBinding | quote }}
+    connectTimeout: {{ .Values.databases.synapse.connectTimeout }}
+    clientEncoding: {{ .Values.databases.synapse.clientEncoding | quote }}
+    keepalives: {{ .Values.databases.synapse.keepalives }}
+    keepalivesIdle: {{ .Values.databases.synapse.keepalivesIdle }}
+    keepalivesInterval: {{ .Values.databases.synapse.keepalivesInterval }}
+    keepalivesCount: {{ .Values.databases.synapse.keepalivesCount }}
+    replication: {{ .Values.databases.synapse.replication }}
+    gssencmode: {{ .Values.databases.synapse.gssencmode | quote }}
+    sslmode: {{ .Values.databases.synapse.sslmode | quote }}
+    sslcompression: {{ .Values.databases.synapse.sslcompression }}
+    sslMinProtocolVersion: {{ .Values.databases.synapse.sslMinProtocolVersion | quote }}
+    connectionPoolMin: {{ .Values.databases.synapse.connectionPoolMin }}
+    connectionPoolMax: {{ .Values.databases.synapse.connectionPoolMax }}
+  # Settings regarding homeserver.
+  homeserver:
+    # -- URL of synapse deployment. As default the url of synapse will be used.
+    #baseUrl: ""
+    serverName: {{ .Values.global.matrixDomain | default .Values.global.domain | quote }}
+  ldap:
+    base: {{ .Values.ldap.baseDn | quote }}
+    bind_dn: "uid=ldapsearch_element,cn=users,{{ .Values.ldap.baseDn }}"
+    bind_password: {{ .Values.secrets.nubus.ldapSearch.element | quote }}
+    filter: "(memberOf=cn=managed-by-attribute-LivecollaborationAdmin,cn=groups,{{ .Values.ldap.baseDn }})"
+    uri: {{ printf "ldap://%s:389" .Values.ldap.host | quote }}
+cron:
+  image:
+    registry: {{ coalesce .Values.repositories.image.registryOpencodeDeEnterprise .Values.global.imageRegistry .Values.images.elementSyncAdmins.registry | quote }}
+    repository: {{ .Values.images.elementSyncAdmins.repository | quote }}
+    tag: {{ .Values.images.elementSyncAdmins.tag | quote }}
+    imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+#fullnameOverride: "opendesk-synapse-admin"
+image:
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDeEnterprise .Values.global.imageRegistry .Values.images.elementSynapseAdmin.registry | quote }}
+  repository: {{ .Values.images.elementSynapseAdmin.repository | quote }}
+  tag: {{ .Values.images.elementSynapseAdmin.tag | quote }}
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+ingress:
+  enabled: {{ .Values.ingress.enabled }}
+  tls:
+    secretName: {{ .Values.ingress.tls.secretName | quote }}
+{{- if .Values.certificate.selfSigned }}
+extraEnvVars:
+  - name: "NODE_EXTRA_CA_CERTS"
+    value: "/etc/ssl/certs/ca-certificates.crt"
+extraVolumes:
+  - name: "trusted-cert-secret-volume"
+    secret:
+      secretName: "opendesk-certificates-ca-tls"
+      items:
+        - key: "ca.crt"
+          path: "ca-certificates.crt"
+extraVolumeMounts:
+  - name: "trusted-cert-secret-volume"
+    mountPath: "/etc/ssl/certs/ca-certificates.crt"
+    subPath: "ca-certificates.crt"
+{{- end }}
+...

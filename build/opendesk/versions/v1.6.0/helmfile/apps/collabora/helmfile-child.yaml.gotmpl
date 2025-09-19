@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+repositories:
+  # Collabora Online
+  # Source: https://github.com/CollaboraOnline/online
+  - name: "collabora-online-repo"
+    keyring: "../../files/gpg-pubkeys/collaboraoffice-com.gpg"
+    verify: {{ .Values.charts.collabora.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.collabora.registry }}/{{ .Values.charts.collabora.repository }}"
+
+  # Collabora Controller - Enterprise Only
+  # Source: https://github.com/CollaboraOnline/online
+  - name: "collabora-controller-repo"
+    keyring: "../../files/gpg-pubkeys/collaboraoffice-com.gpg"
+    verify: {{ .Values.charts.collaboraController.verify }}
+    username: {{ env "OD_ENTERPRISE_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_ENTERPRISE_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDeEnterprise .Values.global.helmRegistry | default .Values.charts.collaboraController.registry }}/{{ .Values.charts.collaboraController.repository }}"
+
+releases:
+  - name: "collabora-online"
+    chart: "collabora-online-repo/{{ .Values.charts.collabora.name }}"
+    version: "{{ .Values.charts.collabora.version }}"
+    values:
+      - "values.yaml.gotmpl"
+      {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+      - "values-enterprise.yaml.gotmpl"
+      {{- end }}
+      {{- range .Values.customization.release.collaboraOnline }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.collabora.enabled }}
+  - name: "collabora-controller"
+    chart: "collabora-controller-repo/{{ .Values.charts.collaboraController.name }}"
+    version: "{{ .Values.charts.collaboraController.version }}"
+    values:
+      {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+      - "values-coco-enterprise.yaml.gotmpl"
+      {{- end }}
+      {{- range .Values.customization.release.collaboraController }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.collaboraController.enabled }}
+
+commonLabels:
+  deployStage: "050-components"
+  component: "collabora"
+...

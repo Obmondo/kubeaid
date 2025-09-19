@@ -1,0 +1,32 @@
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+environments:
+  default:
+    values:
+      - "../../environments/default/*.yaml.gotmpl"
+      {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+      - "../../environments/default-enterprise-overrides/*.yaml.gotmpl"
+      {{- end }}
+  dev:
+    values:
+      - "../../environments/default/*.yaml.gotmpl"
+      {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+      - "../../environments/default-enterprise-overrides/*.yaml.gotmpl"
+      {{- end }}
+      - "../../environments/dev/*.yaml.gotmpl"
+  test:
+    values:
+      - "../../environments/default/*.yaml.gotmpl"
+      {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+      - "../../environments/default-enterprise-overrides/*.yaml.gotmpl"
+      {{- end }}
+      - "../../environments/test/*.yaml.gotmpl"
+  prod:
+    values:
+      - "../../environments/default/*.yaml.gotmpl"
+      {{- if eq (env "OPENDESK_ENTERPRISE") "true" }}
+      - "../../environments/default-enterprise-overrides/*.yaml.gotmpl"
+      {{- end }}
+      - "../../environments/prod/*.yaml.gotmpl"
+...

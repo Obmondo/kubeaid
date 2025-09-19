@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+ingress:
+  enabled: true
+  ingressClassName: "nginx"
+  tls:
+    enabled: true
+    secretName: "opendesk-certificates-tls"
+  parameters:
+    bodySize:
+      collabora: "100M"
+      element: "100M"
+      nextcloud: "100M"
+      nextcloudNotifyPush: "100M"
+      notes: "100M"
+      openproject: "100M"
+      oxAppSuite: "100M"
+      xwiki: "100M"
+    bodyTimeout:
+      collabora: 600
+      element: 60
+      nextcloud: 600
+      nextcloudNotifyPush: 600
+      notes: 60
+      openproject: 60
+      oxAppSuite: 60
+      xwiki: 60
+...

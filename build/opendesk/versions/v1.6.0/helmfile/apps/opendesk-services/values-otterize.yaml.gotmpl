@@ -1,0 +1,63 @@
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+
+additionalAnnotations:
+  {{ .Values.annotations.opendeskServicesOtterize.additional | toYaml | nindent 2 }}
+
+apps:
+  clamavDistributed:
+    enabled: {{ .Values.apps.clamavDistributed.enabled }}
+  clamavSimple:
+    enabled: {{ .Values.apps.clamavSimple.enabled }}
+  collabora:
+    enabled: {{ .Values.apps.collabora.enabled }}
+  cryptpad:
+    enabled: {{ .Values.apps.cryptpad.enabled }}
+  dkimpy:
+    enabled: {{ .Values.apps.dkimpy.enabled }}
+  dovecot:
+    enabled: {{ .Values.apps.dovecot.enabled }}
+  element:
+    enabled: {{ .Values.apps.element.enabled }}
+  jitsi:
+    enabled: {{ .Values.apps.jitsi.enabled }}
+  mariadb:
+    enabled: {{ .Values.apps.mariadb.enabled }}
+  memcached:
+    enabled: {{ .Values.apps.memcached.enabled }}
+  migrations:
+    enabled: {{ .Values.apps.migrations.enabled }}
+  minio:
+    enabled: {{ .Values.apps.minio.enabled }}
+  nextcloud:
+    enabled: {{ .Values.apps.nextcloud.enabled }}
+  notes:
+    enabled: {{ .Values.apps.notes.enabled }}
+  nubus:
+    enabled: {{ .Values.apps.nubus.enabled }}
+  openproject:
+    enabled: {{ .Values.apps.openproject.enabled }}
+  oxAppsuite:
+    enabled: {{ .Values.apps.oxAppSuite.enabled }}
+  postfix:
+    enabled: {{ .Values.apps.postfix.enabled }}
+  postgresql:
+    enabled: {{ .Values.apps.postgresql.enabled }}
+  redis:
+    enabled: {{ .Values.apps.redis.enabled }}
+  xwiki:
+    enabled: {{ .Values.apps.xwiki.enabled }}
+
+ingressController:
+  {{ .Values.security.ingressController | toYaml | nindent 2 }}
+
+extraApps:
+  clusterPostfix:
+    enabled: {{ .Values.security.clusterPostfix.enabled }}
+    namespace: {{ .Values.security.clusterPostfix.namespace }}
+...

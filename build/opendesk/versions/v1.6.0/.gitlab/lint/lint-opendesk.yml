@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+include:
+  - local: "/.gitlab/lint/lint-common.yml"
+
+lint-opendesk:
+  extends: ".lint-common"
+  image: "${OPENDESK_CI_CLI_IMAGE}"
+  rules:
+    - if: >
+        $RUN_RENOVATE == "yes"
+      when: "never"
+    - when: "always"
+  script:
+    - "node /app/src/index.js sort-all -d ${CI_PROJECT_DIR}/helmfile"
+    - "git diff --exit-code"
+...

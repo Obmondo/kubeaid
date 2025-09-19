@@ -1,0 +1,72 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+controller:
+  enableHashmapParallelization: true
+  ingressUrl: "https://{{ .Values.global.hosts.collabora }}.{{ .Values.global.domain }}"
+  namespacedRole: true
+  # CoolController uses `app.kubernetes.io/name` label to find deployment resource
+  # openDesk uses `fullnameOverride` in Collabora Deployment that updates `metadata.name` not the `app.kubernetes.io/name`
+  # Therefore we use the default of `collabora-online` for the `resourceName`
+  resourceName: "collabora-online"
+  statsInterval: 2000
+  watchNamespace: {{ (.Values.apps.collabora.namespace | default .Release.Namespace | quote) }}
+
+  documentMigrator:
+    enabled: true
+    coolMemoryUtilization: {{ .Values.enterpriseFeatures.collabora.autoscaling.targetMemoryUtilizationPercentage }}
+    coolMemoryLimit: {{ .Values.resources.collabora.limits.memory }}
+
+  leaderElection:
+    enabled: {{ if gt .Values.replicas.collaboraController 1 }}true{{ else }}false{{ end }}
+
+image:
+  repository: "{{ coalesce .Values.repositories.image.registryOpencodeDeEnterprise .Values.global.imageRegistry .Values.images.collaboraController.registry }}/{{ .Values.images.collaboraController.repository }}"
+  tag: {{ .Values.images.collaboraController.tag | quote }}
+  pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+imagePullSecrets:
+  {{- range .Values.global.imagePullSecrets }}
+  - name: {{ . | quote }}
+  {{- end }}
+
+ingress:
+  enabled: {{ .Values.ingress.enabled }}
+  annotations:
+    {{ .Values.annotations.coco.ingress | toYaml | nindent 4 }}
+  className: {{ .Values.ingress.ingressClassName | quote }}
+  hosts:
+    - host: "{{ .Values.global.hosts.collabora }}.{{ .Values.global.domain }}"
+      paths:
+        - path: "/controller"
+          pathType: "Prefix"
+  tls:
+    - secretName: {{ .Values.ingress.tls.secretName | quote }}
+      hosts:
+        - "{{ .Values.global.hosts.collabora }}.{{ .Values.global.domain }}"
+
+podAnnotations:
+  {{ .Values.annotations.coco.pod | toYaml | nindent 2 }}
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  privileged: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsGroup: 2000
+  runAsUser: 1000
+  seccompProfile:
+    type: "RuntimeDefault"
+  seLinuxOptions:
+
+replicaCount: {{ .Values.replicas.collaboraController }}
+
+resources:
+  {{ .Values.resources.collaboraController | toYaml | nindent 2 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.coco.serviceAccount | toYaml | nindent 4 }}
+...

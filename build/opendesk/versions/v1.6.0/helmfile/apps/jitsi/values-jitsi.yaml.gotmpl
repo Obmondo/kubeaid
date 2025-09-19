@@ -1,0 +1,342 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+  {{- if .Values.annotations.jitsiGlobal.pod }}
+  podAnnotations:
+    {{ .Values.annotations.jitsiGlobal.pod | toYaml | nindent 4}}
+  {{- end }}
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  enabled: true
+  readOnlyRootFilesystem: true
+  privileged: false
+  capabilities:
+    drop:
+      - "ALL"
+  seccompProfile:
+    type: "RuntimeDefault"
+  runAsUser: 1993
+  runAsGroup: 1993
+  runAsNonRoot: true
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.jitsiKeycloakAdapter | toYaml | nindent 4 }}
+
+
+{{- if .Values.certificate.selfSigned }}
+extraEnvVars:
+  - name: "DENO_CERT"
+    value: "/etc/ssl/certs/ca-certificates.crt"
+
+extraVolumes:
+  - name: "trusted-cert-secret-volume"
+    secret:
+      secretName: "opendesk-certificates-ca-tls"
+      items:
+        - key: "ca.crt"
+          path: "ca-certificates.crt"
+extraVolumeMounts:
+  - name: "trusted-cert-secret-volume"
+    mountPath: "/etc/ssl/certs/ca-certificates.crt"
+    subPath: "ca-certificates.crt"
+{{- end }}
+
+cleanup:
+  deletePodsOnSuccess: {{ .Values.debug.cleanup.deletePodsOnSuccess }}
+  deletePodsOnSuccessTimeout: {{ .Values.debug.cleanup.deletePodsOnSuccessTimeout }}
+
+image:
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.jitsiKeycloakAdapter.registry | quote }}
+  repository: {{ .Values.images.jitsiKeycloakAdapter.repository | quote }}
+  tag: {{ .Values.images.jitsiKeycloakAdapter.tag | quote }}
+
+settings:
+  jwtAppSecret:
+    value: {{ .Values.secrets.jitsi.jwtAppSecret | quote }}
+  keycloakRealm: {{ .Values.platform.realm | quote }}
+  keycloakClientId: "opendesk-jitsi"
+
+theme:
+  title: "Videokonferenz - {{ .Values.theme.texts.productName }}"
+  {{ .Values.theme | toYaml | nindent 2 }}
+
+jitsi:
+  publicURL: "https://{{ .Values.global.hosts.jitsi }}.{{ .Values.global.domain }}"
+  web:
+    replicaCount: {{ .Values.replicas.jitsi }}
+    image:
+      repository: "{{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.jitsi.registry }}/{{ .Values.images.jitsi.repository }}"
+      tag: {{ .Values.images.jitsi.tag | quote }}
+      pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    ingress:
+      enabled: {{ .Values.ingress.enabled }}
+      {{- if .Values.annotations.jitsiWeb.ingress }}
+      annotations:
+        {{- with .Values.annotations.jitsiWeb.ingress }}
+        {{ . | toYaml | nindent 8 }}
+        {{- end }}
+      {{- end }}
+      ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+      hosts:
+        - host: "{{ .Values.global.hosts.jitsi }}.{{ .Values.global.domain }}"
+          paths:
+            - "/"
+      tls:
+        - secretName: {{ .Values.ingress.tls.secretName | quote }}
+          hosts:
+            - "{{ .Values.global.hosts.jitsi }}.{{ .Values.global.domain }}"
+    extraConfig:
+      doNotStoreRoom: {{ not .Values.functional.dataProtection.jitsiRoomHistory.enabled }}
+    extraEnvs:
+      TURN_ENABLE: "1"
+    resources:
+      {{ .Values.resources.jitsi | toYaml | nindent 6 }}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities: {}
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsGroup: 0
+      runAsNonRoot: false
+      runAsUser: 0
+      seccompProfile:
+        type: "RuntimeDefault"
+      seLinuxOptions:
+        {{ .Values.seLinuxOptions.jitsi | toYaml | nindent 8 }}
+    {{- if .Values.annotations.jitsiWeb.pod }}
+    podAnnotations:
+      {{ .Values.annotations.jitsiWeb.pod | toYaml | nindent 6 }}
+    {{- end }}
+  prosody:
+    image:
+      repository: "{{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.prosody.registry }}/{{ .Values.images.prosody.repository }}"
+      tag: {{ .Values.images.prosody.tag | quote }}
+      pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    imagePullSecrets:
+    {{- range .Values.global.imagePullSecrets }}
+      - name: {{ . | quote }}
+    {{- end }}
+    extraEnvs:
+      - name: "AUTH_TYPE"
+        value: "hybrid_matrix_token"
+      - name: "JWT_APP_ID"
+        value: "{{ .Values.global.hosts.jitsi }}.{{ .Values.global.domain }}"
+      - name: "JWT_APP_SECRET"
+        value: {{ .Values.secrets.jitsi.jwtAppSecret | quote }}
+      - name: "MATRIX_UVS_SYNC_POWER_LEVELS"
+        value: "true"
+      - name: "MATRIX_UVS_URL"
+        value: "http://opendesk-matrix-user-verification-service.{{ .Release.Namespace }}.svc.{{ .Values.cluster.networking.domain }}"
+      - name: TURNS_HOST
+        value: {{ .Values.turn.tls.host | quote }}
+      - name: TURNS_PORT
+        value: {{ .Values.turn.tls.port | quote }}
+      - name: TURN_HOST
+        value: {{ .Values.turn.server.host | quote }}
+      - name: TURN_PORT
+        value: {{ .Values.turn.server.port | quote }}
+      - name: TURN_TRANSPORT
+        value: {{ .Values.turn.transport | quote }}
+      - name: TURN_CREDENTIALS
+        value: {{ .Values.turn.credentials | quote }}
+    resources:
+      {{ .Values.resources.prosody | toYaml | nindent 6 }}
+    persistence:
+      size: {{ .Values.persistence.storages.prosody.size | quote }}
+      storageClassName: {{ coalesce .Values.persistence.storages.prosody.storageClassName .Values.persistence.storageClassNames.RWO | quote }}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities: {}
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsGroup: 0
+      runAsNonRoot: false
+      runAsUser: 0
+      seccompProfile:
+        type: "RuntimeDefault"
+      seLinuxOptions:
+        {{ .Values.seLinuxOptions.prosody | toYaml | nindent 8 }}
+    {{- if .Values.annotations.jitsiProsody.pod }}
+    podAnnotations:
+      {{ .Values.annotations.jitsiProsody.pod | toYaml | nindent 6 }}
+    {{- end }}
+  jicofo:
+    replicaCount: {{ .Values.replicas.jicofo }}
+    image:
+      repository: "{{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.jicofo.registry }}/{{ .Values.images.jicofo.repository }}"
+      tag: {{ .Values.images.jicofo.tag | quote }}
+      pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    xmpp:
+      password: {{ .Values.secrets.jitsi.jicofoAuthPassword | quote }}
+      componentSecret: {{ .Values.secrets.jitsi.jicofoComponentPassword | quote }}
+    resources:
+      {{ .Values.resources.jicofo | toYaml | nindent 6 }}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities: {}
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsGroup: 0
+      runAsNonRoot: false
+      runAsUser: 0
+      seccompProfile:
+        type: "RuntimeDefault"
+      seLinuxOptions:
+        {{ .Values.seLinuxOptions.jicofo | toYaml | nindent 8 }}
+    {{- if .Values.annotations.jitsiJicofo.pod }}
+    podAnnotations:
+      {{ .Values.annotations.jitsiJicofo.pod | toYaml | nindent 6 }}
+    {{- end }}
+  jigasi:
+    replicaCount: {{ .Values.replicas.jigasi }}
+    enabled: {{ .Values.sip.jigasi.enabled }}
+    image:
+      repository: "{{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.jigasi.registry }}/{{ .Values.images.jigasi.repository }}"
+      tag: {{ .Values.images.jigasi.tag | quote }}
+      pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    extraEnvs:
+      JIGASI_SIP_PASSWORD: {{ .Values.sip.jigasi.password | quote }}
+      JIGASI_SIP_PORT: {{ .Values.sip.jigasi.port | quote }}
+      JIGASI_SIP_SERVER: {{ .Values.sip.jigasi.server | quote }}
+      JIGASI_SIP_TRANSPORT: {{ .Values.sip.jigasi.transport | quote }}
+      JIGASI_SIP_URI: {{ .Values.sip.jigasi.uri | quote }}
+    xmpp:
+      password: {{ .Values.secrets.jitsi.jigasiXmppPassword | quote }}
+    resources:
+      {{ .Values.resources.jigasi | toYaml | nindent 6 }}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities: {}
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsGroup: 0
+      runAsNonRoot: false
+      runAsUser: 0
+      seccompProfile:
+        type: "RuntimeDefault"
+      seLinuxOptions:
+        {{ .Values.seLinuxOptions.jigasi | toYaml | nindent 8 }}
+    {{- if .Values.annotations.jitsiJigasi.pod }}
+    podAnnotations:
+      {{ .Values.annotations.jitsiJigasi.pod | toYaml | nindent 6 }}
+    {{- end }}
+  jvb:
+    replicaCount: {{ .Values.replicas.jvb }}
+    # The `useNodeIP` option provided by the upstream charts does not support all relevant scenarios, but since
+    # upstream charts v1.4.0 a value for `publicIPs` is required. We set a dummy value as we anyway update it
+    # later with the `patchJVB` job.
+    publicIPs: [ 0.0.0.0 ]
+    image:
+      repository: "{{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.jvb.registry }}/{{ .Values.images.jvb.repository }}"
+      tag: {{ .Values.images.jvb.tag | quote }}
+      pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    xmpp:
+      password: {{ .Values.secrets.jitsi.jvbAuthPassword | quote }}
+    resources:
+      {{ .Values.resources.jvb | toYaml | nindent 6 }}
+    service:
+      type: {{ coalesce .Values.service.type.jitsiVideoBridge .Values.cluster.service.type | quote }}
+    {{- if .Values.annotations.jitsiJvb.service }}
+      annotations:
+        {{ .Values.annotations.jitsiJvb.service | toYaml | nindent 8 }}
+    {{- end }}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities: {}
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsGroup: 0
+      runAsNonRoot: false
+      runAsUser: 0
+      seccompProfile:
+        type: "RuntimeDefault"
+      seLinuxOptions:
+        {{ .Values.seLinuxOptions.jvb | toYaml | nindent 8 }}
+    {{- if .Values.annotations.jitsiJvb.pod }}
+    podAnnotations:
+      {{ .Values.annotations.jitsiJvb.pod | toYaml | nindent 6 }}
+    {{- end }}
+    metrics:
+      prometheusAnnotations:
+        {{ .Values.annotations.jitsiJvb.metricsPrometheus | toYaml | nindent 8 }}
+      {{- if .Values.annotations.jitsiJvb.metricsGrafana }}
+      grafanaDashboards:
+        annotations:
+          {{ .Values.annotations.jitsiJvb.metricsGrafana | toYaml | nindent 10 }}
+      {{- end }}
+  jibri:
+    replicaCount: {{ .Values.replicas.jibri }}
+    image:
+      repository: "{{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.jibri.registry }}/{{ .Values.images.jibri.repository }}"
+      tag: {{ .Values.images.jibri.tag | quote }}
+      pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    recorder:
+      password: {{ .Values.secrets.jitsi.jibriRecorderPassword | quote }}
+    xmpp:
+      password: {{ .Values.secrets.jitsi.jibriXmppPassword | quote }}
+    resources:
+      {{ .Values.resources.jibri | toYaml | nindent 6 }}
+    securityContext:
+      # Chart does not allow to template more
+      capabilities:
+        add: ["SYS_ADMIN"]
+    {{- if .Values.annotations.jitsiJibri.pod }}
+    podAnnotations:
+      {{ .Values.annotations.jitsiJibri.pod | toYaml | nindent 6 }}
+    {{- end }}
+  imagePullSecrets:
+  {{- range .Values.global.imagePullSecrets }}
+    - name: {{ . | quote }}
+  {{- end }}
+  {{- if .Values.annotations.jitsi.serviceAccount }}
+  serviceAccount:
+    annotations:
+      {{ .Values.annotations.jitsi.serviceAccount | toYaml | nindent 6 }}
+  {{- end }}
+
+patchJVB:
+  configuration:
+    staticLoadbalancerIP: {{ .Values.cluster.networking.ingressGatewayIP | quote }}
+    loadbalancerStatusField: {{ .Values.cluster.networking.loadBalancerStatusField | quote }}
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - "ALL"
+    enabled: true
+    privileged: false
+    readOnlyRootFilesystem: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    runAsNonRoot: true
+    seccompProfile:
+      type: "RuntimeDefault"
+    seLinuxOptions:
+      {{ .Values.seLinuxOptions.jitsiPatchJVB | toYaml | nindent 6 }}
+  image:
+    imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.jitsiPatchJVB.registry | quote }}
+    repository: {{ .Values.images.jitsiPatchJVB.repository | quote }}
+    tag: {{ .Values.images.jitsiPatchJVB.tag | quote }}
+
+{{- if .Values.annotations.jitsi.pod }}
+podAnnotations:
+  {{ .Values.annotations.jitsi.pod | toYaml | nindent 2 }}
+{{- end }}
+
+replicaCount: {{ .Values.replicas.jitsiKeycloakAdapter }}
+
+resources:
+  {{ .Values.resources.jitsiKeycloakAdapter | toYaml | nindent 2 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.jitsi.serviceAccount | toYaml | nindent 4 }}
+...

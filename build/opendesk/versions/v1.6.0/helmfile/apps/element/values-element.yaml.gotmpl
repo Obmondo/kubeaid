@@ -1,0 +1,167 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+commonAnnotations:
+  {{ .Values.annotations.element.common | toYaml | nindent 2 }}
+
+configuration:
+  endToEndEncryption: true
+  additionalConfiguration:
+    logout_redirect_url: "https://{{ .Values.global.hosts.keycloak }}.{{ .Values.global.domain }}/realms/{{ .Values.platform.realm }}/protocol/openid-connect/logout?client_id=opendesk-matrix&post_logout_redirect_uri=https%3A%2F%2F{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}"
+
+    "net.nordeck.element_web.module.opendesk":
+      config:
+        banner:
+          ics_navigation_json_url: "https://{{ .Values.global.hosts.intercomService }}.{{ .Values.global.domain }}/navigation.json"
+          ics_silent_url: "https://{{ .Values.global.hosts.intercomService }}.{{ .Values.global.domain }}/silent"
+          portal_logo_svg_url: "https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}/univention/portal/icons/logos/domain.svg"
+          portal_url: "https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}/"
+        custom_css_variables:
+          --cpd-color-bg-action-primary-rest: {{ .Values.theme.colors.primary | quote }}
+          --cpd-color-text-action-accent: {{ .Values.theme.colors.primary | quote }}
+
+    "net.nordeck.element_web.module.widget_lifecycle":
+      widget_permissions:
+        "https://{{ .Values.global.hosts.element }}.{{ .Values.global.domain }}/jitsi.html":
+          identity_approved: true
+        "https://{{ .Values.global.hosts.matrixNeoBoardWidget }}.{{ .Values.global.domain }}/*":
+          preload_approved: true
+          capabilities_approved:
+            - org.matrix.msc2762.send.event:net.nordeck.whiteboard.document.create
+            - org.matrix.msc2762.receive.event:net.nordeck.whiteboard.document.create
+            - org.matrix.msc2762.send.event:net.nordeck.whiteboard.document.chunk
+            - org.matrix.msc2762.receive.event:net.nordeck.whiteboard.document.chunk
+            - org.matrix.msc2762.send.event:net.nordeck.whiteboard.document.snapshot
+            - org.matrix.msc2762.receive.event:net.nordeck.whiteboard.document.snapshot
+            - org.matrix.msc2762.send.state_event:m.room.power_levels#
+            - org.matrix.msc2762.receive.state_event:m.room.power_levels#
+            - org.matrix.msc2762.receive.state_event:m.room.member
+            - org.matrix.msc2762.receive.state_event:m.room.name
+            - org.matrix.msc2762.send.state_event:net.nordeck.whiteboard
+            - org.matrix.msc2762.receive.state_event:net.nordeck.whiteboard
+            - org.matrix.msc2762.send.state_event:net.nordeck.whiteboard.sessions#*
+            - org.matrix.msc2762.receive.state_event:net.nordeck.whiteboard.sessions
+            - org.matrix.msc3819.send.to_device:net.nordeck.whiteboard.connection_signaling
+            - org.matrix.msc3819.receive.to_device:net.nordeck.whiteboard.connection_signaling
+            - town.robin.msc3846.turn_servers
+            - org.matrix.msc4039.upload_file
+            - org.matrix.msc4039.download_file
+        "https://{{ .Values.global.hosts.matrixNeoChoiceWidget }}.{{ .Values.global.domain }}/*":
+          preload_approved: true
+          capabilities_approved:
+            - org.matrix.msc2762.send.event:net.nordeck.poll.vote
+            - org.matrix.msc2762.receive.event:net.nordeck.poll.vote
+            - org.matrix.msc2762.send.state_event:net.nordeck.poll
+            - org.matrix.msc2762.receive.state_event:net.nordeck.poll
+            - org.matrix.msc2762.send.state_event:net.nordeck.poll.settings
+            - org.matrix.msc2762.receive.state_event:net.nordeck.poll.settings
+            - org.matrix.msc2762.receive.state_event:m.room.power_levels
+            - org.matrix.msc2762.receive.state_event:m.room.name
+            - org.matrix.msc2762.receive.state_event:m.room.member
+            - org.matrix.msc2762.send.state_event:net.nordeck.poll.group
+            - org.matrix.msc2762.receive.state_event:net.nordeck.poll.group
+            - org.matrix.msc2762.send.event:net.nordeck.poll.start
+            - org.matrix.msc2762.receive.event:net.nordeck.poll.start
+        "https://{{ .Values.global.hosts.matrixNeoDateFixWidget }}.{{ .Values.global.domain }}/*":
+          preload_approved: true
+          identity_approved: true
+          capabilities_approved:
+            - org.matrix.msc2931.navigate
+            - org.matrix.msc2762.timeline:*
+            - org.matrix.msc2762.receive.state_event:m.room.power_levels
+            - org.matrix.msc2762.receive.event:m.reaction
+            - org.matrix.msc2762.receive.state_event:m.room.create
+            - org.matrix.msc2762.receive.state_event:m.room.tombstone
+            - org.matrix.msc2762.receive.state_event:m.room.member
+            - org.matrix.msc2762.send.state_event:m.room.member
+            - org.matrix.msc2762.receive.state_event:m.room.name
+            - org.matrix.msc2762.receive.state_event:m.room.topic
+            - org.matrix.msc2762.receive.state_event:m.space.parent
+            - org.matrix.msc2762.receive.state_event:m.space.child
+            - org.matrix.msc2762.receive.state_event:net.nordeck.meetings.metadata
+            - org.matrix.msc2762.receive.state_event:im.vector.modular.widgets
+            - org.matrix.msc2762.send.event:net.nordeck.meetings.meeting.create
+            - org.matrix.msc2762.receive.event:net.nordeck.meetings.meeting.create
+            - org.matrix.msc2762.send.event:net.nordeck.meetings.breakoutsessions.create
+            - org.matrix.msc2762.receive.event:net.nordeck.meetings.breakoutsessions.create
+            - org.matrix.msc2762.send.event:net.nordeck.meetings.meeting.close
+            - org.matrix.msc2762.receive.event:net.nordeck.meetings.meeting.close
+            - org.matrix.msc2762.send.event:net.nordeck.meetings.meeting.widgets.handle
+            - org.matrix.msc2762.receive.event:net.nordeck.meetings.meeting.widgets.handle
+            - org.matrix.msc2762.send.event:net.nordeck.meetings.meeting.participants.handle
+            - org.matrix.msc2762.receive.event:net.nordeck.meetings.meeting.participants.handle
+            - org.matrix.msc2762.send.event:net.nordeck.meetings.meeting.update
+            - org.matrix.msc2762.receive.event:net.nordeck.meetings.meeting.update
+            - org.matrix.msc2762.send.event:net.nordeck.meetings.meeting.change.message_permissions
+            - org.matrix.msc2762.receive.event:net.nordeck.meetings.meeting.change.message_permissions
+            - org.matrix.msc2762.send.event:net.nordeck.meetings.sub_meetings.send_message
+            - org.matrix.msc2762.receive.event:net.nordeck.meetings.sub_meetings.send_message
+            - org.matrix.msc3973.user_directory_search
+
+  welcomeUserId: "@meetings-bot:{{ .Values.global.matrixDomain | default .Values.global.domain }}"
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  enabled: true
+  privileged: false
+  readOnlyRootFilesystem: true
+  runAsGroup: 101
+  runAsNonRoot: true
+  runAsUser: 101
+  seccompProfile:
+    type: "RuntimeDefault"
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.element | toYaml | nindent 4 }}
+
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+image:
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.element.registry | quote }}
+  repository: {{ .Values.images.element.repository | quote }}
+  tag: {{ .Values.images.element.tag | quote }}
+
+ingress:
+  host: "{{ .Values.global.hosts.element }}.{{ .Values.global.domain }}"
+  enabled: {{ .Values.ingress.enabled }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  tls:
+    enabled: {{ .Values.ingress.tls.enabled }}
+    secretName: {{ .Values.ingress.tls.secretName | quote }}
+  annotations:
+    {{ .Values.annotations.element.ingress | toYaml | nindent 4 }}
+
+podAnnotations:
+  {{ .Values.annotations.element.pod | toYaml | nindent 2 }}
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 101
+
+replicaCount: {{ .Values.replicas.element }}
+
+resources:
+  {{ .Values.resources.element | toYaml | nindent 2 }}
+
+service:
+  annotations:
+    {{ .Values.annotations.element.service | toYaml | nindent 4 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.element.serviceAccount | toYaml | nindent 4 }}
+
+theme:
+  title: "Chat - {{ .Values.theme.texts.productName }}"
+  {{ .Values.theme | toYaml | nindent 2 }}
+
+...

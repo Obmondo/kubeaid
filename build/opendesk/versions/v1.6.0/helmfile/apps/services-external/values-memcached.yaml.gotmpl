@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+architecture: {{ if gt .Values.replicas.memcached 1 }}"high-availability"{{ else }}"standalone"{{ end }}
+
+commonAnnotations:
+  {{ .Values.annotations.servicesExternalMemcached.common | toYaml | nindent 2 }}
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  enabled: true
+  privileged: false
+  runAsUser: 1001
+  runAsGroup: 1001
+  runAsNonRoot: true
+  seccompProfile:
+    type: "RuntimeDefault"
+  readOnlyRootFilesystem: true
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.memcached | toYaml | nindent 4 }}
+
+global:
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+image:
+  registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.memcached.registry | quote }}
+  repository: {{ .Values.images.memcached.repository | quote }}
+  tag: {{ .Values.images.memcached.tag | quote }}
+  pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+
+podAnnotations:
+  {{ .Values.annotations.servicesExternalMemcached.pod | toYaml | nindent 2 }}
+
+replicaCount: {{ .Values.replicas.memcached }}
+
+resources:
+  {{ .Values.resources.memcached | toYaml | nindent 2 }}
+
+service:
+  annotations:
+    {{ .Values.annotations.servicesExternalMemcached.service | toYaml | nindent 4 }}
+
+serviceAccount:
+  create: true
+  annotations:
+    {{ .Values.annotations.servicesExternalMemcached.serviceAccount | toYaml | nindent 4 }}
+
+...

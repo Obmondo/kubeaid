@@ -1,0 +1,54 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+configuration:
+  asToken: {{ .Values.secrets.matrixGroupsync.synapseAsToken | quote }}
+  dryRun: false
+  hsToken: {{ .Values.secrets.matrixGroupsync.synapseAsToken | quote }}
+  id: "gps"
+  homeserverName: {{ .Values.global.matrixDomain | default .Values.global.domain | quote }}
+  registrationSharedSecret: {{ .Values.secrets.synapse.registrationSharedSecret | quote }}
+  runOnce: false
+  username: "groupsyncbot"
+  ldap:
+    attributes:
+      name: "description"
+      uid: "uid"
+    base: {{ .Values.ldap.baseDn | quote }}
+    bind_dn: "uid=ldapsearch_element,cn=users,{{ .Values.ldap.baseDn }}"
+    bind_password: {{ .Values.secrets.nubus.ldapSearch.element | quote }}
+    check_interval_seconds: 60
+    type: mapped-ldap
+    uri: "ldap://ums-ldap-server:389"
+  spaces:
+    - groups:
+        - externalId: "cn=managed-by-attribute-LivecollaborationAdmin,cn=groups,{{ .Values.ldap.baseDn }}"
+          powerLevel: 50
+        - externalId: "cn=managed-by-attribute-Livecollaboration,cn=groups,{{ .Values.ldap.baseDn }}"
+      id: "c3122e32-4e05-4bf8-8a5d-66679076ed36"
+      name: "openDesk"
+      subspaces:
+        - groups:
+            - externalId: "cn=managed-by-attribute-LivecollaborationAdmin,cn=groups,{{ .Values.ldap.baseDn }}"
+              powerLevel: 50
+          id: "e7889d96-5baa-4e21-be6e-12c66b2e9565"
+          name: "openDesk Element Admins"
+  provisionerDefaultRooms:
+    - id: "c3122e32-4e05-4bf8-8a5d-66679076ed36"
+      properties:
+        name: "openDesk"
+  # Name of group sync service (default opendesk-synapse-groupsync)
+  groupSyncService: "opendesk-synapse-groupsync"
+image:
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDeEnterprise .Values.global.imageRegistry .Values.images.elementGroupsync.registry | quote }}
+  url: {{ .Values.images.elementGroupsync.repository | quote }}
+  tag: {{ .Values.images.elementGroupsync.tag | quote }}
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+...

@@ -1,0 +1,109 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+containerSecurityContext:
+  enabled: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  privileged: false
+  readOnlyRootFilesystem: true
+  runAsGroup: 1001
+  runAsNonRoot: true
+  runAsUser: 1001
+  seccompProfile:
+    type: "RuntimeDefault"
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.cassandra | toYaml | nindent 4 }}
+
+dbUser:
+  user: "root"
+  password: {{ .Values.secrets.cassandra.rootPassword | quote }}
+
+global:
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+image:
+  registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.cassandra.registry | quote }}
+  repository: {{ .Values.images.cassandra.repository | quote }}
+  tag: {{ .Values.images.cassandra.tag | quote }}
+  pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+
+ingress:
+  annotations:
+    {{ .Values.annotations.cassandra.ingress | toYaml | nindent 6 }}
+
+initDB:
+  initUserData.cql: >
+    CREATE KEYSPACE IF NOT EXISTS {{ .Values.databases.dovecotDictmap.name | quote }} WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+    CREATE ROLE IF NOT EXISTS {{ .Values.databases.dovecotDictmap.username | quote }};
+    ALTER ROLE {{ .Values.databases.dovecotDictmap.username | quote }} WITH PASSWORD = {{ regexReplaceAll "'" .Values.secrets.cassandra.dovecotDictmapUser "''" | squote }} AND LOGIN = true;
+    GRANT ALL ON KEYSPACE {{ .Values.databases.dovecotDictmap.name | quote }} TO {{ .Values.databases.dovecotDictmap.username | quote }};
+    CREATE KEYSPACE IF NOT EXISTS {{ .Values.databases.dovecotACL.name | quote }} WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+    CREATE ROLE IF NOT EXISTS {{ .Values.databases.dovecotACL.username | quote }};
+    ALTER ROLE {{ .Values.databases.dovecotACL.username | quote }} WITH PASSWORD = {{ regexReplaceAll "'" .Values.secrets.cassandra.dovecotACLUser "''" | squote }} AND LOGIN = true;
+    GRANT ALL ON KEYSPACE {{ .Values.databases.dovecotACL.name | quote }} TO {{ .Values.databases.dovecotACL.username | quote }};
+
+# Will print a warning if unset but is automatically calculated:
+jvm:
+  maxHeapSize: ""
+  newHeapSize: ""
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 60
+  periodSeconds: 30
+  timeoutSeconds: 30
+  successThreshold: 1
+  failureThreshold: 5
+
+metrics:
+  enabled: false
+  image:
+    registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.cassandraExporter.registry | quote }}
+    repository: {{ .Values.images.cassandraExporter.repository | quote }}
+    tag: {{ .Values.images.cassandraExporter.tag | quote }}
+    pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+
+persistence:
+  commitLogsize: {{ .Values.persistence.storages.cassandra.commitLogsize | quote }}
+  size: {{ .Values.persistence.storages.cassandra.size | quote }}
+  storageClass: {{ coalesce .Values.persistence.storages.cassandra.storageClassName .Values.persistence.storageClassNames.RWO | quote }}
+
+podAnnotations:
+  {{ .Values.annotations.cassandra.pod | toYaml | nindent 2 }}
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 1001
+  fsGroupChangePolicy: "Always"
+  supplementalGroups: []
+  sysctls: []
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 30
+  successThreshold: 1
+  failureThreshold: 5
+
+replicaCount: {{ .Values.replicas.cassandra }}
+
+resources:
+  {{ .Values.resources.cassandra | toYaml | nindent 2 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.cassandra.serviceAccount | toYaml | nindent 4 }}
+
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 60
+...

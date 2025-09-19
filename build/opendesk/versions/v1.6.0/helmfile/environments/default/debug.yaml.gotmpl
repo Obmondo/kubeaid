@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+debug:
+  cleanup:
+    # Keep Pods/Job logs after successful run.
+    deletePodsOnSuccess: true
+    # When deletePodsOnSuccess is enabled, the pod will be deleted after configured seconds.
+    deletePodsOnSuccessTimeout: 60
+    # Keep persistence on deletion of a release.
+    keepPVCOnDelete: false
+    # Keep additional resources, like certificates on deletion of a release.
+    keepRessourceOnDelete: true
+  # should activate debug output in all components and even allow e.g. successfully executed jobs
+  # to stay available. This is going to be implemented on a case by case basis when we actually
+  # need debugging in a component.
+  enabled: false
+...

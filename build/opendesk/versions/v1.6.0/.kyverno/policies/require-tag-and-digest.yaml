@@ -1,0 +1,35 @@
+# SPDX-FileCopyrightText: 2024 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+apiVersion: "kyverno.io/v1"
+kind: "ClusterPolicy"
+metadata:
+  name: "require-tag-and-digest"
+  annotations:
+    policies.kyverno.io/title: "Require tag and digest for image."
+    policies.kyverno.io/subject: "Pod"
+    policies.kyverno.io/description: >-
+      To ensure that containers are not compromised in container registry by pushing malicious code to the same tag, it
+      is required to reference images by setting a sha256 hashed digest.
+      Setting only the digest is complicated for humans to compare software versions, therefore in openDesk it is
+      required to reference container images by tag and digest.
+spec:
+  background: true
+  rules:
+    - match:
+        resources:
+          kinds:
+            - "Pod"
+      name: "require-tag-and-digest"
+      validate:
+        message: "An image tag and digest required."
+        pattern:
+          spec:
+            =(ephemeralContainers):
+              - image: "*:*@sha256:*"
+            =(initContainers):
+              - image: "*:*@sha256:*"
+            containers:
+              - image: "*:*@sha256:*"
+  validationFailureAction: "audit"
+...

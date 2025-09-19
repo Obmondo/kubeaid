@@ -1,0 +1,72 @@
+# SPDX-FileCopyrightText: 2024 Center for Digital Sovereignty of Public Administration (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Federal Ministry of the Interior and Community, PG ZenDiS "Project group for the development of ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+additionalAnnotations:
+  {{ .Values.annotations.elementMatrixNeochoiceWidget.additional | toYaml | nindent 2 }}
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  enabled: true
+  privileged: false
+  readOnlyRootFilesystem: true
+  runAsGroup: 101
+  runAsNonRoot: true
+  runAsUser: 101
+  seccompProfile:
+    type: "RuntimeDefault"
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.matrixNeoChoiceWidget | toYaml | nindent 4 }}
+
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+image:
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.matrixNeoChoiceWidget.registry | quote }}
+  repository: {{ .Values.images.matrixNeoChoiceWidget.repository | quote }}
+  tag: {{ .Values.images.matrixNeoChoiceWidget.tag | quote }}
+
+ingress:
+  enabled: {{ .Values.ingress.enabled }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  tls:
+    enabled: {{ .Values.ingress.tls.enabled }}
+    secretName: {{ .Values.ingress.tls.secretName | quote }}
+  annotations:
+    {{ .Values.annotations.elementMatrixNeochoiceWidget.ingress | toYaml | nindent 4 }}
+
+podAnnotations:
+  {{ .Values.annotations.elementMatrixNeochoiceWidget.pod | toYaml | nindent 2 }}
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 101
+
+replicaCount: {{ .Values.replicas.matrixNeoChoiceWidget }}
+
+service:
+  annotations:
+    {{ .Values.annotations.elementMatrixNeochoiceWidget.service | toYaml | nindent 4 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.elementMatrixNeochoiceWidget.serviceAccount | toYaml | nindent 4 }}
+
+theme:
+  {{ .Values.theme | toYaml | nindent 2 }}
+
+resources:
+  {{ .Values.resources.matrixNeoChoiceWidget | toYaml | nindent 2 }}
+
+nginx:
+  ipv4Only: {{ if eq .Values.cluster.networking.ipFamilies "IPv4" }}true{{ else }}false{{ end }}
+
+...

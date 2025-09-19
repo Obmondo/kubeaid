@@ -1,0 +1,92 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+#
+# Note: Currently only single namespace deployments are supported.
+---
+apps:
+  cassandra:
+    enabled: {{ if eq (env "OPENDESK_ENTERPRISE") "true" }}true{{ else }}false{{ end }}
+    namespace: ~
+  certificates:
+    enabled: true
+    namespace: ~
+  clamavDistributed:
+    enabled: false
+    namespace: ~
+  clamavSimple:
+    enabled: true
+    namespace: ~
+  collabora:
+    enabled: true
+    namespace: ~
+  collaboraController:
+    enabled: {{ if eq (env "OPENDESK_ENTERPRISE") "true" }}true{{ else }}false{{ end }}
+    namespace: ~
+  cryptpad:
+    enabled: true
+    namespace: ~
+  dkimpy:
+    enabled: false
+    namespace: ~
+  dovecot:
+    enabled: true
+    namespace: ~
+  element:
+    enabled: true
+    namespace: ~
+  elementAdmin:
+    enabled: false
+    namespace: ~
+  elementGroupsync:
+    enabled: false
+    namespace: ~
+  home:
+    enabled: true
+    namespace: ~
+  jitsi:
+    enabled: true
+    namespace: ~
+  mariadb:
+    enabled: true
+    namespace: ~
+  memcached:
+    enabled: true
+    namespace: ~
+  migrations:
+    enabled: true
+    namespace: ~
+  minio:
+    enabled: true
+    namespace: ~
+  nextcloud:
+    enabled: true
+    namespace: ~
+  notes:
+    enabled: false
+    namespace: ~
+  nubus:
+    enabled: true
+    namespace: ~
+  openproject:
+    enabled: true
+    namespace: ~
+  oxAppSuite:
+    enabled: true
+    namespace: ~
+  postfix:
+    enabled: true
+    namespace: ~
+  postgresql:
+    enabled: true
+    namespace: ~
+  redis:
+    enabled: true
+    namespace: ~
+  staticFiles:
+    enabled: true
+    namespace: ~
+  xwiki:
+    enabled: true
+    namespace: ~
+...

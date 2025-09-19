@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: 2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+image:
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDeEnterprise .Values.global.imageRegistry .Values.images.dovecot.registry | quote }}
+  repository: {{ .Values.images.dovecot.repository | quote }}
+  tag: {{ .Values.images.dovecot.tag | quote }}
+  pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+
+imageInitCassandra:
+  registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.cassandra.registry | quote }}
+  repository: {{ .Values.images.cassandra.repository | quote }}
+  tag: {{ .Values.images.cassandra.tag | quote }}
+  pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+
+imagePullSecrets:
+  {{ .Values.global.imagePullSecrets | toYaml | nindent 2 }}
+
+dovecot:
+  dictmap:
+    enabled: true
+    host: {{ .Values.databases.dovecotDictmap.host | quote }}
+    port: {{ .Values.databases.dovecotDictmap.port }}
+    username: {{ .Values.databases.dovecotDictmap.username | quote }}
+    password:
+      value: {{ .Values.secrets.cassandra.dovecotDictmapUser | quote }}
+    keyspace: {{ .Values.databases.dovecotDictmap.name | quote }}
+  sharedMailboxes:
+    enabled: true
+    host: {{ .Values.databases.dovecotACL.host | quote }}
+    port: {{ .Values.databases.dovecotACL.port }}
+    username: {{ .Values.databases.dovecotACL.username | quote }}
+    password:
+      value: {{ .Values.secrets.cassandra.dovecotACLUser | quote }}
+    keyspace: {{ .Values.databases.dovecotACL.name | quote }}
+  objectStorage:
+    bucket: {{ .Values.objectstores.dovecot.bucket | quote }}
+    encryption:
+      privateKey:
+        value: {{ requiredEnv "DOVECOT_CRYPT_PRIVATE_KEY" | quote }}
+      publicKey:
+        value: {{ requiredEnv "DOVECOT_CRYPT_PUBLIC_KEY" | quote }}
+    fqdn: {{ .Values.objectstores.dovecot.endpoint | default (printf "%s.%s" .Values.global.hosts.minioApi .Values.global.domain) | quote }}
+    username: {{ .Values.objectstores.dovecot.username | quote }}
+    password:
+      value: {{ .Values.objectstores.dovecot.secretKey | default .Values.secrets.minio.dovecotUser | quote }}
+...

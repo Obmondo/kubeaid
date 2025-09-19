@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2024 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+apiVersion: "kyverno.io/v1"
+kind: "ClusterPolicy"
+metadata:
+  name: "template-imagepullsecrets"
+  annotations:
+    policies.kyverno.io/title: "ImagePullSecrets template variable have to be implemented."
+    policies.kyverno.io/subject: "Pod"
+    policies.kyverno.io/description: >-
+      It is recommended to cache images to ensure continuous image availability during network partitions, rate limiting
+      or registry outages.
+      These caches as well as a company proxy may require authentication which will be provided as ImagePullSecrets.
+      This is a openDesk test to ensure that environment variables are templated in Helmfile deployment.
+spec:
+  background: true
+  rules:
+    - match:
+        resources:
+          kinds:
+            - "Pod"
+      name: "template-imagePullSecrets"
+      validate:
+        message: "ImagePullSecrets are required."
+        pattern:
+          spec:
+            imagePullSecrets:
+              - name: "kyverno-test"
+  validationFailureAction: "audit"
+...

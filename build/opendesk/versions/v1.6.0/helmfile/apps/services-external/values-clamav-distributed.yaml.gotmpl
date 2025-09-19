@@ -1,0 +1,193 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+clamd:
+  commonAnnotations:
+    {{ .Values.annotations.servicesExternalClamavDistributed.clamdCommon | toYaml | nindent 4 }}
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - "ALL"
+    enabled: true
+    privileged: false
+    runAsUser: 100
+    runAsGroup: 101
+    seccompProfile:
+      type: "RuntimeDefault"
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    seLinuxOptions:
+      {{ .Values.seLinuxOptions.clamd | toYaml | nindent 6 }}
+  image:
+    registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.clamd.registry | quote }}
+    repository: {{ .Values.images.clamd.repository | quote }}
+    tag: {{ .Values.images.clamd.tag | quote }}
+    imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  podAnnotations:
+    {{ .Values.annotations.servicesExternalClamavDistributed.clamdPod | toYaml | nindent 4 }}
+  podSecurityContext:
+    enabled: true
+    fsGroup: 101
+    fsGroupChangePolicy: "Always"
+  replicaCount: {{ .Values.replicas.clamd }}
+  resources:
+    {{ .Values.resources.clamd | toYaml | nindent 4 }}
+  service:
+    annotations:
+      {{ .Values.annotations.servicesExternalClamavDistributed.clamdService | toYaml | nindent 6 }}
+
+  serviceAccount:
+    annotations:
+      {{ .Values.annotations.servicesExternalClamavDistributed.clamdServiceAccount | toYaml | nindent 6 }}
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  enabled: true
+  readOnlyRootFilesystem: true
+  runAsUser: 0
+  runAsGroup: 0
+  seccompProfile:
+    type: "RuntimeDefault"
+  runAsNonRoot: false
+  capabilities:
+    drop: []
+  privileged: false
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.clamav | toYaml | nindent 4 }}
+
+freshclam:
+  commonAnnotations:
+    {{ .Values.annotations.servicesExternalClamavDistributed.freshclamCommon | toYaml | nindent 4 }}
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - "ALL"
+    enabled: true
+    privileged: false
+    runAsUser: 100
+    runAsGroup: 101
+    seccompProfile:
+      type: "RuntimeDefault"
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    seLinuxOptions:
+      {{ .Values.seLinuxOptions.freshclam | toYaml | nindent 6 }}
+  image:
+    registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.freshclam.registry | quote }}
+    repository: {{ .Values.images.freshclam.repository | quote }}
+    tag: {{ .Values.images.freshclam.tag | quote }}
+    imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  podAnnotations:
+    {{ .Values.annotations.servicesExternalClamavDistributed.freshclamPod | toYaml | nindent 4 }}
+  podSecurityContext:
+    enabled: true
+    fsGroup: 101
+    fsGroupChangePolicy: "Always"
+  replicaCount: {{ .Values.replicas.freshclam }}
+  resources:
+    {{ .Values.resources.freshclam | toYaml | nindent 4 }}
+  serviceAccount:
+    annotations:
+      {{ .Values.annotations.servicesExternalClamavDistributed.freshclamServiceAccount | toYaml | nindent 6 }}
+  settings:
+    database:
+      auth:
+        {{ .Values.repositories.clamav.auth | toYaml | nindent 8 }}
+      mirror:
+        scheme: {{ .Values.repositories.clamav.mirror.scheme | quote }}
+        url: {{ .Values.repositories.clamav.mirror.url | quote }}
+      customURLs:
+        {{ .Values.repositories.clamav.customURLs | toYaml | nindent 8 }}
+global:
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+icap:
+  commonAnnotations:
+    {{ .Values.annotations.servicesExternalClamavDistributed.icapCommon | toYaml | nindent 4 }}
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - "ALL"
+    enabled: true
+    runAsUser: 100
+    runAsGroup: 101
+    privileged: false
+    seccompProfile:
+      type: "RuntimeDefault"
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    seLinuxOptions:
+      {{ .Values.seLinuxOptions.icap | toYaml | nindent 6 }}
+  image:
+    registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.icap.registry | quote }}
+    repository: {{ .Values.images.icap.repository | quote }}
+    tag: {{ .Values.images.icap.tag | quote }}
+    imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  podAnnotations:
+    {{ .Values.annotations.servicesExternalClamavDistributed.icapPod | toYaml | nindent 4 }}
+  podSecurityContext:
+    enabled: true
+    fsGroup: 101
+    fsGroupChangePolicy: "Always"
+  replicaCount: {{ .Values.replicas.icap }}
+  resources:
+    {{ .Values.resources.icap | toYaml | nindent 4 }}
+  service:
+    annotations:
+      {{ .Values.annotations.servicesExternalClamavDistributed.icapService | toYaml | nindent 6 }}
+
+  serviceAccount:
+    annotations:
+      {{ .Values.annotations.servicesExternalClamavDistributed.icapServiceAccount | toYaml | nindent 6 }}
+
+milter:
+  commonAnnotations:
+    {{ .Values.annotations.servicesExternalClamavDistributed.milterCommon | toYaml | nindent 4 }}
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - "ALL"
+    enabled: true
+    runAsUser: 100
+    runAsGroup: 101
+    privileged: false
+    seccompProfile:
+      type: "RuntimeDefault"
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    seLinuxOptions:
+      {{ .Values.seLinuxOptions.milter | toYaml | nindent 6 }}
+  image:
+    registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.milter.registry | quote }}
+    repository: {{ .Values.images.milter.repository | quote }}
+    tag: {{ .Values.images.milter.tag | quote }}
+    imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+  podAnnotations:
+    {{ .Values.annotations.servicesExternalClamavDistributed.milterPod | toYaml | nindent 4 }}
+  podSecurityContext:
+    enabled: true
+    fsGroup: 101
+    fsGroupChangePolicy: "Always"
+  replicaCount: {{ .Values.replicas.milter }}
+  resources:
+    {{ .Values.resources.milter | toYaml | nindent 4 }}
+  service:
+    annotations:
+      {{ .Values.annotations.servicesExternalClamavDistributed.milterService | toYaml | nindent 6 }}
+
+  serviceAccount:
+    annotations:
+      {{ .Values.annotations.servicesExternalClamavDistributed.milterServiceAccount | toYaml | nindent 6 }}
+
+persistence:
+  size: {{ .Values.persistence.storages.clamav.size | quote }}
+  storageClass: {{ coalesce .Values.persistence.storages.clamav.storageClassName .Values.persistence.storageClassNames.RWX | quote }}
+  annotations:
+    {{ .Values.annotations.servicesExternalClamavDistributed.persistence | toYaml | nindent 4 }}
+...

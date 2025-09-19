@@ -1,0 +1,90 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+# https://github.com/cryptpad/helm/blob/main/charts/cryptpad/README.md or
+# https://github.com/cryptpad/helm/blob/main/charts/cryptpad/values.yaml
+
+# Disable registration and access to unregistered users:
+# (https://docs.cryptpad.org/en/admin_guide/customization.html#application-config)
+
+application_config:
+  availablePadTypes:
+    - "diagram"
+
+# Deactivating public access breaks nextcloud plugin!
+#  registeredOnlyTypes:
+#    - "diagram"
+
+autoscaling:
+  enabled: false
+
+enableEmbedding: true
+
+fullnameOverride: "cryptpad"
+
+image:
+  repository: "{{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.cryptpad.registry }}/{{ .Values.images.cryptpad.repository }}"
+  tag: {{ .Values.images.cryptpad.tag | quote }}
+  pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+
+imagePullSecrets:
+{{- range .Values.global.imagePullSecrets }}
+  - name: {{ . | quote }}
+{{- end }}
+
+ingress:
+  enabled: {{ .Values.ingress.enabled }}
+  annotations:
+    nginx.org/websocket-services: "cryptpad"
+   {{- with .Values.annotations.cryptpad.ingress }}
+   {{ . | toYaml | nindent 4 }}
+   {{- end }}
+  className: {{ .Values.ingress.ingressClassName | quote }}
+  hosts:
+    - host: "{{ .Values.global.hosts.cryptpad }}.{{ .Values.global.domain }}"
+      paths:
+        - path: "/"
+          pathType: "ImplementationSpecific"
+  tls:
+    - secretName: {{ .Values.ingress.tls.secretName | quote }}
+      hosts:
+        - "{{ .Values.global.hosts.cryptpad }}.{{ .Values.global.domain }}"
+
+persistence:
+  enabled: false
+
+podAnnotations:
+  {{ .Values.annotations.cryptpad.pod | toYaml | nindent 2 }}
+
+podSecurityContext:
+  fsGroup: 4001
+
+replicaCount: {{ .Values.replicas.cryptpad }}
+
+resources:
+  {{ .Values.resources.cryptpad | toYaml | nindent 2 }}
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  privileged: false
+  seccompProfile:
+    type: "RuntimeDefault"
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 4001
+  runAsGroup: 4001
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.cryptpad | toYaml | nindent 4 }}
+
+serviceAccount:
+  create: true
+  annotations:
+    {{ .Values.annotations.cryptpad.serviceAccount | toYaml | nindent 4 }}
+
+workloadStateful: false
+
+...

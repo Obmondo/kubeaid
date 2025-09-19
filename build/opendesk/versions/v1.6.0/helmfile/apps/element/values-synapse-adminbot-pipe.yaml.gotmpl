@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+configuration:
+  secretName: "matrix-adminbot-config"
+image:
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDeEnterprise .Values.global.imageRegistry .Values.images.elementPipe.registry | quote }}
+  url: {{ .Values.images.elementPipe.repository | quote }}
+  tag: {{ .Values.images.elementPipe.tag | quote }}
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+fullnameOverride: "opendesk-synapse-adminbot-pipe"
+...

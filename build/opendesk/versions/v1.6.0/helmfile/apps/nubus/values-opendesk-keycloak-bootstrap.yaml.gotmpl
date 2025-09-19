@@ -1,0 +1,798 @@
+# SPDX-FileCopyrightText: 2024-2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  domain: "{{ .Values.global.domain }}"
+  hosts:
+    {{ .Values.global.hosts | toYaml | nindent 4 }}
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+image:
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.opendeskKeycloakBootstrap.registry | quote }}
+  repository: {{ .Values.images.opendeskKeycloakBootstrap.repository | quote }}
+  tag: {{ .Values.images.opendeskKeycloakBootstrap.tag | quote }}
+  imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+
+cleanup:
+  deletePodsOnSuccess: {{ .Values.debug.cleanup.deletePodsOnSuccess }}
+  deletePodsOnSuccessTimeout: {{ .Values.debug.cleanup.deletePodsOnSuccessTimeout }}
+  keepPVCOnDelete: {{ .Values.debug.cleanup.keepPVCOnDelete }}
+
+config:
+  clientAccessRestrictions:
+    {{- if .Values.apps.element.enabled }}
+    matrix:
+      client: "opendesk-matrix"
+      scope: "opendesk-matrix-scope"
+      role: "opendesk-matrix-access-control"
+      group: "managed-by-attribute-Livecollaboration"
+    {{- end }}
+    {{- if .Values.apps.jitsi.enabled }}
+    jitsi:
+      client: "opendesk-jitsi"
+      scope: "opendesk-jitsi-scope"
+      role: "opendesk-jitsi-access-control"
+      group: "managed-by-attribute-Videoconference"
+    {{- end }}
+    {{- if .Values.apps.xwiki.enabled }}
+    xwiki:
+      client: "opendesk-xwiki"
+      scope: "opendesk-xwiki-scope"
+      role: "opendesk-xwiki-access-control"
+      group: "managed-by-attribute-Knowledgemanagement"
+    {{- end }}
+    {{- if .Values.apps.openproject.enabled }}
+    openproject:
+      client: "opendesk-openproject"
+      scope: "opendesk-openproject-scope"
+      role: "opendesk-openproject-access-control"
+      group: "managed-by-attribute-Projectmanagement"
+    {{- end }}
+    {{- if .Values.apps.nextcloud.enabled }}
+    nextcloud:
+      client: "opendesk-nextcloud"
+      scope: "opendesk-nextcloud-scope"
+      role: "opendesk-nextcloud-access-control"
+      group: "managed-by-attribute-Fileshare"
+    {{- end }}
+    {{- if .Values.apps.oxAppSuite.enabled }}
+    oxAppSuite:
+      client: "opendesk-oxappsuite"
+      scope: "opendesk-oxappsuite-scope"
+      role: "opendesk-oxappsuite-access-control"
+      group: "managed-by-attribute-Groupware"
+    dovecot:
+      client: "opendesk-dovecot"
+      scope: "opendesk-dovecot-scope"
+      role: "opendesk-dovecot-access-control"
+      group: "managed-by-attribute-Groupware"
+    {{- end }}
+    {{- if .Values.apps.notes.enabled }}
+    notes:
+      client: "opendesk-notes"
+      scope: "opendesk-notes-scope"
+      role: "opendesk-notes-access-control"
+      group: "managed-by-attribute-Notes"
+    {{- end }}
+
+  custom:
+    clientScopes:
+      {{ .Values.functional.authentication.oidc.clientScopes | toYaml | nindent 6 }}
+    clients:
+      {{ .Values.functional.authentication.oidc.clients | toYaml | nindent 6 }}
+  managed:
+    clientScopes: [ 'acr', 'web-origins', 'email', 'profile', 'microprofile-jwt', 'role_list',
+                    'offline_access', 'roles', 'address', 'phone' ]
+    clients: [ 'guardian-management-api', 'guardian-scripts', 'guardian-ui', 'UMC', '${client_account}',
+               '${client_account-console}', '${client_admin-cli}', '${client_broker}', '${client_realm-management}',
+               '${client_security-admin-console}' ]
+  keycloak:
+    admin:
+      values:
+        username: "kcadmin"
+        password: {{ .Values.secrets.keycloak.adminPassword | quote }}
+    realm: {{ .Values.platform.realm | quote }}
+    intraCluster:
+      enabled: true
+      internalBaseUrl: "http://ums-keycloak.{{ .Release.Namespace }}.svc.{{ .Values.cluster.networking.domain }}:8080"
+  realmSettings:
+    accessTokenLifespan: {{ .Values.functional.authentication.realmSettings.accessTokenLifespan }}
+    revokeRefreshToken: {{ .Values.functional.authentication.realmSettings.revokeRefreshToken }}
+    ssoSessionIdleTimeout: {{ .Values.functional.authentication.realmSettings.ssoSessionIdleTimeout }}
+    ssoSessionMaxLifespan: {{ .Values.functional.authentication.realmSettings.ssoSessionMaxLifespan }}
+    offlineSessionIdleTimeout: {{ .Values.functional.authentication.realmSettings.offlineSessionIdleTimeout }}
+    offlineSessionMaxLifespanEnabled: {{ .Values.functional.authentication.realmSettings.offlineSessionMaxLifespanEnabled }}
+    offlineSessionMaxLifespan: {{ .Values.functional.authentication.realmSettings.offlineSessionMaxLifespan }}
+    clientSessionIdleTimeout: {{ .Values.functional.authentication.realmSettings.clientSessionIdleTimeout }}
+    clientSessionMaxLifespan: {{ .Values.functional.authentication.realmSettings.clientSessionMaxLifespan }}
+    clientOfflineSessionIdleTimeout: {{ .Values.functional.authentication.realmSettings.clientOfflineSessionIdleTimeout }}
+    clientOfflineSessionMaxLifespan: {{ .Values.functional.authentication.realmSettings.clientOfflineSessionMaxLifespan }}
+  ssoFederation:
+    enabled: {{ .Values.functional.authentication.ssoFederation.enabled }}
+    enforceFederatedLogin: {{ .Values.functional.authentication.ssoFederation.enforceFederatedLogin }}
+    name: {{ .Values.functional.authentication.ssoFederation.name | quote }}
+    idpDetails: {{ .Values.functional.authentication.ssoFederation.idpDetails | toYaml | nindent 6 }}
+  twoFactorSettings:
+    additionalGroups: {{ .Values.functional.authentication.twoFactor.groups | toYaml | nindent 6 }}
+  precreateGroups: [ 'Domain Admins', 'Domain Users', '2fa-users', 'IAM API - Full Access',
+                     {{ if .Values.apps.nextcloud.enabled }}'managed-by-attribute-Fileshare', 'managed-by-attribute-FileshareAdmin',{{ end }}
+                     {{ if .Values.apps.xwiki.enabled }}'managed-by-attribute-Knowledgemanagement', 'managed-by-attribute-KnowledgemanagementAdmin',{{ end }}
+                     {{ if .Values.apps.element.enabled }}'managed-by-attribute-Livecollaboration', 'managed-by-attribute-LivecollaborationAdmin',{{ end }}
+                     {{ if .Values.apps.openproject.enabled }}'managed-by-attribute-Projectmanagement', 'managed-by-attribute-ProjectmanagementAdmin',{{ end }}
+                     {{ if .Values.apps.jitsi.enabled }}'managed-by-attribute-Videoconference',{{ end }}
+                     {{ if .Values.apps.oxAppSuite.enabled }}'managed-by-attribute-Groupware',{{ end }}
+                     {{ if .Values.apps.notes.enabled }}'managed-by-attribute-Notes',{{ end }}
+                   ]
+
+  opendesk:
+    # We use client specific scopes as we bind them to Keycloak role membership which itself is linked
+    # to LDAP group membership to ensure a user cannot access an application without the required
+    # group membership.
+    clientScopes:
+      - name: "read_contacts"
+        protocol: "openid-connect"
+      - name: "write_contacts"
+        protocol: "openid-connect"
+      {{ if .Values.apps.openproject.enabled }}
+      - name: "opendesk-openproject-scope"
+        description: "Scope for the claims required by openDesk's OpenProject instance."
+        protocol: "openid-connect"
+        protocolMappers:
+          - name: "opendesk_useruuid"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "entryUUID"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "opendesk_useruuid"
+              jsonType.label: "String"
+          - name: "opendesk_username"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "uid"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "opendesk_username"
+              jsonType.label: "String"
+          - name: "opendeskProjectmanagementAdmin"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "opendeskProjectmanagementAdmin"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "openproject_admin"
+              jsonType.label: "String"
+          - name: "email"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              introspection.token.claim: true
+              userinfo.token.claim: true
+              user.attribute: "email"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "email"
+              jsonType.label: "String"
+          - name: "given name"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              introspection.token.claim: true
+              userinfo.token.claim: true
+              user.attribute: "firstName"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "given_name"
+              jsonType.label: "String"
+          - name: "family name"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              introspection.token.claim: true
+              userinfo.token.claim: true
+              user.attribute: "lastName"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "family_name"
+              jsonType.label: "String"
+      {{ end }}
+      {{ if .Values.apps.jitsi.enabled }}
+      - name: "opendesk-jitsi-scope"
+        description: "Scope for the claims required by openDesk's Jitsi instance."
+        protocol: "openid-connect"
+        protocolMappers:
+          - name: "opendesk_useruuid"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "entryUUID"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "opendesk_useruuid"
+              jsonType.label: "String"
+          - name: "opendesk_username"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "uid"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "opendesk_username"
+              jsonType.label: "String"
+          - name: "full name"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-full-name-mapper"
+            consentRequired: false
+            config:
+              id.token.claim: true
+              introspection.token.claim: true
+              access.token.claim: true
+              userinfo.token.claim: true
+          - name: "email"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              introspection.token.claim: true
+              userinfo.token.claim: true
+              user.attribute: "email"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "email"
+              jsonType.label: "String"
+      {{ end }}
+      {{ if .Values.apps.nextcloud.enabled }}
+      - name: "opendesk-nextcloud-scope"
+        description: "Scope for the claims required by openDesk's Nextcloud instance."
+        protocol: "openid-connect"
+        protocolMappers:
+          - name: "opendesk_useruuid"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "entryUUID"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "opendesk_useruuid"
+              jsonType.label: "String"
+          - name: "opendesk_username"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "uid"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "opendesk_username"
+              jsonType.label: "String"
+          - name: "email"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              introspection.token.claim: true
+              userinfo.token.claim: true
+              user.attribute: "email"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "email"
+              jsonType.label: "String"
+          - name: "context"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "oxContextIDNum"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "context"
+              jsonType.label: "String"
+      {{ end }}
+      {{ if .Values.apps.element.enabled }}
+      - name: "opendesk-matrix-scope"
+        description: "Scope for the claims required by openDesk's Matrix instance."
+        protocol: "openid-connect"
+        protocolMappers:
+          - name: "opendesk_useruuid"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "entryUUID"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "opendesk_useruuid"
+              jsonType.label: "String"
+          - name: "opendesk_username"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "uid"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "opendesk_username"
+              jsonType.label: "String"
+          - name: "full name"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-full-name-mapper"
+            consentRequired: false
+            config:
+              id.token.claim: true
+              introspection.token.claim: true
+              access.token.claim: true
+              userinfo.token.claim: true
+          - name: "email"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              introspection.token.claim: true
+              userinfo.token.claim: true
+              user.attribute: "email"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "email"
+              jsonType.label: "String"
+      {{ end }}
+      {{ if .Values.apps.xwiki.enabled }}
+      - name: "opendesk-xwiki-scope"
+        description: "Scope for the claims required by openDesk's XWiki instance."
+        protocol: "openid-connect"
+        protocolMappers:
+          - name: "opendesk_useruuid"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "entryUUID"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "opendesk_useruuid"
+              jsonType.label: "String"
+          - name: "opendesk_username"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "uid"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "opendesk_username"
+              jsonType.label: "String"
+          - name: "full name"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-full-name-mapper"
+            consentRequired: false
+            config:
+              id.token.claim: true
+              introspection.token.claim: true
+              access.token.claim: true
+              userinfo.token.claim: true
+          - name: "email"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              introspection.token.claim: true
+              userinfo.token.claim: true
+              user.attribute: "email"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "email"
+              jsonType.label: "String"
+      {{ end }}
+      {{ if .Values.apps.oxAppSuite.enabled }}
+      - name: "opendesk-dovecot-scope"
+        description: "Scope for the claims required by openDesk's Dovecot instance."
+        protocol: "openid-connect"
+        protocolMappers:
+          - name: "opendesk_useruuid"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "entryUUID"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "opendesk_useruuid"
+              jsonType.label: "String"
+          - name: "opendesk_username"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "uid"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "opendesk_username"
+              jsonType.label: "String"
+      - name: "opendesk-oxappsuite-scope"
+        description: "Scope for the claims required by openDesk's OX Appuite instance."
+        protocol: "openid-connect"
+        protocolMappers:
+          - name: "context"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "oxContextIDNum"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "context"
+              jsonType.label: "String"
+          - name: "opendesk_useruuid"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "entryUUID"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "opendesk_useruuid"
+              jsonType.label: "String"
+          - name: "opendesk_username"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "uid"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "opendesk_username"
+              jsonType.label: "String"
+      {{ end }}
+      {{ if .Values.apps.notes.enabled }}
+      - name: "opendesk-notes-scope"
+        description: "Scope for the claims required by openDesk's Notes instance."
+        protocol: "openid-connect"
+        protocolMappers:
+          - name: "email"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              introspection.token.claim: true
+              userinfo.token.claim: true
+              user.attribute: "email"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "email"
+              jsonType.label: "String"
+          - name: "given name"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              introspection.token.claim: true
+              userinfo.token.claim: true
+              user.attribute: "firstName"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "given_name"
+              jsonType.label: "String"
+          - name: "family name"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              introspection.token.claim: true
+              userinfo.token.claim: true
+              user.attribute: "lastName"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "family_name"
+              jsonType.label: "String"
+      {{ end }}
+    clients:
+      - name: "opendesk-intercom"
+        clientId: "opendesk-intercom"
+        protocol: "openid-connect"
+        clientAuthenticatorType: "client-secret"
+        secret: {{ .Values.secrets.keycloak.clientSecret.intercom | quote }}
+        redirectUris:
+          - "https://{{ .Values.global.hosts.intercomService }}.{{ .Values.global.domain }}/callback"
+        consentRequired: false
+        frontchannelLogout: false
+        publicClient: false
+        authorizationServicesEnabled: false
+        attributes:
+          backchannel.logout.session.required: true
+          backchannel.logout.revoke.offline.tokens: true
+          backchannel.logout.url: "https://{{ .Values.global.hosts.intercomService }}.{{ .Values.global.domain }}/backchannel-logout"
+        protocolMappers:
+          - name: "intercom-audience"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-audience-mapper"
+            consentRequired: false
+            config:
+              included.client.audience: "opendesk-intercom"
+              id.token.claim: false
+              access.token.claim: true
+          - name: "opendesk_username"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "uid"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "opendesk_username"
+              jsonType.label: "String"
+          - name: "opendesk_useruuid"
+            protocol: "openid-connect"
+            protocolMapper: "oidc-usermodel-attribute-mapper"
+            consentRequired: false
+            config:
+              userinfo.token.claim: true
+              user.attribute: "entryUUID"
+              id.token.claim: true
+              access.token.claim: true
+              claim.name: "opendesk_useruuid"
+              jsonType.label: "String"
+        defaultClientScopes:
+          - "offline_access"
+      {{ if .Values.apps.notes.enabled }}
+      - name: "opendesk-notes"
+        clientId: "opendesk-notes"
+        protocol: "openid-connect"
+        clientAuthenticatorType: "client-secret"
+        secret: {{ .Values.secrets.keycloak.clientSecret.notes | quote }}
+        redirectUris:
+          - "https://{{ .Values.global.hosts.notes }}.{{ .Values.global.domain }}/api/v1.0/callback/"
+        standardFlowEnabled: true
+        implicitFlowEnabled: false
+        alwaysDisplayInConsole: false
+        bearerOnly: false
+        directAccessGrantsEnabled: true
+        serviceAccountsEnabled: false
+        consentRequired: false
+        frontchannelLogout: false
+        publicClient: false
+        authorizationServicesEnabled: false
+        surrogateAuthRequired: false
+        attributes:
+          backchannel.logout.revoke.offline.tokens: false
+          backchannel.logout.session.required: false
+          client.introspection.response.allow.jwt.claim.enabled: false
+          client.use.lightweight.access.token.enabled: false
+          client_credentials.use_refresh_token: false
+          display.on.consent.screen: false
+          oauth2.device.authorization.grant.enabled: false
+          oidc.ciba.grant.enabled: false
+          post.logout.redirect.uris: "https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}/*##https://{{ .Values.global.hosts.notes }}.{{ .Values.global.domain }}/*"
+          require.pushed.authorization.requests: false
+          tls.client.certificate.bound.access.tokens: false
+          token.response.type.bearer.lower-case: false
+          use.jwks.url: false
+          use.refresh.tokens: false
+          # it is probably not even required to set this value explicitly.
+          user.info.response.signature.alg: "RS256"
+        defaultClientScopes:
+          - "opendesk-notes-scope"
+      {{ end }}
+      {{ if .Values.apps.oxAppSuite.enabled }}
+      - name: "opendesk-dovecot"
+        clientId: "opendesk-dovecot"
+        protocol: "openid-connect"
+        clientAuthenticatorType: "client-secret"
+        secret: {{ .Values.secrets.keycloak.clientSecret.dovecot | quote }}
+        consentRequired: false
+        frontchannelLogout: false
+        publicClient: false
+        authorizationServicesEnabled: false
+        attributes:
+          backchannel.logout.session.required: false
+        defaultClientScopes:
+          - "opendesk-dovecot-scope"
+      - name: "opendesk-oxappsuite"
+        clientId: "opendesk-oxappsuite"
+        protocol: "openid-connect"
+        clientAuthenticatorType: "client-secret"
+        secret: {{ .Values.secrets.keycloak.clientSecret.as8oidc | quote }}
+        redirectUris:
+          - "https://{{ .Values.global.hosts.openxchange }}.{{ .Values.global.domain }}/*"
+          - "https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}/*"
+        consentRequired: false
+        frontchannelLogout: false
+        publicClient: false
+        authorizationServicesEnabled: false
+        attributes:
+          backchannel.logout.session.required: true
+          backchannel.logout.url: "https://{{ .Values.global.hosts.openxchange }}.{{ .Values.global.domain }}/ajax/oidc/backchannel_logout"
+          post.logout.redirect.uris: "https://{{ .Values.global.hosts.openxchange }}.{{ .Values.global.domain }}/*##https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}/*"
+        defaultClientScopes:
+          - "opendesk-oxappsuite-scope"
+          - "read_contacts"
+          - "write_contacts"
+      {{ end }}
+      {{ if .Values.apps.jitsi.enabled }}
+      - name: "opendesk-jitsi"
+        clientId: "opendesk-jitsi"
+        protocol: "openid-connect"
+        clientAuthenticatorType: "client-secret"
+        redirectUris:
+          - "https://{{ .Values.global.hosts.jitsi }}.{{ .Values.global.domain }}/*"
+        consentRequired: false
+        frontchannelLogout: false
+        publicClient: true
+        fullScopeAllowed: true
+        authorizationServicesEnabled: false
+        defaultClientScopes:
+          - "opendesk-jitsi-scope"
+      {{ end }}
+      {{ if .Values.apps.element.enabled }}
+      - name: "opendesk-matrix"
+        clientId: "opendesk-matrix"
+        protocol: "openid-connect"
+        clientAuthenticatorType: "client-secret"
+        secret: {{ .Values.secrets.keycloak.clientSecret.matrix | quote }}
+        redirectUris:
+          - "https://{{ .Values.global.hosts.element }}.{{ .Values.global.domain }}/*"
+          - "https://{{ .Values.global.hosts.synapse }}.{{ .Values.global.domain }}/*"
+          - "https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}/*"
+        standardFlowEnabled: true
+        directAccessGrantsEnabled: true
+        serviceAccountsEnabled: true
+        consentRequired: false
+        frontchannelLogout: false
+        publicClient: false
+        authorizationServicesEnabled: false
+        attributes:
+          backchannel.logout.session.required: true
+          backchannel.logout.url: "https://{{ .Values.global.hosts.synapse }}.{{ .Values.global.domain }}/_synapse/client/oidc/backchannel_logout"
+          post.logout.redirect.uris: "https://{{ .Values.global.hosts.element }}.{{ .Values.global.domain }}/*##https://{{ .Values.global.hosts.synapse }}.{{ .Values.global.domain }}/*##https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}/*"
+        defaultClientScopes:
+          - "opendesk-matrix-scope"
+      {{ end }}
+      {{ if .Values.apps.nextcloud.enabled }}
+      - name: "opendesk-nextcloud"
+        clientId: "opendesk-nextcloud"
+        protocol: "openid-connect"
+        clientAuthenticatorType: "client-secret"
+        secret: {{ .Values.secrets.keycloak.clientSecret.ncoidc | quote }}
+        redirectUris:
+          - "https://{{ .Values.global.hosts.nextcloud }}.{{ .Values.global.domain }}/*"
+          - "https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}/*"
+        consentRequired: false
+        frontchannelLogout: false
+        publicClient: false
+        authorizationServicesEnabled: false
+        attributes:
+          backchannel.logout.session.required: true
+          backchannel.logout.url: "https://{{ .Values.global.hosts.nextcloud }}.{{ .Values.global.domain }}/apps/user_oidc/backchannel-logout/opendesk"
+          post.logout.redirect.uris: "https://{{ .Values.global.hosts.nextcloud }}.{{ .Values.global.domain }}/*##https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}/*"
+        defaultClientScopes:
+          - "opendesk-nextcloud-scope"
+          - "read_contacts"
+          - "write_contacts"
+      {{ end }}
+      {{ if .Values.apps.openproject.enabled }}
+      - name: "opendesk-openproject"
+        clientId: "opendesk-openproject"
+        protocol: "openid-connect"
+        clientAuthenticatorType: "client-secret"
+        secret: {{ .Values.secrets.keycloak.clientSecret.openproject | quote }}
+        redirectUris:
+          - "https://{{ .Values.global.hosts.openproject }}.{{ .Values.global.domain }}/*"
+          - "https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}/*"
+        consentRequired: false
+        frontchannelLogout: false
+        publicClient: false
+        serviceAccountsEnabled: true
+        authorizationServicesEnabled: false
+        attributes:
+          backchannel.logout.session.required: true
+          backchannel.logout.url: "https://{{ .Values.global.hosts.openproject }}.{{ .Values.global.domain }}/auth/keycloak/backchannel-logout"
+          post.logout.redirect.uris: "https://{{ .Values.global.hosts.openproject }}.{{ .Values.global.domain }}/*##https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}/*"
+        defaultClientScopes:
+          - "opendesk-openproject-scope"
+      {{ end }}
+      {{ if .Values.apps.xwiki.enabled }}
+      - name: "opendesk-xwiki"
+        clientId: "opendesk-xwiki"
+        protocol: "openid-connect"
+        clientAuthenticatorType: "client-secret"
+        secret: {{ .Values.secrets.keycloak.clientSecret.xwiki | quote }}
+        redirectUris:
+          - "https://{{ .Values.global.hosts.xwiki }}.{{ .Values.global.domain }}/*"
+          - "https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}/*"
+        consentRequired: false
+        frontchannelLogout: false
+        publicClient: false
+        authorizationServicesEnabled: false
+        attributes:
+          backchannel.logout.session.required: false
+          backchannel.logout.url: "https://{{ .Values.global.hosts.xwiki }}.{{ .Values.global.domain }}/oidc/authenticator/backchannel_logout"
+          post.logout.redirect.uris: "https://{{ .Values.global.hosts.xwiki }}.{{ .Values.global.domain }}/*##https://{{ .Values.global.hosts.nubus }}.{{ .Values.global.domain }}/*"
+        defaultClientScopes:
+          - "opendesk-xwiki-scope"
+      {{ end }}
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+  enabled: true
+  privileged: false
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: "RuntimeDefault"
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.opendeskKeycloakBootstrap | toYaml | nindent 4 }}
+
+additionalAnnotations:
+  argocd.argoproj.io/hook: "Sync"
+  argocd.argoproj.io/hook-delete-policy: "BeforeHookCreation"
+  {{- with .Values.annotations.nubusKeycloakBootstrap.additional }}
+  {{. | toYaml | nindent 2 }}
+  {{- end }}
+
+podAnnotations:
+  intents.otterize.com/service-name: "ums-keycloak-bootstrap"
+  {{- with .Values.annotations.nubusKeycloakBootstrap.pod }}
+  {{. | toYaml | nindent 2 }}
+  {{- end }}
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 1000
+  fsGroupChangePolicy: "OnRootMismatch"
+
+resources:
+  {{ .Values.resources.opendeskKeycloakBootstrap | toYaml | nindent 2 }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.nubusKeycloakBootstrap.serviceAccount | toYaml | nindent 4 }}
+
+{{- if .Values.certificate.selfSigned }}
+extraVolumes:
+  - name: "trusted-cert-secret-volume"
+    secret:
+      secretName: "opendesk-certificates-ca-tls"
+      items:
+        - key: "ca.crt"
+          path: "ca-certificates.crt"
+extraVolumeMounts:
+  - name: "trusted-cert-secret-volume"
+    mountPath: "/etc/ssl/certs/ca-certificates.crt"
+    subPath: "ca-certificates.crt"
+{{- end }}
+
+...

@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: 2024 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+apiVersion: "kyverno.io/v1"
+kind: "ClusterPolicy"
+metadata:
+  name: "template-image-registries"
+  annotations:
+    policies.kyverno.io/title: "Check image registry template"
+    policies.kyverno.io/subject: "Pod"
+    policies.kyverno.io/description: >-
+      This policy verifies that a custom external registry can be template to allow downloads from a private registry or
+      cache.
+spec:
+  background: true
+  rules:
+    - match:
+        resources:
+          kinds:
+            - "Pod"
+      name: "template-image-registries"
+      validate:
+        message: "Unknown image registry."
+        pattern:
+          spec:
+            =(ephemeralContainers):
+              - image: "my_private_registry.domain.tld/*"
+            =(initContainers):
+              - image: "my_private_registry.domain.tld/*"
+            containers:
+              - image: "my_private_registry.domain.tld/*"
+  validationFailureAction: "audit"
+...

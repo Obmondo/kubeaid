@@ -1,0 +1,32 @@
+# SPDX-FileCopyrightText: 2024 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+apiVersion: "kyverno.io/v1"
+kind: "ClusterPolicy"
+metadata:
+  name: "disallow-host-path"
+  annotations:
+    policies.kyverno.io/title: "Disallow hostPath"
+    policies.kyverno.io/subject: "Pod,Volume"
+    policies.kyverno.io/description: >-
+      HostPath volumes let Pods use host directories and volumes in containers.
+      Using host resources can be used to access shared data or escalate privileges and should not be allowed.
+      This policy ensures no hostPath volumes are in use.
+spec:
+  background: true
+  rules:
+    - name: "disallow-host-path"
+      match:
+        any:
+          - resources:
+              kinds:
+                - "Pod"
+      validate:
+        message: >-
+          HostPath volumes are forbidden. The field spec.volumes[*].hostPath must be unset.
+        anyPattern:
+          - spec:
+              =(volumes):
+                - X(hostPath): "null"
+          - spec:
+              =(volumes):

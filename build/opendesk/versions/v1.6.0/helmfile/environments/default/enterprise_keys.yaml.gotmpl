@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+# The variables set in this file are required to upgrade components to their "Enterprise" product variant.
+---
+enterpriseKeys:
+  openproject:
+    # Enterprise token must match the deployment's OpenProject host name.
+    token: ~
+  xwiki:
+    # Per instance their must be a unique set of keys.
+    opendeskEnterpriseLicense: ""
+    proApplicationslicense: ""
+  nextcloud:
+    # Subscription key can be used for all customer owned instances, the number of users
+    # from all instances and is limited by the number of users the key was bought for.
+    subscriptionKey: ""
+    # Subscription data is required for air gapped installations.
+    subscriptionData: ""
+
+...

@@ -1,0 +1,188 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  imagePullSecrets:
+    {{ .Values.global.imagePullSecrets | toYaml | nindent 4 }}
+
+exporter:
+
+  additionalAnnotations:
+    intents.otterize.com/service-name: "opendesk-nextcloud-exporter"
+    {{- with .Values.annotations.nextcloudExporter.additional }}
+    {{ . | toYaml | nindent 4 }}
+    {{- end }}
+
+  enabled: true
+  configuration:
+    server: "http://opendesk-nextcloud-aio"
+    token:
+      value: {{ .Values.secrets.nextcloud.metricsToken | quote }}
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - "ALL"
+    enabled: true
+    privileged: false
+    runAsUser: 65532
+    runAsGroup: 65532
+    seccompProfile:
+      type: "RuntimeDefault"
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    seLinuxOptions:
+      {{ .Values.seLinuxOptions.nextcloudExporter | toYaml | nindent 6 }}
+  image:
+    registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.nextcloudExporter.registry | quote }}
+    repository: "{{ .Values.images.nextcloudExporter.repository }}"
+    imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    tag: {{ .Values.images.nextcloudExporter.tag | quote }}
+  podAnnotations:
+    {{ .Values.annotations.nextcloudExporter.pod | toYaml | nindent 4 }}
+  prometheus:
+    serviceMonitor:
+      enabled: {{ .Values.monitoring.prometheus.serviceMonitors.enabled }}
+      labels:
+        {{ .Values.monitoring.prometheus.serviceMonitors.labels | toYaml | nindent 8 }}
+    prometheusRule:
+      enabled: {{ .Values.monitoring.prometheus.prometheusRules.enabled }}
+      additionalLabels:
+        {{ .Values.monitoring.prometheus.prometheusRules.labels | toYaml | nindent 8 }}
+  replicaCount: {{ .Values.replicas.nextcloudExporter }}
+  resources:
+    {{ .Values.resources.nextcloudExporter | toYaml | nindent 4 }}
+
+  serviceAccount:
+    annotations:
+      {{ .Values.annotations.nextcloudExporter.serviceAccount | toYaml | nindent 6 }}
+
+aio:
+  additionalAnnotations:
+    intents.otterize.com/service-name: "opendesk-nextcloud-aio"
+    {{- with .Values.annotations.nextcloudAio.additional }}
+    {{ . | toYaml | nindent 4 }}
+    {{- end }}
+
+  configuration:
+    cache:
+      auth:
+        enabled: true
+        username:
+          value: {{ .Values.cache.nextcloud.username }}
+        password:
+          value: {{ .Values.cache.nextcloud.password | default .Values.secrets.redis.password | quote }}
+      host: {{ .Values.cache.nextcloud.host | quote }}
+      port: {{ .Values.cache.nextcloud.port | quote }}
+      tls: {{ .Values.cache.nextcloud.tls }}
+    database:
+      {{ if eq .Values.databases.nextcloud.type "mariadb" }}
+      type: "mysql"
+      {{ else if eq .Values.databases.nextcloud.type "postgresql" }}
+      type: "pgsql"
+      {{ else }}
+      {{ .Values.databases.nextcloud.type | quote }}
+      {{ end }}
+      host: {{ .Values.databases.nextcloud.host | quote }}
+      port: {{ .Values.databases.nextcloud.port | quote }}
+      name: {{ .Values.databases.nextcloud.name | quote }}
+      auth:
+        username:
+          value: {{ .Values.databases.nextcloud.username | quote }}
+        password:
+          {{- if or (eq .Values.databases.nextcloud.type "mariadb") (eq .Values.databases.nextcloud.type "mysql") }}
+          value: {{ .Values.databases.nextcloud.password | default .Values.secrets.mariadb.nextcloudUser | quote }}
+          {{- else if or (eq .Values.databases.nextcloud.type "postgresql") (eq .Values.databases.nextcloud.type "psql") }}
+          value: {{ .Values.databases.nextcloud.password | default .Values.secrets.postgresql.nextcloudUser | quote }}
+          {{- else }}
+          value: {{ .Values.databases.nextcloud.password | quote }}
+          {{- end }}
+    trustedProxy: {{ join " " .Values.cluster.networking.cidr | quote }}
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - "ALL"
+    enabled: true
+    privileged: false
+    runAsUser: 101
+    runAsGroup: 101
+    seccompProfile:
+      type: "RuntimeDefault"
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    seLinuxOptions:
+      {{ .Values.seLinuxOptions.nextcloud | toYaml | nindent 6 }}
+  cron:
+    successfulJobsHistoryLimit: {{ if .Values.debug.enabled }}"3"{{ else }}"0"{{ end }}
+    resources:
+      {{ .Values.resources.nextcloudCron | toYaml | nindent 6 }}
+
+  debug:
+    loglevel: {{ if .Values.debug.enabled }}"0"{{ else }}"2"{{ end }}
+  {{- if .Values.certificate.selfSigned }}
+  extraEnvVars:
+    - name: "FS_IMPORT_CA_CERTIFICATES"
+      value: "true"
+  {{- end }}
+  {{- if .Values.certificate.selfSigned }}
+  extraVolumes:
+    - name: "trusted-cert-secret-volume"
+      secret:
+        secretName: "opendesk-certificates-ca-tls"
+        items:
+          - key: "ca.crt"
+            path: "ca-certificates.crt"
+  extraVolumeMounts:
+    - name: "trusted-cert-secret-volume"
+      mountPath: "/etc/ssl/certs/ca-certificates.crt"
+      subPath: "ca-certificates.crt"
+  {{- end }}
+  image:
+    registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.nextcloud.registry | quote }}
+    repository: {{ .Values.images.nextcloud.repository | quote }}
+    imagePullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+    tag: {{ .Values.images.nextcloud.tag | quote }}
+  ingress:
+    enabled: {{ .Values.ingress.enabled }}
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "{{ .Values.ingress.parameters.bodySize.nextcloud }}"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "{{ .Values.ingress.parameters.bodyTimeout.nextcloud }}"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "{{ .Values.ingress.parameters.bodyTimeout.nextcloud }}"
+      nginx.org/client-max-body-size: "{{ .Values.ingress.parameters.bodySize.nextcloud }}"
+      nginx.org/proxy-read-timeout: "{{ .Values.ingress.parameters.bodyTimeout.nextcloud }}s"
+      nginx.org/proxy-send-timeout: "{{ .Values.ingress.parameters.bodyTimeout.nextcloud }}s"
+      {{- with .Values.annotations.nextcloudAio.ingress }}
+        {{ . | toYaml | nindent 6 }}
+      {{- end }}
+    ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+    host: "{{ .Values.global.hosts.nextcloud }}.{{ .Values.global.domain }}"
+    tls:
+      secretName: {{ .Values.ingress.tls.secretName | quote }}
+  podAnnotations:
+    {{ .Values.annotations.nextcloudAio.pod | toYaml | nindent 4 }}
+  podSecurityContext:
+    fsGroup: 101
+  prometheus:
+    serviceMonitor:
+      enabled: {{ .Values.monitoring.prometheus.serviceMonitors.enabled }}
+      labels:
+        {{ .Values.monitoring.prometheus.serviceMonitors.labels | toYaml | nindent 8 }}
+    prometheusRule:
+      enabled: {{ .Values.monitoring.prometheus.prometheusRules.enabled }}
+      additionalLabels:
+        {{ .Values.monitoring.prometheus.prometheusRules.labels | toYaml | nindent 8 }}
+  replicaCount: {{ .Values.replicas.nextcloud }}
+  resources:
+    {{ .Values.resources.nextcloud | toYaml | nindent 4 }}
+
+  service:
+    annotations:
+      {{ .Values.annotations.nextcloudAio.service | toYaml | nindent 6 }}
+
+  serviceAccount:
+    annotations:
+      {{ .Values.annotations.nextcloudAio.serviceAccount | toYaml | nindent 6 }}
+
+...

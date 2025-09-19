@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+repositories:
+  # XWiki
+  # Source: https://github.com/xwiki-contrib/xwiki-helm
+  - name: "xwiki-repo"
+    keyring: "../../files/gpg-pubkeys/xwiki-com.gpg"
+    verify: {{ .Values.charts.xwiki.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.xwiki.registry }}/{{ .Values.charts.xwiki.repository }}"
+
+releases:
+  - name: "xwiki"
+    chart: "xwiki-repo/{{ .Values.charts.xwiki.name }}"
+    version: "{{ .Values.charts.xwiki.version }}"
+    wait: true
+    values:
+      - "values.yaml.gotmpl"
+      {{- range .Values.customization.release.xwiki }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.xwiki.enabled }}
+    timeout: 1800
+
+commonLabels:
+  deployStage: "050-components"
+  component: "xwiki"
+...

@@ -1,0 +1,76 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+global:
+  domain: {{ .Values.global.domain | quote }}
+  hosts:
+    {{- if .Values.apps.collabora.enabled }}
+    collabora: {{ .Values.global.hosts.collabora }}
+    {{- end }}
+    {{- if .Values.apps.cryptpad.enabled }}
+    cryptpad: {{ .Values.global.hosts.cryptpad }}
+    {{- end }}
+    {{- if .Values.apps.element.enabled }}
+    element: {{ .Values.global.hosts.element }}
+    matrixNeoBoardWidget: {{ .Values.global.hosts.matrixNeoBoardWidget }}
+    matrixNeoChoiceWidget: {{ .Values.global.hosts.matrixNeoChoiceWidget }}
+    matrixNeoDateFixBot: {{ .Values.global.hosts.matrixNeoDateFixBot }}
+    matrixNeoDateFixWidget: {{ .Values.global.hosts.matrixNeoDateFixWidget }}
+    synapse: {{ .Values.global.hosts.synapse }}
+    synapseFederation: {{ .Values.global.hosts.synapseFederation }}
+    whiteboard: {{ .Values.global.hosts.whiteboard }}
+    {{- end }}
+    {{- if .Values.apps.elementAdmin.enabled }}
+    adminBot: {{ .Values.global.hosts.adminBot }}
+    synapseAdmin: {{ .Values.global.hosts.synapseAdmin }}
+    {{- end }}
+    {{- if .Values.apps.jitsi.enabled }}
+    jitsi: {{ .Values.global.hosts.jitsi }}
+    {{- end }}
+    {{- if .Values.apps.minio.enabled }}
+    minioApi: {{ .Values.global.hosts.minioApi }}
+    minioConsole: {{ .Values.global.hosts.minioConsole }}
+    {{- end }}
+    {{- if .Values.apps.nextcloud.enabled }}
+    nextcloud: {{ .Values.global.hosts.nextcloud }}
+    {{- end }}
+    {{- if .Values.apps.notes.enabled }}
+    notes: {{ .Values.global.hosts.notes }}
+    {{- end }}
+    {{- if .Values.apps.nubus.enabled }}
+    intercomService: {{ .Values.global.hosts.intercomService }}
+    keycloak: {{ .Values.global.hosts.keycloak }}
+    nubus: {{ .Values.global.hosts.nubus }}
+    {{- end }}
+    {{- if .Values.apps.openproject.enabled }}
+    openproject: {{ .Values.global.hosts.openproject }}
+    {{- end }}
+    {{- if .Values.apps.oxAppSuite.enabled }}
+    openxchange: {{ .Values.global.hosts.openxchange }}
+    openxchangeDav: {{ .Values.global.hosts.openxchangeDav }}
+    {{- end }}
+    {{- if .Values.apps.staticFiles.enabled }}
+    static: {{ .Values.global.hosts.static }}
+    {{- end }}
+    {{- if .Values.apps.xwiki.enabled }}
+    xwiki: {{ .Values.global.hosts.xwiki }}
+    {{- end }}
+
+issuerRef:
+  name: {{ .Values.certificate.issuerRef.name | quote }}
+  kind: {{ .Values.certificate.issuerRef.kind | quote }}
+
+cleanup:
+  keepRessourceOnDelete: {{ .Values.debug.cleanup.keepRessourceOnDelete }}
+
+selfSigned:
+  enabled: {{ .Values.certificate.selfSigned }}
+  keystores:
+    jks:
+      enabled: true
+      password:
+        value: {{ .Values.secrets.certificates.password | quote }}
+
+wildcard: {{ .Values.certificate.wildcard }}
+...

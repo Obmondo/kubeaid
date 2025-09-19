@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+repositories:
+  # openDesk Jitsi
+  # Source: https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-jitsi
+  - name: "jitsi-repo"
+    keyring: "../../files/gpg-pubkeys/opencode.gpg"
+    verify: {{ .Values.charts.jitsi.verify }}
+    username: {{ env "OD_PRIVATE_REGISTRY_USERNAME" | quote }}
+    password: {{ env "OD_PRIVATE_REGISTRY_PASSWORD" | quote }}
+    oci: true
+    url: "{{ coalesce .Values.repositories.helm.registryOpencodeDe .Values.global.helmRegistry | default .Values.charts.jitsi.registry }}/{{ .Values.charts.jitsi.repository }}"
+
+releases:
+  - name: "jitsi"
+    chart: "jitsi-repo/{{ .Values.charts.jitsi.name }}"
+    version: "{{ .Values.charts.jitsi.version }}"
+    values:
+      - "values-jitsi.yaml.gotmpl"
+      {{- range .Values.customization.release.jitsi }}
+      - {{ . }}
+      {{- end }}
+    installed: {{ .Values.apps.jitsi.enabled }}
+    timeout: 900
+
+commonLabels:
+  deployStage: "050-components"
+  component: "jitsi"
+...

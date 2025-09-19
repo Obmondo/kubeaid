@@ -1,0 +1,192 @@
+# SPDX-FileCopyrightText: 2024 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+functional:
+
+  admin:
+    portal:
+      deploymentTimestamp:
+        # Set to `false` to disable to not provide and update openDesk deployment timestamp for admins in the portal.
+        # This is helpful in GitOps deployments as with the timestamp there will always be a change detected.
+        enabled: true
+
+  authentication:
+    newDeviceLoginNotification:
+      # openDesk's Keycloak extensions can send out an email every time a user logs in with a new "device".
+      # It uses device/browser fingerprinting to identify such an event. The feature can be toggled below.
+      enabled: true
+    twoFactor:
+      # Define a list of groups to enable 2FA for.
+      # Note: Removing a group from the list will not disable 2FA for the removed group.
+      groups:
+        - "Domain Admins"
+    oidc:
+      # Define additional/custom OIDC clients to be created in the 'opendesk' realm within Keycloak.
+      clients: ~
+      # Define additional/custom OIDC client scopes to be created in the 'opendesk' realm within Keycloak.
+      clientScopes: ~
+    # Configure global settings of the 'opendesk' realm within Keycloak. The values are directly
+    # passed into the `realmSettings` section of the `opendesk-keycloak-bootstrap` chart.
+    # Ref.: https://gitlab.opencode.de/bmi/opendesk/components/platform-development/charts/opendesk-keycloak-bootstrap
+    # Note: Global settings can potentially be overridden on a client level.
+    realmSettings:
+      accessTokenLifespan: 300
+      revokeRefreshToken: false
+      ssoSessionIdleTimeout: 14400
+      ssoSessionMaxLifespan: 57600
+      offlineSessionIdleTimeout: 2592000
+      offlineSessionMaxLifespanEnabled: false
+      offlineSessionMaxLifespan: 5184000
+      clientSessionIdleTimeout: 0
+      clientSessionMaxLifespan: 0
+      clientOfflineSessionIdleTimeout: 0
+      clientOfflineSessionMaxLifespan: 0
+    # SSO federation allows an external OIDC IdP to authenticate users within openDesk
+    ssoFederation:
+      # Enabling SSO federation requires an upstream IdP specific configuration in `idpDetails` below.
+      enabled: false
+      # When enforcing the federated login all users are immediately redirected to the federated IdP when a login
+      # is requested or required.
+      enforceFederatedLogin: false
+      # Name of the SSO federation, if you do not enforce the login the name is shown as a login option the user can select
+      # within the openDesk login dialog.
+      name: "My upstream IdP"
+      # Configuration details for your upstream IdP, when you configured them manually in the Keycloak UI e.g. for
+      # testing the setup, you can get them from a Keycloak realm export in the `identityProviders` list.
+      # Notes:
+      # - You have to convert the configuration into YAML to apply it below.
+      # - You have to omit the following attributes as they are either defined explicitly above or implicitly by
+      #   the openDesk configuration
+      #  - `displayName`
+      #  - `alias`
+      #  - `firstBrokerLoginFlowAlias`
+      #  - `internalId`
+      idpDetails: {}
+
+  chat:
+    matrix:
+      profile:
+        # Once connected with a user that user's Matrix ID is rarely checked by their communication partners, as the
+        # display name is used to see whom they are communicating with. Not allowing users to change their
+        # own display name reduces the risk of identity fraud.
+        # To get the display name updated from the central identity and access management you have to have the Synapse
+        # enterprise feature "groupsync" configured.
+        allowUsersToUpdateDisplayname: true
+
+        # If the LDAP entryUUID should be used for the localpart of user's Matrix IDs following setting must be `true`.
+        useImmutableIdentifierForLocalpart: false
+
+  externalServices:
+    nubus:
+      udmRestApi:
+        # Enable to make the UDM REST API from the Nubus stack externally available.
+        enabled: false
+    matrix:
+      federation:
+        # Disable to not support Matrix federation with your installation.
+        enabled: true
+        # List of matrix homeserver domains you want to allow federation with
+        domainAllowList: []
+
+  dataProtection:
+    matrixPresence:
+      # Enable to allow information about the user presence status to be shared.
+      # Ref.: https://element-hq.github.io/synapse/latest/usage/configuration/config_documentation.html#presence
+      enabled: false
+    jitsiRoomHistory:
+      # Disable to avoid the room history to be stored in the user's browser local storage.
+      # Ref.: https://github.com/jitsi/docker-jitsi-meet/issues/898
+      enabled: true
+
+  filestore:
+    quota:
+      # Set the default quota for all users in GB
+      default: 1
+    # Options related to file sharing.
+    # Changing these options might require a restart of the `opendesk-nextcloud-php` Pod(s).
+    sharing:
+      # External shares
+      external:
+        # Enables sharing of files with external participants (create external links, send links by mail and allow external upload in shared folders).
+        # If you disable this option existing external shares stop working, when re-enabling it the old shares are available again.
+        enabled: false
+        # Enforces passwords to be used on external shares.
+        enforcePasswords: false
+        # Let Nextcloud send the password set for the share by mail to the recipient of the share.
+        sendPasswordMail: true
+        # Expiry settings for the external shares.
+        expiry:
+          # If true the check box for the expiry date is enabled by default.
+          activeByDefault: true
+          # Enforce an expiry date to be set overriding `activeByDefault` setting.
+          enforced: false
+          # Set the number of days the default expiry date is in the future (requires `activeByDefault` to be `true`)
+          defaultDays: 30
+      # External shares
+      internal:
+        # Expiry settings for the internal shares.
+        expiry:
+          # If true the check box for the expiry date is enabled by default.
+          activeByDefault: false
+          # Enforce an expiry date to be set overriding `activeByDefault` setting.
+          enforced: false
+          # Set the number of days the default expiry date is in the future (requires `activeByDefault` to be `true`).
+          defaultDays: 90
+    # Nextcloud specific configuration
+    nextcloud:
+      retentionObligation:
+        # yamllint disable rule:line-length
+        # Set Nextcloud's `trashbin_retention_obligation`
+        # Ref.: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#trashbin-retention-obligation
+        trashbin: "auto"
+        # Set Nextcloud's `versions_retention_obligation`
+        # Ref.: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#versions-retention-obligation
+        versions: "auto"
+        # yamllint enable rule:line-length
+
+  groupware:
+    # Related settings for the CalDAV and CardCAV support of the groupware module.
+    davSupport:
+      # Enabled by default it is available at:
+      # - https://<.Values.global.hosts.openxchangeDav>.<.Values.global.domain>/caldav/[folderId]"
+      # - https://<.Values.global.hosts.openxchangeDav>.<.Values.global.domain>/carddav/[folderId]"
+      # Can be switched off using the below feature toggle.
+      enabled: true
+
+  migration:
+    oxAppSuite:
+      # Note: Only available in openDesk Enterprise.
+      # Turn on temporary for migration purposes only. Will enable master password auth in OX AppSuite and Dovecot using
+      # `secrets.oxAppSuite.migrationsMasterPassword`.
+      enabled: false
+
+  portal:
+    # Configure if the a re-direct to the login dialogue is enforced, or if the portal is shown and the user as to actively
+    # trigger the login flow, e.g. but clicking on the "Login" portal tile.
+    enforceLogin: true
+    # Link to the legal notice shown in the portal menu, set to "~" if you want to remove the link
+    linkLegalNotice: "https://opendesk.eu/impressum"
+    # Link to the privacy statement shown in the portal menu, set to "~" if you want to remove the link
+    linkPrivacyStatement: "https://zendis.de/datenschutzerklaerung"
+    # Link to documentation, shown in the right lower corner of the portal, set to "~" if you want to remove the link
+    linkDocumentation: "https://docs.opendesk.eu/"
+    # Link to support, shown in the right lower corner of the portal, set to "~" if you want to remove the link
+    linkSupport: "https://opendesk.eu/support"
+    # Link to feedback, shown in the right lower corner of the portal, set to "~" if you want to remove the link
+    linkFeedback: "https://opendesk.eu/feedback"
+    # Newsfeed related settings
+    newsfeed:
+      # Newsfeed is enabled by default, when XWiki is also deployed, you can forcefully disable the newsfeed
+      enabled: true
+    # Welcome message related settings
+    welcomeMessage:
+      # Welcome message is enabled by default and can be switched off below.
+      enabled: true
+
+  weboffice:
+    # Set the file format to be used by default when creating new documents from the portal or the Nextcloud app.
+    # You can choose between "ODF" and "OOXML".
+    # Ref.: https://en.wikipedia.org/wiki/Comparison_of_Office_Open_XML_and_OpenDocument
+    defaultFormat: "ODF"
+
+...

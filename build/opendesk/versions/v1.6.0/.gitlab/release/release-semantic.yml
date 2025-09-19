@@ -1,0 +1,63 @@
+# SPDX-FileCopyrightText: 2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-License-Identifier: Apache-2.0
+---
+release:
+  cache:
+    - key: "generate-docs-${CI_COMMIT_REF_SLUG}"
+      paths:
+        - "${CI_PROJECT_DIR}/docs"
+      policy: "pull"
+  rules:
+    - if: >
+        $JOB_AVSCAN_ENABLED != 'false' &&
+        $CI_COMMIT_BRANCH == $RELEASE_BRANCH &&
+        $CI_PIPELINE_SOURCE =~ "push|merge_request_event"
+      when: "on_success"
+  script:
+    - >
+      export RELEASE_VERSION=$(semantic-release --dry-run --branches $CI_COMMIT_REF_NAME --plugins
+      "@semantic-release/gitlab" | grep -oP "Published release [0-9]+\.[0-9]+\.[0-9]+ on" |
+      grep -oP "[0-9]+\.[0-9]+\.[0-9]+")
+    - |
+      if [ -z "${RELEASE_VERSION}" ]; then
+        echo "RELEASE_VERSION=$(git describe --tags --abbrev=0 | sed s@^v@@g )"
+      else
+        echo "RELEASE_VERSION=${RELEASE_VERSION}"
+      fi
+    - |
+      echo -e "\n[INFO] Writing data to helm value file..."
+      cat <<EOF >helmfile/environments/default/global.generated.yaml.gotmpl
+      # SPDX-FileCopyrightText: 2024-2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+      # SPDX-License-Identifier: Apache-2.0
+      ---
+      global:
+        systemInformation:
+          releaseVersion: "v$(echo -E "$RELEASE_VERSION")"
+      ...
+      EOF
+    - |
+      cat << 'EOF' > ${CI_PROJECT_DIR}/.releaserc
+      {
+        "branches": ["main"],
+        "plugins": [
+          "@semantic-release/gitlab",
+          "@semantic-release/release-notes-generator",
+          "@semantic-release/changelog",
+          ["@semantic-release/git", {
+            "assets": [
+              "charts/**/Chart.yaml",
+              "CHANGELOG.md",
+              "charts/**/README.md",
+              "helmfile/environments/default/global.generated.yaml.gotmpl",
+              ".kyverno/kyverno-test.yaml",
+              "docs"
+            ],
+            "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+          }]
+        ]
+      }
+      EOF
+    - "semantic-release"
+  needs:
+    - "generate-docs"
+...

@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+cluster:
+  service:
+    # Based on the available Implementations of your cluster, choose the type of Service.
+    # Choose out of "ClusterIP", "NodePort" or "LoadBalancer.
+    type: "LoadBalancer"
+
+  persistence:
+    # Enable if ReadWriteMany (RWX) storage is available (f.e. CephFS, NFS, ...).
+    readWriteMany:
+      enabled: false
+
+  networking:
+    # Kubernetes internal cluster domain.
+    domain: "cluster.local"
+    # Kubernetes cluster network CIDRs.
+    cidr:
+      - "10.0.0.0/8"
+    # IP addresses or IP ranges of the reverse proxy / load balancer to restrict the requesting source
+    # for defined services.
+    incomingCIDR: []
+    # Ingress-gateway IP - only relevant for "NodePort" cluster services.
+    # When ingress and egress gateway use different ips, which results that pods can't self-discover their incoming ip,
+    # you need to provide the public (load-balanced) ingress gateways ip address.
+    ingressGatewayIP: ""
+    # LoadBalancer status field - only relevant for "LoadBalancer" cluster services.
+    # The IP/DNS of your load-balancer will be fetched for some components from 'status' map of services.
+    # Most providers use '.status.loadBalancer.ingress[0].ip' to store public ip. You can modify the chosen field here.
+    loadBalancerStatusField: "ip"
+    # Network protocol options: "IPv4", "IPv6", "DualStack"
+    ipFamilies: "DualStack"
+
+  container:
+    # Used container engine in kubernetes cluster.
+    engine: "cri-o"
+
+...

@@ -1,0 +1,139 @@
+# SPDX-FileCopyrightText: 2024-2025 Zentrum für Digitale Souveränität der Öffentlichen Verwaltung (ZenDiS) GmbH
+# SPDX-FileCopyrightText: 2023 Bundesministerium des Innern und für Heimat, PG ZenDiS "Projektgruppe für Aufbau ZenDiS"
+# SPDX-License-Identifier: Apache-2.0
+---
+commonAnnotations:
+  {{ .Values.annotations.openxchangeDovecot.common | toYaml | nindent 2 }}
+
+image:
+  registry: {{ coalesce .Values.repositories.image.registryOpencodeDe .Values.global.imageRegistry .Values.images.dovecot.registry | quote }}
+  repository: {{ .Values.images.dovecot.repository | quote }}
+  tag: {{ .Values.images.dovecot.tag | quote }}
+  pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+
+imageInitDovecot:
+  registry: {{ coalesce .Values.repositories.image.dockerHub .Values.global.imageRegistry .Values.images.dovecotBootstrap.registry | quote }}
+  repository: {{ .Values.images.dovecotBootstrap.repository | quote }}
+  tag: {{ .Values.images.dovecotBootstrap.tag | quote }}
+  pullPolicy: {{ .Values.global.imagePullPolicy | quote }}
+
+imagePullSecrets:
+  {{ .Values.global.imagePullSecrets | toYaml | nindent 2 }}
+
+dovecot:
+  mailDomains: {{ toYaml (prepend .Values.global.additionalMailDomains (.Values.global.mailDomain | default .Values.global.domain) | uniq) | nindent 4 }}
+  defaultMailDomain: {{ .Values.global.mailDomain | default .Values.global.domain | quote }}
+  password:
+    value: {{ .Values.secrets.dovecot.doveadm | quote }}
+  migration:
+    enabled: {{ .Values.functional.migration.oxAppSuite.enabled }}
+    masterPassword:
+      value: {{ .Values.secrets.oxAppSuite.migrationsMasterPassword | quote }}
+  ldap:
+    enabled: true
+    host: {{ .Values.ldap.host | quote }}
+    port: 389
+    base: "{{ .Values.ldap.baseDn }}"
+    dn: "uid=ldapsearch_dovecot,cn=users,{{ .Values.ldap.baseDn }}"
+    password:
+      value: {{ .Values.secrets.nubus.ldapSearch.dovecot | quote }}
+  oidc:
+    enabled: true
+    clientID:
+      value: "opendesk-dovecot"
+    clientSecret:
+      value: {{ .Values.secrets.keycloak.clientSecret.dovecot | quote }}
+    introspectionHost: {{ printf "%s.%s" .Values.global.hosts.keycloak .Values.global.domain | quote }}
+    introspectionPath: "/realms/{{ .Values.platform.realm }}/protocol/openid-connect/token/introspect"
+    usernameAttribute: "opendesk_username"
+  loginTrustedNetworks: {{ join " " .Values.cluster.networking.cidr | quote }}
+  submission:
+    enabled: true
+    ssl: "no"
+    host: "{{ printf "%s.%s.svc.%s" "postfix" (.Values.apps.postfix.namespace | default .Release.Namespace) .Values.cluster.networking.domain }}:25"
+
+certificate:
+  secretName: {{ .Values.ingress.tls.secretName | quote }}
+
+{{- if .Values.cluster.persistence.readWriteMany.enabled }}
+replicaCount: {{ .Values.replicas.dovecot }}
+{{- else }}
+replicaCount: 1
+{{- end }}
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+    add:
+      - "CHOWN"
+      - "DAC_OVERRIDE"
+      - "KILL"
+      - "NET_BIND_SERVICE"
+      - "SETGID"
+      - "SETUID"
+      - "SYS_CHROOT"
+  enabled: true
+  readOnlyRootFilesystem: true
+  seccompProfile:
+    type: "RuntimeDefault"
+  seLinuxOptions:
+    {{ .Values.seLinuxOptions.dovecot | toYaml | nindent 4 }}
+
+{{- if .Values.debug.enabled }}
+debug: true
+{{- end }}
+
+{{- if .Values.certificate.selfSigned }}
+extraVolumes:
+  - name: "trusted-cert-secret-volume"
+    secret:
+      secretName: "opendesk-certificates-ca-tls"
+      items:
+        - key: "ca.crt"
+          path: "ca-certificates.crt"
+extraVolumeMounts:
+  - name: "trusted-cert-secret-volume"
+    mountPath: "/etc/ssl/certs/ca-certificates.crt"
+    subPath: "ca-certificates.crt"
+{{- end }}
+
+podSecurityContext:
+  enabled: true
+  fsGroup: 1000
+
+persistence:
+  {{- if .Values.cluster.persistence.readWriteMany.enabled }}
+  storageClassName: {{ coalesce .Values.persistence.storages.dovecot.storageClassName .Values.persistence.storageClassNames.RWX | quote }}
+  accessModes:
+    - "ReadWriteMany"
+  {{- else }}
+  storageClassName: {{ coalesce .Values.persistence.storages.dovecot.storageClassName .Values.persistence.storageClassNames.RWO | quote }}
+  accessModes:
+    - "ReadWriteOnce"
+  {{- end }}
+  size: {{ .Values.persistence.storages.dovecot.size | quote }}
+  annotations:
+    {{ .Values.annotations.openxchangeDovecot.persistence | toYaml | nindent 4 }}
+
+podAnnotations:
+  {{ .Values.annotations.openxchangeDovecot.pod | toYaml | nindent 2 }}
+
+resources:
+  {{ .Values.resources.dovecot | toYaml | nindent 2 }}
+
+{{- if or (eq (coalesce .Values.service.type.dovecot .Values.cluster.service.type) "NodePort") (eq (coalesce .Values.service.type.dovecot .Values.cluster.service.type) "LoadBalancer") }}
+service:
+  annotations:
+    {{ .Values.annotations.openxchangeDovecot.service | toYaml | nindent 4 }}
+  external:
+    enabled: true
+    type: {{ coalesce .Values.service.type.dovecot .Values.cluster.service.type | quote }}
+{{- end }}
+
+serviceAccount:
+  annotations:
+    {{ .Values.annotations.openxchangeDovecot.serviceAccount | toYaml | nindent 4 }}
+
+...
