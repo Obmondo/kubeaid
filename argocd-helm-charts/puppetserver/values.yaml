@@ -3,7 +3,7 @@ puppetserver:
     extraEnv:
       PUPPET_REPORTS: puppetdb,prometheus
       PUPPETSERVER_ENVIRONMENT_TIMEOUT: 0
-      AUTOSIGN: /etc/puppetlabs/code/autosign.conf
+      AUTOSIGN: /etc/puppetlabs/puppet/autosign.conf
     postgresql:
       auth:
         existingSecret: puppetserver-pgsql-app
@@ -38,10 +38,10 @@ puppetserver:
           set -e
 
           # ALLOWED_CLIENT=*.myinternal.domain
-          if ${ALLOWED_CLIENT}; then
+          if [[ -n "${ALLOWED_CLIENT}" ]]; then
             cat <<EOL > "/etc/puppetlabs/puppet/autosign.conf"
-            "*.${ALLOWED_CLIENT}"
-            EOL
+          *.${ALLOWED_CLIENT}
+          EOL
           fi
         configure_puppet_conf.sh: |-
           #!/bin/bash
