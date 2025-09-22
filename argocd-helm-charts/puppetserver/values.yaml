@@ -83,7 +83,8 @@ puppetserver:
     eyaml:
       existingSecret: eyaml-keys
     name: hiera
-    hieradataurl: "https://github.com/Obmondo/linuxaid-config-template.git"
+    # Add your linuxaid-config git repo here
+    # hieradataurl: "https://github.com/Obmondo/linuxaid-config-template.git"
 
   postgresql:
     enabled: false
