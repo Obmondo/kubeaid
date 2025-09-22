@@ -2,6 +2,16 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`b613073a`](../../commit/b613073a) update readme
+- [`bc4dcbaf`](../../commit/bc4dcbaf) feat: added kube-prom v0.16.0 with a release fix
+- [`8a45ab17`](../../commit/8a45ab17) Updated the opendesk so its handled the same way as Kube promethues
+- [`9f59c891`](../../commit/9f59c891) fix: handle the kube-prom strict v0.13.0 check gracefully using equality operator
+- [`eb20d70f`](../../commit/eb20d70f) fix: Add 10-minute delay to domain status alerts
+- [`730d01e3`](../../commit/730d01e3) feat: Added support for ruleNamespaceSelector in common template
+- [`3078f816`](../../commit/3078f816) Split Grafana dashboards into per-dashboard ConfigMaps https://gitea.obmondo.com/EnableIT/KubeAid/issues/901
+- [`263a8584`](../../commit/263a8584) feat: rabbitmq mixin is coming from a diff upstream repo for v0.13.0, so lets handle that accordingly
+
 ## 17.2.0
 ### Minor Version Upgrades
 - Updated traefik from version 37.0.0 to 37.1.1
