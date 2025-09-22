@@ -14,6 +14,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Security
 ---
+## [2.35.1]
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+- Added missing security context to configfile and keystore init containers to support restricted Kubernetes environments
+### Security
+---
+## [2.35.0]
+### Added
+- Updated OpenSearch appVersion to 2.19.3
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+---
 ## [2.34.0]
 ### Added
 - Switch 2.x.x to be released from 2.x branch
@@ -602,7 +620,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Security
 
-[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.34.0...HEAD
+[Unreleased]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.35.1...HEAD
+[2.35.1]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.35.0...opensearch-2.35.1
+[2.35.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.34.0...opensearch-2.35.0
 [2.34.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.33.0...opensearch-2.34.0
 [2.33.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.32.0...opensearch-2.33.0
 [2.32.0]: https://github.com/opensearch-project/helm-charts/compare/opensearch-2.31.0...opensearch-2.32.0

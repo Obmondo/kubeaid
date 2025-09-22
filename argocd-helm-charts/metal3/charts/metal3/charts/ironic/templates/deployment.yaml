@@ -39,10 +39,10 @@ spec:
         - /bin/runhttpd
         envFrom:
         - configMapRef:
-            name: ironic-bmo
+            name: ironic
         livenessProbe:
           exec:
-            command: ["sh", "-c", "curl -sSfk https://127.0.0.1:6385"]
+            command: ["sh", "-c", "{{ include "ironic.probeCommand" . }}"]
           failureThreshold: 10
           initialDelaySeconds: 30
           periodSeconds: 30
@@ -60,7 +60,7 @@ spec:
         {{- end }}
         readinessProbe:
           exec:
-            command: ["sh", "-c", "curl -sSfk https://127.0.0.1:6385"]
+            command: ["sh", "-c", "{{ include "ironic.probeCommand" . }}"]
           failureThreshold: 10
           initialDelaySeconds: 30
           periodSeconds: 30
@@ -97,7 +97,7 @@ spec:
         - /bin/runironic
         envFrom:
         - configMapRef:
-            name: ironic-bmo
+            name: ironic
         env:
         {{- if .Values.global.enable_basicAuth }}
         - name: IRONIC_HTPASSWD
@@ -170,7 +170,7 @@ spec:
         - /bin/rundnsmasq
         envFrom:
         - configMapRef:
-            name: ironic-bmo
+            name: ironic
         livenessProbe:
           exec:
             command:

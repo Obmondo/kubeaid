@@ -83,3 +83,50 @@ Get ironic CA volumeMounts
   readOnly: true
 {{- end }}
 {{- end }}
+
+{{/*
+Get the formatted "External" hostname or IP based URL
+*/}}
+{{- define "ironic.externalHttpUrl" }}
+{{- $host := ternary (include "metal3.hostIP" .) .Values.global.externalHttpHost (empty .Values.global.externalHttpHost) }}
+{{- if regexMatch ".*:.*" $host }}
+{{- $host = print "[" $host "]" }}
+{{- end }}
+{{- $protocol := "http" }}
+{{- $port := "6180" }}
+{{- if .Values.global.enable_vmedia_tls }}
+{{- $protocol = "https" }}
+{{- $port = .Values.global.vmediaTLSPort | default "6185" }}
+{{- end }}
+{{- print $protocol "://" $host ":" $port }}
+{{- end }}
+
+{{/*
+Get the command to use for Liveness and Readiness probes
+*/}}
+{{- define "ironic.probeCommand" }}
+{{- $host := "127.0.0.1" }}
+{{- if eq .Values.listenOnAll false }}
+{{- $host = coalesce .Values.global.provisioningIP .Values.global.ironicIP .Values.global.provisioningHostname }}
+{{- if regexMatch ".*:.*" $host }}
+{{- $host = print "[" $host "]" }}
+{{- end }}
+{{- end }}
+{{- print "curl -sSfk https://" $host ":6385" }}
+{{- end }}
+
+{{/*
+Create the subjectAltNames section to be set on the Certificate
+*/}}
+{{- define "ironic.subjectAltNames" -}}
+{{- with .Values.global }}
+{{- if .provisioningHostname }}
+dnsNames:
+- {{ .provisioningHostname }}
+{{- end -}}
+{{- if or .ironicIP .provisioningIP }}
+ipAddresses:
+  - {{ coalesce .provisioningIP .ironicIP }}
+{{- end }}
+{{- end }}
+{{- end }}

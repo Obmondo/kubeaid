@@ -2,6 +2,32 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 18.0.0
+### Major Version Upgrades
+- Updated graylog from version 2.4.1 to 3.0.0
+
+### Minor Version Upgrades
+- Updated opentelemetry-collector from version 0.133.0 to 0.134.0
+- Updated metal3 from version 0.11.6 to 0.12.7
+- Updated harbor from version 1.17.2 to 1.18.0
+- Updated gitlab-runner from version 0.80.1 to 0.81.0
+- Updated gitea from version 12.2.0 to 12.3.0
+- Updated cloud-provider-azure from version 1.33.3 to 1.34.1
+- Updated argo-cd from version 8.3.7 to 8.5.3
+
+### Patch Version Upgrades
+- Updated velero from version 10.1.2 to 10.1.3
+- Updated teleport-kube-agent from version 18.2.1 to 18.2.2
+- Updated teleport-cluster from version 18.2.1 to 18.2.2
+- Added rook-ceph from version v1.17.2 to v1.17.2
+- Updated opentelemetry-operator from version 0.95.0 to 0.95.1
+- Updated mattermost-team-edition from version 6.6.83 to 6.6.84
+- Updated mariadb-operator from version 25.8.3 to 25.8.4
+- Updated kyverno from version 3.5.1 to 3.5.2
+- Updated erpnext from version 7.0.232 to 7.0.234
+- Updated cilium from version 1.18.1 to 1.18.2
+- Updated aws-efs-csi-driver from version 3.2.2 to 3.2.3
+
 ### Improvements
 - [`b613073a`](../../commit/b613073a) update readme
 - [`bc4dcbaf`](../../commit/bc4dcbaf) feat: added kube-prom v0.16.0 with a release fix

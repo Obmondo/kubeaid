@@ -6,6 +6,7 @@ metadata:
     control-plane: controller-manager
   name: {{ include "baremetal-operator.fullname" . }}-controller-manager-metrics-service
 spec:
+  ipFamilyPolicy: PreferDualStack
   ports:
   - name: https
     port: 8443

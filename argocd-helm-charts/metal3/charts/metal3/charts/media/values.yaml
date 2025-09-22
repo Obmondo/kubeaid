@@ -22,9 +22,9 @@ global:
 replicaCount: 1
 
 image:
-  repository: registry.opensuse.org/isv/suse/edge/metal3/containers/images/ironic
+  repository: registry.suse.com/suse/nginx
   pullPolicy: IfNotPresent
-  tag: 26.1.2.4
+  tag: 1.21
 
 imagePullSecrets: []
 nameOverride: ""

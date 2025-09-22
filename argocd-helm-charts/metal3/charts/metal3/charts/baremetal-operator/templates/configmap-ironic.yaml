@@ -1,19 +1,18 @@
   {{- $enableTLS := .Values.global.enable_tls }}
   {{- $enableVMediaTLS := .Values.global.enable_vmedia_tls }}
   {{- $protocol := ternary "https" "http" $enableTLS }}
-  {{- $ironicIP := .Values.global.ironicIP | default "" }}
-  {{- $ironicApiHost := print $ironicIP ":6385" }}
-  {{- $ironicBootHost := print $ironicIP ":6180" }}
-  {{- $ironicCacheHost := print $ironicIP ":6180" }}
-  {{- $deployArch := .Values.global.deployArchitecture }}
+  {{- $ironicHost := include "baremetal-operator.ironicHttpHost" . | required "Missing host information for BMO to connect to Ironic" }}
+  {{- $ironicApiHost := print $ironicHost ":6385" }}
+  {{- $ironicBootHost := print $ironicHost ":6180" }}
+  {{- $ironicCacheHost := print $ironicHost ":6180" }}
 
 apiVersion: v1
 data:
   IRONIC_ENDPOINT: "{{ $protocol }}://{{ $ironicApiHost }}/v1/"
   # Switch VMedia to HTTP if enable_vmedia_tls is false
   {{- if and $enableTLS $enableVMediaTLS }}
-    {{- $ironicBootHost = print $ironicIP ":" .Values.global.vmediaTLSPort }}
-    {{- $ironicCacheHost = print $ironicIP ":" .Values.global.vmediaTLSPort }}
+    {{- $ironicBootHost = print $ironicHost ":" .Values.global.vmediaTLSPort }}
+    {{- $ironicCacheHost = print $ironicHost ":" .Values.global.vmediaTLSPort }}
     {{- $protocol = "https" }}
   RESTART_CONTAINER_CERTIFICATE_UPDATED: "true"
   {{- else }}
@@ -21,9 +20,10 @@ data:
   RESTART_CONTAINER_CERTIFICATE_UPDATED: "false"
   {{- end }}
   CACHEURL: "{{ $protocol }}://{{ $ironicCacheHost }}/images"
-  DEPLOY_KERNEL_URL: "{{ $protocol }}://{{ $ironicBootHost }}/images/ironic-python-agent-{{ $deployArch }}.kernel"
-  DEPLOY_RAMDISK_URL: "{{ $protocol }}://{{ $ironicBootHost }}/images/ironic-python-agent-{{ $deployArch }}.initramfs"
-  DEPLOY_ARCHITECTURE: "{{ $deployArch }}"
+  {{- if .Values.baremetaloperator.externalHttpIPv6 }}
+  {{- $port := ternary .Values.global.vmediaTLSPort .Values.baremetaloperator.httpPort $enableVMediaTLS }}
+  IRONIC_EXTERNAL_URL_V6: "{{ $protocol }}://[{{ .Values.baremetaloperator.externalHttpIPv6 }}]:{{ $port }}"
+  {{- end }}
 kind: ConfigMap
 metadata:
   name: baremetal-operator-ironic

@@ -34,13 +34,9 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          command:
-          - /usr/sbin/httpd
-          args:
-          - -DFOREGROUND
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http

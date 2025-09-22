@@ -3,5 +3,5 @@ name: harbor
 version: 0.1.0
 dependencies:
   - name: harbor
-    version: "1.17.2"
+    version: "1.18.0"
     repository: https://helm.goharbor.io

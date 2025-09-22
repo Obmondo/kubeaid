@@ -1,9 +1,9 @@
 dependencies:
-- name: mongodb
-  repository: https://charts.bitnami.com/bitnami
-  version: 16.5.21
+- name: community-operator
+  repository: https://mongodb.github.io/helm-charts
+  version: 0.13.0
 - name: opensearch
   repository: https://opensearch-project.github.io/helm-charts
-  version: 2.34.0
-digest: sha256:c27cfb9b2a5643b4514d377eeb894854652bd296a4a3b17bbea82154187f9fea
-generated: "2025-09-12T03:55:39.192191089Z"
+  version: 2.35.1
+digest: sha256:fdd6c7a691692371ecc358c0cceaefb319c8c6730a71164ab7f8b2c02088df8b
+generated: "2025-09-21T02:37:48.288741492Z"

@@ -109,7 +109,7 @@ spec:
             - name: GRAYLOG_SERVER_JAVA_OPTS
               {{- $javaOpts := .Values.graylog.javaOpts }}
               {{- if .Values.graylog.heapSize }}
-              value: "{{ $javaOpts }} {{ printf "-Xms%s -Xmx%s" .Values.graylog.heapSize .Values.graylog.heapSize}}"
+              value: "{{ $javaOpts }} {{ printf "-Xms%s -Xmx%s" .Values.graylog.heapSize .Values.graylog.heapSize }}"
               {{- else }}
               value: "{{ $javaOpts }} -XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport"
               {{- end }}
@@ -130,12 +130,23 @@ spec:
                   name: {{ .Values.graylog.opensearch.uriSecretName | default (printf "%s-es" (include "graylog.fullname" .)) }}
                   key: {{ .Values.graylog.opensearch.uriSecretKey }}
             {{- end }}
-            {{- if .Values.graylog.mongodb.uriSecretKey }}
+            {{- if .Values.graylog.mongodb.uri }}
+            - name: GRAYLOG_MONGODB_URI
+              value: {{ .Values.graylog.mongodb.uri | quote }}
+            {{- else if .Values.graylog.mongodb.uriSecretKey }}
             - name: GRAYLOG_MONGODB_URI
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.graylog.mongodb.uriSecretName | default (printf "%s-mongodb" (include "graylog.fullname" .)) }}
-                  key: {{ .Values.graylog.mongodb.uriSecretKey }}
+                  key: {{ .Values.graylog.mongodb.uriSecretKey | default "connectionString" }}
+            {{- else if .Values.mongodb.community.install }}
+            - name: GRAYLOG_MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "graylog.mongodb.name" . }}-graylog-graylog # format: <metadata.name>-<auth-db>-<username>
+                  key: connectionString.standard
+            {{- end }}
+            {{- if .Values.graylog.trustedProxies }}
             {{- end }}
             {{- range $key, $value := .Values.graylog.env }}
             - name: {{ $key }}

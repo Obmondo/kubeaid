@@ -5,6 +5,7 @@ metadata:
     {{- include "baremetal-operator.labels" . | nindent 4 }}
   name: {{ include "baremetal-operator.fullname" . }}-webhook-service
 spec:
+  ipFamilyPolicy: PreferDualStack
   ports:
   - port: 443
     targetPort: 9443

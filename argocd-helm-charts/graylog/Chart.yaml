@@ -3,5 +3,5 @@ name: graylog
 version: 4.3.9
 dependencies:
   - name: graylog
-    version: 2.4.1
+    version: 3.0.0
     repository: https://charts.kong-z.com

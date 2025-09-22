@@ -3,4 +3,4 @@ dependencies:
   repository: https://charts.helm.sh/stable
   version: 1.6.4
 digest: sha256:01345d74dd8069b6c142c7c52e67ea41ede74613386426f7217e14efcc65a1b3
-generated: "2025-08-22T06:55:06.48772576Z"
+generated: "2025-09-16T05:46:47.209027705Z"

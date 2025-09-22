@@ -28,7 +28,7 @@ images:
   baremetalOperator:
     repository: registry.opensuse.org/isv/suse/edge/containers/images/baremetal-operator
     pullPolicy: IfNotPresent
-    tag: "0.9.1.1"
+    tag: "0.10.2.1"
 
 imagePullSecrets: []
 nameOverride: "manger"
@@ -84,3 +84,8 @@ affinity: {}
 
 baremetaloperator:
   httpPort: "6180"
+
+  # IPv6 used for accessing the Ironic HTTP server for BMCs with an IPv6 only address.
+  # It should not be used in conjunction with 'provisioningHostname' unless BMCs do not
+  # support hostnames.
+  externalHttpIPv6: ""

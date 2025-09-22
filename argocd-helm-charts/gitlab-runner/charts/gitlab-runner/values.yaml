@@ -761,7 +761,7 @@ volumes: []
 ## Array of extra K8s manifests to deploy
 ##
 extraObjects: []
-# - apiVersion: external-secrets.io/v1beta1
+# - apiVersion: external-secrets.io/v1
 #   kind: ExternalSecret
 #   metadata:
 #     name: '{{ include "gitlab-runner.secret" . }}'

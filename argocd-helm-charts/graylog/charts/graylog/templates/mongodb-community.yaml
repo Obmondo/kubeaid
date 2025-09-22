@@ -1,0 +1,46 @@
+{{- if .Values.mongodb.community.install }}
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: {{ include "graylog.mongodb.name" . }}
+spec:
+  members: {{ .Values.mongodb.community.replicas }}
+  type: ReplicaSet
+  version: {{ .Values.mongodb.community.version | quote}}
+  security:
+    authentication:
+      modes: ["SCRAM"] # Standard password authentication
+  users:
+    - name: {{ .Values.mongodb.community.auth.user }}
+      db: graylog
+      passwordSecretRef:
+        # This secret will be created by the operator
+        name: {{ include "graylog.mongodb.name" . }}
+      roles:
+        - name: readWrite
+          db: graylog
+        - name: clusterMonitor
+          db: admin
+      scramCredentialsSecretName: graylog
+  additionalConnectionStringConfig:
+    authSource: "graylog"
+    connectTimeoutMS: "300000"
+  statefulSet:
+    spec:
+      volumeClaimTemplates:
+        - metadata:
+            name: data-volume
+          spec:
+            resources:
+              requests:
+                storage: {{ .Values.mongodb.persistence.size }}
+---
+{{- $password := include "graylog.mongodb.auth.password" . }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "graylog.mongodb.name" . }}
+type: Opaque
+stringData:
+  password: {{ $password | quote }}
+{{- end }}

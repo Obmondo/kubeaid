@@ -32,6 +32,12 @@ global:
   # IP Address assigned to network interface on provisioning network
   provisioningIP: ""
 
+  # Fully Qualified Domain Name used by Ironic for both binding (to the
+  # associated IPv4 and/or IPv6 addresses) and exposing the API, dnsmask and
+  # media, also used by BMO. Note, this is the only way to enable a fully
+  # working dual-stack configuration.
+  provisioningHostname: ""
+
   # Whether the NIC names should be predictable or not
   predictableNicNames: "true"
 
@@ -52,15 +58,17 @@ global:
 
 replicaCount: 1
 
+listenOnAll: true
+
 images:
   ironic:
-    repository: registry.opensuse.org/isv/suse/edge/metal3/containers/images/ironic
+    repository: registry.opensuse.org/isv/suse/edge/containers/images/ironic
     pullPolicy: IfNotPresent
-    tag: 26.1.2.4
+    tag: 29.0.4.3
   ironicIPADownloader:
     repository: registry.opensuse.org/isv/suse/edge/containers/images/ironic-ipa-downloader
     pullPolicy: IfNotPresent
-    tag: 3.0.7
+    tag: 3.0.9
 
 nameOverride: ""
 fullnameOverride: ""

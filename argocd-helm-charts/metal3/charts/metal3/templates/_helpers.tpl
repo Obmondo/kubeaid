@@ -60,3 +60,18 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Produce the correct IP or hostname for Ironic provisioning
+*/}}
+{{- define "metal3.hostIP" -}}
+{{- with .Values.global }}
+{{- if and .provisioningHostname (or .provisioningIP .ironicIP) }}
+{{  fail "Please provide either provisioningHostname or provisioningIP or ironicIP" }}
+{{- end }}
+{{- if and .provisioningIP .ironicIP }}
+{{  fail "Please provide either ironicIP or provisioningIP" }}
+{{- end }}
+{{- coalesce .provisioningIP .ironicIP }}
+{{- end }}
+{{- end }}

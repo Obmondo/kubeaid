@@ -3,4 +3,4 @@ appVersion: "10.11"
 description: A Helm chart for MariaDB, used by Metal3
 name: mariadb
 type: application
-version: 0.6.0
+version: 0.6.1

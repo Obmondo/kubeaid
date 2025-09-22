@@ -60,11 +60,17 @@ global:
   # IP Address assigned to network interface on provisioning network
   provisioningIP: ""
 
+  # Fully Qualified Domain Name used by Ironic for both binding (to the 
+  # associated IPv4 and/or IPv6 addresses) and exposing the API, dnsmask and
+  # media, also used by BMO. Note, this is the only way to enable a fully
+  # working dual-stack configuration.
+  provisioningHostname: ""
+
+  # Hostname or IP for accessing the Ironic API server from a non-provisioning network
+  externalHttpHost: ""
+
   # Name for the MariaDB service
   databaseServiceName: metal3-mariadb
-
-  # Architecture for deployed nodes (either x86_64 or arm64)
-  deployArchitecture: x86_64
 
   # In a multi-node cluster use the node selector to ensure the pods
   # all run on the same host where the dnsmasqDNSServer and provisioningIP

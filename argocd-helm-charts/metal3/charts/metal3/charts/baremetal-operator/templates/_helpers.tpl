@@ -61,3 +61,19 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create the URL to use for connecting to the Ironic servers (e.g. API, cache)
+*/}}
+{{- define "baremetal-operator.ironicHttpHost" -}}
+{{- $hostIP := include "metal3.hostIP" . -}}
+{{- with .Values.global }}
+{{- if .provisioningHostname }}
+{{- .provisioningHostname }}
+{{- else if regexMatch ".*:.*" $hostIP}}
+{{- print "[" $hostIP "]" }}
+{{- else }}
+{{- $hostIP }}
+{{- end }}
+{{- end }}
+{{- end }}

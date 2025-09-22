@@ -1,6 +1,6 @@
 dependencies:
 - name: mariadb-operator
   repository: https://mariadb-operator.github.io/mariadb-operator
-  version: 25.8.3
-digest: sha256:c5a6d142c66c2ae5cab600485550222d2b0344f9d7cb02b58ec87fc4f8f5e788
-generated: "2025-08-13T12:48:22.233400784+05:30"
+  version: 25.8.4
+digest: sha256:4bf10b11c5ec9fa5357e4db4602541340e6728741b7b0f96098ea12efb457d41
+generated: "2025-09-22T12:17:55.482686889+05:30"
