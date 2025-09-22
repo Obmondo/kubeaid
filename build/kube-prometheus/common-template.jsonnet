@@ -15,6 +15,7 @@ local default_vars = {
     'system',
     'cert-manager',
     'traefik',
+    'monitoring',
   ],
   // Custom kubeaid or non kubeaid apps that need AutoSync
   kubeaid_users_apps+: [],
