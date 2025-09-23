@@ -4,6 +4,7 @@ puppetserver:
       PUPPET_REPORTS: puppetdb,prometheus
       PUPPETSERVER_ENVIRONMENT_TIMEOUT: 0
       AUTOSIGN: /etc/puppetlabs/puppet/autosign.conf
+      PUPPETSERVER_ENC_PATH: /etc/puppetlabs/code/environments/master/linuxaid_enc.rb
     postgresql:
       auth:
         existingSecret: puppetserver-pgsql-app
@@ -68,6 +69,14 @@ puppetserver:
 
           mkdir -p /etc/puppetlabs/code/prometheus-dropzone
           chown puppet:puppet /etc/puppetlabs/code/prometheus-dropzone
+        configure_external_nodes.sh: |-
+          #!/bin/bash
+          set -e
+
+          if test -n "${PUPPETSERVER_ENC_PATH}" ; then
+            puppet config set external_nodes "$PUPPETSERVER_ENC_PATH" --section server
+            puppet config set node_terminus "exec" --section server
+          fi
     persistence:
       code:
         size: 8Gi
