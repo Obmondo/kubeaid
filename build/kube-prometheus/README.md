@@ -8,7 +8,7 @@ For the Makefile, run `make setup` to install `jb`, initialize it and fetch the
 `kube-prometheus` folder. `make build` compiles the manifests
 
 Any ideas/suggestions are welcomed...
-
+> **NOTE:** v0.16.0 is a special release. The upstream kube-prometheus v0.16.0 release had an issue, which we resolved by pointing the release to this Patch commit: [prometheus-operator/kube-prometheus#2733](https://github.com/prometheus-operator/kube-prometheus/pull/2733)
 ## Running
 
 ### Mac OS
