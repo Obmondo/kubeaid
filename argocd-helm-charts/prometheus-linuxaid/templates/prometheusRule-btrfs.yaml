@@ -5,7 +5,7 @@ metadata:
   labels:
     prometheus: {{ .Values.customerid }}
   name: btrfs-rules
-  namespace: monitoring-{{ .Values.customerid }}
+  namespace: {{ template "prometheus-linuxaid.namespace" . }}
 spec:
   {{- $.Files.Get "rules/btrfs.yaml" | nindent 4 }}
 {{- end }}

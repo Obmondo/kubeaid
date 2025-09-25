@@ -2,7 +2,7 @@ apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
 metadata:
   name: grafana-prometheus-{{ .Values.customerid }}
-  namespace: monitoring-{{ .Values.customerid }}
+  namespace: {{ template "prometheus-linuxaid.namespace" . }}
 spec:
   instanceSelector:
     matchLabels:

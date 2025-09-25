@@ -3,7 +3,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: psi-record-rules
-  namespace: monitoring-{{ .Values.customerid }}
+  namespace: {{ template "prometheus-linuxaid.namespace" . }}
 spec:
   {{- $.Files.Get "records/psi.yaml" | nindent 4 }}
 {{- end }}

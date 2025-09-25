@@ -3,7 +3,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: backup-rules
-  namespace: monitoring-{{ .Values.customerid }}
+  namespace: {{ template "prometheus-linuxaid.namespace" . }}
 spec:
   {{- $.Files.Get "rules/backup.yaml" | nindent 4 }}
 {{- end }}

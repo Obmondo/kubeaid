@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: Alertmanager
 metadata:
   name: {{ .Values.customerid }}
-  namespace: monitoring-{{ .Values.customerid }}
+  namespace: {{ template "prometheus-linuxaid.namespace" . }}
 spec:
   replicas: 1
   resources:

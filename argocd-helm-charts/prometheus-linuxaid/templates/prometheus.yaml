@@ -2,11 +2,11 @@ apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
 metadata:
   name: {{ .Values.customerid }}
-  namespace: monitoring-{{ .Values.customerid }}
+  namespace: {{ template "prometheus-linuxaid.namespace" . }}
 spec:
   alerting:
     alertmanagers:
-    - namespace: monitoring-{{ .Values.customerid }}
+    - namespace: {{ template "prometheus-linuxaid.namespace" . }}
       name: alertmanager-main
       port: web
   podMetadata:

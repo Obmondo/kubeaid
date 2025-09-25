@@ -2,7 +2,7 @@ apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
   name: haproxy
-  namespace: monitoring-{{ .Values.customerid }}
+  namespace: {{ template "prometheus-linuxaid.namespace" . }}
 spec:
   resyncPeriod: 30s
   instanceSelector:
