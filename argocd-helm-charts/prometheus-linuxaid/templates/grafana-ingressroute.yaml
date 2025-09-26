@@ -8,7 +8,7 @@ spec:
     - websecure
   routes:
   - kind: Rule
-    match: Host(`{{ .Values.grafana.server }}`) && PathPrefix(`/{{ .Values.prometheus.routePrefix }}`)
+    match: Host(`{{ .Values.grafana.server }}`) && PathPrefix(`{{ .Values.prometheus.routePrefix }}`)
     priority: 10
     services:
     - kind: Service
