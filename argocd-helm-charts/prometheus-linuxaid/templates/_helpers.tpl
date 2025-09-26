@@ -10,3 +10,19 @@ Preserve the default behavior of the Release namespace if no override is provide
 {{- .Release.Namespace -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Create a default fully qualified app name.
+*/}}
+{{- define "prometheus-linuxaid.fullname" -}}
+{{- if .Values.fullnameOverride }}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- $name := default .Chart.Name .Values.namespaceOverride }}
+{{- if contains $name .Release.Name }}
+{{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
+{{- end }}

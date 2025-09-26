@@ -1,3 +1,6 @@
+fullnameOverride: ""
+namespaceOverride: ""
+
 prometheus:
   namespaceOverride: ""
   version: v2.54.1
