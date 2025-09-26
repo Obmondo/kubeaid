@@ -1,5 +1,5 @@
 apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
+kind: IngressRouteTCP
 metadata:
   name: {{ include "puppetdb.name" . }}
 spec:
@@ -7,13 +7,12 @@ spec:
     - websecure
   routes:
   - kind: Rule
-    match: HostSNI(`{{ .Values.puppetserver.puppetserver.masters.fqdns.alternateServerNames }}`)
+    match: HostSNI(`{{ .Values.puppetserver.puppetdb.fqdns.alternateServerNames }}`)
     priority: 10
     services:
     - kind: Service
       name: {{ include "puppetserver.serviceName" (dict "root" . "service" "puppetdb") }}
-      port: pdb-http
+      port: pdb-https
+
   tls:
-    options:
-      name: prometheus-puppet-agent-tls-auth
-      namespace: traefik
+    passthrough: true
