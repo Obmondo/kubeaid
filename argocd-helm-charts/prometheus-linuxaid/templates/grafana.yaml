@@ -1,7 +1,7 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: Grafana
 metadata:
-  name: grafana-{{ .Values.customerid }}
+  name: grafana
   namespace: {{ template "prometheus-linuxaid.namespace" . }}
   labels:
     dashboards: "grafana"
@@ -20,7 +20,7 @@ spec:
       header_property: "username"
       auto_sign_up: "true"
     server:
-      root_url: "https://{{ .Values.grafana.server }}/{{ .Values.customerid }}"
+      root_url: "https://{{ .Values.grafana.server }}/{{ .Values.prometheus.routePrefix }}"
       serve_from_sub_path: "true"
     users:
       allow_sign_up: "false"

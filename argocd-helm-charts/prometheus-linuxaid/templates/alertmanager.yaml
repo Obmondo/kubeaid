@@ -1,7 +1,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: Alertmanager
 metadata:
-  name: {{ .Values.customerid }}
+  name: alertmanager
   namespace: {{ template "prometheus-linuxaid.namespace" . }}
 spec:
   replicas: 1
@@ -18,6 +18,6 @@ spec:
   serviceAccountName: alertmanager-main
   portName: web
   version: {{ .Values.alertmanager.version }}
-  configSecret: alertmanager-config-{{ .Values.customerid }}
+  configSecret: alertmanager-config
   secrets:
   - puppet-agent-tls-auth

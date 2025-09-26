@@ -1,9 +1,11 @@
 prometheus:
   namespaceOverride: ""
   version: v2.54.1
-  server: prometheus.obmondo.com
   ingress:
     enable: false
+    annotations:
+      kubernetes.io/ingress.class: traefik
+      cert-manager.io/cluster-issuer: letsencrypt
   storage:
     size: 30Gi
     className: rook-ceph-block
@@ -21,8 +23,9 @@ prometheus:
     failureThreshold: 240
   readinessProbe:
     failureThreshold: 240
+  externalUrl: /
+  routePrefix: /
 grafana:
-  server: graphs.obmondo.com
   version: 11.1.4
 prometheusRule:
   domain: true

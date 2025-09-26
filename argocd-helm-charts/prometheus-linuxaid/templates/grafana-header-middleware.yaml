@@ -1,11 +1,13 @@
+{{- if and .Values.middleware.jwt.enabled .Values.middleware.jwt.public_key }}
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: grafana-header-{{ .Values.customerid }}
+  name: grafana-header
   namespace: {{ template "prometheus-linuxaid.namespace" . }}
 spec:
   plugin:
     headerauthentication:
       header:
-        key: {{ .Values.customerid }}
+        key: {{ .Values.middleware.jwt.headers.authentication }}
         name: X-Obmondo-Customerid
+{{- end }}

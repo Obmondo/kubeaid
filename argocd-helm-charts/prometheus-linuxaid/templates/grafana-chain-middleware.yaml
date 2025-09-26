@@ -1,10 +1,12 @@
+{{- if and .Values.middleware.jwt.enabled .Values.middleware.jwt.public_key }}
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: grafana-chain-{{ .Values.customerid }}
+  name: grafana-chain
   namespace: {{ template "prometheus-linuxaid.namespace" . }}
 spec:
   chain:
     middlewares:
-    - name: grafana-jwt-{{ .Values.customerid }}
-    - name: grafana-header-{{ .Values.customerid }}
+    - name: grafana-jwt
+    - name: grafana-header
+{{- end }}

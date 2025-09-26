@@ -1,7 +1,7 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
 metadata:
-  name: grafana-prometheus-{{ .Values.customerid }}
+  name: grafana-prometheus
   namespace: {{ template "prometheus-linuxaid.namespace" . }}
 spec:
   instanceSelector:
@@ -11,7 +11,7 @@ spec:
     name: prometheus
     type: prometheus
     access: proxy
-    url: http://prometheus-main:9090/{{ .Values.customerid }}
+    url: http://prometheus-main:9090/{{ .Values.prometheus.routePrefix }}
     isDefault: true
     jsonData:
       'timeInterval': "1m"

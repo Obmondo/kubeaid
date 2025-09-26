@@ -2,28 +2,15 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.customerid }}
+  name: {{ .Values.prometheus.server }}
   namespace: {{ template "prometheus-linuxaid.namespace" . }}
   annotations:
-    kubernetes.io/ingress.class: traefik-cert-manager
-    cert-manager.io/cluster-issuer: letsencrypt
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/router.tls.domains.0.main: {{ .Values.prometheus.server }}
-    traefik.ingress.kubernetes.io/router.tls.options: traefik-prometheus-puppet-agent-tls-auth@kubernetescrd
-    traefik.ingress.kubernetes.io/router.middlewares: monitoring-{{ .Values.customerid }}-ipwhitelist-{{ .Values.customerid }}@kubernetescrd
+    {{- with .Values.deployment.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   rules:
     - host: {{ .Values.prometheus.server }}
-      http:
-        paths:
-          - pathType: Prefix
-            path: /{{ .Values.customerid }}/api/v1/write
-            backend:
-              service:
-                name: prometheus-main
-                port:
-                  name: web
-    - host: prometheus.{{ .Values.customerid }}.kbm.obmondo.com
       http:
         paths:
           - pathType: Prefix
@@ -36,6 +23,5 @@ spec:
   tls:
     - hosts:
         - {{ .Values.prometheus.server }}
-        - prometheus.{{ .Values.customerid }}.kbm.obmondo.com
-      secretName: prometheus-{{ .Values.customerid }}-tls
+      secretName: prometheus-tls
   {{- end -}}

@@ -1,7 +1,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
 metadata:
-  name: {{ .Values.customerid }}
+  name: prometheus
   namespace: {{ template "prometheus-linuxaid.namespace" . }}
 spec:
   alerting:
@@ -11,7 +11,7 @@ spec:
       port: web
   podMetadata:
     labels:
-      app.kubernetes.io/instance: {{ .Values.customerid }}
+      app.kubernetes.io/instance: k8s
       app.kubernetes.io/name: prometheus
   podMonitorNamespaceSelector: null
   podMonitorSelector: {}
@@ -26,13 +26,16 @@ spec:
       - key: kubernetes.io/metadata.name
         operator: In
         values:
-          - monitoring-{{ .Values.customerid }}
-          - puppetserver-{{ .Values.customerid }}
+          - {{ template "prometheus-linuxaid.namespace" . }}
+          - puppetserver
+          {{- range .Values.prometheus.serviceMonitorNamespaces }}
+          - {{ . }}
+          {{- end }}
   serviceMonitorSelector: {}
   replicas: 1
   retention: {{ .Values.prometheus.retention | default "15d" | }}
-  externalUrl: /{{ .Values.customerid }}
-  routePrefix: /{{ .Values.customerid }}
+  externalUrl: {{ .Values.externalUrl }}
+  routePrefix: {{ .Values.routePrefix }}
   evaluationInterval: 30s
   portName: web
   resources: {{ toYaml .Values.prometheus.resources | nindent 4 }}
