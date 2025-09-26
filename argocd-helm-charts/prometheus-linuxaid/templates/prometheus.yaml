@@ -34,8 +34,8 @@ spec:
   serviceMonitorSelector: {}
   replicas: 1
   retention: {{ .Values.prometheus.retention | default "15d" | }}
-  externalUrl: {{ .Values.externalUrl }}
-  routePrefix: {{ .Values.routePrefix }}
+  externalUrl: {{ .Values.prometheus.externalUrl }}
+  routePrefix: {{ .Values.prometheus.routePrefix }}
   evaluationInterval: 30s
   portName: web
   resources: {{ toYaml .Values.prometheus.resources | nindent 4 }}
