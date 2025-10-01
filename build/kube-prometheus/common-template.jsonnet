@@ -155,6 +155,9 @@ local default_vars = {
   prometheus_ingress_annotations: {
     'cert-manager.io/cluster-issuer': 'letsencrypt',
   },
+  alertmanager_ingress_annotations: {
+    'cert-manager.io/cluster-issuer': 'letsencrypt',
+  },
   addMixins: {
     ceph: false,
     'argo-cd': true,
@@ -743,6 +746,40 @@ local kp =
               ],
             }],
             vars.grafana_ingress_annotations,
+          ),
+        },
+      } else {}
+  ) + (
+    if std.objectHas(vars, 'alertmanager_ingress_host') then
+      {
+        ingress+:: {
+          alertmanager: utils.ingress(
+            'alertmanager',
+            $.values.common.namespace,
+            [{
+              host: vars.alertmanager_ingress_host,
+              http: {
+                paths: [{
+                  path: '/',
+                  pathType: 'Prefix',
+                  backend: {
+                    service: {
+                      name: 'alertmanager',
+                      port: {
+                        name: 'http',
+                      },
+                    },
+                  },
+                }],
+              },
+            }],
+            [{
+              secretName: 'kube-prometheus-alertmanager-tls',
+              hosts: [
+                vars.alertmanager_ingress_host,
+              ],
+            }],
+            vars.alertmanager_ingress_annotations,
           ),
         },
       } else {}
