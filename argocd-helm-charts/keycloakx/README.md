@@ -1,13 +1,12 @@
 # Keycloak Server Setup
 
+Step 1) Generate keycloak admin password (fallback user).
+
 NOTE: Do not give admin password from the webUI, add the password via an ENV variable. 'KEYCLOAK_PASSWORD'
 
-* There are bunch of ways to do this, I have did it in this way.
 
 ```bash
-# Regular way
-kubectl create secret generic keycloak-admin --from-file=KEYCLOAK_PASSWORD=./keycloak_password -n keycloak
-
+openssl rand -base64 14 > ./keycloak_password
 # Sealed Secret way
 kubectl create secret generic keycloak-admin -n keycloak --dry-run=client --from-file=KEYCLOAK_PASSWORD=./keycloak_password -o json >mysecret.json
 kubeseal --controller-name sealed-secrets --controller-namespace system <mysecret.json >keycloak-admin.json
