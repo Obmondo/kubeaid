@@ -30,7 +30,7 @@ global:
 ##
 image:
   registry: docker.io
-  repository: bitnami/rabbitmq
+  repository: bitnamilegacy/rabbitmq
   tag: 3.12.0-debian-11-r0
   digest: ""
   ## set to true if you would like to see extra information on logs
