@@ -185,7 +185,7 @@ local default_vars = {
   grafana_dashboards+: {},
 };
 
-local vars = std.mergePatch(default_vars, ext_vars);
+local vars = default_vars + ext_vars;
 
 local mixins = remove_nulls([
   addMixin(
@@ -284,6 +284,7 @@ local scrape_namespaces = std.uniq(std.sort(std.flattenArrays(
   ] + [
     ['argocd'],
     ['system'],
+    ['sealed-secrets'],
     ['cert-manager'],
     ['traefik'],
     ['monitoring'],
