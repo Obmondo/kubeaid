@@ -10,13 +10,7 @@ local ext_vars = std.extVar('vars');
 
 local default_vars = {
   prometheus_scrape_namespaces+: [],
-  prometheus_scrape_default_namespaces+: [
-    'argocd',
-    'system',
-    'cert-manager',
-    'traefik',
-    'monitoring',
-  ],
+
   // Custom kubeaid or non kubeaid apps that need AutoSync
   kubeaid_users_apps+: [],
   kubeaid_apps+: [
@@ -287,7 +281,12 @@ local mixins = remove_nulls([
 local scrape_namespaces = std.uniq(std.sort(std.flattenArrays(
   [
     vars.prometheus_scrape_namespaces,
-    vars.prometheus_scrape_default_namespaces,
+  ] + [
+    ['argocd'],
+    ['system'],
+    ['cert-manager'],
+    ['traefik'],
+    ['monitoring'],
   ] + (
     if std.objectHas(vars, 'connect_obmondo') && vars.connect_obmondo then
       [
