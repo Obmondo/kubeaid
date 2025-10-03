@@ -764,9 +764,9 @@ local kp =
                   pathType: 'Prefix',
                   backend: {
                     service: {
-                      name: 'alertmanager',
+                      name: 'alertmanager-main',
                       port: {
-                        name: 'http',
+                        name: 'web',
                       },
                     },
                   },
