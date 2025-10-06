@@ -5,7 +5,7 @@ metadata:
   name: {{ include "prometheus-linuxaid.fullname" . }}
   namespace: {{ template "prometheus-linuxaid.namespace" . }}
   annotations:
-    {{- with .Values.deployment.annotations }}
+    {{- with .Values.grafana.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
