@@ -1,4 +1,4 @@
-{{- if .Values.prometheus.ingress.enable -}}
+{{- if .Values.alertmanager.ingress.enabled -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -9,19 +9,20 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
+  ingressClassName: {{ .Values.alertmanager.ingress.ingressClassName }}
   rules:
-    - host: {{ .Values.prometheus.server }}
+    - host: {{ .Values.alertmanager.ingress.domain }}
       http:
         paths:
           - pathType: Prefix
             path: /
             backend:
               service:
-                name: prometheus-main
+                name: alertmanager-main
                 port:
                   name: web
   tls:
     - hosts:
-        - {{ .Values.prometheus.server }}
-      secretName: prometheus-tls
-  {{- end -}}
+        - {{ .Values.alertmanager.ingress.domain }}
+      secretName: alertmanager-tls
+{{- end -}}

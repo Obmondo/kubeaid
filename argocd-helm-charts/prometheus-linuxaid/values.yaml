@@ -5,10 +5,12 @@ prometheus:
   namespaceOverride: ""
   version: v2.54.1
   ingress:
-    enable: false
+    enabled: false
     annotations:
       kubernetes.io/ingress.class: traefik
       cert-manager.io/cluster-issuer: letsencrypt
+    ingressClassName: ""
+    domain: ""
   storage:
     size: 30Gi
     className: rook-ceph-block
@@ -28,8 +30,17 @@ prometheus:
     failureThreshold: 240
   externalUrl: /
   routePrefix: /
+
 grafana:
   version: 11.1.4
+  ingress:
+    enabled: false
+    annotations:
+      kubernetes.io/ingress.class: traefik
+      cert-manager.io/cluster-issuer: letsencrypt
+    ingressClassName: ""
+    domain: ""
+
 prometheusRule:
   domain: true
   dns: true
@@ -65,8 +76,16 @@ prometheusRule:
   zfs: true
   smartmon: true
   gitlab_runner: true
+
 alertmanager:
   version: v0.27.0
+  ingress:
+    enabled: false
+    annotations:
+      kubernetes.io/ingress.class: traefik
+      cert-manager.io/cluster-issuer: letsencrypt
+    ingressClassName: ""
+    domain: ""
   config:
     global:
       resolve_timeout: 5m

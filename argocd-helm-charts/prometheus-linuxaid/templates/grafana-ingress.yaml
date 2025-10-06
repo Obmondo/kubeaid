@@ -1,0 +1,28 @@
+{{- if .Values.grafana.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "prometheus-linuxaid.fullname" . }}
+  namespace: {{ template "prometheus-linuxaid.namespace" . }}
+  annotations:
+    {{- with .Values.deployment.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.grafana.ingress.ingressClassName }}
+  rules:
+    - host: {{ .Values.grafana.ingress.domain }}
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: grafana-service
+                port:
+                  name: grafana
+  tls:
+    - hosts:
+        - {{ .Values.grafana.ingress.domain }}
+      secretName: grafana-tls
+{{- end -}}

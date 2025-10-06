@@ -1,3 +1,4 @@
+{{- if eq .Values.prometheus.routePrefix "/" }}
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -21,3 +22,4 @@ spec:
     options:
       name: prometheus-puppet-agent-tls-auth
       namespace: traefik
+{{- end }}
