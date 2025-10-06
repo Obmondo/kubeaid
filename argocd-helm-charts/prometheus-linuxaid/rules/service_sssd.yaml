@@ -17,7 +17,7 @@ groups:
       expr: |
         obmondo_sssd_status_check == 1
         and on(certname) obmondo_monitoring{alert_id="monitor::system::service::sssd::check"} > 0
-      for: 5m
+      for: 30m
       labels:
         severity: critical
         alert_id: monitor::system::service::sssd::check

@@ -34,7 +34,7 @@ tests:
 
     alert_rule_test:
       - alertname: 'monitor::system::service::sssd::check'
-        eval_time: 10m
+        eval_time: 30m
         exp_alerts:
           - exp_labels:
               severity: 'critical'
