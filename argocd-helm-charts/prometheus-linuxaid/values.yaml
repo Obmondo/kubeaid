@@ -118,34 +118,7 @@ alertmanager:
       group_wait: 10s
       group_interval: 10s
       repeat_interval: 1h
-      receiver: "obmondo"
-      routes:
-        - receiver: "obmondo"
-          matchers:
-            - "alertname = Watchdog"
-          repeat_interval: 5m
-        - receiver: "null"
-          matchers:
-            - "namespace =~ testing|obmondo-ci"
-        - receiver: "null"
-          matchers:
-            - "alertname = InfoInhibitor"
-        - receiver: obmondo
-          continue: true
 
-    receivers:
-      - name: "null"
-      - name: obmondo
-        webhook_configs:
-          - url: https://alerts.obmondo.com/hooks/alertmanager
-            send_resolved: true
-            max_alerts: 0
-            http_config:
-              tls_config:
-                server_name: alerts.obmondo.com
-                cert_file: /etc/alertmanager/secrets/puppet-agent-tls-auth/tls.crt
-                key_file: /etc/alertmanager/secrets/puppet-agent-tls-auth/tls.key
-                insecure_skip_verify: false
 middleware:
   jwt:
     enabled: false
