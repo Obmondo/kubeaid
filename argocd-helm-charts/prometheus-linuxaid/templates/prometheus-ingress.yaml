@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "prometheus-linuxaid.fullname" . }}
+  name: prometheus-{{ include "prometheus-linuxaid.fullname" . }}
   namespace: {{ template "prometheus-linuxaid.namespace" . }}
   annotations:
     {{- with .Values.prometheus.ingress.annotations }}
