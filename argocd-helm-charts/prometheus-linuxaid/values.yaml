@@ -6,9 +6,7 @@ prometheus:
   version: v2.54.1
   ingress:
     enabled: false
-    annotations:
-      kubernetes.io/ingress.class: traefik
-      cert-manager.io/cluster-issuer: letsencrypt
+    annotations: {}
     ingressClassName: ""
     domain: ""
   storage:
