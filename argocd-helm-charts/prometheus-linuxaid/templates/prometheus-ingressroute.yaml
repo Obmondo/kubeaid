@@ -1,4 +1,4 @@
-{{- if eq .Values.prometheus.routePrefix "/" }}
+{{- if ne .Values.prometheus.routePrefix "/" }}
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
