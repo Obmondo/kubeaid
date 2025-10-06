@@ -710,6 +710,30 @@ local kp =
           ),
         },
       },
+      networkPolicy+: {
+        spec+: {
+          ingress+: [
+            {
+              from: [{
+                namespaceSelector: {
+                  matchLabels: {
+                    'kubernetes.io/metadata.name': 'traefik',
+                  },
+                },
+                podSelector: {
+                  matchLabels: {
+                    'app.kubernetes.io/name': 'traefik',
+                  },
+                },
+              }],
+              ports: [{
+                port: 9093,
+                protocol: 'TCP',
+              }],
+            },
+          ]
+        },
+      },
     } + (
       if std.objectHas(vars, 'connect_obmondo') && vars.connect_obmondo then {
         secret:: {},
