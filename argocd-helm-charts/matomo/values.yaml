@@ -1,5 +1,7 @@
 matomo:
   image:
+    registry: docker.io
+    repository: bitnamilegacy/matomo
     tag: 5.1.1
   mariadb:
     enabled: false
