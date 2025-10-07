@@ -15,8 +15,6 @@ puppetserver:
   puppetserver:
     name: puppetserver
     puppeturl: "https://github.com/Obmondo/LinuxAid.git"
-    image: ghcr.io/voxpupuli/container-puppetserver
-    tag: 7.17.0-v1.5.0
     masters:
       fqdns:
         alternateServerNames:
@@ -103,8 +101,6 @@ puppetserver:
   puppetdb:
     enabled: true
     name: puppetdb
-    image: ghcr.io/voxpupuli/container-puppetdb
-    tag: 7.18.0-v1.5.0
     persistence:
       size: 1Gi
     resources:
@@ -122,8 +118,6 @@ puppetserver:
   puppetboard:
     enabled: true
     name: puppetboard
-    image: ghcr.io/voxpupuli/puppetboard
-    tag: 6.0.1
     extraEnv:
       PUPPETBOARD_WORKERS: 2
 
