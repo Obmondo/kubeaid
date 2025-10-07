@@ -25,4 +25,4 @@ tests:
               alert_id: monitor::system::docker::status
             exp_annotations:
               summary: 'Docker container packagesign-script-1 is down on host bantha.enableit'
-              description: 'Docker container **packagesign-script-1** is down since from 10min on server **bantha.enableit**'
+              description: 'Docker container **packagesign-script-1** is down since from 15min on server **bantha.enableit**'
