@@ -1,0 +1,45 @@
+apiVersion: v2
+appVersion: 8.8.0
+dependencies:
+- condition: postgresql.enabled
+  name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 12.1.11
+description: OpenVox automates the delivery and operation of software.
+home: https://puppet.com/
+icon: https://secure.gravatar.com/avatar/fdd009b7c1ec96e088b389f773e87aec.jpg?s=80&r=g&d=mm
+keywords:
+- OpenVox
+- OpenVoxserver
+- automation
+- iac
+- infrastructure
+- cm
+- ci
+- cd
+kubeVersion: '>=1.10.0-0'
+maintainers:
+- email: miroslav.hadzhiev@gmail.com
+  name: Xtigyro
+- email: morgan@puppet.com
+  name: underscorgan
+- email: slconley@gmail.com
+  name: slconley
+- email: raphael.pinson@camptocamp.com
+  name: raphink
+- email: david.phayanouvong@gmail.com
+  name: davidphay
+- email: reinier@skoef.nl
+  name: skoef
+- email: niels@hojen.net
+  name: nielshojen
+- email: linas@daneliukas.eu
+  name: ldaneliukas
+- email: anthony@sts.io
+  name: anthonysomerset
+name: puppetserver
+sources:
+- https://github.com/puppetlabs/pupperware/
+- https://github.com/postgres/postgres
+- https://github.com/bitnami/charts/tree/master/bitnami/postgresql
+version: 10.0.0

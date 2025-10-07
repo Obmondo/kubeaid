@@ -2,6 +2,14 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## Unreleased Changes
+### Major Version Upgrades %%^^
+
+### Minor Version Upgrades %%^^
+
+### Patch Version Upgrades %%^^
+- Added puppetserver from version 10.0.0 to 10.0.0
+
 ## 18.0.0
 ### Major Version Upgrades
 - Updated graylog from version 2.4.1 to 3.0.0

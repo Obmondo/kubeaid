@@ -1,0 +1,769 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "puppetserver.fullname" . }}-puppetserver-master
+  labels:
+    {{- include "puppetserver.puppetserver.labels" . | nindent 4 }}
+    {{- with .Values.puppetserver.masters.extraLabels -}}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+  {{- if .Values.puppetserver.masters.annotations }}
+  annotations:
+    {{- toYaml .Values.puppetserver.masters.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.puppetserver.masters.multiMasters.enabled }}
+  {{- if not (.Values.puppetserver.masters.multiMasters.autoScaling.enabled) }}
+  replicas: {{ .Values.puppetserver.masters.multiMasters.manualScaling.masters }}
+  {{- end }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "puppetserver.puppetserver.matchLabels" . | nindent 6 }}
+  {{- if .Values.puppetserver.masters.updateStrategy }}
+  strategy: {{- toYaml .Values.puppetserver.masters.updateStrategy | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- include "puppetserver.puppetserver.labels" . | nindent 8 }}
+        {{- with .Values.puppetserver.masters.extraLabels -}}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
+      annotations:
+        checksum/hiera-configmap: {{ include (print $.Template.BasePath "/hiera-configmap.yaml") . | sha256sum }}
+        {{- if .Values.r10k.asSidecar }}
+        checksum/r10k-code.configmap: {{ include (print $.Template.BasePath "/r10k-code.configmap.yaml") . | sha256sum }}
+        checksum/r10k-hiera.configmap: {{ include (print $.Template.BasePath "/r10k-hiera.configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if and .Values.singleCA.enabled .Values.singleCA.crl.asSidecar }}
+        checksum/crl-config: {{ include (print $.Template.BasePath "/update-crl-configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.puppetserver.customconfigs.enabled }}
+        checksum/custom-configs.configmap: {{ include (print $.Template.BasePath "/puppetserver-customconfigs-configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.puppetserver.customentrypoints.enabled }}
+        checksum/custom-entrypoints.configmap: {{ include (print $.Template.BasePath "/puppetserver-custom-entrypoints-configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.podAnnotations }}
+        {{- toYaml .Values.podAnnotations | nindent 8 }}
+        {{- end }}
+        {{- if .Values.puppetserver.masters.podAnnotations }}
+        {{- toYaml .Values.puppetserver.masters.podAnnotations | nindent 8 }}
+        {{- end }}
+    spec:
+      hostname: puppet
+      {{- if .Values.puppetserver.serviceAccount.enabled }}
+      serviceAccountName: {{ include "puppetserver.serviceAccountName" . }}
+      {{- end }}
+      {{- if not .Values.global.runAsNonRoot }}
+      initContainers:
+        - name: perms-and-dirs
+          image: "{{.Values.puppetserver.image}}:{{.Values.puppetserver.tag}}"
+          imagePullPolicy: "{{.Values.puppetserver.pullPolicy}}"
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 200m
+            limits:
+              memory: 256Mi
+              cpu: 300m
+          env:
+          {{- if .Values.puppetserver.masters.multiMasters.enabled }}
+            - name: PUPPET_DATA_DIR
+              value: "/etc/puppetlabs/code/environments"
+            - name: PUPPET_SSL_DIR
+              value: "/etc/puppetlabs/puppet/ssl/certs"
+          {{- end }}
+          {{- range $key, $value := .Values.global.extraEnv }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+            {{- range $key, $value := .Values.puppetserver.masters.extraEnv }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+          envFrom:
+          {{- if .Values.global.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.global.extraEnvSecret }}
+          {{- end }}
+          {{- if .Values.puppetserver.masters.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.puppetserver.masters.extraEnvSecret }}
+          {{- end }}
+          command: [ "sh", "-c" ]
+          args:
+            - mkdir -p /etc/puppetlabs/puppet/eyaml/keys;
+              {{- if .Values.puppetserver.masters.multiMasters.enabled }}
+              cp /tmp/puppet/configmap/check_for_masters.sh /etc/puppetlabs/puppet/check_for_masters.sh;
+              chown puppet:puppet /etc/puppetlabs/puppet/check_for_masters.sh;
+              chmod +x /etc/puppetlabs/puppet/check_for_masters.sh;
+              bash /etc/puppetlabs/puppet/check_for_masters.sh;
+              {{- end }}
+              mkdir -p /etc/puppetlabs/code/environments;
+              mkdir -p /etc/puppetlabs/puppet/manifests;
+              mkdir -p /etc/puppetlabs/code/r10k_cache;
+              chown -R puppet:puppet /etc/puppetlabs;
+              {{- if (not .Values.puppetserver.compilers.enabled) }}
+              {{- if .Values.r10k.asSidecar }}
+              {{- if .Values.puppetserver.puppeturl }}
+              cp /tmp/puppet/configmap/r10k_code_entrypoint.sh /etc/puppetlabs/puppet/r10k_code_entrypoint.sh;
+              cp /tmp/puppet/configmap/r10k_code_cronjob.sh /etc/puppetlabs/puppet/r10k_code_cronjob.sh;
+              cp /tmp/puppet/configmap/r10k_code.yaml /etc/puppetlabs/puppet/r10k_code.yaml;
+              chown puppet:puppet /etc/puppetlabs/puppet/r10k_code_entrypoint.sh /etc/puppetlabs/puppet/r10k_code_cronjob.sh /etc/puppetlabs/puppet/r10k_code.yaml;
+              chmod +x /etc/puppetlabs/puppet/r10k_code_entrypoint.sh /etc/puppetlabs/puppet/r10k_code_cronjob.sh;
+              {{- end }}
+              {{- if (include "hiera.enable" .) }}
+              cp /tmp/puppet/configmap/r10k_hiera_entrypoint.sh /etc/puppetlabs/puppet/r10k_hiera_entrypoint.sh;
+              cp /tmp/puppet/configmap/r10k_hiera_cronjob.sh /etc/puppetlabs/puppet/r10k_hiera_cronjob.sh;
+              cp /tmp/puppet/configmap/r10k_hiera.yaml /etc/puppetlabs/puppet/r10k_hiera.yaml;
+              chown puppet:puppet /etc/puppetlabs/puppet/r10k_hiera_entrypoint.sh /etc/puppetlabs/puppet/r10k_hiera_cronjob.sh /etc/puppetlabs/puppet/r10k_hiera.yaml;
+              chmod +x /etc/puppetlabs/puppet/r10k_hiera_entrypoint.sh /etc/puppetlabs/puppet/r10k_hiera_cronjob.sh;
+              {{- end }}
+              {{- if .Values.hiera.config }}
+              cp /tmp/puppet/configmap/hiera.yaml /etc/puppetlabs/puppet/hiera.yaml;
+              chown puppet:puppet /etc/puppetlabs/puppet/hiera.yaml;
+              {{- end }}
+              {{- if or (.Values.hiera.eyaml.public_key) (.Values.hiera.eyaml.private_key) (.Values.hiera.eyaml.existingMap) (.Values.hiera.eyaml.existingSecret) }}
+              cp /tmp/puppet/configmap/eyaml/*private_key.pkcs7.pem /etc/puppetlabs/puppet/eyaml/keys/;
+              chown puppet:puppet /etc/puppetlabs/puppet/eyaml/keys/*private_key.pkcs7.pem;
+              cp /tmp/puppet/configmap/eyaml/*public_key.pkcs7.pem /etc/puppetlabs/puppet/eyaml/keys/;
+              chown puppet:puppet /etc/puppetlabs/puppet/eyaml/keys/*public_key.pkcs7.pem;
+              {{- end }}
+              {{- end }}
+              {{- end }}
+              cp /tmp/puppet/configmap/site.pp /etc/puppetlabs/puppet/manifests/site.pp;
+              chown puppet:puppet /etc/puppetlabs/puppet/manifests/site.pp;
+              {{- if .Values.puppetserver.extraInitArgs }}
+              {{- .Values.puppetserver.extraInitArgs | nindent 14 }}
+              {{- end }}
+              mkdir -p /opt/puppetlabs/server/data/puppetserver/dropsonde/bin/;
+              touch /opt/puppetlabs/server/data/puppetserver/dropsonde/bin/dropsonde;
+              chown puppet:puppet -R /opt/puppetlabs/server/data/puppetserver/;
+              {{- if eq .Values.puppetserver.persistence.confd.enabled true }}
+              cp -rp /etc/puppetlabs/puppetserver/conf.d/* /conf.d/;
+              {{- end}}
+          securityContext:
+            runAsUser: 0
+            runAsNonRoot: false
+            capabilities:
+              drop:
+                - all
+              add:
+                - CAP_CHOWN
+                - CAP_SETUID
+                - CAP_SETGID
+                - CAP_DAC_OVERRIDE
+                - CAP_AUDIT_WRITE
+                - CAP_FOWNER
+                - CHOWN
+                - SETUID
+                - SETGID
+                - DAC_OVERRIDE
+                - AUDIT_WRITE
+                - FOWNER
+          volumeMounts:
+            {{- if eq .Values.puppetserver.persistence.confd.enabled true }}
+            - name: puppet-confd
+              mountPath: /conf.d/
+            {{- end}}
+            - name: puppet-puppet-storage
+              mountPath: /etc/puppetlabs/puppet/
+            {{- if and .Values.puppetserver.puppeturl (not .Values.puppetserver.compilers.enabled) }}
+            - name: puppet-code-storage
+              mountPath: /etc/puppetlabs/code/
+            {{- if .Values.r10k.asSidecar }}
+            - name: r10k-code-volume
+              mountPath: /tmp/puppet/configmap/r10k_code_entrypoint.sh
+              subPath: r10k_code_entrypoint.sh
+            - name: r10k-code-volume
+              mountPath: /tmp/puppet/configmap/r10k_code_cronjob.sh
+              subPath: r10k_code_cronjob.sh
+            - name: r10k-code-volume
+              mountPath: /tmp/puppet/configmap/r10k_code.yaml
+              subPath: r10k_code.yaml
+            {{- if and (include "hiera.enable" .) }}
+            - name: r10k-hiera-volume
+              mountPath: /tmp/puppet/configmap/r10k_hiera_entrypoint.sh
+              subPath: r10k_hiera_entrypoint.sh
+            - name: r10k-hiera-volume
+              mountPath: /tmp/puppet/configmap/r10k_hiera_cronjob.sh
+              subPath: r10k_hiera_cronjob.sh
+            - name: r10k-hiera-volume
+              mountPath: /tmp/puppet/configmap/r10k_hiera.yaml
+              subPath: r10k_hiera.yaml
+            {{- end }}
+            {{- end }}
+            {{- if .Values.hiera.config }}
+            - name: hiera-volume
+              mountPath: /tmp/puppet/configmap/hiera.yaml
+              subPath: hiera.yaml
+            {{- end }}
+            {{- if and (or (.Values.hiera.eyaml.existingMap) (.Values.hiera.eyaml.existingSecret)) (not .Values.hiera.eyaml.public_key) (not .Values.hiera.eyaml.private_key)  }}
+            - name: eyaml-volume
+              mountPath: /tmp/puppet/configmap/eyaml
+            {{- end }}
+            {{- if and (or (.Values.hiera.eyaml.public_key) (.Values.hiera.eyaml.private_key)) (not .Values.hiera.eyaml.existingSecret)}}
+            - name: eyamlpub-volume
+              mountPath: /tmp/puppet/configmap/eyaml/public_key.pkcs7.pem
+              subPath: public_key.pkcs7.pem
+            - name: eyamlpriv-volume
+              mountPath: /tmp/puppet/configmap/eyaml/private_key.pkcs7.pem
+              subPath: private_key.pkcs7.pem
+            {{- end }}
+            {{- end }}
+            {{- if .Values.puppetserver.masters.multiMasters.enabled }}
+            - name: init-masters-volume
+              mountPath: /tmp/puppet/configmap/check_for_masters.sh
+              subPath: check_for_masters.sh
+            {{- end }}
+            - name: manifests-volume
+              mountPath: /tmp/puppet/configmap/site.pp
+              subPath: site.pp
+            {{- if eq .Values.puppetserver.persistence.data.enabled true }}
+            - name: puppet-serverdata-storage
+              mountPath: /opt/puppetlabs/server/data/puppetserver/
+            {{- end }}
+      {{- end }}
+      containers:
+        - name: {{ template "puppetserver.fullname" . }}
+          image: "{{.Values.puppetserver.image}}:{{.Values.puppetserver.tag}}"
+          imagePullPolicy: "{{.Values.puppetserver.pullPolicy}}"
+          resources:
+            {{- toYaml .Values.puppetserver.masters.resources | nindent 12 }}
+          {{- if .Values.global.runAsNonRoot }}
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - exec /opt/puppetlabs/bin/puppetserver foreground
+          {{- end }}
+          env:
+            {{- if not .Values.global.runAsNonRoot }}
+            - name: OPENVOXSERVER_HOSTNAME
+              value: puppet
+            # necessary to set certname and server in puppet.conf, required by
+            # puppetserver ca cli application
+            {{- if .Values.singleCA.enabled }}
+            - name: CA_ENABLED
+              value: "false"
+              # set the hostname to puppet to identify easily the certificate
+            {{- end }}
+            - name: OPENVOXSERVER_PORT
+              value: "{{ template "puppetserver.puppetserver-masters.port" . }}"
+            - name: DNS_ALT_NAMES
+              value: "{{ template "puppetserver.master.san" . }}"
+            - name: OPENVOXDB_SERVER_URLS
+              value: https://{{ if .Values.singleCA.enabled}}{{.Values.singleCA.puppetdb.overrideHostname}}{{else }}{{ ( include "puppetdb.fullname" . ) }}{{end}}:8081
+            - name: CA_ALLOW_SUBJECT_ALT_NAMES
+              value: "true"
+            {{- end }}
+            {{- range $key, $value := .Values.global.extraEnv }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+            {{- range $key, $value := .Values.puppetserver.masters.extraEnv }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+          envFrom:
+            {{- if .Values.global.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.global.extraEnvSecret }}
+            {{- end }}
+            {{- if .Values.puppetserver.masters.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.puppetserver.masters.extraEnvSecret }}
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /status/v1/simple
+              port: {{ template "puppetserver.puppetserver-masters.port" .}}
+              scheme: {{ .Values.puppetserver.masters.readinessProbeScheme }} 
+            periodSeconds: {{ .Values.puppetserver.masters.readinessProbePeriodSeconds }}
+            timeoutSeconds: {{ .Values.puppetserver.masters.readinessProbeTimeout }}
+            failureThreshold: {{ .Values.puppetserver.masters.readinessProbeFailureThreshold }}
+            successThreshold: {{ .Values.puppetserver.masters.readinessProbeSuccessThreshold }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ template "puppetserver.puppetserver-masters.port" .}}
+            periodSeconds: {{ .Values.puppetserver.masters.livenessProbePeriodSeconds }}
+            timeoutSeconds: {{ .Values.puppetserver.masters.livenessProbeTimeout }}
+            failureThreshold: {{ .Values.puppetserver.masters.livenessProbeFailureThreshold }}
+            successThreshold: {{ .Values.puppetserver.masters.livenessProbeSuccessThreshold }}
+          startupProbe:
+            tcpSocket:
+              port: {{ template "puppetserver.puppetserver-masters.port" .}}
+            periodSeconds: {{ .Values.puppetserver.masters.startupProbePeriodSeconds }}
+            failureThreshold: {{ .Values.puppetserver.masters.startupProbeFailureThreshold }}
+          ports:
+            - containerPort: {{ template "puppetserver.puppetserver-masters.port" .}}
+          volumeMounts:
+            - name: puppet-puppet-storage
+              mountPath: /etc/puppetlabs/puppet/
+            {{- if eq .Values.puppetserver.persistence.data.enabled true }}
+            - name: puppet-serverdata-storage
+              mountPath: /opt/puppetlabs/server/data/puppetserver/
+            {{- end }}
+            - name: puppet-ca-storage
+              mountPath: /etc/puppetlabs/puppetserver/ca/
+            {{- range $key, $value := .Values.puppetserver.customconfigs.configmaps }}
+            - name: puppetserver-custom-configs
+              mountPath: /etc/puppetlabs/puppetserver/conf.d/{{ $key }}
+              subPath: {{ $key }}
+            {{- end }}
+            {{- range $key, $value := .Values.puppetserver.customentrypoints.configmaps }}
+            - name: puppetserver-customentrypoints
+              mountPath: /docker-custom-entrypoint.d/{{ $key }}
+              subPath: {{ $key }}
+            {{- end }}
+            {{- if .Values.global.runAsNonRoot }}
+            - name: puppet-puppetserver
+              mountPath: /etc/puppetlabs/puppetserver/
+            {{- else }}
+            {{- if eq .Values.puppetserver.persistence.confd.enabled true }}
+            - name: puppet-confd
+              mountPath: /etc/puppetlabs/puppetserver/conf.d/
+            {{- end }}
+            {{- end }}
+            {{- if (not .Values.puppetserver.compilers.enabled) }}
+            - name: puppet-code-storage
+              mountPath: /etc/puppetlabs/code/
+            {{- if .Values.hiera.config }}
+            - name: hiera-volume
+              mountPath: /etc/puppetlabs/puppet/hiera.yaml
+              subPath: hiera.yaml
+            {{- if and (or (.Values.hiera.eyaml.existingMap) (.Values.hiera.eyaml.existingSecret)) (not .Values.hiera.eyaml.public_key) (not .Values.hiera.eyaml.private_key)  }}
+            - name: eyaml-volume
+              mountPath: /etc/puppetlabs/puppet/eyaml/keys
+            {{- end }}
+            {{- end }}
+            {{- end }}
+          securityContext:
+            {{- if .Values.global.runAsNonRoot }}
+            runAsUser: {{ .Values.global.securityContext.runAsUser }}
+            runAsGroup: {{ .Values.global.securityContext.runAsGroup }}
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - all
+            {{- else }}
+            {{- toYaml .Values.puppetserver.securityContext | nindent 12 }}
+            {{- end }}
+        {{- if and .Values.puppetserver.puppeturl (not .Values.puppetserver.compilers.enabled) .Values.r10k.asSidecar }}
+        # r10k Code Sidecar
+        - name: r10k-code
+          image: "{{ tpl .Values.r10k.image . }}:{{ tpl .Values.r10k.tag . }}"
+          imagePullPolicy: {{ tpl .Values.r10k.imagePullPolicy . }}
+          resources:
+            {{- toYaml .Values.r10k.code.resources | nindent 12 }}
+          env:
+          {{- range $key, $value := .Values.global.extraEnv }}
+          - name: {{ $key }}
+            value: "{{ $value }}"
+          {{- end }}
+          {{- range $key, $value := .Values.r10k.code.extraEnv }}
+          - name: {{ $key }}
+            value: "{{ $value }}"
+          {{- end }}
+          envFrom:
+          {{- if .Values.global.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.global.extraEnvSecret }}
+          {{- end }}
+          {{- if .Values.r10k.code.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.r10k.code.extraEnvSecret }}
+          {{- end }}
+          command:
+            {{- range .Values.r10k.code.command }}
+            - {{ . | quote }}
+            {{- end}}
+          args:
+            {{- range .Values.r10k.code.args }}
+            - {{ . | quote }}
+            {{- end }}
+          securityContext:
+            runAsUser: {{ .Values.global.securityContext.runAsUser }}
+            runAsGroup: {{ .Values.global.securityContext.runAsGroup }}
+            {{- toYaml .Values.r10k.podSecurityContext | nindent 12 }}
+            {{- toYaml .Values.r10k.containerSecurityContext | nindent 12 }}
+          volumeMounts:
+          {{- with .Values.r10k.code.viaSsh.credentials }}
+          {{- if or (.existingSecret) (and (.ssh.value) (.known_hosts.value)) }}
+          - name: r10k-code-ssh
+            mountPath: /home/puppet/.ssh
+          {{- end }}
+          {{- end }}
+          {{- with .Values.r10k.code.viaHttps.credentials }}
+          {{- if or .existingSecret .netrc.value }}
+          - name: r10k-code-netrc
+            mountPath: /home/puppet/.netrc
+            subPath: .netrc
+          {{- end }}
+          {{- end }}
+          {{- with .Values.r10k.code.viaHttps.customCa }}
+          {{- if or .existingSecret .cert.value }}
+          - name: r10k-code-cert
+            mountPath: /home/puppet/code-certs/ca.pem
+            subPath: ca.pem
+          {{- end }}
+          {{- end }}
+          - name: puppet-code-storage
+            mountPath: /etc/puppetlabs/code/
+          - name: puppet-puppet-storage
+            mountPath: /etc/puppetlabs/puppet/
+          - name: r10k-code-volume
+            mountPath: /etc/puppetlabs/puppet/r10k_code_entrypoint.sh
+            subPath: r10k_code_entrypoint.sh
+          - name: r10k-code-volume
+            mountPath: /etc/puppetlabs/puppet/r10k_code_cronjob.sh
+            subPath: r10k_code_cronjob.sh
+          - name: r10k-code-volume
+            mountPath: /etc/puppetlabs/puppet/r10k_code.yaml
+            subPath: r10k_code.yaml
+          readinessProbe:
+            exec:
+              command:
+              {{- include "r10k.code.readinessProbe" .  | nindent 16 }}
+            failureThreshold: 2
+            initialDelaySeconds: 5
+            periodSeconds: 20
+            successThreshold: 1
+            timeoutSeconds: 5
+        {{- end }}
+        {{- if and (include "hiera.enable" .) (not .Values.puppetserver.compilers.enabled) .Values.r10k.asSidecar }}
+        # r10k Hiera Sidecar
+        - name: r10k-hiera
+          image: "{{ tpl .Values.r10k.image . }}:{{ tpl .Values.r10k.tag . }}"
+          imagePullPolicy: {{ tpl .Values.r10k.imagePullPolicy . }}
+          resources:
+            {{- toYaml .Values.r10k.hiera.resources | nindent 12 }}
+          env:
+          {{- range $key, $value := .Values.global.extraEnv }}
+          - name: {{ $key }}
+            value: "{{ $value }}"
+          {{- end }}
+          {{- range $key, $value := .Values.r10k.hiera.extraEnv }}
+          - name: {{ $key }}
+            value: "{{ $value }}"
+          {{- end }}
+          envFrom:
+          {{- if .Values.global.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.global.extraEnvSecret }}
+          {{- end }}
+          {{- if .Values.r10k.hiera.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.r10k.hiera.extraEnvSecret }}
+          {{- end }}
+          command: [ "sh", "-c", "/etc/puppetlabs/puppet/r10k_hiera_entrypoint.sh" ]
+          securityContext:
+            runAsUser: {{ .Values.global.securityContext.runAsUser }}
+            runAsGroup: {{ .Values.global.securityContext.runAsGroup }}
+            {{- toYaml .Values.r10k.podSecurityContext | nindent 12 }}
+            {{- toYaml .Values.r10k.containerSecurityContext | nindent 12 }}
+          volumeMounts:
+          {{- with .Values.r10k.hiera.viaSsh.credentials }}
+          {{- if or (.existingSecret) (and (.ssh.value) (.known_hosts.value)) }}
+          - name: r10k-hiera-ssh
+            mountPath: /home/puppet/.ssh
+          {{- end }}
+          {{- end }}
+          {{- with .Values.r10k.hiera.viaHttps.credentials }}
+          {{- if or .existingSecret .netrc.value }}
+          - name: r10k-hiera-netrc
+            mountPath: /home/puppet/.netrc
+            subPath: .netrc
+          {{- end }}
+          {{- end }}
+          - name: puppet-code-storage
+            mountPath: /etc/puppetlabs/code/
+          - name: puppet-puppet-storage
+            mountPath: /etc/puppetlabs/puppet/
+          readinessProbe:
+            exec:
+              command: ["/bin/sh", "-ec", "test -f {{ .Values.r10k.hiera.cronJob.successFile }}"]
+            failureThreshold: 2
+            initialDelaySeconds: 5
+            periodSeconds: 20
+            successThreshold: 1
+            timeoutSeconds: 5
+        {{- end }}
+        {{- if and .Values.singleCA.enabled .Values.singleCA.crl.asSidecar }}
+        # singleCA crl script update Sidecar
+        - name: update-crl
+          image: "{{ tpl .Values.singleCA.crl.image . }}:{{ tpl .Values.singleCA.crl.tag . }}"
+          imagePullPolicy: {{ tpl .Values.singleCA.crl.imagePullPolicy . }}
+          resources:
+            {{- toYaml .Values.singleCA.crl.resources | nindent 12 }}
+          env:
+          - name: SSL_PATH
+            value: /etc/puppetlabs/puppet/ssl
+          - name: CRL_SCRIPT_PATH
+            value: /etc/puppetlabs/puppet/ssl
+          {{- range $key, $value := .Values.global.extraEnv }}
+          - name: {{ $key }}
+            value: "{{ $value }}"
+          {{- end }}
+          {{- range $key, $value := .Values.puppetserver.masters.extraEnv }}
+          - name: {{ $key }}
+            value: "{{ $value }}"
+          {{- end }}
+          {{- range $key, $value := .Values.singleCA.crl.extraEnv }}
+          - name: {{ $key }}
+            value: "{{ $value }}"
+          {{- end }}
+          envFrom:
+          {{- if .Values.global.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.global.extraEnvSecret }}
+          {{- end }}
+          {{- if .Values.puppetserver.masters.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.puppetserver.masters.extraEnvSecret }}
+          {{- end }}
+          {{- if .Values.singleCA.crl.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.singleCA.crl.extraEnvSecret }}
+          {{- end }}
+          command: ["sh", "-c", "/etc/puppetlabs/puppet/ssl/crl_entrypoint.sh" ]
+          securityContext:
+            runAsUser: {{ .Values.global.securityContext.runAsUser }}
+            runAsGroup: {{ .Values.global.securityContext.runAsGroup }}
+            {{- toYaml .Values.singleCA.crl.securityContext | nindent 12 }}
+          volumeMounts:
+          - name: puppet-puppet-storage
+            mountPath: /etc/puppetlabs/puppet/
+          readinessProbe:
+            exec:
+              command: ["/bin/sh", "-ec", "test -f ~/.crl_cronjob.success"]
+            failureThreshold: 2
+            initialDelaySeconds: 5
+            periodSeconds: 20
+            successThreshold: 1
+            timeoutSeconds: 5
+        {{- end }}
+        {{- if .Values.metrics.prometheus.jmx.enabled  }}
+        - name: jmx-exporter
+          image: "{{ tpl .Values.metrics.prometheus.jmx.image . }}:{{ tpl .Values.metrics.prometheus.jmx.tag . }}"
+          imagePullPolicy: {{ tpl .Values.metrics.prometheus.jmx.imagePullPolicy . }}
+          resources:
+            {{- toYaml .Values.metrics.prometheus.jmx.resources | nindent 12 }}
+          args: ["{{ .Values.metrics.prometheus.jmx.port }}", "/jmx_exporter.yaml"]
+          env:
+            {{- range $key, $value := .Values.global.extraEnv }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+            {{- range $key, $value := .Values.metrics.prometheus.jmx.extraEnv }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+          envFrom:
+          {{- if .Values.global.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.global.extraEnvSecret }}
+          {{- end }}
+          {{- if .Values.metrics.prometheus.jmx.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.metrics.prometheus.jmx.extraEnvSecret }}
+          {{- end }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.metrics.prometheus.jmx.port }}
+          volumeMounts:
+            - name: jmx-config
+              mountPath: /jmx_exporter.yaml
+              subPath: jmx_exporter.yaml
+          securityContext:
+            runAsUser: 999
+            runAsGroup: 999
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - all
+        {{- end }}
+        {{- with .Values.puppetserver.masters.extraContainers }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- if .Values.singleCA.puppetdb.overrideHostname }}
+      {{- $service := lookup "v1" "Service" .Release.Namespace  (include "puppetdb.fullname" . ) }}
+      hostAliases:
+        {{- if $service }}
+        - ip: {{ $service.spec.clusterIP }}
+        {{- else }}
+        - ip: 127.0.0.1 # this case is just to avoid an error with helm diff
+        {{- end }}
+          hostnames:
+          - {{ .Values.singleCA.puppetdb.overrideHostname }}
+      {{- end }}
+      imagePullSecrets:
+      {{- with .Values.global.imagePullSecrets }}
+      {{ toYaml . }}
+      {{- end }}
+      securityContext:
+        fsGroup: 999   # "puppet" GID
+      volumes:
+        {{- if (not .Values.puppetserver.compilers.enabled) }}
+        - name: puppet-code-storage
+          persistentVolumeClaim:
+            claimName: {{ template "puppetserver.persistence.code.claimName" . }}
+        {{- end }}
+        - name: puppet-ca-storage
+          persistentVolumeClaim:
+            claimName: {{ template "puppetserver.persistence.ca.claimName" . }}
+        - name: puppet-puppet-storage
+          persistentVolumeClaim:
+            claimName: {{ template "puppetserver.persistence.puppet.claimName" . }}
+        {{- if .Values.singleCA.enabled }}
+        - name: crl-volume
+          configMap:
+            name: {{ template "puppetserver.fullname" . }}-crl-config
+        {{- end }}
+        {{- if eq .Values.puppetserver.persistence.data.enabled true }}
+        - name: puppet-serverdata-storage
+          persistentVolumeClaim:
+            claimName: {{ template "puppetserver.persistence.data.claimName" . }}
+        {{- end }}
+        {{- if .Values.puppetserver.masters.multiMasters.enabled }}
+        - name: init-masters-volume
+          configMap:
+            name: {{ template "puppetserver.fullname" . }}-init-masters-config
+        {{- end }}
+        {{- if .Values.puppetserver.customconfigs.enabled }}
+        - name: puppetserver-custom-configs
+          configMap:
+            name: {{ template "puppetserver.fullname" . }}-custom-configs
+        {{- end }}
+        {{- if .Values.puppetserver.customentrypoints.enabled }}
+        - name: puppetserver-customentrypoints
+          configMap:
+            name: {{ template "puppetserver.fullname" . }}-customentrypoints
+            defaultMode: 0777
+        {{- end }}
+        {{- if .Values.metrics.prometheus.jmx.enabled  }}
+        - name: jmx-config
+          configMap:
+            name: {{ template "puppetserver.fullname" . }}-jmx-config
+        {{- end }}
+        - name: manifests-volume
+          configMap:
+            name: {{ template "puppetserver.fullname" . }}-manifests-config
+        {{- if (not .Values.puppetserver.compilers.enabled) }}
+        {{- if .Values.hiera.config }}
+        - name: hiera-volume
+          configMap:
+            name: {{ template "puppetserver.fullname" . }}-hiera-config
+        {{- end }}
+        {{- if .Values.hiera.eyaml.existingSecret }}
+        - name: eyaml-volume
+          secret:
+            secretName: {{ .Values.hiera.eyaml.existingSecret }}
+        {{- else if or (.Values.hiera.eyaml.public_key) (.Values.hiera.eyaml.private_key) }}
+        - name: eyamlpub-volume
+          secret:
+            secretName: {{ template "puppetserver.hiera.publicSecret" . }}
+        - name: eyamlpriv-volume
+          secret:
+            secretName: {{ template "puppetserver.hiera.privateSecret" . }}
+        {{- else if .Values.hiera.eyaml.existingMap  }}
+        - name: eyaml-volume
+          configMap:
+            name: {{ .Values.hiera.eyaml.existingMap }}
+        {{- end }}
+        {{- if (include "hiera.enable" .) }}
+        - name: r10k-hiera-volume
+          configMap:
+            name: {{ template "puppetserver.fullname" . }}-r10k-hiera-config
+        {{- end }}
+        {{- if .Values.r10k.asSidecar }}
+        {{- if or (.Values.r10k.code.viaSsh.credentials.existingSecret) (and (.Values.r10k.code.viaSsh.credentials.ssh.value) (.Values.r10k.code.viaSsh.credentials.known_hosts.value)) }}
+        - name: r10k-code-ssh
+          secret:
+            secretName: {{ template "r10k.code.viaSsh.secret" . }}
+            defaultMode: 288 # = mode 0440
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: known_hosts
+                path: known_hosts
+        {{- end }}
+        {{- if or .Values.r10k.code.viaHttps.credentials.existingSecret .Values.r10k.code.viaHttps.credentials.netrc.value }}
+        - name: r10k-code-netrc
+          secret:
+            secretName: {{ template "r10k.code.viaHttps.secret" . }}
+            defaultMode: 288 # = mode 0440
+            items:
+              - key: netrc
+                path: .netrc
+        {{- end }}
+        {{- if or .Values.r10k.code.viaHttps.customCa.existingSecret .Values.r10k.code.viaHttps.customCa.cert.value }}
+        - name: r10k-code-cert
+          secret:
+            secretName: {{ template "r10k.code.viaHttps.customCa.secret" . }}
+            defaultMode: 288 # = mode 0440
+            items:
+              - key: cert
+                path: ca.pem
+        {{- end }}
+        {{- if .Values.puppetserver.puppeturl }}
+        - name: r10k-code-volume
+          configMap:
+            name: {{ template "puppetserver.fullname" . }}-r10k-code-config
+            defaultMode: 0777
+        {{- end }}
+        {{- if or (.Values.r10k.hiera.viaSsh.credentials.existingSecret) (and (.Values.r10k.hiera.viaSsh.credentials.ssh.value) (.Values.r10k.hiera.viaSsh.credentials.known_hosts.value)) }}
+        - name: r10k-hiera-ssh
+          secret:
+            secretName: {{ template "r10k.hiera.viaSsh.secret" . }}
+            defaultMode: 288 # = mode 0440
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: known_hosts
+                path: known_hosts
+        {{- end }}
+        {{- if or .Values.r10k.hiera.viaHttps.credentials.existingSecret .Values.r10k.hiera.viaHttps.credentials.netrc.value }}
+        - name: r10k-hiera-netrc
+          secret:
+            secretName: {{ template "r10k.hiera.viaHttps.secret" . }}
+            defaultMode: 288 # = mode 0440
+            items:
+              - key: netrc
+                path: .netrc
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.global.runAsNonRoot }}
+        - name: puppet-puppetserver
+          persistentVolumeClaim:
+            claimName: {{ template "puppetserver.persistence.server.claimName" . }}
+        {{- else }}
+        {{- if eq .Values.puppetserver.persistence.confd.enabled true }}
+        - name: puppet-confd
+          persistentVolumeClaim:
+            claimName: {{ template "puppetserver.persistence.confd.claimName" . }}
+        {{- end }}
+        {{- end }}
+        {{- range $extraSecret := .Values.puppetserver.extraSecrets }}
+        - name: {{ $extraSecret.name }}
+          secret:
+            secretName: {{ $extraSecret.name }}
+        {{- end }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{ toYaml .Values.nodeSelector | nindent 10 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity:
+      {{ toYaml .Values.affinity | nindent 10 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+        {{ toYaml .Values.tolerations| nindent 10 }}
+      {{- end }}
+      {{- if and (.Capabilities.APIVersions.Has "scheduling.k8s.io/v1beta1") (.Values.priorityClassName) }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}

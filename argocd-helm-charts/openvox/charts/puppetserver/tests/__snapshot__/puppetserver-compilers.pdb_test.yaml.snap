@@ -1,0 +1,20 @@
+manifest should match snapshot:
+  1: |
+    apiVersion: policy/v1
+    kind: PodDisruptionBudget
+    metadata:
+      labels:
+        app.kubernetes.io/component: puppetserver-compilers
+        app.kubernetes.io/instance: puppetserver
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: puppetserver
+        app.kubernetes.io/version: 8.8.0
+        helm.sh/chart: puppetserver-10.0.0
+      name: puppetserver-compilers
+    spec:
+      maxUnavailable: 2
+      minAvailable: 1
+      selector:
+        matchLabels:
+          app.kubernetes.io/component: puppetserver-compilers
+          app.kubernetes.io/name: puppetserver

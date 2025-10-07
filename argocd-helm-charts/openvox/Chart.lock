@@ -1,0 +1,6 @@
+dependencies:
+- name: puppetserver
+  repository: https://openvoxproject.github.io/openvox-helm-chart/
+  version: 10.0.0
+digest: sha256:8ea7f2d33e9a7c32ec351e2170225cd1089920228a8548b4068ede7e23043584
+generated: "2025-10-07T15:09:10.035902264+05:30"

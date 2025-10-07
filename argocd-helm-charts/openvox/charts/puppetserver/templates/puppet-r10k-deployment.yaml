@@ -1,0 +1,279 @@
+{{- if and .Values.puppetserver.puppeturl (not .Values.r10k.asSidecar) (or ( eq .Values.puppetserver.compilers.kind "Deployment" ) ( not .Values.puppetserver.compilers.enabled ) ) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "puppetserver.fullname" . }}-r10k
+  labels:
+    {{- include "puppetserver.r10k.labels" . | nindent 4 }}
+    {{- with .Values.r10k.code.extraLabels -}}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "puppetserver.r10k.matchLabels" . | nindent 6 }}
+  {{- if .Values.r10k.updateStrategy }}
+  strategy: {{- toYaml .Values.r10k.updateStrategy | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- include "puppetserver.r10k.labels" . | nindent 8 }}
+        {{- with .Values.r10k.code.extraLabels -}}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
+      annotations:
+        checksum/r10k-code.configmap: {{ include (print $.Template.BasePath "/r10k-code.configmap.yaml") . | sha256sum }}
+        checksum/r10k-hiera.configmap: {{ include (print $.Template.BasePath "/r10k-hiera.configmap.yaml") . | sha256sum }}
+        {{- if .Values.podAnnotations }}
+        {{- toYaml .Values.podAnnotations | nindent 8 }}
+        {{- end }}
+    spec:
+      # restartPolicy: OnFailure
+      securityContext:
+        {{- toYaml .Values.r10k.podSecurityContext | nindent 8 }}
+        runAsUser: {{ .Values.global.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.global.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.global.securityContext.fsGroup }}
+      containers:
+        - name: r10k-code
+          image: "{{ tpl .Values.r10k.image . }}:{{ tpl .Values.r10k.tag . }}"
+          imagePullPolicy: {{ tpl .Values.r10k.imagePullPolicy . }}
+          command:
+            {{- range .Values.r10k.code.command }}
+            - {{ . | quote }}
+            {{- end}}
+          args:
+            {{- range .Values.r10k.code.args }}
+            - {{ . | quote }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.r10k.code.resources | nindent 12 }}
+          env:
+            {{- range $key, $value := .Values.global.extraEnv }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+            {{- range $key, $value := .Values.r10k.code.extraEnv }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+          envFrom:
+          {{- if .Values.global.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.global.extraEnvSecret }}
+          {{- end }}
+          {{- if .Values.r10k.code.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.r10k.code.extraEnvSecret }}
+          {{- end }}
+          volumeMounts:
+          {{- with .Values.r10k.code.viaSsh.credentials }}
+          {{- if or (.existingSecret) (and (.ssh.value) (.known_hosts.value)) }}
+          - name: r10k-code-ssh
+            mountPath: /home/puppet/.ssh
+          {{- end }}
+          {{- end }}
+          {{- with .Values.r10k.code.viaHttps.credentials }}
+          {{- if or .existingSecret .netrc.value }}
+          - name: r10k-code-netrc
+            mountPath: /home/puppet/.netrc
+            subPath: .netrc
+          {{- end }}
+          {{- end }}
+          {{- with .Values.r10k.code.viaHttps.customCa }}
+          {{- if or .existingSecret .cert.value }}
+          - name: r10k-code-cert
+            mountPath: /home/puppet/code-certs/ca.pem
+            subPath: ca.pem
+          {{- end }}
+          {{- end }}
+          - name: puppet-code-storage
+            mountPath: /etc/puppetlabs/code/
+          - name: r10k-code-volume
+            mountPath: /etc/puppetlabs/puppet/r10k_code_entrypoint.sh
+            subPath: r10k_code_entrypoint.sh
+          - name: r10k-code-volume
+            mountPath: /etc/puppetlabs/puppet/r10k_code_cronjob.sh
+            subPath: r10k_code_cronjob.sh
+          - name: r10k-code-volume
+            mountPath: /etc/puppetlabs/puppet/r10k_code.yaml
+            subPath: r10k_code.yaml
+          readinessProbe:
+            exec:
+              command:
+              {{- include "r10k.code.readinessProbe" .  | nindent 16 }}
+            failureThreshold: 2
+            initialDelaySeconds: 5
+            periodSeconds: 20
+            successThreshold: 1
+            timeoutSeconds: 5
+          securityContext:
+            {{- toYaml .Values.r10k.containerSecurityContext | nindent 12 }}
+        {{- if (include "hiera.enable" .) }}
+        - name: r10k-hiera
+          image: "{{ tpl .Values.r10k.image . }}:{{ tpl .Values.r10k.tag . }}"
+          imagePullPolicy: {{ tpl .Values.r10k.imagePullPolicy . }}
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - /etc/puppetlabs/puppet/r10k_hiera_entrypoint.sh;
+          resources:
+            {{- toYaml .Values.r10k.hiera.resources | nindent 12 }}
+          env:
+            {{- range $key, $value := .Values.global.extraEnv }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+            {{- range $key, $value := .Values.r10k.hiera.extraEnv }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+          envFrom:
+          {{- if .Values.global.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.global.extraEnvSecret }}
+          {{- end }}
+          {{- if .Values.r10k.hiera.extraEnvSecret }}
+            - secretRef:
+                name: {{ .Values.r10k.hiera.extraEnvSecret }}
+          {{- end }}
+          volumeMounts:
+            {{- with .Values.r10k.hiera.viaSsh.credentials }}
+            {{- if or (.existingSecret) (and (.ssh.value) (.known_hosts.value)) }}
+            - name: r10k-hiera-ssh
+              mountPath: /home/puppet/.ssh
+            {{- end }}
+            {{- end }}
+            {{- with .Values.r10k.hiera.viaHttps.credentials }}
+            {{- if or .existingSecret .netrc.value }}
+            - name: r10k-hiera-netrc
+              mountPath: /home/puppet/.netrc
+              subPath: .netrc
+            {{- end }}
+            {{- end }}
+            - name: puppet-code-storage
+              mountPath: /etc/puppetlabs/code/
+            - name: r10k-hiera-volume
+              mountPath: /etc/puppetlabs/puppet/r10k_hiera_entrypoint.sh
+              subPath: r10k_hiera_entrypoint.sh
+            - name: r10k-hiera-volume
+              mountPath: /etc/puppetlabs/puppet/r10k_hiera_cronjob.sh
+              subPath: r10k_hiera_cronjob.sh
+            - name: r10k-hiera-volume
+              mountPath: /etc/puppetlabs/puppet/r10k_hiera.yaml
+              subPath: r10k_hiera.yaml
+            {{- if and (or (.Values.hiera.eyaml.existingMap) (.Values.hiera.eyaml.existingSecret)) (not .Values.hiera.eyaml.public_key) (not .Values.hiera.eyaml.private_key)  }}
+            - name: eyaml-volume
+              mountPath: /etc/puppetlabs/puppet/eyaml/keys
+            {{- end }}
+            {{- if and (or (.Values.hiera.eyaml.public_key) (.Values.hiera.eyaml.private_key)) (not .Values.hiera.eyaml.existingSecret)}}
+            - name: eyamlpub-volume
+              mountPath: /etc/puppetlabs/puppet/eyaml/keys/public_key.pkcs7.pem
+              subPath: public_key.pkcs7.pem
+            - name: eyamlpriv-volume
+              mountPath: /etc/puppetlabs/puppet/eyaml/keys/private_key.pkcs7.pem
+              subPath: private_key.pkcs7.pem
+            {{- end }}
+          readinessProbe:
+            exec:
+              command: ["/bin/sh", "-ec", "test -f {{ .Values.r10k.hiera.cronJob.successFile }}"]
+            failureThreshold: 2
+            initialDelaySeconds: 5
+            periodSeconds: 20
+            successThreshold: 1
+            timeoutSeconds: 5
+          securityContext:
+            {{- toYaml .Values.r10k.containerSecurityContext | nindent 12 }}
+        {{- end }}
+      volumes:
+        - name: puppet-code-storage
+          persistentVolumeClaim:
+            claimName: {{ template "puppetserver.persistence.code.claimName" . }}
+        - name: r10k-code-volume
+          configMap:
+            name: {{ template "puppetserver.fullname" . }}-r10k-code-config
+            defaultMode: 0550
+        {{- if or (.Values.r10k.code.viaSsh.credentials.existingSecret) (and (.Values.r10k.code.viaSsh.credentials.ssh.value) (.Values.r10k.code.viaSsh.credentials.known_hosts.value)) }}
+        - name: r10k-code-ssh
+          secret:
+            secretName: {{ template "r10k.code.viaSsh.secret" . }}
+            defaultMode: 288 # = mode 0440
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: known_hosts
+                path: known_hosts
+        {{- end }}
+        {{- if or .Values.r10k.code.viaHttps.customCa.existingSecret .Values.r10k.code.viaHttps.customCa.cert.value }}
+        - name: r10k-code-cert
+          secret:
+            secretName: {{ template "r10k.code.viaHttps.customCa.secret" . }}
+            defaultMode: 288 # = mode 0440
+            items:
+              - key: cert
+                path: ca.pem
+        {{- end }}
+        {{- if or .Values.r10k.code.viaHttps.credentials.existingSecret .Values.r10k.code.viaHttps.credentials.netrc.value }}
+        - name: r10k-code-netrc
+          secret:
+            secretName: {{ template "r10k.code.viaHttps.secret" . }}
+            defaultMode: 288 # = mode 0440
+            items:
+              - key: netrc
+                path: .netrc
+        {{- end }}
+        {{- if (include "hiera.enable" .) }}
+        - name: r10k-hiera-volume
+          configMap:
+            name: {{ template "puppetserver.fullname" . }}-r10k-hiera-config
+            defaultMode: 0550
+        {{- if or (.Values.r10k.hiera.viaSsh.credentials.existingSecret) (and (.Values.r10k.hiera.viaSsh.credentials.ssh.value) (.Values.r10k.hiera.viaSsh.credentials.known_hosts.value)) }}
+        - name: r10k-hiera-ssh
+          secret:
+            secretName: {{ template "r10k.hiera.viaSsh.secret" . }}
+            defaultMode: 288 # = mode 0440
+            items:
+              - key: id_rsa
+                path: id_rsa
+              - key: known_hosts
+                path: known_hosts
+        {{- end }}
+        {{- if or .Values.r10k.hiera.viaHttps.credentials.existingSecret .Values.r10k.hiera.viaHttps.credentials.netrc.value }}
+        - name: r10k-hiera-netrc
+          secret:
+            secretName: {{ template "r10k.hiera.viaHttps.secret" . }}
+            defaultMode: 288 # = mode 0440
+            items:
+              - key: netrc
+                path: .netrc
+        {{- end }}
+        {{- if .Values.hiera.config }}
+        - name: hiera-volume
+          configMap:
+            name: {{ template "puppetserver.fullname" . }}-hiera-config
+        {{- end }}
+        {{- if .Values.hiera.eyaml.existingSecret }}
+        - name: eyaml-volume
+          secret:
+            secretName: {{ .Values.hiera.eyaml.existingSecret }}
+        {{- else if or (.Values.hiera.eyaml.public_key) (.Values.hiera.eyaml.private_key) }}
+        - name: eyamlpub-volume
+          secret:
+            secretName: {{ template "puppetserver.hiera.publicSecret" . }}
+        - name: eyamlpriv-volume
+          secret:
+            secretName: {{ template "puppetserver.hiera.privateSecret" . }}
+        {{- else if .Values.hiera.eyaml.existingMap  }}
+        - name: eyaml-volume
+          configMap:
+            name: {{ .Values.hiera.eyaml.existingMap }}
+        {{- end }}
+        {{- end }}
+        {{- range $extraSecret := .Values.puppetserver.extraSecrets }}
+        - name: {{ $extraSecret.name }}
+          secret:
+            secretName: {{ $extraSecret.name }}
+        {{- end }}
+{{- end }}
