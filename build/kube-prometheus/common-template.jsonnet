@@ -731,7 +731,7 @@ local kp =
                 protocol: 'TCP',
               }],
             },
-          ]
+          ],
         },
       },
     } + (
