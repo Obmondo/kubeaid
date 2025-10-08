@@ -1,5 +1,7 @@
 # Harbor
 
+Harbor needs to have a storage-class defined in its values - that gives it a PV with ReadWriteMany support - to ensure High Availability, scaling, failover and drainage of k8s nodes (for regular maintenance) works.
+
 ## Extra configurations for complete Harbor setup
 
 We need to create few configurations and save them in secrets.

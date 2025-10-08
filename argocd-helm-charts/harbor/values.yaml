@@ -3,6 +3,7 @@ harbor:
   persistence:
     enabled: true
     persistentVolumeClaim:
+      accessMode: ReadWriteMany
       registry:
         size: 20Gi
   core:
