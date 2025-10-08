@@ -4,10 +4,10 @@ kind: Ingress
 metadata:
   name: prometheus-{{ include "prometheus-linuxaid.fullname" . }}
   namespace: {{ template "prometheus-linuxaid.namespace" . }}
+  {{- with .Values.prometheus.ingress.annotations }}
   annotations:
-    {{- with .Values.prometheus.ingress.annotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   ingressClassName: {{ .Values.prometheus.ingress.ingressClassName }}
   rules:

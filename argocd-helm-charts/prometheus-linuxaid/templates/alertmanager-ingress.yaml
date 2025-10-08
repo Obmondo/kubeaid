@@ -4,10 +4,10 @@ kind: Ingress
 metadata:
   name: alertmanager-{{ include "prometheus-linuxaid.fullname" . }}
   namespace: {{ template "prometheus-linuxaid.namespace" . }}
+  {{- with .Values.alertmanager.ingress.annotations }}
   annotations:
-    {{- with .Values.alertmanager.annotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   ingressClassName: {{ .Values.alertmanager.ingress.ingressClassName }}
   rules:

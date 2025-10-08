@@ -20,4 +20,6 @@ spec:
   version: {{ .Values.alertmanager.version }}
   configSecret: alertmanager-config
   secrets:
-  - puppet-agent-tls-auth
+  {{- range .Values.alertmanager.secrets }}
+  - {{ . }}
+  {{- end }}
