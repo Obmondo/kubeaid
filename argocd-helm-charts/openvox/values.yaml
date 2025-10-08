@@ -111,6 +111,9 @@ puppetserver:
     fqdns:
       alternateServerNames:
     extraEnv:
+      # NOTE: openvox has a default certname, as openvoxdb, but autosign can't read the SAN
+      # which has the puppetdb, and due to this puppetdb never starts
+      CERTNAME: puppetdb
       OPENVOXDB_POSTGRES_HOSTNAME: puppetserver-pgsql-rw
       OPENVOXDB_POSTGRES_DATABASE: puppetdb
       OPENVOXDB_JAVA_ARGS: "-Xms512m -Xmx2500m -XX:+HeapDumpOnOutOfMemoryError"
