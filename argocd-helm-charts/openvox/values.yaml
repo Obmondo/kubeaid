@@ -1,10 +1,10 @@
 puppetserver:
   global:
     extraEnv:
-      PUPPET_REPORTS: puppetdb,prometheus
-      PUPPETSERVER_ENVIRONMENT_TIMEOUT: 0
+      OPENVOX_REPORTS: puppetdb,prometheus
+      OPENVOX_ENVIRONMENT_TIMEOUT: 0
       AUTOSIGN: /etc/puppetlabs/puppet/autosign.conf
-      PUPPETSERVER_ENC_PATH: /etc/puppetlabs/code/environments/master/linuxaid_enc.rb
+      OPENVOXSERVER_ENC_PATH: /etc/puppetlabs/code/environments/master/linuxaid_enc.rb
     postgresql:
       auth:
         existingSecret: puppetserver-pgsql-app
@@ -17,12 +17,11 @@ puppetserver:
     puppeturl: "https://github.com/Obmondo/LinuxAid.git"
     masters:
       fqdns:
-        alternateServerNames:
+        alternateServerNames: ""
       extraEnv:
-        PUPPETSERVER_JAVA_ARGS: "-Xms512m -Xmx2500m -XX:+HeapDumpOnOutOfMemoryError"
-        PUPPETDB_JAVA_ARGS: "-Xms256m -Xmx256m -XX:+HeapDumpOnOutOfMemoryError"
-        PUPPETSERVER_MAX_REQUESTS_PER_INSTANCE: 10000
-        PUPPETSERVER_MAX_ACTIVE_INSTANCES: 4
+        OPENVOXSERVER_JAVA_ARGS: "-Xms512m -Xmx2500m -XX:+HeapDumpOnOutOfMemoryError"
+        OPENVOXSERVER_MAX_REQUESTS_PER_INSTANCE: 10000
+        OPENVOXSERVER_MAX_ACTIVE_INSTANCES: 4
       resources:
         requests:
           memory: 3096Mi
@@ -73,8 +72,8 @@ puppetserver:
           #!/bin/bash
           set -e
 
-          if test -n "${PUPPETSERVER_ENC_PATH}" ; then
-            puppet config set external_nodes "$PUPPETSERVER_ENC_PATH" --section server
+          if test -n "${OPENVOXSERVER_ENC_PATH}" ; then
+            puppet config set external_nodes "$OPENVOXSERVER_ENC_PATH" --section server
             puppet config set node_terminus "exec" --section server
           fi
     persistence:
@@ -112,8 +111,8 @@ puppetserver:
     fqdns:
       alternateServerNames:
     extraEnv:
-      PUPPETDB_POSTGRES_HOSTNAME: puppetserver-pgsql-rw
-      PUPPETDB_JAVA_ARGS: "-Xms512m -Xmx2500m -XX:+HeapDumpOnOutOfMemoryError"
+      OPENVOXDB_POSTGRES_HOSTNAME: puppetserver-pgsql-rw
+      OPENVOXDB_JAVA_ARGS: "-Xms512m -Xmx2500m -XX:+HeapDumpOnOutOfMemoryError"
 
   puppetboard:
     enabled: true
