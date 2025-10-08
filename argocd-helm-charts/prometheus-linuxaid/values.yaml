@@ -3,7 +3,7 @@ namespaceOverride: ""
 
 prometheus:
   namespaceOverride: ""
-  version: v2.54.1
+  version: v3.4.0
   ingress:
     enabled: false
     annotations: {}
@@ -30,7 +30,7 @@ prometheus:
   routePrefix: /
 
 grafana:
-  version: 11.1.4
+  version: 12.2.0
   ingress:
     enabled: false
     annotations: {}
@@ -75,7 +75,7 @@ prometheusRule:
 
 alertmanager:
   enabled: true
-  version: v0.27.0
+  version: v0.28.1
   ingress:
     enabled: false
     annotations: {}
