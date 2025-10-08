@@ -5,6 +5,8 @@ puppetserver:
       OPENVOX_ENVIRONMENT_TIMEOUT: 0
       AUTOSIGN: /etc/puppetlabs/puppet/autosign.conf
       OPENVOXSERVER_ENC_PATH: /etc/puppetlabs/code/environments/master/linuxaid_enc.rb
+      PUPPETDB_KEY_FILE: /opt/puppetlabs/server/data/puppetdb/certs/private_keys/puppetdb.pem
+      PUPPETDB_CERT_FILE: /opt/puppetlabs/server/data/puppetdb/certs/certs/puppetdb.pem
     postgresql:
       auth:
         existingSecret: puppetserver-pgsql-app
@@ -124,6 +126,9 @@ puppetserver:
     name: puppetboard
     extraEnv:
       PUPPETBOARD_WORKERS: 2
+      DEFAULT_ENVIRONMENT: master
+      PUPPETDB_KEY: /opt/puppetlabs/server/data/puppetdb/certs/private_keys/puppetdb.pem
+      PUPPETDB_CERT: /opt/puppetlabs/server/data/puppetdb/certs/certs/puppetdb.pem
 
   metrics:
     prometheus:
