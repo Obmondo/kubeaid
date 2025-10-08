@@ -1,3 +1,4 @@
+{{- if .Values.alertmanager.enabled -}}
 apiVersion: monitoring.coreos.com/v1
 kind: Alertmanager
 metadata:
@@ -23,3 +24,4 @@ spec:
   {{- range .Values.alertmanager.secrets }}
   - {{ . }}
   {{- end }}
+{{- end }}

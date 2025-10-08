@@ -74,6 +74,7 @@ prometheusRule:
   gitlab_runner: true
 
 alertmanager:
+  enabled: true
   version: v0.27.0
   ingress:
     enabled: false
@@ -112,6 +113,23 @@ alertmanager:
       group_wait: 10s
       group_interval: 10s
       repeat_interval: 1h
+      receiver: Default
+      routes:
+        - matchers:
+          - "alertname = Watchdog"
+          receiver: Watchdog
+        - matchers:
+          - "alertname = InfoInhibitor"
+          receiver: "null"
+        - matchers:
+          - "severity = critical"
+          receiver: "Critical"
+
+    receivers:
+      - name: Default
+      - name: Watchdog
+      - name: Critical
+      - name: "null"
 
 middleware:
   jwt:

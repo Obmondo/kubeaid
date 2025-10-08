@@ -1,3 +1,4 @@
+{{- if .Values.alertmanager.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -17,3 +18,4 @@ spec:
   selector:
     app.kubernetes.io/name: alertmanager
   sessionAffinity: ClientIP
+{{- end }}
