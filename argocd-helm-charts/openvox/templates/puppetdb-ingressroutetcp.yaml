@@ -6,12 +6,10 @@ spec:
   entryPoints:
     - websecure
   routes:
-  - kind: Rule
-    match: HostSNI(`{{ .Values.puppetserver.puppetdb.fqdns.alternateServerNames }}`)
+  - match: HostSNI(`{{ .Values.puppetserver.puppetdb.fqdns.alternateServerNames }}`)
     priority: 10
     services:
-    - kind: Service
-      name: {{ include "puppetserver.serviceName" (dict "root" . "service" "puppetdb") }}
+    - name: {{ include "puppetserver.serviceName" (dict "root" . "service" "puppetdb") }}
       port: pdb-https
 
   tls:
