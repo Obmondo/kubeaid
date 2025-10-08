@@ -116,6 +116,7 @@ puppetserver:
 
   puppetboard:
     enabled: true
+    image: 6.0.1
     name: puppetboard
     extraEnv:
       PUPPETBOARD_WORKERS: 2
