@@ -444,8 +444,36 @@ the keycloak app next it will use the same PVC/PV.
 
 Restoring itself to the point previously setup and configured to.
 
+## Migrating Keycloak from Zalando to CNPG
+
+Keycloak has its configuration in a pgsql database. Taking a backup of the `keycloak` database is sufficient to restore
+the state of an existing Keycloak.
+
+These steps will cause a downtime for your keycloak instance, please request appropriate service windows
+and have backups at hand to revert back to a stable version.
+
+Steps:
+
+1) Point the keycloak helm chart to a feature branch or the latest tag of Kubeaid repo from ArgoCD that enables the cnpg cluster resource.
+    Please remember that you might need to edit your values.yaml file to disable the zalando pgsql from getting created.
+2) Sync the `kind: Cluster` resource from the ArgoCD UI. This is the destination postgres db, and it will be completely clean.
+3) Don't sync the Keycloak StatefulSet for now.
+4) Take a shell into the existing zalando pgsql pod, and take a pgdump of `keycloak` database
+    ```
+    pg_dump -d keycloak -U keycloak -f keycloak_db.dump
+    ```
+5) Copy the dump from the zalando pgsql pod to your local machine.
+6) Copy the dump from the local machine to your destination cnpg pod.
+7) Take a shell into the cnpg pod and import the dump
+    ```
+    psql -d keycloak < keycloak_db.dump
+    ```
+8) Sync the Keycloak statefulset from ArgoCD UI and wait for a while for the migrations to be completed.
+9) Your keycloak instance will be migrated to the new pgsql db and should become healthy in a while.
+
 ## Good "Reads"
 
 * <https://medium.com/keycloak/github-as-identity-provider-in-keyclaok-dca95a9d80ca>
 * <https://www.youtube.com/watch?v=duawSV69LDI>
 * <https://medium.com/keycloak/keycloak-as-an-identity-broker-an-identity-provider-af1b150ea94>
+* <https://www.postgresql.org/docs/current/backup-dump.html#BACKUP-DUMP-RESTORE>
