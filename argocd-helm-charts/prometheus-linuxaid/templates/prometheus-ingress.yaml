@@ -1,16 +1,17 @@
-{{- if .Values.prometheus.ingress.enable -}}
+{{- if .Values.prometheus.ingress.enabled -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "prometheus-linuxaid.fullname" . }}
+  name: prometheus-{{ include "prometheus-linuxaid.fullname" . }}
   namespace: {{ template "prometheus-linuxaid.namespace" . }}
   annotations:
-    {{- with .Values.deployment.annotations }}
+    {{- with .Values.prometheus.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
+  ingressClassName: {{ .Values.prometheus.ingress.ingressClassName }}
   rules:
-    - host: {{ .Values.prometheus.server }}
+    - host: {{ .Values.prometheus.ingress.domain }}
       http:
         paths:
           - pathType: Prefix
@@ -22,6 +23,6 @@ spec:
                   name: web
   tls:
     - hosts:
-        - {{ .Values.prometheus.server }}
+        - {{ .Values.prometheus.ingress.domain }}
       secretName: prometheus-tls
-  {{- end -}}
+{{- end -}}
