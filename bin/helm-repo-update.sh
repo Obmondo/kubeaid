@@ -102,7 +102,7 @@ get_current_version() {
   local changelog_file="CHANGELOG.md"
   local version
   if [ -f "$changelog_file" ]; then
-    version=$(grep -oP '^## \K[0-9]+\.[0-9]+\.[0-9]+' "$changelog_file" | head -n1)
+    version=$(grep '^## [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*' "$changelog_file" | head -n1 | cut -d' ' -f2)
     if [ -z "$version" ]; then
       echo "1.0.0"
     else
@@ -326,22 +326,31 @@ EOF
 
   # Check if the Unreleased Changes section exists
   if ! grep -q "^## Unreleased Changes" "$changelog_file"; then
-    sed -i "/All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file./a\\\n## Unreleased Changes" CHANGELOG.md
-    sed -i "/Unreleased Changes/a\\### Patch Version Upgrades %%^^" CHANGELOG.md
-    sed -i "/Unreleased Changes/a\\### Minor Version Upgrades %%^^\n" CHANGELOG.md
-    sed -i "/Unreleased Changes/a\\### Major Version Upgrades %%^^\n" CHANGELOG.md
+    sed -i '' "/All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file./a\\
+## Unreleased Changes" CHANGELOG.md
+    sed -i '' "/Unreleased Changes/a\\
+### Patch Version Upgrades %%^^" CHANGELOG.md
+    sed -i '' "/Unreleased Changes/a\\
+### Minor Version Upgrades %%^^\\
+" CHANGELOG.md
+    sed -i '' "/Unreleased Changes/a\\
+### Major Version Upgrades %%^^\\
+" CHANGELOG.md
   fi
 
   # Add the new entry under the appropriate section under the Unreleased Changes
   case "$change_type" in
     major)
-      sed -i "/### Major Version Upgrades %%^^/a\\- $message" "$changelog_file"
+      sed -i '' "/### Major Version Upgrades %%^^/a\\
+- $message" "$changelog_file"
       ;;
     minor)
-      sed -i "/### Minor Version Upgrades %%^^/a\\- $message" "$changelog_file"
+      sed -i '' "/### Minor Version Upgrades %%^^/a\\
+- $message" "$changelog_file"
       ;;
     patch)
-      sed -i "/### Patch Version Upgrades %%^^/a\\- $message" "$changelog_file"
+      sed -i '' "/### Patch Version Upgrades %%^^/a\\
+- $message" "$changelog_file"
       ;;
     *)
       echo "Invalid change type: $change_type"
@@ -409,22 +418,22 @@ if "$UPDATE_ALL"; then
 
     new_ver="$(bump_version "$current_ver" "$bump_type")"
 
-    sed -i "s/Unreleased Changes/$new_ver/" CHANGELOG.md
+    sed -i '' "s/Unreleased Changes/$new_ver/" CHANGELOG.md
     echo "Updated the changelog entry from 'Unreleased Changes' to '$new_ver'"
 
-    # Remove Chnages heading markers
-    sed -i 's/ %%\^\^//g' CHANGELOG.md
+    # Remove Changes heading markers
+    sed -i '' 's/ %%\^\^//g' CHANGELOG.md
     # Remove empty sections
-    sed -i '/### Major Version Upgrades/{N;/### Major Version Upgrades\n\n###$/d;}' CHANGELOG.md
-    sed -i '/### Minor Version Upgrades/{N;/### Minor Version Upgrades\n\n###$/d;}' CHANGELOG.md
-    sed -i '/### Patch Version Upgrades/{N;/### Patch Version Upgrades\n\n###$/d;}' CHANGELOG.md
+    sed -i '' '/### Major Version Upgrades/{N;/### Major Version Upgrades\n\n###$/d;}' CHANGELOG.md
+    sed -i '' '/### Minor Version Upgrades/{N;/### Minor Version Upgrades\n\n###$/d;}' CHANGELOG.md
+    sed -i '' '/### Patch Version Upgrades/{N;/### Patch Version Upgrades\n\n###$/d;}' CHANGELOG.md
 
   else
     bump_type="patch"
     current_ver="$(get_current_version)"
 
     new_ver="$(bump_version "$current_ver" "$bump_type")"
-    sed -i "0,/### Improvements/{s/### Improvements/## $new_ver\n### Improvements/}" CHANGELOG.md
+    sed -i '' "0,/### Improvements/{s/### Improvements/## $new_ver\n### Improvements/}" CHANGELOG.md
   fi
 fi
 
