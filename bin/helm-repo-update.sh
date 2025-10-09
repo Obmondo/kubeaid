@@ -2,6 +2,22 @@
 
 set -eou pipefail
 
+# This script requires Linux and bash to run
+if [[ "$(uname -s)" != "Linux" ]]; then
+  echo "Error: This script must be run on Linux"
+  echo "Current OS: $(uname -s)"
+  echo "This script uses GNU sed which is not compatible with BSD sed (macOS)"
+  exit 1
+fi
+
+# Ensure we're running in bash
+if [[ -z "$BASH_VERSION" ]]; then
+  echo "Error: This script must be run in bash"
+  echo "Current shell: $SHELL"
+  echo "This script uses bash-specific features and syntax"
+  exit 1
+fi
+
 for program in helm tar yq git; do
   if ! command -v "$program" >/dev/null; then
     echo "Missing $program"
