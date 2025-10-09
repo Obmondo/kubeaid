@@ -2,7 +2,7 @@ puppetserver:
   global:
     extraEnv:
       OPENVOX_REPORTS: puppetdb,prometheus
-      OPENVOX_ENVIRONMENT_TIMEOUT: 0
+      OPENVOXSERVER_ENVIRONMENT_TIMEOUT: 0
       AUTOSIGN: /etc/puppetlabs/puppet/autosign.conf
       OPENVOXSERVER_ENC_PATH: /etc/puppetlabs/code/environments/master/linuxaid_enc.rb
     postgresql:
