@@ -172,6 +172,7 @@ local default_vars = {
     smartmon: false,
     mdraid: true,
     opencost: false,
+    'kubelet-cert-expiry': false,
   },
   mixin_configs: {
     // Example:
@@ -274,6 +275,11 @@ local mixins = remove_nulls([
   addMixin(
     'opencost',
     (import 'github.com/adinhodovic/opencost-mixin/mixin.libsonnet'),
+    vars,
+  ),
+  addMixin(
+    'kubelet-cert-expiry',
+    (import 'mixins/kubelet-cert-expiry/mixin.libsonnet'),
     vars,
   ),
 ]);
