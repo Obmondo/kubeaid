@@ -1,0 +1,12 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Values
+metadata:
+  name: values
+policies:
+  - name: replace-container-image-registries
+    rules:
+      - name: replace-docker.io
+        values:
+          imageData:
+            registry: docker.io
+            resolvedImage: docker.io/velero/velero:v1.16.1@sha256:3608bca1e44ea6c4d268eb6db02260269892c0b42b86bbf1e77a6fa16c3c9282

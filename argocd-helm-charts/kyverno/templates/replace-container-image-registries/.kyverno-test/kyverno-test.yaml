@@ -1,0 +1,50 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: replace-container-image-registries
+policies:
+  - policy.yaml
+resources:
+  - registry-specified.pod.yaml
+  - registry-unspecified.pod.yaml
+  - tag-unspecified.pod.yaml
+  - digest-specified.pod.yaml
+variables: values.yaml
+targetResources:
+  - registry-specified.pod.patched.yaml
+  - registry-unspecified.pod.patched.yaml
+  - tag-unspecified.pod.patched.yaml
+  - digest-specified.pod.patched.yaml
+results:
+
+  - policy: replace-container-image-registries
+    rule: replace-docker.io
+    kind: Pod
+    resources:
+      - registry-specified
+    patchedResources: registry-specified.pod.patched.yaml
+    result: pass
+
+  - policy: replace-container-image-registries
+    rule: replace-docker.io
+    kind: Pod
+    resources:
+      - registry-unspecified
+    patchedResources: registry-unspecified.pod.patched.yaml
+    result: pass
+
+  - policy: replace-container-image-registries
+    rule: replace-docker.io
+    kind: Pod
+    resources:
+      - tag-unspecified
+    patchedResources: tag-unspecified.pod.patched.yaml
+    result: pass
+
+  - policy: replace-container-image-registries
+    rule: replace-docker.io
+    kind: Pod
+    resources:
+      - digest-specified
+    patchedResources: digest-specified.pod.patched.yaml
+    result: pass
