@@ -16,13 +16,25 @@ args:
   # https://github.com/hetznercloud/hcloud-cloud-controller-manager/issues/492
   webhook-secure-port: "0"
 
+  # Experimental feature, which enables route reconciliation based on the following Kubernetes events:
+  # - Node added
+  # - Node deleted
+  # - Node PodCIDRs, or Addresses updated
+  # This replaces the fixed route reconcile interval of 30s
+  feature-gates: "CloudControllerManagerWatchBasedRoutesReconciliation=false"
+
 # Change deployment kind from "Deployment" to "DaemonSet"
 kind: Deployment
 
 # change replicaCount (only used when kind is "Deployment")
 replicaCount: 1
 
-# hccm environment variables
+# You can define extra environment variables for the HCCM.
+# Both Kubernetes formats are supported: `value` and `valueFrom`.
+# Note: `valueFrom` can reference ConfigMaps, Secrets, or other supported sources.
+# Examples:
+# - ConfigMaps: https://kubernetes.io/docs/concepts/configuration/configmap/#using-configmaps-as-environment-variables
+# - Secrets: https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables
 env:
   # The following variables are managed by the chart and should *not* be set here:
   # HCLOUD_METRICS_ENABLED - see monitoring.enabled
@@ -152,3 +164,15 @@ extraVolumes: []
 #   - name: token-volume
 #     secret:
 #       secretName: hcloud-token
+
+# Set the dns policy for the deployment.
+# See: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
+dnsPolicy: Default
+# Set the dns config for the deployment.
+# See: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-dns-config
+dnsConfig: {}
+# # Example
+# dnsConfig:
+#   nameservers:
+#     - 8.8.8.8
+#     - 1.1.1.1

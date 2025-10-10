@@ -1,3 +1,4 @@
+{{- if .Values.global.rbac.create }}
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -13,8 +14,7 @@ rules:
   - "trust.cert-manager.io"
   resources:
   - "bundles"
-  # We also need patch here so we can perform migrations from old CSA to SSA.
-  verbs: ["get", "list", "watch", "patch"]
+  verbs: ["get", "list", "watch"]
 
 # Permissions to update finalizers are required for trust-manager to work correctly
 # on OpenShift, even though we don't directly use finalizers at the time of writing
@@ -33,38 +33,10 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - "configmaps"
-  verbs: ["get", "list", "create", "patch", "watch", "delete"]
-- apiGroups:
-  - ""
-  resources:
   - "namespaces"
   verbs: ["get", "list", "watch"]
 
-- apiGroups:
-  - ""
-  resources:
-  - "events"
-  verbs: ["create", "patch"]
-
-{{- if .Values.secretTargets.enabled }}
-{{- if .Values.secretTargets.authorizedSecretsAll }}
-- apiGroups:
-  - ""
-  resources:
-  - "secrets"
-  verbs: ["get", "list", "create", "patch", "watch", "delete"]
-{{- else if .Values.secretTargets.authorizedSecrets }}
-- apiGroups:
-  - ""
-  resources:
-  - "secrets"
-  verbs: ["get", "list", "watch"]
-- apiGroups:
-  - ""
-  resources:
-  - "secrets"
-  verbs: ["create", "patch", "delete"]
-  resourceNames: {{ .Values.secretTargets.authorizedSecrets | toYaml | nindent 2 }}
+{{- if not .Values.app.targetNamespaces }}
+{{ include "trust-manager.rbac.namespacedResourcesRules" . }}
 {{- end -}}
 {{- end -}}

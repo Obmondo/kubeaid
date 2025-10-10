@@ -21,6 +21,9 @@ metadata:
   namespace: {{ include "haproxy.namespace" . }}
   labels:
     {{- include "haproxy.labels" . | nindent 4 }}
+{{- range $key, $value := .Values.service.labels }}
+    {{ $key }}: {{ $value | quote }}
+{{- end }}
   annotations:
 {{- range $key, $value := .Values.service.annotations }}
     {{ $key }}: {{ $value | quote }}
@@ -45,11 +48,18 @@ spec:
   loadBalancerSourceRanges:
   {{- toYaml . | nindent 2 }}
   {{- end }}
+  {{- if .Values.service.ipFamilies }}
+  ipFamilies:
+  {{- toYaml .Values.service.ipFamilies | nindent 2 }}
+  {{- end }}
+  {{- if .Values.service.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.service.ipFamilyPolicy | quote }}
+  {{- end }}
   {{- with .Values.service.externalIPs }}
   externalIPs:
   {{- toYaml . | nindent 2 }}
   {{- end }}
-  {{- if or .Values.containerPorts .Values.service.additionalPorts }}
+  {{- if or .Values.containerPorts .Values.service.additionalPorts .Values.service.rawAdditionalPorts }}
   {{- $nodePorts := .Values.service.nodePorts }}
   {{- $servicePortType := .Values.service.type }}
   ports:
@@ -74,5 +84,8 @@ spec:
     nodePort: {{ get $nodePorts $key }}
   {{- end }}
   {{- end }}
+  {{- end }}
+  {{- with .Values.service.rawAdditionalPorts }}
+  {{- toYaml . | nindent 2 }}
   {{- end }}
   {{- end }}

@@ -1,9 +1,9 @@
 annotations:
   artifacthub.io/changes: |
     - kind: changed
-      description: "Make securityContext of hot reload container configurable in fluent-bit chart"
+      description: "Update Fluent Bit OCI image to 4.1.0."
 apiVersion: v1
-appVersion: 4.0.7
+appVersion: 4.1.0
 description: Fast and lightweight log processor and forwarder or Linux, OSX and BSD
   family operating systems.
 home: https://fluentbit.io/
@@ -24,4 +24,4 @@ maintainers:
 name: fluent-bit
 sources:
 - https://github.com/fluent/fluent-bit/
-version: 0.53.0
+version: 0.54.0

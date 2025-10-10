@@ -183,6 +183,11 @@ spec:
       {{- if .Values.volumes.metricsApiServer.extraVolumes }}
       {{- toYaml .Values.volumes.metricsApiServer.extraVolumes | nindent 6 }}
       {{- end }}
+      {{- $dnsConfig := .Values.metricsServer.dnsConfig | default .Values.global.dnsConfig }}
+      {{- if $dnsConfig }}
+      dnsConfig:
+      {{- toYaml $dnsConfig | nindent 8 }}
+      {{- end }}
       dnsPolicy: {{ .Values.metricsServer.dnsPolicy }}
       hostNetwork: {{ .Values.metricsServer.useHostNetwork }}
       nodeSelector:

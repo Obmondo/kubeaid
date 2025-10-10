@@ -6,6 +6,15 @@
 
 <!-- AUTO-GENERATED -->
 
+### Global
+
+#### **global.rbac.create** ~ `bool`
+> Default value:
+> ```yaml
+> true
+> ```
+
+Create required ClusterRoles, Roles, ClusterRoleBindings and RoleBindings for trust-manager.
 ### CRDs
 
 #### **crds.enabled** ~ `bool`
@@ -165,12 +174,8 @@ repository: jetstack/cert-manager-package-debian
 
 The repository for the default package image. This image enables the 'useDefaultCAs' source on Bundles.
 #### **defaultPackageImage.tag** ~ `string`
-> Default value:
-> ```yaml
-> 20230311-deb12u1.0
-> ```
 
-Override the image tag of the default package image. If no value is set, the chart's appVersion is used.
+Override the image tag of the default package image. Is set at chart build time to the version specified in ./make/00_debian_bookworm_version.mk.
 
 #### **defaultPackageImage.digest** ~ `string`
 
@@ -417,6 +422,10 @@ The path on which to expose the trust-manager HTTP readiness probe using the def
 > ```
 
 The namespace used as the trust source. Note that the namespace _must_ exist before installing trust-manager.
+#### **app.targetNamespaces** ~ `array`
+
+List of target namespaces that trust-manager can write to. By default, trust-manager can write targets in any namespace.
+
 #### **app.securityContext.seccompProfileEnabled** ~ `bool`
 > Default value:
 > ```yaml

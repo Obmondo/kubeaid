@@ -2,9 +2,9 @@
 
 OpenCost and OpenCost UI
 
-![Version: 2.2.7](https://img.shields.io/badge/Version-2.2.7-informational?style=flat-square)
+![Version: 2.3.1](https://img.shields.io/badge/Version-2.3.1-informational?style=flat-square)
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
-![AppVersion: 1.117.3](https://img.shields.io/badge/AppVersion-1.117.3-informational?style=flat-square)
+![AppVersion: 1.117.6](https://img.shields.io/badge/AppVersion-1.117.6-informational?style=flat-square)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/opencost)](https://artifacthub.io/packages/search?repo=opencost)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/opencost-oci)](https://artifacthub.io/packages/search?repo=opencost-oci)
 
@@ -80,11 +80,12 @@ $ helm install opencost opencost/opencost
 | opencost.exporter.extraArgs | list | `[]` | List of extra arguments for the command, e.g.: log-format=json |
 | opencost.exporter.extraEnv | object | `{}` | Any extra environment variables you would like to pass on to the pod |
 | opencost.exporter.extraVolumeMounts | list | `[]` | A list of volume mounts to be added to the pod |
+| opencost.exporter.image | object | `{"fullImageName":null,"pullPolicy":"IfNotPresent","registry":"ghcr.io","repository":"opencost/opencost","tag":"1.117.6@sha256:6f1a0e6fe21559a77051e7b7f9e4ac6bc80277131492ae084e8365ada805af91"}` | This overrides the above defaultClusterId. Ensure the ConfigMap exists and contains the required CLUSTER_ID key. clusterIdConfigmap: cluster-id-configmap |
 | opencost.exporter.image.fullImageName | string | `nil` | Override the full image name for development purposes |
 | opencost.exporter.image.pullPolicy | string | `"IfNotPresent"` | Exporter container image pull policy |
 | opencost.exporter.image.registry | string | `"ghcr.io"` | Exporter container image registry |
 | opencost.exporter.image.repository | string | `"opencost/opencost"` | Exporter container image name |
-| opencost.exporter.image.tag | string | `"1.117.3@sha256:09fae89c4544ec2a891e2902e88ce3137d7032c6edbe0fd97441aaee7bdbea54"` | Exporter container image tag |
+| opencost.exporter.image.tag | string | `"1.117.6@sha256:6f1a0e6fe21559a77051e7b7f9e4ac6bc80277131492ae084e8365ada805af91"` | Exporter container image tag |
 | opencost.exporter.livenessProbe.enabled | bool | `true` | Whether probe is enabled |
 | opencost.exporter.livenessProbe.failureThreshold | int | `3` | Number of failures for probe to be considered failed |
 | opencost.exporter.livenessProbe.initialDelaySeconds | int | `10` | Number of seconds before probe is initiated |
@@ -218,6 +219,15 @@ $ helm install opencost opencost/opencost
 | opencost.ui.uiPort | int | `9090` |  |
 | opencost.ui.useDefaultFqdn | bool | `false` |  |
 | opencost.ui.useIPv6 | bool | `true` |  |
+| opencost.updateCaTrust.caCertsSecret | string | `"ca-certs-secret"` |  |
+| opencost.updateCaTrust.enabled | bool | `false` |  |
+| opencost.updateCaTrust.resources | object | `{}` |  |
+| opencost.updateCaTrust.securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| opencost.updateCaTrust.securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| opencost.updateCaTrust.securityContext.runAsGroup | int | `0` |  |
+| opencost.updateCaTrust.securityContext.runAsNonRoot | bool | `false` |  |
+| opencost.updateCaTrust.securityContext.runAsUser | int | `0` |  |
+| opencost.updateCaTrust.securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | pdb.enabled | bool | `false` |  |
 | pdb.maxUnavailable | string | `nil` | Maximum number of pods that can be unavailable after the eviction |
 | pdb.minAvailable | string | `nil` | Minimum number of pods that must be available after the eviction |

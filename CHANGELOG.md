@@ -2,12 +2,42 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
-## Unreleased Changes
-### Major Version Upgrades %%^^
+## 19.0.0
+### Major Version Upgrades
+- Updated velero from version 10.1.3 to 11.0.0
 
-### Minor Version Upgrades %%^^
+### Minor Version Upgrades
+- Updated strimzi-kafka-operator from version 0.47.0 to 0.48.0
+- Updated trust-manager from version v0.19.0 to v0.20.0
+- Updated sonarqube from version 2025.4.2 to 2025.5.0
+- Updated prometheus-smartctl-exporter from version 0.15.4 to 0.16.0
+- Updated opentelemetry-collector from version 0.134.0 to 0.136.1
+- Updated opentelemetry-operator from version 0.95.1 to 0.97.1
+- Updated opencost from version 2.2.7 to 2.3.1
+- Updated keda from version 2.17.2 to 2.18.0
+- Updated hcloud-csi from version 2.17.0 to 2.18.0
+- Updated haproxy from version 1.24.0 to 1.26.1
+- Updated gitea from version 12.3.0 to 12.4.0
+- Updated fluent-bit from version 0.53.0 to 0.54.0
+- Updated external-dns from version 1.18.0 to 1.19.0
+- Updated cluster-api-operator from version 0.23.0 to 0.24.0
+- Updated cert-manager from version v1.18.2 to v1.19.0
+- Updated hcloud-cloud-controller-manager from version 1.26.0 to 1.27.0
+- Updated argocd-image-updater from version 0.12.3 to 0.13.0
+- Updated argo-cd from version 8.5.10 to 8.6.0
 
-### Patch Version Upgrades %%^^
+### Patch Version Upgrades
+- Updated traefik from version 37.1.1 to 37.1.2
+- Updated teleport-kube-agent from version 18.2.2 to 18.2.7
+- Updated teleport-cluster from version 18.2.2 to 18.2.7
+- Updated sealed-secrets from version 2.17.1 to 2.17.7
+- Updated rook-ceph-cluster from version v1.18.2 to v1.18.4
+- Added rook-ceph from version v1.17.2 to v1.17.2
+- Updated keycloakx from version 7.1.3 to 7.1.4
+- Updated graylog from version 3.0.0 to 3.0.1
+- Updated erpnext from version 7.0.234 to 7.0.243
+- Updated aws-cloud-controller-manager from version 0.0.9 to 0.0.10
+- Updated aws-efs-csi-driver from version 3.2.3 to 3.2.4
 - Added puppetserver from version 10.0.0 to 10.0.0
 
 ## 18.0.0

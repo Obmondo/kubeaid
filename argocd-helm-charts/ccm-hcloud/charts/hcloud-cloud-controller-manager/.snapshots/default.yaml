@@ -64,6 +64,7 @@ spec:
           args:
             - "--allow-untagged-cloud"
             - "--cloud-provider=hcloud"
+            - "--feature-gates=CloudControllerManagerWatchBasedRoutesReconciliation=false"
             - "--route-reconciliation-period=30s"
             - "--webhook-secure-port=0"
             - "--leader-elect=false"
@@ -85,7 +86,7 @@ spec:
                   key: robot-user
                   name: hcloud
                   optional: true
-          image: docker.io/hetznercloud/hcloud-cloud-controller-manager:v1.26.0 # x-releaser-pleaser-version
+          image: docker.io/hetznercloud/hcloud-cloud-controller-manager:v1.27.0 # x-releaser-pleaser-version
           ports:
             - name: metrics
               containerPort: 8233

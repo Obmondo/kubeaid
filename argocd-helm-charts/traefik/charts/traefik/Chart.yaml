@@ -1,10 +1,12 @@
 annotations:
-  artifacthub.io/changes: "- \"feat(hub): allow to specify admission controller certificate
-    from existing secret\"\n- \"feat(deps): update traefik docker tag to v3.5.2\"\n-
-    \"feat(accesslog): ✨ add genericCLF format\"\n- \"chore(release): \U0001F680 publish
-    v37.1.1\"\n"
+  artifacthub.io/changes: |
+    - "fix(observability): tracer creation warning with default security context"
+    - "fix(CRDs): ✨ update for Traefik Proxy v3.5.2"
+    - "feat(deps): update traefik docker tag to v3.5.3 + add plugin hash option"
+    - "feat(CRDs): update for Traefik to v3.5.3"
+    - "chore(release): :rocket: publish traefik 37.1.2 and crds 1.11.1"
 apiVersion: v2
-appVersion: v3.5.2
+appVersion: v3.5.3
 description: A Traefik based Kubernetes ingress controller
 home: https://traefik.io/
 icon: https://raw.githubusercontent.com/traefik/traefik/master/docs/content/assets/img/traefik.logo.png
@@ -24,4 +26,4 @@ sources:
 - https://github.com/traefik/traefik-helm-chart
 - https://github.com/traefik/traefik
 type: application
-version: 37.1.1
+version: 37.1.2

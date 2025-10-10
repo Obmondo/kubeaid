@@ -1,37 +1,15 @@
 annotations:
   artifacthub.io/changes: |
+    - kind: fixed
+      description: use bitnamilegacy images (#962)
     - kind: changed
-      description: update lockfiles (#950)
+      description: update dependency helm-unittest/helm-unittest to v1.0.2 (#960)
     - kind: changed
-      description: update workflow dependencies (minor & patch) (#949)
+      description: update commitlint/commitlint docker tag to v20 (#957)
     - kind: changed
-      description: update dependency go-gitea/gitea to v1.24.6 (#948)
+      description: update lockfiles (#956)
     - kind: changed
-      description: update lockfiles (#947)
-    - kind: changed
-      description: update https://github.com/aws-actions/configure-aws-credentials action to v5 (#946)
-    - kind: changed
-      description: update lockfiles (#945)
-    - kind: changed
-      description: update actions/checkout action to v5 (#928)
-    - kind: changed
-      description: update workflow dependencies (minor & patch) (#943)
-    - kind: changed
-      description: update subcharts (minor & patch) (#942)
-    - kind: changed
-      description: update subcharts (minor & patch) (#941)
-    - kind: changed
-      description: update unittests/bash/test_helper/bats-support digest to 0954abb (#939)
-    - kind: changed
-      description: update alpine/helm docker tag to v3.18.5 (#940)
-    - kind: changed
-      description: update maintainers list - add ChristopherHX (#937)
-    - kind: changed
-      description: update maintainers list - DaanSelen (#936)
-    - kind: changed
-      description: update maintainers list - volker.raschek (#933)
-    - kind: changed
-      description: update maintainers list - rossigee (#932)
+      description: update alpine/helm docker tag to v3.19.0 (#954)
 apiVersion: v2
 appVersion: 1.24.6
 dependencies:
@@ -75,4 +53,4 @@ sources:
 - https://github.com/go-gitea/gitea
 - https://docker.gitea.com/gitea
 type: application
-version: 12.3.0
+version: 12.4.0
