@@ -1,0 +1,30 @@
+
+{{ if .Values.matternelle }}
+---
+apiVersion: "networking.k8s.io/v1"
+kind: Ingress
+metadata:
+  name: webchat-mattermost-team-edition
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: letsencrypt
+    kubernetes.io/ingress.class: traefik-cert-manager
+spec:
+  rules:
+
+  - host: {{.Values.matternelle.domain}}
+    http:
+      paths:
+      - path: /
+        backend:
+          service:
+            name: mattermost-team-edition
+            port:
+              number: 8989
+        pathType: Prefix
+  tls:
+    - hosts:
+      - {{.Values.matternelle.domain}}
+      secretName: {{.Values.matternelle.domain}}
+{{ end }}
