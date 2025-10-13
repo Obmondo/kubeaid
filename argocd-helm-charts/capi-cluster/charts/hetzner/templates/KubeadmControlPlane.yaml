@@ -41,7 +41,6 @@ spec:
           bind-address: 0.0.0.0
           cloud-provider: external
           cluster-signing-cert-file: /etc/kubernetes/pki/ca.crt
-          cluster-signing-duration: 6h0m0s
           cluster-signing-key-file: /etc/kubernetes/pki/ca.key
           kubeconfig: /etc/kubernetes/controller-manager.conf
           profiling: "false"
