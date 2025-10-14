@@ -80,6 +80,7 @@ puppetserver:
       code:
         size: 8Gi
   r10k:
+    asSidecar: false
     code:
       cronJob:
         schedule: "*/2 * * * *"
