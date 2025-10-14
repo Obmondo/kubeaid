@@ -7,6 +7,8 @@ name: Weekly Helm Repo Update
 jobs:
   helm-repo-update:
     runs-on: ubuntu-22.04-htzhel1-ax42-a
+    container:
+      image: ${{ secrets.HARBOR_REGISTRY }}/${{ vars.KUBEAID_CI_IMAGE }}:${{ vars.KUBEAID_CI_TAG }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
