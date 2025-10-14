@@ -5,8 +5,6 @@ name: kubeaid
     types:
       - opened
       - synchronize
-  schedule:
-    - cron: '23 0 * * *'
 
 jobs:
   kubeaid:
@@ -45,6 +43,3 @@ jobs:
     - name: jsonnetlint
       run: ./bin/lint-jsonnetfmt.sh
 
-    - name: helm-update
-      if: github.event.schedule == '23 0 * * *'
-      run: ./bin/helm-repo-update.sh --update-all --pull-request --gitea-actions --skip-charts argo-cd
