@@ -1,5 +1,40 @@
 # Helm chart
 
+## 2.51.0
+
+- Bump driver version to `v1.51.0`.
+
+### Feature
+
+- Add Helm parameters to customize PDB `maxUnavailable` and `minAvailable` ([#2703](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/2703), [@ConnorJC3](https://github.com/ConnorJC3))
+
+## 2.50.1
+
+- Bump driver version to `v1.50.1`.
+
+## 2.50.0
+
+### Feature
+
+- Bump driver version to `v1.50.0`.
+
+## 2.49.2
+
+- Bump driver version to `v1.49.1`
+
+## 2.49.1
+
+### Feature
+
+- Add `terminationMessagePolicy: FallbackToLogsOnError` to all containers to use log messages as termination message ([#2672](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/2672), [@ConnorJC3](https://github.com/ConnorJC3))
+
+## 2.49.0
+
+### Feature
+
+- Add `debugLogs` Helm parameter to turn on maximum verbosity logging ([#2624](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/2624), [@AndrewSirenko](https://github.com/AndrewSirenko))
+- Add `containerPort` declarations for containers in Helm chart to support metrics discovery by monitoring systems ([#2654](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/pull/2654), [@torredil](https://github.com/torredil))
+
 ## 2.48.0
 
 ### Feature

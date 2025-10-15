@@ -155,7 +155,7 @@ sidecars:
     image:
       pullPolicy: IfNotPresent
       repository: public.ecr.aws/ebs-csi-driver/volume-modifier-for-k8s
-      tag: "v0.7.0"
+      tag: "v0.8.0"
     leaderElection:
       enabled: true
       # Optional values to tune lease behavior.
@@ -259,6 +259,10 @@ controller:
     # pod restarts or evictions.
     enabled: true
     # unhealthyPodEvictionPolicy:
+    # Configure the maxUnavailable or minAvailable for the PDB
+    # If either parameter is non-null, no default is used for both
+    # maxUnavailable:
+    # minAvailable:
   priorityClassName: system-cluster-critical
   # AWS region to use. If not specified then the region will be looked up via the AWS EC2 metadata
   # service.
@@ -524,7 +528,9 @@ useOldCSIDriver: false
 nodeAllocatableUpdatePeriodSeconds: 10
 # Deploy EBS CSI Driver without controller and associated resources
 nodeComponentOnly: false
+# Set maximum verbosity for logs of each container and other recommended debugging parameters such as enabling AWS SDK debug logging
+debugLogs: false
 helmTester:
   enabled: true
   # Supply a custom image to the ebs-csi-driver-test pod in helm-tester.yaml
-  image: "us-central1-docker.pkg.dev/k8s-staging-test-infra/images/kubekins-e2e:v20250815-171060767f-master"
+  image: "us-central1-docker.pkg.dev/k8s-staging-test-infra/images/kubekins-e2e:v20250925-95b5a2c7a5-master"

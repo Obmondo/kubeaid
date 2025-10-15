@@ -65,7 +65,7 @@ image:
 
   # Kubernetes imagePullPolicy on Deployment.
   pullPolicy: IfNotPresent
-  tag: v0.20.0
+  tag: v0.20.1
 defaultPackage:
   # Whether to load the default trust package during pod initialization, and include it in main container args. This container enables the 'useDefaultCAs' source on Bundles.
   enabled: true

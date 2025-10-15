@@ -2,6 +2,19 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 19.1.0
+### Minor Version Upgrades
+- Updated velero from version 11.0.0 to 11.1.0
+- Updated rook-ceph from version v1.17.2 to v1.18.4
+- Updated cluster-autoscaler from version 9.50.1 to 9.51.0
+- Updated aws-ebs-csi-driver from version 2.50.1 to 2.51.0
+
+### Patch Version Upgrades
+- Updated trust-manager from version v0.20.0 to v0.20.1
+- Updated opencost from version 2.3.1 to 2.3.2
+- Updated erpnext from version 7.0.243 to 7.0.244
+- Updated argo-cd from version 8.6.0 to 8.6.1
+
 ### Improvements
 - [`aeb7c435`](../../commit/aeb7c435) fix: run r10k as a diff pod, if r10k dies, puppet client would fail to connect to puppetserver, since liveness is broken
 - [`cc9de2dc`](../../commit/cc9de2dc) adding container image with helm installed

@@ -92,7 +92,11 @@ spec:
             {{- with .Values.node.loggingFormat }}
             - --logging-format={{ . }}
             {{- end }}
+            {{- if .Values.debugLogs }}
+            - --v=7
+            {{- else }}
             - --v={{ .Values.node.logLevel }}
+            {{- end }}
             {{- if .Values.node.otelTracing }}
             - --enable-otel-tracing=true
             {{- end}}
@@ -148,6 +152,11 @@ spec:
             - name: healthz
               containerPort: 9808
               protocol: TCP
+            {{- if .Values.node.enableMetrics }}
+            - name: metrics
+              containerPort: 3302
+              protocol: TCP
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /healthz
@@ -175,13 +184,18 @@ spec:
             preStop:
               exec:
                 command: ["/bin/aws-ebs-csi-driver", "pre-stop-hook"]
+          terminationMessagePolicy: FallbackToLogsOnError
         - name: node-driver-registrar
           image: {{ printf "%s%s:%s" (default "" .Values.image.containerRegistry) .Values.sidecars.nodeDriverRegistrar.image.repository .Values.sidecars.nodeDriverRegistrar.image.tag }}
           imagePullPolicy: {{ default .Values.image.pullPolicy .Values.sidecars.nodeDriverRegistrar.image.pullPolicy }}
           args:
             - --csi-address=$(ADDRESS)
             - --kubelet-registration-path=$(DRIVER_REG_SOCK_PATH)
+            {{- if .Values.debugLogs }}
+            - --v=7
+            {{- else }}
             - --v={{ .Values.sidecars.nodeDriverRegistrar.logLevel }}
+            {{- end }}
             {{- range .Values.sidecars.nodeDriverRegistrar.additionalArgs }}
             - {{ . }}
             {{- end }}
@@ -219,6 +233,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          terminationMessagePolicy: FallbackToLogsOnError
         - name: liveness-probe
           image: {{ printf "%s%s:%s" (default "" .Values.image.containerRegistry) .Values.sidecars.livenessProbe.image.repository .Values.sidecars.livenessProbe.image.tag }}
           imagePullPolicy: {{ default .Values.image.pullPolicy .Values.sidecars.livenessProbe.image.pullPolicy }}
@@ -242,6 +257,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          terminationMessagePolicy: FallbackToLogsOnError
       {{- if .Values.imagePullSecrets }}
       imagePullSecrets:
       {{- range .Values.imagePullSecrets }}
