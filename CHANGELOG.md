@@ -2,6 +2,13 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`aeb7c435`](../../commit/aeb7c435) fix: run r10k as a diff pod, if r10k dies, puppet client would fail to connect to puppetserver, since liveness is broken
+- [`cc9de2dc`](../../commit/cc9de2dc) adding container image with helm installed
+- [`45b06a17`](../../commit/45b06a17) lint fix
+- [`f2ab8247`](../../commit/f2ab8247) kept only one monday workflow
+- [`f2e15c9d`](../../commit/f2e15c9d) Enable matternelle domain
+
 ## 19.0.0
 ### Major Version Upgrades
 - Updated velero from version 10.1.3 to 11.0.0
