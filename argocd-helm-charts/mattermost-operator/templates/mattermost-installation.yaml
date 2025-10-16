@@ -19,6 +19,9 @@ spec:
     {{- if .Values.mattermost.ingress.host }}
     host: {{ .Values.mattermost.ingress.host }}
     {{- end }}
+    {{- if .Values.mattermost.ingress.tlsSecret }}
+    tlsSecret: {{ .Values.mattermost.ingress.tlsSecret }}
+    {{- end }}
     {{- if .Values.mattermost.ingress.annotations }}
     annotations:
 {{ toYaml .Values.mattermost.ingress.annotations | indent 6 }}

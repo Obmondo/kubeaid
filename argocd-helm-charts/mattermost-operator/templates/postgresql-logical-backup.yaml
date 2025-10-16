@@ -23,7 +23,7 @@ spec:
                     fieldRef:
                       apiVersion: v1
                       fieldPath: metadata.namespace
-                - name: PGHOSTa
+                - name: PGHOST
                   value: {{ .Values.postgres.host | default "mattermost-pgsql-rw" }}
                 - name: PGPASSWORD
                   valueFrom:
