@@ -9,13 +9,23 @@ tests:
     input_series:
       - series: obmondo_monitoring{certname="atat.enableit", alert_id="monitor::system::disk::usage"}
         values: 1x30
+      - series: obmondo_monitoring{certname="bantha.enableit", alert_id="monitor::system::disk::usage"}
+        values: 1x30
       - series: record::monitor::system::disk::filesystem_space_percentage{mountpoint="/var", certname="atat.enableit", threshold="80", disk_group="0_to_100_GB", alert_id="monitor::system::disk::usage"}
+        values: 80x20
+      - series: record::monitor::system::disk::filesystem_space_percentage{mountpoint="/var", certname="bantha.enableit", threshold="80", disk_group="0_to_100_GB", alert_id="monitor::system::disk::usage"}
+        values: 80x20
+      - series: record::monitor::system::disk::filesystem_space_percentage{mountpoint="/opt", certname="bantha.enableit", threshold="80", disk_group="0_to_100_GB", alert_id="monitor::system::disk::usage"}
         values: 80x20
         # simulate metrics when atat.enableit with /tmp has value of 60 for first 10min and 90 after 10min
       - series: record::monitor::system::disk::filesystem_space_percentage{mountpoint="/tmp", certname="atat.enableit", threshold="85", disk_group="100_to_250_GB", alert_id="monitor::system::disk::usage"}
         values: 70x20
       - series: threshold::monitor::system::disk::usage{mountpoint="/var", certname="atat.enableit"}
         values: 70x20
+      - series: threshold::monitor::system::disk::usage{mountpoint="/var", certname="bantha.enableit"}
+        values: 70x20
+      - series: threshold::monitor::system::disk::ignore{mountpoint="/opt", certname="bantha.enableit"}
+        values: 1x30
 
     alert_rule_test:
       # Should not alert because percentage is not above threshold till 9th min
@@ -35,6 +45,15 @@ tests:
               alert_id: monitor::system::disk::usage
             exp_annotations:
               summary: 'Available disk space on /var on **atat.enableit** is low'
+              description: 'Available space is very low on filesystem `/var` and current usage is around 80% which is above the threshold of 70%'
+          - exp_labels:
+              severity: "warning"
+              mountpoint: /var
+              certname: bantha.enableit
+              disk_group: 0_to_100_GB
+              alert_id: monitor::system::disk::usage
+            exp_annotations:
+              summary: 'Available disk space on /var on **bantha.enableit** is low'
               description: 'Available space is very low on filesystem `/var` and current usage is around 80% which is above the threshold of 70%'
 
   - interval: 1m
