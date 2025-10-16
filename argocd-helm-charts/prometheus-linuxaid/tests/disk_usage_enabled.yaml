@@ -24,7 +24,7 @@ tests:
         values: 70x20
       - series: threshold::monitor::system::disk::usage{mountpoint="/var", certname="bantha.enableit"}
         values: 70x20
-      - series: threshold::monitor::system::disk::ignore{mountpoint="/opt", certname="bantha.enableit"}
+      - series: threshold::monitor::system::disk::usage::ignore_mountpoints{mountpoint="/opt", certname="bantha.enableit"}
         values: 1x30
 
     alert_rule_test:
