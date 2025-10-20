@@ -69,6 +69,15 @@ controller:
 #      driver: linstor.csi.linbit.com
 #      deletionPolicy: Delete
 
+  volumeGroupSnapshotClasses: []
+#    - name: linstor-csi-delete
+#      annotations:
+#        groupsnapshot.storage.kubernetes.io/is-default-class: "true"
+#      labels:
+#        velero.io/csi-volumegroupsnapshot-class: "true"
+#      driver: linstor.csi.linbit.com
+#      deletionPolicy: Delete
+
   priorityClassName: ""
     # Specifies wether a Priority Class should be attached to deployment pods
 

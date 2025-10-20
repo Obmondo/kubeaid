@@ -2,6 +2,27 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+## 20.0.0
+### Major Version Upgrades
+- Updated argo-cd from version 8.6.1 to 9.0.3
+
+### Minor Version Upgrades
+- Updated opentelemetry-collector from version 0.136.1 to 0.137.0
+- Updated opensearch-dashboards from version 3.2.2 to 3.3.0
+- Updated opensearch from version 3.2.1 to 3.3.0
+- Updated gitlab-runner from version 0.81.0 to 0.82.0
+- Updated cluster-autoscaler from version 9.51.0 to 9.52.0
+
+### Patch Version Upgrades
+- Updated velero from version 11.1.0 to 11.1.1
+- Updated tigera-operator from version v3.30.3 to v3.30.4
+- Updated trust-manager from version v0.20.1 to v0.20.2
+- Updated snapshot-controller from version 4.1.0 to 4.1.1
+- Added rook-ceph from version v1.18.4 to v1.18.4
+- Updated mattermost-team-edition from version 6.6.84 to 6.6.85
+- Updated erpnext from version 7.0.244 to 7.0.246
+- Updated cert-manager from version v1.19.0 to v1.19.1
+
 ### Improvements
 - [`6a9c904a`](../../commit/6a9c904a) fixing odoo image
 - [`b73121f6`](../../commit/b73121f6) changing ignore to ignore_mountpoint

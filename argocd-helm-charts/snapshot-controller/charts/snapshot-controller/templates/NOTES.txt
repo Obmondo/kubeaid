@@ -2,7 +2,7 @@
 Volume Snapshot Controller installed.
 {{- end }}
 
-{{- if and (not (.Capabilities.APIVersions.Has "snapshot.storage.k8s.io/v1")) (not (.Capabilities.APIVersions.Has "snapshot.storage.k8s.io/v1beta") ) }}
+{{- if and (not (.Capabilities.APIVersions.Has "snapshot.storage.k8s.io/v1")) (not (.Capabilities.APIVersions.Has "snapshot.storage.k8s.io/v1beta1") ) }}
 Please install the snapshot CRDs, otherwise the controller will not run.
 
 kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/{{ .Chart.AppVersion }}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
@@ -15,6 +15,9 @@ you have the latest CRDs applied, you can run the following commands:
 kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/{{ .Chart.AppVersion }}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
 kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/{{ .Chart.AppVersion }}/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml
 kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/{{ .Chart.AppVersion }}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml
+kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/{{ .Chart.AppVersion }}/client/config/crd/groupsnapshot.storage.k8s.io_volumegroupsnapshotclasses.yaml
+kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/{{ .Chart.AppVersion }}/client/config/crd/groupsnapshot.storage.k8s.io_volumegroupsnapshotcontents.yaml
+kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/{{ .Chart.AppVersion }}/client/config/crd/groupsnapshot.storage.k8s.io_volumegroupsnapshots.yaml
 {{- end }}
 
 If you already have volume snapshots deployed using a CRDs before v1, you should

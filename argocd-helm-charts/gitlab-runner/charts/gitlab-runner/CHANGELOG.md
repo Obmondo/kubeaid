@@ -1,3 +1,9 @@
+## v0.82.0 (2025-10-17)
+
+### New features
+
+- Update GitLab Runner version to v18.5.0
+
 ## v0.81.0 (2025-09-18)
 
 ### New features

@@ -33,9 +33,12 @@ helm upgrade snapshot-controller piraeus-charts/snapshot-controller
 To enjoy all the latest features of the snapshot controller, you may want to upgrade your CRDs as well:
 
 ```
-kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v8.2.0/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
-kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v8.2.0/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml
-kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v8.2.0/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml
+kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v8.3.0/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
+kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v8.3.0/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml
+kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v8.3.0/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml
+kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v8.3.0/client/config/crd/groupsnapshot.storage.k8s.io_volumegroupsnapshotclasses.yaml
+kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v8.3.0/client/config/crd/groupsnapshot.storage.k8s.io_volumegroupsnapshotcontents.yaml
+kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v8.3.0/client/config/crd/groupsnapshot.storage.k8s.io_volumegroupsnapshots.yaml
 ```
 
 ## Upgrade from older CRDs
@@ -64,9 +67,12 @@ The upgrade procedure can be summarized by the following steps:
 4. Upgrade the CRDs
 
    ```
-   kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v5.0.0/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
-   kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v5.0.0/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml
-   kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v5.0.0/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml
+   kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v8.3.0/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
+   kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v8.3.0/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml
+   kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v8.3.0/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml
+   kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v8.3.0/client/config/crd/groupsnapshot.storage.k8s.io_volumegroupsnapshotclasses.yaml
+   kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v8.3.0/client/config/crd/groupsnapshot.storage.k8s.io_volumegroupsnapshotcontents.yaml
+   kubectl replace -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v8.3.0/client/config/crd/groupsnapshot.storage.k8s.io_volumegroupsnapshots.yaml
    ```
 
 5. Upgrade to the latest version:
