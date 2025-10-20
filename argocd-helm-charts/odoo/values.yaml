@@ -30,6 +30,10 @@ odoo:
   ingress:
     enabled: false
 
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/odoo
+
 # tolerations:
 #   - key: "node-role.kubernetes.io/control-plane"
 #     operator: "Exists"
