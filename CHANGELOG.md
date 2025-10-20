@@ -2,6 +2,12 @@
 
 All releases and the changes included in them (pulled from git commits added since last release) will be detailed in this file.
 
+### Improvements
+- [`6a9c904a`](../../commit/6a9c904a) fixing odoo image
+- [`b73121f6`](../../commit/b73121f6) changing ignore to ignore_mountpoint
+- [`2a44addd`](../../commit/2a44addd) Updated the disk alert to ignore mountpoints for which we don't want the alert for
+- [`936a1f6d`](../../commit/936a1f6d) Add tls support fixed error in logical backup
+
 ## 19.1.0
 ### Minor Version Upgrades
 - Updated velero from version 11.0.0 to 11.1.0
