@@ -170,6 +170,62 @@ bootstrap:
           maxParallel: 8
 ```
 
+#### Using Restore Script
+
+The [restore script](./bin/restore.sh) can run in two modes:
+
+- **interactive mode** (default): it asks you for the required input values such as storage provider, credentials, backup file path, and database details.
+- **non-interactive mode**: you must set all required environment variables before running the script. If any required variable is missing, the script will fail at validation.
+
+Set `RESTORE_MODE=non-interactive` to run in non-interactive mode.
+
+##### Example command for non-interactive mode:
+
+```bash
+RESTORE_MODE=non-interactive \
+STORAGE_PROVIDER=s3 \
+AWS_ACCESS_KEY_ID=your_access_key \
+AWS_SECRET_ACCESS_KEY=your_secret_key \
+LOGICAL_BACKUP_S3_BUCKET=your_bucket_name \
+BACKUP_FILE_PATH=path/to/backup.sql.gz \
+LOGICAL_BACKUP_S3_ENDPOINT=https://s3.your-endpoint.com \
+DB_NAME=your_db \
+DB_USER=your_db_user \
+DB_PASS=your_db_password \
+DB_HOST=your_db_host \
+DB_PORT=5432 \
+./restore_script.sh
+```
+
+---
+
+##### Required Environment Variables
+
+| Variable Name                  | Description                            | Required For           |
+|-------------------------------|------------------------------------|-----------------------|
+| `RESTORE_MODE`                 | Mode: `interactive` or `non-interactive` | Both                  |
+| `STORAGE_PROVIDER`             | Storage backend: `s3` or `azure`   | Both                  |
+| **S3 specifics:**              |                                    |                       |
+| `AWS_ACCESS_KEY_ID`            | AWS S3 access key ID                | S3                    |
+| `AWS_SECRET_ACCESS_KEY`        | AWS S3 secret access key            | S3                    |
+| `LOGICAL_BACKUP_S3_BUCKET`     | S3 bucket name                     | S3                    |
+| `BACKUP_FILE_PATH`             | Backup file path in bucket          | S3/Azure               |
+| `LOGICAL_BACKUP_S3_ENDPOINT`   | S3 service endpoint URL             | S3                    |
+| **Azure specifics:**           |                                    |                       |
+| `AZURE_STORAGE_ACCOUNT_NAME`   | Azure storage account name          | Azure                 |
+| `AZURE_STORAGE_ACCOUNT_KEY`    | Azure storage access key            | Azure                 |
+| `AZURE_STORAGE_CONTAINER_NAME` | Azure blob storage container name  | Azure                 |
+| `AZURE_STORAGE_BACKUP_PATH`    | Backup blob path                   | Azure                 |
+| **Database connection:**       |                                    |                       |
+| `DB_NAME`                     | Database name                      | Both                  |
+| `DB_USER`                     | Database username                  | Both                  |
+| `DB_PASS`                     | Database password                  | Both                  |
+| `DB_HOST`                     | Database host address              | Both                  |
+| `DB_PORT`                     | Database port                      | Both                  |
+
+---
+
+
 ## Docs and External References
 
 - https://www.enterprisedb.com/blog/current-state-major-postgresql-upgrades-cloudnativepg-kubernetes
