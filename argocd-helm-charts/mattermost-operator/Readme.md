@@ -43,6 +43,34 @@ This guide outlines the steps to restore a Mattermost instance or migrate it to 
    ```sh
    psql -h 172.20.36.240 -p 5432 -d mattermost -U mattermost < <backupfile>.sql
    ```
+   Note:
+   If you are using Mattermost version 10.11.4, the database connection string (DB_CONNECTION_STRING) 
+      is stored inside the database configuration.
+   After restoring, you must update it with the new PostgreSQL credentials.
+   
+   ```sh
+   # Connect to PostgreSQL
+   psql -h 172.20.36.240 -p 5432 -d mattermost -U mattermost
+
+   # Fetch the current connection string
+   mattermost=> SELECT ("value"::jsonb)->'SqlSettings'->>'DataSource' AS "DataSource"
+   FROM "configurations"
+   WHERE "active" = true;
+   
+   # Example output:
+   # postgres://mattermost:zPWjYqmdpRSb01psy4p1uqTHGmT0WVehvm3nHyuDg7eb9K2WhvJNKBOFjo3USKJK@mattermost-pgsql-rw:5432/mattermost
+   
+   # Update the connection string using the new credentials
+   UPDATE configurations
+   SET "value" = jsonb_set(
+     "value"::jsonb,
+     '{SqlSettings,DataSource}',
+     to_jsonb('postgres://mattermost:P3abi2rHJqGzYaCXyaw9BdDoCAulMnqGUIDdjgA6fQSA21Yc4HNVcjSn6tQ8J3vf@mattermost-pgsql-rw:5432/mattermost'::text),
+     false
+   )
+   WHERE "active" = true;
+
+   ```
 
 7. **Copy PVC files to the new S3 bucket to restore file storage.**
 
