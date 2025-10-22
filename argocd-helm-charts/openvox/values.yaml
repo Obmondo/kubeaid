@@ -132,6 +132,17 @@ puppetserver:
       jmx:
         enabled: false
 
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/component
+            operator: In
+            values:
+            - puppetserver
+        topologyKey: kubernetes.io/hostname
+
 postgresql:
   instance: 1
   size: 2Gi
