@@ -7,6 +7,9 @@ spec:
   imagePullPolicy: {{ .Values.mattermost.imagePullPolicy | default "IfNotPresent" }}
   version: {{ .Values.mattermost.version | default "10.9.4" }}
   size: {{ .Values.mattermost.size | default "5000users" }}
+  scheduling:
+    resources:
+{{ toYaml .Values.mattermost.resources | indent 6 }}
   useServiceLoadBalancer: {{ .Values.mattermost.useServiceLoadBalancer | default false }}
   serviceAnnotations:
     {{- if .Values.mattermost.serviceAnnotations }}

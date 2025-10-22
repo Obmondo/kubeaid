@@ -1,0 +1,139 @@
+mattermost-operator:
+  mattermostOperator:
+    enabled: true
+    replicas: 1
+    rbac:
+      create: true
+    serviceAccount:
+      create: true
+    env:
+      maxReconcilingInstallations: 20
+      maxReconcilingConcurrency: 10
+      requeuOnLimitDelay: 20s
+    image:
+      repository: mattermost/mattermost-operator
+      tag: v1.23.0
+      pullPolicy: IfNotPresent
+    args:
+      - --enable-leader-election
+      - --metrics-addr=0.0.0.0:8383
+mattermost:
+  name: mattermost
+  image: mattermost/mattermost-team-edition
+  imagePullPolicy: IfNotPresent
+  version: 10.11.4
+  size: 150users
+  resources:
+    limits:
+      cpu: '5'
+      memory: 8Gi
+    requests:
+      cpu: 500m
+      memory: 500Mi
+  useServiceLoadBalancer: false
+  serviceAnnotations: {}
+  ingress:
+    enabled: true
+    host: chat.com
+    tlsSecret: chat.com
+    annotations:
+      kubernetes.io/tls-acme: "true"
+      cert-manager.io/cluster-issuer: letsencrypt
+      kubernetes.io/ingress.class: traefik-cert-manager
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  mattermostEnv:
+    - name: MM_FILESETTINGS_AMAZONS3SSE
+      value: "true"
+    - name: MM_FILESETTINGS_AMAZONS3SSL
+      value: "true"
+    - name: MM_GITLABSETTINGS_ENABLE
+      value: "true"
+    - name: MM_GITLABSETTINGS_ID
+      value: "mattermost"
+    - name: MM_GITLABSETTINGS_SECRET
+      value: "random123"
+    - name: MM_GITLABSETTINGS_USERAPIENDPOINT
+      value: "https://keycloak.com/auth/realms/company/protocol/openid-connect/userinfo"
+    - name: MM_GITLABSETTINGS_AUTHENDPOINT
+      value: "https://keycloak.com/auth/realms/company/protocol/openid-connect/auth"
+    - name: MM_GITLABSETTINGS_TOKENENDPOINT
+      value: "https://keycloak.com/auth/realms/company/protocol/openid-connect/token"
+    - name: MM_TEAMSETTINGS_RESTRICTCREATIONTODOMAINS
+      value: "enableit.dk"
+    - name: MM_EMAILSETTINGS_SENDPUSHNOTIFICATIONS
+      value: "true"
+    - name: MM_EMAILSETTINGS_PUSHNOTIFICATIONSERVER
+      value: "https://push-test.mattermost.com"
+    - name: MM_SERVICESETTINGS_SITEURL
+      value: "https://chat.com"
+    - name: MM_SERVICESETTINGS_COLLAPSEDTHREADS
+      value: "default_on"
+    - name: MM_SERVICESETTINGS_THREADAUTOFOLLOW
+      value: "true"
+    - name: MM_SERVICESETTINGS_ENABLELINKPREVIEWS
+      value: "true"
+    - name: MM_SERVICESETTINGS_RESTRICTLINKPREVIEWS
+      value: "github.com"
+    - name: MM_SERVICESETTINGS_ENABLEAPIUSERDELETION
+      value: "true"
+    - name: MM_PLUGINSETTINGS_ENABLE
+      value: "true"
+    - name: MM_PLUGINSETTINGS_PLUGINS
+      value: |
+        {
+          "mattermost-autolink": {
+            "EnableAdminCommand": true,
+            "EnableOnUpdate": true,
+            "Links": [
+              {
+                "DisableNonWordPrefix": false,
+                "DisableNonWordSuffix": false,
+                "Disabled": false,
+                "Name": "ticket",
+                "Pattern": "(?P<ticket_id>TCK[0-9]{7})",
+                "Scope": null,
+                "Template": "[ticket${ticket_id}](https://meet.jit.si)"
+              }
+    - name: MM_PLUGINSETTINGS_PLUGINSTATES
+      value: |
+        {
+          "com.github.matterpoll.matterpoll": {
+            "Enable": true
+          },
+          "com.github.moussetc.mattermost.plugin.giphy": {
+            "Enable": true
+          },
+          "com.mattermost.apps": {
+            "Enable": true
+          },
+          "mattermost-autolink": {
+            "Enable": true
+          },
+          "memes": {
+            "Enable": true
+          },
+          "com.gitlab.itk.fr.matternelle": {
+            "Enable": true
+          }
+        }
+  licenseSecret: ""                      # Set your secret name if using enterprise license
+  database:
+    external:
+      secret: db-credentials             # Name of Kubernetes secret for DB connection string
+  fileStore:
+    external:
+      url: bucket.com
+      bucket: mattermost
+      secret: file-store-credentials          # Name of Kubernetes secret for file store credentials
+
+postgres:
+  size: 20Gi
+  instance: 2
+  pass: mattermost-pgsql-app
+  storageClass: zfs-localpv
+  logicalbackup:
+    enabled: true
+    s3bucket: "logical-backup-kam"
+    provider: "s3"
+    s3endpoint: "https://bucket.com"
+    retension: "30"
